@@ -16,6 +16,25 @@ predates the gate is frozen in [`PRE_GATE.json`](PRE_GATE.json) and is
 `VALIDATION.json` validates it. `python3 scripts/validation_gate.py check`
 lists each row's standing.
 
+Diagnostic component record awaiting admission:
+[H6 forced-divisor fiber pilot, 2026-11-24](20261124-h6-fiber-pilot-01/README.md).
+Nine fibers per arm: recorded F4+linear products 23,196,730 full-reference,
+16,414,425 plain and 12,480,689 traced; no new admissible graph rows.
+AMD EPYC 9V74, local reserved CPU0, count study only. This unsigned partial
+counter record is excluded from the admitted table. [pcc:unverified]
+
+[H6 exact unit-elimination diagnostic, 2026-11-24](20261124-h6-unit-fiber-01/README.md):
+same nine fibers, six-variable plain/traced counts23,582,716/19,237,258,
+respectively1.4367x/1.5414x their frozen seven-variable solver counts.
+All outputs match, no new rows. AMD EPYC9V74, reservedCPU0, partial count
+only; unsigned and excluded from the admitted table. [pcc:unverified]
+
+[Anchored graph support-policy diagnostic, 2026-11-24](20261124-anchored-support-policy-01/README.md):
+258 matching calls, expanded policy1 extra deferred edge versus0 old,
+zero full relations; traced172,312,093 F4+linear products over129 fibers.
+AMD EPYC9V74/localCPU0, partial count only, unsigned/unadmitted.
+[pcc:unverified]
+
 **Gate audit, 2026-10-24 (base `5cb5538` plus rule-v6/v7 validation):**
 all rows remaining in this admitted table have a passing gate standing in the
 complete local source tree. Twenty-one post-freeze rows lacking independent
@@ -44,7 +63,74 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [26 November Rust Prime31 norm-one-torus m=5 component study](20261126-norm-one-torus-m5/)
+retains a report PDF plus SVG and 150 dpi PNG copies. Its publicly precommitted
+producer run reports 48.356 ms versus 10.355 ms median setup-plus-query time
+(4.669821x) and 57,052 versus 2 setup inversions. The clock was non-isolated,
+there is no matched rho reference, and PCC claim `PCC-20261126-7a50b7` lacks
+independent signatures; it remains outside the admitted table.
+[pcc:unverified]
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+
+The [25 November Curve25519 projective-split qualification](20261125-curve25519-projective-split/)
+retains the frozen `m=3` counted-F4 comparison: candidate/baseline ratios
+`1.001116` at `t=3` and `1.000464` at `t=4`; both `t=5` arms timed out and
+both `t=6` arms were memory-killed before one target. It is not qualified for
+`m=4`, supplies no exponent or subexponential claim, and remains outside the
+admitted table because no independent replay, validator report, matched-rho
+reference, or `VALIDATION.json` exists. [Study](../research/curve25519_projective_split_20261118/),
+[PDF](20261125-curve25519-projective-split/report.pdf). [pcc:unverified]
+
+The [25 November Curve25519 symmetric-remainder quotient qualification](20261125-curve25519-symmetric-remainder/)
+retains 72 counted native-Rust rows. At `d=19`, explicit quotient auxiliaries
+lower maximum productive degree from 5 to 4 but raise F4 work: paired Q/D
+geometric mean `1.2864624565`, descriptive 95% interval
+`[1.2864612925, 1.2864635223]`, against the frozen upper target `<0.50`; peak
+RSS reaches 2.4275 times direct. Scaling and `m=4` were not opened. It remains
+outside the admitted table because no independent replay, validator report,
+matched-rho reference, or `VALIDATION.json` exists.
+[Study](../research/curve25519_symmetric_remainder_20261125/),
+[PDF](20261125-curve25519-symmetric-remainder/report.pdf). [pcc:unverified]
+
+The [25 November Curve25519 selective-quotient qualification](20261125-curve25519-selective-quotient/)
+retains 72 counted native-Rust rows over six frozen cut policies at `d=19`.
+The primary last-two-nonlinear-square policy lowers maximum productive degree
+from 5 to 4 on 8/8 random targets, but its paired B/D geometric mean is
+`1.3292420766`, descriptive 95% interval
+`[1.3292409735, 1.3292431924]`, against the frozen upper target `<0.75`; peak
+RSS reaches 2.2876 times D. Scaling and `m=4` were not opened. It remains
+outside the admitted table because no independent replay, validator report,
+matched-rho reference, or `VALIDATION.json` exists.
+[Study](../research/curve25519_selective_quotient_20261125/),
+[PDF](20261125-curve25519-selective-quotient/report.pdf). [pcc:unverified]
+
+The [25 November Curve25519 quotient-layout qualification](20261125-curve25519-quotient-layout/)
+retains 60 counted native-Rust rows over five frozen layouts at `d=19`, plus
+12 fresh-seed reproduction rows from the predecessor binary. The primary
+quotient-first F layout retains maximum productive degree 4 but its paired F/D
+geometric mean is `1.2934390725`, descriptive 95% interval
+`[1.2934369447, 1.2934413625]`, against the frozen upper target `<0.75`; peak
+RSS reaches 2.3766 times D. This ordinary-grevlex variable permutation is not
+a true block-order solver. Scaling and `m=4` were not opened. It remains
+outside the admitted table because no independent replay, validator report,
+matched-rho reference, or `VALIDATION.json` exists.
+[Study](../research/curve25519_quotient_layout_20261125/),
+[PDF](20261125-curve25519-quotient-layout/report.pdf). [pcc:unverified]
+
+The [25 November Curve25519 pair-trace 2+1 split screen](20261125-curve25519-pair-trace/)
+retains 24 counted native-Rust rows at the first frozen `d=7` gate, plus 16
+baseline-reproduction rows. The primary P arm combines an exact unordered-pair
+trace quotient with two quadratized S3 links. It lowers maximum productive
+degree from 5 to 4, but its paired P/D geometric mean is `2371.7222843`, with
+descriptive 95% interval `[2371.7202857, 2371.7238337]`, against the frozen
+upper target below `1.00`; peak RSS reaches 14.4512 times D. The raw split R
+is already 1,143.94 times D. The gated `d=9`, `d=19`, scaling, and `m=4`
+stages were not opened. It remains outside the admitted table because no
+independent replay, validator report, matched-rho reference, or
+`VALIDATION.json` exists.
+[Study](../research/curve25519_pair_trace_20261125/),
+[PDF](20261125-curve25519-pair-trace/report.pdf). [pcc:unverified]
 
 The [17 November native Rust identity component study](20261117-native-identity/) has checked pipeline full-paid paired medians1.306792/1.286039/1.254269 and work medians3.242510/3.067128/2.907275 at n3/4/6,25mainblocks each,AMD EPYC9V74 localL0. Ordinary95 controls reject n4/n6; prospective simultaneous screens pass. The unsigned synthetic polynomial-kernel result remains outside the admitted table; no15x claim. [Study](../research/relation_degree_trace_20261115/native-identity-20261117/RESULT.md),[PDF](20261117-native-identity/results-report.pdf). [pcc:unverified]
 
@@ -86,6 +172,7 @@ figures and exact proposed row are preserved there.
 |:--|:--|:--|:--|:--|:--|
 | 2026-11-19 | [`20261119-genus-ladder-scaling`](20261119-genus-ladder-scaling/) ([README](20261119-genus-ladder-scaling/README.md); [validation](20261119-genus-ladder-scaling/VALIDATION.json)) | Hyperelliptic IC (`genus_ladder`) on prime-order Jacobians, 3 curves × 6 targets × 2 seeds per cell, frozen protocol (lead C): genus 4 at a third prime p = 54293 (#J ≈ 2^63; D1 replaced 60013, which the 63-bit #J guard rejects), arms x (cc 2.0) and x\* (cc 1.4), both double large prime; genus 5 at p = 2357 and 4099 (#J ≈ 2^56, 2^60, matched to genus-4 p = 16411 and 32771), arm x5 (double large prime, cc 2.0) and arm x5\* (cc 2.8, which is **full-factor-base IC with no large primes**, ERRATA E1); reference the ideal negation-rho bound sqrt(πr/4); group operations plus w GAE per counted native F_p / mod-r operation (§5a) | IC / ideal negation rho at w = 1 [pcc:unverified]: genus 4 p = 54293 x\* **0.524 [0.523, 0.526]**, x 0.645; genus 5 double-large-prime arm x5 **0.437 [0.427, 0.445]** (p = 2357) and **0.224 [0.222, 0.227]** (p = 4099); full-factor-base x5\* 0.419 and 0.201; below the bound at w = 0, 0.1 and 1 in every cell. Genus 5 against genus 4 at matched N (double-large-prime arms): x5 / x\* = 0.499 [0.487, 0.508] at N ≈ 2^56 and 0.351 [0.347, 0.354] at N ≈ 2^60. x\* three-point exponent 1.568, but the fit is curved (E2); genus-5 slopes are two-point fits (E3); hash and table bookkeeping uncounted (≤ 0.3%, E4). Confirms known asymptotics on this implementation; hyperelliptic, not an elliptic-curve result | 4-core shared VM, local, single-threaded, counts deterministic | [`research/genus_ladder_scaling_20261119`](../research/genus_ladder_scaling_20261119/) (lane PR #5031) |
 | 2026-11-24 | [`20261124-quartic-diem-la`](20261124-quartic-diem-la/) ([README](20261124-quartic-diem-la/README.md); [validation](20261124-quartic-diem-la/VALIDATION.json)) | Diem 2LP IC on prime-order plane quartics (genus 3, non-hyperelliptic), p = 4099–131101, 5 curves × 2 seeds per prime, 80 paired runs, frozen protocol: arm `2lp-sfb-sge` (trim + SGE + coordinate Wiedemann on a square subsystem, counted fallback) against baseline `2lp-sfb` (scalar Wiedemann on AᵀDA) on identical instances; reference the ideal negation-rho bound sqrt(πr/4); group operations plus w GAE per counted native operation (§5a) | Component speed-up, frozen rule IMPROVEMENT [pcc:unverified]: pooled paired GAE ratio sge/sfb **0.371 [0.340, 0.406]** at w = 1, 0.372 at w = 0.1, 1.0028 [1.0010, 1.0048] at w = 0 (inside the preregistered 1.01 tolerance; order reverses at w = 0, so not a §5a ranking, ERRATA E2). IC / ideal negation rho at p = 131101, w = 1: 7.75 → **2.78 [2.02, 3.80]**; UNRESOLVED at every prime. Validated with errata E1–E6 | 4-core shared VM, local, ≤ 2 threads, counts deterministic | [`research/quartic_diem_la_20261123`](../research/quartic_diem_la_20261123/) (lane PR #5081) |
+| 2026-11-26 | [`20261126-quartic-diem-nofb`](20261126-quartic-diem-nofb/) ([README](20261126-quartic-diem-nofb/README.md); [validation](20261126-quartic-diem-nofb/VALIDATION.json)) | Diem 2LP IC on prime-order plane quartics (genus 3, non-hyperelliptic), p = 4099–131101, 5 curves × 4 solver seeds per prime, 160 paired runs, frozen protocol with seed manifest: arm `2lp-sfb-sge-nofb` (skips the full-core Wiedemann fallback after a failed square solve) against `2lp-sfb-sge` on identical instances and draws; held-out seeds 3–4 primary; reference the ideal negation-rho bound sqrt(πr/4); group operations plus w GAE per counted native operation (§5a) | Component speed-up, frozen rule IMPROVEMENT with the order holding across the band [pcc:unverified]: held-out pooled paired GAE ratio nofb/sge **0.832 [0.758, 0.907]** at w = 1, 0.997 [0.9959, 0.9984] at w = 0; nofb no costlier on every counter (all 80 pairs); 0 rescues of 16 fallbacks. IC / ideal negation rho at p = 131101, w = 1: 2.63 → **1.98 [1.84, 2.16]**; UNRESOLVED at every prime. Validated with errata E1–E5 | 4-core shared VM, local, ≤ 2 threads, counts deterministic | [`research/quartic_diem_nofb_20261126`](../research/quartic_diem_nofb_20261126/) (lane PR #5216) |
 | 2026-11-18 | [`20261118-genus4-prime-order`](20261118-genus4-prime-order/) ([PDF](20261118-genus4-prime-order/REPORT.pdf); [validation](20261118-genus4-prime-order/VALIDATION.json)) | Genus-4 hyperelliptic IC (`genus_ladder`, double large prime + prefilter + coordinate Wiedemann + unit-T walk + Ferrari + SGE) on prime-order Jacobians, 5 curves × 6 targets × 2 seeds at p = 16411 and p = 32771 (#J ≈ 2^56, 2^60), frozen protocol; factor-base constant tuned on held-out cofactor-2 curves (x\*, cc 1.4) against the lab setting (x, cc 2.0); reference the ideal negation-rho bound sqrt(πr/4); group operations plus w GAE per emitted native operation (§5a) | x\* / ideal negation rho **0.876 [0.872, 0.880]** (p = 16411) and **0.640 [0.638, 0.641]** (p = 32771) at w = 1, below at w = 0, 0.1 and 1 at both primes (order holds to 1.14 / 1.56 GAE per native op); x (cc 2.0) 0.999 and 0.769; slope of the ratio in ln p −0.45 (x\*); x\*/x 0.877 / 0.832. Confirms known asymptotics (double large prime genus 4 below rho) on this implementation; hyperelliptic, not an elliptic-curve result | 4 vCPU shared VM, local, counts deterministic | [`research/genus4_prime_order_20261118`](../research/genus4_prime_order_20261118/) (PR #4693) |
 | 2026-11-18 | [`20261118-genus4-followup`](20261118-genus4-followup/) ([PDF](20261118-genus4-followup/REPORT.pdf); [validation](20261118-genus4-followup/VALIDATION.json)) | Genus-4 hyperelliptic IC (`genus_ladder`, p = 16411, 54 targets on 3 curves × 2 seeds, frozen protocol): arm x (double large prime + prefilter + coordinate Wiedemann + unit-T walk + Ferrari quartic test + SGE) and arm w (without Ferrari and SGE) against window-free plain rho in the same binary, and the ideal negation-rho bound sqrt(πr/4); group operations plus w GAE per native F_p operation (§5a); factor-base size retuned on p = 8209 (frozen rule) | arm x / plain rho at w = 1 (Q3) **0.874 [0.767, 0.9996]**, fragile (upper end below 1 for 18 of 50 bootstrap seeds); against the ideal negation bound 0.126× at w = 0.1, **1.240× [1.185, 1.301] at w = 1**, so the §5a order does not hold across the band; per curve 0.998× plain-rho expectation on the two h = 2 curves, 0.707× on the prime-order one; cc* = 2.0 (no factor-base change) | 4 vCPU shared VM, local, counts deterministic | [`research/genus4_followup_20261118`](../research/genus4_followup_20261118/) (PR #4693) |
 | 2026-10-29 | [`20261029-jv-cover-hilbert-stop`](20261029-jv-cover-hilbert-stop/) ([PDF](20261029-jv-cover-hilbert-stop/REPORT.pdf); [validation](20261029-jv-cover-hilbert-stop/VALIDATION.json)) | Hilbert early stop in the Joux–Vitse cover index calculus (`jv_cover --exp dlp`, six-quadric cover over `F_p`, `--stop hilbert:16` with an incremental staircase) against unmodified full F4 and an A/A copy; p = 53, 101, 251, 503 (25 cells, 8/8/6/3 seeds), same relations and relation digest, every logarithm verified; weak class, lower-bound framing (counted `F_p` multiplications only) | paired S_A/S_B 1.848 [1.825, 1.878] (p=53), 1.875 [1.870, 1.879] (101), 1.868 [1.866, 1.870] (251), 1.849 [1.848, 1.850] (503), all 25 cells pass; emitted native-ops ratio 0.988/0.985/0.984/0.983; the as-found `hilbert:1` + scan form is a relabelling (S 2.53–2.64× lower, native ops 8.3–8.5× higher); log–log slope of S/rho −2.27; counted unit only, IC is a lower bound (F4 driver's pair selection, assembly and lookups unpriced); validation is a same-host replay plus a negation-map rho reference measured after the run | Intel Xeon 2.10 GHz, 4 vCPU shared VM, load 3–6, one thread (`RAYON_NUM_THREADS=1`); deterministic counts | [`research/ic_cover_weakclass_20261023`](../research/ic_cover_weakclass_20261023/) ([report](../research/ic_cover_weakclass_20261023/REPORT.md)) |

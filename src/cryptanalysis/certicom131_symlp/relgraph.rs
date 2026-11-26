@@ -100,9 +100,11 @@ fn signed(s: i8, r: &BigUint) -> BigUint {
     }
 }
 
-/// `x^{-1} mod r` for prime `r` (Fermat).
+/// `x^{-1} mod r` for prime `r` (shared extended Euclid).
 fn inv_mod(x: &BigUint, r: &BigUint) -> BigUint {
-    x.modpow(&(r - BigUint::from(2u8)), r)
+    // Was Fermat x^(r-2); for prime r > 2 that is the shared inverse, and 0
+    // for x ≡ 0, kept here.
+    crate::gcd::int::modinv_big(x, r).unwrap_or_else(BigUint::zero)
 }
 
 impl LpGraph {

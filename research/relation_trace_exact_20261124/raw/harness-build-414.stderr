@@ -1,0 +1,46 @@
+   Compiling version_check v0.9.5
+   Compiling generic-array v0.14.7
+   Compiling typenum v1.20.1
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling cfg-if v1.0.5
+   Compiling sha2 v0.10.9
+   Compiling certified-relations v0.1.0 (/workspace/relation-ideas-live/crates/certified-relations)
+   Compiling relation-trace-exact-qualification v0.1.0 (/workspace/relation-ideas-live/research/relation_trace_exact_20261124/harness)
+warning: taking a mutable reference to a `const` item
+   --> main.rs:453:9
+    |
+453 |         &mut usize::MAX,
+    |         ^^^^^^^^^^^^^^^
+    |
+    = note: each usage of a `const` item creates a new temporary
+    = note: the mutable reference will refer to this temporary, not the original `const` item
+note: `const` item defined here
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/uint_macros.rs:51:8
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1457:4
+   ::: /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1481:5
+    |
+    = note: in this macro invocation
+    = note: `#[warn(const_item_mutation)]` on by default
+    = note: this warning originates in the macro `uint_impl` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: taking a mutable reference to a `const` item
+   --> main.rs:497:30
+    |
+497 |         write_new(&temp, &v, &mut usize::MAX)?;
+    |                              ^^^^^^^^^^^^^^^
+    |
+    = note: each usage of a `const` item creates a new temporary
+    = note: the mutable reference will refer to this temporary, not the original `const` item
+note: `const` item defined here
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/uint_macros.rs:51:8
+   --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1457:4
+   ::: /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1481:5
+    |
+    = note: in this macro invocation
+    = note: this warning originates in the macro `uint_impl` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+warning: `relation-trace-exact-qualification` (bin "relation-trace-exact") generated 2 warnings
+    Finished `release` profile [unoptimized] target(s) in 5.72s

@@ -334,12 +334,7 @@ enum CoordinateMap {
 }
 
 fn inverse_mod(value: &BigUint, p: &BigUint) -> Option<BigUint> {
-    let modulus = BigInt::from(p.clone());
-    let egcd = BigInt::from(value % p).extended_gcd(&modulus);
-    if egcd.gcd != BigInt::one() {
-        return None;
-    }
-    egcd.x.mod_floor(&modulus).to_biguint()
+    crate::gcd::int::modinv_big(value, p)
 }
 
 fn subtract_mod(a: &BigUint, b: &BigUint, p: &BigUint) -> BigUint {

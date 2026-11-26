@@ -3002,16 +3002,8 @@ fn lp_mul(a: u128, b: u128, r: u128) -> u128 {
 }
 
 fn lp_inv(a: u128, r: u128) -> u128 {
-    // r is prime: a^(r−2).
-    let (mut base, mut e, mut acc) = (a % r, r - 2, 1u128);
-    while e > 0 {
-        if e & 1 == 1 {
-            acc = lp_mul(acc, base, r);
-        }
-        base = lp_mul(base, base, r);
-        e >>= 1;
-    }
-    acc
+    // r is prime: the value a^(r−2) gave, 0 for a ≡ 0.
+    crate::gcd::int::inv_mod_u128(a, r).unwrap_or(0)
 }
 
 fn lp_sub(a: u128, b: u128, r: u128) -> u128 {

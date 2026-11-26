@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-26T06:20:53Z",
+ "id": "PCC-20261126-7a50b7",
+ "kind": "speedup",
+ "producer": {
+  "commit": "df88d266047559526a0337db8df01b839d847651",
+  "model": "Codex Rust producer; independent CI signatures pending",
+  "session": "codex/norm-one-torus-rust-batch-mitm-public-precommit"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/norm_one_torus_rust_mitm_20261126/public-precommit/validator-report.json",
+   "sha256": "0f07b7ebada79310059744c1d252179d57f8e54df7c6d407d9fa5323831f5797"
+  },
+  {
+   "kind": "replay",
+   "path": "research/norm_one_torus_rust_mitm_20261126/public-precommit/replay-certificate.json",
+   "sha256": "00e1648cfefb21553f34b98cd88757bbb395b33181744394461b6245e6cfe8a4"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/norm_one_torus_rust_mitm_20261126/public-precommit; manifest committed and pushed at df88d266047559526a0337db8df01b839d847651 before execution; curve icv1-fp31-tm3989-ae9db972; Dickson t=6, lo=0, c_top=0; arity m=5; Rust producer evidence",
+ "statement": "On the publicly precommitted Prime31 norm-one-torus m=5 generic 2+3 decomposition component, the batch-inversion plus signed-quotient candidate recorded local non-isolated producer medians of 10.355 ms versus 48.356 ms for individual affine normalization (4.669821x), while setup inversions fell from 57052 to 2; all 40 precommitted-seed hit/miss decisions and all 8 returned witnesses passed the retained affine verifier. This is unisolated component evidence, not a full ECDLP or rho comparison, and has no independent signed standing or zero-knowledge execution proof."
+}

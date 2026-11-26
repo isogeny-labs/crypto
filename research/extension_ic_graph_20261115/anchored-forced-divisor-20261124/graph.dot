@@ -1,0 +1,12 @@
+digraph G {
+  graph [rankdir=TB,bgcolor="white",pad="0.2",nodesep="0.35",ranksep="0.4",fontname="DejaVu Sans"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#52738c",fillcolor="#edf4f7"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#52738c"];
+  actual [label="Checked retained source 0\nB + Q = 0\n7 small points, one quadratic",color="#007f73",fillcolor="#e4f4ef"];
+  proposed [label="Proposed new principal function\nS + Q + R1 + R2 = 0\n3 small points, three quadratics",style="rounded,dashed",fillcolor="white"];
+  cancel [label="Integer subtraction of original witnesses\n(S + Q + R1 + R2) - (B + Q)",style="rounded,dashed",fillcolor="white"];
+  result [label="Proposed composite graph edge\n(S - B) + R1 + R2 = 0\nTwo endpoints; both function witnesses retained",style="rounded,dashed",fillcolor="white"];
+  actual -> cancel [label="available and replayed"];
+  proposed -> cancel [label="requires materializer + finder",style=dashed];
+  cancel -> result [label="requires exact incidence/group/projection checks",style=dashed];
+}

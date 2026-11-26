@@ -1,0 +1,26 @@
+{
+  "schema": "relation-idea-identity-precall/v1",
+  "recorded_utc": "2026-11-23T23:52:27.086122+00:00",
+  "source": "IDENTITY_SOURCE_402.json",
+  "executable": "/workspace/relation-idea-identity-402",
+  "executable_sha256": "63fa11f2bf642cee14174b338c22e696528e727e02afa4aaa9666793cc90730f",
+  "source_sha256": "a21d59b892f5e365ed855f80425a303504db312b0e2cd2272a263a515104397a",
+  "command": [
+    "taskset",
+    "-c",
+    "0",
+    "timeout",
+    "--kill-after=2s",
+    "30s",
+    "prlimit",
+    "--as=2147483648",
+    "--fsize=16777216",
+    "--",
+    "/workspace/relation-idea-identity-402",
+    "research/relation_information_leads_20261123/certificates"
+  ],
+  "cpu": 0,
+  "threads": 1,
+  "new_output_directory": "research/relation_information_leads_20261123/certificates",
+  "performance_experiment": false
+}

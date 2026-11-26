@@ -1,0 +1,68 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Packed sibling-subset sampler and pool-128 discriminator",
+  "description": "Frozen 2026-11-25 before sampler implementation. One public k=28 workload, matched p64/p128/p256 sibling arms, full setup charged. See SAMPLER_PROTOCOL.md.",
+  "arms": [
+    {
+      "name": "tw2cj-lazy-sib8-p64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=64",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "tw2cj-lazy-sib8-p128",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=128",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "tw2cj-lazy-sib8-p256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+          "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+          "targets": "stride-generator"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 20261128,
+    "timeout_seconds": 600,
+    "warmup": 0
+  },
+  "workloads": {
+    "curves": [
+      {
+        "a": 178687587,
+        "b": 13872414,
+        "gx": 89478497,
+        "gy": 121408824,
+        "group_order": 268464472,
+        "p": 268434581,
+        "r": 33558059,
+        "kind": "prime_explicit"
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 20261228,
+    "targets_per_curve": 1
+  }
+}

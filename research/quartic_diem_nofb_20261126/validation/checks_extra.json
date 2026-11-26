@@ -1,0 +1,1312 @@
+{
+ "schema": "validator-checks-extra/v1",
+ "sha": "cc7e5c5488a82277131c1dfe9e90d2aa64c54a50",
+ "manifests": {
+  "frozen.sha256": {
+   "entries": {
+    "PROTOCOL.md": true,
+    "seeds.json": true,
+    "analyze.py": true,
+    "run_main.sh": true,
+    "run_131101.sh": true
+   },
+   "ok": true
+  },
+  "data.sha256": {
+   "entries": {
+    "raw/run.jsonl": true,
+    "raw/run131101.jsonl": true
+   },
+   "ok": true
+  },
+  "binary": {
+   "binary.sha256": "55ebb4404a070356bbd35612737aa31f00a9f0edfa8e72ab26b4a02287631602",
+   "dev/binary.sha256": "55ebb4404a070356bbd35612737aa31f00a9f0edfa8e72ab26b4a02287631602",
+   "bound_copy": "55ebb4404a070356bbd35612737aa31f00a9f0edfa8e72ab26b4a02287631602",
+   "ok": true
+  },
+  "source.sha256": {
+   "entries": {
+    "src/cryptanalysis/quartic_ladder.rs": {
+     "31a1e2f53ef": true,
+     "8297532db36": true,
+     "cc7e5c5488a": true
+    },
+    "src/cryptanalysis/genus_ladder.rs": {
+     "31a1e2f53ef": true,
+     "8297532db36": true,
+     "cc7e5c5488a": true
+    },
+    "src/bin/genus_ladder.rs": {
+     "31a1e2f53ef": true,
+     "8297532db36": true,
+     "cc7e5c5488a": true
+    }
+   },
+   "ok": true
+  }
+ },
+ "freeze_order": {
+  "commit_dates": {
+   "31a1e2f53ef": "2026-11-26T02:48:48+00:00",
+   "8bc5537a844": "2026-11-26T03:06:09+00:00",
+   "8297532db36": "2026-11-26T03:33:35+00:00",
+   "a8fa56ebb34": "2026-11-26T03:34:39+00:00",
+   "cc7e5c5488a": "2026-11-26T04:05:54+00:00"
+  },
+  "raw_stamps": {
+   "main_start.txt": "2026-11-26T03:33:48Z",
+   "main_end.txt": "2026-11-26T03:39:51Z",
+   "r131101_start.txt": "2026-11-26T03:39:51Z",
+   "r131101_end.txt": "2026-11-26T04:03:50Z"
+  },
+  "done_wall_s": {
+   "run.jsonl": 362.453884105,
+   "run131101.jsonl": 1439.61827143
+  },
+  "stamp_intervals_s": {
+   "main": 363.0,
+   "131101": 1439.0
+  },
+  "done_vs_stamps_abs_diff_s": {
+   "main": 0.546115895000014,
+   "131101": 0.6182714300000498
+  },
+  "freeze_before_main_start_s": 13.0,
+  "dev_smoke_after_draft_s": 1041.0,
+  "driver_committed_after_main_start_s": 51.0,
+  "commits_touching_raw": [
+   "cc7e5c5488a"
+  ],
+  "frozen_files_unchanged_freeze_to_sha": true,
+  "protocol_section4_predictions_unchanged_draft_to_freeze": true,
+  "protocol_decision_rule_unchanged_draft_to_freeze": true,
+  "analyze_py_hash": {
+   "31a1e2f53ef": "168d361e4f910b2f6547cb0845360ce1f09b689d47534416e40c8d64d4e7bf11",
+   "8297532db36": "c7d273fc3312872a0aa3fd38f5c14690b9520f626f04846d140543c8331ea509",
+   "cc7e5c5488a": "c7d273fc3312872a0aa3fd38f5c14690b9520f626f04846d140543c8331ea509"
+  },
+  "worktree_birth_times": {
+   "run.jsonl": {
+    "birth_utc": "2026-11-26T03:33:48+00:00",
+    "mtime_utc": "2026-11-26T03:39:51+00:00"
+   },
+   "run131101.jsonl": {
+    "birth_utc": "2026-11-26T03:39:51+00:00",
+    "mtime_utc": "2026-11-26T04:03:50+00:00"
+   }
+  },
+  "ok": true
+ },
+ "binary_binding": {
+  "available": true,
+  "target_release_genus_ladder_sha256": "55ebb4404a070356bbd35612737aa31f00a9f0edfa8e72ab26b4a02287631602",
+  "deps_matching_binary": [
+   "genus_ladder-d7e92aa79b358cff"
+  ],
+  "dep_info": {
+   "lib": {
+    "fingerprint": "crypto-4fb2b19b7d9c9847",
+    "invoked_utc": "2026-11-26T02:38:31.754745+00:00",
+    "n_source_files": 1169,
+    "outside_repo": [],
+    "modified_at_or_after_invocation": [],
+    "newest_source": "src/cryptanalysis/quartic_ladder.rs",
+    "newest_source_mtime_utc": "2026-11-26T02:17:25.701412+00:00",
+    "all_tracked": true,
+    "worktree_differs_from_build_commit": []
+   },
+   "bin": {
+    "fingerprint": "crypto-d7e92aa79b358cff",
+    "invoked_utc": "2026-11-26T02:55:02.722804+00:00",
+    "n_source_files": 1,
+    "outside_repo": [],
+    "modified_at_or_after_invocation": [],
+    "newest_source": "src/bin/genus_ladder.rs",
+    "newest_source_mtime_utc": "2026-11-26T02:17:04.844067+00:00",
+    "all_tracked": true,
+    "worktree_differs_from_build_commit": []
+   }
+  },
+  "cargo_lock_toml_equal_build_commit": true,
+  "src_equal_build_commit_to_sha": true,
+  "exe_stat": {
+   "birth_utc": "2026-11-26T02:55:09+00:00",
+   "mtime_utc": "2026-11-26T02:55:09+00:00"
+  },
+  "bin_fingerprint_finished_utc": "2026-11-26T02:55:09.486805+00:00",
+  "ok": true
+ },
+ "analyze_py_reproduction": {
+  "committed_raw": {
+   "sha256": "a9575d5fb1e2e6d856f2fdf91ec057bb2207ac0bd1b3625b53d70613d22b276f",
+   "byte_identical": true
+  },
+  "replay_raw": {
+   "sha256": "a9575d5fb1e2e6d856f2fdf91ec057bb2207ac0bd1b3625b53d70613d22b276f",
+   "byte_identical": true
+  },
+  "committed_sha256": "a9575d5fb1e2e6d856f2fdf91ec057bb2207ac0bd1b3625b53d70613d22b276f"
+ },
+ "structural_identities": {
+  "single_attempt_runs": 130,
+  "coord_wiedemann_spmv_closed_form_violations": [],
+  "trim_and_square_dims_violations": [],
+  "ok": true
+ },
+ "section5a_fields": {
+  "integer_fields": [
+   "attempts",
+   "cantor_inv",
+   "cantor_mul",
+   "core_cols",
+   "core_nnz",
+   "core_rows",
+   "curve_seed",
+   "decomp_fallbacks",
+   "decomp_relations",
+   "decomp_trials",
+   "fb_cols",
+   "fb_samples",
+   "g",
+   "group_ops",
+   "h",
+   "idx_inserts",
+   "idx_lookups",
+   "idx_points",
+   "inhom_linked",
+   "inhom_rows",
+   "la_add",
+   "la_bm_add",
+   "la_bm_mul",
+   "la_dsu_add",
+   "la_dsu_mul",
+   "la_fallback_rescues",
+   "la_fallbacks",
+   "la_fallbacks_skipped",
+   "la_mul",
+   "la_peel_add",
+   "la_peel_mul",
+   "la_rows_add",
+   "la_rows_mul",
+   "la_sge_add",
+   "la_sge_mul",
+   "la_skipped",
+   "la_skipped_attempts",
+   "la_spmv_add",
+   "la_spmv_mul",
+   "la_trim_add",
+   "la_trim_mul",
+   "la_tscan_add",
+   "la_tscan_mul",
+   "la_vec_add",
+   "la_vec_mul",
+   "lines_tried",
+   "n_points",
+   "order",
+   "p",
+   "r",
+   "recovered",
+   "rel_add",
+   "rel_decomp_add",
+   "rel_decomp_mul",
+   "rel_enum_add",
+   "rel_enum_mul",
+   "rel_mul",
+   "relations",
+   "rels_line",
+   "seed",
+   "sge_cols_in",
+   "sge_cols_out",
+   "sge_nnz_in",
+   "sge_nnz_out",
+   "sge_rows_in",
+   "sge_rows_out",
+   "sq_dim",
+   "sq_nnz",
+   "t_secret",
+   "trials",
+   "wall_ns"
+  ],
+  "unclassified": [],
+  "subsplits_within_summed_counters": true,
+  "ok": true
+ },
+ "figures_and_pdf": {
+  "fig_svg_equals_report_copy": true,
+  "plot_py_opens": [
+   "sys.argv[1]",
+   "\"fig_nofb.svg\"",
+   "\"fig_nofb.svg\", \"w\"",
+   "\"fig_nofb.png\""
+  ],
+  "plot_py_data_inputs": [
+   "sys.argv[1]"
+  ],
+  "plot_py_reads_only_argv1": true,
+  "pdf_numbers_from_typ_missing_in_pdf_text": [],
+  "pdf_text_ok": true
+ },
+ "bench_record": {
+  "metric_paired": true,
+  "metric_icr": true,
+  "raw_hashes": {
+   "research/quartic_diem_nofb_20261126/raw/run.jsonl": true,
+   "research/quartic_diem_nofb_20261126/raw/run131101.jsonl": true,
+   "research/quartic_diem_nofb_20261126/analysis.json": true
+  },
+  "raw_uploaded": [
+   false,
+   false,
+   false
+  ],
+  "commit": "8bc5537a8441f5c4e9edc57f0791dd0bc8f2d02e",
+  "commit_dirty": true,
+  "command": [
+   "research/quartic_diem_nofb_20261126/run_all.sh"
+  ],
+  "command_started_utc": "2026-11-26T03:33:48+00:00",
+  "summary": "IMPROVEMENT, order holds across the band (frozen rule): skipping the full-core fallback cuts quartic Diem 2lp-sfb-sge GAE_1 to 0.833x [0.758,0.907] (held-out seeds), 0 rescues of 16; IC/rho 131101 w=1 2.63 -> 1.98 [pcc:unverified]",
+  "summary_headline_displayed": [
+   "0.833x"
+  ],
+  "summary_headline_correct_rounding": "0.832x"
+ },
+ "documents": {
+  "checked": 38,
+  "failures": [
+   {
+    "file": "RESULTS.md",
+    "line": 32,
+    "text": "0.833 [0.758, 0.907]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.758",
+     "0.907"
+    ],
+    "values": [
+     0.8324605695547613,
+     0.7580108149319122,
+     0.9066146062794362
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832",
+     "0.758",
+     "0.907"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 52,
+    "text": "at 0.833",
+    "present_on_line": true,
+    "displayed": [
+     "0.833"
+    ],
+    "values": [
+     0.8324605695547613
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 60,
+    "text": "0.269 [0.264, 0.275]",
+    "present_on_line": true,
+    "displayed": [
+     "0.269",
+     "0.264",
+     "0.275"
+    ],
+    "values": [
+     0.26905739631271547,
+     0.2634979809379867,
+     0.27473410708074764
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.269",
+     "0.263",
+     "0.275"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 61,
+    "text": "0.199 [0.184, 0.217]",
+    "present_on_line": true,
+    "displayed": [
+     "0.199",
+     "0.184",
+     "0.217"
+    ],
+    "values": [
+     0.19861372965676133,
+     0.18370261450533565,
+     0.21648645915387113
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.199",
+     "0.184",
+     "0.216"
+    ],
+    "ok": false
+   },
+   {
+    "file": "report.typ",
+    "line": 20,
+    "text": "[0.833 \\[0.758, 0.907\\]], [0.826 \\[0.773, 0.881\\]]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "values": [
+     0.8324605695547613,
+     0.7580108149319122,
+     0.9066146062794362,
+     0.825858683349888,
+     0.7727483898469525,
+     0.8805484236433329
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "ok": false
+   }
+  ],
+  "all": [
+   {
+    "file": "RESULTS.md",
+    "line": 32,
+    "text": "0.833 [0.758, 0.907]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.758",
+     "0.907"
+    ],
+    "values": [
+     0.8324605695547613,
+     0.7580108149319122,
+     0.9066146062794362
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832",
+     "0.758",
+     "0.907"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 32,
+    "text": "0.826 [0.773, 0.881]",
+    "present_on_line": true,
+    "displayed": [
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "values": [
+     0.825858683349888,
+     0.7727483898469525,
+     0.8805484236433329
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 33,
+    "text": "0.833 [0.761, 0.908]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.761",
+     "0.908"
+    ],
+    "values": [
+     0.8326009800723707,
+     0.7612175267526203,
+     0.9079510565463786
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.833",
+     "0.761",
+     "0.908"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 33,
+    "text": "0.826 [0.771, 0.880]",
+    "present_on_line": true,
+    "displayed": [
+     "0.826",
+     "0.771",
+     "0.880"
+    ],
+    "values": [
+     0.8260129018198628,
+     0.770921612095301,
+     0.8803973971658806
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.826",
+     "0.771",
+     "0.880"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 34,
+    "text": "0.9971 [0.9959, 0.9984]",
+    "present_on_line": true,
+    "displayed": [
+     "0.9971",
+     "0.9959",
+     "0.9984"
+    ],
+    "values": [
+     0.9970757056957934,
+     0.9959279218319614,
+     0.9983601390068022
+    ],
+    "decimals": 4,
+    "correct_rounding": [
+     "0.9971",
+     "0.9959",
+     "0.9984"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 34,
+    "text": "0.9972 [0.9962, 0.9980]",
+    "present_on_line": true,
+    "displayed": [
+     "0.9972",
+     "0.9962",
+     "0.9980"
+    ],
+    "values": [
+     0.9971710350309705,
+     0.9961899138093644,
+     0.9979796551184511
+    ],
+    "decimals": 4,
+    "correct_rounding": [
+     "0.9972",
+     "0.9962",
+     "0.9980"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 42,
+    "text": "| GAE ratio | 1.000 |",
+    "present_on_line": true,
+    "displayed": [
+     "1.000"
+    ],
+    "values": [
+     1.0
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "1.000"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 42,
+    "text": "0.683 [0.571, 0.783]",
+    "present_on_line": true,
+    "displayed": [
+     "0.683",
+     "0.571",
+     "0.783"
+    ],
+    "values": [
+     0.682964096324912,
+     0.5708332920939,
+     0.7834923803014554
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.683",
+     "0.571",
+     "0.783"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 42,
+    "text": "0.903 [0.814, 1.000]",
+    "present_on_line": true,
+    "displayed": [
+     "0.903",
+     "0.814",
+     "1.000"
+    ],
+    "values": [
+     0.9026521594736758,
+     0.8139884836846297,
+     1.0
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.903",
+     "0.814",
+     "1.000"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 42,
+    "text": "0.755 [0.623, 0.897]",
+    "present_on_line": true,
+    "displayed": [
+     "0.755",
+     "0.623",
+     "0.897"
+    ],
+    "values": [
+     0.7545789036102941,
+     0.6229094160921269,
+     0.8966857486730381
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.755",
+     "0.623",
+     "0.897"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 43,
+    "text": "| 1.000 | 0.592 | 0.872 | 0.700 |",
+    "present_on_line": true,
+    "displayed": [
+     "1.000",
+     "0.592",
+     "0.872",
+     "0.700"
+    ],
+    "values": [
+     1.0,
+     0.5924454630086363,
+     0.8723982024712642,
+     0.7003212886923349
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "1.000",
+     "0.592",
+     "0.872",
+     "0.700"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 45,
+    "text": "20.2\u201327.3%",
+    "present_on_line": true,
+    "displayed": [
+     "20.2",
+     "27.3"
+    ],
+    "values": [
+     20.229603154112656,
+     27.282502184126823
+    ],
+    "decimals": 1,
+    "correct_rounding": [
+     "20.2",
+     "27.3"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 51,
+    "text": "20.2\u201327.3%",
+    "present_on_line": true,
+    "displayed": [
+     "20.2",
+     "27.3"
+    ],
+    "values": [
+     20.229603154112656,
+     27.282502184126823
+    ],
+    "decimals": 1,
+    "correct_rounding": [
+     "20.2",
+     "27.3"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 52,
+    "text": "at 0.833",
+    "present_on_line": true,
+    "displayed": [
+     "0.833"
+    ],
+    "values": [
+     0.8324605695547613
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 58,
+    "text": "| 4099 | 0.886 | 0.886 |",
+    "present_on_line": true,
+    "displayed": [
+     "0.886",
+     "0.886"
+    ],
+    "values": [
+     0.8857130850573212,
+     0.8857130850573212
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.886",
+     "0.886"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 58,
+    "text": "| 8.83 | 8.83 |",
+    "present_on_line": true,
+    "displayed": [
+     "8.83",
+     "8.83"
+    ],
+    "values": [
+     8.833443028251784,
+     8.833443028251784
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "8.83",
+     "8.83"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 59,
+    "text": "| 16411 | 0.756 |",
+    "present_on_line": true,
+    "displayed": [
+     "0.756"
+    ],
+    "values": [
+     0.7559468190340253
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.756"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 59,
+    "text": "0.517 [0.472, 0.572]",
+    "present_on_line": true,
+    "displayed": [
+     "0.517",
+     "0.472",
+     "0.572"
+    ],
+    "values": [
+     0.5165325576868444,
+     0.47244107215799,
+     0.5723728330411652
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.517",
+     "0.472",
+     "0.572"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 59,
+    "text": "| 7.55 |",
+    "present_on_line": true,
+    "displayed": [
+     "7.55"
+    ],
+    "values": [
+     7.551347115734903
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "7.55"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 59,
+    "text": "5.16 [4.72, 5.73]",
+    "present_on_line": true,
+    "displayed": [
+     "5.16",
+     "4.72",
+     "5.73"
+    ],
+    "values": [
+     5.157298958933619,
+     4.7181425845227,
+     5.731986860801692
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "5.16",
+     "4.72",
+     "5.73"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 60,
+    "text": "| 65537 | 0.298 |",
+    "present_on_line": true,
+    "displayed": [
+     "0.298"
+    ],
+    "values": [
+     0.2980522618654119
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.298"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 60,
+    "text": "0.269 [0.264, 0.275]",
+    "present_on_line": true,
+    "displayed": [
+     "0.269",
+     "0.264",
+     "0.275"
+    ],
+    "values": [
+     0.26905739631271547,
+     0.2634979809379867,
+     0.27473410708074764
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.269",
+     "0.263",
+     "0.275"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 60,
+    "text": "| 2.98 |",
+    "present_on_line": true,
+    "displayed": [
+     "2.98"
+    ],
+    "values": [
+     2.9774856228519075
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "2.98"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 60,
+    "text": "2.69 [2.63, 2.74]",
+    "present_on_line": true,
+    "displayed": [
+     "2.69",
+     "2.63",
+     "2.74"
+    ],
+    "values": [
+     2.687633827269097,
+     2.6318101823518525,
+     2.744641554287986
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "2.69",
+     "2.63",
+     "2.74"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 61,
+    "text": "| 131101 | 0.263 |",
+    "present_on_line": true,
+    "displayed": [
+     "0.263"
+    ],
+    "values": [
+     0.2631606278451402
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.263"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 61,
+    "text": "0.199 [0.184, 0.217]",
+    "present_on_line": true,
+    "displayed": [
+     "0.199",
+     "0.184",
+     "0.217"
+    ],
+    "values": [
+     0.19861372965676133,
+     0.18370261450533565,
+     0.21648645915387113
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.199",
+     "0.184",
+     "0.216"
+    ],
+    "ok": false
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 61,
+    "text": "2.63 [2.04, 3.47]",
+    "present_on_line": true,
+    "displayed": [
+     "2.63",
+     "2.04",
+     "3.47"
+    ],
+    "values": [
+     2.6299004659708833,
+     2.0364355343689,
+     3.473468738193092
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "2.63",
+     "2.04",
+     "3.47"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 61,
+    "text": "1.98 [1.84, 2.16]",
+    "present_on_line": true,
+    "displayed": [
+     "1.98",
+     "1.84",
+     "2.16"
+    ],
+    "values": [
+     1.9844674102165105,
+     1.8354226870568757,
+     2.1632340213236523
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "1.98",
+     "1.84",
+     "2.16"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 63,
+    "text": "about 2e-4",
+    "present_on_line": true,
+    "displayed": [
+     "2",
+     "2"
+    ],
+    "values": [
+     1.6998766261717253,
+     1.697252702911615
+    ],
+    "decimals": 0,
+    "correct_rounding": [
+     "2",
+     "2"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 65,
+    "text": "1.98\u00d7",
+    "present_on_line": true,
+    "displayed": [
+     "1.98"
+    ],
+    "values": [
+     1.9844674102165105
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "1.98"
+    ],
+    "ok": true
+   },
+   {
+    "file": "RESULTS.md",
+    "line": 65,
+    "text": "2.63\u00d7",
+    "present_on_line": true,
+    "displayed": [
+     "2.63"
+    ],
+    "values": [
+     2.6299004659708833
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "2.63"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 20,
+    "text": "[0.833 \\[0.758, 0.907\\]], [0.826 \\[0.773, 0.881\\]]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "values": [
+     0.8324605695547613,
+     0.7580108149319122,
+     0.9066146062794362,
+     0.825858683349888,
+     0.7727483898469525,
+     0.8805484236433329
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.832",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    "ok": false
+   },
+   {
+    "file": "report.typ",
+    "line": 21,
+    "text": "[0.833 \\[0.761, 0.908\\]], [0.826 \\[0.771, 0.880\\]]",
+    "present_on_line": true,
+    "displayed": [
+     "0.833",
+     "0.761",
+     "0.908",
+     "0.826",
+     "0.771",
+     "0.880"
+    ],
+    "values": [
+     0.8326009800723707,
+     0.7612175267526203,
+     0.9079510565463786,
+     0.8260129018198628,
+     0.770921612095301,
+     0.8803973971658806
+    ],
+    "decimals": 3,
+    "correct_rounding": [
+     "0.833",
+     "0.761",
+     "0.908",
+     "0.826",
+     "0.771",
+     "0.880"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 22,
+    "text": "[0.9971 \\[0.9959, 0.9984\\]], [0.9972 \\[0.9962, 0.9980\\]]",
+    "present_on_line": true,
+    "displayed": [
+     "0.9971",
+     "0.9959",
+     "0.9984",
+     "0.9972",
+     "0.9962",
+     "0.9980"
+    ],
+    "values": [
+     0.9970757056957934,
+     0.9959279218319614,
+     0.9983601390068022,
+     0.9971710350309705,
+     0.9961899138093644,
+     0.9979796551184511
+    ],
+    "decimals": 4,
+    "correct_rounding": [
+     "0.9971",
+     "0.9959",
+     "0.9984",
+     "0.9972",
+     "0.9962",
+     "0.9980"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 24,
+    "text": "20\u201327%",
+    "present_on_line": true,
+    "displayed": [
+     "20",
+     "27"
+    ],
+    "values": [
+     20.229603154112656,
+     27.282502184126823
+    ],
+    "decimals": 0,
+    "correct_rounding": [
+     "20",
+     "27"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 31,
+    "text": "[8.83], [7.55], [2.98], [2.63]",
+    "present_on_line": true,
+    "displayed": [
+     "8.83",
+     "7.55",
+     "2.98",
+     "2.63"
+    ],
+    "values": [
+     8.833443028251784,
+     7.551347115734903,
+     2.9774856228519075,
+     2.6299004659708833
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "8.83",
+     "7.55",
+     "2.98",
+     "2.63"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 32,
+    "text": "[8.83], [5.16], [2.69], [1.98 \\[1.84, 2.16\\]]",
+    "present_on_line": true,
+    "displayed": [
+     "8.83",
+     "5.16",
+     "2.69",
+     "1.98",
+     "1.84",
+     "2.16"
+    ],
+    "values": [
+     8.833443028251784,
+     5.157298958933619,
+     2.687633827269097,
+     1.9844674102165105,
+     1.8354226870568757,
+     2.1632340213236523
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "8.83",
+     "5.16",
+     "2.69",
+     "1.98",
+     "1.84",
+     "2.16"
+    ],
+    "ok": true
+   },
+   {
+    "file": "report.typ",
+    "line": 34,
+    "text": "1.98\u00d7",
+    "present_on_line": true,
+    "displayed": [
+     "1.98"
+    ],
+    "values": [
+     1.9844674102165105
+    ],
+    "decimals": 2,
+    "correct_rounding": [
+     "1.98"
+    ],
+    "ok": true
+   }
+  ],
+  "multi_attempt_cost_claim": {
+   "RESULTS.md:69": "- **Remaining cost.** With the fallback gone, a run that needs a second attempt costs about twice a single-attempt run. Those runs exist because attempt 1 leaves t undetermined (parent ERRATA E6).",
+   "report.typ:36": "*Next lever.* Second attempts now cost about double a single attempt. They come from first attempts in which t is undetermined. Avoiding those needs a new protocol.",
+   "measured_nofb_gae1_two_attempt_over_same_curve_single_attempt_gm": [
+    1.5043226702996144,
+    1.9002646838331405
+   ],
+   "measured_three_attempt": [
+    2.2495164970626873
+   ]
+  },
+  "analysis_json_rule_text": "PROTOCOL.md section 6",
+  "protocol_decision_section": true
+ },
+ "seed_manifest": {
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "master_seed": null,
+  "has_prng_versions": true,
+  "cargo_lock_rand_0_8_8": true,
+  "cargo_lock_rand_chacha_0_3_1": true,
+  "mix64_at_residual_walk_336": true,
+  "streams_listed": [
+   "bootstrap",
+   "curve",
+   "generator",
+   "solver",
+   "target"
+  ],
+  "non_test_seed_sites_quartic_ladder": [
+   [
+    1241,
+    "let mut rng = StdRng::seed_from_u64(seed ^ 0xB5B5_0DD5_0DD5_B5B5);"
+   ],
+   [
+    1319,
+    "let mut rng = StdRng::seed_from_u64(mix64(curve_seed ^ 0x6E6E_7A7A_0101_2323));"
+   ],
+   [
+    1330,
+    "let t = StdRng::seed_from_u64(mix64(target_seed ^ 0x7A26_E7A2_6E7A_26E7)).gen_range(1..r);"
+   ],
+   [
+    1854,
+    "let mut prng = StdRng::seed_from_u64(0x51A7_7E2D_0000_0000 ^ q as u64);"
+   ],
+   [
+    1888,
+    "let mut prng = StdRng::seed_from_u64(0x5AFB_0000_0000_0000 ^ q);"
+   ],
+   [
+    1943,
+    "let mut rng = StdRng::seed_from_u64(prm.seed);"
+   ]
+  ],
+  "panel_matches_protocol": true
+ },
+ "repository_policy": {
+  "raw/run.jsonl": {
+   "bytes": 254691,
+   "over_64KiB": true
+  },
+  "raw/run131101.jsonl": {
+   "bytes": 89012,
+   "over_64KiB": true
+  },
+  "analysis.json": {
+   "bytes": 15526,
+   "over_64KiB": false
+  },
+  "dev/smoke_dev.jsonl": {
+   "bytes": 34423,
+   "over_64KiB": false
+  },
+  "artifacts_manifest_present": false
+ }
+}

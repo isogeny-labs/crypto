@@ -1,0 +1,364 @@
+{
+  "schema": "m31-integrated-development/v1",
+  "standing": "unsigned producer development evidence; pcc:unverified",
+  "base_commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "branch": "lane/m31-integrated-build-20261123",
+  "scope": "Native implementation and local correctness qualification only",
+  "source_files": [
+    {
+      "path": "research/m31_integrated_build_20261123/check.sh",
+      "sha256": "7e694eea833c80ea4c3f38cc9a1174442c5cac40fe2a787d6a187967d343008a",
+      "bytes": 2037,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/Cargo.lock",
+      "sha256": "df65f6cc4cc34e79f68f4c2bcc7c6771f5bf92efb5e86c42dc114cc45fe67146",
+      "bytes": 6420,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/Cargo.toml",
+      "sha256": "614a09cb34fc57bb0e6dcaac22ceb76da9f0fee9aba9dabdfae4007e60b7e723",
+      "bytes": 436,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/SOURCE_SHA256SUMS",
+      "sha256": "f9a42d06a6c4b303db48c35da3a3dc0fb9878d3eaf2ee03be36e9a78f218887c",
+      "bytes": 1667,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/admission.rs",
+      "sha256": "021b730f46d3b398abcc28f2df03d800ba96cef31c204d4f55673f5bf1bf9e32",
+      "bytes": 5882,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/build.rs",
+      "sha256": "2088089bbc03286a85e7065e27c3e545926a8e1164bd415f4954dc2e90d8d701",
+      "bytes": 1283,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/compare.rs",
+      "sha256": "261b5e0cc584a03a42d5808d269255ad3684233344daa02ad45675f3cae9a4b8",
+      "bytes": 11678,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis.rs",
+      "sha256": "e6edaf5604439092bf5f79ea4e64e0f2567e72ef6980faa6812983678d1aa03e",
+      "bytes": 228,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/jv_large_prime_rank_bound.rs",
+      "sha256": "335a874e1ebca0faaba766f844d42a171b16fba206d85925e050918b86666aee",
+      "bytes": 58,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/large_prime_filter",
+      "sha256": "59e9c996d35385bee005ee746e09d6baddb57ac9dbf074854bb8739ca91311fc",
+      "bytes": 48,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/large_prime_filter.rs",
+      "sha256": "2c14dbbb3d80059fed7f813307aa2bd10702cb13905998f8bf7a0471da78700d",
+      "bytes": 51,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/large_prime_filter_mst.rs",
+      "sha256": "e6e35a3915252a45abb1c3ffbcf3643b83689fed9e1b4b63671af17d610abad5",
+      "bytes": 55,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/large_prime_graph",
+      "sha256": "0deb864732deca1ee61453955668aaa1f6ce7383f240c118efdf3a14317bc59c",
+      "bytes": 47,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/cryptanalysis/large_prime_graph.rs",
+      "sha256": "899ea51d70a24d4f48f0cb5f7b4d99977ca65f1a36c5808a714524c0ccbb4526",
+      "bytes": 50,
+      "kind": "symlink-target-bytes"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/lib.rs",
+      "sha256": "0da409326bbcc592b07f666c928aacde426a14369f231616327989ca24152e8a",
+      "bytes": 2159,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/main.rs",
+      "sha256": "ebdd56ac1f1c4005c6d556a8e418dae5bdfd0da563bde0cc5b9ff2d98ee1f4c4",
+      "bytes": 13238,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/tape.rs",
+      "sha256": "f96a6a01eaf07418891a0510b8365fe73a3a73547f904e511d2ebe7133d37c1a",
+      "bytes": 7048,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/graph/tests/graph_suite.rs",
+      "sha256": "1991a9bf443a5ee274b4d4f4979231672794f313ac3e3aed65730881a4adf930",
+      "bytes": 13271,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/Cargo.lock",
+      "sha256": "52b6fae1870a7f08869a9dd834eafc5ea9486d8b1db2b3046b4138b42f134701",
+      "bytes": 10102,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/Cargo.toml",
+      "sha256": "e36ebbdc367fac847b2b83f97c73b174360036efd78e5d77db9bf5728e75a7fa",
+      "bytes": 715,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/identity_certificate.rs",
+      "sha256": "e2a1164e6e565857260c7ccb56c5cf5bc3df9d7b3840fc41f2bfa2131fce378c",
+      "bytes": 7820,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/lib.rs",
+      "sha256": "40caca23c14e4424385e919ec11c37207e411eb82a3ed7217e9308678ca8f64e",
+      "bytes": 25617,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/main.rs",
+      "sha256": "a9db4531a0675ecdab4c3e5fbfcd10cea16266d67a22c69a7a9df168f6942eb6",
+      "bytes": 1209,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/tests.rs",
+      "sha256": "7e7ba9f7db695a6711075c11089026aa6040bcf995743aaf0785cafb55434e6e",
+      "bytes": 12092,
+      "kind": "file"
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/structured/tests/cli.rs",
+      "sha256": "27a80275ba191181be612b4742cfac771a8a31515ab63c5aa72ea91e7641cf1d",
+      "bytes": 2495,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/Cargo.lock",
+      "sha256": "9896516dc81af72ac556547d27771e24ca99e5df4962843355dbbb12286d7c93",
+      "bytes": 10105,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/Cargo.toml",
+      "sha256": "c479327837e7c26e545af18868548abc7989aa7ecbd9064c2cb896b9dcb9f0aa",
+      "bytes": 827,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/extractor.rs",
+      "sha256": "ebce04e3ec0e4eb9ed8dc2cdf57e260bb616c979e2693de13c0ed7b5a880192a",
+      "bytes": 33770,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/f4-source/build.rs",
+      "sha256": "75eb2ec5697a44a365e1fba3e9f4f169ca79d0d96218a918b39635daa763b612",
+      "bytes": 24026,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/lib.rs",
+      "sha256": "259fc8ed978b03592cbd1e22ce08067fdf48a8b9f6400ce91a09dd799ec26633",
+      "bytes": 726,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/query_pipeline.rs",
+      "sha256": "aa1debc45b269217bcc806b5c9d5efacf7d2db56cf45fd709f9cf6b3cea2145f",
+      "bytes": 5815,
+      "kind": "file"
+    },
+    {
+      "path": "research/prime31_four_summand_20261122/native/streaming_tests.rs",
+      "sha256": "7a1d62ed638858da65d291dce7c8873fe8f4969c1753d6b0b03aa2406c846687",
+      "bytes": 8585,
+      "kind": "file"
+    }
+  ],
+  "source_manifest": {
+    "path": "research/m31_integrated_build_20261123/evidence/SOURCE_SHA256SUMS",
+    "sha256": "0d2057fe6796901d709a228419caab0d74fc6522e453dff170ab8f6b565a5da2",
+    "bytes": 4131
+  },
+  "gates": [
+    {
+      "name": "graph",
+      "profile": "release",
+      "passed": 7,
+      "failed": 0,
+      "exit_code": 0,
+      "log": {
+        "path": "research/m31_integrated_build_20261123/graph/evidence/06-tests.stdout",
+        "sha256": "2e1722fa173128475c294d65ea8e41a7ed97d1b805589b09399209ec5f4b1be4",
+        "bytes": 624
+      },
+      "exit": {
+        "path": "research/m31_integrated_build_20261123/graph/evidence/06-tests.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "seeded_dense_oracle_systems": 128,
+      "stderr": {
+        "path": "research/m31_integrated_build_20261123/graph/evidence/06-tests.stderr",
+        "sha256": "f2a221823e2281f559f9986d6bc07fe3c084eda1fe1cdf0b7651051c48a0f17c",
+        "bytes": 356
+      },
+      "command": {
+        "path": "research/m31_integrated_build_20261123/graph/evidence/06-tests.command.txt",
+        "sha256": "fed53b4f6ff0b914f918ac7607ab61f1cd2f3ed39d7fe1a17733d3cd6bb0a901",
+        "bytes": 638
+      },
+      "component_receipt": {
+        "path": "research/m31_integrated_build_20261123/graph/evidence/RECEIPT.json",
+        "sha256": "26e792f9de6d6b08a49d4eb84aa0abca4fe06481636c1de38e9ab05c402cdcac",
+        "bytes": 2227
+      }
+    },
+    {
+      "name": "structured",
+      "profile": "release",
+      "passed": 13,
+      "failed": 0,
+      "exit_code": 0,
+      "log": {
+        "path": "research/m31_integrated_build_20261123/structured/evidence/release.final.log",
+        "sha256": "35ba3f4067cf4c3e43cc8570a98c705840db2016d6e1dcf1ea5a80dbf2b77b34",
+        "bytes": 10232
+      },
+      "exit": {
+        "path": "research/m31_integrated_build_20261123/structured/evidence/release.final.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "library_tests": 10,
+      "cli_tests": 3,
+      "command": {
+        "path": "research/m31_integrated_build_20261123/structured/evidence/release.final.command.txt",
+        "sha256": "c10471f9a7fb4a643fad24cd3f8bac156f8924a865194c5489d5401c01373c5e",
+        "bytes": 457
+      }
+    },
+    {
+      "name": "rr5",
+      "profile": "release",
+      "passed": 50,
+      "failed": 0,
+      "exit_code": 0,
+      "log": {
+        "path": "research/m31_integrated_build_20261123/rr5/evidence/native-all-targets.log",
+        "sha256": "30e9205b3c0ec092e080cfe1b535d1f1cc8c3218abbd27336b5a774a4509cdd6",
+        "bytes": 12888
+      },
+      "exit": {
+        "path": "research/m31_integrated_build_20261123/rr5/evidence/native-all-targets.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "bytes": 2
+      },
+      "library_tests": 42,
+      "public_example_tests": 8,
+      "new_m31_library_tests": 10,
+      "commands": {
+        "path": "research/m31_integrated_build_20261123/rr5/evidence/COMMANDS.md",
+        "sha256": "5b9dff71cb3a49302bf9360f7412628b1b47a4e85e56b6a69768dcc675e0b3e8",
+        "bytes": 3948
+      },
+      "detailed_output": {
+        "path": "research/m31_integrated_build_20261123/rr5/evidence/native-tests-initial.log",
+        "sha256": "7ef104570c71a635f6cc42f99c0048bfb739bda45f6d352168a4d781bfc0c286",
+        "bytes": 59702
+      }
+    }
+  ],
+  "total_distinct_component_tests": 70,
+  "root_gate": {
+    "passed": false,
+    "release_test_retry_exit": 124,
+    "library_check_exit": 124,
+    "observed_compiler_diagnostic": "E0425: powers, gcds, previous, r and g in src/cryptanalysis/prime_root_trace.rs",
+    "source_unchanged_from_base": true,
+    "log": {
+      "path": "research/m31_integrated_build_20261123/evidence/root-library-check.log",
+      "sha256": "2c0dbcc8dc6beedc825c75d47a18eb6d1c67da96b3e5fa8df0f4ec805a0b327e",
+      "bytes": 16046
+    },
+    "partial_capture": {
+      "path": "research/m31_integrated_build_20261123/evidence/root-library-capture-status.txt",
+      "sha256": "a111c31211d95e4dee3bd3a3de997cd237059a165b79cff61ea18e4efb3f1e5a",
+      "bytes": 657
+    },
+    "source_identity": {
+      "path": "research/m31_integrated_build_20261123/evidence/root-source.sha256",
+      "sha256": "34545006e11b7adfe35e02c9f78b367ecd092e45a1f8b643ae6d0e6e3891b08b",
+      "bytes": 104
+    },
+    "attempts": [
+      "root-library-initial",
+      "root-library-dependency-restored",
+      "root-library-retry",
+      "root-compiler-diagnostic",
+      "root-library-check"
+    ]
+  },
+  "auxiliary_identity": {
+    "id": "IDC1hd6568d78855aef4c",
+    "field": "M61 fixed by identity.certificate/v1; generic algebraic record only",
+    "proof": null,
+    "certificate": {
+      "path": "research/m31_integrated_build_20261123/structured/evidence/quadratic-resultant.identity.json",
+      "sha256": "fb1c8a1de505b63687c00199ae58670fe3670ef179a26b1f6cdcc435ac077716",
+      "bytes": 4697
+    },
+    "checker": {
+      "path": "research/m31_integrated_build_20261123/structured/evidence/quadratic-resultant.check.json",
+      "sha256": "a33654000ff2d2c90ec18d62cdf5183f5d48937f0f28b34f4a2dbc268b60ceec",
+      "bytes": 1740
+    }
+  },
+  "independent_review": {
+    "path": "research/m31_integrated_build_20261123/evidence/INDEPENDENT_REVIEW.md",
+    "sha256": "a5621309b055e9c2bb2f4897bcfb9df696d1f06427a92031390feddeda2297f1",
+    "bytes": 12246
+  },
+  "environment": {
+    "path": "research/m31_integrated_build_20261123/evidence/ENVIRONMENT.txt",
+    "sha256": "602a3cdb445e93159170b8428c007f67b01a7703578892f9d7e98272ae920f58",
+    "bytes": 1087
+  },
+  "report": {
+    "path": "research/m31_integrated_build_20261123/reports/REPORT.md",
+    "sha256": "5b977496c166ca51793c4a1fc8417540e4400bef510c7256280e76513b0d34d4",
+    "bytes": 14396
+  },
+  "report_pdf": {
+    "path": "research/m31_integrated_build_20261123/reports/m31-integrated-build.pdf",
+    "sha256": "c90badf62d9f634505375a6f3cf6cca7c92044edbe73166a73635fd29a60b986",
+    "bytes": 285357
+  },
+  "complete_cold_cost": null,
+  "scientific_jobs_launched": 0,
+  "signed_verdict": false,
+  "root_gate_warning": "No complete root test result is inferred from compiler diagnostics or capped builds."
+}

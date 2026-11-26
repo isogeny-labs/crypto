@@ -1470,13 +1470,9 @@ fn pmod_mul(q: u64, a: &[u64], b: &[u64]) -> Vec<u64> {
 }
 
 fn pinv(q: u64, a: u64) -> u64 {
-    let (mut r0, mut r1, mut t0, mut t1) = (q as i128, a as i128, 0i128, 1i128);
-    while r1 != 0 {
-        let d = r0 / r1;
-        (r0, r1) = (r1, r0 - d * r1);
-        (t0, t1) = (t1, t0 - d * t1);
-    }
-    t0.rem_euclid(q as i128) as u64
+    // Shared inverse.  The old Euclid did not check for a unit; a non-unit
+    // (only `a ≡ 0` for prime `q`) still returns 0, as it did for `a = 0`.
+    crate::gcd::int::inv_mod_u64(a, q).unwrap_or(0)
 }
 
 fn pmod_rem(q: u64, a: &[u64], g: &[u64]) -> Vec<u64> {
@@ -1495,21 +1491,8 @@ fn pmod_rem(q: u64, a: &[u64], g: &[u64]) -> Vec<u64> {
 }
 
 fn pmod_gcd(q: u64, a: &[u64], b: &[u64]) -> Vec<u64> {
-    let (mut a, mut b) = (a.to_vec(), b.to_vec());
-    pmod_trim(&mut a);
-    pmod_trim(&mut b);
-    while !b.is_empty() {
-        let r = pmod_rem(q, &a, &b);
-        a = b;
-        b = r;
-    }
-    if let Some(&l) = a.last() {
-        let il = pinv(q, l);
-        for c in a.iter_mut() {
-            *c = mmq(*c, il, q);
-        }
-    }
-    a
+    // Monic gcd (zero polynomial = empty) through the shared module.
+    crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(q), a, b)
 }
 
 fn pmod_powx(q: u64, base: &[u64], mut e: u64, g: &[u64]) -> Vec<u64> {

@@ -1,0 +1,18 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T05:16:39Z",
+  "admission":"user-authorized local-only parallel E(F_p) work with prior bypass; checkpoint currently missing .resume, earlier S3 HTTP 403; neither gate represented as passing",
+  "worktree_commit":"163dfb9b567f90873e99aa25adbcb3ae7bf077af",
+  "source":{"path":"WS68_BASE_POLICY.rs","sha256":"f89d86886103765413ec02c7f17d3a17f748cf1145e880608121c3bd384d73dd"},
+  "immutable_qualifier":{"path":"WS68_BASE_POLICY.qualifier.rs","sha256":"f89d86886103765413ec02c7f17d3a17f748cf1145e880608121c3bd384d73dd"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_BASE_POLICY","WS68_BASE_POLICY.qualifier.rs","-o","WS68_BASE_POLICY.bin"],
+  "curve":{"p":1009,"a":1,"b":14,"G":[0,425],"order":1013},
+  "factor_base":"first 8 or 16 valid abscissae, least nonnegative y",
+  "targets":[123,277,411,509,701,827,941,1003],
+  "stream":{"seed_formula":"0x6e7120261124 XOR target_scalar; xorshift64","cap_per_target":512,"candidate":"[a]G+Q","same_order_across_policies":true},
+  "policies":["fixed8","fixed16","expand128: B8 for 128 trials then rebuild B16"],
+  "acceptance":"every emitted relation verifies as a curve-group sum, rank and target pin are exact mod 1013, every recovered scalar satisfies [x]G=Q; censored trials retained",
+  "cost_scope":"counts pair-table group additions, trial scalar-multiply/add operations, base lift tests separately; modular elimination and wall time not charged",
+  "claim_boundary":"bounded policy diagnostic, not complete cost or cryptanalytic speedup"
+}

@@ -554,13 +554,12 @@ fn f2_sqr_mod(a: u128, f: u128) -> u128 {
 }
 
 /// gcd of two bit-packed F_2 polynomials.
-fn f2_gcd(mut a: u128, mut b: u128) -> u128 {
-    while b != 0 {
-        let r = f2_rem(a, b);
-        a = b;
-        b = r;
-    }
-    a
+fn f2_gcd(a: u128, b: u128) -> u128 {
+    // Shared bit-packed GF(2)[x] gcd on the two 64-bit words.
+    let g = crate::gcd::gf2::gcd(&[a as u64, (a >> 64) as u64], &[b as u64, (b >> 64) as u64]);
+    g.iter()
+        .enumerate()
+        .fold(0u128, |acc, (i, &w)| acc | (w as u128) << (64 * i))
 }
 
 /// Distinct prime factors of `n` (small `n`).

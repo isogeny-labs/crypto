@@ -1,0 +1,15 @@
+{
+  "record_type": "immutable_pre_call",
+  "created_utc": "2026-11-25T05:57:18Z",
+  "admission": "user-authorized bounded local E(F_p) run after prior S3 HTTP 403 and missing .resume gates; no cloud spend",
+  "conductor_task": "T-12362",
+  "worktree_commit": "0b9e7498456145108c5acc880c6e5e2a7c86631a",
+  "source": {"path": "WS68_INTERVAL_POLICY.rs", "sha256": "2db0051aef82985a04b0346351fff74489d556286996b75ae670ba7da59c49ce"},
+  "immutable_qualifier": {"path": "WS68_INTERVAL_POLICY.qualifier.rs", "sha256": "2db0051aef82985a04b0346351fff74489d556286996b75ae670ba7da59c49ce"},
+  "compiler": {"path": "/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc", "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv": ["rustc", "-O", "--edition", "2021", "--crate-name", "WS68_INTERVAL_POLICY", "WS68_INTERVAL_POLICY.qualifier.rs", "-o", "WS68_INTERVAL_POLICY.bin"],
+  "input": {"curve": "E/F_1009: y^2=x^3+x+14", "generator": [0,425], "order": 1013, "targets": [123,277,411,509,701,827,941,1003], "candidates_per_target": 512, "candidate_rule": "Q+[a]G for contiguous integers a=0..511", "factor_base": "first 16 canonical x-ordered points", "relation_predicate": "exact membership in pair-sum table"},
+  "policies": {"fixed8": 8, "fixed32": 32, "pid": {"initial_width": 8, "minimum": 4, "maximum": 64, "target_hit_rate_per_1024": 128, "kp": 8, "ki": 1, "kd": 4, "update": "after each unsolved interval; integer division and width clamp as source"}},
+  "expected": "All 4096 candidate points printed; same ordered stream per target for three arms. Verify every accepted EC relation, rank and target when pinned. Preserve censored arms and report group additions, relation lookups, batch dispatches, rank checks and controller updates separately.",
+  "claim_boundary": "Partial #97 interval scheduling control on contiguous scalar candidates, not a Semaev or smoothness sieve. No performance claim without elimination and wall costs."
+}

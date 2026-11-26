@@ -363,6 +363,7 @@ impl PackedRowMap {
 /// because their original pivots have been saved. Rank and the first
 /// contradiction/full-rank index are the same as sequential elimination.
 #[cfg(target_arch = "x86_64")]
+#[allow(unused_assignments)]
 unsafe fn eliminate_packed_prefix(
     coefficients: [u64; 4],
     targets: u16,

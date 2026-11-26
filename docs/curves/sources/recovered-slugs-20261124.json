@@ -1,0 +1,310 @@
+{
+ "schema": "curve-records/v1",
+ "what_this_is": "Short Weierstrass curves that research records and reports name by ICV1 slug but that no registry source carried with a group order (same purpose as recovered-slugs-20261113.json). Each model was either read as p, a, b from a tracked record, or solved from the j-invariant in the recorded ICV1 string and the recorded generator (one cubic in a over GF(p)); in both cases the ICV1 identity recomputed by scripts/curve_id.py from p, a, b and order equals the one the research cites. Every order below 2^40 was certified on 2026-11-24 by a point whose exact order exceeds the Hasse width; icv1-fp256-t0-5593c5e9 is y^2 = x^3 - 3x over the P-256 prime (j = 1728, p = 3 mod 4), which is supersingular with order p + 1. No experiment was run.",
+ "curves": [
+  {
+   "slug": "icv1-fp18-tm261-3d7f426b",
+   "p": "262069",
+   "a": "184289",
+   "b": "22172",
+   "order": "262331",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "262331",
+   "cofactor": 1,
+   "generator": [
+    206600,
+    144724
+   ],
+   "icv1": "ICV1:fp-262069:-261:262331:226383:unk:unk:r:3d7f426bdebf",
+   "generator_call": "find_prime_order_curve(18, 2025957397)",
+   "found_in": "research/curve25519_ic_baseline_20261102/sessions/k20/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp19-t241-6012dab8",
+   "p": "343073",
+   "a": "139295",
+   "b": "279002",
+   "order": "342833",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "342833",
+   "cofactor": 1,
+   "generator": [
+    0,
+    168272
+   ],
+   "icv1": "ICV1:fp-343073:241:342833:144483:unk:unk:r:6012dab82087",
+   "generator_call": "conductor_gap::crater(params(263, 241))",
+   "found_in": "research/ecbench_open_questions_20261014/plans/q08-isogeny.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp19-t241-b992f548",
+   "p": "343073",
+   "a": "109202",
+   "b": "285915",
+   "order": "342833",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "342833",
+   "cofactor": 1,
+   "generator": [
+    0,
+    92431
+   ],
+   "icv1": "ICV1:fp-343073:241:342833:1187:unk:unk:r:b992f548cf44",
+   "generator_call": "conductor_gap::floor(params(263, 241), 59297)",
+   "found_in": "research/ecbench_open_questions_20261014/plans/q08-isogeny.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp22-tm149-52fcd7ee",
+   "p": "2504323",
+   "a": "830857",
+   "b": "2064494",
+   "order": "2504473",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "2504473",
+   "cofactor": 1,
+   "generator": [
+    2264296,
+    1824483
+   ],
+   "icv1": "ICV1:fp-2504323:-149:2504473:161816:unk:unk:r:52fcd7ee5fe2",
+   "generator_call": "find_prime_order_curve(22, 2025957385)",
+   "found_in": "research/curve25519_ic_baseline_20261102/sessions/k24/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp24-tm1297-6f714a52",
+   "p": "13200281",
+   "a": "12826491",
+   "b": "371010",
+   "order": "13201579",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "13201579",
+   "cofactor": 1,
+   "generator": [
+    3676476,
+    10074760
+   ],
+   "icv1": "ICV1:fp-13200281:-1297:13201579:137838:unk:unk:r:6f714a520bde",
+   "generator_call": "find_prime_order_curve(24, 202610297243)",
+   "found_in": "research/ic_dg_wall_20261029/P24/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp24-tm2281-0469151f",
+   "p": "9083681",
+   "a": "3543793",
+   "b": "5550229",
+   "order": "9085963",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "9085963",
+   "cofactor": 1,
+   "generator": [
+    5037290,
+    864544
+   ],
+   "icv1": "ICV1:fp-9083681:-2281:9085963:8083770:unk:unk:r:0469151f66ff",
+   "generator_call": "find_prime_order_curve(24, 202610297244)",
+   "found_in": "research/ic_dg_wall_20261029/P24/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp24-tm241-91a7fdd0",
+   "p": "14222609",
+   "a": "4208094",
+   "b": "1638746",
+   "order": "14222851",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P24.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp24-tm2519-cce74591",
+   "p": "13820551",
+   "a": "5272966",
+   "b": "10402012",
+   "order": "13823071",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P24.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp26-t2377-bc089d44",
+   "p": "58637077",
+   "a": "56319287",
+   "b": "13472213",
+   "order": "58634701",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "58634701",
+   "cofactor": 1,
+   "generator": [
+    728624,
+    24927177
+   ],
+   "icv1": "ICV1:fp-58637077:2377:58634701:15493409:unk:unk:r:bc089d4450ba",
+   "generator_call": "find_prime_order_curve(26, 2025957389)",
+   "found_in": "research/curve25519_ic_baseline_20261102/sessions/k28/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp28-t10131-f8b12347",
+   "p": "141633133",
+   "a": "121897889",
+   "b": "69802990",
+   "order": "141623003",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "141623003",
+   "cofactor": 1,
+   "generator": [
+    104053844,
+    83595558
+   ],
+   "icv1": "ICV1:fp-141633133:10131:141623003:134280829:unk:unk:r:f8b123473482",
+   "generator_call": "find_prime_order_curve(28, 2026110628111)",
+   "found_in": "research/ic_line_layout_tournament_20261031/eks-results-v6/qualification/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp28-t14677-349132c0",
+   "p": "144774559",
+   "a": "58759124",
+   "b": "11514128",
+   "order": "144759883",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "144759883",
+   "cofactor": 1,
+   "generator": [
+    129619618,
+    35768020
+   ],
+   "icv1": "ICV1:fp-144774559:14677:144759883:125446474:unk:unk:r:349132c083f7",
+   "generator_call": "find_prime_order_curve(28, 202610297283)",
+   "found_in": "research/ic_dg_wall_20261029/P28/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp28-t22749-960afa7f",
+   "p": "168813481",
+   "a": "99094963",
+   "b": "62679740",
+   "order": "168790733",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "168790733",
+   "cofactor": 1,
+   "generator": [
+    86360139,
+    162587105
+   ],
+   "icv1": "ICV1:fp-168813481:22749:168790733:26961700:unk:unk:r:960afa7feef7",
+   "generator_call": "find_prime_order_curve(28, 202610297284)",
+   "found_in": "research/ic_dg_wall_20261029/P28/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp28-tm16691-2ecb61f0",
+   "p": "174147989",
+   "a": "134325254",
+   "b": "100838165",
+   "order": "174164681",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P28.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp28-tm7951-a51cdbf3",
+   "p": "264046031",
+   "a": "197973208",
+   "b": "94957142",
+   "order": "264053983",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P28.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp30-t2977-099f582e",
+   "p": "841817993",
+   "a": "86412729",
+   "b": "831502978",
+   "order": "841815017",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "841815017",
+   "cofactor": 1,
+   "generator": [
+    482677570,
+    339832136
+   ],
+   "icv1": "ICV1:fp-841817993:2977:841815017:300256815:unk:unk:r:099f582e8c9e",
+   "generator_call": "find_prime_order_curve(30, 2025957377)",
+   "found_in": "research/curve25519_ic_baseline_20261102/sessions/k32/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp32-t16357-dd50743c",
+   "p": "2825520559",
+   "a": "1250034945",
+   "b": "1212443590",
+   "order": "2825504203",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "2825504203",
+   "cofactor": 1,
+   "generator": [
+    1955769364,
+    1749218810
+   ],
+   "icv1": "ICV1:fp-2825520559:16357:2825504203:887847971:unk:unk:r:dd50743ca3ed",
+   "generator_call": "find_prime_order_curve(32, 202610297323)",
+   "found_in": "research/ic_dg_wall_20261029/P32/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp32-tm103307-fa421912",
+   "p": "3964853953",
+   "a": "3324026396",
+   "b": "2935384572",
+   "order": "3964957261",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P32.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp32-tm24839-2a7bda13",
+   "p": "4208200067",
+   "a": "813362712",
+   "b": "1696924641",
+   "order": "4208224907",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/ic_srenew_deferred_guard_20261029/v3/validation/recompute-P32.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  },
+  {
+   "slug": "icv1-fp32-tm94829-d5c5f997",
+   "p": "3655057793",
+   "a": "3100316406",
+   "b": "320156642",
+   "order": "3655152623",
+   "form": "y^2=x^3+ax+b",
+   "subgroup_order": "3655152623",
+   "cofactor": 1,
+   "generator": [
+    2238960521,
+    1238892980
+   ],
+   "icv1": "ICV1:fp-3655057793:-94829:3655152623:1047246869:unk:unk:r:d5c5f9979097",
+   "generator_call": "find_prime_order_curve(32, 202610297324)",
+   "found_in": "research/ic_dg_wall_20261029/P32/counted/eks-results/session/plan.json",
+   "recovered_by": "solved for a, b from the recorded j-invariant and generator; the recomputed ICV1 equals the recorded one"
+  },
+  {
+   "slug": "icv1-fp256-t0-5593c5e9",
+   "p": "115792089210356248762697446949407573530086143415290314195533631308867097853951",
+   "a": "115792089210356248762697446949407573530086143415290314195533631308867097853948",
+   "b": "0",
+   "order": "115792089210356248762697446949407573530086143415290314195533631308867097853952",
+   "form": "y^2=x^3+ax+b",
+   "found_in": "research/p256_aux_smooth_20261114/evidence/native/fixture-depth4/certificate.json",
+   "recovered_by": "p, a, b read from the tracked record; the slug recomputed from p, a, b and order equals the cited one"
+  }
+ ]
+}

@@ -1,51 +1,61 @@
 {
-  "schema": "curve25519.projective-split-tests/v1",
-  "timestamp_utc": "2026-11-18T07:17:22Z",
+  "schema": "curve25519.projective-split-tests/v2",
+  "timestamp_utc": "2026-11-25T19:19:00Z",
   "status": "pass_on_compile_repair_overlay",
   "source": {
-    "task_base_head_before_diff": "1e3326aaae01e57412dac1f9e3cad2ae2932f989",
+    "task_commit": "fcfa0556673cbbf45dec4a9d1906bd8f1e068fba",
     "compile_repair_pr_head": "d0d4dcaed96cfba2b971abef656decacb428474c",
-    "pkm_semaev_diff_sha256": "cc6a8175cffef4ddc914722a1f4d025b149b1b214fc6577ed6393a93518d3482",
-    "test_binary_sha256": "98cd6aa7e2532207b80f2985d772bb1c1ff1abe2fd2e20f26ed7e96100007782",
+    "counter_instrumentation_diff_sha256": "a9b7159f5c36bf1faf888a281568a03c58092059899cdb05058b6d645b118991",
+    "test_binary_sha256": "5e38bb9b8035bb66e737864d0a5e52271adc97bb91be231c674bb70fc7d4e55e",
+    "measurement_binary_sha256": "249c9415a43d060012ad179ab6d814da7ee0530e8ad8ee50693bc272c80764fc",
     "toolchain": "rustc 1.94.1 (e408947bf 2026-03-25)"
   },
   "build": {
-    "command": "cargo +1.94.1 test --release --lib projective_chain_keeps_identity_and_rejects_zero_coordinates --no-run",
-    "result": "exit 0",
-    "duration": "13m47s",
-    "disclosure": "The disposable worktree used PR #4650 plus local, uncommitted shims for unrelated main-branch duplicate/drift errors. No shim touched pkm_semaev.rs, f4_fp_tower.rs, sig_fp_tower.rs, ic_boundary prime arithmetic, or the test bodies. The task diff was applied byte-for-byte."
+    "command": "CARGO_TARGET_DIR=/workspace/crypto/target cargo +1.94.1 test --release --lib projective_chain_keeps_identity_and_rejects_zero_coordinates -- --exact --nocapture",
+    "result": "exit 0 (build); the unqualified exact Cargo filter selected zero tests, detected and corrected by direct fully-qualified invocations below",
+    "duration": "20m27s cold release test artifact",
+    "disclosure": "The disposable worktree used compile-repair PR #4650 plus local, uncommitted shims for unrelated duplicate/drift and sparse-fixture failures. No shim touched pkm_semaev.rs, curve25519_family.rs, f4_fp_tower.rs, sig_fp_tower.rs, prime-field arithmetic, or the test bodies. The task source and counter diff were overlaid exactly."
   },
   "tests": [
     {
       "name": "cryptanalysis::ic_framework::pkm_semaev::tests::projective_chain_keeps_identity_and_rejects_zero_coordinates",
-      "command": "crypto_lib-bc2e1793b88d0264 <name> --exact --nocapture",
+      "command": "target/release/deps/crypto_lib-bc2e1793b88d0264 --exact <fully-qualified-name> --nocapture",
       "exit": 0,
       "passed": 1,
       "failed": 0,
-      "seconds": 0.12
+      "seconds": 0.11,
+      "scope": "bihomogeneous identity equations, (0:0) exclusion, exact signed inverse-pair witness whose first two lifted points add to the group identity"
     },
     {
       "name": "cryptanalysis::ic_framework::pkm_semaev::tests::planted_m3_decompositions_are_found",
-      "command": "crypto_lib-bc2e1793b88d0264 <name> --exact --nocapture",
+      "command": "target/release/deps/crypto_lib-bc2e1793b88d0264 --exact <fully-qualified-name> --nocapture",
       "exit": 0,
       "passed": 1,
       "failed": 0,
-      "seconds": 1.19
+      "seconds": 1.69
     },
     {
       "name": "cryptanalysis::ic_framework::pkm_semaev::tests::f4_agrees_with_grid_on_random_targets",
-      "command": "crypto_lib-bc2e1793b88d0264 <name> --exact --nocapture",
+      "command": "target/release/deps/crypto_lib-bc2e1793b88d0264 --exact <fully-qualified-name> --nocapture",
       "exit": 0,
       "passed": 1,
       "failed": 0,
-      "seconds": 5.79,
+      "seconds": 8.81,
       "scope": "40 deterministic random/planted targets; affine chain, projective chain, full S4 and exhaustive grid verdicts agree; returned relations are group checked"
     }
   ],
-  "excluded": [
-    "No qualification performance cell was run.",
-    "No exponent was estimated.",
-    "The task branch root build still stops on 35 unrelated errors.",
-    "The frozen eight-planted-per-measured-cell gate remains pending."
+  "measurement_correctness": {
+    "complete_cells": ["t3-chain", "t3-projective", "t4-chain", "t4-projective"],
+    "planted_exact_each": 8,
+    "invalid_rows_each": 0,
+    "projective_planted_charts": {
+      "t3": {"affine": 6, "identity": 2},
+      "t4": {"affine": 7, "identity": 1}
+    }
+  },
+  "claim_boundary": [
+    "The task branch root build still stops on unrelated errors; this evidence does not clear that gate.",
+    "The t=5 and t=6 cells are censored, so the four-point slope estimator is undefined.",
+    "A component qualification result would not by itself establish total subexponential ECDLP."
   ]
 }

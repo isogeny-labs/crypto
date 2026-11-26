@@ -211,10 +211,13 @@ fn mul_mod(lhs: &BigUint, rhs: &BigUint, p: &BigUint) -> BigUint {
 }
 
 fn inverse_mod(value: &BigUint, p: &BigUint) -> Option<BigUint> {
+    // `p` is a validated (probable) prime and both callers pass reduced
+    // values, so the old Fermat power `value^(p-2)` is the inverse when
+    // `value ≠ 0`; zero stays `None`.
     if value.is_zero() {
         None
     } else {
-        Some(value.modpow(&(p - BigUint::from(2u8)), p))
+        crate::gcd::int::modinv_big(value, p)
     }
 }
 

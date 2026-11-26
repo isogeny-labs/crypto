@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:56:05Z",
+ "id": "PCC-20261124-d1c3b4",
+ "kind": "execution",
+ "producer": {
+  "commit": "69d54004bddc54795baf36bb295d7c10d1df7511",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/successor-review-20261124/PLAN.md",
+    "sha256": "dac473d8d177b97773614a03eaa7ae100de40ad2f033f46e4e9fd40c964be6bd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/successor-review-20261124/source-worker-inputs.sha256",
+    "sha256": "f5292da217fa7c9a0ee617cce38aed4d4865b8b2dec5a4d02e2115867a54152b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/successor-review-20261124/validation/review-tests-final.log",
+    "sha256": "5d665b112e6bb70a5894501a5f7d0aecbf6ea1483bb463589f15eff9b480173a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/successor-review-20261124/validation/review-clippy.log",
+    "sha256": "15cd67ec630aa1058691eb0428be0cf95bccd1668aa5c8a6ef8eecafaf61ab64"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Qualified source-only Rust successor metadata audit before public-case execution: three controls pass for known j0/j1728 and singular refusal, Frobenius fixed-space versus rational-point distinction, and output/answer-field allowlists. Optimized source build and strict Clippy pass. Frozen inputs are exact public curve, retained collection packet and prior H2 result; no new F4, root finder, rho or DLP call has run."
+}

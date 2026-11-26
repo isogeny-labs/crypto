@@ -333,111 +333,44 @@ impl Field for FpK {
         if self.k() == 1 {
             return vec![self.inv_mod(a[0])];
         }
-        // Extended Euclid in GF(p)[z]: s·a ≡ gcd (mod m), the gcd a unit.
-        let p = self.p;
-        let strip = |mut v: Vec<u64>| {
-            while v.last() == Some(&0) {
-                v.pop();
+        // a⁻¹ mod m in GF(p)[z] by the shared extended GCD.
+        let fp = crate::gcd::poly::Fp64::new(self.p);
+        let a_red: Vec<u64> = a.iter().map(|&c| c % self.p).collect();
+        match crate::gcd::poly::inv_mod(&fp, &a_red, &self.full_modulus()) {
+            Some(s) => {
+                let mut out = vec![0u64; self.k()];
+                out[..s.len()].copy_from_slice(&s);
+                out
             }
-            v
-        };
-        let mut m = self.modulus.clone();
-        m.push(1);
-        let (mut r0, mut r1) = (m, strip(a.clone()));
-        let (mut s0, mut s1): (Vec<u64>, Vec<u64>) = (Vec::new(), vec![1]);
-        while r1.len() > 1 {
-            // r0 = qt·r1 + rem.
-            let lead_inv = self.inv_mod(*r1.last().expect("non-zero"));
-            let mut rem = r0.clone();
-            let mut qt = vec![0u64; rem.len() + 1 - r1.len()];
-            while rem.len() >= r1.len() {
-                let c = self.mulmod(*rem.last().expect("non-empty"), lead_inv);
-                let shift = rem.len() - r1.len();
-                qt[shift] = c;
-                for (i, &x) in r1.iter().enumerate() {
-                    let sub = self.mulmod(c, x);
-                    rem[shift + i] = (rem[shift + i] + p - sub) % p;
-                }
-                rem = strip(rem);
-                if rem.is_empty() {
-                    break;
-                }
-            }
-            // s2 = s0 − qt·s1.
-            let mut s2 = vec![0u64; (qt.len() + s1.len()).max(s0.len())];
-            for (i, &x) in s0.iter().enumerate() {
-                s2[i] = x;
-            }
-            for (i, &x) in qt.iter().enumerate() {
-                if x == 0 {
-                    continue;
-                }
-                for (j, &y) in s1.iter().enumerate() {
-                    let sub = self.mulmod(x, y);
-                    s2[i + j] = (s2[i + j] + p - sub) % p;
-                }
-            }
-            (r0, r1) = (r1, rem);
-            (s0, s1) = (s1, strip(s2));
-            if r1.is_empty() {
+            None => {
                 // A common factor with m: no inverse in GF(p)[z]/(m), so
                 // keep the old a^(q − 2) rather than fail.
-                let q = BigUint::from(p).pow(self.k() as u32);
-                return self.pow(a, &(q - 2u8));
+                let q = BigUint::from(self.p).pow(self.k() as u32);
+                self.pow(a, &(q - 2u8))
             }
         }
-        let c = self.inv_mod(r1[0]);
-        let mut out = vec![0u64; self.k()];
-        for (i, &x) in s1.iter().enumerate() {
-            out[i] = self.mulmod(x, c);
-        }
-        out
     }
 }
 
 impl FpK {
     /// Whether `gcd(a, m) = 1` in `GF(p)[z]`, `m` the modulus (which need
-    /// not be irreducible here): Euclid on the remainders.
+    /// not be irreducible here), by the shared `crate::gcd::poly::gcd`.
     pub fn coprime(&self, a: &[u64]) -> bool {
-        let p = self.p;
-        let strip = |mut v: Vec<u64>| {
-            while v.last() == Some(&0) {
-                v.pop();
-            }
-            v
-        };
+        let fp = crate::gcd::poly::Fp64::new(self.p);
+        let a_red: Vec<u64> = a.iter().map(|&c| c % self.p).collect();
+        crate::gcd::poly::gcd(&fp, &self.full_modulus(), &a_red) == [1]
+    }
+
+    /// The monic modulus `m` with its leading coefficient.
+    fn full_modulus(&self) -> Vec<u64> {
         let mut m = self.modulus.clone();
         m.push(1);
-        let (mut r0, mut r1) = (m, strip(a.to_vec()));
-        while r1.len() > 1 {
-            let lead_inv = self.inv_mod(*r1.last().expect("non-zero"));
-            let mut rem = r0;
-            while rem.len() >= r1.len() {
-                let c = self.mulmod(*rem.last().expect("non-empty"), lead_inv);
-                let shift = rem.len() - r1.len();
-                for (i, &x) in r1.iter().enumerate() {
-                    let sub = self.mulmod(c, x);
-                    rem[shift + i] = (rem[shift + i] + p - sub) % p;
-                }
-                rem = strip(rem);
-                if rem.is_empty() {
-                    break;
-                }
-            }
-            (r0, r1) = (r1, rem);
-        }
-        r1.len() == 1
+        m
     }
 
     fn inv_mod(&self, a: u64) -> u64 {
-        let (mut r0, mut r1) = (i128::from(self.p), i128::from(a % self.p));
-        let (mut s0, mut s1) = (0i128, 1i128);
-        while r1 != 0 {
-            let q = r0 / r1;
-            (r0, r1) = (r1, r0 - q * r1);
-            (s0, s1) = (s1, s0 - q * s1);
-        }
-        s0.rem_euclid(i128::from(self.p)) as u64
+        // As before: 0 for a ≡ 0 (no check, no panic).
+        crate::gcd::int::inv_mod_u64(a % self.p, self.p).unwrap_or(0)
     }
 }
 

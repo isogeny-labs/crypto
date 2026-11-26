@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:29:46Z",
+ "id": "PCC-20261124-c193f2",
+ "kind": "execution",
+ "producer": {
+  "commit": "3370dc1bf3558978ca81f1c68908bcf86d277e50",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/anchored-forced-divisor-20261124/composite-source/validation/graph-tests-qualified.log",
+    "sha256": "a68c006a82f20546ff7cdb0f4295133cf3f9f8bef816210b7d35d1e5fa521e52"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/anchored-forced-divisor-20261124/composite-source/source-worker-inputs.sha256",
+    "sha256": "e2c11c0d6c7f118e4000d3243383bcaf7c97cb54c13ec310f8eb7cacd86be9d6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/jv_forced_graph.rs",
+    "sha256": "21234fa441486b11fd33d6e2235cc43080609fc03e1e4139f75b6fe6abc6e8f4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/jv_forced_divisor.rs",
+    "sha256": "9acaccb3253269b366321f8fd1ec2282e295c15512f1bdb71a48b1137cbbcf90"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Exact-source Rust three-quadratic/composite graph integration has26 passing native controls and strict worker/test Clippy. Planted smooth F11 support passes actual norm/Mumford/group replay; first lex3LP control at307 points,59 quartic attempts with all refusals retained. Composite preserves both original function proofs, exact signed anchor cancellation, smooth curve/field/ordered-base binding, deferred graph admission, trivial-row exclusion and integer projection checks. Tampering is refused. No saved public-curve finder run or new measured graph row; scoped Root41 dependencies and native coverage remain partial, producer-unsigned."
+}

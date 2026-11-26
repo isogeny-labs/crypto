@@ -148,30 +148,7 @@ impl Fp {
 
 #[inline(always)]
 fn inv_mod(a: u64, m: u64) -> u64 {
-    if m < (1u64 << 63) {
-        let (mut r0, mut r1) = (m, a);
-        let (mut s0, mut s1) = (0i64, 1i64);
-        while r1 != 0 {
-            let q = r0 / r1;
-            (r0, r1) = (r1, r0 - q * r1);
-            (s0, s1) = (s1, s0.wrapping_sub((q as i64).wrapping_mul(s1)));
-        }
-        assert_eq!(r0, 1, "not invertible");
-        return if s0 < 0 {
-            (s0 + m as i64) as u64
-        } else {
-            s0 as u64
-        };
-    }
-    let (mut r0, mut r1) = (m as i128, a as i128);
-    let (mut s0, mut s1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (s0, s1) = (s1, s0 - q * s1);
-    }
-    assert_eq!(r0, 1, "not invertible");
-    s0.rem_euclid(m as i128) as u64
+    crypto_lib::gcd::int::inv_mod_u64(a, m).expect("not invertible")
 }
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
@@ -284,11 +261,8 @@ fn brent(n: u64) -> u64 {
     unreachable!()
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 // ---------------------------------------------------------------- curves

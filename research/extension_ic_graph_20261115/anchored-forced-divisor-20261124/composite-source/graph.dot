@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",fontname="DejaVu Sans",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#007f73",fillcolor="#e4f4ef"];
+ edge [color="#52738c",fontname="DejaVu Sans",fontsize=9];
+ p [label="Planted F11 control\nExact 3-small / 3-quadratic\nnorm + support + Jacobian"];
+ c [label="Checked anchor cancellation\nBoth functions retained\nInteger signs + domain binding"];
+ d [label="Existing deferred graph\nTwo endpoints retained\nNo ungrounded full row"];
+ f [label="Next: public-curve finder\nCost, refusals, useful closure",style="rounded,dashed",fillcolor="white",color="#52738c"];
+ p -> c -> d;
+ d -> f [style=dashed,label="separate registration"];
+}

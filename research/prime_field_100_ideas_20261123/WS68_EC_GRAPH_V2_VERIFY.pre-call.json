@@ -1,0 +1,14 @@
+{
+  "record_type": "immutable_pre_call",
+  "created_utc": "2026-11-25T04:39:49Z",
+  "admission": "user-authorized local bypass of S3 HTTP 403; parent requested independent V2 native verification",
+  "worktree_commit": "c0f6885005f713e0fe56087584f8fbd8bdbcca5b",
+  "producer_source": {"path": "EC_GRAPH_RANK_GP_V2.gp", "sha256": "4234f8c06f4acb764e59314ec85d72348925f6ee4c19907bcd605f5d4402b87f"},
+  "producer_stdout": {"path": "EC_GRAPH_RANK_GP_V2.stdout.txt", "sha256": "1a2f0f09992538dd789f38fda43a5bd20765580f952dba7181e3e99b81e59f83"},
+  "verifier_source": {"path": "WS68_EC_GRAPH_V2_VERIFY.rs", "sha256": "7d220d4161dae426d30ee72ed1a00ef3b24c2c87ca747a2db1785c7519cfd981"},
+  "immutable_qualifier": {"path": "WS68_EC_GRAPH_V2_VERIFY.qualifier.rs", "sha256": "7d220d4161dae426d30ee72ed1a00ef3b24c2c87ca747a2db1785c7519cfd981"},
+  "compiler": {"path": "/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc", "version": "rustc 1.99.1", "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv": ["rustc", "-O", "--edition", "2021", "--crate-name", "WS68_EC_GRAPH_V2_VERIFY", "WS68_EC_GRAPH_V2_VERIFY.qualifier.rs", "-o", "WS68_EC_GRAPH_V2_VERIFY.bin"],
+  "expected": {"curve_p":1009,"group_order":1013,"group_count":1013,"A_rows_valid":3,"B_rows_valid":3,"det_A":2,"rank_A":3,"det_B":0,"rank_B":2},
+  "claim_boundary": "exact public EC row and modular-rank verification; no performance claim"
+}
