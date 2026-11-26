@@ -12,5 +12,4 @@ admitted benchmark row. [pcc:unverified]
 
 - [Report PDF](report.pdf)
 - [Timing and counter figure (SVG)](speedup.svg) [pcc:unverified]
-- [Timing and counter figure (150 dpi PNG)](speedup.png) [pcc:unverified]
 - [Source report](../../research/norm_one_torus_rust_mitm_20261126/REPORT.md)

@@ -84,7 +84,10 @@ pub fn sha256_hex(bytes: &[u8]) -> String {
 }
 
 fn decode_hex(value: &str) -> Vec<u8> {
-    assert!(value.len() % 2 == 0, "hex input must have even length");
+    assert!(
+        value.len().is_multiple_of(2),
+        "hex input must have even length"
+    );
     value
         .as_bytes()
         .chunks_exact(2)
