@@ -460,7 +460,7 @@ composition, not an online-only or free-oracle calculation.
 The achievement remains conditional in two important senses.  The combined
 Rust/source cost argument is a producer audit rather than an independent
 refinement proof, and the Bochum reduction assumes the external tensor
-contraction theorem.  The native typed encoders and 173-test suite exercise
+contraction theorem.  The native typed encoders and 174-test suite exercise
 the required information-flow and polynomial-description claims, but do not
 kernel-check the whole asymptotic chain. [pcc:unverified]
 

@@ -200,6 +200,16 @@ nontrivial extension sample values. Factoring those scalar identities through
 `modes`, `child`, and all packet ports remains in items 2–3.
 `[pcc:unverified]`
 
+For the packet-local part of items 2–3, an independent exhaustive oracle now
+enumerates every constant/incoming-mode choice per row and filters only by the
+requested exponent vector. It agrees with the production depth-first
+coefficient extractor on all 64 port assignments for four rows, two columns,
+two simultaneous incoming modes of total degree three, local affine terms,
+and two outgoing forms including a square. The remaining link is the global
+claim that `modes` assigns every scalar series term to exactly one target and
+source group and that multiplying the resulting child contractions preserves
+all old vertex correlations. `[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,
