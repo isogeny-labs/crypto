@@ -147,5 +147,34 @@
     "derived_source_cost_envelope": "(s+description_length)^O(1) * 2^(290*s/sqrt(u_0)) <= (s+description_length)^O(1) * 2^(148480*s/sqrt(lambda))",
     "claim_boundary": "unverified producer-level source-cost certificate; no independent Rust refinement, kernel-checked whole theorem, practical Curve25519 attack or verification of the external contraction/reduction theorem"
   },
-  "next_gate": "independently refine or formally prove the combined source-cost theorem and bind the prime-field ECDLP reduction's typed-description and success-probability hypotheses"
+  "prime_field_reduction_ledger": {
+    "primary_source_commit": "1ee44e562b1b9a50ea339f3b8f81112b5a24b96f",
+    "primary_source_pdf_sha256": "82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11",
+    "source_scope": "Bochum v0.2 Theorem 4 and Lemmas 9-13",
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/reduction.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-reduction-audit.rs",
+    "success_chain": {
+      "fixed_target_seed_average": "at least 2/5",
+      "good_seed_probability": "at least 1/4",
+      "enough_relations_given_good_seed": "at least 3/4 within 20(N+1) targets",
+      "nonzero_extraction_coefficient": "1-1/r",
+      "per_trial": "3(r-1)/(16r)>1/6",
+      "expected_trials": "at most 6"
+    },
+    "curve25519_finite_ledger": {
+      "field_bits": 255,
+      "subgroup_bits": 253,
+      "slots": 2,
+      "target_membership_mass": "85070591730234615865843651857942052865",
+      "columns_upper_bound_using_4p": "5444517870735015415413993718908291383340",
+      "expected_contraction_calls_bits": 149,
+      "dense_elimination_work_bits": 412,
+      "unit_constant_relation_phase_exponent_surrogate": 392,
+      "unit_constant_linear_algebra_exponent_surrogate": 399
+    },
+    "total_expected_work": "2^O(b/(log b)^(1/4))=r^o(1), including setup, relation generation, dense linear algebra and target recovery, conditional on the contraction theorem and producer source-cost audit",
+    "native_boundary": "finite retry/column/resource caps return an unknown limit error; every host-representable input uses the finite-size fallback",
+    "claim_boundary": "unverified producer composition; not an independent refinement proof, practical attack, deployed-curve result or verification of the external theorem"
+  },
+  "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

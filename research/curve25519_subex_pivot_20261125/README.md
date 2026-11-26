@@ -374,6 +374,88 @@ general contraction theorem and its prime-field ECDLP reduction remain
 external assumptions; the live `usize` backend still takes the documented
 finite-size fallback on every representable input. [pcc:unverified]
 
+### Prime-field reduction and total-work ledger
+
+The outer ECDLP reduction has now been checked against the pinned Bochum v0.2
+primary source at commit `1ee44e562b1b9a50ea339f3b8f81112b5a24b96f`;
+the read PDF has SHA-256
+`82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11`.
+The relevant chain is Theorem 4 and Lemmas 9--13.
+
+For `b=ceil(log2(p))` and
+`m=ceil((log2(b))^(1/4))`, put
+`L=max(ceil(r^(1/m)),10m)`.  The random affine hashes give each fixed target
+a decomposition with seed-averaged probability at least `2/5`.  Therefore
+at least `1/4` of seeds cover at least `1/5` of targets.  For one such
+seed, 20`(N+1)` independent targets collect `N+1` relations with probability
+at least `3/4`.  Because decomposition and row-dependency selection are
+deterministic functions of the seed and targets, the final coefficient `V`
+remains uniform; `V!=0` with probability `1-1/r`.  The resulting exact
+per-trial lower bound is
+
+```text
+3(r-1)/(16r) > 1/6.
+```
+
+The production Rust path matches the required information flow:
+`solve` samples independent `u,v`, passes only
+`R=[u]P+[v]Q` and the public bases to deterministic `Counter::witness`,
+uses the first deterministic row dependency, retries on too few rows or
+`V=0`, and replays the recovered scalar.  It enumerates each base exactly
+by inverse hash and parity-selected square root, and gives a point appearing
+in two slot bases two distinct matrix columns.  Its configured finite trial
+cap returns a resource-limit error rather than a false answer; the theorem
+schedule retries fresh trials and has expected trial count at most six.
+[pcc:unverified]
+
+The new native `tensor-reduction-audit` prices that schedule with exact
+integers.  Its default Curve25519 field/subgroup row reports:
+
+| item | exact or bit-size bound |
+| --- | ---: |
+| field/subgroup bits | 255 / 253 |
+| theorem slots `m` | 2 |
+| target membership mass `L` | 85070591730234615865843651857942052865 |
+| safe columns using `s<=4p` | 5444517870735015415413993718908291383340 |
+| expected prefix-contraction calls | 149 bits |
+| conservative dense-elimination bit work | 412 bits |
+| unit-constant relation-phase exponent surrogate | 392 |
+| unit-constant linear-algebra exponent surrogate | 399 |
+
+The last two rows deliberately omit the contraction theorem's hidden constants
+and are not runtime estimates.  They show that the construction has no
+practical claim at 255 bits even before those constants.
+
+Asymptotically, one decomposition network has `O(mb)` edges, polynomial
+typed description and degree `O(b^(3/4))).  Prefix self-reduction uses
+`O(mb)` contractions per relation query.  The complete charged terms are
+
+```text
+factor-base construction          2^O(b/m + log b)
+number of contraction calls       2^O(b/m + log b)
+one contraction                   2^O(mb/sqrt(log b))
+dense linear algebra              2^O(3b/m + log b)
+target generation/recovery        polynomial per call.
+```
+
+With `m=ceil((log b)^(1/4))`, setup, relation finding, linear algebra, and
+target recovery are all bounded by
+
+```text
+2^O(b/(log b)^(1/4)) = r^o(1)
+```
+
+for fixed cofactor and `log r=b+O(1)`.  This is a total expected-work
+composition, not an online-only or free-oracle calculation.
+[pcc:unverified]
+
+The achievement remains conditional in two important senses.  The combined
+Rust/source cost argument is a producer audit rather than an independent
+refinement proof, and the Bochum reduction assumes the external tensor
+contraction theorem.  The native typed encoders and 163-test suite exercise
+the required information-flow and polynomial-description claims, but do not
+kernel-check the whole asymptotic chain. [pcc:unverified]
+
 ## Primary references and local context
 
 - Akshima et al., pinned Bochum v0.2, Theorem 4:
