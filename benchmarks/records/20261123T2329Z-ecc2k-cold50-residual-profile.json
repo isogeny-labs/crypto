@@ -1,0 +1,118 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T23:30:35+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "tools/profile.sh",
+        "cpu",
+        "--mode",
+        "callgrind",
+        "--out",
+        "research/trace_zero_cold50_20261123/profiles/candidate1-cold",
+        "--label",
+        "Candidate1 residual costs before candidate2",
+        "--",
+        "research/trace_zero_cold50_20261123/bin/elimination",
+        "one",
+        "research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json",
+        "elimination"
+      ],
+      "cwd": "/workspace/crypto",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:27:50Z",
+      "wall_s": 0.505
+    },
+    {
+      "argv": [
+        "bash",
+        "tools/profile.sh",
+        "cpu",
+        "--mode",
+        "callgrind",
+        "--out",
+        "research/trace_zero_cold50_20261123/profiles/candidate1-aa-cold",
+        "--label",
+        "Candidate1 residual costs before candidate2",
+        "--",
+        "research/trace_zero_cold50_20261123/bin/elimination",
+        "one",
+        "research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json",
+        "elimination"
+      ],
+      "cwd": "/workspace/crypto",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:27:51Z",
+      "wall_s": 0.525
+    }
+  ],
+  "commit": "e64469e6aea1b9c558c8f6c79bb69cfc697369bf",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T23:29:39+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T2329Z-ecc2k-cold50-residual-profile",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "whole_cold_ir",
+      "note": "Absolute candidate1 remaining-cost profile, protocol-before-data; commands imported from actual manifests after the calls.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        23781983.0,
+        23781983.0
+      ],
+      "unit": "ir",
+      "value": 23781983.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-cold50",
+  "raw": [
+    {
+      "bytes": 285,
+      "path": "research/trace_zero_cold50_20261123/checks/candidate1-residual-profile.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/17/17770c297394a489fad47718cf85844c44075703576622a9821caf8628263c45",
+      "sha256": "17770c297394a489fad47718cf85844c44075703576622a9821caf8628263c45",
+      "uploaded": false
+    },
+    {
+      "bytes": 6068,
+      "path": "research/trace_zero_cold50_20261123/profiles/candidate1-cold/hotspots.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/20a210a0d75414877a560f50fe6ba01a5f540541d8c956a472ab507c999ae371",
+      "sha256": "20a210a0d75414877a560f50fe6ba01a5f540541d8c956a472ab507c999ae371",
+      "uploaded": false
+    },
+    {
+      "bytes": 6068,
+      "path": "research/trace_zero_cold50_20261123/profiles/candidate1-aa-cold/hotspots.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/20a210a0d75414877a560f50fe6ba01a5f540541d8c956a472ab507c999ae371",
+      "sha256": "20a210a0d75414877a560f50fe6ba01a5f540541d8c956a472ab507c999ae371",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold50_20261123/candidate1/report.pdf",
+    "png": [],
+    "svg": [
+      "research/trace_zero_cold50_20261123/profiles/candidate1-cold/hotspots.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50-residual-profile",
+  "status": "measured",
+  "summary": "Two fixed absolute candidate1 profiles identify multiplication/reduction interfaces; source/protocol before data, exact manifest-command bookkeeping imported afterwards. No gain comparison.",
+  "validation": null
+}

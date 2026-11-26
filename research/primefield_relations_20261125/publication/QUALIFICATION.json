@@ -1,0 +1,51 @@
+{
+  "schema": "isogeny.shared-selector-publication-qualification/v1",
+  "source_problem": {
+    "p": 2147483647,
+    "r": 2147446831
+  },
+  "standing": "unsigned producer evidence; no independent signed PCC verdict",
+  "cargo": {
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "test_threads": 1,
+    "raw": "replay/cargo-tests.stdout"
+  },
+  "replay": {
+    "capacity_table_equal": true,
+    "full_rational_certificates_equal": true,
+    "gate_json_equal": true,
+    "raw": "replay/post-call.json"
+  },
+  "gate": {
+    "assertion_entries": 47,
+    "distinct_names": 31,
+    "selector_roots": 29,
+    "rational_abscissae": 17,
+    "signed_lifts": 34,
+    "original_labeled_columns": 3
+  },
+  "new_relation_search_calls": 0,
+  "new_randomized_experiments": 0,
+  "performance_claim": false,
+  "formalization": "written proof and independent agent review; not Lean checked",
+  "scope_corrections": [
+    "selector is nonconstant before applying the fiber-degree bound",
+    "occupancy parameter k restricted to 1..M"
+  ],
+  "original_evidence": "Frozen attempt-001 and capacity certificates retained byte-for-byte; original resource/provenance caveats retained.",
+  "publication_changes": [
+    "study-local dependency-free Cargo package",
+    "PATH/absolute RUSTC support and compiler-probe completion trap",
+    "push-main/manual CI replay only",
+    "source-linked two-page PDF and editable figures",
+    "Rust 1.100.0 CI pin and failure provenance upload"
+  ],
+  "binaries": "Four original ELF files omitted; original hashes retained as historical metadata.",
+  "root_library_gate": "Not passed: first offline attempt lacked registry cache, cached attempt lacked sparse path dependency. Logs retained; no root source changes.",
+  "tracking_pr": 5206,
+  "integration_branch": "lane/m31-shared-selector-integration-20261125",
+  "new_pcc_claims": 0,
+  "claim_admission": "Archived correctness fixture does not satisfy exhaustive arbitrary-coordinate and matched-cost admission; no new PCC IDs.",
+  "integration_pr": 5213
+}

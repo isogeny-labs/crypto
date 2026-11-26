@@ -1,0 +1,37 @@
+{
+  "schema": "cayley-chord.publication/v1",
+  "original_date": "2026-11-25",
+  "pr": 5232,
+  "original_manifest_sha256": "a5792d96b12794fe4c3b8d8012342662fac361daa4d60612634c90b5865d8501",
+  "frozen_algorithm_files": [
+    "main.rs",
+    "extractor.rs",
+    "reference.rs",
+    "upstream/arithmetic.rs"
+  ],
+  "unchanged_scientific_records": "publication/original-protocol.md, SOURCE.json, upstream snapshots, and evidence except the explicitly path-redacted failed-link log",
+  "original_failed_link_stderr_sha256": "332d703a4ddf6b4909c6df0f4b031de51fd5737c4e9f2cbfeb1ddbbbb894e0bd",
+  "published_redacted_stderr_sha256": "f71a9061069006ccaf16d55c490a6872a2dc67167134ab58e9c454bcbbcd0b49",
+  "redaction": "Replace absolute workspace scratch paths with <scratch-path>; scientific diagnostics retained.",
+  "omitted": [
+    "rebuildable ELF and failed-build object files",
+    "private scheduling handoff and task identifier",
+    "internal service paragraph from narrative review",
+    "original README and REVIEW narrative versions, whose hashes remain in original-manifest.sha256"
+  ],
+  "adapted": [
+    "README.md: publication context, provenance, nonempty comparator hypothesis and formalization map",
+    "REVIEW.md: omit internal service history and qualify standing",
+    "replay.sh: hydrate case files through existing artifact recovery before the unchanged replay",
+    "PROTOCOL.md: append only a PCC-unverified publication-standing tag; unchanged original archived in publication/original-protocol.md"
+  ],
+  "artifact_recovery": {
+    "case_sha256": "aa02a987378a24ba7f04803e508be084371f6bb76d96249de0f5a4b276653e4c",
+    "uncompressed_bytes": 521012,
+    "gzip_file": ".artifacts/recovery/aa02a987378a24ba7f04803e508be084371f6bb76d96249de0f5a4b276653e4c-cayley-chord-m31-cases.jsonl.gz",
+    "gzip_bytes": 83438,
+    "s3_upload": false
+  },
+  "pcc_standing": "unverified; no new PCC IDs",
+  "original_protocol_sha256": "06260c3c57b66a0259bf7b1a064679d74e26c2b620458578cd30c618acae784f"
+}

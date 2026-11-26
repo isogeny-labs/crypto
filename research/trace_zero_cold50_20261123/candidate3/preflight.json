@@ -1,0 +1,1037 @@
+{
+  "engineering_total_seconds": 8.989876898,
+  "rows": [
+    {
+      "arm": "baseline",
+      "engineering_elapsed_seconds": 0.631936214,
+      "instance": "scale-n83-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 6857,
+        "field_square": 2684,
+        "instructions": 27360424,
+        "oracle_instructions": 8258793,
+        "post_instructions": 1059399,
+        "setup_instructions": 18042232
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 378
+        },
+        "group": {
+          "adds": 512,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1039,
+          447,
+          377
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 8688,
+          "f2m83_inverse_informational": 2,
+          "f2m83_mul": 6857,
+          "f2m83_square": 2684
+        },
+        "outcome": "Found",
+        "patterns_attempted": 378,
+        "patterns_refuted": 377,
+        "points": [
+          [
+            "fa8",
+            "33a4295c7514590999461"
+          ],
+          [
+            "6ca",
+            "96ec949f83e21e374fba"
+          ],
+          [
+            "5ca",
+            "4b873bf64d04131e59b10"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 376,
+          "rows": 4890,
+          "systems": 377
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "incumbent",
+      "engineering_elapsed_seconds": 0.558175526,
+      "instance": "scale-n83-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 6857,
+        "field_square": 2684,
+        "instructions": 22064735,
+        "oracle_instructions": 8238497,
+        "post_instructions": 1059152,
+        "setup_instructions": 12767086
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 378
+        },
+        "group": {
+          "adds": 512,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1039,
+          447,
+          377
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 8688,
+          "f2m83_inverse_informational": 2,
+          "f2m83_mul": 6857,
+          "f2m83_square": 2684
+        },
+        "outcome": "Found",
+        "patterns_attempted": 378,
+        "patterns_refuted": 377,
+        "points": [
+          [
+            "fa8",
+            "33a4295c7514590999461"
+          ],
+          [
+            "6ca",
+            "96ec949f83e21e374fba"
+          ],
+          [
+            "5ca",
+            "4b873bf64d04131e59b10"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 376,
+          "rows": 4890,
+          "systems": 377
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "elimination",
+      "engineering_elapsed_seconds": 0.464813883,
+      "instance": "scale-n83-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 6857,
+        "field_square": 2684,
+        "instructions": 13335403,
+        "oracle_instructions": 6960946,
+        "post_instructions": 1058515,
+        "setup_instructions": 5315942
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 378
+        },
+        "group": {
+          "adds": 512,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1039,
+          447,
+          377
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 8688,
+          "f2m83_inverse_informational": 2,
+          "f2m83_mul": 6857,
+          "f2m83_square": 2684
+        },
+        "outcome": "Found",
+        "patterns_attempted": 378,
+        "patterns_refuted": 377,
+        "points": [
+          [
+            "fa8",
+            "33a4295c7514590999461"
+          ],
+          [
+            "6ca",
+            "96ec949f83e21e374fba"
+          ],
+          [
+            "5ca",
+            "4b873bf64d04131e59b10"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 376,
+          "rows": 4890,
+          "systems": 377
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline-aa",
+      "engineering_elapsed_seconds": 0.558338271,
+      "instance": "scale-n83-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 6857,
+        "field_square": 2684,
+        "instructions": 27363118,
+        "oracle_instructions": 8261420,
+        "post_instructions": 1059405,
+        "setup_instructions": 18042293
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 378
+        },
+        "group": {
+          "adds": 512,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1039,
+          447,
+          377
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 8688,
+          "f2m83_inverse_informational": 2,
+          "f2m83_mul": 6857,
+          "f2m83_square": 2684
+        },
+        "outcome": "Found",
+        "patterns_attempted": 378,
+        "patterns_refuted": 377,
+        "points": [
+          [
+            "fa8",
+            "33a4295c7514590999461"
+          ],
+          [
+            "6ca",
+            "96ec949f83e21e374fba"
+          ],
+          [
+            "5ca",
+            "4b873bf64d04131e59b10"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 376,
+          "rows": 4890,
+          "systems": 377
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline",
+      "engineering_elapsed_seconds": 0.57268005,
+      "instance": "scale-n83-d12-uniform",
+      "metrics": {
+        "field_mul": 16854,
+        "field_square": 4671,
+        "instructions": 33334915,
+        "oracle_instructions": 14397040,
+        "post_instructions": 894949,
+        "setup_instructions": 18042926
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "group": {
+          "adds": 2007,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 28364,
+          "f2m83_inverse_informational": 8,
+          "f2m83_mul": 16854,
+          "f2m83_square": 4671
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "patterns_refuted": 2008,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 2007,
+          "rows": 26093,
+          "systems": 2007
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "incumbent",
+      "engineering_elapsed_seconds": 0.525344248,
+      "instance": "scale-n83-d12-uniform",
+      "metrics": {
+        "field_mul": 16854,
+        "field_square": 4671,
+        "instructions": 28060207,
+        "oracle_instructions": 14397532,
+        "post_instructions": 894651,
+        "setup_instructions": 12768024
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "group": {
+          "adds": 2007,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 28364,
+          "f2m83_inverse_informational": 8,
+          "f2m83_mul": 16854,
+          "f2m83_square": 4671
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "patterns_refuted": 2008,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 2007,
+          "rows": 26093,
+          "systems": 2007
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "elimination",
+      "engineering_elapsed_seconds": 0.451977176,
+      "instance": "scale-n83-d12-uniform",
+      "metrics": {
+        "field_mul": 16854,
+        "field_square": 4671,
+        "instructions": 19066186,
+        "oracle_instructions": 12854444,
+        "post_instructions": 894718,
+        "setup_instructions": 5317024
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "group": {
+          "adds": 2007,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 28364,
+          "f2m83_inverse_informational": 8,
+          "f2m83_mul": 16854,
+          "f2m83_square": 4671
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "patterns_refuted": 2008,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 2007,
+          "rows": 26093,
+          "systems": 2007
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline-aa",
+      "engineering_elapsed_seconds": 0.582495167,
+      "instance": "scale-n83-d12-uniform",
+      "metrics": {
+        "field_mul": 16854,
+        "field_square": 4671,
+        "instructions": 33334965,
+        "oracle_instructions": 14397039,
+        "post_instructions": 894949,
+        "setup_instructions": 18042977
+      },
+      "n": 83,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 2008
+        },
+        "group": {
+          "adds": 2007,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m83_add": 28364,
+          "f2m83_inverse_informational": 8,
+          "f2m83_mul": 16854,
+          "f2m83_square": 4671
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 2008,
+        "patterns_refuted": 2008,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 2007,
+          "rows": 26093,
+          "systems": 2007
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline",
+      "engineering_elapsed_seconds": 0.608192432,
+      "instance": "scale-n131-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 12324,
+        "field_square": 3924,
+        "instructions": 39964754,
+        "oracle_instructions": 13853526,
+        "post_instructions": 1087281,
+        "setup_instructions": 25023947
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1051
+        },
+        "group": {
+          "adds": 1280,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1362,
+          1378,
+          1050
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 18120,
+          "f2m131_inverse_informational": 5,
+          "f2m131_mul": 12324,
+          "f2m131_square": 3924
+        },
+        "outcome": "Found",
+        "patterns_attempted": 1051,
+        "patterns_refuted": 1050,
+        "points": [
+          [
+            "1628",
+            "6e2c343d3a312a4c6f27da424aab09951"
+          ],
+          [
+            "1644",
+            "4209bbcb4db1f23f6aa3811f279302f10"
+          ],
+          [
+            "112c",
+            "714afd1583719cbf550d4c98a4f411ed7"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1049,
+          "rows": 13706,
+          "systems": 1050
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "incumbent",
+      "engineering_elapsed_seconds": 0.578636717,
+      "instance": "scale-n131-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 12324,
+        "field_square": 3924,
+        "instructions": 30909695,
+        "oracle_instructions": 13861077,
+        "post_instructions": 1087298,
+        "setup_instructions": 15961320
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1051
+        },
+        "group": {
+          "adds": 1280,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1362,
+          1378,
+          1050
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 18120,
+          "f2m131_inverse_informational": 5,
+          "f2m131_mul": 12324,
+          "f2m131_square": 3924
+        },
+        "outcome": "Found",
+        "patterns_attempted": 1051,
+        "patterns_refuted": 1050,
+        "points": [
+          [
+            "1628",
+            "6e2c343d3a312a4c6f27da424aab09951"
+          ],
+          [
+            "1644",
+            "4209bbcb4db1f23f6aa3811f279302f10"
+          ],
+          [
+            "112c",
+            "714afd1583719cbf550d4c98a4f411ed7"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1049,
+          "rows": 13706,
+          "systems": 1050
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "elimination",
+      "engineering_elapsed_seconds": 0.477268207,
+      "instance": "scale-n131-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 12324,
+        "field_square": 3924,
+        "instructions": 18156599,
+        "oracle_instructions": 10453854,
+        "post_instructions": 1084516,
+        "setup_instructions": 6618229
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1051
+        },
+        "group": {
+          "adds": 1280,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1362,
+          1378,
+          1050
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 18120,
+          "f2m131_inverse_informational": 5,
+          "f2m131_mul": 12324,
+          "f2m131_square": 3924
+        },
+        "outcome": "Found",
+        "patterns_attempted": 1051,
+        "patterns_refuted": 1050,
+        "points": [
+          [
+            "1628",
+            "6e2c343d3a312a4c6f27da424aab09951"
+          ],
+          [
+            "1644",
+            "4209bbcb4db1f23f6aa3811f279302f10"
+          ],
+          [
+            "112c",
+            "714afd1583719cbf550d4c98a4f411ed7"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1049,
+          "rows": 13706,
+          "systems": 1050
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline-aa",
+      "engineering_elapsed_seconds": 0.644705645,
+      "instance": "scale-n131-d12-distinct-planted-1",
+      "metrics": {
+        "field_mul": 12324,
+        "field_square": 3924,
+        "instructions": 39972153,
+        "oracle_instructions": 13860858,
+        "post_instructions": 1087287,
+        "setup_instructions": 25024008
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 35,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1051
+        },
+        "group": {
+          "adds": 1280,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": [
+          1362,
+          1378,
+          1050
+        ],
+        "models": 1,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 18120,
+          "f2m131_inverse_informational": 5,
+          "f2m131_mul": 12324,
+          "f2m131_square": 3924
+        },
+        "outcome": "Found",
+        "patterns_attempted": 1051,
+        "patterns_refuted": 1050,
+        "points": [
+          [
+            "1628",
+            "6e2c343d3a312a4c6f27da424aab09951"
+          ],
+          [
+            "1644",
+            "4209bbcb4db1f23f6aa3811f279302f10"
+          ],
+          [
+            "112c",
+            "714afd1583719cbf550d4c98a4f411ed7"
+          ]
+        ],
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1049,
+          "rows": 13706,
+          "systems": 1050
+        },
+        "reason": null,
+        "replay": true,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline",
+      "engineering_elapsed_seconds": 0.62799181,
+      "instance": "scale-n131-d12-uniform",
+      "metrics": {
+        "field_mul": 17285,
+        "field_square": 5027,
+        "instructions": 44024415,
+        "oracle_instructions": 18069389,
+        "post_instructions": 925804,
+        "setup_instructions": 25029222
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "group": {
+          "adds": 1993,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 27761,
+          "f2m131_inverse_informational": 8,
+          "f2m131_mul": 17285,
+          "f2m131_square": 5027
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "patterns_refuted": 1994,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1993,
+          "rows": 25786,
+          "systems": 1993
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "incumbent",
+      "engineering_elapsed_seconds": 0.560779909,
+      "instance": "scale-n131-d12-uniform",
+      "metrics": {
+        "field_mul": 17285,
+        "field_square": 5027,
+        "instructions": 34986059,
+        "oracle_instructions": 18093653,
+        "post_instructions": 925809,
+        "setup_instructions": 15966597
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "group": {
+          "adds": 1993,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 27761,
+          "f2m131_inverse_informational": 8,
+          "f2m131_mul": 17285,
+          "f2m131_square": 5027
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "patterns_refuted": 1994,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1993,
+          "rows": 25786,
+          "systems": 1993
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "elimination",
+      "engineering_elapsed_seconds": 0.48661324,
+      "instance": "scale-n131-d12-uniform",
+      "metrics": {
+        "field_mul": 17285,
+        "field_square": 5027,
+        "instructions": 21346390,
+        "oracle_instructions": 13797515,
+        "post_instructions": 925025,
+        "setup_instructions": 6623850
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "group": {
+          "adds": 1993,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 27761,
+          "f2m131_inverse_informational": 8,
+          "f2m131_mul": 17285,
+          "f2m131_square": 5027
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "patterns_refuted": 1994,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1993,
+          "rows": 25786,
+          "systems": 1993
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    },
+    {
+      "arm": "baseline-aa",
+      "engineering_elapsed_seconds": 0.65973869,
+      "instance": "scale-n131-d12-uniform",
+      "metrics": {
+        "field_mul": 17285,
+        "field_square": 5027,
+        "instructions": 44024465,
+        "oracle_instructions": 18069388,
+        "post_instructions": 925804,
+        "setup_instructions": 25029273
+      },
+      "n": 131,
+      "result": {
+        "common": {
+          "linear_columns": 35,
+          "maximum_nullity": 0,
+          "maximum_rank": 0,
+          "product_dimension": 23,
+          "source_dimension": 12,
+          "systems": 1994
+        },
+        "group": {
+          "adds": 1993,
+          "bucket_reads": 0,
+          "canonicalisations": 0,
+          "declined_lanes": 0,
+          "doubles": 0,
+          "filter_probes": 0,
+          "frobenius_maps": 0,
+          "scalar_mults": 0
+        },
+        "indices": null,
+        "models": 0,
+        "oracle_and_wrapper_replay_field": {
+          "f2m131_add": 27761,
+          "f2m131_inverse_informational": 8,
+          "f2m131_mul": 17285,
+          "f2m131_square": 5027
+        },
+        "outcome": "Refuted",
+        "patterns_attempted": 1994,
+        "patterns_refuted": 1994,
+        "points": null,
+        "projected": {
+          "columns": 13,
+          "inconsistent": 1993,
+          "rows": 25786,
+          "systems": 1993
+        },
+        "reason": null,
+        "replay": false,
+        "setup_field": {},
+        "valid": true
+      }
+    }
+  ]
+}

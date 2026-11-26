@@ -1,0 +1,172 @@
+# Overlap-sensitive exact Prim for the large-prime MST filter (2026-11-25)
+
+Branch `claude/overlap-sensitive-mst-20261125`, PR #5183. Component change to
+`src/cryptanalysis/large_prime_filter_mst.rs`. No timing claim, no natural
+Prime31 stream, no end-to-end ECDLP claim. [pcc:unverified]
+
+## Boundary
+
+The original MST filter eliminates one large-prime column `j` at a time. It
+normalizes the `k` member rows (coefficient of `j` = 1) and runs Prim on the
+complete graph whose edge `(v,u)` is the sparse difference `r_v - r_u`, keyed
+`(|small|+|large|, |sources|, v, u)`, with infeasible edges absent. It forms
+all `k(k-1)/2` differences. The new opt-in `MstStrategy::OverlapSensitive`
+(`filter_large_primes_mst_with`) returns the same tree while forming only the
+differences of *overlapping* pairs plus the `k-1` selected rows. The default
+(`filter_large_primes_mst`) is unchanged.
+
+## Algorithm and proof
+
+Per normalized row: `w_v` = small terms + large terms other than `j`, `q_v` =
+source terms. Rows `v,u` *overlap* if they share a small column, a large
+column other than `j`, or a source id.
+
+* **Disjoint pair, exact key.** No term cancels or merges, so the key is
+  `K(v,u) = (w_v+w_u, q_v+q_u, v, u)` and the resource counts are additive.
+* **Subadditivity.** For any pair the support of `r_v - r_u` lies in the
+  union, and each shared key merges two terms into at most one, so an
+  overlapping pair's key is *strictly* below `K(v,u)` in its first two
+  components.
+* **Cap condition (sufficient).** If the two largest rows of the column fit
+  together in every cap (`max_small_weight`, `max_sources`,
+  `max_active_coefficients`, by top-two sums), then by additivity and
+  subadditivity *every* pair is feasible: the feasible graph is complete.
+  If it fails, that column runs the exhaustive Prim (`exhaustive_fallback_trees`).
+* **Selection.** Let `m` be the visited vertex minimal in `(w,q,index)`. For
+  a fixed unvisited `u`, `K(v,u)` over visited `v` is ordered as `(w_v,q_v,v)`,
+  so `m` gives `u`'s best implicit edge when `u` is disjoint from `m`; if `u`
+  overlaps `m`, the explicit edge `(m,u)` is strictly below `K(m,u)` and below
+  every other implicit candidate. Over all `u`, `K(m,u)` is minimized by the
+  first unvisited `u` in `(w,q,index)` order, and if that `u` overlaps `m` the
+  explicit `(m,u)` edge is already smaller. Hence each Prim step picks
+  `min(best explicit edge in a lazy heap, K(m, first unvisited))`.
+  Keys include `(v,u)`, so ties break exactly as in the exhaustive Prim.
+* **Materialization.** A selected implicit edge is formed by the same
+  `axpy(p-1)` as the exhaustive Prim, so relation coefficients, RHS and source
+  witnesses are identical. Its key is checked against the prediction; a
+  mismatch would recompute the tree exhaustively and is counted in
+  `implicit_key_mismatches` (tests require 0).
+
+Two earlier ingredients were removed after mutation testing showed they could
+not change the result, as the bullets above show: a per-row "exceptional
+best disjoint endpoint" for rows overlapping `m`, and an overlap skip in the
+implicit scan.
+
+Work per tree: overlap graph from an inverted index (input traversal),
+one difference per overlapping pair, `k-1` materializations (output), and
+`O(k log k + |overlap pairs| log k)` heap/ordered-set work. With no overlap
+the tree forms only its `k-1` output rows.
+
+**Accounting choice.** The budget check and the legacy `edge_evaluations`
+counter still charge `k(k-1)/2` logical edges per column, so refusals,
+relations, `LargePrimeFilterReport` and every legacy `MstStats` field are
+identical across strategies. New counters (serde-skipped when zero, so
+existing JSON is unchanged): `explicit_edge_evaluations`,
+`implicit_selected_edges`, `overlapping_pairs`, `exhaustive_fallback_trees`,
+`fallback_edge_evaluations`, `implicit_key_mismatches`.
+
+## Evidence (local, source-exact harness)
+
+`research/lp_graph_algorithms_20261123/native_gain_dsu/run.sh`, rustc 1.97.0,
+release: **43/43 tests pass** (41 existing + 2 new).
+
+* `overlap_sensitive_prim_reproduces_exhaustive_prim_exactly`: 1200 seeded
+  streams, 2..61 rows, arity 1..3, primes 3, 7, 101, 1000003, 2147446831,
+  2^61-1, small-column density 4..2^20, a hub family (one light row sharing a
+  hot column with about half the rows), tight weight/source caps, tight edge
+  and coefficient budgets. Exact equality of `Option<Vec<CompleteRelation>>`,
+  report and legacy stats; every output replays from the inputs. 267 atomic
+  refusals and 369 fallback trees occur and agree.
+* `overlap_sensitive_prim_forms_no_difference_on_disjoint_rows`: one column,
+  40 disjoint rows over F_2147446831: 0 explicit differences, 39 implicit
+  selections, 780 logical edges; plus a cap-failure fixture that falls back.
+* Mutation check: flipping the `m` update, the explicit-vs-implicit
+  comparison, the implicit key, the explicit-key update rule, or any one of
+  the cap tests makes the equivalence tests fail.
+
+Differences formed (explicit + materialized + all pairs of fallback trees)
+versus logical edges, from the same run. These are counters on synthetic
+streams, not runtimes:
+
+| small columns | hub | formed | logical | ratio |
+|---:|:-:|---:|---:|---:|
+| 4 | no | 44,594 | 58,792 | 0.76 |
+| 4 | yes | 21,897 | 26,033 | 0.84 |
+| 8 | no | 36,092 | 53,758 | 0.67 |
+| 64 | no | 30,335 | 62,043 | 0.49 |
+| 1024 | no | 21,190 | 57,342 | 0.37 |
+| 2^20 | no | 20,940 | 55,428 | 0.38 |
+| all | | 260,287 | 446,718 | 0.58 |
+
+The ratio stops falling at sparse small supports: rows created by earlier
+merges share source ids and the remaining large columns, so residual overlap
+stays even when small supports are disjoint. Fallback trees (cap condition
+failed) are a further floor.
+
+## Shared-key exact keys (`MstStrategy::SharedKey`)
+
+For normalized rows `r_v`, `r_u` and one key space (small columns, large
+columns, source ids) with supports `A`, `B`, the difference has
+`|A| + |B| - c - e` terms, where `c` counts shared keys and `e` counts shared
+keys with equal coefficients (they cancel; unequal ones merge into one
+term). The eliminated column is shared with coefficient one and cancels like
+any other equal key. So every pair's exact key `(small+large, sources, v, u)`
+and exact feasibility (small, sources and atom caps) follow from per-pair
+counts, which a sorted incidence list per key space fills in
+`sum over keys of (rows sharing it)^2 / 2` integer updates. Prim then runs
+on these keys exactly as the exhaustive Prim does, with no cap condition,
+and only the `k-1` selected rows are formed, each checked against its
+predicted counts (`implicit_key_mismatches`, tests require 0). A
+disconnected feasible graph falls back to the exhaustive Prim, which then
+refuses with its own stats.
+
+Synthetic suite (same 1200 streams): identical relations, report, legacy
+stats and refusals; 51,601 differences formed against 446,718 logical edges
+(0.12x), including 89 disconnected-tree fallbacks. 44/44 native tests pass.
+Seven of nine mutations make the tests fail; the two that survive do not
+change the result: dropping the per-edge atom cap (unreachable, since a
+difference has at most `atoms(r_v)+atoms(r_u)` terms and the persistent
+total of all rows is checked first; the exhaustive Prim's check is equally
+unreachable) and weakening the redundant key self-check.
+
+## Natural M31 stream (2026-11-25)
+
+On the authentic group-admitted M31 ten-query stream of PR #5076 (rebuilt
+from the frozen producer input; hashes match CI), all three strategies give
+identical relations, witnesses, report and legacy stats, with 0 replay
+failures. Every admitted row carries the target column `u32::MAX` (10
+distinct coefficients), so 1273 of 1328 same-column pairs overlap.
+
+| arm | differences formed | MST-stage instructions | ratio |
+|---|---:|---:|---:|
+| exhaustive | 1328 | 29.43 M | 1.000 |
+| overlap-sensitive | 1280 | 32.75 M | 1.113 |
+| shared-key | 449 | 29.21 M | 0.992 |
+
+Shared-key removes 66 % of the differences but only 0.8 % of the stage's
+instructions: spanning-tree work is about 8 % of this stage, and the outer
+elimination loop (it rebuilds the column map and the row vector after every
+pivot, O(rows x pivots)) dominates. Details:
+`evidence/m31-mst-strategies-20261125/`.
+
+## Incremental column maintenance in `eliminate`
+
+The outer loop now keeps a slab of rows with append-only ids, an id-ordered
+member set per large column, a `(degree, column)` priority set, and running
+totals for atoms and rows over the caps, instead of rebuilding all of them
+after every pivot. The live rows in id order are exactly the vector the old
+loop rebuilt, so member order, ties, column choice, refusals and output
+are unchanged. A differential build of the old and new source over 12,018
+runs (4000 seeded streams, M31, synthetic streams up to 4000 rows, three
+strategies) prints identical output. On M31 the exhaustive MST stage falls
+from 29.43 M to 7.71 M instructions (0.262x; wall 3.34 ms to about 1 ms);
+on synthetic streams the gain grows with size, 3.2x at 500 rows to 25x at
+4000 rows, as the old cost was quadratic. With the loop fixed, shared-key
+is 0.96x and overlap-sensitive 1.43x the exhaustive arm's instructions on
+M31. Details: `evidence/m31-mst-strategies-20261125/incremental-eliminate/`.
+
+## Next step
+
+Profile the MST stage again after the incremental loop to see what now
+dominates, and measure its share of a cold M31 solve, which has not been
+measured here.

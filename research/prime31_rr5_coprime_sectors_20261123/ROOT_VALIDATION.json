@@ -1,0 +1,46 @@
+{
+  "schema": "rr5.root-validation-observation/v1",
+  "root_base": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "scope": "local mandatory full-root validation, distinct from standalone constructor tests",
+  "root_code_and_cargo_unchanged": true,
+  "attempts": [
+    {
+      "attempt": "root-library-01",
+      "command": "timeout 600 cargo +1.100.0 test --locked --offline --release --lib -j2",
+      "started_utc": "2026-11-24T03:16:45Z",
+      "stdout_bytes": 0,
+      "stderr_bytes": 418,
+      "exit_status": 101,
+      "source_check_exit": 0,
+      "completed_utc": "2026-11-24T03:16:45Z",
+      "status": "failed before compilation: omitted tracked path dependency"
+    },
+    {
+      "attempt": "root-library-02",
+      "command": "timeout 600 cargo +1.100.0 test --locked --offline --release --lib -j2",
+      "started_utc": "2026-11-24T03:22:08Z",
+      "stdout_bytes": 0,
+      "stderr_bytes": 883,
+      "exit_status": null,
+      "source_check_exit": null,
+      "completed_utc": null,
+      "status": "censored: session unavailable without terminal receipt"
+    },
+    {
+      "attempt": "root-library-03",
+      "command": "timeout --kill-after=10s 300 cargo +1.100.0 test --locked --offline --release --lib -j2",
+      "started_utc": "2026-11-24T03:33:33Z",
+      "stdout_bytes": 0,
+      "stderr_bytes": 196,
+      "exit_status": 124,
+      "source_check_exit": 0,
+      "completed_utc": "2026-11-24T03:38:33Z",
+      "status": "recorded timeout before root test execution"
+    }
+  ],
+  "root_library_gate_passed": false,
+  "root_tests_executed": false,
+  "final_declared_cap_seconds": 300,
+  "final_kill_after_seconds": 10,
+  "inference_limit": "No compiler defect count, root success, or terminal exit for attempt 02 is inferred. No fourth attempt performed."
+}
