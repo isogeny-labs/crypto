@@ -1752,6 +1752,31 @@ samples neither prove zero bias nor certify a correlation
 large enough for a cold below-rho sign computation; a full
 cost and calibration would also be required. [pcc:unverified]
 
+### Characteristic-index division-polynomial screen
+
+The [EDS Frobenius argument of Shipsey and Swart,
+§4](https://eprint.iacr.org/2008/444.pdf) motivates checking
+indices near the field characteristic `p`; its published scalar
+recovery algorithm assumes a different group-order relation.
+On P-192, five compact point-only features were evaluated:
+`χ_p(ψ_(p−2)(Q))`, `χ_p(ψ_p(Q))`, `χ_p(ψ_(p+2)(Q))`, and
+`χ_p(ψ_(p±1)(Q)/(2y(Q)))`. The even-index quotient makes those
+two features invariant under `Q↦−Q`, as are the three odd-index
+features. The replay checks that symmetry and matches the
+recurrence to Sage's direct polynomials at indices `3,5,7`.
+[pcc:unverified]
+
+After normalization at `G`, the first three features and the
+`p−1` quotient give `−1` at `[2]G` against `χ_r(2)=+1`.
+The `p+2` feature and `p+1` quotient give `+1` at `[3]G`
+against `χ_r(3)=−1`. All five therefore fail exactness on
+P-192 at a public known marking. The script
+[`characteristic_index_screen.sage`](characteristic_index_screen.sage)
+and [`CHARACTERISTIC_INDEX_SCREEN.jsonl`](CHARACTERISTIC_INDEX_SCREEN.jsonl)
+retain the 12-mark panel, source hash, signs, and witnesses.
+This bounded screen does not estimate bias or charge a complete
+arbitrary-target sign computation. [pcc:unverified]
+
 ### Oracle-model check: EDS residue and shifted Legendre
 
 Two published oracle problems are adjacent to this sign goal but do
