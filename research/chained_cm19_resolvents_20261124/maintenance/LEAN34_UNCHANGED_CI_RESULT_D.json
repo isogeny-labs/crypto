@@ -1,0 +1,67 @@
+{
+  "schema": "eligible-unchanged-formal-library-ci-review/v1",
+  "recorded": "2026-11-24T03:46:45.702035+00:00",
+  "repository": "aburan28/crypto-lean",
+  "PR": 34,
+  "head": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+  "state": "open",
+  "draft": true,
+  "API_review_completed_clock": "2026-11-24T03:39:32Z",
+  "tool_cell_duration_seconds": 0.8,
+  "exact_previous_floor": "2026-11-24T03:38:50.359426+00:00",
+  "all_attempt_checks": 2,
+  "all_event_runs": 1,
+  "checks": [
+    {
+      "id": 137657420576,
+      "name": "selftest",
+      "status": "completed",
+      "conclusion": "failure",
+      "details_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447/job/137657420576"
+    },
+    {
+      "id": 137657420105,
+      "name": "build-and-audit",
+      "status": "completed",
+      "conclusion": "failure",
+      "details_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447/job/137657420105"
+    }
+  ],
+  "runs": [
+    {
+      "id": 45164375447,
+      "name": "CI",
+      "event": "pull_request",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "b0c73236f22b988feba0a73e58e57e0b5272bbad",
+      "html_url": "https://github.com/aburan28/crypto-lean/actions/runs/45164375447"
+    }
+  ],
+  "prior_whole_evidence": {
+    "path": "research/chained_cm19_geometric4_20261123/maintenance/LEAN34_HEAD_CI_2338.json",
+    "sha256": "23ea55b422bfd1830175446b0e12f35bb942a52e68950a92f6b87371f077e1b8"
+  },
+  "prior_claim": "PCC-20261123-25f8f5",
+  "raw_whole_API": [
+    {
+      "path": "/dev/shm/ct24-lean34-due-PR.json",
+      "bytes": 36984,
+      "sha256": "816c959cd1acee569fa9d8ccfe018851df61697351dfba66fd31886751149d1e"
+    },
+    {
+      "path": "/dev/shm/ct24-lean34-due-checks.json",
+      "bytes": 16451,
+      "sha256": "edb992681d95d0acaf32537d070159f9098d1caced42bbd5eb34560db8a1a596"
+    },
+    {
+      "path": "/dev/shm/ct24-lean34-due-runs.json",
+      "bytes": 27969,
+      "sha256": "e72a291a64947fb772c60d8d28676bd9b9e300a601665f5cde04ac20bcf415d4"
+    }
+  ],
+  "scope": "Same two completed failed check IDs and same failed run45164375447. Prior full annotations record account billing lock; no current account balance, build/theorem success or signer verdict inferred. No known-failed annotation400 repeat, log refetch, rerun, empty commit or identity/backend workaround.",
+  "next_unchanged_review_not_before": "2026-11-24T07:46:45.702035+00:00",
+  "floor_correction": "Earlier queue abbreviated03:38:35; authoritative preceding receipt says03:38:50.359426. Actual new API cell completed03:39:32 with duration0.8s, after the authoritative floor; retain old queues unchanged and use the new exact floor."
+}

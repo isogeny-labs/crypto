@@ -1,0 +1,11 @@
+valgrind --tool=callgrind, Ir per process; lp_mst_strategies --input admitted.jsonl (613 rows)
+--modulus 2147446831 --reps R --time-only ARM. Per MST run = (Ir[R=11] - Ir[R=1]) / 10.
+
+arm                 Ir R=1        Ir R=11       per MST run   ratio
+exhaustive          315,374,423   609,677,091   29,430,267    1.000
+overlap_sensitive   318,763,124   646,241,236   32,747,811    1.113
+shared_key          315,083,195   607,160,455   29,207,726    0.992
+
+Inclusive profile (all arms, reps 3): exhaustive_tree_rows is about 2.4M Ir of
+about 30M per MST run; the outer eliminate loop (per-pivot column-map rebuild
+and row-vector rebuild, O(rows x pivots)) dominates.

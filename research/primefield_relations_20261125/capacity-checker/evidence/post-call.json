@@ -1,0 +1,26 @@
+{
+  "study_id": "m31-shared-chain-capacity-v1",
+  "completed_before_utc": "2026-11-25T19:33:06Z",
+  "build_exit_code": 0,
+  "tests_exit_code": 0,
+  "formula_evaluation_exit_code": 0,
+  "tests_passed": 4,
+  "tests_failed": 0,
+  "exact_rational_certificates": 62,
+  "source_sha256": "e5ab263df42beedee1c350f9ffc853b0d0d738a9a9bc1a58c8aec5cb1705e83d",
+  "release_binary_sha256": "0b26c6e6d9ec24434aba0b16ee916a4315bcbc114e8287f711a635269d6e077f",
+  "test_binary_sha256": "f537dd02f901d788117a69fa29ba9b750d266bc1c924e3603c5bda734a0c09e0",
+  "new_random_trials": 0,
+  "new_relation_searches": 0,
+  "corrected_code_versions": 0,
+  "resource_protocol_deviation":"The formula executable is single-threaded. The Rust test harness used its default scheduling: --test-threads=1 was not passed, so the intended one-thread cap in pre-call.json was not enforced for the four unit tests. No timing or equal-resource claim depends on that run.",
+  "interpretation": "Deterministic Rust calculations verify numerical upper bounds under the written sampling and family hypotheses. Exhaustive finite-set tests check representative combinatorial events. The general mathematical theorem has human-readable proof and independent agent review; it has not been checked by Lean.",
+  "headline_certificates": [
+    {"kind":"adaptive_stirling","t":8,"probability_at_most":"2^-207"},
+    {"kind":"adaptive_stirling","t":12,"probability_at_most":"2^-66"},
+    {"kind":"adaptive_stirling","t":14,"probability_at_most":"2^-5"},
+    {"kind":"adaptive_anchors","t":16,"support_cap":128,"probability_at_most":"2^-864"},
+    {"kind":"adaptive_anchors","t":32,"support_cap":128,"probability_at_most":"2^-458"},
+    {"kind":"adaptive_anchors","t":32,"support_cap":1024,"probability_at_most":"2^-7"}
+  ]
+}

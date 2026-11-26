@@ -1,0 +1,43 @@
+Successful bounded m=3 development correctness verification.
+No scientific timing, memory measurement, or comparison panel was performed.
+
+Execution accounting before the parent's final frozen-source gate:
+ONE unique m=3 fixture, THREE producer executions, THREE verifier attempts.
+The first two verifier attempts were incomplete and the third verified.
+The repeated producer runs are duplicates, not additional correctness cases.
+Separate one-chart algebra unit controls do not count as Semaev fixtures.
+
+Command (outer wall cap45 seconds):
+timeout 45s cargo test --offline --manifest-path summation_split/m31_native/Cargo.toml f4::tests::m31_one_preclosed_geometric_system_bounded_development_probe -- --nocapture
+
+Fixture: systems::fixture_plane(3,0), PreclosedSequential, Geometric.
+Field:2147483647. Exact System::quotient_presentation() variable permutation.
+
+Producer bounds unchanged from both prior attempts:
+max_pairs=2000; max_rows=512; max_columns=512; max_nonzeros=25000;
+max_basis=64; max_degree=8; max_steps=32 matrix batches;
+max_reductions=20000.
+
+Producer observation:
+Complete; nonfixed_basis=30; processed_pairs=scheduled_pairs=561;
+matrix_batches=10; maximum raw product degree6;
+maximum post-NF matrix-column degree6.
+
+Independent verifier has a separately declared, parent-authorized budget:
+max_pairs=10000; max_steps=10000 ordinary pair steps;
+max_reductions=1000000; max_basis=128; max_degree=12;
+max_rows=512; max_columns=512; max_nonzeros=25000.
+
+Verified:
+- all561 S-pairs of the four fixed chart generators plus30 returned polynomials;
+- all11 original system generators belong to that candidate ideal;
+- ordinary Buchberger on the original ideal completed528 pairs, basis33;
+- all30 returned nonfixed polynomials belong to that ORIGINAL ideal.
+
+Thus the returned ambient basis generates precisely the original ideal and
+satisfies the ordinary Buchberger criterion for this one fixture.
+The test passed; cargo exit0. Both previous failed verifier attempts remain
+in f4-verifier-step-limit-initial.txt and f4-verifier-reduction-limit-second.txt.
+
+This does not extract projected roots, replace the 50-instance-per-configuration
+acceptance gate, establish a general solving-degree bound, or measure speedup.
