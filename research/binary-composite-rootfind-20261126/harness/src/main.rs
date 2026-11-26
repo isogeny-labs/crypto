@@ -73,7 +73,7 @@ fn cost_json(o: &Ops, n: u32) -> serde_json::Value {
 
 // ───────────────────────── pairs-and-solve (arms F, F0, G) ──────────────────
 
-pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, la_stream: &[&str], ap: bool) -> Vec<serde_json::Value> {
+pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, la_stream: &[&str], ap: bool, la_ech: bool) -> Vec<serde_json::Value> {
     let gf = &c.gf;
     let t0 = std::time::Instant::now();
     let (cf_sh, cf_pt, cf_fac, cf_gcd, cf_lv) = (CF::new(gf), CF::new(gf), CF::new(gf), CF::new(gf), CF::new(gf));
@@ -89,6 +89,8 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
     let mut rows: Vec<Row> = vec![];
     let (mut o_targets, mut o_resolve, mut o_la) = (Ops::default(), Ops::default(), Ops::default());
     let mut la = LaStats::default();
+    let mut ech = if la_ech { Some(Echelon::new(c.ell)) } else { None };
+    let mut fed = 0usize;
     let (mut set_f, mut set_g) = (vec![], vec![]);
     let (mut w_fac, mut w_gcd) = (0u128, 0u128);
     let (mut g_checked, mut mismatches, mut unresolved, mut ntargets) = (0u64, 0u64, 0u64, 0u64);
@@ -124,6 +126,23 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
             }
         }
         o_resolve = o_resolve.add(&cf_sh.ops().sub(&s1));
+        if let Some(ech) = ech.as_mut() {
+            let s2 = cf_sh.ops();
+            let mut dd = None;
+            while fed < rows.len() {
+                dd = ech.add(&cf_sh, &rows[fed]);
+                fed += 1;
+                if dd.is_some() {
+                    break;
+                }
+            }
+            o_la = o_la.add(&cf_sh.ops().sub(&s2));
+            if let Some(dd) = dd {
+                d = Some(dd);
+                break;
+            }
+            continue;
+        }
         let nc = ncols_of(&rows);
         if rows.len() >= nc + 4 && rows.len() >= next_try {
             let s2 = cf_sh.ops();
@@ -162,7 +181,7 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
     let common = json!({
         "d": d, "verified": verified, "targets": tgt_used, "relations": rows.len(),
         "columns": ncols_of(&rows), "fb": fb.xs.len(), "rows_unresolved": unresolved,
-        "la_calls": la.calls, "la_attempts": la.attempts, "pair_u": pt.nu,
+        "la_calls": la.calls, "la_attempts": la.attempts, "la": if la_ech { "echelon" } else { "wiedemann" }, "echelon_rows_in": ech.as_ref().map(|e| e.rows_in), "echelon_useless_dependencies": ech.as_ref().map(|e| e.useless_dependencies), "pair_u": pt.nu,
         "gcd_targets_checked": g_checked, "gcd_set_mismatches": mismatches,
     });
     let mut outs = vec![];
@@ -201,7 +220,7 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
 
 // ───────────────────────── meet in the middle (M3, M2) ──────────────────────
 
-pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_stream: &[&str], ap: bool) -> serde_json::Value {
+pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_stream: &[&str], ap: bool, la_ech: bool) -> serde_json::Value {
     let gf = &c.gf;
     let t0 = std::time::Instant::now();
     let (cf_sh, cf_t, cf_p) = (CF::new(gf), CF::new(gf), CF::new(gf));
@@ -216,6 +235,8 @@ pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_
     let mut rows: Vec<Row> = vec![];
     let (mut o_targets, mut o_resolve, mut o_la) = (Ops::default(), Ops::default(), Ops::default());
     let mut la = LaStats::default();
+    let mut ech = if la_ech { Some(Echelon::new(c.ell)) } else { None };
+    let mut fed = 0usize;
     let mut s3 = vec![];
     let mut s2 = vec![];
     let (mut unresolved, mut ntargets) = (0u64, 0u64);
@@ -251,6 +272,23 @@ pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_
             }
         }
         o_resolve = o_resolve.add(&cf_sh.ops().sub(&a1));
+        if let Some(ech) = ech.as_mut() {
+            let a2 = cf_sh.ops();
+            let mut dd = None;
+            while fed < rows.len() {
+                dd = ech.add(&cf_sh, &rows[fed]);
+                fed += 1;
+                if dd.is_some() {
+                    break;
+                }
+            }
+            o_la = o_la.add(&cf_sh.ops().sub(&a2));
+            if let Some(dd) = dd {
+                d = Some(dd);
+                break;
+            }
+            continue;
+        }
         let nc = ncols_of_fast(&rows, f as usize);
         if rows.len() >= nc + 4 && rows.len() >= next_try {
             let a2 = cf_sh.ops();
@@ -280,7 +318,7 @@ pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_
         "arm": if m == 3 { "M3" } else { "M2" },
         "d": d, "verified": verified, "targets": ntargets, "relations": rows.len(),
         "columns": ncols_of(&rows), "fb": fb.xs.len(), "rows_unresolved": unresolved,
-        "la_calls": la.calls, "la_attempts": la.attempts, "table_keys": uh.map.len(),
+        "la_calls": la.calls, "la_attempts": la.attempts, "la": if la_ech { "echelon" } else { "wiedemann" }, "echelon_rows_in": ech.as_ref().map(|e| e.rows_in), "echelon_useless_dependencies": ech.as_ref().map(|e| e.useless_dependencies), "table_keys": uh.map.len(),
         "phases": phases_json(&ph), "total": tot.json(), "cost": cost_json(&tot, c.n),
         "wall_ns": t0.elapsed().as_nanos() as u64,
         "note": if m == 3 { "m=3 MITM: u-table of pairs, probe x(R±P3) by one AS step" } else { "m=2 MITM: u-table of pairs, probe x(R)" },
@@ -435,15 +473,32 @@ fn selftest(n: u32, np: u32) {
     }
     println!("{tot} targets: factored == gcd == m3 sets, consistent with crypto oracles; {hits} relations");
     let (q, d) = make_target("selftest-target", &inst, n, 0, 1);
-    let outs = run_ps(c, inst.g, q, &sub, &["selftest-ps", &n.to_string()], u64::MAX, &["selftest-la"], false);
+    let outs = run_ps(c, inst.g, q, &sub, &["selftest-ps", &n.to_string()], u64::MAX, &["selftest-la"], false, false);
     for o in &outs {
         println!("{} d={} verified={} targets={} rels={} meq={:.3e}", o["arm"], o["d"], o["verified"], o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
     }
     assert_eq!(outs[0]["d"].as_u64(), Some(d));
     for m in [3, 2] {
-        let o = run_mitm(c, inst.g, q, &sub, m, &["selftest-ps", &n.to_string()], &["selftest-la"], false);
+        let o = run_mitm(c, inst.g, q, &sub, m, &["selftest-ps", &n.to_string()], &["selftest-la"], false, false);
         println!("{} d={} verified={} targets={} rels={} meq={:.3e}", o["arm"], o["d"], o["verified"], o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
         assert_eq!(o["d"].as_u64(), Some(d));
+    }
+    // Amendments A1 + A2 on the same selftest instance, 6 targets.
+    for ti in 1..7u32 {
+        let (q, d) = make_target("selftest-target", &inst, n, 0, ti);
+        let st = ti.to_string();
+        let outs = run_ps(c, inst.g, q, &sub, &["selftest-ps-a1", &n.to_string(), &st], u64::MAX, &["selftest-la"], true, true);
+        let mut line = format!("A1+A2 ti={ti}:");
+        for o in &outs {
+            assert_eq!(o["d"].as_u64(), Some(d), "A1+A2 {}", o["arm"]);
+            line += &format!(" {}(t={},rels={},meq={:.2e})", o["arm"].as_str().unwrap(), o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
+        }
+        for m in [3, 2] {
+            let o = run_mitm(c, inst.g, q, &sub, m, &["selftest-ps-a1", &n.to_string(), &st], &["selftest-la"], true, true);
+            assert_eq!(o["d"].as_u64(), Some(d), "A1+A2 M{m}");
+            line += &format!(" {}(t={},rels={},meq={:.2e})", o["arm"].as_str().unwrap(), o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
+        }
+        println!("{line}");
     }
     for w in [1usize, 4, 16] {
         let o = rho_record(c, inst.g, q, w, &["selftest-rho", &w.to_string()]);
@@ -482,6 +537,7 @@ fn run(protocol: &str, out: &str, threads: usize) {
     let targets = p["targets_per_curve"].as_u64().unwrap() as u32;
     let rho_seeds = p["rho_seeds_per_target"].as_u64().unwrap() as u32;
     let ap = p["target_walk"].as_str() == Some("ap");
+    let ech = p["linear_algebra"].as_str() == Some("echelon");
     let arms: Vec<String> = p["ic_arms"].as_array().unwrap().iter().map(|s| s.as_str().unwrap().to_string()).collect();
     let file = Arc::new(Mutex::new(std::fs::OpenOptions::new().create(true).append(true).open(out).unwrap()));
     let mut jobs: Vec<(u32, u32, usize, u32, u32, u64)> = vec![];
@@ -506,6 +562,7 @@ fn run(protocol: &str, out: &str, threads: usize) {
     for _ in 0..threads {
         let (jobs, file, arms) = (jobs.clone(), file.clone(), arms.clone());
         let ap = ap;
+        let ech = ech;
         hs.push(std::thread::spawn(move || loop {
             let job = jobs.lock().unwrap().pop();
             let Some((n, np, w, ci, ti, gmax)) = job else { break };
@@ -542,12 +599,12 @@ fn run(protocol: &str, out: &str, threads: usize) {
                         }
                     }
                     "PS" if arms.iter().any(|x| x == "F") => {
-                        for v in run_ps(c, inst.g, q, &sub, &stream, gmax, &["la", &ns, &cs, &ts, "PS"], ap) {
+                        for v in run_ps(c, inst.g, q, &sub, &stream, gmax, &["la", &ns, &cs, &ts, "PS"], ap, ech) {
                             emit(v);
                         }
                     }
-                    "M3" if arms.iter().any(|x| x == "M3") => emit(run_mitm(c, inst.g, q, &sub, 3, &stream, &["la", &ns, &cs, &ts, "M3"], ap)),
-                    "M2" if arms.iter().any(|x| x == "M2") => emit(run_mitm(c, inst.g, q, &sub, 2, &stream, &["la", &ns, &cs, &ts, "M2"], ap)),
+                    "M3" if arms.iter().any(|x| x == "M3") => emit(run_mitm(c, inst.g, q, &sub, 3, &stream, &["la", &ns, &cs, &ts, "M3"], ap, ech)),
+                    "M2" if arms.iter().any(|x| x == "M2") => emit(run_mitm(c, inst.g, q, &sub, 2, &stream, &["la", &ns, &cs, &ts, "M2"], ap, ech)),
                     _ => {}
                 }
             }

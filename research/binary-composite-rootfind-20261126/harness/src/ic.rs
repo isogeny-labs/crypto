@@ -837,6 +837,74 @@ pub struct LaStats {
     pub attempts: u32,
 }
 
+/// Amendment A2: incremental sparse echelon elimination mod ℓ on the
+/// augmented rows `[M | a | b]`.  Every pivot row's leading (smallest)
+/// column has coefficient 1; a new row is reduced at its smallest column
+/// until it becomes a pivot or its `M` part vanishes.  A vanished row
+/// carries `(A, B)` with `A + B·d = 0`; `B ≠ 0` gives the logarithm.  This
+/// stops at the first dependency that determines `d`.  Every product mod ℓ
+/// is one `z`, every addition one `za`, an inversion `2·bits(ℓ)` `z`.
+pub struct Echelon {
+    ell: u64,
+    piv: HashMap<usize, (Vec<(usize, u64)>, u64, u64)>,
+    pub rows_in: u64,
+    pub useless_dependencies: u64,
+}
+
+impl Echelon {
+    pub fn new(ell: u64) -> Self {
+        Echelon { ell, piv: HashMap::new(), rows_in: 0, useless_dependencies: 0 }
+    }
+    pub fn add(&mut self, cf: &CF, row: &Row) -> Option<u64> {
+        let ell = self.ell;
+        self.rows_in += 1;
+        let mm = |a: u64, b: u64| ((a as u128 * b as u128) % ell as u128) as u64;
+        let mut cur: std::collections::BTreeMap<usize, u64> = Default::default();
+        for &(c, e) in &row.cols {
+            let v = ((e % ell as i64) + ell as i64) as u64 % ell;
+            if v != 0 {
+                cur.insert(c, v);
+            }
+        }
+        let (mut aa, mut bb) = (row.a, row.b);
+        loop {
+            let Some((&c0, &v0)) = cur.iter().next() else {
+                if bb == 0 {
+                    self.useless_dependencies += 1;
+                    return None;
+                }
+                return Some(mm((ell - aa) % ell, inv_mod(cf, bb, ell)));
+            };
+            match self.piv.get(&c0) {
+                Some((prow, pa, pb)) => {
+                    let neg = ell - v0;
+                    for &(c, pv) in prow {
+                        cf.zmul(1);
+                        cf.zadd(1);
+                        let t = mm(neg, pv);
+                        let e = cur.entry(c).or_insert(0);
+                        *e = (*e + t) % ell;
+                        if *e == 0 {
+                            cur.remove(&c);
+                        }
+                    }
+                    cf.zmul(2);
+                    cf.zadd(2);
+                    aa = (aa + mm(neg, *pa)) % ell;
+                    bb = (bb + mm(neg, *pb)) % ell;
+                }
+                None => {
+                    let iv = inv_mod(cf, v0, ell);
+                    let prow: Vec<(usize, u64)> = cur.iter().map(|(&c, &v)| (c, mm(v, iv))).collect();
+                    cf.zmul(prow.len() as u64 + 2);
+                    self.piv.insert(c0, (prow, mm(aa, iv), mm(bb, iv)));
+                    return None;
+                }
+            }
+        }
+    }
+}
+
 /// The logarithm from the relations: `d = −Σ c_j a_j / Σ c_j b_j`.
 pub fn solve_log(cf: &CF, rows: &[Row], ell: u64, rng: &mut Sm64, st: &mut LaStats) -> Option<u64> {
     st.calls += 1;
