@@ -405,11 +405,21 @@
     "note": "research/curve25519_subex_pivot_20261125/PACKING_PROVENANCE_CERTIFICATE.md",
     "verifier_source": "crates/hashed-ecdl-tensor/src/packing_provenance_certificate.rs",
     "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
-    "wire_format": "schema-1 JSON with deterministic byte-for-byte round trip on every producer path",
-    "checks": "edge-order endpoint indices; left/right vertex labels including isolates; optional exact greedy conditional-expectation replay with first-minimum tie breaking; exact variance inequality; exact ordered label classes; padded class height; unordered digit-pair pattern order; copy-index and slot reconstruction; empty-packet suppression; exact packet array and pair-pattern equality; active-coordinate left/right group equality; KL<=3M admission and every-coordinate radix group-port balance when source bounds are claimed",
+    "wire_format": "schema-2 JSON with endpoint vertex and port indices and deterministic byte-for-byte round trip on every producer path",
+    "checks": "edge-order endpoint vertex/port indices; left/right vertex labels including isolates; optional exact greedy conditional-expectation replay with first-minimum tie breaking; exact variance inequality; exact ordered label classes; padded class height; unordered digit-pair pattern order; copy-index and slot reconstruction; empty-packet suppression; exact packet array and pair-pattern equality; active-coordinate left/right group equality; KL<=3M admission and every-coordinate radix group-port balance when source bounds are claimed",
     "observed_gate": "all 596 three- through five-edge partition certificates, the correlated two-edge fixture, and the executed non-strict diagnostic serialize, parse, round-trip and independently replay; a packet-pair mutation is rejected; a dedicated admitted three-edge source control replays conditional label selection and all packing bounds, while a label mutation is rejected",
     "dependency_boundary": "verifier imports the serialized factorization type and generic Meter only, not graph, packing, deformation or contraction code",
     "claim_boundary": "complete finite replay from a bipartite edge skeleton through optional conditional-expectation labels and source packing bounds to packet/group objects; no uniform arbitrary-size label-selection theorem, asymptotic graph realization, external contraction proof or practical Curve25519 attack"
   },
-  "next_gate": "connect the complete finite packing-provenance interface and schema-5 strict-shrink implication to a uniform arbitrary-size object refinement, and separately rederive the description-composition inequality; accept a counterexample to any premise as decisive"
+  "child_provenance_control": {
+    "note": "research/curve25519_subex_pivot_20261125/CHILD_PROVENANCE_CERTIFICATE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/child_provenance_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "wire_format": "schema-1 JSON with deterministic round trip for each checked child",
+    "checks": "parent port uniqueness and contiguity; selected old-vertex order across both bipartite sides; selected isolates; preserved old degrees and port indices; one child packet vertex per parent packet including isolates; row-before-column incidence order; packet ownership; sequential packet-port indices; exact child edge order",
+    "observed_gate": "both group children of the admitted three-edge conditional-packing control replay exactly at the zero mode tuple; incrementing one packet-port index is rejected",
+    "dependency_boundary": "verifier imports the packing-provenance type and generic Meter only, not graph, deformation, packet-tensor or contraction code",
+    "claim_boundary": "finite child topology provenance only; no independent tensor identity, creation precision, mode coefficient, arbitrary-size refinement, external contraction proof or practical Curve25519 attack"
+  },
+  "next_gate": "extend finite child provenance through tensor identity, creation precision and mode coefficients, then connect the resulting interface and schema-5 strict-shrink implication to a uniform arbitrary-size object refinement; separately rederive description composition and accept a counterexample to any premise as decisive"
 }

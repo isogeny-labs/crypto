@@ -19,6 +19,7 @@ pub mod batch;
 pub mod binary;
 pub mod canonical;
 pub mod census;
+pub mod child_provenance_certificate;
 mod collector_metrics;
 pub mod contraction;
 pub mod curve;

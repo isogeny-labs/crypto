@@ -1,6 +1,6 @@
 # Packing provenance certificate
 
-The schema-1 packing-provenance certificate binds an accepted schema-2
+The schema-2 packing-provenance certificate binds an accepted schema-2
 factorization certificate to a finite labeled bipartite edge skeleton. Its
 standalone verifier imports neither graph nor packing implementation code.
 `[pcc:unverified]`
@@ -10,7 +10,7 @@ standalone verifier imports neither graph nor packing implementation code.
 The provenance object carries:
 
 - the packet radix, packet exponent `a`, and active coordinate `i`;
-- each edge's left and right endpoint vertex index in source order;
+- each edge's left and right endpoint vertex and port index in source order;
 - labels for every left and right vertex, including isolates; and
 - the unordered digit-pair pattern attached to every emitted packet.
 
@@ -59,6 +59,8 @@ source-bound replays pass, while a label mutation fails with
 
 This closes finite replay from an edge skeleton through conditional label
 selection, source packing bounds, packet slots, and active factorization groups.
+The endpoint ports also feed the separate schema-1 child-topology provenance
+replay in `CHILD_PROVENANCE_CERTIFICATE.md`.
 It does not prove a uniform theorem about arbitrary-size label selection,
 construct an asymptotic graph family satisfying the complete recursion
 premises, or prove the external contraction theorem. Those are the next

@@ -2,6 +2,10 @@
 
 use super::*;
 use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
+use crate::child_provenance_certificate::{
+    verify as verify_child_provenance, Certificate as ChildProvenanceCertificate,
+    ChildEdge as ProvenanceChildEdge, SCHEMA as CHILD_PROVENANCE_SCHEMA,
+};
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
     description_envelope, verify as standalone_verify, verify_source_dimensions,
@@ -280,7 +284,9 @@ fn packing_provenance(
             .iter()
             .map(|edge| EdgeEndpoints {
                 left: edge.left.0,
+                left_port: edge.left.1,
                 right: edge.right.0,
+                right_port: edge.right.1,
             })
             .collect(),
         row_labels: packing.row_labels.clone(),
@@ -289,6 +295,29 @@ fn packing_provenance(
             .packets
             .iter()
             .map(|packet| packet.pairs.clone())
+            .collect(),
+    }
+}
+
+fn child_provenance(child: &Bipartite, group: usize) -> ChildProvenanceCertificate {
+    ChildProvenanceCertificate {
+        schema: CHILD_PROVENANCE_SCHEMA,
+        group,
+        old_vertex_degrees: child.left.iter().map(|vertex| vertex.edges.len()).collect(),
+        packet_vertex_degrees: child
+            .right
+            .iter()
+            .map(|vertex| vertex.edges.len())
+            .collect(),
+        edges: child
+            .edges
+            .iter()
+            .map(|edge| ProvenanceChildEdge {
+                left_vertex: edge.left.0,
+                left_port: edge.left.1,
+                right_vertex: edge.right.0,
+                right_port: edge.right.1,
+            })
             .collect(),
     }
 }
@@ -616,6 +645,56 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.conditional_labels_verified);
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
+
+    let conditional_packets: Vec<_> = conditional_packing
+        .packets
+        .iter()
+        .map(|packet| packet.slots.clone())
+        .collect();
+    let zero_beta = vec![0usize; conditional_modes.len()];
+    let mut first_child_provenance = None;
+    for group in 0..conditional_parameters.radix {
+        let child = deformation::child(
+            &conditional_graph,
+            &conditional_packing,
+            0,
+            &conditional_parameters,
+            &conditional_kernel,
+            &conditional_modes,
+            &zero_beta,
+            group,
+            &mut meter,
+        )
+        .unwrap();
+        let produced_child = child_provenance(&child, group);
+        let serialized_child = serde_json::to_vec(&produced_child).unwrap();
+        let parsed_child: ChildProvenanceCertificate =
+            serde_json::from_slice(&serialized_child).unwrap();
+        assert_eq!(serde_json::to_vec(&parsed_child).unwrap(), serialized_child);
+        let summary = verify_child_provenance(
+            &conditional_provenance,
+            &conditional_packets,
+            &parsed_child,
+            &mut meter,
+        )
+        .unwrap();
+        assert_eq!(summary.edges, child.edges.len());
+        if !parsed_child.edges.is_empty() && first_child_provenance.is_none() {
+            first_child_provenance = Some(parsed_child);
+        }
+    }
+    let mut bad_child = first_child_provenance.unwrap();
+    bad_child.edges[0].right_port += 1;
+    assert_eq!(
+        verify_child_provenance(
+            &conditional_provenance,
+            &conditional_packets,
+            &bad_child,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance replay"
+    );
 
     let mut bad_conditional_labels = conditional_provenance;
     bad_conditional_labels.row_labels[0] ^= 1;

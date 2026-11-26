@@ -102,6 +102,15 @@ inequality, packet capacity, and every-coordinate group balance. The uniform
 arbitrary-size argument and the asymptotic R1 object remain open.
 `[pcc:unverified]`
 
+The schema-1 child-topology verifier continues that finite refinement through
+one group child. From parent endpoint ports and packets it reconstructs selected
+old vertices and isolates, preserved degrees/ports, all packet vertices and
+isolates, packet ownership, and the complete child edge order. Both groups of
+the admitted three-edge control pass after serialization; a packet-port
+mutation fails. This strengthens R1 items 2–3 at the topology layer, while
+tensor identity, creation precision, coefficients, and uniform arbitrary-size
+refinement remain open. `[pcc:unverified]`
+
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to
 one group, so a child has at most `6M/64` edges and

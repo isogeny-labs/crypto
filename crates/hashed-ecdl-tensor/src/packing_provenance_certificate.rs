@@ -10,15 +10,19 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 
 /// Current packing-provenance wire schema.
-pub const SCHEMA: u32 = 1;
+pub const SCHEMA: u32 = 2;
 
 /// Endpoint vertex indices for one edge in source order.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EdgeEndpoints {
     /// Index of the left endpoint vertex.
     pub left: usize,
+    /// Port index at the left endpoint vertex.
+    pub left_port: usize,
     /// Index of the right endpoint vertex.
     pub right: usize,
+    /// Port index at the right endpoint vertex.
+    pub right_port: usize,
 }
 
 /// Finite data needed to replay packet construction independently.
