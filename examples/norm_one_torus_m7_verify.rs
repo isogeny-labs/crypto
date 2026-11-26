@@ -169,7 +169,7 @@ fn main() {
     assert_eq!(certificates.factor_base_abscissae, fixture.abscissae);
     assert_eq!(point_from_record(certificates.target), fixture.target);
     assert_eq!(certificates.planted_indices, fixture.planted_indices);
-    assert_eq!(certificates.arms.len(), 4);
+    assert!((4..=5).contains(&certificates.arms.len()));
     assert_eq!(
         certificates.result_digest,
         result_digest(&certificates.arms)
@@ -221,6 +221,28 @@ fn main() {
             assert_eq!(arm.index_bytes, 0);
             assert_eq!(arm.key_comparisons, 0);
         }
+        let affine_branches =
+            arm.affine_generic + arm.affine_inverse + arm.affine_doubling + arm.affine_identity;
+        if arm.arm == "retain3-prefix16-affine-leaf" {
+            assert_eq!(affine_branches, arm.candidates);
+            assert_eq!(arm.query_ops.inversions, 476);
+        } else {
+            assert_eq!(affine_branches, 0);
+        }
+    }
+    if certificates.arms.len() == 5 {
+        let centered = certificates
+            .arms
+            .iter()
+            .find(|arm| arm.arm == "retain3-prefix16-centered")
+            .expect("centered retained-3 arm");
+        let affine = certificates
+            .arms
+            .iter()
+            .find(|arm| arm.arm == "retain3-prefix16-affine-leaf")
+            .expect("affine-leaf arm");
+        assert!(affine.query_ops.multiplications < centered.query_ops.multiplications);
+        assert!(affine.query_ops.squarings < centered.query_ops.squarings);
     }
 
     let report = VerificationReport {

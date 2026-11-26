@@ -69,6 +69,14 @@ pub struct ArmCertificate {
     pub payload_bytes: usize,
     pub index_bytes: usize,
     pub container_capacity: usize,
+    #[serde(default)]
+    pub affine_generic: u64,
+    #[serde(default)]
+    pub affine_inverse: u64,
+    #[serde(default)]
+    pub affine_doubling: u64,
+    #[serde(default)]
+    pub affine_identity: u64,
     pub witness: Option<Vec<usize>>,
 }
 
@@ -257,7 +265,7 @@ pub fn certificate_bundle(
     manifest_bytes: &[u8],
     arms: Vec<ArmCertificate>,
 ) -> CertificateBundle {
-    assert_eq!(arms.len(), 4);
+    assert!((4..=5).contains(&arms.len()));
     assert!(arms
         .iter()
         .all(|arm| verify_witness(fixture, arm.witness.as_deref())));

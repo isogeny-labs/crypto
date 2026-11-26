@@ -55,14 +55,16 @@ mod engine {
         Retain4HashCentered,
         Retain4PrefixCentered,
         Retain3PrefixCentered,
+        Retain3PrefixAffineLeaf,
     }
 
     impl Arm {
-        pub(super) const ALL: [Self; 4] = [
+        pub(super) const ALL: [Self; 5] = [
             Self::Retain4HashSum,
             Self::Retain4HashCentered,
             Self::Retain4PrefixCentered,
             Self::Retain3PrefixCentered,
+            Self::Retain3PrefixAffineLeaf,
         ];
 
         fn name(self) -> &'static str {
@@ -71,12 +73,13 @@ mod engine {
                 Self::Retain4HashCentered => "retain4-hash-centered",
                 Self::Retain4PrefixCentered => "retain4-prefix16-centered",
                 Self::Retain3PrefixCentered => "retain3-prefix16-centered",
+                Self::Retain3PrefixAffineLeaf => "retain3-prefix16-affine-leaf",
             }
         }
 
         fn retained_arity(self) -> usize {
             match self {
-                Self::Retain3PrefixCentered => 3,
+                Self::Retain3PrefixCentered | Self::Retain3PrefixAffineLeaf => 3,
                 _ => 4,
             }
         }
@@ -84,7 +87,9 @@ mod engine {
         fn uses_prefix(self) -> bool {
             matches!(
                 self,
-                Self::Retain4PrefixCentered | Self::Retain3PrefixCentered
+                Self::Retain4PrefixCentered
+                    | Self::Retain3PrefixCentered
+                    | Self::Retain3PrefixAffineLeaf
             )
         }
 
@@ -131,6 +136,20 @@ mod engine {
     struct LookupCounts {
         probes: u64,
         comparisons: u64,
+    }
+
+    #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+    struct AffineBranchCounts {
+        generic: u64,
+        inverse: u64,
+        doubling: u64,
+        identity: u64,
+    }
+
+    impl AffineBranchCounts {
+        fn total(self) -> u64 {
+            self.generic + self.inverse + self.doubling + self.identity
+        }
     }
 
     impl RetainedTable {
@@ -673,6 +692,203 @@ mod engine {
         (result, candidates)
     }
 
+    #[derive(Clone, Copy)]
+    struct AffineSlopeWork {
+        output_index: usize,
+        x1: u64,
+        y1: u64,
+        x2: u64,
+        numerator: u64,
+    }
+
+    fn batch_affine_add(
+        block: &[(PrimePoint, PrimePoint, u32)],
+        fixture: &Fixture,
+        ops: &mut OpCounts,
+        branches: &mut AffineBranchCounts,
+    ) -> Vec<(PrimePoint, u32)> {
+        let modulus = fixture.instance.curve.p;
+        let curve_a = fixture.instance.curve.a;
+        let mut output: Vec<_> = block
+            .iter()
+            .map(|&(_, _, witness)| (PrimePoint::INFINITY, witness))
+            .collect();
+        let mut denominators = Vec::with_capacity(block.len());
+        let mut work = Vec::with_capacity(block.len());
+
+        for (output_index, &(left, right, _)) in block.iter().enumerate() {
+            ops.additions += 1;
+            if left.infinity {
+                branches.identity += 1;
+                output[output_index].0 = right;
+                continue;
+            }
+            if right.infinity {
+                branches.identity += 1;
+                output[output_index].0 = left;
+                continue;
+            }
+
+            let (numerator, denominator) = if left.x == right.x {
+                if left.y != right.y || left.y == 0 {
+                    branches.inverse += 1;
+                    output[output_index].0 = PrimePoint::INFINITY;
+                    continue;
+                }
+                branches.doubling += 1;
+                ops.doublings += 1;
+                let xx = ops.square(left.x, modulus);
+                let three_xx = add_mod(add_mod(xx, xx, modulus), xx, modulus);
+                (
+                    add_mod(three_xx, curve_a, modulus),
+                    add_mod(left.y, left.y, modulus),
+                )
+            } else {
+                branches.generic += 1;
+                (
+                    sub_mod(right.y, left.y, modulus),
+                    sub_mod(right.x, left.x, modulus),
+                )
+            };
+            assert_ne!(denominator, 0);
+            denominators.push(denominator);
+            work.push(AffineSlopeWork {
+                output_index,
+                x1: left.x,
+                y1: left.y,
+                x2: right.x,
+                numerator,
+            });
+        }
+
+        batch_invert(&mut denominators, modulus, ops);
+        for (item, inverse) in work.into_iter().zip(denominators) {
+            let slope = ops.mul(item.numerator, inverse, modulus);
+            let x3 = sub_mod(
+                sub_mod(ops.square(slope, modulus), item.x1, modulus),
+                item.x2,
+                modulus,
+            );
+            let y3 = sub_mod(
+                ops.mul(slope, sub_mod(item.x1, x3, modulus), modulus),
+                item.y1,
+                modulus,
+            );
+            output[item.output_index].0 = PrimePoint::affine(x3, y3);
+        }
+        output
+    }
+
+    fn probe_affine_block(
+        block: &[(PrimePoint, PrimePoint, u32)],
+        table: &RetainedTable,
+        fixture: &Fixture,
+        ops: &mut OpCounts,
+        lookup: &mut LookupCounts,
+        branches: &mut AffineBranchCounts,
+        result: &mut Option<Vec<usize>>,
+    ) {
+        for (point, packed_stream) in batch_affine_add(block, fixture, ops, branches) {
+            if let Some(retained) = table.lookup(point, fixture, lookup) {
+                if result.is_none() {
+                    let mut witness = unpack_witness(packed_stream, 4);
+                    witness.extend(retained);
+                    *result = Some(witness);
+                }
+            }
+        }
+    }
+
+    fn centered_three_prefixes(fixture: &Fixture, ops: &mut OpCounts) -> Vec<(Jacobian, u32)> {
+        let mut prefixes = Vec::with_capacity(54_740);
+        for first in 0..fixture.base.len() {
+            let after_first = Jacobian::from_affine(fixture.target).add_mixed(
+                fixture.base[fixture.neg_index[first]],
+                fixture.instance.curve.a,
+                fixture.instance.curve.p,
+                ops,
+            );
+            for second in first..fixture.base.len() {
+                let after_second = after_first.add_mixed(
+                    fixture.base[fixture.neg_index[second]],
+                    fixture.instance.curve.a,
+                    fixture.instance.curve.p,
+                    ops,
+                );
+                for third in second..fixture.base.len() {
+                    prefixes.push((
+                        after_second.add_mixed(
+                            fixture.base[fixture.neg_index[third]],
+                            fixture.instance.curve.a,
+                            fixture.instance.curve.p,
+                            ops,
+                        ),
+                        pack_witness(&[first as u8, second as u8, third as u8]),
+                    ));
+                }
+            }
+        }
+        assert_eq!(prefixes.len(), 54_740);
+        assert_eq!(ops.additions, 57_154);
+        prefixes
+    }
+
+    fn query_retain3_affine_leaf(
+        fixture: &Fixture,
+        table: &RetainedTable,
+        block_size: usize,
+        ops: &mut OpCounts,
+        lookup: &mut LookupCounts,
+    ) -> (Option<Vec<usize>>, u64, AffineBranchCounts) {
+        let prefix_states = centered_three_prefixes(fixture, ops);
+        let prefixes = normalize_batch(&prefix_states, fixture.instance.curve.p, ops);
+        let mut block = Vec::with_capacity(block_size);
+        let mut result = None;
+        let mut candidates = 0u64;
+        let mut branches = AffineBranchCounts::default();
+
+        for (prefix, packed_prefix) in prefixes {
+            let third = ((packed_prefix >> 14) & 0x7f) as usize;
+            for fourth in third..fixture.base.len() {
+                block.push((
+                    prefix,
+                    fixture.base[fixture.neg_index[fourth]],
+                    packed_prefix | ((fourth as u32) << 21),
+                ));
+                candidates += 1;
+                if block.len() == block_size {
+                    probe_affine_block(
+                        &block,
+                        table,
+                        fixture,
+                        ops,
+                        lookup,
+                        &mut branches,
+                        &mut result,
+                    );
+                    block.clear();
+                }
+            }
+        }
+        if !block.is_empty() {
+            probe_affine_block(
+                &block,
+                table,
+                fixture,
+                ops,
+                lookup,
+                &mut branches,
+                &mut result,
+            );
+        }
+
+        assert_eq!(candidates, 971_635);
+        assert_eq!(branches.total(), candidates);
+        assert_eq!(ops.additions, 1_028_789);
+        assert_eq!(ops.inversions, 476);
+        (result, candidates, branches)
+    }
+
     pub(super) fn time_arm(fixture: &Fixture, arm: Arm, block_size: usize) -> TimedArm {
         let started = Instant::now();
         let (table, retained_states, setup_ops) = build_table(fixture, arm);
@@ -681,17 +897,35 @@ mod engine {
         let started = Instant::now();
         let mut query_ops = OpCounts::default();
         let mut lookup = LookupCounts::default();
-        let (witness, candidates) = match (arm.retained_arity(), arm.centered()) {
-            (4, false) => {
-                query_retain4_sum(fixture, &table, block_size, &mut query_ops, &mut lookup)
+        let (witness, candidates, affine_branches) = match arm {
+            Arm::Retain4HashSum => {
+                let (witness, candidates) =
+                    query_retain4_sum(fixture, &table, block_size, &mut query_ops, &mut lookup);
+                (witness, candidates, AffineBranchCounts::default())
             }
-            (4, true) => {
-                query_retain4_centered(fixture, &table, block_size, &mut query_ops, &mut lookup)
+            Arm::Retain4HashCentered | Arm::Retain4PrefixCentered => {
+                let (witness, candidates) = query_retain4_centered(
+                    fixture,
+                    &table,
+                    block_size,
+                    &mut query_ops,
+                    &mut lookup,
+                );
+                (witness, candidates, AffineBranchCounts::default())
             }
-            (3, true) => {
-                query_retain3_centered(fixture, &table, block_size, &mut query_ops, &mut lookup)
+            Arm::Retain3PrefixCentered => {
+                let (witness, candidates) = query_retain3_centered(
+                    fixture,
+                    &table,
+                    block_size,
+                    &mut query_ops,
+                    &mut lookup,
+                );
+                (witness, candidates, AffineBranchCounts::default())
             }
-            _ => unreachable!(),
+            Arm::Retain3PrefixAffineLeaf => {
+                query_retain3_affine_leaf(fixture, &table, block_size, &mut query_ops, &mut lookup)
+            }
         };
         let query = started.elapsed();
         assert_eq!(lookup.probes, candidates);
@@ -711,6 +945,10 @@ mod engine {
                 payload_bytes: table.payload_bytes(),
                 index_bytes: table.index_bytes(),
                 container_capacity: table.container_capacity(),
+                affine_generic: affine_branches.generic,
+                affine_inverse: affine_branches.inverse,
+                affine_doubling: affine_branches.doubling,
+                affine_identity: affine_branches.identity,
                 witness,
             },
             setup,
@@ -722,7 +960,7 @@ mod engine {
         let total = run.setup + run.query;
         let certificate = &run.certificate;
         println!(
-            "{round},{},{:.3},{:.3},{:.3},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
+            "{round},{},{:.3},{:.3},{:.3},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
             certificate.arm,
             run.setup.as_secs_f64() * 1_000.0,
             run.query.as_secs_f64() * 1_000.0,
@@ -745,6 +983,10 @@ mod engine {
             certificate.payload_bytes,
             certificate.index_bytes,
             certificate.container_capacity,
+            certificate.affine_generic,
+            certificate.affine_inverse,
+            certificate.affine_doubling,
+            certificate.affine_identity,
             usize::from(certificate.witness.is_some()),
         );
     }
@@ -766,6 +1008,10 @@ mod engine {
     #[cfg(test)]
     mod tests {
         use super::*;
+        use crypto_lib::cryptanalysis::ic_boundary::{
+            fp_p31_subexp_mersenne_instance, CountedGroup, GroupOps,
+        };
+        use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::dickson_factor_base;
 
         #[test]
         fn packed_witness_and_negation_round_trip() {
@@ -807,6 +1053,57 @@ mod engine {
             assert_eq!(size_of::<CompactEntry>(), 12);
             assert_eq!(size_of::<CompactValue>(), 8);
         }
+
+        #[test]
+        fn affine_batch_covers_generic_inverse_double_and_identity() {
+            let instance = fp_p31_subexp_mersenne_instance();
+            let factor_base = dickson_factor_base(&instance, 6, 0, 0).unwrap();
+            let first = factor_base.points[0];
+            let generic = factor_base
+                .points
+                .iter()
+                .copied()
+                .find(|point| point.x != first.x)
+                .unwrap();
+            let inverse = factor_base.points[factor_base.neg_index[0]];
+            let fixture = Fixture {
+                target: instance.curve.identity(),
+                instance,
+                base: factor_base.points,
+                neg_index: factor_base.neg_index,
+                abscissae: factor_base.abscissae,
+                planted_indices: Vec::new(),
+            };
+            let block = [
+                (first, generic, 0),
+                (first, inverse, 1),
+                (first, first, 2),
+                (PrimePoint::INFINITY, generic, 3),
+            ];
+            let mut ops = OpCounts::default();
+            let mut branches = AffineBranchCounts::default();
+            let output = batch_affine_add(&block, &fixture, &mut ops, &mut branches);
+            for ((left, right, witness), (actual, actual_witness)) in block.into_iter().zip(output)
+            {
+                assert_eq!(actual_witness, witness);
+                assert_eq!(
+                    actual,
+                    fixture
+                        .instance
+                        .curve
+                        .add(&mut GroupOps::default(), left, right)
+                );
+            }
+            assert_eq!(
+                branches,
+                AffineBranchCounts {
+                    generic: 1,
+                    inverse: 1,
+                    doubling: 1,
+                    identity: 1,
+                }
+            );
+        }
     }
 }
 
@@ -828,7 +1125,7 @@ fn main() {
     let configuration = &manifest.configuration;
 
     println!(
-        "round,implementation,setup_ms,query_ms,total_ms,retained_states,distinct_keys,candidates,table_probes,key_comparisons,setup_inversions,query_inversions,setup_multiplications,query_multiplications,setup_squarings,query_squarings,setup_additions,query_additions,setup_doublings,query_doublings,payload_bytes,index_bytes,container_capacity,success"
+        "round,implementation,setup_ms,query_ms,total_ms,retained_states,distinct_keys,candidates,table_probes,key_comparisons,setup_inversions,query_inversions,setup_multiplications,query_multiplications,setup_squarings,query_squarings,setup_additions,query_additions,setup_doublings,query_doublings,payload_bytes,index_bytes,container_capacity,affine_generic,affine_inverse,affine_doubling,affine_identity,success"
     );
 
     let mut certificates: Vec<Option<common::ArmCertificate>> = vec![None; Arm::ALL.len()];
