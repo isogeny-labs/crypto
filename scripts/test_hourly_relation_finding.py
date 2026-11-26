@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Contract checks for the hourly relation-yield telemetry parser."""
 import unittest
+from unittest import mock
+import contextlib
+import hashlib
+import io
+import json
+import os
 from pathlib import Path
 import tempfile
-from hourly_cpu_telemetry import compare_cpu, append_row, read_history, perf_values
+from hourly_cpu_telemetry import compare_cpu, append_row, read_history, perf_values, fingerprint
 
 from hourly_relation_finding import compare, percent_change, verified_metrics
 
@@ -104,6 +110,26 @@ class CPUCohortTests(unittest.TestCase):
         self.assertEqual(len(compare_cpu(row, history + [self.row(200, rate=100)], store)), 2)
         self.assertEqual(row["baseline_version"], version)
         self.assertEqual(row["throughput_deviation_pct"], 40)
+
+    def test_fingerprint_diagnostics_preserve_identity(self):
+        with tempfile.TemporaryDirectory() as d:
+            binary = Path(d) / "sample"
+            binary.write_bytes(b"synthetic telemetry fixture")
+            flags = {"RUSTFLAGS": "-C debuginfo=0", "CARGO_INCREMENTAL": "0",
+                     "CARGO_PROFILE_RELEASE_DEBUG": "0", "CARGO_BUILD_TARGET": ""}
+            compiler = "fixture compiler\n"
+            expected = json.dumps({
+                "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+                "compiler": compiler, "flags": flags,
+            }, sort_keys=True)
+            output = io.StringIO()
+            with mock.patch.dict(os.environ, flags), mock.patch(
+                    "hourly_cpu_telemetry.subprocess.check_output",
+                    return_value=compiler), contextlib.redirect_stderr(output):
+                actual = fingerprint(binary)
+            self.assertEqual(actual, hashlib.sha256(expected.encode()).hexdigest())
+            self.assertEqual(output.getvalue(),
+                             "hourly_build_fingerprint_components=" + expected + "\n")
 
     def test_legacy_csv_and_unavailable_counters(self):
         with tempfile.TemporaryDirectory() as d:
