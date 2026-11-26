@@ -177,6 +177,10 @@ contraction. `[pcc:unverified]` This decomposes into:
    integral; and
 6. creation-time representatives are lifted canonically at later precisions.
 
+`HERMITE_IDENTITY.md` states item 5 as an explicit fraction-field identity,
+maps every term to `recover`, and isolates the remaining all-parameter 2-adic
+loss inequality. `[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,

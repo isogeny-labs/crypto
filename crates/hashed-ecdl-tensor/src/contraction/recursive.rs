@@ -668,6 +668,73 @@ mod tests {
     }
 
     #[test]
+    fn root_precision_jets_are_insufficient_for_tapered_hermite_recovery() {
+        let mut meter = Meter::new(Limits {
+            steps: 10_000_000_000,
+            ..Limits::default()
+        });
+        let parameters = Parameters {
+            radix: 2,
+            u: 2,
+            a: 2,
+            length: 4,
+            array: 16,
+        };
+        let edges = 2usize;
+        let precision = 5usize;
+        let degree = 4usize;
+        let samples = edges * (2 * parameters.length - 1) + 1;
+        let ring = Ring::new(degree, precision, &mut meter).unwrap();
+        let coefficients: Vec<_> = (0..samples)
+            .map(|i| ring.integer(&BigUint::from(5 * i + 3)))
+            .collect();
+        let low = ring.at_precision(precision, &meter).unwrap();
+        let nodes: Vec<_> = (0..samples)
+            .map(|j| low.point(&BigUint::from(j)).unwrap())
+            .collect();
+        let lifted: Vec<_> = coefficients
+            .iter()
+            .map(|coefficient| low.lift(coefficient).unwrap())
+            .collect();
+        let mut jets = Vec::new();
+        for t in deformation::grid(&parameters, &mut meter).unwrap() {
+            let qt = multiplicity(edges, &parameters, t).unwrap();
+            if qt == 0 {
+                continue;
+            }
+            let values: Vec<_> = nodes
+                .iter()
+                .map(|z| {
+                    let shifted = low.shift(z, parameters.a + 1).unwrap();
+                    let argument = low
+                        .add(&low.signed(&BigInt::from(t)), &shifted, &mut meter)
+                        .unwrap();
+                    polynomial_value(&lifted, &argument, &low, &mut meter).unwrap()
+                })
+                .collect();
+            let mut jet = interpolate(&nodes, &values, &low, &mut meter).unwrap();
+            jet.truncate(qt);
+            let local = ring
+                .at_precision(
+                    child_precision(edges, &parameters, t, precision).unwrap(),
+                    &meter,
+                )
+                .unwrap();
+            jets.push(Jet {
+                t,
+                coefficients: jet
+                    .iter()
+                    .map(|coefficient| local.lift(coefficient).unwrap())
+                    .collect(),
+                ring: local,
+            });
+        }
+        let recovered = recover(&jets, edges, &parameters, &ring, &mut meter).unwrap();
+        assert_eq!(recovered, ring.integer(&BigUint::from(7u8)));
+        assert_ne!(recovered, coefficients[0]);
+    }
+
+    #[test]
     fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
         let mut meter = Meter::new(Limits::default());
         let modes: Vec<_> = [1usize, 2, 3]

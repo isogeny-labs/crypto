@@ -71,7 +71,7 @@
     "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
     "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
     "test_result": {
-      "passed": 12,
+      "passed": 13,
       "failed": 0
     },
     "packet_capacity_binding": "production packing rejects unless K*L<=3M",
@@ -110,7 +110,7 @@
     "tree_native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
     "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
     "test_result": {
-      "passed": 12,
+      "passed": 13,
       "failed": 0
     },
     "width_formulas": {
@@ -189,7 +189,7 @@
     },
     "observed_gate": "a nonempty child call was recorded at depth three and the recovered value equaled independent direct contraction",
     "focused_result": "1 passed in 0.57 seconds",
-    "complete_library_result": "171 passed; 0 failed",
+    "complete_library_result": "173 passed; 0 failed",
     "discarded_preflight": "the larger diagnostic taper a=2,length=4 at every level exceeded 60 seconds; a heterogeneous u=2 root plus two compact levels remained live past 90 seconds; both were interrupted and no result from either is claimed",
     "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines; not an asymptotic induction proof"
   },
@@ -219,8 +219,19 @@
     },
     "observed_gate": "every tapered recovery was 2-adically integral and returned the exact polynomial constant",
     "focused_result": "1 passed in 5.63 seconds",
-    "complete_library_result": "171 passed; 0 failed",
+    "complete_library_result": "173 passed; 0 failed",
     "claim_boundary": "bounded polynomial identity controls for two and three taper valuations; not a quantified Hermite recovery theorem or Rust refinement proof"
+  },
+  "hermite_precision_controls": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/HERMITE_IDENTITY.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "positive_loss_test": "contraction::recursive::dimension_controls::child_precision_covers_rational_multiplier_loss_on_small_source_grids",
+    "negative_test": "contraction::recursive::tests::root_precision_jets_are_insufficient_for_tapered_hermite_recovery",
+    "positive_gate": "the prescribed child loss covers the exact E_t(0) and (-t/alpha)^j rational-multiplier loss on source-shaped small grids",
+    "negative_gate": "root-precision jets lifted into the declared child rings return 7 instead of the true constant 3",
+    "focused_result": "2 passed; 0 failed",
+    "complete_library_result": "173 passed; 0 failed",
+    "claim_boundary": "the negative is not a live-path counterexample because active computes at child_precision; the all-parameter precision inequality and Rust refinement remain unverified"
   },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

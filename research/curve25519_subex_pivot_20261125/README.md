@@ -460,7 +460,7 @@ composition, not an online-only or free-oracle calculation.
 The achievement remains conditional in two important senses.  The combined
 Rust/source cost argument is a producer audit rather than an independent
 refinement proof, and the Bochum reduction assumes the external tensor
-contraction theorem.  The native typed encoders and 171-test suite exercise
+contraction theorem.  The native typed encoders and 173-test suite exercise
 the required information-flow and polynomial-description claims, but do not
 kernel-check the whole asymptotic chain. [pcc:unverified]
 
@@ -474,6 +474,8 @@ kernel-check the whole asymptotic chain. [pcc:unverified]
   `docs/leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md`
 - Independent-lemma and acceptance map:
   [`FORMALIZATION.md`](FORMALIZATION.md)
+- Tapered recovery identity and precision obligation:
+  [`HERMITE_IDENTITY.md`](HERMITE_IDENTITY.md)
 - Pair-image degree gate:
   `research/curve25519_pair_image_gate_20261125/README.md`
 

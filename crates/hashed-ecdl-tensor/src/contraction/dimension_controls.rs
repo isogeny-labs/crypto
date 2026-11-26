@@ -295,6 +295,54 @@ fn rational_width_envelope_covers_exact_small_grid_recovery() {
 }
 
 #[test]
+fn child_precision_covers_rational_multiplier_loss_on_small_source_grids() {
+    let meter = Meter::new(Limits::default());
+    for u in 1usize..=3 {
+        for a in 2 * u..=2 * u + 2 {
+            let parameters = Parameters {
+                radix: 2,
+                u,
+                a,
+                length: 1 << a,
+                array: 1,
+            };
+            let points = deformation::grid(&parameters, &meter).unwrap();
+            for edges in [u, 2 * u + 1, 17] {
+                for &t in &points {
+                    let qt = multiplicity(edges, &parameters, t).unwrap();
+                    if qt == 0 {
+                        continue;
+                    }
+                    let mut e_zero_valuation = 0i64;
+                    for &q in &points {
+                        let qq = multiplicity(edges, &parameters, q).unwrap();
+                        if q == t || qq == 0 {
+                            continue;
+                        }
+                        let difference_valuation = deformation::valuation(t - q);
+                        assert!(difference_valuation <= a);
+                        e_zero_valuation += i64::try_from(qq).unwrap()
+                            * (i64::try_from(deformation::valuation(q)).unwrap()
+                                - i64::try_from(difference_valuation).unwrap());
+                    }
+                    let coordinate = i64::try_from(deformation::valuation(t)).unwrap();
+                    let evaluation_step = coordinate - i64::try_from(a + 1).unwrap();
+                    let final_multiplier_valuation =
+                        e_zero_valuation + i64::try_from(qt - 1).unwrap() * evaluation_step;
+                    let rational_loss =
+                        usize::try_from(-final_multiplier_valuation.min(0)).unwrap();
+                    let prescribed_loss = child_precision(edges, &parameters, t, 7).unwrap() - 7;
+                    assert!(
+                        rational_loss <= prescribed_loss,
+                        "edges={edges}, u={u}, a={a}, t={t}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn root_precision_envelope_covers_all_active_scales_and_native_increments() {
     // Actual source scales at astronomical sizes, without allocating a graph.
     for root_u in [1u64, 3, 8] {
