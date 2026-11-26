@@ -72,6 +72,16 @@ and establish all of the following:
 The runtime guards and canonical serialization tests are evidence for R1 but
 do not constitute a refinement proof. `[pcc:unverified]`
 
+The forced source-object control covers 2,080 `(radix,a,M,family,schedule,i)`
+contexts, 3,388 retained tuple states and 25,490 group-child calls. It checks
+every old vertex, isolate, endpoint/port identity, packet ownership, creation
+precision and total endpoint mass, plus 7,351 generated modes whose packet,
+target-row digit, source-column digit, nonzero coefficients, and weight bound
+all match their descriptions. A balanced radix-64 fixture additionally keeps
+all 262,144 packet vertices, including 254,016 isolates. This substantially
+tests items 2–5, but deliberately bypasses `Setup` admission and therefore
+does not close the live-object refinement. `[pcc:unverified]`
+
 ## R2 — Uniform precision history
 
 Put `s=M_0`, `lambda=ceil(log2(s))`, and
