@@ -248,8 +248,8 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/ic_boundary.rs",
-            // Whole-file refresh reviewed in PR5099 and rechecked for the
-            // additive sectors; see prime31_rr5_coprime_sectors_20261123/SOURCE_REVIEW.md.
+            // Reviewed for the integrated build; see its rr5/README.md.
+            // The changed selected bytes add two cfg(test) map accessors.
             "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
             &[
                 Range {
@@ -337,8 +337,7 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/semaev_prime_poly.rs",
-            // The selected Fp bytes are unchanged; the whole-file change was
-            // reviewed separately. Keep the exact-source guard mandatory.
+            // The selected Fp range is byte-identical; changes are outside it.
             "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
             &[Range {
                 start: "/// `F_p` arithmetic for `p < 2^62`.\n",
@@ -437,6 +436,14 @@ fn main() {
         (
             "research/prime31_four_summand_20261122/native/relation_adapter.rs",
             "signed-RHS consumer",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/query_pipeline.rs",
+            "caller-driven streaming public-query integration",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/streaming_tests.rs",
+            "M31 streaming API and public-query development controls",
         ),
         (
             "research/prime31_four_summand_20261122/native/main.rs",
