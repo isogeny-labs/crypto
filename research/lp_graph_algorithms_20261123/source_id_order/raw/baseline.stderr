@@ -1,0 +1,33 @@
+     Locking 21 packages to highest compatible versions
+      Adding sha2 v0.10.9 (available: v0.11.1)
+   Compiling version_check v0.9.5
+   Compiling generic-array v0.14.7
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.6
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling digest v0.10.7
+   Compiling serde_derive v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling cpufeatures v0.2.17
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling sha2 v0.10.9
+   Compiling crypto v0.0.0 (/workspace/scratch/8ce37b502878/graph-witness-order-source/research/lp_graph_algorithms_20261123/native_gain_dsu)
+    Finished `release` profile [optimized] target(s) in 43.05s
+     Running ../../../tests/large_prime_graph.rs (target-source-id-order/release/build/crypto/e35f35b3ffd387d5/out/large_prime_graph-e35f35b3ffd387d5)
+
+thread 'm31_nonmonotone_source_ids_eager_materialization' (507) panicked at ../../../tests/large_prime_graph.rs:832:10:
+valid witnesses must accept arbitrary unique original source IDs
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'm31_nonmonotone_source_ids_lazy_materialization' (508) panicked at ../../../tests/large_prime_graph.rs:832:10:
+valid witnesses must accept arbitrary unique original source IDs
+error: test failed, to rerun pass `--test large_prime_graph`

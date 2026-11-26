@@ -3583,24 +3583,27 @@ mod tests {
             assert_eq!(inst.koblitz.as_ref().unwrap().trace, mu);
             let base = CompactOrbitScanBase { instance: &inst };
             let fbspec = if k == 1 {
-                "columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1".to_string()
+                "columns=1,raw_x_cap=100000000,generator_orbit=1".to_string()
             } else {
-                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d},lean_layout=1,orbit_key_reuse=1")
+                format!("columns={k},raw_x_cap=100000000,generator_orbit=1,generator_multiples={k},multiple_doublings={d},orbit_key_reuse=1")
             };
             let planted = 1 + planted_seed % (inst.r - 1);
             let ctx = binary_ctx_and_planted(&inst, &group, planted);
-            let build = |extra: &str| {
+            let build = |lean_layout: u8, extra: &str| {
                 let (_, params) =
-                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}{extra}")).unwrap();
+                    Params::parse_spec(&format!(
+                        "compact-orbit-scan:{fbspec},lean_layout={lean_layout}{extra}"
+                    ))
+                    .unwrap();
                 let mut ops = GroupOps::default();
                 base.build(&ctx, &params, &mut ops).map(|fb| (fb, ops))
             };
             // The base: off is the incumbent; on keeps every slot, column,
             // coefficient and negation map, stores the identity in each odd
             // slot, and drops exactly the k·n negations.
-            let (b0, o0) = build("").unwrap();
-            let (bz, oz) = build(",lazy_neg=0").unwrap();
-            let (b1, o1) = build(",lazy_neg=1").unwrap();
+            let (b0, o0) = build(1, "").unwrap();
+            let (bz, oz) = build(1, ",lazy_neg=0").unwrap();
+            let (b1, o1) = build(1, ",lazy_neg=1").unwrap();
             assert_eq!(b0.points, bz.points);
             assert_eq!(b0.cost.native, bz.cost.native);
             assert!(!b0.negations_deferred && !bz.negations_deferred && b1.negations_deferred);
@@ -3626,8 +3629,8 @@ mod tests {
                     assert_eq!(b1.cost.native.get(name), Some(v), "{name}");
                 }
             }
-            assert!(build(",lean_layout=0,lazy_neg=1").is_err());
-            assert!(build(",lazy_neg=2").is_err());
+            assert!(build(0, ",lazy_neg=1").is_err());
+            assert!(build(1, ",lazy_neg=2").is_err());
             // Tables that read every stored point refuse such a base.
             assert!(FrobeniusPairTable::build(&inst, &b1).is_none());
             assert!(FrobeniusPairTable::build_lazy(&inst, &b1).is_none());
@@ -3715,7 +3718,8 @@ mod tests {
                     ..Default::default()
                 };
                 let (_, params) =
-                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec}")).unwrap();
+                    Params::parse_spec(&format!("compact-orbit-scan:{fbspec},lean_layout=1"))
+                        .unwrap();
                 pspec.factor_base_params = params;
                 for (key, v) in fbp {
                     pspec.factor_base_params.set(key, *v);

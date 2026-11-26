@@ -51,6 +51,13 @@ experiment director freezes this route in the task card; the executor runs it
 unchanged. Preserve explicitly requested environments and keep local development
 checks local. Loading instructions alone does not authorize an experiment.
 
+**Experiment seeds and A/B repeatability** (owner, 2026-11-23): follow
+[docs/experiment-seeds.md](docs/experiment-seeds.md), policy
+`isogeny-labs/experiment-seeds/v1`. Freeze explicit seed panels and logical
+streams before execution; pair public workloads, retain raw failures and replay
+records, and preserve the existing stronger A/A, isolation and native-execution
+rules. Apply the same contract in scheduled tasks and handoffs.
+
 **First step of every task** (owner, 2026-11-16): before any other work, add
 the task to "Active items" in `docs/ACTIVE.md`, commit that alone, push, and
 open a **draft** PR named after the task (lane work pushes to the lane PR

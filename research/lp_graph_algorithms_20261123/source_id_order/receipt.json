@@ -1,0 +1,136 @@
+{
+  "schema": "graph-witness-source-id-regression/v1",
+  "status": "producer-local-development-evidence",
+  "base_commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "protocol_commit": "1999bde21a47b8a61db3a1c4daff3a9a83960ac7",
+  "published_source_commit": "e7084130837c91ff5c3c2b14dc058048b6a21c5e",
+  "coordinate_modulus": 2147483647,
+  "relation_modulus": 2147446831,
+  "fixture_kind": "synthetic coefficient regression for the existing M31 subgroup; no new group relation collection",
+  "baseline": {
+    "production_witness_blob": "c6caf51dbcea0436294d662ac48c70df151b7202",
+    "test_filter": "m31_nonmonotone_source_ids",
+    "passed": 0,
+    "failed": 2,
+    "exit": 101,
+    "expected_failure": true
+  },
+  "candidate": {
+    "passed": 45,
+    "failed": 0,
+    "exit": 0,
+    "new_tests": 4,
+    "row_permutations": 6,
+    "collectors": [
+      "eager",
+      "lazy"
+    ],
+    "input_order_cases": 12,
+    "pre_post_source_manifest_equal": true
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "build_jobs": 1,
+    "test_threads": 1,
+    "offline_dependencies": true,
+    "timeout_seconds": 300
+  },
+  "scope": {
+    "original_production_modules": true,
+    "standalone_source_exact_harness": true,
+    "unrelated_metering_shim": true,
+    "full_root_crate_tested": false,
+    "signed_pcc_verification": false,
+    "performance_measurement": false,
+    "paid_compute": false,
+    "collector_rerun": false
+  },
+  "files": [
+    {
+      "path": "src/cryptanalysis/large_prime_graph/witness.rs",
+      "bytes": 27609,
+      "sha256": "37ee227b10b9aab391784acdf5c74b6c834ac03d4837b58323d7da1e688933bf",
+      "git_blob": "dd3fff0db9e680f4aa4ab09a53f3ca9ac1fd67c5"
+    },
+    {
+      "path": "tests/large_prime_graph.rs",
+      "bytes": 90929,
+      "sha256": "6411a5d188c37614ac7418365c647f1daffc05220f694e249ca41ac4a92857b1",
+      "git_blob": "6d53491c773086d875eda2f00e09365ae9f12e56"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/Cargo.lock",
+      "bytes": 4883,
+      "sha256": "ecbe0d4475006d952d5df4c08d9bd86893992b024abb7edbf76da1e0fa9c0c1c",
+      "git_blob": "5e80861de9e96d11f2f8b7f7e24c6ba988fb687e"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/baseline-pre-call.sha256",
+      "bytes": 337,
+      "sha256": "9d8744907e4db9bfc4861273971c75bcf7e7cc29b626e4bbbda99c8823d3b538",
+      "git_blob": "6dc0dc3195019fe03bfc337a5326e8dea753872c"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/baseline.exit",
+      "bytes": 4,
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "git_blob": "398050c62c882fa5ebc8d8aaa2e730e70790beeb"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/baseline.stderr",
+      "bytes": 1577,
+      "sha256": "c9150f810500abaa288de77b8e2c08b8b077f983cda518031303e5454ee58c0e",
+      "git_blob": "a75725deca055c3a35b8737e0e5e0ed3679ff275"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/baseline.stdout",
+      "bytes": 374,
+      "sha256": "eb1b9ba7fb692b9247902ad8cc12ea63dba4e9a909afad71f7e045a69e0ca523",
+      "git_blob": "becb10a5af0da2a8cbf6775f459e24a86f259755"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/candidate-post-call.sha256",
+      "bytes": 468,
+      "sha256": "732b9f4266cdf5794e3b4a4542c12b67bb4ebeb107b0278026b267457e8118fa",
+      "git_blob": "29de13efcf084b790035b9baf6a5b07398cc9ab6"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/candidate-pre-call.sha256",
+      "bytes": 468,
+      "sha256": "732b9f4266cdf5794e3b4a4542c12b67bb4ebeb107b0278026b267457e8118fa",
+      "git_blob": "29de13efcf084b790035b9baf6a5b07398cc9ab6"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/candidate.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "git_blob": "573541ac9702dd3969c9bc859d2b91ec1f7e6e56"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/candidate.stderr",
+      "bytes": 397,
+      "sha256": "ab0ea0a15fdf4d9fa7d6e082faa20aef9a9259d47abeec8c227e8ae4690f9acd",
+      "git_blob": "e9cb48dab754b6f34038dae3114023c0d65044d7"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/candidate.stdout",
+      "bytes": 3109,
+      "sha256": "00338fd1803c497428f4f209ea242c5c280e7ddccde9be3adf9243960df586aa",
+      "git_blob": "9ef4ff052f49bd42cd982e60d910d22735a20259"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/cargo-version.txt",
+      "bytes": 37,
+      "sha256": "d62bac2223cd9bd1a54c0ccd82d4084b7d1d60044855e2f6a1b49f4f77e6f41c",
+      "git_blob": "1050afc4aae5878b435b0e95b034f68ebe8ba8df"
+    },
+    {
+      "path": "research/lp_graph_algorithms_20261123/source_id_order/raw/rustc-version.txt",
+      "bytes": 37,
+      "sha256": "56625f11cb9e645f8e638a6bcdf0565a20a8724585b537b8548886789b9f77be",
+      "git_blob": "dfad5000449201618e2726fc65e7d6e0f158a53e"
+    }
+  ]
+}
