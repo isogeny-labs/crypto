@@ -46,7 +46,14 @@ fn neg_mod(a: u64, modulus: u64) -> u64 {
 
 fn inverse_mod(a: u64, modulus: u64) -> Option<u64> {
     jv_bitops::hook_inv(modulus);
-    crate::gcd::int::inv_mod_u64(a, modulus)
+    let (mut old_r, mut r) = (a, modulus);
+    let (mut old_s, mut s) = (1i128, 0i128);
+    while r != 0 {
+        let q = old_r / r;
+        (old_r, r) = (r, old_r - q * r);
+        (old_s, s) = (s, old_s - q as i128 * s);
+    }
+    (old_r == 1).then(|| old_s.rem_euclid(modulus as i128) as u64)
 }
 
 fn normalise<K: Ord + Copy>(terms: &mut Vec<(K, u64)>, modulus: u64) {
