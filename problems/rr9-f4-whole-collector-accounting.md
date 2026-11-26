@@ -3,7 +3,7 @@
 - **Status:** `open`
 - **Kind:** implementation gap; measurement and accounting gap
 - **Affected work:** the prospective [Prime31 common-support RR9/F4 protocol](../research/prime31_shared_coefficient_membership_20261118/PROTOCOL_RR9_F4_20261120.md) and its [machine-readable v1 protocol](../research/prime31_shared_coefficient_membership_20261118/protocol-rr9-f4-v1.json), the [RR9 and closures development report](../research/prime31_rr9_and_closures_20261119/REPORT.md) and [raw result](../research/prime31_rr9_and_closures_20261119/RESULTS.json), and the separate [B8 full-eight precursor protocol](../research/prime31_ic_20261115/rr9/RR9_FULL8_F4_PROTOCOL_20261122.md)
-- **Next action owner:** draft PR #5227, call-owned F4 accounting implementation slice
+- **Next action owner:** draft PR #5227, shared-helper and allocator token-migration slice
 - **Last updated:** 2026-11-26
 
 ## Problem
@@ -75,16 +75,19 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   trace-sink delivery after a counter failure.  Those controls stop before
   later native/root/delivery work, but they do not yet cover every deep charge
   site; the operation gate remains false.
-  The next migration slice binds each admitted call to a unique accounting
+  The current migration binds each admitted call to a unique accounting
   context and records
-  `accounting_token_mode=borrowed_traversal_tls_shadow_v1`; rejected preflight
-  records retain `not_started_preflight_rejected`.  Production tokens borrow
-  the live session, their phase and external-pause guards are non-`Send`, and
-  same-thread mismatch, scoped foreign-thread use, suspended-token use and an
-  unbalanced external pause fail closed with structured blockers.  Traversal
-  orchestration and callback/trace delivery now use that token boundary, but
-  native F4 and shared arithmetic, root, reducer and allocation helpers remain
-  a non-authoritative TLS shadow.  Operation, memory and work-ownership gates
+  `accounting_token_mode=borrowed_traversal_native_driver_tls_helper_shadow_v1`;
+  rejected preflight records retain `not_started_preflight_rejected`.
+  Production tokens borrow the live session, their phase and external-pause
+  guards are non-`Send`, and same-thread mismatch, scoped foreign-thread use,
+  suspended-token use and an unbalanced external pause fail closed with
+  structured blockers. Traversal, callback/trace delivery and direct admitted
+  native-driver phases, charges and blockers now use that token boundary.
+  Tokenless native plain/record/replay entry under an unsuspended ledger is
+  rejected, and a native stop is polled before wrapper follow-on work. Shared
+  arithmetic, root, reducer, Rayon-closure and allocation helpers remain a
+  non-authoritative TLS shadow. Operation, memory and work-ownership gates
   therefore all remain false, no checklist item is closed, and no ledger is
   promotion-ready.
 - **Observed partial collector charge:** the development whole-solve code adds
@@ -126,7 +129,7 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   instrumentation costs.
 - **Missing capability:** source-complete call-owned operation,
   allocation/capacity and scratch accounting; propagation of the borrowed
-  token through native F4, shared arithmetic, root, reducer and
+  token through shared arithmetic, root, reducer, Rayon-closure and
   allocator-owned work; prospective runner integration; and a distinct
   whole-collector ledger that covers every attempt and phase in a common,
   source-bound schema.
@@ -194,9 +197,10 @@ still require prospective executions and independent replay.
 ## Next discriminating step
 
 - **Action or proof obligation:** extend the reviewed borrowed-token boundary
-  beyond traversal and delivery through native F4, shared arithmetic, root,
-  reducer and allocator-owned work while retaining TLS only as a differential
-  shadow. Route every admitted allocation/capacity/scratch lifetime and
+  beyond traversal, delivery and native-driver orchestration through shared
+  arithmetic, root, reducer, Rayon-closure and allocator-owned work while
+  retaining TLS only as a differential shadow. Route every admitted
+  allocation/capacity/scratch lifetime and
   remaining operation/branch through checked call-owned accounting; extend the
   typed stop to every unowned operation or overflow; close the remaining phase
   and hand-count controls; and keep all three promotion gates false until that
@@ -253,3 +257,16 @@ arithmetic, root, reducer and allocator ownership remain TLS-shadow gaps, so
 all three promotion gates remain false and no checklist item is satisfied. No
 registered or scientific case was run; every B4/B8/B31, full-eight, collector
 and six-size obligation remains open.
+
+2026-11-26: Draft PR #5227 extended the borrowed token through the admitted
+native F4 driver. Direct input-normalization, pair-selection, symbolic,
+column/matrix, row-reduction and basis-cleanup phases and driver-owned charges
+now require the session token; missing, mismatched, preblocked and foreign
+tokens fail closed before later native work. Accepted records are labeled
+`borrowed_traversal_native_driver_tls_helper_shadow_v1`. Shared arithmetic,
+GM, reducer, root, Rayon-closure and allocation helpers remain TLS shadows,
+and preflight-excluded Hilbert, staircase, run-log and trace-helper paths are
+not part of the admitted ownership claim. All three promotion gates remain
+false, no checklist item is satisfied and no registered or scientific case
+was run; every B4/B8/B31, full-eight, collector and six-size obligation remains
+open.
