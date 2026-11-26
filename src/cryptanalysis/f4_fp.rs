@@ -6442,11 +6442,14 @@ fn f4_with_arithmetic(
         let (cols, sparse, tp1): (Cols, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
             packed.as_mut()
         {
-            visit_account_block(
-                "uninstrumented_branch",
-                None,
-                "packed symbolic preprocessing is not yet allocation-complete",
-            );
+            if visit_accounting_charging() {
+                visit_account_block(
+                    "uninstrumented_branch",
+                    None,
+                    "packed symbolic preprocessing is not yet allocation-complete",
+                );
+                abort_call!(F4Stop::Accounting);
+            }
             pk.extend(&basis);
             let pk = &*pk;
             // Spread over threads only from `F4_FP_PAR_SYM_SEEDS` seed rows
@@ -7967,6 +7970,7 @@ fn make_monic(mut f: Poly, p: u64) -> Poly {
 enum F4Stop {
     Resource(F4ResourceLimit),
     Deadline,
+    Accounting,
 }
 
 impl From<F4ResourceLimit> for F4Stop {
@@ -8482,7 +8486,7 @@ impl std::fmt::Display for VisitAccountedErrorV1 {
 impl std::error::Error for VisitAccountedErrorV1 {}
 
 #[derive(Clone, Copy)]
-#[allow(dead_code)] // Reserved leaves remain unreachable while both coverage gates are false.
+#[allow(dead_code)] // Reserved leaves remain unreachable while promotion gates are false.
 enum VisitAccountingCounter {
     FieldMultiplications,
     FieldAdditions,
@@ -9090,6 +9094,14 @@ fn visit_accounting_charging() -> bool {
     })
 }
 
+fn visit_accounting_should_stop() -> bool {
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        slot.borrow().as_ref().is_some_and(|accounting| {
+            accounting.suspended_depth == 0 && accounting.blocker.is_some()
+        })
+    })
+}
+
 #[inline]
 fn visit_account_with(f: impl FnOnce(&mut VisitAccountingBuilder)) {
     if VISIT_ACCOUNTING_CHARGING_CALLS.load(AtomicOrdering::Relaxed) == 0 {
@@ -9639,6 +9651,7 @@ enum VisitEnd {
     TimedOut,
     TraceStopped,
     ResourceLimited,
+    AccountingStopped,
 }
 
 /// Borrowed events for one depth-first traversal. `assignments` contains only
@@ -9701,17 +9714,23 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
-    fn emit(&mut self, event: VisitEvent<'_>) -> bool {
+    fn emit(&mut self, event: VisitEvent<'_>) -> Result<(), VisitEnd> {
         if self.report.trace_stopped {
-            return false;
+            return Err(VisitEnd::TraceStopped);
         }
         if let Some(sink) = &mut self.sink {
-            let _account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::TraceDelivery);
+            let account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::TraceDelivery);
             visit_account_charge(VisitAccountingCounter::TraceDeliveries, 1);
+            if visit_accounting_should_stop() {
+                return Err(VisitEnd::AccountingStopped);
+            }
             let delivered = {
                 let _external = visit_account_pause_external_work();
                 sink(event)
             };
+            if visit_accounting_should_stop() {
+                return Err(VisitEnd::AccountingStopped);
+            }
             if let Err(mut error) = delivered {
                 let mut end = error.len().min(512);
                 while !error.is_char_boundary(end) {
@@ -9720,10 +9739,18 @@ where
                 error.truncate(end);
                 self.report.trace_stopped = true;
                 self.report.trace_error = Some(error);
-                return false;
+                drop(account_phase);
+                if visit_accounting_should_stop() {
+                    return Err(VisitEnd::AccountingStopped);
+                }
+                return Err(VisitEnd::TraceStopped);
+            }
+            drop(account_phase);
+            if visit_accounting_should_stop() {
+                return Err(VisitEnd::AccountingStopped);
             }
         }
-        true
+        Ok(())
     }
     fn expired(&self) -> bool {
         self.opts.deadline.is_some_and(|d| Instant::now() >= d)
@@ -9731,6 +9758,9 @@ where
 
     fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
         let _account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::Traversal);
+        if visit_accounting_should_stop() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.trace_stopped {
             return VisitEnd::TraceStopped;
         }
@@ -9740,6 +9770,9 @@ where
         let node_id = self.next_node;
         self.next_node += 1;
         visit_account_charge(VisitAccountingCounter::TraversalNodes, 1);
+        if visit_accounting_should_stop() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.sink.is_some() {
             let assignments: Vec<_> = self
                 .assignment
@@ -9748,14 +9781,14 @@ where
                 .enumerate()
                 .filter(|(i, _)| !active.contains(i))
                 .collect();
-            if !self.emit(VisitEvent::System {
+            if let Err(end) = self.emit(VisitEvent::System {
                 node_id,
                 parent_id,
                 active_variables: active,
                 assignments: &assignments,
                 polynomials: input,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         // Sink persistence may itself consume the remaining deadline. It is
@@ -9775,6 +9808,9 @@ where
                         g.len(),
                     );
                 }
+                if visit_accounting_should_stop() {
+                    return VisitEnd::AccountingStopped;
+                }
                 let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
                 let original_satisfied = residual_satisfied.then(|| {
                     for g in self.original {
@@ -9783,21 +9819,27 @@ where
                             g.len(),
                         );
                     }
+                    if visit_accounting_should_stop() {
+                        return false;
+                    }
                     self.original
                         .iter()
                         .all(|g| eval(g, &self.assignment, self.p) == 0)
                 });
                 (residual_satisfied, original_satisfied)
             };
+            if visit_accounting_should_stop() {
+                return VisitEnd::AccountingStopped;
+            }
             if self.sink.is_some() {
                 let assignment = self.assignment.clone();
-                if !self.emit(VisitEvent::Candidate {
+                if let Err(end) = self.emit(VisitEvent::Candidate {
                     node_id,
                     assignment: &assignment,
                     residual_satisfied,
                     original_satisfied,
                 }) {
-                    return VisitEnd::TraceStopped;
+                    return end;
                 }
             }
             if self.sink.is_some() && self.expired() {
@@ -9810,15 +9852,21 @@ where
                 self.report.candidates_rejected += 1;
                 return VisitEnd::Complete;
             }
-            self.report.solutions_visited += 1;
             let stop = {
                 let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
                 let _account_phase =
                     visit_account_phase_scope(VisitAccountingPhaseV1::CallbackDelivery);
                 visit_account_charge(VisitAccountingCounter::CallbackDeliveries, 1);
+                if visit_accounting_should_stop() {
+                    return VisitEnd::AccountingStopped;
+                }
+                self.report.solutions_visited += 1;
                 let _external = visit_account_pause_external_work();
                 (self.visitor)(&self.assignment)
             };
+            if visit_accounting_should_stop() {
+                return VisitEnd::AccountingStopped;
+            }
             return if stop {
                 VisitEnd::Stopped
             } else {
@@ -9846,17 +9894,23 @@ where
                     - before.replay_attempts) as usize;
                 (r, None)
             } else if self.sink.is_some() {
-                visit_account_block(
-                    "uninstrumented_branch",
-                    None,
-                    "recording-specific contributor recovery is not operation-complete",
-                );
+                if visit_accounting_charging() {
+                    visit_account_block(
+                        "uninstrumented_branch",
+                        None,
+                        "recording-specific contributor recovery is not operation-complete",
+                    );
+                    return VisitEnd::AccountingStopped;
+                }
                 let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
                 (r, Some(trace))
             } else {
                 (f4(input, active.len(), self.p, self.opts), None)
             }
         };
+        if visit_accounting_should_stop() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
@@ -9890,13 +9944,13 @@ where
             // Preserve the diagnostic event without cloning the incoming
             // generators or admitting root recovery from an incomplete call.
             if let Some(trace) = &trace {
-                if !self.emit(VisitEvent::NativeResult {
+                if let Err(end) = self.emit(VisitEvent::NativeResult {
                     node_id,
                     report: &r,
                     trace,
                     generating_set: input,
                 }) {
-                    return VisitEnd::TraceStopped;
+                    return end;
                 }
             }
             return VisitEnd::ResourceLimited;
@@ -9916,13 +9970,13 @@ where
         });
         let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
-            if !self.emit(VisitEvent::NativeResult {
+            if let Err(end) = self.emit(VisitEvent::NativeResult {
                 node_id,
                 report: &r,
                 trace,
                 generating_set,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         if r.timed_out || self.expired() {
@@ -10091,7 +10145,10 @@ where
                 self.report.full_field_branches += 1;
             }
             visit_account_charge(VisitAccountingCounter::BranchDeliveries, 1);
-            if !self.emit(VisitEvent::Branch {
+            if visit_accounting_should_stop() {
+                return VisitEnd::AccountingStopped;
+            }
+            if let Err(end) = self.emit(VisitEvent::Branch {
                 node_id,
                 original_variable: original,
                 value,
@@ -10103,7 +10160,7 @@ where
                     "finite_domain"
                 },
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
             if self.sink.is_some() && self.expired() {
                 return VisitEnd::TimedOut;
@@ -10735,7 +10792,10 @@ where
         timing: timing.as_ref(),
         domain_index: vec![None; n_vars],
     };
-    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    let mut end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    if visit_accounting_should_stop() {
+        end = VisitEnd::AccountingStopped;
+    }
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
@@ -11342,6 +11402,20 @@ mod visit_accounting_tests {
         assert_reconciles_in_mode(record, "caller_one_thread_rayon_tls_unproven");
     }
 
+    fn begin_counter_overflow_session(
+        id: &str,
+        opts: &F4Options,
+        trace_sink: bool,
+        counter: VisitAccountingCounter,
+    ) -> VisitAccountingSession {
+        let mut builder = VisitAccountingBuilder::new(request(id), opts, trace_sink);
+        *counter.field(&mut builder.total) = u64::MAX;
+        *counter.field(&mut builder.phases[VisitAccountingPhaseV1::Validation.index()]) = u64::MAX;
+        VisitAccountingSession::begin(builder)
+            .ok()
+            .expect("test owns the accounted session")
+    }
+
     #[test]
     fn legacy_entry_point_preserves_serialized_shape() {
         let report = solve_visit(
@@ -11568,6 +11642,177 @@ mod visit_accounting_tests {
     }
 
     #[test]
+    fn known_uninstrumented_branches_stop_before_native_or_delivery_work() {
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+
+        let traced = in_owner_pool(|| {
+            let mut system_events = 0usize;
+            let mut other_events = 0usize;
+            let report = solve_visit_traced_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("recording-boundary"),
+                |_| panic!("recording blocker reached visitor"),
+                |event| {
+                    match event {
+                        VisitEvent::System { .. } => system_events += 1,
+                        _ => other_events += 1,
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            (report, system_events, other_events)
+        });
+        assert_eq!((traced.1, traced.2), (1, 0));
+        assert!(!traced.0.complete && !traced.0.trace_stopped);
+        assert_eq!(traced.0.f4_runs, 0);
+        let record = accounting(&traced.0);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::Traversal)
+        );
+        assert_eq!(record.total.traversal_nodes, 1);
+        assert_eq!(record.total.trace_deliveries, 1);
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+
+        let packed = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("packed-boundary"),
+                |_| panic!("packed blocker reached visitor"),
+            )
+            .unwrap()
+        });
+        assert!(!packed.complete && !packed.stopped_early && !packed.timed_out);
+        assert_eq!(packed.f4_runs, 0);
+        let record = accounting(&packed);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::SymbolicPreprocessing)
+        );
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn delivery_counter_overflow_stops_before_external_bodies() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let callback_session = begin_counter_overflow_session(
+                "callback-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::CallbackDeliveries,
+            );
+            let mut callback_entered = false;
+            let callback_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert_eq!(callback_report.solutions_visited, 0);
+            let callback_record = callback_session.finish(visit_disposition(
+                &callback_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                callback_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = callback_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(
+                blocker.phase,
+                Some(VisitAccountingPhaseV1::CallbackDelivery)
+            );
+            assert_eq!(blocker.counter, Some("callback_deliveries"));
+            assert!(!callback_record.reconciliation.checked_arithmetic);
+            assert!(callback_record.reconciliation.phase_sum_equals_total);
+
+            let trace_session = begin_counter_overflow_session(
+                "trace-overflow",
+                &opts,
+                true,
+                VisitAccountingCounter::TraceDeliveries,
+            );
+            let mut visitor_entered = false;
+            let mut sink_entered = false;
+            let trace_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                |_| {
+                    visitor_entered = true;
+                    false
+                },
+                Some(|_: VisitEvent<'_>| {
+                    sink_entered = true;
+                    Ok(())
+                }),
+                None,
+            )
+            .unwrap();
+            assert!(!visitor_entered && !sink_entered);
+            assert!(!trace_report.trace_stopped);
+            let trace_record = trace_session.finish(visit_disposition(
+                &trace_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                trace_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = trace_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::TraceDelivery));
+            assert_eq!(blocker.counter, Some("trace_deliveries"));
+            assert!(!trace_record.reconciliation.checked_arithmetic);
+            assert!(trace_record.reconciliation.phase_sum_equals_total);
+        });
+    }
+
+    #[test]
     fn unsupported_configuration_and_invalid_binding_retain_ledgers() {
         let outside = solve_visit_accounted_v1(
             &[],
@@ -11738,6 +11983,19 @@ mod visit_accounting_tests {
                     )
                     .unwrap();
                     assert_eq!(nested, vec![vec![1]]);
+
+                    let packed_input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+                    let packed_report = solve_visit(
+                        &packed_input,
+                        1,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 4),
+                        &[None],
+                        |_| panic!("inconsistent nested packed solve reached callback"),
+                    )
+                    .unwrap();
+                    assert!(packed_report.complete);
+                    assert_eq!(packed_report.solutions_visited, 0);
                     false
                 },
             )

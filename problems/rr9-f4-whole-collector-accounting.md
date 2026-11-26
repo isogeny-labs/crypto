@@ -70,6 +70,11 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   ownership and promotion-ready executor integration, the prospective RR9
   runner, and the outer collector are not complete.  This foundation
   therefore satisfies no checklist item and authorizes no scientific row.
+  The current continuation also propagates private typed accounting stops at
+  the traced-recording and packed-symbolic boundaries and before callback or
+  trace-sink delivery after a counter failure.  Those controls stop before
+  later native/root/delivery work, but they do not yet cover every deep charge
+  site; the operation gate remains false.
 - **Observed partial collector charge:** the development whole-solve code adds
   only `rec.f4_field_ops + rec.root_field_muls` for each RR9 call. Its Prime31
   scaling table derives a lower bound from the smaller observed UNSAT
@@ -178,12 +183,12 @@ still require prospective executions and independent replay.
 - **Action or proof obligation:** finish and independently review the
   `VisitAccountingV1` slice in `src/cryptanalysis/f4_fp.rs`: route every
   admitted allocation/capacity/scratch and remaining operation/branch through
-  checked call-owned accounting, stop on the first unowned operation, close
-  the remaining phase and hand-count controls, add explicit token ownership
-  through the callback-free private executor, and keep all three promotion
-  gates false until that review passes. Keep both copied-source bridges
-  compiling while completing the ledger, then integrate only through a
-  prospectively frozen successor RR9 runner schema.
+  checked call-owned accounting, extend the typed stop to every unowned
+  operation/overflow, close the remaining phase and hand-count controls, add
+  explicit token ownership through the callback-free private executor, and
+  keep all three promotion gates false until that review passes. Keep both
+  copied-source bridges compiling while completing the ledger, then integrate
+  only through a prospectively frozen successor RR9 runner schema.
   Do not combine this slice with a B31 run or the whole-collector
   implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to
