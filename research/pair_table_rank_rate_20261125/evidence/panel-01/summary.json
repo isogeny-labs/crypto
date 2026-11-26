@@ -1,0 +1,114 @@
+{
+ "arms": {
+  "default": {
+   "n": 10,
+   "all_recovered_987654321": true,
+   "cold_ms": 583.238904,
+   "rank": 630.0,
+   "queries": 678.0,
+   "build_ms": 136.651174,
+   "source_ms": 412.1558045000001,
+   "consumer_ms": 5.518232999999999,
+   "probes": 0.0,
+   "rank_per_s": 1080.1940894955535,
+   "distinct_digests": 1
+  },
+  "pt1": {
+   "n": 10,
+   "all_recovered_987654321": true,
+   "cold_ms": 83.260852,
+   "rank": 660.5,
+   "queries": 62.0,
+   "build_ms": 23.4410925,
+   "source_ms": 44.36406699999999,
+   "consumer_ms": 14.314944,
+   "probes": 1773200.0,
+   "rank_per_s": 7911.67792407828,
+   "distinct_digests": 10
+  },
+  "pt4": {
+   "n": 10,
+   "all_recovered_987654321": true,
+   "cold_ms": 61.030051,
+   "rank": 660.5,
+   "queries": 64.0,
+   "build_ms": 24.928449,
+   "source_ms": 19.2862375,
+   "consumer_ms": 13.868858500000002,
+   "probes": 1830400.0,
+   "rank_per_s": 10814.59123837854,
+   "distinct_digests": 10
+  },
+  "ref": {
+   "n": 10,
+   "all_recovered_987654321": true,
+   "cold_ms": 261.37260749999996,
+   "rank": 665.5,
+   "queries": 41.0,
+   "build_ms": 68.5308095,
+   "source_ms": 151.42712699999998,
+   "consumer_ms": 32.4659845,
+   "rank_per_s": 2539.8042231162835
+  },
+  "rho": {
+   "n": 10,
+   "all_recovered_987654321": true,
+   "cold_ms": 3.794631,
+   "rank": 0.0,
+   "queries": 0.0,
+   "build_ms": 0.0,
+   "source_ms": 3.794631,
+   "consumer_ms": 0.0,
+   "points": 46109.5,
+   "rank_per_s": 0.0
+  }
+ },
+ "ratios": {
+  "ref/pt1:cold_ms": [
+   3.2666519361870914,
+   3.033531357018598,
+   3.523718489296244
+  ],
+  "default/pt1:cold_ms": [
+   6.940150476658786,
+   6.397827267380401,
+   7.548582862511
+  ],
+  "pt1/pt4:cold_ms": [
+   1.364367211904759,
+   1.2719857335095954,
+   1.4366024162312188
+  ],
+  "ref/pt4:cold_ms": [
+   4.456912794438866,
+   4.1977648512718515,
+   4.771262535913196
+  ],
+  "default/pt4:cold_ms": [
+   9.468913756038432,
+   8.868230790818258,
+   10.227565435348703
+  ],
+  "pt1/rho:cold_ms (unpaired, rho random seeds)": [
+   20.2535828468415,
+   16.997900634781693,
+   23.918814181892298
+  ],
+  "pt4/rho:cold_ms (unpaired, rho random seeds)": [
+   14.844671339298737,
+   12.541265650217616,
+   17.396969947508758
+  ],
+  "ref/rho:cold_ms (unpaired, rho random seeds)": [
+   66.1614056213605,
+   55.83536654901524,
+   77.79559692127859
+  ],
+  "default/rho:cold_ms (unpaired, rho random seeds)": [
+   140.56291264855528,
+   119.31595721033972,
+   163.73157921101514
+  ]
+ },
+ "pt1_pt4_same_stream_per_salt": true
+}
