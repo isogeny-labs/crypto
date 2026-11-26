@@ -34,7 +34,7 @@ int main(int argc,char** argv) { try {
     }
     require(U==expected && std::get<0>(bezout(U,derivative(U))).degree()==0,"entire distinct reference special fiber");
     require(value(V+Poly{F(1)},xs[0])!=ys[0],"changed reference ordinate rejects");
-    require(U!=Poly{-xs[0],F(1)}*Poly{-xs[1],F(1)},"dropped reference factor rejects");
+    require(!(U==Poly{-xs[0],F(1)}*Poly{-xs[1],F(1)}),"dropped reference factor rejects");
     const auto& row=global.at("V").arr[0];Poly a=read_long(row.at("a")),b=read_long(row.at("b")),c=read_long(row.at("c"));
     bool rejected=false;try { static_cast<void>(limit(a,b+c,c)); } catch(const std::exception&) { rejected=true; }
     require(rejected,"unramified source infinity Y-pole rejects");
