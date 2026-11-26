@@ -204,7 +204,8 @@ int main(int argc,char** argv) { try {
     std::cout<<"{\"standing\":\"unregistered producer-unverified separate native point-map verification\",\"precision\":"<<precision<<",\"global_map_identity_checked\":true,\"Hilbert_dimensions\":["<<h14<<','<<h15<<"],\"curve_map_degree\":"<<(24-h14)/2<<",\"infinity_factor_instances\":"<<factors.size()<<",\"infinity_closed_points\":"<<results.size()<<",\"fresh_conjugate_checks\":"<<conjugate_checks<<",\"affine_base_point_identity_checked\":true,\"source_y_coefficients_compared\":"<<precision<<",\"scaled_X_coefficients_compared\":24,\"mutation_controls_rejected\":5,\"full_projective_Jacobian_transpose_implemented\":false,\"signed_independent_verdict\":false,\"infinity_polynomial\":";
     emit(q);std::cout<<",\"points\":[";
     for (size_t i=0;i<results.size();++i) {
-        if (i) std::cout<<',';const auto& r=results[i];std::cout<<"{\"factor\":";emit(r.factor);
+        if (i) std::cout<<',';
+        const auto& r=results[i];std::cout<<"{\"factor\":";emit(r.factor);
         std::cout<<",\"multiplicity\":"<<r.multiplicity<<",\"solved_axis\":"<<r.solved<<",\"free_axis\":"<<r.free<<",\"Z_order\":"<<r.z_order<<",\"X_valuation\":"<<r.vx<<",\"Y_valuation\":"<<r.vy<<",\"image\":{\"infinity\":"<<(r.infinity?"true":"false");
         if (!r.infinity) { std::cout<<",\"x\":";emit(r.x);std::cout<<",\"y\":";emit(r.y); }std::cout<<"}}";
     }

@@ -1,0 +1,8 @@
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/projective_verification_20261126/evidence/attempt-v1/source/check.cpp: In function ‘int main(int, char**)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/projective_verification_20261126/evidence/attempt-v1/source/check.cpp:207:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  207 |         if (i) std::cout<<',';const auto& r=results[i];std::cout<<"{\"factor\":";emit(r.factor);
+      |         ^~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/projective_verification_20261126/evidence/attempt-v1/source/check.cpp:207:31: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  207 |         if (i) std::cout<<',';const auto& r=results[i];std::cout<<"{\"factor\":";emit(r.factor);
+      |                               ^~~~~
+cc1plus: all warnings being treated as errors
