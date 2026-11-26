@@ -1,12 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 cd "$(dirname "$0")"
-test "$#" -eq 1
+test "$#" -ge 1
+test "$#" -le 2
 test ! -e "$1"
 mkdir -p "$(dirname "$1")"
 mkdir "$1"
 out=$(cd "$1" && pwd)
-prior=$(cd evidence/attempt-v1 && pwd)
+prior=$(cd "${2:-evidence/attempt-v1}" && pwd)
 TIMEFORMAT='{"wall_seconds":%R,"user_seconds":%U,"system_seconds":%S}'
 native() {
     local label=$1 limit=$2

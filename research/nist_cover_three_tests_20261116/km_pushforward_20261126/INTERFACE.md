@@ -26,3 +26,10 @@ record both stage exits/costs and the complete wrapper, and fail on any
 rejection or cap exhaustion. Qualify that full facade with the retained
 external public F(G) class, comparing the point to the existing separate
 result. This is an API and representation check, not a performance claim.
+
+Reproduction-path clarification frozen before the explicit-path qualification:
+run-eval.sh accepts an optional qualified extraction-tree argument. On a fresh
+checkout first run run.sh into a fresh directory, then name that same directory
+as the second run-eval.sh argument. The historical default and all frozen
+arithmetic/criteria remain unchanged. Qualify this mode in eval-v2 using
+the same fixed already qualified extraction tree.
