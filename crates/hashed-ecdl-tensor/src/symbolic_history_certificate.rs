@@ -8,7 +8,7 @@ use crate::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const SCHEMA: u32 = 1;
+pub(crate) const SCHEMA: u32 = 2;
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 const MINIMUM_LAMBDA: u64 = 1 << 26;
 
@@ -19,6 +19,10 @@ pub(crate) struct DepthCertificate {
     pub(crate) u: u64,
     pub(crate) prior_a: u64,
     pub(crate) current_a: u64,
+    pub(crate) first_tile_exponent: u64,
+    pub(crate) last_tile_exponent: u64,
+    pub(crate) first_distance_exponent: u64,
+    pub(crate) last_distance_exponent: u64,
     pub(crate) inherited_lhs: BigUint,
     pub(crate) inherited_rhs_exponent: u64,
     pub(crate) evaluation_lhs: BigUint,
@@ -36,6 +40,11 @@ pub struct Certificate {
     pub(crate) scale_floor: u64,
     pub(crate) inherited_precision_constant: u64,
     pub(crate) normalized_precision_constant: u64,
+    pub(crate) packet_capacity_constant: u64,
+    pub(crate) mode_distance_constant: u64,
+    pub(crate) mode_precision_product_constant: u64,
+    pub(crate) tuple_square_root_ceiling: u64,
+    pub(crate) tuple_exponent_constant: u64,
     pub(crate) depths: Vec<DepthCertificate>,
     pub(crate) local_child_exponent_constant: u64,
     pub(crate) path_sum_constant: u64,
@@ -58,6 +67,8 @@ pub struct VerificationSummary {
     pub root_u: u64,
     /// Number of possible active depths reconstructed from strict shrinkage.
     pub active_depths: usize,
+    /// Constant in `log2(T) <= C*M/sqrt(u)` from the source mode bounds.
+    pub tuple_exponent_constant: u64,
     /// Root-`u` exponent constant for the complete recursion composition.
     pub total_root_u_exponent_constant: u64,
     /// Root-log exponent constant after the uniform square-root conversion.
@@ -125,6 +136,16 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     }
     let leaf_divisor = floor_sqrt(certificate.lambda);
     let root_u = certificate.lambda / EPSILON_DENOMINATOR;
+    let packet_capacity_constant = 3u64;
+    let mode_distance_constant = checked_mul(2, packet_capacity_constant, "mode distance")?;
+    let mode_precision_product_constant =
+        checked_mul(mode_distance_constant, 34, "mode precision product")?;
+    let tuple_square_root_ceiling = 15u64;
+    let tuple_exponent_constant = checked_add(
+        checked_mul(5, tuple_square_root_ceiling, "tuple exponent")?,
+        5,
+        "tuple exponent",
+    )?;
     if leaf_divisor <= 1
         || root_u == 0
         || certificate.leaf_divisor != leaf_divisor
@@ -132,6 +153,13 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         || certificate.scale_floor != 32
         || certificate.inherited_precision_constant != 81
         || certificate.normalized_precision_constant != 34
+        || certificate.packet_capacity_constant != packet_capacity_constant
+        || certificate.mode_distance_constant != mode_distance_constant
+        || certificate.mode_precision_product_constant != mode_precision_product_constant
+        || certificate.tuple_square_root_ceiling != tuple_square_root_ceiling
+        || certificate.tuple_exponent_constant != tuple_exponent_constant
+        || (tuple_square_root_ceiling - 1).pow(2) >= mode_precision_product_constant
+        || tuple_square_root_ceiling.pow(2) < mode_precision_product_constant
     {
         return Err("symbolic history constants".into());
     }
@@ -150,6 +178,14 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             checked_mul(2, u, "symbolic history scale")?,
             "symbolic history scale",
         )?;
+        let first_tile_exponent = 1u64;
+        let last_tile_exponent = u;
+        let first_distance_exponent = current_a;
+        let last_distance_exponent = current_a
+            .checked_sub(u)
+            .and_then(|value| value.checked_add(1))
+            .ok_or_else(|| "symbolic tile-distance range".to_string())?;
+        let tile_distance_exponent = checked_add(current_a, 1, "tile-distance exponent")?;
         let inherited_lhs = BigUint::from(81u8) * BigUint::from(leaf_divisor) * BigUint::from(u);
         let inherited_rhs_exponent = checked_add(u, 1, "inherited exponent")?;
         let evaluation_lhs = BigUint::from(8u8)
@@ -170,6 +206,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             || case.u != u
             || case.prior_a != prior_a
             || case.current_a != current_a
+            || case.first_tile_exponent != first_tile_exponent
+            || case.last_tile_exponent != last_tile_exponent
+            || case.first_distance_exponent != first_distance_exponent
+            || case.last_distance_exponent != last_distance_exponent
             || case.inherited_lhs != inherited_lhs
             || case.inherited_rhs_exponent != inherited_rhs_exponent
             || case.evaluation_lhs != evaluation_lhs
@@ -179,6 +219,16 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             return Err("symbolic history depth mismatch".into());
         }
         if u < certificate.scale_floor
+            || checked_add(
+                first_tile_exponent,
+                first_distance_exponent,
+                "tile-distance exponent",
+            )? != tile_distance_exponent
+            || checked_add(
+                last_tile_exponent,
+                last_distance_exponent,
+                "tile-distance exponent",
+            )? != tile_distance_exponent
             || !at_most_power_of_two(&inherited_lhs, inherited_rhs_exponent)
             || !at_most_power_of_two(&evaluation_lhs, evaluation_rhs_exponent)
             || !geometric_holds
@@ -197,6 +247,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     }
 
     let local_child_exponent_constant = 96u64;
+    let accounted_local_constant = tuple_exponent_constant + 4 + 5 + 6;
+    if local_child_exponent_constant < accounted_local_constant {
+        return Err("symbolic history local exponent".into());
+    }
     let path_sum_constant = 3u64;
     let active_tree_exponent_constant = checked_mul(
         local_child_exponent_constant,
@@ -252,6 +306,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         lambda: certificate.lambda,
         root_u,
         active_depths: index,
+        tuple_exponent_constant,
         total_root_u_exponent_constant,
         total_root_log_exponent_constant,
     })

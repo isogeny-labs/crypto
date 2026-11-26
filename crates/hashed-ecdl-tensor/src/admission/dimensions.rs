@@ -641,6 +641,14 @@ pub fn symbolic_history_certificate(
                 u: history_case.u,
                 prior_a: history_case.prior_a,
                 current_a: history_case.current_a,
+                first_tile_exponent: 1,
+                last_tile_exponent: history_case.u,
+                first_distance_exponent: history_case.current_a,
+                last_distance_exponent: history_case
+                    .current_a
+                    .checked_sub(history_case.u)
+                    .and_then(|value| value.checked_add(1))
+                    .ok_or_else(|| invalid("symbolic tile-distance range"))?,
                 inherited_lhs: history_case.inherited_absorption_lhs.clone(),
                 inherited_rhs_exponent: history_case.inherited_absorption_rhs_exponent,
                 evaluation_lhs: history_case.evaluation_absorption_lhs.clone(),
@@ -657,6 +665,11 @@ pub fn symbolic_history_certificate(
         scale_floor: history.scale_floor,
         inherited_precision_constant: history.inherited_precision_constant,
         normalized_precision_constant: history.normalized_precision_constant,
+        packet_capacity_constant: 3,
+        mode_distance_constant: 6,
+        mode_precision_product_constant: 204,
+        tuple_square_root_ceiling: 15,
+        tuple_exponent_constant: 80,
         depths,
         local_child_exponent_constant: composition.local_child_exponent_constant,
         path_sum_constant: composition.path_sum_constant,

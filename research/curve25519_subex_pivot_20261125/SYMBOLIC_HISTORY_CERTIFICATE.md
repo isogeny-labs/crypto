@@ -22,6 +22,23 @@ plain fields it independently reconstructs:
 6. leaf-scale and packet-entry absorption; and
 7. the reported constants `96`, `3`, `288`, `290`, and `148480`.
 
+Schema 2 also commits to the local source-bound chain
+
+```text
+K L <= 3M,
+tau D = 2L,
+n D <= 6M,
+p u <= 34 M D,
+n p <= 204 M^2/u,
+log2(T) <= 80 M/sqrt(u).
+```
+
+The verifier checks the constants `3,6,34,204`, proves
+`14^2<204<=15^2`, and reconstructs `80=5*15+5`. It then checks that tuple,
+active-node, interpolation-sample, and radix terms fit the declared local
+constant `96`. These are exact implications of the stated scalar premises;
+the certificate does not prove that a graph realizes them. `[pcc:unverified]`
+
 Missing, extra, reordered, or altered depth rows fail closed. Schema,
 precision-transition, and final-composition mutations are explicit negative
 controls. `[pcc:unverified]`
@@ -38,7 +55,12 @@ u_d     512   256   128    64    32
 a_d    1024  1536  1792  1920  1984
 ```
 
-The newline-terminated JSON fixture is 1,624 bytes. The native command
+Each depth row commits to the first and last tile/distance exponents. The
+verifier checks both endpoint identities
+`1+a = u+(a-u+1) = a+1`, which proves `tau D=2L` uniformly for every
+coordinate between them.
+
+The newline-terminated schema-2 JSON fixture is 2,325 bytes. The native command
 
 ```text
 cargo run --locked \
@@ -48,7 +70,8 @@ cargo run --locked \
 ```
 
 reports five active depths, root `u=512`, total root-`u` exponent constant
-`290`, and root-log constant `148480`. Input is capped at 1 MiB.
+`290`, root-log constant `148480`, and tuple exponent constant `80`. Input is
+capped at 1 MiB.
 `[pcc:unverified]`
 
 ## Remaining refinement boundary

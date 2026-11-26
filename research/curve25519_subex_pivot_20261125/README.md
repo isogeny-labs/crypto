@@ -315,11 +315,15 @@ passes 14/14 controls. [pcc:unverified]
 `SYMBOLIC_HISTORY_CERTIFICATE.md` now separates this transcript from its
 producer. A standalone module reconstructs the five-depth schedule, both
 precision absorptions, geometric path comparisons, packet-entry absorption,
-and final constants from a stable 1,624-byte JSON fixture. It imports neither
+and final constants from a stable 2,325-byte JSON fixture. Schema 2 additionally
+checks the chain from `K L<=3M`, `tau D=2L`, and `p u<=34 M D` to
+`n p<=204 M^2/u` and tuple exponent constant `80`; per-depth endpoint
+commitments check `tau D=2L` across the full coordinate range. It imports neither
 the producer dimension audit nor contraction/packing/factorization code.
-Schema, missing-depth, precision-transition, and final-constant mutations are
-rejected. This is an independent scalar replay, not graph realization or a
-proof of the external theorem. `[pcc:unverified]`
+Schema, missing-depth, precision-transition, source-constant, and
+final-constant mutations are rejected. This is an independent scalar replay,
+not graph realization or a proof of the external theorem.
+`[pcc:unverified]`
 
 This threshold is asymptotic: it means a root edge count on the order of
 `2^(2^26)`, far outside the live `usize` representation and irrelevant to

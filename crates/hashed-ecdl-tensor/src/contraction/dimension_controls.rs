@@ -504,7 +504,7 @@ fn recursion_composition_has_depth_independent_constants() {
 fn symbolic_history_certificate_has_independent_exact_replay() {
     let produced = symbolic_history_certificate(UNIFORM_HISTORY_LAMBDA_THRESHOLD).unwrap();
     let serialized = serde_json::to_vec(&produced).unwrap();
-    assert_eq!(serialized.len(), 1_623);
+    assert_eq!(serialized.len(), 2_324);
     assert_eq!(
         serialized,
         include_bytes!("../../examples/symbolic-history-certificate.json")
@@ -517,6 +517,7 @@ fn symbolic_history_certificate_has_independent_exact_replay() {
     assert_eq!(summary.lambda, UNIFORM_HISTORY_LAMBDA_THRESHOLD);
     assert_eq!(summary.root_u, 512);
     assert_eq!(summary.active_depths, 5);
+    assert_eq!(summary.tuple_exponent_constant, 80);
     assert_eq!(summary.total_root_u_exponent_constant, 290);
     assert_eq!(summary.total_root_log_exponent_constant, 148_480);
 
@@ -542,6 +543,12 @@ fn symbolic_history_certificate_has_independent_exact_replay() {
     );
 
     let mut bad_composition = certificate;
+    bad_composition.mode_precision_product_constant += 1;
+    assert_eq!(
+        verify_symbolic_history(&bad_composition).unwrap_err(),
+        "symbolic history constants"
+    );
+    bad_composition.mode_precision_product_constant -= 1;
     bad_composition.total_root_u_exponent_constant += 1;
     assert_eq!(
         verify_symbolic_history(&bad_composition).unwrap_err(),

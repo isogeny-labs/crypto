@@ -122,8 +122,10 @@ quadratic left bound grows by less than two.  For evaluation,
 
 The schema-versioned transcript in `SYMBOLIC_HISTORY_CERTIFICATE.md` gives a
 separate executable scalar boundary. Its verifier independently reconstructs
-all five threshold depths and composition constants from a 1,624-byte JSON
-fixture without importing the producer dimension audit or graph code. This
+all five threshold depths and composition constants from a 2,325-byte JSON
+fixture without importing the producer dimension audit or graph code. Schema 2
+also checks the exact local chain `nD<=6M`, `pu<=34MD`,
+`np<=204M^2/u`, and the tuple exponent constant `80`. This
 strengthens R2's finite replay but does not discharge R1's graph-realization
 premise. `[pcc:unverified]`
 
