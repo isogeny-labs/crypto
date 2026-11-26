@@ -55,7 +55,11 @@
 //! the descent systems of the coordinate thread can be timed at `m = 3`.
 
 use std::collections::HashSet;
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering as AtomicOrdering};
+use std::marker::PhantomData;
+use std::num::NonZeroU64;
+use std::rc::Rc;
+use std::sync::atomic::{AtomicU64, AtomicU8, AtomicUsize, Ordering as AtomicOrdering};
+use std::thread::ThreadId;
 use std::time::{Duration, Instant};
 
 use rayon::prelude::*;
@@ -8207,6 +8211,87 @@ pub struct VisitAccountingRequestV1 {
     pub binding: VisitAccountingBindingV1,
 }
 
+const VISIT_ACCOUNTING_CONTEXT_FAULT_NONE: u8 = 0;
+const VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD: u8 = 1;
+static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
+
+/// Per-call ownership identity for the first explicit-token migration slice.
+///
+/// The authoritative ledger is still worker TLS.  The borrowed token gates
+/// traversal-owned mutations and cannot enter detached `'static` work; native
+/// F4 and shared arithmetic helpers remain a non-authoritative TLS shadow
+/// until later migration.
+struct VisitAccountingContext {
+    id: NonZeroU64,
+    owner_thread: ThreadId,
+    fault: AtomicU8,
+}
+
+impl VisitAccountingContext {
+    fn new() -> Option<Self> {
+        let mut observed = VISIT_ACCOUNTING_CONTEXT_IDS.load(AtomicOrdering::Relaxed);
+        let id = loop {
+            let id = NonZeroU64::new(observed)?;
+            let next = observed.checked_add(1)?;
+            match VISIT_ACCOUNTING_CONTEXT_IDS.compare_exchange_weak(
+                observed,
+                next,
+                AtomicOrdering::Relaxed,
+                AtomicOrdering::Relaxed,
+            ) {
+                Ok(_) => break id,
+                Err(current) => observed = current,
+            }
+        };
+        Some(Self {
+            id,
+            owner_thread: std::thread::current().id(),
+            fault: AtomicU8::new(VISIT_ACCOUNTING_CONTEXT_FAULT_NONE),
+        })
+    }
+
+    #[cfg(test)]
+    fn unbound_test_token(&self) -> VisitAccountingToken<'_> {
+        VisitAccountingToken(self)
+    }
+
+    fn record_foreign_thread(&self) {
+        let _ = self.fault.compare_exchange(
+            VISIT_ACCOUNTING_CONTEXT_FAULT_NONE,
+            VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD,
+            AtomicOrdering::Release,
+            AtomicOrdering::Relaxed,
+        );
+    }
+}
+
+#[derive(Clone, Copy)]
+struct VisitAccountingToken<'a>(&'a VisitAccountingContext);
+
+impl VisitAccountingToken<'_> {
+    fn id(self) -> NonZeroU64 {
+        self.0.id
+    }
+}
+
+#[derive(Clone, Copy)]
+enum VisitAccount<'a> {
+    Off,
+    On(VisitAccountingToken<'a>),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum VisitAccountingControl {
+    Continue,
+    Stop,
+}
+
+impl VisitAccountingControl {
+    fn stopped(self) -> bool {
+        self == Self::Stop
+    }
+}
+
 #[derive(Clone, Copy)]
 enum VisitAccountingEntryMode {
     CallerPool,
@@ -8411,6 +8496,7 @@ pub struct VisitAccountingArmV1 {
     pub ordering: &'static str,
     pub selection_strategy: &'static str,
     pub ownership_mode: &'static str,
+    pub accounting_token_mode: &'static str,
     pub rayon_threads: usize,
     pub inside_rayon_worker: bool,
     pub max_degree: u32,
@@ -8601,6 +8687,7 @@ impl VisitAccountingCounter {
 struct VisitAccountingBuilder {
     request: VisitAccountingRequestV1,
     arm: VisitAccountingArmV1,
+    token_identity: Option<NonZeroU64>,
     phases: [VisitAccountingWorkV1; 15],
     total: VisitAccountingWorkV1,
     current_phase: VisitAccountingPhaseV1,
@@ -8727,6 +8814,7 @@ impl VisitAccountingBuilder {
                 },
                 selection_strategy: "normal_degree_by_degree",
                 ownership_mode: entry_mode.ownership_mode(),
+                accounting_token_mode: "not_started_preflight_rejected",
                 rayon_threads: rayon::current_num_threads(),
                 inside_rayon_worker: rayon::current_thread_index().is_some(),
                 max_degree: opts.max_degree,
@@ -8758,6 +8846,7 @@ impl VisitAccountingBuilder {
                 linear_interreduce_enabled: linear_interreduce,
                 lazy_simd: simd,
             },
+            token_identity: None,
             phases: std::array::from_fn(|_| VisitAccountingWorkV1::default()),
             total: VisitAccountingWorkV1::default(),
             current_phase: VisitAccountingPhaseV1::Validation,
@@ -8777,6 +8866,11 @@ impl VisitAccountingBuilder {
             memory_tracking_complete: false,
             work_ownership_complete: false,
         }
+    }
+
+    fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
+        self.token_identity = Some(token.id());
+        self.arm.accounting_token_mode = "borrowed_traversal_tls_shadow_v1";
     }
 
     fn block(
@@ -9094,12 +9188,191 @@ fn visit_accounting_charging() -> bool {
     })
 }
 
-fn visit_accounting_should_stop() -> bool {
+fn visit_accounting_merge_context_fault(
+    token: VisitAccountingToken<'_>,
+    accounting: &mut VisitAccountingBuilder,
+) {
+    if token.0.fault.load(AtomicOrdering::Acquire) == VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD
+    {
+        accounting.block(
+            "foreign_thread_work",
+            None,
+            "borrowed accounting token was used outside its owning thread",
+        );
+    }
+}
+
+fn visit_account_with_token(
+    token: VisitAccountingToken<'_>,
+    run_when_blocked: bool,
+    allow_suspended: bool,
+    f: impl FnOnce(&mut VisitAccountingBuilder),
+) -> VisitAccountingControl {
+    if std::thread::current().id() != token.0.owner_thread {
+        token.0.record_foreign_thread();
+        return VisitAccountingControl::Stop;
+    }
     VISIT_ACCOUNTING_ACTIVE.with(|slot| {
-        slot.borrow().as_ref().is_some_and(|accounting| {
-            accounting.suspended_depth == 0 && accounting.blocker.is_some()
-        })
+        let mut slot = slot.borrow_mut();
+        let Some(accounting) = slot.as_mut() else {
+            return VisitAccountingControl::Stop;
+        };
+        if accounting.token_identity != Some(token.id()) {
+            accounting.block(
+                "accounting_token_mismatch",
+                None,
+                "borrowed accounting token does not own the active ledger",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        visit_accounting_merge_context_fault(token, accounting);
+        if accounting.suspended_depth != 0 && !allow_suspended {
+            accounting.block(
+                "accounting_token_suspended",
+                None,
+                "solver-owned token was used while external work was suspended",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        if accounting.blocker.is_some() && !run_when_blocked {
+            return VisitAccountingControl::Stop;
+        }
+        f(accounting);
+        if accounting.blocker.is_some() {
+            VisitAccountingControl::Stop
+        } else {
+            VisitAccountingControl::Continue
+        }
     })
+}
+
+impl<'a> VisitAccount<'a> {
+    fn control(self) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |_| {}),
+        }
+    }
+
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.charge(counter, amount);
+            }),
+        }
+    }
+
+    fn charge_usize(self, counter: VisitAccountingCounter, value: usize) -> VisitAccountingControl {
+        match u64::try_from(value) {
+            Ok(value) => self.charge(counter, value),
+            Err(_) => self.block(
+                "counter_overflow",
+                Some(counter.name()),
+                "usize observation does not fit u64",
+            ),
+        }
+    }
+
+    fn block(
+        self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.block(code, counter, detail);
+            }),
+        }
+    }
+
+    fn phase_scope(
+        self,
+        phase: VisitAccountingPhaseV1,
+    ) -> (VisitAccountingTokenPhaseScope<'a>, VisitAccountingControl) {
+        let mut previous = None;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                previous = Some(accounting.current_phase);
+                accounting.transition(phase);
+            }),
+        };
+        (
+            VisitAccountingTokenPhaseScope {
+                token: match self {
+                    Self::Off => None,
+                    Self::On(token) => Some(token),
+                },
+                previous,
+                _not_send: PhantomData,
+            },
+            control,
+        )
+    }
+
+    fn pause_external(
+        self,
+    ) -> Result<VisitAccountingTokenExternalPause<'a>, VisitAccountingControl> {
+        let mut active = false;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.pause_external_work();
+                active = true;
+            }),
+        };
+        let guard = VisitAccountingTokenExternalPause {
+            token: match self {
+                Self::Off => None,
+                Self::On(token) => Some(token),
+            },
+            active,
+            _not_send: PhantomData,
+        };
+        if control.stopped() {
+            drop(guard);
+            Err(VisitAccountingControl::Stop)
+        } else {
+            Ok(guard)
+        }
+    }
+}
+
+struct VisitAccountingTokenPhaseScope<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    previous: Option<VisitAccountingPhaseV1>,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenPhaseScope<'_> {
+    fn drop(&mut self) {
+        if let (Some(token), Some(previous)) = (self.token, self.previous.take()) {
+            let _ = visit_account_with_token(token, true, false, |accounting| {
+                accounting.transition(previous);
+            });
+        }
+    }
+}
+
+struct VisitAccountingTokenExternalPause<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    active: bool,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenExternalPause<'_> {
+    fn drop(&mut self) {
+        if self.active {
+            if let Some(token) = self.token {
+                let _ = visit_account_with_token(token, true, true, |accounting| {
+                    accounting.resume_external_work();
+                });
+            }
+        }
+    }
 }
 
 #[inline]
@@ -9170,44 +9443,24 @@ fn visit_account_phase_scope(phase: VisitAccountingPhaseV1) -> VisitAccountingPh
     VisitAccountingPhaseScope { previous }
 }
 
-struct VisitAccountingExternalPause {
+struct VisitAccountingSession<'a> {
     active: bool,
+    context: &'a VisitAccountingContext,
+    _not_send: PhantomData<Rc<()>>,
 }
 
-impl Drop for VisitAccountingExternalPause {
-    fn drop(&mut self) {
-        if self.active {
-            VISIT_ACCOUNTING_ACTIVE.with(|slot| {
-                if let Some(accounting) = slot.borrow_mut().as_mut() {
-                    accounting.resume_external_work();
-                }
-            });
+impl<'a> VisitAccountingSession<'a> {
+    fn begin(
+        mut builder: VisitAccountingBuilder,
+        context: &'a VisitAccountingContext,
+    ) -> Result<Self, VisitAccountingBuilder> {
+        let token = VisitAccountingToken(context);
+        builder.bind_token(token);
+        if std::thread::current().id() != token.0.owner_thread {
+            token.0.record_foreign_thread();
+            visit_accounting_merge_context_fault(token, &mut builder);
+            return Err(builder);
         }
-    }
-}
-
-fn visit_account_pause_external_work() -> VisitAccountingExternalPause {
-    if VISIT_ACCOUNTING_CHARGING_CALLS.load(AtomicOrdering::Relaxed) == 0 {
-        return VisitAccountingExternalPause { active: false };
-    }
-    let active = VISIT_ACCOUNTING_ACTIVE.with(|slot| {
-        let mut slot = slot.borrow_mut();
-        if let Some(accounting) = slot.as_mut() {
-            accounting.pause_external_work();
-            true
-        } else {
-            false
-        }
-    });
-    VisitAccountingExternalPause { active }
-}
-
-struct VisitAccountingSession {
-    active: bool,
-}
-
-impl VisitAccountingSession {
-    fn begin(builder: VisitAccountingBuilder) -> Result<Self, VisitAccountingBuilder> {
         VISIT_ACCOUNTING_ACTIVE.with(|slot| {
             let mut slot = slot.borrow_mut();
             if slot.is_some() {
@@ -9215,26 +9468,52 @@ impl VisitAccountingSession {
             } else {
                 *slot = Some(builder);
                 VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
-                Ok(Self { active: true })
+                Ok(Self {
+                    active: true,
+                    context,
+                    _not_send: PhantomData,
+                })
             }
         })
     }
 
+    /// Borrow the per-call token from the live session.  This brands every
+    /// production token use with the session lease: Rust will not allow the
+    /// session to be sealed while a token-derived account or guard is live.
+    fn token<'session>(&'session self) -> VisitAccountingToken<'session> {
+        VisitAccountingToken(self.context)
+    }
+
     fn finish(mut self, disposition: VisitDispositionV1) -> VisitAccountingV1 {
         self.active = false;
-        let builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        let mut builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| {
             slot.borrow_mut()
                 .take()
                 .expect("accounted visitor session must still own its meter")
         });
-        if builder.suspended_depth == 0 {
+        visit_accounting_merge_context_fault(VisitAccountingToken(self.context), &mut builder);
+        let unbalanced_suspension = builder.suspended_depth != 0;
+        if unbalanced_suspension {
+            builder.block(
+                "unbalanced_external_work_suspension",
+                None,
+                "accounting session reached seal while external work remained suspended",
+            );
+            // The excluded interval has no valid endpoint.  Resume only the
+            // local clock state so sealing does not charge arbitrary external
+            // work; the global charging count was already decremented by the
+            // first pause and therefore must not be decremented again below.
+            builder.suspended_depth = 0;
+            builder.last_wall = Instant::now();
+            builder.last_cpu_ns = visit_thread_cpu_ns();
+        } else {
             VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
         }
         builder.seal(disposition)
     }
 }
 
-impl Drop for VisitAccountingSession {
+impl Drop for VisitAccountingSession<'_> {
     fn drop(&mut self) {
         if self.active {
             let builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| slot.borrow_mut().take());
@@ -9692,11 +9971,12 @@ pub enum VisitEvent<'a> {
     },
 }
 
-struct VisitState<'a, F, S> {
+struct VisitState<'a, 'account, F, S> {
     original: &'a [Poly],
     domains: &'a [Option<Vec<u64>>],
     p: u64,
     opts: &'a F4Options,
+    account: VisitAccount<'account>,
     assignment: Vec<u64>,
     visitor: F,
     sink: Option<S>,
@@ -9709,7 +9989,7 @@ struct VisitState<'a, F, S> {
     domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
-impl<F, S> VisitState<'_, F, S>
+impl<F, S> VisitState<'_, '_, F, S>
 where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
@@ -9719,16 +9999,25 @@ where
             return Err(VisitEnd::TraceStopped);
         }
         if let Some(sink) = &mut self.sink {
-            let account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::TraceDelivery);
-            visit_account_charge(VisitAccountingCounter::TraceDeliveries, 1);
-            if visit_accounting_should_stop() {
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::TraceDelivery);
+            if control.stopped()
+                || self
+                    .account
+                    .charge(VisitAccountingCounter::TraceDeliveries, 1)
+                    .stopped()
+            {
                 return Err(VisitEnd::AccountingStopped);
             }
             let delivered = {
-                let _external = visit_account_pause_external_work();
+                let _external = self
+                    .account
+                    .pause_external()
+                    .map_err(|_| VisitEnd::AccountingStopped)?;
                 sink(event)
             };
-            if visit_accounting_should_stop() {
+            if self.account.control().stopped() {
                 return Err(VisitEnd::AccountingStopped);
             }
             if let Err(mut error) = delivered {
@@ -9740,13 +10029,13 @@ where
                 self.report.trace_stopped = true;
                 self.report.trace_error = Some(error);
                 drop(account_phase);
-                if visit_accounting_should_stop() {
+                if self.account.control().stopped() {
                     return Err(VisitEnd::AccountingStopped);
                 }
                 return Err(VisitEnd::TraceStopped);
             }
             drop(account_phase);
-            if visit_accounting_should_stop() {
+            if self.account.control().stopped() {
                 return Err(VisitEnd::AccountingStopped);
             }
         }
@@ -9757,8 +10046,8 @@ where
     }
 
     fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
-        let _account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::Traversal);
-        if visit_accounting_should_stop() {
+        let (_account_phase, control) = self.account.phase_scope(VisitAccountingPhaseV1::Traversal);
+        if control.stopped() {
             return VisitEnd::AccountingStopped;
         }
         if self.report.trace_stopped {
@@ -9769,8 +10058,11 @@ where
         }
         let node_id = self.next_node;
         self.next_node += 1;
-        visit_account_charge(VisitAccountingCounter::TraversalNodes, 1);
-        if visit_accounting_should_stop() {
+        if self
+            .account
+            .charge(VisitAccountingCounter::TraversalNodes, 1)
+            .stopped()
+        {
             return VisitEnd::AccountingStopped;
         }
         if self.sink.is_some() {
@@ -9800,27 +10092,31 @@ where
             // A degree-truncated basis can describe a strict superset of
             // the original variety. Never expose those spurious roots.
             let (residual_satisfied, original_satisfied) = {
-                let _phase =
-                    visit_account_phase_scope(VisitAccountingPhaseV1::CandidateVerification);
-                for g in input {
-                    visit_account_charge_usize(
-                        VisitAccountingCounter::CandidateTermsChecked,
-                        g.len(),
-                    );
-                }
-                if visit_accounting_should_stop() {
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CandidateVerification);
+                if control.stopped() {
                     return VisitEnd::AccountingStopped;
+                }
+                for g in input {
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
                 }
                 let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
                 let original_satisfied = residual_satisfied.then(|| {
                     for g in self.original {
-                        visit_account_charge_usize(
-                            VisitAccountingCounter::CandidateTermsChecked,
-                            g.len(),
-                        );
-                    }
-                    if visit_accounting_should_stop() {
-                        return false;
+                        if self
+                            .account
+                            .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                            .stopped()
+                        {
+                            return false;
+                        }
                     }
                     self.original
                         .iter()
@@ -9828,7 +10124,7 @@ where
                 });
                 (residual_satisfied, original_satisfied)
             };
-            if visit_accounting_should_stop() {
+            if self.account.control().stopped() {
                 return VisitEnd::AccountingStopped;
             }
             if self.sink.is_some() {
@@ -9854,17 +10150,25 @@ where
             }
             let stop = {
                 let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
-                let _account_phase =
-                    visit_account_phase_scope(VisitAccountingPhaseV1::CallbackDelivery);
-                visit_account_charge(VisitAccountingCounter::CallbackDeliveries, 1);
-                if visit_accounting_should_stop() {
+                let (_account_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CallbackDelivery);
+                if control.stopped()
+                    || self
+                        .account
+                        .charge(VisitAccountingCounter::CallbackDeliveries, 1)
+                        .stopped()
+                {
                     return VisitEnd::AccountingStopped;
                 }
-                self.report.solutions_visited += 1;
-                let _external = visit_account_pause_external_work();
+                let _external = match self.account.pause_external() {
+                    Ok(external) => external,
+                    Err(_) => return VisitEnd::AccountingStopped,
+                };
                 (self.visitor)(&self.assignment)
             };
-            if visit_accounting_should_stop() {
+            self.report.solutions_visited += 1;
+            if self.account.control().stopped() {
                 return VisitEnd::AccountingStopped;
             }
             return if stop {
@@ -9894,8 +10198,8 @@ where
                     - before.replay_attempts) as usize;
                 (r, None)
             } else if self.sink.is_some() {
-                if visit_accounting_charging() {
-                    visit_account_block(
+                if matches!(self.account, VisitAccount::On(_)) {
+                    self.account.block(
                         "uninstrumented_branch",
                         None,
                         "recording-specific contributor recovery is not operation-complete",
@@ -9908,7 +10212,7 @@ where
                 (f4(input, active.len(), self.p, self.opts), None)
             }
         };
-        if visit_accounting_should_stop() {
+        if self.account.control().stopped() {
             return VisitEnd::AccountingStopped;
         }
         if self.report.f4_runs == 0 {
@@ -10001,7 +10305,12 @@ where
             }
             let var = *vars.iter().next().unwrap();
             let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
-            let _account_phase = visit_account_phase_scope(VisitAccountingPhaseV1::RootExtraction);
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::RootExtraction);
+            if control.stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
                 match self.opts.domain_roots {
                     DomainRootMode::Scan => false,
@@ -10043,13 +10352,30 @@ where
                     .checked_sub(before)
                 {
                     Some(muls) => {
-                        visit_account_charge(VisitAccountingCounter::FieldMultiplications, muls)
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
                     }
-                    None => visit_account_block(
-                        "counter_underflow",
-                        Some("field_multiplications"),
-                        "finite-domain root counter regressed",
-                    ),
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "finite-domain root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
                 }
                 let Some(roots) = roots else {
                     return VisitEnd::TimedOut;
@@ -10090,24 +10416,52 @@ where
                 );
                 match self.report.root_field_multiplications.checked_sub(before) {
                     Some(muls) => {
-                        visit_account_charge(VisitAccountingCounter::FieldMultiplications, muls)
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
                     }
-                    None => visit_account_block(
-                        "counter_underflow",
-                        Some("field_multiplications"),
-                        "unrestricted root counter regressed",
-                    ),
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "unrestricted root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
                 }
                 let Some(roots) = roots else {
                     return VisitEnd::TimedOut;
                 };
                 roots
             };
-            visit_account_charge_usize(VisitAccountingCounter::RootCandidates, roots.len());
+            if self
+                .account
+                .charge_usize(VisitAccountingCounter::RootCandidates, roots.len())
+                .stopped()
+            {
+                return VisitEnd::AccountingStopped;
+            }
             if best.as_ref().is_none_or(|(_, old)| roots.len() < old.len()) {
                 best = Some((var, roots));
             }
-            if best.as_ref().is_some_and(|(_, roots)| roots.is_empty()) {
+            let empty_roots = best.as_ref().is_some_and(|(_, roots)| roots.is_empty());
+            drop(account_phase);
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
+            if empty_roots {
                 return VisitEnd::Complete;
             }
         }
@@ -10144,8 +10498,11 @@ where
             if full_field {
                 self.report.full_field_branches += 1;
             }
-            visit_account_charge(VisitAccountingCounter::BranchDeliveries, 1);
-            if visit_accounting_should_stop() {
+            if self
+                .account
+                .charge(VisitAccountingCounter::BranchDeliveries, 1)
+                .stopped()
+            {
                 return VisitEnd::AccountingStopped;
             }
             if let Err(end) = self.emit(VisitEvent::Branch {
@@ -10167,12 +10524,20 @@ where
             }
             self.assignment[original] = value;
             let sub: Vec<_> = {
-                let _phase = visit_account_phase_scope(VisitAccountingPhaseV1::Specialization);
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::Specialization);
+                if control.stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
                 for g in generating_set {
-                    visit_account_charge_usize(
-                        VisitAccountingCounter::SpecializationTerms,
-                        g.len(),
-                    );
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::SpecializationTerms, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
                 }
                 generating_set
                     .iter()
@@ -10182,6 +10547,9 @@ where
                     .filter(|g| !g.is_empty())
                     .collect()
             };
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             let end = self.walk(&sub, &remaining, Some(node_id));
             if end != VisitEnd::Complete {
                 return end;
@@ -10477,7 +10845,15 @@ where
             accounting: builder.seal(VisitDispositionV1::Unsupported),
         });
     }
-    let session = VisitAccountingSession::begin(builder).map_err(|mut builder| {
+    let Some(context) = VisitAccountingContext::new() else {
+        let error = "accounting context identifier space is exhausted".to_string();
+        builder.block("accounting_context_exhausted", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    };
+    let session = VisitAccountingSession::begin(builder, &context).map_err(|mut builder| {
         builder.block(
             "nested_accounted_call",
             None,
@@ -10488,16 +10864,32 @@ where
             accounting: builder.seal(VisitDispositionV1::Unsupported),
         }
     })?;
-    visit_account_charge_usize(VisitAccountingCounter::SymbolicRows, input.len());
-    for polynomial in input {
-        visit_account_charge_usize(VisitAccountingCounter::SymbolicMonomials, polynomial.len());
-    }
-    visit_account_charge_usize(VisitAccountingCounter::Comparisons, domains.len());
-    for domain in domains.iter().flatten() {
-        visit_account_charge_usize(VisitAccountingCounter::Comparisons, domain.len());
+    let account = VisitAccount::On(session.token());
+    let initial_accounting_stopped = account
+        .charge_usize(VisitAccountingCounter::SymbolicRows, input.len())
+        .stopped()
+        || input.iter().any(|polynomial| {
+            account
+                .charge_usize(VisitAccountingCounter::SymbolicMonomials, polynomial.len())
+                .stopped()
+        })
+        || account
+            .charge_usize(VisitAccountingCounter::Comparisons, domains.len())
+            .stopped()
+        || domains.iter().flatten().any(|domain| {
+            account
+                .charge_usize(VisitAccountingCounter::Comparisons, domain.len())
+                .stopped()
+        });
+    if initial_accounting_stopped || account.control().stopped() {
+        let mut report = VisitReport::default();
+        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        return Ok(report);
     }
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
-    match solve_visit_impl(input, n_vars, p, opts, domains, visitor, sink, None) {
+    match solve_visit_impl(
+        input, n_vars, p, opts, domains, account, visitor, sink, None,
+    ) {
         Ok(mut report) => {
             let disposition = visit_disposition(
                 &report,
@@ -10530,10 +10922,10 @@ pub struct VisitFirstReportV1 {
 ///
 /// The executor owns a one-thread Rayon pool and exposes no caller callback or
 /// trace sink, preventing those extension points from submitting unrelated
-/// work to that pool.  Its current accounting implementation still uses the
-/// worker-local meter as a shadow; `work_ownership_complete` therefore remains
-/// false until the solver carries an explicit borrowed ownership token through
-/// every charged path.
+/// work to that pool. Traversal and delivery now borrow a session-branded
+/// token, but native F4 and shared arithmetic helpers still use the worker-local
+/// meter as a shadow. `work_ownership_complete` therefore remains false until
+/// every admitted charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
     pool: rayon::ThreadPool,
 }
@@ -10672,6 +11064,7 @@ pub fn solve_visit(
         p,
         opts,
         domains,
+        VisitAccount::Off,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
         None,
@@ -10699,7 +11092,17 @@ pub fn solve_visit_traced(
     if opts.stop_hilbert.is_some() {
         return Err("traced visitor does not support Hilbert stopping".into());
     }
-    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink), None)
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        VisitAccount::Off,
+        visitor,
+        Some(sink),
+        None,
+    )
 }
 
 /// Reuse certified native traces across attempts in one explicitly scoped
@@ -10724,6 +11127,7 @@ pub fn solve_visit_reusing(
         p,
         opts,
         domains,
+        VisitAccount::Off,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
         Some(pool),
@@ -10731,12 +11135,13 @@ pub fn solve_visit_reusing(
 }
 
 #[allow(clippy::too_many_arguments)]
-fn solve_visit_impl<F, S>(
+fn solve_visit_impl<'account, F, S>(
     input: &[Poly],
     n_vars: usize,
     p: u64,
     opts: &F4Options,
     domains: &[Option<Vec<u64>>],
+    account: VisitAccount<'account>,
     visitor: F,
     sink: Option<S>,
     pool: Option<&mut TracePool>,
@@ -10745,6 +11150,9 @@ where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    if account.control().stopped() {
+        return Ok(VisitReport::default());
+    }
     let timing = opts.visit_timing.then(VisitClock::new);
     if opts.resource_limits.is_some() && (pool.is_some() || opts.sibling_batch) {
         return Ok(VisitReport {
@@ -10783,6 +11191,7 @@ where
         domains,
         p,
         opts,
+        account,
         assignment: vec![0; n_vars],
         visitor,
         sink,
@@ -10793,7 +11202,7 @@ where
         domain_index: vec![None; n_vars],
     };
     let mut end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
-    if visit_accounting_should_stop() {
+    if account.control().stopped() {
         end = VisitEnd::AccountingStopped;
     }
     state.report.complete = end == VisitEnd::Complete;
@@ -11382,7 +11791,11 @@ mod visit_accounting_tests {
             .expect("accounted entry point returns its ledger")
     }
 
-    fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
+    fn assert_reconciles_in_modes(
+        record: &VisitAccountingV1,
+        ownership_mode: &str,
+        accounting_token_mode: &str,
+    ) {
         let mut sum = VisitAccountingWorkV1::default();
         for phase in &record.phases {
             sum.checked_add_assign(&phase.work).unwrap();
@@ -11394,24 +11807,38 @@ mod visit_accounting_tests {
         assert!(!record.reconciliation.memory_tracking_complete);
         assert!(!record.reconciliation.work_ownership_complete);
         assert_eq!(record.arm.ownership_mode, ownership_mode);
+        assert_eq!(record.arm.accounting_token_mode, accounting_token_mode);
         assert_eq!(record.scope, "solve_visit_call_only");
         assert!(record.whole_collector_accounting_required);
+    }
+
+    fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
+        assert_reconciles_in_modes(record, ownership_mode, "borrowed_traversal_tls_shadow_v1");
     }
 
     fn assert_reconciles(record: &VisitAccountingV1) {
         assert_reconciles_in_mode(record, "caller_one_thread_rayon_tls_unproven");
     }
 
-    fn begin_counter_overflow_session(
+    fn assert_reconciles_rejected(record: &VisitAccountingV1) {
+        assert_reconciles_in_modes(
+            record,
+            "caller_one_thread_rayon_tls_unproven",
+            "not_started_preflight_rejected",
+        );
+    }
+
+    fn begin_counter_overflow_session<'a>(
+        context: &'a VisitAccountingContext,
         id: &str,
         opts: &F4Options,
         trace_sink: bool,
         counter: VisitAccountingCounter,
-    ) -> VisitAccountingSession {
+    ) -> VisitAccountingSession<'a> {
         let mut builder = VisitAccountingBuilder::new(request(id), opts, trace_sink);
         *counter.field(&mut builder.total) = u64::MAX;
         *counter.field(&mut builder.phases[VisitAccountingPhaseV1::Validation.index()]) = u64::MAX;
-        VisitAccountingSession::begin(builder)
+        VisitAccountingSession::begin(builder, context)
             .ok()
             .expect("test owns the accounted session")
     }
@@ -11725,7 +12152,9 @@ mod visit_accounting_tests {
         in_owner_pool(|| {
             let opts = F4Options::new(Ordering::Grevlex, 4);
 
+            let callback_context = VisitAccountingContext::new().unwrap();
             let callback_session = begin_counter_overflow_session(
+                &callback_context,
                 "callback-overflow",
                 &opts,
                 false,
@@ -11738,6 +12167,7 @@ mod visit_accounting_tests {
                 7,
                 &opts,
                 &[],
+                VisitAccount::On(callback_session.token()),
                 |_| {
                     callback_entered = true;
                     false
@@ -11766,8 +12196,14 @@ mod visit_accounting_tests {
             assert_eq!(blocker.counter, Some("callback_deliveries"));
             assert!(!callback_record.reconciliation.checked_arithmetic);
             assert!(callback_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                callback_record.arm.accounting_token_mode,
+                "borrowed_traversal_tls_shadow_v1"
+            );
 
+            let trace_context = VisitAccountingContext::new().unwrap();
             let trace_session = begin_counter_overflow_session(
+                &trace_context,
                 "trace-overflow",
                 &opts,
                 true,
@@ -11781,6 +12217,7 @@ mod visit_accounting_tests {
                 7,
                 &opts,
                 &[],
+                VisitAccount::On(trace_session.token()),
                 |_| {
                     visitor_entered = true;
                     false
@@ -11809,6 +12246,125 @@ mod visit_accounting_tests {
             assert_eq!(blocker.counter, Some("trace_deliveries"));
             assert!(!trace_record.reconciliation.checked_arithmetic);
             assert!(trace_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                trace_record.arm.accounting_token_mode,
+                "borrowed_traversal_tls_shadow_v1"
+            );
+        });
+    }
+
+    #[test]
+    fn same_thread_token_mismatch_stops_before_callback_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let mut callback_entered = false;
+            let report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(wrong_context.unbound_test_token()),
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert!(!report.complete && !report.stopped_early);
+            assert_eq!(report.solutions_visited, 0);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn scoped_foreign_thread_token_use_is_sticky_and_uncharged() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("foreign-thread-token"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let token = session.token();
+            let control = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        VisitAccount::On(token).charge(VisitAccountingCounter::TraversalNodes, 1)
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_eq!(control, VisitAccountingControl::Stop);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "foreign_thread_work");
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn forgotten_external_pause_fails_closed_and_releases_session_slot() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("forgotten-pause"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let pause = VisitAccount::On(session.token()).pause_external().unwrap();
+            std::mem::forget(pause);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+
+            let next_context = VisitAccountingContext::new().unwrap();
+            let next = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("after-forgotten-pause"), &opts, false),
+                &next_context,
+            )
+            .ok()
+            .expect("failed session releases the worker ledger slot");
+            let next_record = next.finish(VisitDispositionV1::Incomplete);
+            assert_ne!(
+                next_record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert_reconciles(&next_record);
         });
     }
 
@@ -11832,7 +12388,7 @@ mod visit_accounting_tests {
             outside.accounting.blocker.as_ref().unwrap().code,
             "unsupported_configuration"
         );
-        assert_reconciles(&outside.accounting);
+        assert_reconciles_rejected(&outside.accounting);
 
         let invalid = in_owner_pool(|| {
             let mut bad = request("bad-binding");
@@ -11856,7 +12412,7 @@ mod visit_accounting_tests {
             invalid.accounting.blocker.as_ref().unwrap().code,
             "invalid_binding"
         );
-        assert_reconciles(&invalid.accounting);
+        assert_reconciles_rejected(&invalid.accounting);
 
         let observed = in_owner_pool(|| {
             let (sender, _receiver) = std::sync::mpsc::channel();
@@ -11878,7 +12434,7 @@ mod visit_accounting_tests {
             VisitDispositionV1::Unsupported
         );
         assert!(observed.message.contains("progress observation"));
-        assert_reconciles(&observed.accounting);
+        assert_reconciles_rejected(&observed.accounting);
     }
 
     #[test]
@@ -11983,6 +12539,26 @@ mod visit_accounting_tests {
                     )
                     .unwrap();
                     assert_eq!(nested, vec![vec![1]]);
+
+                    let nested_accounted = solve_visit_accounted_v1(
+                        &[],
+                        0,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 2),
+                        &[],
+                        request("callback-nested-accounted"),
+                        |_| panic!("rejected nested accounted call reached callback"),
+                    )
+                    .unwrap_err();
+                    assert_eq!(
+                        nested_accounted.accounting.solver_disposition,
+                        VisitDispositionV1::Unsupported
+                    );
+                    assert_eq!(
+                        nested_accounted.accounting.blocker.as_ref().unwrap().code,
+                        "nested_accounted_call"
+                    );
+                    assert_reconciles_rejected(&nested_accounted.accounting);
 
                     let packed_input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
                     let packed_report = solve_visit(

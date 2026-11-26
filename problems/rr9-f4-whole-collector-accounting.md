@@ -75,6 +75,18 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   trace-sink delivery after a counter failure.  Those controls stop before
   later native/root/delivery work, but they do not yet cover every deep charge
   site; the operation gate remains false.
+  The next migration slice binds each admitted call to a unique accounting
+  context and records
+  `accounting_token_mode=borrowed_traversal_tls_shadow_v1`; rejected preflight
+  records retain `not_started_preflight_rejected`.  Production tokens borrow
+  the live session, their phase and external-pause guards are non-`Send`, and
+  same-thread mismatch, scoped foreign-thread use, suspended-token use and an
+  unbalanced external pause fail closed with structured blockers.  Traversal
+  orchestration and callback/trace delivery now use that token boundary, but
+  native F4 and shared arithmetic, root, reducer and allocation helpers remain
+  a non-authoritative TLS shadow.  Operation, memory and work-ownership gates
+  therefore all remain false, no checklist item is closed, and no ledger is
+  promotion-ready.
 - **Observed partial collector charge:** the development whole-solve code adds
   only `rec.f4_field_ops + rec.root_field_muls` for each RR9 call. Its Prime31
   scaling table derives a lower bound from the smaller observed UNSAT
@@ -113,8 +125,9 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   intrinsic algebraic growth from implementation, allocation, ordering or
   instrumentation costs.
 - **Missing capability:** source-complete call-owned operation,
-  allocation/capacity and scratch accounting (including remaining pivot and
-  unowned-branch coverage), prospective runner integration, and a distinct
+  allocation/capacity and scratch accounting; propagation of the borrowed
+  token through native F4, shared arithmetic, root, reducer and
+  allocator-owned work; prospective runner integration; and a distinct
   whole-collector ledger that covers every attempt and phase in a common,
   source-bound schema.
 - **What this evidence does not establish:** it does not invalidate the B4/B8
@@ -180,17 +193,16 @@ still require prospective executions and independent replay.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** finish and independently review the
-  `VisitAccountingV1` slice in `src/cryptanalysis/f4_fp.rs`: route every
-  admitted allocation/capacity/scratch and remaining operation/branch through
-  checked call-owned accounting, extend the typed stop to every unowned
-  operation/overflow, close the remaining phase and hand-count controls, add
-  explicit token ownership through the callback-free private executor, and
-  keep all three promotion gates false until that review passes. Keep both
-  copied-source bridges compiling while completing the ledger, then integrate
-  only through a prospectively frozen successor RR9 runner schema.
-  Do not combine this slice with a B31 run or the whole-collector
-  implementation.
+- **Action or proof obligation:** extend the reviewed borrowed-token boundary
+  beyond traversal and delivery through native F4, shared arithmetic, root,
+  reducer and allocator-owned work while retaining TLS only as a differential
+  shadow. Route every admitted allocation/capacity/scratch lifetime and
+  remaining operation/branch through checked call-owned accounting; extend the
+  typed stop to every unowned operation or overflow; close the remaining phase
+  and hand-count controls; and keep all three promotion gates false until that
+  review passes. Keep both copied-source bridges compiling, then integrate only
+  through a prospectively frozen successor RR9 runner schema. Do not combine
+  this slice with a B31 run or the whole-collector implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to
   exercise each phase, then the existing public B8 known-chart case only as a
   non-registered integration preflight. Compare solutions, completion states
@@ -227,6 +239,17 @@ result.
 2026-11-26: Draft PR #5227 gained the opt-in call-owned accounting
 foundation and focused non-scientific controls.  Independent source review
 found remaining operation and allocation/scratch coverage, stop-on-blocker,
-and whole-collector gaps, so both private promotion gates remain false and
+and whole-collector gaps, so all three private promotion gates remain false and
 admitted ledgers fail closed.  No registered or scientific case was run; all
 B4/B8/B31, full8, collector and six-size obligations remain open.
+
+2026-11-26: Draft PR #5227 added the first borrowed-token migration boundary.
+Admitted calls bind a session-branded owner-thread context as
+`borrowed_traversal_tls_shadow_v1`; rejected preflight records retain
+`not_started_preflight_rejected`. Focused controls cover correct binding,
+same-thread mismatch, scoped foreign-thread use, nested accounted-call
+rejection, paused legacy work and unbalanced-pause recovery. Native F4, shared
+arithmetic, root, reducer and allocator ownership remain TLS-shadow gaps, so
+all three promotion gates remain false and no checklist item is satisfied. No
+registered or scientific case was run; every B4/B8/B31, full-eight, collector
+and six-size obligation remains open.
