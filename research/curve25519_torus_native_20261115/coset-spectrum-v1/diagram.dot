@@ -1,0 +1,20 @@
+digraph spectral_contract {
+  graph [rankdir=TB, bgcolor="white", pad=0.16, nodesep=0.32, ranksep=0.34];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=14,
+        margin="0.18,0.12", color="#253c59", fillcolor="#f0f5fa"];
+  edge [color="#546a80", arrowsize=0.7, fontname="Helvetica", fontsize=12];
+  coefficients [label="UNKNOWN section coefficients\nS(c), degree 6"];
+  indices [label="UNKNOWN coset indices\n6 bounded words; repeats allowed"];
+  candidate [label="Candidate algebra A_S = Fp[X]/S\n6 x 6 multiplication operator M_g"];
+  spectrum [label="charpoly(M_g) = product(T - b_j)\nMap + torsion + discriminant guards"];
+  replay [label="Original support / sign / index replay", fillcolor="#e7f4ef"];
+  ideal [label="Root-discovery ideal in ALL unknowns\nQuotient dimension D is UNKNOWN", fillcolor="#fff0db", color="#9a5b14"];
+  solver [label="Costed elimination operation: OPEN\nCompare the original point circuit", fillcolor="#fff0db", color="#9a5b14"];
+  coefficients -> candidate;
+  candidate -> spectrum;
+  indices -> spectrum;
+  spectrum -> replay [label="after a root is found"];
+  spectrum -> ideal;
+  ideal -> solver;
+  candidate -> ideal [label="dimension 6 does not give D = 6", style=dashed, color="#aa3f36"];
+}

@@ -1,0 +1,9 @@
+# Commands executed for this software qualification; do not overwrite retained logs.
+# All Cargo commands used:
+# RUSTUP_HOME=/workspace/scratch/rust/rustup
+# CARGO_HOME=/workspace/scratch/rust/cargo
+# CARGO_TARGET_DIR=/workspace/scratch/rr5-production-target
+# CARGO_BUILD_JOBS=2; RUST_TEST_THREADS=1 for tests
+cargo +1.99.1 test --release --locked --manifest-path research/smooth_p_plus_one_20261123/native/Cargo.toml --bin dickson-four-summand --features production-controls
+cargo +1.99.1 test --release --locked --manifest-path research/smooth_p_plus_one_20261123/native/Cargo.toml --bin dickson-four-summand
+cargo +1.99.1 build --release --locked --manifest-path research/smooth_p_plus_one_20261123/native/Cargo.toml --bin dickson-four-summand --features production-controls

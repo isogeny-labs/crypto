@@ -136,6 +136,50 @@ fn tuple_states(
     states.into_iter().collect()
 }
 
+fn check_mode_placement(
+    graph: &Bipartite,
+    packing: &Packing,
+    p: &Parameters,
+    coordinate: usize,
+    modes: &[Mode],
+    precision: usize,
+) -> usize {
+    for mode in modes {
+        assert!(mode.packet < packing.packets.len());
+        assert!(mode.source < p.radix);
+        assert!(mode.target < p.radix);
+        assert!((1..precision).contains(&mode.weight));
+        assert!(!mode.rows.is_empty());
+        assert!(!mode.columns.is_empty());
+        let packet = &packing.packets[mode.packet];
+        for &(slot, ref coefficient) in &mode.rows {
+            assert!(!coefficient.is_zero());
+            let edge = packet.slots[slot].expect("mode row must name a packet edge");
+            assert_eq!(
+                packing::digit(
+                    packing.row_labels[graph.edges[edge].left.0],
+                    coordinate,
+                    p.radix,
+                ),
+                mode.target
+            );
+        }
+        for &(slot, ref coefficient) in &mode.columns {
+            assert!(!coefficient.is_zero());
+            let edge = packet.slots[slot].expect("mode column must name a packet edge");
+            assert_eq!(
+                packing::digit(
+                    packing.column_labels[graph.edges[edge].right.0],
+                    coordinate,
+                    p.radix,
+                ),
+                mode.source
+            );
+        }
+    }
+    modes.len()
+}
+
 struct Observation {
     edges: Vec<usize>,
     old_vertices: usize,
@@ -319,6 +363,7 @@ fn child_port_mass_source_controls() {
     let mut tuples = 0usize;
     let mut base_group_calls = 0usize;
     let mut nonempty_tuple_controls = 0usize;
+    let mut mode_placement_checks = 0usize;
     for (radix, a) in [
         (2usize, 1usize),
         (2, 2),
@@ -357,6 +402,14 @@ fn child_port_mass_source_controls() {
                             &graph, &packing, coordinate, &p, &kernel, &mut meter,
                         )
                         .unwrap();
+                        mode_placement_checks += check_mode_placement(
+                            &graph,
+                            &packing,
+                            &p,
+                            coordinate,
+                            &modes,
+                            ring.precision(),
+                        );
                         let states = tuple_states(
                             &graph,
                             &packing,
@@ -405,6 +458,7 @@ fn child_port_mass_source_controls() {
     }
     assert_eq!(contexts, 2080);
     assert!(base_group_calls <= 46_560);
+    assert!(mode_placement_checks > 0);
 
     // Balanced actual radix64, with zero modes; still forced component parameters.
     let p = Parameters {
@@ -553,7 +607,8 @@ fn child_port_mass_source_controls() {
         &mut writer,
         json!({"kind":"summary","base_contexts":contexts,"distinct_context_tuples":tuples,
         "base_group_calls":base_group_calls,"balanced_group_calls":64,"negative_child_probes":negative_calls,
-        "positive_M_model_controls":nonempty_tuple_controls,"meter_steps_diagnostic":meter.used,
+        "positive_M_model_controls":nonempty_tuple_controls,"mode_placement_checks":mode_placement_checks,
+        "meter_steps_diagnostic":meter.used,
         "scope":"forced source-object accounting; no Setup admission,contraction value or timing claim",
         "checks_passed":true}),
     );

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T20:25:02Z",
+ "id": "PCC-20261124-6f5ee8",
+ "kind": "statement",
+ "producer": {
+  "commit": "45aa9d5b048c03aa37333cb32325d85c224243b6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/refinement_v2/f8191_recovery_128.jsonl",
+    "sha256": "6d5d596fce6d3b5eeab1447fc68b4a4bd926ff53d2ad2744dec953ed500b5733"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/refinement_v2/prefix_check.txt",
+    "sha256": "bef69414b72b6ae137797280962f8dce2f4320365bd9b64c1b9aeccaea37e56f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/smooth_p_plus_one_20261123",
+ "statement": "In the separately frozen F8191 depth-five seed-781815 128-draw development extension, Refined recovered scalar 4356 after 50 oracle calls, 15 selected rows and base rank 14, and its first 30 attempt records match the retained incomplete trial. Direct recovered the same scalar in 13 calls. Scalar multiplication is asserted by the native driver; independent signed verification and admitted timing remain absent."
+}

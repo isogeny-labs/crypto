@@ -1,0 +1,664 @@
+﻿2026-11-23T19:25:54.6708006Z Current runner version: '2.338.2'
+2026-11-23T19:25:54.6733687Z ##[group]Runner Image Provisioner
+2026-11-23T19:25:54.6734475Z Hosted Compute Agent
+2026-11-23T19:25:54.6734998Z Version: 20261111.635
+2026-11-23T19:25:54.6735562Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-23T19:25:54.6736266Z Build Date: 2026-11-11T01:49:01Z
+2026-11-23T19:25:54.6736838Z Worker ID: {2ba3cf16-ba83-4e9b-a8c1-b4d324fb3dd5}
+2026-11-23T19:25:54.6737466Z Region: eastus
+2026-11-23T19:25:54.6737946Z Cloud: Azure
+2026-11-23T19:25:54.6738399Z ##[endgroup]
+2026-11-23T19:25:54.6739550Z ##[group]Operating System
+2026-11-23T19:25:54.6740084Z Ubuntu
+2026-11-23T19:25:54.6740523Z 24.04.5
+2026-11-23T19:25:54.6741339Z LTS
+2026-11-23T19:25:54.6741790Z ##[endgroup]
+2026-11-23T19:25:54.6742385Z ##[group]Runner Image
+2026-11-23T19:25:54.6742908Z Image: ubuntu-24.04
+2026-11-23T19:25:54.6743375Z Version: 20261116.376.1
+2026-11-23T19:25:54.6744489Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-23T19:25:54.6745834Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+2026-11-23T19:25:54.6746636Z ##[endgroup]
+2026-11-23T19:25:54.6747567Z ##[group]GITHUB_TOKEN Permissions
+2026-11-23T19:25:54.6749173Z Contents: read
+2026-11-23T19:25:54.6749698Z Metadata: read
+2026-11-23T19:25:54.6750269Z ##[endgroup]
+2026-11-23T19:25:54.6752541Z Secret source: Actions
+2026-11-23T19:25:54.6753447Z Cache mode: write
+2026-11-23T19:25:54.6754054Z Prepare workflow directory
+2026-11-23T19:25:54.7116366Z Prepare all required actions
+2026-11-23T19:25:54.7171715Z Getting action download info
+2026-11-23T19:25:54.8980501Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-23T19:25:55.0577615Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-23T19:25:55.2643447Z Complete job name: gate
+2026-11-23T19:25:55.3364146Z ##[group]Run actions/checkout@v4
+2026-11-23T19:25:55.3364833Z with:
+2026-11-23T19:25:55.3365225Z   fetch-depth: 2
+2026-11-23T19:25:55.3365593Z   repository: isogeny-labs/crypto
+2026-11-23T19:25:55.3368691Z   token: ***
+2026-11-23T19:25:55.3369048Z   ssh-strict: true
+2026-11-23T19:25:55.3369395Z   ssh-user: git
+2026-11-23T19:25:55.3369749Z   persist-credentials: true
+2026-11-23T19:25:55.3370135Z   clean: true
+2026-11-23T19:25:55.3370491Z   sparse-checkout-cone-mode: true
+2026-11-23T19:25:55.3370896Z   fetch-tags: false
+2026-11-23T19:25:55.3371372Z   show-progress: true
+2026-11-23T19:25:55.3371719Z   lfs: false
+2026-11-23T19:25:55.3372043Z   submodules: false
+2026-11-23T19:25:55.3372404Z   set-safe-directory: true
+2026-11-23T19:25:55.3372796Z   allow-unsafe-pr-checkout: false
+2026-11-23T19:25:55.3373362Z ##[endgroup]
+2026-11-23T19:25:55.5497571Z Syncing repository: isogeny-labs/crypto
+2026-11-23T19:25:55.5499972Z ##[group]Getting Git version info
+2026-11-23T19:25:55.5501154Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-23T19:25:55.5502445Z [command]/usr/bin/git version
+2026-11-23T19:25:55.5553680Z git version 2.56.1
+2026-11-23T19:25:55.5570602Z ##[endgroup]
+2026-11-23T19:25:55.5584679Z Temporarily overriding HOME='/home/runner/work/_temp/240d94e7-f153-4cab-947c-d08e05781332' before making global git config changes
+2026-11-23T19:25:55.5586993Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T19:25:55.5589403Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-23T19:25:55.5645332Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-23T19:25:55.5649364Z ##[group]Initializing the repository
+2026-11-23T19:25:55.5653016Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-23T19:25:55.5741947Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-23T19:25:55.5743755Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-23T19:25:55.5746435Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-23T19:25:55.5748060Z hint: call:
+2026-11-23T19:25:55.5748966Z hint:
+2026-11-23T19:25:55.5749604Z hint: 	git config --global init.defaultBranch <name>
+2026-11-23T19:25:55.5750155Z hint:
+2026-11-23T19:25:55.5750771Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-23T19:25:55.5751742Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-23T19:25:55.5752468Z hint:
+2026-11-23T19:25:55.5752918Z hint: 	git branch -m <name>
+2026-11-23T19:25:55.5753341Z hint:
+2026-11-23T19:25:55.5753981Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-23T19:25:55.5822943Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-23T19:25:55.5833840Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-23T19:25:55.5876962Z ##[endgroup]
+2026-11-23T19:25:55.5878067Z ##[group]Disabling automatic garbage collection
+2026-11-23T19:25:55.5880351Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-23T19:25:55.5909414Z ##[endgroup]
+2026-11-23T19:25:55.5910404Z ##[group]Setting up auth
+2026-11-23T19:25:55.5914671Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T19:25:55.5952270Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T19:25:55.6497236Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T19:25:55.6535492Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T19:25:55.6742014Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T19:25:55.6778539Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T19:25:55.6993457Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-23T19:25:55.7038567Z ##[endgroup]
+2026-11-23T19:25:55.7039706Z ##[group]Fetching the repository
+2026-11-23T19:25:55.7048879Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=2 origin +d622ad9379792d17df7370cdc2524a5ae73de86d:refs/remotes/pull/5071/merge
+2026-11-23T19:26:47.9118213Z From https://github.com/isogeny-labs/crypto
+2026-11-23T19:26:47.9122078Z  * [new ref]               d622ad9379792d17df7370cdc2524a5ae73de86d -> pull/5071/merge
+2026-11-23T19:26:47.9124612Z ##[endgroup]
+2026-11-23T19:26:47.9125092Z ##[group]Determining the checkout info
+2026-11-23T19:26:47.9125725Z ##[endgroup]
+2026-11-23T19:26:47.9128160Z [command]/usr/bin/git sparse-checkout disable
+2026-11-23T19:26:47.9193296Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-23T19:26:47.9235052Z ##[group]Checking out the ref
+2026-11-23T19:26:47.9237871Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/5071/merge
+2026-11-23T19:26:49.3857986Z Updating files:   0% (4382/480600)
+2026-11-23T19:26:50.1126912Z Updating files:   1% (4806/480600)
+2026-11-23T19:26:50.2798313Z Updating files:   2% (9612/480600)
+2026-11-23T19:26:51.2806499Z Updating files:   2% (9851/480600)
+2026-11-23T19:26:51.4694833Z Updating files:   2% (12886/480600)
+2026-11-23T19:26:51.8360638Z Updating files:   3% (14418/480600)
+2026-11-23T19:26:52.1321518Z Updating files:   4% (19224/480600)
+2026-11-23T19:26:52.2798381Z Updating files:   5% (24030/480600)
+2026-11-23T19:26:52.4367989Z Updating files:   5% (25331/480600)
+2026-11-23T19:26:52.6696214Z Updating files:   6% (28836/480600)
+2026-11-23T19:26:53.0240465Z Updating files:   7% (33642/480600)
+2026-11-23T19:26:53.2797725Z Updating files:   8% (38448/480600)
+2026-11-23T19:26:53.2940375Z Updating files:   8% (42926/480600)
+2026-11-23T19:26:53.5340130Z Updating files:   9% (43254/480600)
+2026-11-23T19:26:53.7455519Z Updating files:  10% (48060/480600)
+2026-11-23T19:26:54.1137023Z Updating files:  11% (52866/480600)
+2026-11-23T19:26:54.2798035Z Updating files:  12% (57672/480600)
+2026-11-23T19:26:54.4397943Z Updating files:  12% (59677/480600)
+2026-11-23T19:26:55.3335732Z Updating files:  13% (62478/480600)
+2026-11-23T19:26:55.4956472Z Updating files:  13% (66031/480600)
+2026-11-23T19:26:55.7877487Z Updating files:  14% (67284/480600)
+2026-11-23T19:26:56.2798118Z Updating files:  15% (72090/480600)
+2026-11-23T19:26:56.2929259Z Updating files:  15% (76503/480600)
+2026-11-23T19:26:56.6844125Z Updating files:  16% (76896/480600)
+2026-11-23T19:26:56.9386934Z Updating files:  17% (81702/480600)
+2026-11-23T19:26:57.2662610Z Updating files:  18% (86508/480600)
+2026-11-23T19:26:57.2797404Z Updating files:  19% (91314/480600)
+2026-11-23T19:26:58.2609628Z Updating files:  19% (91551/480600)
+2026-11-23T19:26:58.2797008Z Updating files:  20% (96120/480600)
+2026-11-23T19:26:58.5697595Z Updating files:  20% (96469/480600)
+2026-11-23T19:26:58.8275013Z Updating files:  21% (100926/480600)
+2026-11-23T19:26:59.1088883Z Updating files:  22% (105732/480600)
+2026-11-23T19:26:59.2797742Z Updating files:  23% (110538/480600)
+2026-11-23T19:26:59.3493571Z Updating files:  23% (113760/480600)
+2026-11-23T19:26:59.5542322Z Updating files:  24% (115344/480600)
+2026-11-23T19:26:59.9307406Z Updating files:  25% (120150/480600)
+2026-11-23T19:27:00.2403193Z Updating files:  26% (124956/480600)
+2026-11-23T19:27:00.2800163Z Updating files:  27% (129762/480600)
+2026-11-23T19:27:00.5295856Z Updating files:  27% (130345/480600)
+2026-11-23T19:27:00.8663857Z Updating files:  28% (134568/480600)
+2026-11-23T19:27:01.2797225Z Updating files:  29% (139374/480600)
+2026-11-23T19:27:01.3606640Z Updating files:  29% (142704/480600)
+2026-11-23T19:27:01.5821095Z Updating files:  30% (144180/480600)
+2026-11-23T19:27:01.9517250Z Updating files:  31% (148986/480600)
+2026-11-23T19:27:02.2802274Z Updating files:  32% (153792/480600)
+2026-11-23T19:27:02.3247250Z Updating files:  32% (157987/480600)
+2026-11-23T19:27:02.6177484Z Updating files:  33% (158598/480600)
+2026-11-23T19:27:02.8271834Z Updating files:  34% (163404/480600)
+2026-11-23T19:27:03.1006696Z Updating files:  35% (168210/480600)
+2026-11-23T19:27:03.2799332Z Updating files:  36% (173016/480600)
+2026-11-23T19:27:03.3868511Z Updating files:  36% (175911/480600)
+2026-11-23T19:27:03.6179159Z Updating files:  37% (177822/480600)
+2026-11-23T19:27:04.0596908Z Updating files:  38% (182628/480600)
+2026-11-23T19:27:04.2802437Z Updating files:  39% (187434/480600)
+2026-11-23T19:27:05.3106446Z Updating files:  39% (188670/480600)
+2026-11-23T19:27:05.9372444Z Updating files:  39% (191082/480600)
+2026-11-23T19:27:06.2864520Z Updating files:  40% (192240/480600)
+2026-11-23T19:27:06.7955829Z Updating files:  40% (193435/480600)
+2026-11-23T19:27:07.0881194Z Updating files:  41% (197046/480600)
+2026-11-23T19:27:07.2797722Z Updating files:  42% (201852/480600)
+2026-11-23T19:27:07.8254927Z Updating files:  42% (205083/480600)
+2026-11-23T19:27:08.0318430Z Updating files:  43% (206658/480600)
+2026-11-23T19:27:08.2449170Z Updating files:  44% (211464/480600)
+2026-11-23T19:27:08.2797115Z Updating files:  45% (216270/480600)
+2026-11-23T19:27:08.4522068Z Updating files:  45% (217134/480600)
+2026-11-23T19:27:08.7246742Z Updating files:  46% (221076/480600)
+2026-11-23T19:27:08.9764442Z Updating files:  47% (225882/480600)
+2026-11-23T19:27:09.3526182Z Updating files:  48% (230688/480600)
+2026-11-23T19:27:09.6015358Z Updating files:  48% (232432/480600)
+2026-11-23T19:27:10.2697029Z Updating files:  49% (235494/480600)
+2026-11-23T19:27:10.2796067Z Updating files:  50% (240300/480600)
+2026-11-23T19:27:10.6610686Z Updating files:  50% (240522/480600)
+2026-11-23T19:27:10.9682517Z Updating files:  51% (245106/480600)
+2026-11-23T19:27:11.2125392Z Updating files:  52% (249912/480600)
+2026-11-23T19:27:11.2875127Z Updating files:  53% (254718/480600)
+2026-11-23T19:27:11.5115102Z Updating files:  53% (255837/480600)
+2026-11-23T19:27:12.1974893Z Updating files:  54% (259524/480600)
+2026-11-23T19:27:12.2797263Z Updating files:  55% (264330/480600)
+2026-11-23T19:27:12.4529778Z Updating files:  55% (265802/480600)
+2026-11-23T19:27:12.9838446Z Updating files:  56% (269136/480600)
+2026-11-23T19:27:13.2211525Z Updating files:  57% (273942/480600)
+2026-11-23T19:27:13.2797576Z Updating files:  58% (278748/480600)
+2026-11-23T19:27:13.6672581Z Updating files:  58% (280008/480600)
+2026-11-23T19:27:14.2161283Z Updating files:  59% (283554/480600)
+2026-11-23T19:27:14.2799088Z Updating files:  60% (288360/480600)
+2026-11-23T19:27:15.2825352Z Updating files:  60% (289644/480600)
+2026-11-23T19:27:16.1833732Z Updating files:  60% (291681/480600)
+2026-11-23T19:27:16.2798121Z Updating files:  61% (293166/480600)
+2026-11-23T19:27:16.7986479Z Updating files:  61% (294001/480600)
+2026-11-23T19:27:17.2796836Z Updating files:  62% (297972/480600)
+2026-11-23T19:27:17.3393086Z Updating files:  62% (301657/480600)
+2026-11-23T19:27:17.6513276Z Updating files:  63% (302778/480600)
+2026-11-23T19:27:18.1349904Z Updating files:  64% (307584/480600)
+2026-11-23T19:27:18.2797712Z Updating files:  65% (312390/480600)
+2026-11-23T19:27:18.3632072Z Updating files:  65% (315424/480600)
+2026-11-23T19:27:18.8172299Z Updating files:  66% (317196/480600)
+2026-11-23T19:27:19.2896124Z Updating files:  67% (322002/480600)
+2026-11-23T19:27:19.5003654Z Updating files:  67% (324836/480600)
+2026-11-23T19:27:20.2800177Z Updating files:  68% (326808/480600)
+2026-11-23T19:27:20.4290663Z Updating files:  68% (330231/480600)
+2026-11-23T19:27:21.1594653Z Updating files:  69% (331614/480600)
+2026-11-23T19:27:21.2915051Z Updating files:  70% (336420/480600)
+2026-11-23T19:27:21.4446746Z Updating files:  70% (339090/480600)
+2026-11-23T19:27:21.8015683Z Updating files:  71% (341226/480600)
+2026-11-23T19:27:22.2731387Z Updating files:  72% (346032/480600)
+2026-11-23T19:27:22.2796019Z Updating files:  73% (350838/480600)
+2026-11-23T19:27:22.5303244Z Updating files:  73% (351010/480600)
+2026-11-23T19:27:22.8261276Z Updating files:  74% (355644/480600)
+2026-11-23T19:27:23.2797779Z Updating files:  75% (360450/480600)
+2026-11-23T19:27:23.4045833Z Updating files:  75% (362213/480600)
+2026-11-23T19:27:23.6260054Z Updating files:  76% (365256/480600)
+2026-11-23T19:27:23.9015894Z Updating files:  77% (370062/480600)
+2026-11-23T19:27:24.2812182Z Updating files:  78% (374868/480600)
+2026-11-23T19:27:24.3320768Z Updating files:  78% (378661/480600)
+2026-11-23T19:27:24.7129693Z Updating files:  79% (379674/480600)
+2026-11-23T19:27:25.2055136Z Updating files:  80% (384480/480600)
+2026-11-23T19:27:25.4031942Z Updating files:  81% (389286/480600)
+2026-11-23T19:27:25.6962214Z Updating files:  81% (389697/480600)
+2026-11-23T19:27:25.9635502Z Updating files:  82% (394092/480600)
+2026-11-23T19:27:26.2797110Z Updating files:  83% (398898/480600)
+2026-11-23T19:27:26.4304940Z Updating files:  83% (403296/480600)
+2026-11-23T19:27:26.8910560Z Updating files:  84% (403704/480600)
+2026-11-23T19:27:27.2799119Z Updating files:  85% (408510/480600)
+2026-11-23T19:27:27.9023350Z Updating files:  85% (410514/480600)
+2026-11-23T19:27:28.2797318Z Updating files:  86% (413316/480600)
+2026-11-23T19:27:28.2934335Z Updating files:  86% (417780/480600)
+2026-11-23T19:27:29.3628479Z Updating files:  87% (418122/480600)
+2026-11-23T19:27:29.9557655Z Updating files:  87% (421709/480600)
+2026-11-23T19:27:30.2801589Z Updating files:  88% (422928/480600)
+2026-11-23T19:27:30.7057151Z Updating files:  88% (424014/480600)
+2026-11-23T19:27:30.8968160Z Updating files:  89% (427734/480600)
+2026-11-23T19:27:31.2797164Z Updating files:  90% (432540/480600)
+2026-11-23T19:27:31.6611544Z Updating files:  90% (434285/480600)
+2026-11-23T19:27:32.2799708Z Updating files:  91% (437346/480600)
+2026-11-23T19:27:32.3626546Z Updating files:  91% (440946/480600)
+2026-11-23T19:27:32.5845534Z Updating files:  92% (442152/480600)
+2026-11-23T19:27:32.9759397Z Updating files:  93% (446958/480600)
+2026-11-23T19:27:33.3685045Z Updating files:  94% (451764/480600)
+2026-11-23T19:27:33.5215902Z Updating files:  94% (454408/480600)
+2026-11-23T19:27:34.1616833Z Updating files:  95% (456570/480600)
+2026-11-23T19:27:34.2885506Z Updating files:  96% (461376/480600)
+2026-11-23T19:27:34.5133907Z Updating files:  96% (463242/480600)
+2026-11-23T19:27:34.8706621Z Updating files:  97% (466182/480600)
+2026-11-23T19:27:35.2965499Z Updating files:  98% (470988/480600)
+2026-11-23T19:27:35.4898138Z Updating files:  98% (474026/480600)
+2026-11-23T19:27:36.2891200Z Updating files:  99% (475794/480600)
+2026-11-23T19:27:36.3064493Z Updating files:  99% (480591/480600)
+2026-11-23T19:27:36.3064846Z Updating files: 100% (480600/480600)
+2026-11-23T19:27:36.3065180Z Updating files: 100% (480600/480600), done.
+2026-11-23T19:27:36.8522508Z Note: switching to 'refs/remotes/pull/5071/merge'.
+2026-11-23T19:27:36.8522852Z 
+2026-11-23T19:27:36.8523134Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-23T19:27:36.8523540Z changes and commit them, and you can discard any commits you make in this
+2026-11-23T19:27:36.8523915Z state without impacting any branches by switching back to a branch.
+2026-11-23T19:27:36.8524125Z 
+2026-11-23T19:27:36.8524281Z If you want to create a new branch to retain commits you create, you may
+2026-11-23T19:27:36.8524647Z do so (now or later) by using -c with the switch command. Example:
+2026-11-23T19:27:36.8524849Z 
+2026-11-23T19:27:36.8524935Z   git switch -c <new-branch-name>
+2026-11-23T19:27:36.8525072Z 
+2026-11-23T19:27:36.8525154Z Or undo this operation with:
+2026-11-23T19:27:36.8525284Z 
+2026-11-23T19:27:36.8525359Z   git switch -
+2026-11-23T19:27:36.8525456Z 
+2026-11-23T19:27:36.8525623Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-23T19:27:36.8525849Z 
+2026-11-23T19:27:36.8526498Z HEAD is now at d622ad9379 Merge 1ef6277f7e975fac1cbe548d4fd63e8ccf4373d4 into da7777094392d3ccd37db78dcfc761c32e7e7813
+2026-11-23T19:27:36.8862720Z ##[endgroup]
+2026-11-23T19:27:36.8914275Z [command]/usr/bin/git log -1 --format=%H
+2026-11-23T19:27:36.8945886Z d622ad9379792d17df7370cdc2524a5ae73de86d
+2026-11-23T19:27:36.9306166Z ##[group]Run actions/setup-python@v5
+2026-11-23T19:27:36.9306403Z with:
+2026-11-23T19:27:36.9306576Z   python-version: 3.11
+2026-11-23T19:27:36.9306761Z   check-latest: false
+2026-11-23T19:27:36.9308584Z   token: ***
+2026-11-23T19:27:36.9308774Z   update-environment: true
+2026-11-23T19:27:36.9308971Z   allow-prereleases: false
+2026-11-23T19:27:36.9309153Z   freethreaded: false
+2026-11-23T19:27:36.9309324Z ##[endgroup]
+2026-11-23T19:27:37.0487136Z ##[group]Installed versions
+2026-11-23T19:27:37.0554088Z (node:2154) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-23T19:27:37.0554660Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-23T19:27:37.0555260Z Successfully set up CPython (3.11.18)
+2026-11-23T19:27:37.0555864Z ##[endgroup]
+2026-11-23T19:27:37.0771614Z ##[group]Run git rev-parse --verify "HEAD^1^{commit}"
+2026-11-23T19:27:37.0772338Z [36;1mgit rev-parse --verify "HEAD^1^{commit}"[0m
+2026-11-23T19:27:37.0810332Z shell: /usr/bin/bash -e {0}
+2026-11-23T19:27:37.0810764Z env:
+2026-11-23T19:27:37.0811436Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.0812151Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-23T19:27:37.0812700Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.0813215Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.0813711Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.0814240Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-23T19:27:37.0814691Z ##[endgroup]
+2026-11-23T19:27:37.1125929Z da7777094392d3ccd37db78dcfc761c32e7e7813
+2026-11-23T19:27:37.1360356Z ##[group]Run python3 tools/pcc/pcc.py canary
+2026-11-23T19:27:37.1360884Z [36;1mpython3 tools/pcc/pcc.py canary[0m
+2026-11-23T19:27:37.1382382Z shell: /usr/bin/bash -e {0}
+2026-11-23T19:27:37.1382666Z env:
+2026-11-23T19:27:37.1382993Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.1383502Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-23T19:27:37.1384005Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.1384454Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.1384905Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:37.1385352Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-23T19:27:37.1385736Z ##[endgroup]
+2026-11-23T19:27:40.0451179Z ok    expected fail          got fail          claim: new registration cannot borrow legacy payload dates
+2026-11-23T19:27:40.0451956Z ok    expected pass          got pass          clean:solve
+2026-11-23T19:27:40.0452371Z ok    expected pass          got pass          clean:zk
+2026-11-23T19:27:40.0452811Z ok    expected pass          got pass          clean:measurement
+2026-11-23T19:27:40.0453256Z ok    expected pass          got pass          clean:execution
+2026-11-23T19:27:40.0453709Z ok    expected pass_or_not_covered got not_covered   clean:lean
+2026-11-23T19:27:40.0454293Z ok    expected not_covered   got not_covered   clean:attestation(statement claim never verifies)
+2026-11-23T19:27:40.0454869Z ok    expected fail          got fail          certificate:wrong k
+2026-11-23T19:27:40.0455346Z ok    expected fail          got fail          certificate:Q off the curve
+2026-11-23T19:27:40.0455821Z ok    expected fail          got fail          certificate:composite n
+2026-11-23T19:27:40.0456262Z ok    expected fail          got fail          certificate:[n]P != O
+2026-11-23T19:27:40.0456725Z ok    expected fail          got fail          claim:pinned digest mismatch
+2026-11-23T19:27:40.0457213Z ok    expected fail          got fail          claim:proof path outside the repository
+2026-11-23T19:27:40.0457719Z ok    expected fail          got fail          claim:minimum proof kind absent
+2026-11-23T19:27:40.0458181Z ok    expected fail          got fail          zk-certificate:tampered s
+2026-11-23T19:27:40.0458708Z ok    expected fail          got fail          zk-certificate:proof transplanted to another Q
+2026-11-23T19:27:40.0459191Z ok    expected fail          got fail          lean:sorry
+2026-11-23T19:27:40.0459579Z ok    expected fail          got fail          lean:native_decide
+2026-11-23T19:27:40.0459980Z ok    expected fail          got fail          lean:user axiom
+2026-11-23T19:27:40.0460376Z ok    expected fail          got fail          lean:skipKernelTC
+2026-11-23T19:27:40.0460806Z ok    expected fail          got fail          lean:#exit before the theorem
+2026-11-23T19:27:40.0461433Z ok    expected fail          got fail          lean:statement edited after pinning
+2026-11-23T19:27:40.0461899Z ok    expected fail          got fail          lean:conclusion True
+2026-11-23T19:27:40.0462360Z ok    expected fail          got fail          lean:theorem renamed away
+2026-11-23T19:27:40.0462968Z ok    expected not_covered   got not_covered   replay:no signature (unsigned is uncovered, never verified)
+2026-11-23T19:27:40.0463643Z ok    expected fail          got fail          replay:signature by an untrusted key
+2026-11-23T19:27:40.0464244Z ok    expected fail          got fail          replay:signature over a different subject
+2026-11-23T19:27:40.0464832Z ok    expected fail          got fail          replay:empty runs (even when signed)
+2026-11-23T19:27:40.0465526Z ok    expected not_covered   got not_covered   replay:independent:true written by the producer, unsigned
+2026-11-23T19:27:40.0466261Z ok    expected not_covered   got not_covered   recompute:raw data without a sha256 pin
+2026-11-23T19:27:40.0467276Z ok    expected fail          got fail          recompute:raw data path outside the repository
+2026-11-23T19:27:40.0467939Z ok    expected fail          got fail          recompute:headline claimed != recomputed
+2026-11-23T19:27:40.0468715Z ok    expected fail          got fail          recompute:raw data digest mismatch
+2026-11-23T19:27:40.0469238Z ok    expected fail          got fail          execution:dev-mode receipt
+2026-11-23T19:27:40.0469746Z ok    expected fail          got fail          execution:wrong image id
+2026-11-23T19:27:40.0470319Z ok    expected fail          got fail          execution:journal does not commit to the raw result
+2026-11-23T19:27:40.0470913Z ok    expected fail          got fail          execution:verifier binary digest mismatch
+2026-11-23T19:27:40.0479917Z ok    expected not_covered   got not_covered   execution:verifier not in keyring
+2026-11-23T19:27:40.0480549Z ok    expected fail          got fail          execution:verifier reports not verified
+2026-11-23T19:27:40.0481278Z ok    expected fail          got fail          attestation:wrong key
+2026-11-23T19:27:40.0481850Z ok    expected fail          got fail          attestation:subject edited after signing
+2026-11-23T19:27:40.0482509Z ok    expected not_covered   got not_covered   attestation:legacy flat pin remains scoped
+2026-11-23T19:27:40.0483086Z ok    expected fail          got fail          attestation:legacy corrupt pin
+2026-11-23T19:27:40.0483637Z ok    expected fail          got fail          attestation:canonical corrupt pin cannot fall back
+2026-11-23T19:27:40.0484290Z ok    expected pass          got pass          ledger:clean chain, signed verdict
+2026-11-23T19:27:40.0484831Z ok    expected fail          got fail          ledger:entry edited
+2026-11-23T19:27:40.0485335Z ok    expected fail          got fail          ledger:entry deleted
+2026-11-23T19:27:40.0485903Z ok    expected fail          got fail          ledger:history rewritten (base not a prefix)
+2026-11-23T19:27:40.0486522Z ok    expected fail          got fail          ledger:history removed below base
+2026-11-23T19:27:40.0487164Z ok    expected unverified    got unverified    ledger:verdict without a trusted signature
+2026-11-23T19:27:40.0487820Z ok    expected unverified    got unverified    ledger:stale verdict after the claim changed
+2026-11-23T19:27:40.0488432Z ok    expected unverified    got unverified    ledger:verdict key not in keyring
+2026-11-23T19:27:40.0488967Z ok    expected failed        got failed        ledger:signed failing verdict
+2026-11-23T19:27:40.0489481Z ok    expected fail          got fail          ledger:new claim without claim_type
+2026-11-23T19:27:40.0490055Z ok    expected fail          got fail          ledger:claim_type exemption by backdated created_at
+2026-11-23T19:27:40.0490679Z ok    expected pass          got pass          ledger:legacy claim without claim_type counts as data
+2026-11-23T19:27:40.0491410Z ok    expected fail          got fail          prose:strong claim with no citation
+2026-11-23T19:27:40.0491981Z ok    expected fail          got fail          prose:citation to an unverified claim
+2026-11-23T19:27:40.0492524Z ok    expected fail          got fail          prose:citation to an unknown claim
+2026-11-23T19:27:40.0493024Z ok    expected pass          got pass          prose:verified citation
+2026-11-23T19:27:40.0493526Z ok    expected pass          got pass          prose:explicit unverified tag
+2026-11-23T19:27:40.0494038Z ok    expected pass          got pass          prose:code block is not prose
+2026-11-23T19:27:40.0494531Z ok    expected pass          got pass          prose:no strong word
+2026-11-23T19:27:40.0495044Z ok    expected pass          got pass          trust:unchanged keyring against the base
+2026-11-23T19:27:40.0495650Z ok    expected unverified    got unverified    trust:self-added key under the base keyring
+2026-11-23T19:27:40.0496286Z ok    expected fail          got fail          trust:keyring changed relative to the base
+2026-11-23T19:27:40.0496985Z ok    expected pass          got pass          trust:keyring change the owner pinned
+2026-11-23T19:27:40.0497745Z ok    expected fail          got fail          trust:keyring that does not match the pin
+2026-11-23T19:27:40.0498449Z ok    expected fail          got fail          trust:base ref that does not resolve
+2026-11-23T19:27:40.0499058Z ok    expected fail          got fail          trust:keyring ref that does not resolve
+2026-11-23T19:27:40.0499657Z canary: 70/70 classes behave as required
+2026-11-23T19:27:40.0658845Z ##[group]Run python3 tools/pcc/pcc.py ledger verify --base HEAD^1
+2026-11-23T19:27:40.0659246Z [36;1mpython3 tools/pcc/pcc.py ledger verify --base HEAD^1[0m
+2026-11-23T19:27:40.0678499Z shell: /usr/bin/bash -e {0}
+2026-11-23T19:27:40.0678708Z env:
+2026-11-23T19:27:40.0678926Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.0679279Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-23T19:27:40.0679613Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.0679906Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.0680202Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.0680518Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-23T19:27:40.0680770Z   PCC_KEYRING_SHA256: 
+2026-11-23T19:27:40.0681146Z ##[endgroup]
+2026-11-23T19:27:40.7803619Z claim PCC-20261112-06eb58: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7804437Z claim PCC-20261112-1c1db4: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7805154Z claim PCC-20261112-803949: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7805871Z claim PCC-20261112-cb73f6: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7806583Z claim PCC-20261113-1e2412: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7807301Z claim PCC-20261113-31f9cd: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7808034Z claim PCC-20261113-39640f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7808729Z claim PCC-20261113-39a4c6: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7809437Z claim PCC-20261113-3aa5ac: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7810174Z claim PCC-20261113-5ce98d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7810890Z claim PCC-20261113-6296df: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7811742Z claim PCC-20261113-7dec93: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7812442Z claim PCC-20261113-857fc2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7813142Z claim PCC-20261113-97e420: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7813947Z claim PCC-20261113-9b23b3: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7814720Z claim PCC-20261113-bc105f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7815442Z claim PCC-20261113-c139f1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7816147Z claim PCC-20261113-cc3069: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7816857Z claim PCC-20261113-cda3d2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7817566Z claim PCC-20261113-d23121: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7818274Z claim PCC-20261113-da72ba: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7818975Z claim PCC-20261113-e2fbfe: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7820066Z claim PCC-20261113-eee828: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7820761Z claim PCC-20261114-04e0a2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7821835Z claim PCC-20261114-0a4692: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7822519Z claim PCC-20261114-0c4538: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7823227Z claim PCC-20261114-0c9bcf: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7823933Z claim PCC-20261114-13f615: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7824626Z claim PCC-20261114-20a800: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7825324Z claim PCC-20261114-25d8e2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7826035Z claim PCC-20261114-262c52: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7826747Z claim PCC-20261114-286b6f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7827455Z claim PCC-20261114-2d6d52: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7828159Z claim PCC-20261114-2fd770: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7828864Z claim PCC-20261114-332aee: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7829563Z claim PCC-20261114-3a8304: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7830260Z claim PCC-20261114-3cb039: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7831348Z claim PCC-20261114-3f6943: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7832037Z claim PCC-20261114-480d25: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7832697Z claim PCC-20261114-4dc478: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7833349Z claim PCC-20261114-4f738d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7833997Z claim PCC-20261114-501186: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7834663Z claim PCC-20261114-502574: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7835358Z claim PCC-20261114-52a042: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7836050Z claim PCC-20261114-66624a: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7836750Z claim PCC-20261114-6fec58: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7837465Z claim PCC-20261114-72d986: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7838159Z claim PCC-20261114-7a948c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7838888Z claim PCC-20261114-81195a: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7839599Z claim PCC-20261114-8c5c1e: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7840298Z claim PCC-20261114-8d2918: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7841266Z claim PCC-20261114-8dd57c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7842117Z claim PCC-20261114-8f6cf7: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7843040Z claim PCC-20261114-9391e1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7843747Z claim PCC-20261114-9633b4: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7844695Z claim PCC-20261114-aec576: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7845454Z claim PCC-20261114-bf5572: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7846295Z claim PCC-20261114-c3ba4f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7846999Z claim PCC-20261114-c4aad9: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7847729Z claim PCC-20261114-c938e8: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7848584Z claim PCC-20261114-cbcb79: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7849288Z claim PCC-20261114-cc4013: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7850040Z claim PCC-20261114-cdb4f1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7850839Z claim PCC-20261114-e0dd93: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7851762Z claim PCC-20261114-e1a4a9: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7852589Z claim PCC-20261114-e203ff: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7853379Z claim PCC-20261114-e6d254: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7854166Z claim PCC-20261114-ee1e7f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7854958Z claim PCC-20261114-efe7ee: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7855743Z claim PCC-20261114-f7faf2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7856507Z claim PCC-20261115-004f3b: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7857256Z claim PCC-20261115-11e7ca: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7858008Z claim PCC-20261115-16a863: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7858753Z claim PCC-20261115-1a1570: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7859488Z claim PCC-20261115-1dd55f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7860218Z claim PCC-20261115-29cf72: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7867722Z claim PCC-20261115-2cfd10: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7868475Z claim PCC-20261115-2d7887: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7869167Z claim PCC-20261115-2e7ce0: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7869930Z claim PCC-20261115-2e952c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7870787Z claim PCC-20261115-2f14e0: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7871775Z claim PCC-20261115-357b60: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7872638Z claim PCC-20261115-3a4e18: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7873474Z claim PCC-20261115-3a618f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7874307Z claim PCC-20261115-3de836: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7875423Z claim PCC-20261115-421c18: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7876350Z claim PCC-20261115-4711ad: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7877051Z claim PCC-20261115-4bbf2f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7877864Z claim PCC-20261115-4ead05: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7878714Z claim PCC-20261115-51947e: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7879573Z claim PCC-20261115-529612: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7880333Z claim PCC-20261115-5b3bc5: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7881296Z claim PCC-20261115-67cf17: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7882133Z claim PCC-20261115-6a306d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7882990Z claim PCC-20261115-7c8fe4: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7883864Z claim PCC-20261115-833af1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7884706Z claim PCC-20261115-8c0b5f: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7885547Z claim PCC-20261115-8d7f73: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7886377Z claim PCC-20261115-919b86: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7887212Z claim PCC-20261115-92db4d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7888015Z claim PCC-20261115-9eb5c1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7888771Z claim PCC-20261115-b11451: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7889551Z claim PCC-20261115-b5d0f3: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7890404Z claim PCC-20261115-b69cc7: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7891364Z claim PCC-20261115-bb5771: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7892218Z claim PCC-20261115-bec94e: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7893041Z claim PCC-20261115-c0e6db: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7893797Z claim PCC-20261115-c6ab79: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7894537Z claim PCC-20261115-c6b0bf: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7895260Z claim PCC-20261115-c81d29: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7895977Z claim PCC-20261115-d00adb: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7896711Z claim PCC-20261115-d5bc3d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7897448Z claim PCC-20261115-db512a: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7898192Z claim PCC-20261115-de23d0: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7898930Z claim PCC-20261115-e2a305: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7899680Z claim PCC-20261115-e5feb1: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7900850Z claim PCC-20261115-e8c175: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7901716Z claim PCC-20261115-ed6495: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7902580Z claim PCC-20261115-f02ed3: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7903317Z claim PCC-20261115-f28255: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7904067Z claim PCC-20261115-f8a8f9: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7904830Z claim PCC-20261116-02c748: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7905561Z claim PCC-20261116-02e783: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7906321Z claim PCC-20261116-065fc4: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7907074Z claim PCC-20261116-06a53c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7907824Z claim PCC-20261116-07ba6b: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7908579Z claim PCC-20261116-0afecf: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7909359Z claim PCC-20261116-22c62d: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7910117Z claim PCC-20261116-289646: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7910903Z claim PCC-20261116-29f710: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7911817Z claim PCC-20261116-3686b2: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7912620Z claim PCC-20261116-378474: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7913417Z claim PCC-20261116-3a0b23: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7914212Z claim PCC-20261116-3a0d5c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7915001Z claim PCC-20261116-3b1033: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7915791Z claim PCC-20261116-3e0526: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7916612Z claim PCC-20261116-4592c6: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7917446Z claim PCC-20261116-545da0: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7918252Z claim PCC-20261116-6361ce: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7919055Z claim PCC-20261116-7bb318: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7919853Z claim PCC-20261116-7cb8bc: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7920638Z claim PCC-20261116-826480: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7921582Z claim PCC-20261116-a28bcb: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7922429Z claim PCC-20261116-b8dc3c: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7923223Z claim PCC-20261116-bc1b4e: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7924032Z claim PCC-20261116-bc6b12: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7924804Z claim PCC-20261116-c356c4: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7925745Z claim PCC-20261116-d3520e: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7926547Z claim PCC-20261116-d7ba18: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7927481Z claim PCC-20261116-e4da91: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7928289Z claim PCC-20261116-edc634: rejected missing-type payload, exact hash retained; ineligible as evidence
+2026-11-23T19:27:40.7928895Z ledger: 1830 entries, chain ok
+2026-11-23T19:27:40.8020878Z ##[group]Run rc=0
+2026-11-23T19:27:40.8021341Z [36;1mrc=0[0m
+2026-11-23T19:27:40.8021676Z [36;1mfor f in $(git diff --name-only --diff-filter=AM "HEAD^1" HEAD -- 'pcc/claims/*.json'); do[0m
+2026-11-23T19:27:40.8022056Z [36;1m  id="$(basename "$f" .json)"[0m
+2026-11-23T19:27:40.8022318Z [36;1m  s=0; python3 tools/pcc/pcc.py verify "$id" || s=$?[0m
+2026-11-23T19:27:40.8022713Z [36;1m  if [ "$s" -ne 0 ] && [ "$s" -ne 2 ]; then echo "::error file=$f::claim $id does not verify"; rc=1; fi[0m
+2026-11-23T19:27:40.8023048Z [36;1mdone[0m
+2026-11-23T19:27:40.8023208Z [36;1mexit $rc[0m
+2026-11-23T19:27:40.8043615Z shell: /usr/bin/bash -e {0}
+2026-11-23T19:27:40.8043820Z env:
+2026-11-23T19:27:40.8044037Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.8044394Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-23T19:27:40.8044726Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.8045057Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.8045355Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-23T19:27:40.8045645Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-23T19:27:40.8045899Z   PCC_KEYRING_REF: HEAD^1
+2026-11-23T19:27:40.8046080Z ##[endgroup]
+2026-11-23T19:27:40.9633003Z PCC-20261123-5a6ca9: not_covered
+2026-11-23T19:27:40.9633450Z   - a statement claim has no proof kind and can never be verified
+2026-11-23T19:27:40.9633784Z   attestation: not_covered
+2026-11-23T19:27:40.9634310Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9634598Z   attestation: not_covered
+2026-11-23T19:27:40.9634886Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9635152Z   attestation: not_covered
+2026-11-23T19:27:40.9635421Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9635683Z   attestation: not_covered
+2026-11-23T19:27:40.9635963Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9636217Z   attestation: not_covered
+2026-11-23T19:27:40.9636482Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9636731Z   attestation: not_covered
+2026-11-23T19:27:40.9636990Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9637236Z   attestation: not_covered
+2026-11-23T19:27:40.9637500Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9637743Z   attestation: not_covered
+2026-11-23T19:27:40.9638002Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9638249Z   attestation: not_covered
+2026-11-23T19:27:40.9638517Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9638772Z   attestation: not_covered
+2026-11-23T19:27:40.9639035Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9639299Z   attestation: not_covered
+2026-11-23T19:27:40.9639579Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9639835Z   attestation: not_covered
+2026-11-23T19:27:40.9640097Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9640346Z   attestation: not_covered
+2026-11-23T19:27:40.9640607Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9640859Z   attestation: not_covered
+2026-11-23T19:27:40.9641621Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9641889Z   attestation: not_covered
+2026-11-23T19:27:40.9642161Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9642411Z   attestation: not_covered
+2026-11-23T19:27:40.9642676Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9642928Z   attestation: not_covered
+2026-11-23T19:27:40.9643190Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9643622Z   attestation: not_covered
+2026-11-23T19:27:40.9643899Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9644159Z   attestation: not_covered
+2026-11-23T19:27:40.9644425Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9644683Z   attestation: not_covered
+2026-11-23T19:27:40.9644952Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9645221Z   attestation: not_covered
+2026-11-23T19:27:40.9645486Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9645736Z   attestation: not_covered
+2026-11-23T19:27:40.9645994Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:40.9646243Z   attestation: not_covered
+2026-11-23T19:27:40.9646503Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0517485Z PCC-20261123-5faff9: not_covered
+2026-11-23T19:27:41.0518017Z   - a statement claim has no proof kind and can never be verified
+2026-11-23T19:27:41.0518473Z   attestation: not_covered
+2026-11-23T19:27:41.0519166Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0519582Z   attestation: not_covered
+2026-11-23T19:27:41.0519984Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0520368Z   attestation: not_covered
+2026-11-23T19:27:41.0520747Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0521346Z   attestation: not_covered
+2026-11-23T19:27:41.0521786Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0522165Z   attestation: not_covered
+2026-11-23T19:27:41.0522553Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0522913Z   attestation: not_covered
+2026-11-23T19:27:41.0523312Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0523691Z   attestation: not_covered
+2026-11-23T19:27:41.0524105Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.0524471Z   attestation: not_covered
+2026-11-23T19:27:41.0524860Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1423299Z PCC-20261123-8d8628: fail
+2026-11-23T19:27:41.1423651Z   lean: fail
+2026-11-23T19:27:41.1423926Z     - lean: theorem and decl_sha256 are required
+2026-11-23T19:27:41.1424258Z   lean: fail
+2026-11-23T19:27:41.1424545Z     - lean: theorem and decl_sha256 are required
+2026-11-23T19:27:41.1424851Z   lean: fail
+2026-11-23T19:27:41.1425088Z     - lean: theorem and decl_sha256 are required
+2026-11-23T19:27:41.1425412Z   attestation: not_covered
+2026-11-23T19:27:41.1426111Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1426534Z   attestation: not_covered
+2026-11-23T19:27:41.1426930Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1427306Z   attestation: not_covered
+2026-11-23T19:27:41.1427723Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1428109Z   attestation: not_covered
+2026-11-23T19:27:41.1428492Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1428843Z   attestation: not_covered
+2026-11-23T19:27:41.1429233Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1429590Z   attestation: not_covered
+2026-11-23T19:27:41.1429979Z     · artifact: unsigned; independence needs a keyring signature
+2026-11-23T19:27:41.1522596Z ##[error]claim PCC-20261123-8d8628 does not verify
+2026-11-23T19:27:41.1530557Z ##[error]Process completed with exit code 1.
+2026-11-23T19:27:41.1709840Z Post job cleanup.
+2026-11-23T19:27:41.2462901Z [command]/usr/bin/git version
+2026-11-23T19:27:41.2500786Z git version 2.56.1
+2026-11-23T19:27:41.2535254Z Temporarily overriding HOME='/home/runner/work/_temp/c426ada0-ac6e-4f64-ae0c-12338634bde3' before making global git config changes
+2026-11-23T19:27:41.2536604Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T19:27:41.2538217Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-23T19:27:41.2608957Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T19:27:41.2648416Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T19:27:41.3707949Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T19:27:41.3745490Z http.https://github.com/.extraheader
+2026-11-23T19:27:41.3756074Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-23T19:27:41.3847300Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T19:27:41.4819097Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T19:27:41.4862958Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T19:27:41.6015278Z Cleaning up orphan processes
+2026-11-23T19:27:41.6318084Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

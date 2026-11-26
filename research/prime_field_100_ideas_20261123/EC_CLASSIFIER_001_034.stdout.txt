@@ -1,0 +1,9 @@
+holdout x=48 nearest_train_x=42 hamming=3 nn_block=4 nn_hits=4 train_best_block=3 train_best_hits=6 static_block=1 static_hits=2
+holdout x=49 nearest_train_x=43 hamming=3 nn_block=3 nn_hits=8 train_best_block=3 train_best_hits=8 static_block=1 static_hits=4
+holdout x=54 nearest_train_x=42 hamming=3 nn_block=4 nn_hits=12 train_best_block=3 train_best_hits=13 static_block=1 static_hits=17
+holdout x=55 nearest_train_x=43 hamming=3 nn_block=3 nn_hits=4 train_best_block=3 train_best_hits=4 static_block=1 static_hits=4
+summary train_positive=6/16 threshold=6 constant_positive=false train_block_hits=[10, 14, 20, 19]
+classifier_nn_confusion_TP_FP_FN_TN=[5, 3, 4, 4] false_negative_exact_hits=33 constant_confusion_TP_FP_FN_TN=[0, 0, 9, 7]
+one_block_holdout_hits nn=28 train_best=31 static_block1=27 candidate_patterns_per_arm=32768
+charged train_label_comparisons=131072 shared_group_sum_patterns=32768 nn_inference_xor_popcount=16 holdout_audit_label_comparisons=131072
+complete EC heldout bit-feature control

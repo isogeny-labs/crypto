@@ -59,11 +59,11 @@ use super::stages::{
 use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstance};
 use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
 use crate::cryptanalysis::ic_boundary::{
-    binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
-    prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
-    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, TauOrbitCheck, WSumTable,
-    WalkOpts, WalkTable,
+    binary_affine_subspace_factor_base, binary_subspace_factor_base, decompose_mitm,
+    decompose_mitm_frobenius, koblitz_factor_base, prime_factor_base, prime_factor_base_strided,
+    BinaryGroup, BinaryInstance, ColumnFold, CountedGroup, FactorBase, FrobeniusPairTable,
+    GroupOps, KSumTable, OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint,
+    Relation, TargetWalk, TauOrbitCheck, WSumTable, WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::{with_cached_point_lifts, FastPoint};
@@ -592,14 +592,20 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn describe(&self, params: &Params) -> String {
+        let trace2e = params.get("select") == Some("trace2e");
+        let cut = if trace2e {
+            ", cut to Tr(x) = Tr(a) (points in 2E)"
+        } else {
+            ""
+        };
         if params.get("basis").is_some() {
             return format!(
-                "points whose abscissa lies in the explicitly recorded {}-dimensional subspace",
+                "points whose abscissa lies in the explicitly recorded {}-dimensional subspace{cut}",
                 params.get("dimension").unwrap_or("?")
             );
         }
         format!(
-            "points whose abscissa lies in the {}-dimensional subspace spanned by {{1, z, …}}",
+            "points whose abscissa lies in the {}-dimensional subspace spanned by {{1, z, …}}{cut}",
             params.get("dimension").unwrap_or("?")
         )
     }
@@ -616,7 +622,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
             ),
             (
                 "select",
-                "optional subspace selection: `prefix` (default, <1, z, ...>), `strict4e` (sieve-built subspace with every abscissa in 4E; Koblitz a=0, odd n, h=4 only) or `gated-rank` (best of `candidates` draws by the rank-aware key); excludes `basis`",
+                "optional subspace selection: `prefix` (default, <1, z, ...>), `trace2e` (the prefix or explicit `basis` subspace V cut to the abscissae with Tr(x) = Tr(a), i.e. the points of 2E: the coset {x in V : Tr x = Tr a} of dimension D - 1, enumerated directly so the excluded half is never scanned; any binary curve; dimension >= 2), `strict4e` (sieve-built subspace with every abscissa in 4E; Koblitz a=0, odd n, h=4 only) or `gated-rank` (best of `candidates` draws by the rank-aware key); `strict4e` and `gated-rank` exclude `basis`",
             ),
             ("seed", "seed of `select` (default 1); deterministic per seed"),
             ("candidates", "`select=gated-rank` only: sieve draws (default 16)"),
@@ -637,7 +643,7 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         // Validate before narrowing: e.g. 2^32 + 3 must not become dimension 3.
         let dim = dim as u32;
         let select = params.get("select").unwrap_or("prefix");
-        if select != "prefix" && params.get("basis").is_some() {
+        if !matches!(select, "prefix" | "trace2e") && params.get("basis").is_some() {
             return Err("`select` and an explicit `basis` are mutually exclusive".into());
         }
         if matches!(select, "strict4e" | "gated-rank") {
@@ -673,9 +679,9 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
             fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
             return Ok(fb);
         }
-        if select != "prefix" {
+        if !matches!(select, "prefix" | "trace2e") {
             return Err(format!(
-                "unknown select `{select}`; try prefix, strict4e or gated-rank"
+                "unknown select `{select}`; try prefix, trace2e, strict4e or gated-rank"
             ));
         }
         let basis: Vec<u64> = if let Some(text) = params.get("basis") {
@@ -714,8 +720,51 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         } else {
             (0..dim).map(|k| 1u64 << k).collect()
         };
+        if select == "trace2e" {
+            if dim < 2 {
+                return Err("select=trace2e needs dimension >= 2".into());
+            }
+            let start = Instant::now();
+            let (cut, offset) = trace_cut(self.instance, &basis)?;
+            let mut fb = binary_affine_subspace_factor_base(self.instance, &cut, offset);
+            // One absolute trace per basis element (a linear functional on
+            // the field word); unpriced native work (AGENTS.md section 5a).
+            fb.cost
+                .count("trace2e_basis_traces_uncharged", basis.len() as u64 + 1);
+            fb.cost.wall_ns += start.elapsed().as_nanos() as u64;
+            return Ok(fb);
+        }
         Ok(binary_subspace_factor_base(self.instance, &basis))
     }
+}
+
+/// **The 2E cut of a subspace** (`binary-subspace select=trace2e`): for
+/// `V = span(basis)`, the abscissae `x ∈ V` with `Tr(x) = Tr(a)`, as
+/// `(cut, offset)` with `{x ∈ V : Tr x = Tr a} = offset + span(cut)`.
+/// A point `(x, y)` of `y² + xy = x³ + ax² + b` lies in `2E(F_{2^n})` iff
+/// `Tr(x) = Tr(a)` (see [`trace_kernel_basis`]), so every point above the
+/// result is in 2E.  When the trace is not constant on `V`, `cut` is a
+/// basis of `ker Tr ∩ V` (dimension `dim V − 1`) and `offset` is `0` or a
+/// basis element of trace 1; when it is identically 0 on `V`, the cut is
+/// `V` itself if `Tr(a) = 0` and empty (an error) otherwise.  Measured in
+/// workspace `docs/notes/binary-torsion-ic-20261125/ecbench/` ("Confirmatory
+/// C1"): 0.67–0.87× `binary-subspace` in S on five panel Koblitz curves.
+pub fn trace_cut(inst: &BinaryInstance, basis: &[u64]) -> Result<(Vec<u64>, u64), String> {
+    let tr = |v: u64| inst.artin_schreier.trace(v);
+    let want = tr(inst.a);
+    let Some(&pivot) = basis.iter().find(|&&v| tr(v) == 1) else {
+        return if want == 0 {
+            Ok((basis.to_vec(), 0))
+        } else {
+            Err("select=trace2e: the trace is 0 on the whole subspace and Tr(a) = 1, so no point of 2E lies above it".into())
+        };
+    };
+    let cut = basis
+        .iter()
+        .filter(|&&v| v != pivot)
+        .map(|&v| if tr(v) == 1 { v ^ pivot } else { v })
+        .collect();
+    Ok((cut, if want == 1 { pivot } else { 0 }))
 }
 
 /// `dim` independent elements of `ker Tr`, from `1, z, z², …`: each monomial

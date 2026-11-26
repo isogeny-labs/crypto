@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T23:13:17Z",
+ "id": "PCC-20261124-1a672f",
+ "kind": "statement",
+ "producer": {
+  "commit": "513acca244209fbf52bcd8b02e3d2215b11dfe04",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/base_lookup_v1/default_tests.txt",
+    "sha256": "05da879f589e32604d83cd2297e60648b2c4c6c38198e093e67fe9eb274b597a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/base_lookup_v1/build.txt",
+    "sha256": "0d836bd53891ff55a7c0db37512ed393cfb1f338d61a8041ba1076e7b50bd616"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-common-base-lookup",
+ "statement": "The common base-lookup development build passes six default-feature tests and exits zero for the feature-enabled release build. Together with the 27 feature tests this qualifies the software for its separately frozen local controls; it provides no admitted cost comparison or signed validation."
+}

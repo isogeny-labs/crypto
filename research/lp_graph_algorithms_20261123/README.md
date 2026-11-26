@@ -1,5 +1,11 @@
 # Large-prime graph algorithms: integration of the #4917 catalog queue
 
+## M31 retained-stream continuation, 2026-11-24 UTC
+
+The current draft continuation is [PR #5076](https://github.com/isogeny-labs/crypto/pull/5076). Native Rust replay on p=2147483647 checked the existing 645-row B677 capture and admitted 613 rows. At prefixes 256/512/613, forest, pivot and MST each retained useful and augmented ranks 131/355/452 with zero source replay failures. The [frozen receipt](evidence/native-m31-capture-20261124/README.md) and [visual report](reports/run-20261124T0200Z/REPORT.md) bind the exact source and raw outputs. Unsigned registration PCC-20261124-fcc0a3; [pcc:unverified].
+
+This is a generic exhaustive-pair baseline with one fixed public target. The result compares graph projection payload; collection, target recovery, timing and full cold-cost comparisons remain separate. Historical entries below are preserved. No PR merge or paid compute was performed.
+
 Date 2026-11-23. Code: `src/cryptanalysis/large_prime_graph.rs`,
 `src/cryptanalysis/large_prime_graph/eval.rs`, `examples/lp_graph_eval.rs`,
 `tests/large_prime_graph.rs`; follow-up (2026-11-23): `large_prime_graph/block_wiedemann.rs`,

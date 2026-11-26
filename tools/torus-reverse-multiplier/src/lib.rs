@@ -1,0 +1,406 @@
+//! Public-target two-leaf query on a freely adapted base; no scalar recovery.
+pub mod controls;
+pub mod poly;
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use torus_coset_circuit::Spec;
+use torus_quotient_query::arithmetic::{c, trim, Engine, P};
+use torus_s4::{curve25519_prime, Curve, Field, Point};
+use torus_s4_tree::Fp2;
+pub type Result<T> = std::result::Result<T, String>;
+pub const WORK: u64 = 100_000_000;
+fn real(a: BigUint) -> Fp2 {
+    Fp2 { a, b: 0u32.into() }
+}
+pub fn fp2_json(a: &Fp2) -> Value {
+    json!([a.a.to_string(), a.b.to_string()])
+}
+pub fn point_json(a: &Point) -> Value {
+    a.as_ref()
+        .map_or(Value::Null, |(x, y)| json!([x.to_string(), y.to_string()]))
+}
+pub fn curve(s: &Spec) -> Result<Curve> {
+    let (a, q, ca): (u64, u64, u64) = if s.p == BigUint::from(101u32) {
+        (17, 3, 95)
+    } else if s.p == curve25519_prime() {
+        (60824497, 213156431, 486662)
+    } else {
+        return Err("unsupported field".into());
+    };
+    let f = Field::new(s.p.clone())?;
+    if s.order_factor != a
+        || s.q != q
+        || s.k < 2
+        || s.k > 65536
+        || 2 * s.k >= a
+        || s.curve_a != Some(ca.into())
+        || s.h.a >= s.p
+        || s.h.b >= s.p
+        || s.h.norm(&f) != BigUint::one()
+        || s.h.pow(&(BigUint::from(a) * q), &f) != Fp2::one()
+        || s.h.pow(&a.into(), &f) == Fp2::one()
+        || s.h.pow(&q.into(), &f) == Fp2::one()
+    {
+        return Err("malformed original family/spec admission".into());
+    }
+    Ok(Curve { f, a: ca.into() })
+}
+pub fn cayley(f: &Field, x: &BigUint) -> Result<Fp2> {
+    if x >= &f.p {
+        return Err("noncanonical Cayley input".into());
+    }
+    let square = f.scale(&f.square(x), 2);
+    let inverse = f.inv(&f.sub(&1u32.into(), &square))?;
+    let z = Fp2 {
+        a: f.mul(&f.add(&1u32.into(), &square), &inverse),
+        b: f.mul(&f.scale(x, 2), &inverse),
+    };
+    if z.norm(f) != BigUint::one() {
+        return Err("Cayley norm".into());
+    }
+    Ok(z)
+}
+pub fn coordinates(e: &Engine, alpha: &Fp2, a: &BigUint, negative: bool) -> Result<(P, P)> {
+    let v = vec![c(1), c(0), real(e.f.sub(&0u32.into(), &2u32.into()))];
+    let u = vec![
+        real(alpha.a.clone()),
+        real(e.f.scale(&alpha.b, 4)),
+        real(e.f.scale(&alpha.a, 2)),
+    ];
+    let signed_v = if negative {
+        e.scale(&v, &e.neg(&c(1)))?
+    } else {
+        v
+    };
+    Ok((
+        e.scale(&e.psub(&signed_v, &u), &real(a.clone()))?,
+        e.scale(&u, &c(2))?,
+    ))
+}
+pub fn numerator(
+    e: &Engine,
+    n1: &[Fp2],
+    d1: &[Fp2],
+    n2: &[Fp2],
+    d2: &[Fp2],
+    a: &BigUint,
+    r: &BigUint,
+) -> Result<P> {
+    let x = e.product(n1, d2)?;
+    let y = e.product(n2, d1)?;
+    let z = e.product(d1, d2)?;
+    let nn = e.product(n1, n2)?;
+    let diff = e.psub(&x, &y);
+    let first = e.scale(&e.product(&diff, &diff)?, &real(e.f.square(r)))?;
+    let mid1 = e.product(&e.padd(&x, &y), &e.padd(&nn, &z))?;
+    let mid2 = e.scale(&e.product(&nn, &z)?, &real(e.f.scale(a, 2)))?;
+    let middle = e.scale(&e.padd(&mid1, &mid2), &real(e.f.scale(r, 2)))?;
+    let last = e.psub(&nn, &z);
+    let p = trim(e.padd(&e.psub(&first, &middle), &e.product(&last, &last)?));
+    if p.len() > 9 {
+        return Err("compiler degree8 violation".into());
+    }
+    Ok(p)
+}
+pub fn raw_choices(curve: &Curve, z: &Fp2) -> Result<Vec<(usize, Point)>> {
+    let f = &curve.f;
+    if z.a >= f.p || z.b >= f.p || z.norm(f) != BigUint::one() || z.a.is_zero() {
+        return Err("raw parameter norm/chart".into());
+    }
+    let half = f.mul(&curve.a, &f.inv(&2u32.into())?);
+    let center = f.sub(&0u32.into(), &half);
+    let delta = f.mul(&half, &f.inv(&z.a)?);
+    let candidates = [f.add(&center, &delta), f.sub(&center, &delta)];
+    let rational_branches = candidates
+        .iter()
+        .map(|x| f.sqrt(&curve.rhs(x)))
+        .collect::<Result<Vec<_>>>()?;
+    // Match the original index adapter's unique rational raw-branch admission,
+    // including a zero-ordinate branch in the ambiguity count.
+    if rational_branches.iter().filter(|v| v.is_some()).count() != 1 {
+        return Ok(vec![]);
+    }
+    let mut out = vec![];
+    for (branch, x) in candidates.into_iter().enumerate() {
+        if let Some(y) = f.sqrt(&curve.rhs(&x))? {
+            if y.is_zero() {
+                continue;
+            }
+            let y = y.clone().min(f.sub(&0u32.into(), &y));
+            for yy in [y.clone(), f.sub(&0u32.into(), &y)] {
+                let p = Some((x.clone(), yy));
+                if !curve.contains(&p) {
+                    return Err("raw curve replay".into());
+                }
+                if curve.times(&p, 8)?.is_none() {
+                    continue;
+                }
+                out.push((branch, p));
+            }
+        }
+    }
+    Ok(out)
+}
+#[derive(Clone)]
+pub struct Lift {
+    pub sigma: Fp2,
+    pub raw: [Point; 2],
+    pub images: [Point; 2],
+    pub branches: [usize; 2],
+    pub base_key: Fp2,
+}
+impl Lift {
+    pub fn key(&self) -> String {
+        json!({"sigma":fp2_json(&self.sigma),"raw":[point_json(&self.raw[0]),point_json(&self.raw[1])]}).to_string()
+    }
+    pub fn row_key(&self, f: &Field) -> Result<String> {
+        let mut row: BTreeMap<(BigUint, BigUint), i64> = BTreeMap::new();
+        for p in &self.images {
+            let (x, y) = p.as_ref().ok_or("identity image")?;
+            let ny = f.sub(&0u32.into(), y);
+            let (canonical, coefficient) = if *y <= ny { (y.clone(), 1) } else { (ny, -1) };
+            *row.entry((x.clone(), canonical)).or_default() += coefficient;
+        }
+        Ok(json!(row
+            .into_iter()
+            .filter(|(_, v)| *v != 0)
+            .map(|((x, y), v)| json!([x.to_string(), y.to_string(), v]))
+            .collect::<Vec<_>>())
+        .to_string())
+    }
+    pub fn json(&self, f: &Field) -> Result<Value> {
+        Ok(
+            json!({"sigma":fp2_json(&self.sigma),"parameter_base_key_sigma_q":fp2_json(&self.base_key),"raw":[point_json(&self.raw[0]),point_json(&self.raw[1])],"images":[point_json(&self.images[0]),point_json(&self.images[1])],"branches":self.branches,"relative_labels":[[1,0],[2,0]],"geometric_signed_row":self.row_key(f)?,"scope":"adapted base; relative parameter and direct group replay, not unchanged full point-Circuit qualification"}),
+        )
+    }
+}
+pub fn lifts(s: &Spec, curve: &Curve, r: &Point, sigma: &Fp2) -> Result<Vec<Lift>> {
+    let f = &curve.f;
+    let alpha = [s.h.clone(), s.h.mul(&s.h, f)];
+    let z = [sigma.mul(&alpha[0], f), sigma.mul(&alpha[1], f)];
+    let inv = sigma.inverse(f)?;
+    for i in 0..2 {
+        let relative = z[i].mul(&inv, f);
+        if relative != alpha[i]
+            || relative.pow(&s.q.into(), f) != s.h.pow(&(BigUint::from(s.q) * (i + 1)), f)
+        {
+            return Err("relative label/power replay".into());
+        }
+    }
+    let q = curve.times(r, 8)?;
+    let mut out = vec![];
+    for (b1, p1) in raw_choices(curve, &z[0])? {
+        for (b2, p2) in raw_choices(curve, &z[1])? {
+            if curve.add(&p1, &p2)? != *r {
+                continue;
+            }
+            let images = [curve.times(&p1, 8)?, curve.times(&p2, 8)?];
+            if curve.add(&images[0], &images[1])? != q {
+                return Err("image sum replay".into());
+            }
+            let value = Lift {
+                sigma: sigma.clone(),
+                raw: [p1.clone(), p2],
+                images,
+                branches: [b1, b2],
+                base_key: sigma.pow(&s.q.into(), f),
+            };
+            verify_lift(s, curve, r, &value)?;
+            out.push(value);
+        }
+    }
+    Ok(out)
+}
+pub fn verify_lift(s: &Spec, curve: &Curve, r: &Point, value: &Lift) -> Result<()> {
+    let f = &curve.f;
+    if value.sigma.a >= f.p
+        || value.sigma.b >= f.p
+        || value.sigma.norm(f) != BigUint::one()
+        || value.base_key != value.sigma.pow(&s.q.into(), f)
+    {
+        return Err("lift multiplier/base key".into());
+    }
+    let half = f.mul(&curve.a, &f.inv(&2u32.into())?);
+    for i in 0..2 {
+        if !curve.contains(&value.raw[i]) || value.raw[i].is_none() || value.branches[i] > 1 {
+            return Err("lift raw/branch admission".into());
+        }
+        let z = value.sigma.mul(&s.h.pow(&(i + 1).into(), f), f);
+        if !raw_choices(curve, &z)?
+            .iter()
+            .any(|(branch, p)| *branch == value.branches[i] && *p == value.raw[i])
+        {
+            return Err("lift original unique-branch/nonidentity admission".into());
+        }
+        let delta = f.mul(&half, &f.inv(&z.a)?);
+        let center = f.sub(&0u32.into(), &half);
+        let x = if value.branches[i] == 0 {
+            f.add(&center, &delta)
+        } else {
+            f.sub(&center, &delta)
+        };
+        if value.raw[i].as_ref().unwrap().0 != x
+            || value.images[i].is_none()
+            || value.images[i] != curve.times(&value.raw[i], 8)?
+        {
+            return Err("lift raw/map/image replay".into());
+        }
+    }
+    if curve.add(&value.raw[0], &value.raw[1])? != *r
+        || curve.add(&value.images[0], &value.images[1])? != curve.times(r, 8)?
+    {
+        return Err("lift original target replay".into());
+    }
+    Ok(())
+}
+pub struct Answer {
+    pub lifts: Vec<Lift>,
+    pub record: Value,
+}
+/// Public inputs only. Original relative templates h,h² are derived, never planted.
+pub fn solve(s: &Spec, r: &Point, work_cap: u64) -> Result<Answer> {
+    let curve = curve(s)?;
+    let (rx, ry) = r.as_ref().ok_or("unsupported identity raw target")?;
+    if !curve.contains(r) {
+        return Err("offcurve/noncanonical public target".into());
+    }
+    if ry.is_zero() || curve.times(r, 8)?.is_none() {
+        return Err("unsupported target cofactor sector".into());
+    }
+    let e = Engine::new(s.p.clone(), work_cap)?;
+    let alphas = [s.h.clone(), s.h.mul(&s.h, &curve.f)];
+    let mut roots = BTreeSet::new();
+    let mut branches = vec![];
+    for b1 in [false, true] {
+        for b2 in [false, true] {
+            let (n1, d1) = coordinates(&e, &alphas[0], &curve.a, b1)?;
+            let (n2, d2) = coordinates(&e, &alphas[1], &curve.a, b2)?;
+            let p = numerator(&e, &n1, &d1, &n2, &d2, &curve.a, rx)?;
+            let (xs, cert) = poly::roots(&e, &p)?;
+            for (x, _) in xs {
+                roots.insert(x);
+            }
+            branches.push(json!({"negative_branches":[b1,b2],"certificate":cert,"degree":p.len().saturating_sub(1)}));
+        }
+    }
+    if roots.len() > 32 {
+        return Err("finite candidate bound".into());
+    }
+    let mut candidates = vec![];
+    let mut found = BTreeMap::new();
+    for c0 in roots {
+        let sigma = cayley(&curve.f, &c0)?;
+        let values = lifts(s, &curve, r, &sigma)?;
+        candidates.push(
+            json!({"c":c0.to_string(),"sigma":fp2_json(&sigma),"accepted_lifts":values.len()}),
+        );
+        for value in values {
+            found.insert(value.key(), value);
+        }
+    }
+    let infinity = Fp2 {
+        a: curve.f.sub(&0u32.into(), &1u32.into()),
+        b: 0u32.into(),
+    };
+    let inf = lifts(s, &curve, r, &infinity)?;
+    let infinity_lifts = inf.len();
+    for value in inf {
+        found.insert(value.key(), value);
+    }
+    let values: Vec<_> = found.into_values().collect();
+    let row_keys: BTreeSet<_> = values
+        .iter()
+        .map(|v| v.row_key(&curve.f))
+        .collect::<Result<_>>()?;
+    let base_keys: BTreeSet<_> = values
+        .iter()
+        .map(|v| fp2_json(&v.base_key).to_string())
+        .collect();
+    let record = json!({"p":s.p.to_string(),"a":s.order_factor,"q":s.q,"k":s.k,"R":point_json(r),"Q":point_json(&curve.times(r,8)?),"branches":branches,"finite_candidates":candidates,"infinity_lifts":infinity_lifts,"lifts":values.iter().map(|v|v.json(&curve.f)).collect::<Result<Vec<_>>>()?,"geometric_rows":row_keys.len(),"parameter_base_classes":base_keys.len(),"partial_new_poly_counts":e.stats(),"scope":"complete declared two-template/Fp-Cayley/raw-R sector when all stages finish; not full-base absence or scalar recovery"});
+    Ok(Answer {
+        lifts: values,
+        record,
+    })
+}
+pub fn numeric_s3(f: &Field, a: &BigUint, x: &BigUint, y: &BigUint, r: &BigUint) -> BigUint {
+    let xy = f.mul(x, y);
+    let mid = f.add(
+        &f.mul(&f.add(x, y), &f.add(&xy, &1u32.into())),
+        &f.scale(&f.mul(a, &xy), 2),
+    );
+    f.add(
+        &f.sub(
+            &f.mul(&f.square(&f.sub(x, y)), &f.square(r)),
+            &f.scale(&f.mul(&mid, r), 2),
+        ),
+        &f.square(&f.sub(&xy, &1u32.into())),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn ambiguous_unit_parameter_matches_original_index_admission() {
+        let s = torus_quotient_query::controls::spec(false, 8).unwrap();
+        let cv = curve(&s).unwrap();
+        assert_eq!(cv.rhs(&6u32.into()), 6u32.into());
+        assert_eq!(cv.f.square(&39u32.into()), 6u32.into());
+        assert!(raw_choices(&cv, &Fp2::one()).unwrap().is_empty());
+        assert!(raw_choices(&cv, &Fp2::one().neg(&cv.f)).unwrap().is_empty());
+    }
+    #[test]
+    fn external_lift_check_also_refuses_ambiguous_encoding() {
+        let s = torus_quotient_query::controls::spec(false, 8).unwrap();
+        let cv = curve(&s).unwrap();
+        let sigma = s.h.inverse(&cv.f).unwrap();
+        let (b2, p2) = raw_choices(&cv, &s.h).unwrap().remove(0);
+        let raw = [Some((6u32.into(), 39u32.into())), p2];
+        let r = cv.add(&raw[0], &raw[1]).unwrap();
+        let images = [cv.times(&raw[0], 8).unwrap(), cv.times(&raw[1], 8).unwrap()];
+        let v = Lift {
+            base_key: sigma.pow(&s.q.into(), &cv.f),
+            sigma,
+            raw,
+            images,
+            branches: [1, b2],
+        };
+        assert!(verify_lift(&s, &cv, &r, &v).is_err());
+    }
+    #[test]
+    fn cayley_and_clearing_all_toy_chart_values() {
+        let s = torus_quotient_query::controls::spec(false, 8).unwrap();
+        let curve = curve(&s).unwrap();
+        let e = Engine::new(s.p.clone(), WORK).unwrap();
+        let alpha = [s.h.clone(), s.h.mul(&s.h, &curve.f)];
+        for b1 in [false, true] {
+            for b2 in [false, true] {
+                let (n1, d1) = coordinates(&e, &alpha[0], &curve.a, b1).unwrap();
+                let (n2, d2) = coordinates(&e, &alpha[1], &curve.a, b2).unwrap();
+                let p = numerator(&e, &n1, &d1, &n2, &d2, &curve.a, &7u32.into()).unwrap();
+                assert!(p.len() <= 9);
+                for x in 0..101 {
+                    assert_eq!(
+                        cayley(&curve.f, &BigUint::from(x)).unwrap().norm(&curve.f),
+                        BigUint::one()
+                    );
+                    let t = c(x);
+                    let n = [e.eval(&n1, &t).unwrap(), e.eval(&n2, &t).unwrap()];
+                    let d = [e.eval(&d1, &t).unwrap(), e.eval(&d2, &t).unwrap()];
+                    if d[0].a.is_zero() || d[1].a.is_zero() {
+                        continue;
+                    }
+                    let u0 = curve.f.mul(&n[0].a, &curve.f.inv(&d[0].a).unwrap());
+                    let u1 = curve.f.mul(&n[1].a, &curve.f.inv(&d[1].a).unwrap());
+                    let expected = curve.f.mul(
+                        &numeric_s3(&curve.f, &curve.a, &u0, &u1, &7u32.into()),
+                        &curve.f.square(&curve.f.mul(&d[0].a, &d[1].a)),
+                    );
+                    assert_eq!(e.eval(&p, &t).unwrap().a, expected);
+                }
+            }
+        }
+    }
+}

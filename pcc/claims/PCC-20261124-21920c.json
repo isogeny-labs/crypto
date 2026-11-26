@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:12:18Z",
+ "id": "PCC-20261124-21920c",
+ "kind": "execution",
+ "producer": {
+  "commit": "8aa70e211f9a42e9823e859b1c7197c8677dceca",
+  "model": "GPT-6-Astra-Pro",
+  "session": "rr5-b677-isolab-payload-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/QUALIFICATION.json",
+    "sha256": "018b75c2d2c95204156326088057854cf568e75f721ccc9956c6d9dc301df620"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/tests.stdout",
+    "sha256": "6520a853cd8ae291bd426a366f6808b7ce4a70da1ad483eb0389eb483c08f136"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/runner-contracts.stdout",
+    "sha256": "0ac747a53f9c483b771b10129f94c0989a5e2c7d8a82f72fbe48d69c5d868110"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/artifact-contracts.stdout",
+    "sha256": "e9553486126680d810cdba25d06190624c5f243dd7b56c342a7a3151db8a2593"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/selected-ranges.json",
+    "sha256": "8c3a89f60585aff08772e1cc6724c6d12f2794bcdcf30ad92a9d0aa8fea74e01"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Local development only; the full root-library gate and cloud admission are separate. No signed PCC verdict is asserted.",
+ "statement": "Producer-reported local RR5 payload development qualification at source 8aa70e211f9a42e9823e859b1c7197c8677dceca: the static bundle build and 32 library, 19 independent-checker, 8 public-example, 57 mock runner and 67 mock artifact-custody tests returned success. This is unsigned development evidence, not an execution proof, a registered B677 extraction outcome, an independent completeness proof, or an ECDLP speed result."
+}

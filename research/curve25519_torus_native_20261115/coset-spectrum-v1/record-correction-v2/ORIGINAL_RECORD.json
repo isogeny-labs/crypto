@@ -1,0 +1,73 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T19:09:16Z",
+ "id": "PCC-20261123-8d8628",
+ "kind": "theorem",
+ "producer": {
+  "commit": "56fab49541b82bfec1f306f5d49c9f2d4463b752",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_charpoly"
+  },
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_square_zero"
+  },
+  {
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_nonzero"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/build.log",
+    "sha256": "6f5132472435fa51aeec69806d89e58e28e015e7e1077fbbc571eac74e80a305"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/audit.log",
+    "sha256": "2277b33ea2fac8554a27337604cbaaef44fad4fc8c8e8b8bcf6f82bbcfc4ea3e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/lake-build.log",
+    "sha256": "c3da1282842078756440506aebe6a719b5d2489874ce99d7ccc01a4a3335bc5e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lake-manifest.json",
+    "sha256": "47324a43f60bbc6f62f9f8cc5a741d8aa2bc2bc7b3484e1e0c8503ec5d1e9fad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lakefile.toml",
+    "sha256": "a2761c9d8d8dbde0bd2f1bbb27434c5485b27cb2b3937cd7ef05d6f0126ba447"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Three finite Mathlib matrix endpoints only; no six-dimensional section/compiler/curve or solver-complexity theorem",
+ "statement": "The concrete ZMod101 matrix N=[[0,1],[0,0]] has characteristic polynomial T^2, is square-zero and is nonzero."
+}

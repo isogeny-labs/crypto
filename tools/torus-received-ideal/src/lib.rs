@@ -1,0 +1,615 @@
+//! Universal received-symbol identity and one bounded quotient discriminator.
+use num_bigint::BigUint;
+use num_traits::{One, Zero};
+use serde_json::{json, Value};
+use std::{collections::BTreeSet, io::Write};
+use torus_quotient_query::controls::spec;
+use torus_s4::{Curve, Field, Point};
+use torus_s4_tree::Fp2;
+pub type Result<T> = std::result::Result<T, String>;
+type P = Vec<BigUint>;
+type Matrix = Vec<Vec<BigUint>>;
+const WIDTH: usize = 11;
+const COLS: usize = 55;
+const PIVOT: usize = 54;
+fn z() -> BigUint {
+    BigUint::zero()
+}
+fn one() -> BigUint {
+    BigUint::one()
+}
+fn trim(p: &mut P) {
+    while p.last().is_some_and(BigUint::is_zero) {
+        p.pop();
+    }
+}
+fn add(f: &Field, a: &[BigUint], b: &[BigUint]) -> P {
+    let mut r = vec![z(); a.len().max(b.len())];
+    for (i, c) in a.iter().enumerate() {
+        r[i] = c.clone()
+    }
+    for (i, c) in b.iter().enumerate() {
+        r[i] = f.add(&r[i], c)
+    }
+    trim(&mut r);
+    r
+}
+fn neg(f: &Field, a: &[BigUint]) -> P {
+    a.iter().map(|x| f.sub(&z(), x)).collect()
+}
+fn sub(f: &Field, a: &[BigUint], b: &[BigUint]) -> P {
+    add(f, a, &neg(f, b))
+}
+fn scale(f: &Field, a: &[BigUint], s: &BigUint) -> P {
+    let mut r: P = a.iter().map(|x| f.mul(x, s)).collect();
+    trim(&mut r);
+    r
+}
+fn mul(f: &Field, a: &[BigUint], b: &[BigUint]) -> P {
+    if a.is_empty() || b.is_empty() {
+        return vec![];
+    }
+    let mut r = vec![z(); a.len() + b.len() - 1];
+    for (i, x) in a.iter().enumerate() {
+        for (j, y) in b.iter().enumerate() {
+            r[i + j] = f.add(&r[i + j], &f.mul(x, y));
+        }
+    }
+    trim(&mut r);
+    r
+}
+fn power(f: &Field, a: &[BigUint], n: usize) -> P {
+    (0..n).fold(vec![one()], |r, _| mul(f, &r, a))
+}
+fn eval(f: &Field, p: &[BigUint], x: &BigUint) -> BigUint {
+    p.iter().rev().fold(z(), |a, c| f.add(&f.mul(&a, x), c))
+}
+fn enc(p: &[BigUint]) -> Value {
+    json!(p.iter().map(ToString::to_string).collect::<Vec<_>>())
+}
+fn enc_matrix(a: &[Vec<BigUint>]) -> Value {
+    json!(a
+        .iter()
+        .map(|r| r.iter().map(ToString::to_string).collect::<Vec<_>>())
+        .collect::<Vec<_>>())
+}
+fn beta(f: &Field, a: &BigUint, t: &BigUint) -> Result<BigUint> {
+    if t.is_zero() || t >= &f.p {
+        return Err("zero/noncanonical tau".into());
+    }
+    Ok(f.mul(
+        &f.mul(&f.square(a), &f.sub(&f.square(t), &one())),
+        &f.inv(&f.scale(&f.square(t), 4))?,
+    ))
+}
+fn relation(f: &Field, a: &BigUint, t: &BigUint) -> Result<P> {
+    let b = beta(f, a, t)?;
+    let c = f.sub(&one(), &b);
+    Ok(vec![
+        f.mul(&b.modpow(&3u32.into(), &f.p), &f.square(&c)),
+        z(),
+        f.mul(&f.mul(a, &c), &f.sub(&f.square(a), &f.scale(&b, 3))),
+        z(),
+        one(),
+    ])
+}
+fn divide_monic(f: &Field, a: &[BigUint], b: &[BigUint]) -> Result<(P, P)> {
+    if a.len() > 17
+        || b.is_empty()
+        || b.last() != Some(&one())
+        || a.iter().chain(b).any(|x| x >= &f.p)
+    {
+        return Err("monic division admission".into());
+    }
+    let mut r = a.to_vec();
+    trim(&mut r);
+    let mut q = vec![z(); r.len().saturating_sub(b.len()) + 1];
+    while r.len() >= b.len() {
+        let k = r.len() - b.len();
+        let c = r.last().unwrap().clone();
+        q[k] = c.clone();
+        for (i, x) in b.iter().enumerate() {
+            r[k + i] = f.sub(&r[k + i], &f.mul(&c, x));
+        }
+        trim(&mut r);
+    }
+    trim(&mut q);
+    Ok((q, r))
+}
+/// Coefficients indexed by W-degree then tau-degree. No irreducibility claim.
+fn universal(f: &Field, a: &BigUint) -> Result<P> {
+    let j = vec![z(), z(), 4u32.into()];
+    let b = scale(f, &[f.sub(&z(), &one()), z(), one()], &f.square(a));
+    let c = sub(f, &j, &b);
+    let g0 = mul(f, &power(f, &b, 3), &power(f, &c, 2));
+    let g2 = scale(
+        f,
+        &mul(
+            f,
+            &mul(f, &power(f, &j, 3), &c),
+            &sub(f, &scale(f, &j, &f.square(a)), &scale(f, &b, &3u32.into())),
+        ),
+        a,
+    );
+    let g4 = power(f, &j, 5);
+    let mut g = vec![z(); COLS];
+    for (w, p) in [(0, g0), (2, g2), (4, g4)] {
+        if p.len() > WIDTH {
+            return Err("universal coefficient box overflow".into());
+        }
+        for (i, v) in p.into_iter().enumerate() {
+            g[w * WIDTH + i] = v
+        }
+    }
+    let h = |e: BigUint| {
+        let constant = neg(
+            f,
+            &scale(
+                f,
+                &mul(f, &power(f, &[e, f.sub(&z(), &one())], 3), &c),
+                &a.modpow(&3u32.into(), &f.p),
+            ),
+        );
+        let mut lead = vec![z(); 6];
+        lead[5] = 32u32.into();
+        (constant, lead)
+    };
+    let (hp0, hp2) = h(one());
+    let (hm0, hm2) = h(f.sub(&z(), &one()));
+    let parts = [
+        mul(f, &hp0, &hm0),
+        add(f, &mul(f, &hp0, &hm2), &mul(f, &hp2, &hm0)),
+        mul(f, &hp2, &hm2),
+    ];
+    for (w, p) in [0usize, 2, 4].into_iter().zip(parts) {
+        for i in 0..WIDTH {
+            if g[w * WIDTH + i] != p.get(i).cloned().unwrap_or_default() {
+                return Err("branch factor product coefficient mismatch".into());
+            }
+        }
+    }
+    if g[PIVOT] != BigUint::from(1024u32) % &f.p || g[PIVOT].is_zero() {
+        return Err("normalizer pivot unavailable".into());
+    }
+    Ok(g)
+}
+fn row(f: &Field, t: &BigUint, w: &BigUint) -> P {
+    let mut tp = vec![one()];
+    let mut wp = vec![one()];
+    for i in 1..WIDTH {
+        tp.push(f.mul(&tp[i - 1], t))
+    }
+    for i in 1..5 {
+        wp.push(f.mul(&wp[i - 1], w))
+    }
+    wp.iter()
+        .flat_map(|y| tp.iter().map(move |x| f.mul(x, y)))
+        .collect()
+}
+fn dot(f: &Field, a: &[BigUint], b: &[BigUint]) -> BigUint {
+    a.iter()
+        .zip(b)
+        .fold(z(), |s, (x, y)| f.add(&s, &f.mul(x, y)))
+}
+fn normalize(f: &Field, p: &[BigUint], g: &[BigUint]) -> Result<P> {
+    if p.len() != COLS || g.len() != COLS || p.iter().chain(g).any(|x| x >= &f.p) {
+        return Err("box normalization admission".into());
+    }
+    let q = f.mul(&p[PIVOT], &f.inv(&g[PIVOT])?);
+    Ok(p.iter()
+        .zip(g)
+        .map(|(x, y)| f.sub(x, &f.mul(&q, y)))
+        .collect())
+}
+fn dims(f: &Field, a: &[Vec<BigUint>]) -> Result<(usize, usize)> {
+    if a.is_empty() || a.len() > 108 || a[0].is_empty() || a[0].len() > COLS {
+        return Err("matrix dimensions/resource refusal".into());
+    }
+    let n = a[0].len();
+    if a.iter()
+        .any(|r| r.len() != n || r.iter().any(|x| x >= &f.p))
+    {
+        return Err("ragged/noncanonical matrix".into());
+    }
+    Ok((a.len(), n))
+}
+struct Reduced {
+    a: Matrix,
+    pivots: Vec<usize>,
+    ids: Vec<usize>,
+}
+fn reduce(f: &Field, a: &[Vec<BigUint>]) -> Result<Reduced> {
+    let (m, n) = dims(f, a)?;
+    let mut a = a.to_vec();
+    let mut ids: Vec<_> = (0..m).collect();
+    let mut pivots = vec![];
+    for c in 0..n {
+        let k = pivots.len();
+        let Some(r) = (k..m).find(|&r| !a[r][c].is_zero()) else {
+            continue;
+        };
+        a.swap(k, r);
+        ids.swap(k, r);
+        let inv = f.inv(&a[k][c])?;
+        for x in a[k].iter_mut().skip(c) {
+            *x = f.mul(x, &inv)
+        }
+        let p = a[k].clone();
+        for row in a.iter_mut().skip(k + 1) {
+            let q = row[c].clone();
+            if q.is_zero() {
+                continue;
+            }
+            for j in c..n {
+                row[j] = f.sub(&row[j], &f.mul(&q, &p[j]));
+            }
+        }
+        pivots.push(c);
+        if pivots.len() == m {
+            break;
+        }
+    }
+    ids.truncate(pivots.len());
+    Ok(Reduced { a, pivots, ids })
+}
+fn kernels(f: &Field, r: &Reduced, n: usize) -> Vec<P> {
+    (0..n)
+        .filter(|c| !r.pivots.contains(c))
+        .map(|free| {
+            let mut v = vec![z(); n];
+            v[free] = one();
+            for (i, &c) in r.pivots.iter().enumerate().rev() {
+                let sum = r.a[i]
+                    .iter()
+                    .zip(&v)
+                    .skip(c + 1)
+                    .fold(z(), |s, (x, y)| f.add(&s, &f.mul(x, y)));
+                v[c] = f.sub(&z(), &sum);
+            }
+            v
+        })
+        .collect()
+}
+fn kernel_check(f: &Field, a: &[Vec<BigUint>], v: &[BigUint]) -> Result<()> {
+    let (_, n) = dims(f, a)?;
+    if v.len() != n
+        || v.iter().all(BigUint::is_zero)
+        || v.iter().any(|x| x >= &f.p)
+        || a.iter().any(|r| !dot(f, r, v).is_zero())
+    {
+        return Err("kernel witness rejected".into());
+    }
+    Ok(())
+}
+fn determinant_lu(f: &Field, a: &[Vec<BigUint>]) -> Result<BigUint> {
+    let (m, n) = dims(f, a)?;
+    if m != n {
+        return Err("square minor".into());
+    }
+    let mut a = a.to_vec();
+    let mut det = one();
+    for k in 0..n {
+        let Some(r) = (k..n).find(|&r| !a[r][k].is_zero()) else {
+            return Ok(z());
+        };
+        if r != k {
+            a.swap(r, k);
+            det = f.sub(&z(), &det)
+        }
+        let p = a[k][k].clone();
+        det = f.mul(&det, &p);
+        let inv = f.inv(&p)?;
+        let pivot = a[k].clone();
+        for row in a.iter_mut().skip(k + 1) {
+            let q = f.mul(&row[k], &inv);
+            for j in k..n {
+                row[j] = f.sub(&row[j], &f.mul(&q, &pivot[j]));
+            }
+        }
+    }
+    Ok(det)
+}
+fn determinant_bareiss(f: &Field, a: &[Vec<BigUint>]) -> Result<BigUint> {
+    let (m, n) = dims(f, a)?;
+    if m != n {
+        return Err("square minor".into());
+    }
+    let mut b = a.to_vec();
+    let mut previous = one();
+    let mut negative = false;
+    for k in 0..n - 1 {
+        let Some(r) = (k..n).find(|&r| !b[r][k].is_zero()) else {
+            return Ok(z());
+        };
+        if r != k {
+            b.swap(k, r);
+            negative = !negative
+        }
+        let pivot = b[k][k].clone();
+        let row = b[k].clone();
+        let inv = f.inv(&previous)?;
+        for target in b.iter_mut().skip(k + 1) {
+            let left = target[k].clone();
+            for j in k + 1..n {
+                target[j] = f.mul(
+                    &f.sub(&f.mul(&pivot, &target[j]), &f.mul(&left, &row[j])),
+                    &inv,
+                )
+            }
+            target[k] = z();
+        }
+        previous = pivot;
+    }
+    let d = b[n - 1][n - 1].clone();
+    Ok(if negative { f.sub(&z(), &d) } else { d })
+}
+fn number(f: &Field, v: &Value) -> Result<BigUint> {
+    let x: BigUint = v
+        .as_str()
+        .ok_or("decimal string")?
+        .parse()
+        .map_err(|_| "decimal")?;
+    if x >= f.p {
+        return Err("noncanonical field input".into());
+    }
+    Ok(x)
+}
+fn point(f: &Field, v: &Value) -> Result<Point> {
+    let a = v.as_array().ok_or("finite point array")?;
+    if a.len() != 2 {
+        return Err("point length".into());
+    }
+    Ok(Some((number(f, &a[0])?, number(f, &a[1])?)))
+}
+fn emit(w: &mut impl Write, v: Value) -> Result<()> {
+    writeln!(w, "{v}").map_err(|e| e.to_string())?;
+    w.flush().map_err(|e| e.to_string())
+}
+fn controls() -> Result<Value> {
+    let f = Field::new(101u32.into())?;
+    let g = universal(&f, &95u32.into())?;
+    let norm = normalize(&f, &g, &g)?;
+    if norm.iter().any(|x| !x.is_zero()) {
+        return Err("universal normalization control".into());
+    }
+    let mut non = g.clone();
+    non[0] = f.add(&non[0], &one());
+    let mut expected = vec![z(); COLS];
+    expected[0] = one();
+    if normalize(&f, &non, &g)? != expected {
+        return Err("nonuniversal remainder control".into());
+    }
+    let t = 7u32.into();
+    let rel = relation(&f, &95u32.into(), &t)?;
+    let mut divisions = 0;
+    for k in 0..=8 {
+        let mut h = vec![z(); k + 1];
+        h[k] = one();
+        let product = mul(&f, &h, &rel);
+        let (q, r) = divide_monic(&f, &product, &rel)?;
+        if q != h || !r.is_empty() {
+            return Err("monic zero remainder".into());
+        }
+        for c in 0..4 {
+            let mut bad = product.clone();
+            bad.resize(bad.len().max(c + 1), z());
+            bad[c] = f.add(&bad[c], &one());
+            let (q, r) = divide_monic(&f, &bad, &rel)?;
+            if add(&f, &mul(&f, &q, &rel), &r) != bad || r.get(c) != Some(&one()) {
+                return Err("monic reconstruction/corruption".into());
+            }
+        }
+        divisions += 1;
+    }
+    let a = vec![
+        vec![2u32.into(), 3u32.into(), 5u32.into()],
+        vec![7u32.into(), 11u32.into(), 13u32.into()],
+        vec![17u32.into(), 19u32.into(), 23u32.into()],
+    ];
+    if determinant_lu(&f, &a)? != 23u32.into() || determinant_bareiss(&f, &a)? != 23u32.into() {
+        return Err("determinant control".into());
+    }
+    let refusals = [
+        relation(&f, &95u32.into(), &z()).is_err(),
+        divide_monic(&f, &[one()], &[]).is_err(),
+        divide_monic(&f, &[one()], &[2u32.into()]).is_err(),
+        normalize(&f, &g[..54], &g).is_err(),
+        dims(&f, &[vec![101u32.into()]]).is_err(),
+        number(&f, &json!("101")).is_err(),
+    ];
+    if refusals.iter().any(|x| !*x) {
+        return Err("admission control accepted".into());
+    }
+    Ok(
+        json!({"symbolic_branch_factor_product":true,"universal_box_normalizes_to_zero":true,"nonuniversal_constant_survives":true,"monic_shift_cases":divisions,"monic_corruption_cases":4*divisions,"determinant_control":23,"refusals":refusals.len()}),
+    )
+}
+pub fn run(out: &mut impl Write) -> Result<()> {
+    emit(out, json!({"kind":"small_controls","checks":controls()?}))?;
+    let s = spec(true, 20633)?;
+    let f = Field::new(s.p.clone())?;
+    let curve = Curve {
+        f: f.clone(),
+        a: s.curve_a.clone().ok_or("A")?,
+    };
+    let data: Value =
+        serde_json::from_str(include_str!("../FIXTURES.json")).map_err(|e| e.to_string())?;
+    if data["public_spec"]["p"] != json!(s.p.to_string())
+        || data["public_spec"]["q"] != json!(s.q)
+        || data["public_spec"]["K"] != json!(s.k)
+        || data["public_spec"]["A"] != json!(curve.a.to_string())
+        || data["public_spec"]["a"] != json!(s.order_factor)
+        || data["public_spec"]["h"] != json!([s.h.a.to_string(), s.h.b.to_string()])
+    {
+        return Err("original spec provenance mismatch".into());
+    }
+    let points = data["points"].as_array().ok_or("fixed points")?;
+    if points.len() != 108 {
+        return Err("fixed prefix length".into());
+    }
+    let g = universal(&f, &curve.a)?;
+    emit(
+        out,
+        json!({"kind":"universal_box","tau_degree":10,"w_degree":4,"coefficient_order":"W-major, tau-minor","coefficients":enc(&g),"normalizer_pivot":PIVOT,"pivot_coefficient":g[PIVOT].to_string(),"branch_factor_product":true,"universal_not_selection":true}),
+    )?;
+    let half = f.mul(&curve.a, &f.inv(&2u32.into())?);
+    let center = f.sub(&z(), &half);
+    let mut matrices: [Matrix; 2] = [vec![], vec![]];
+    let mut seen = BTreeSet::new();
+    let mut signed = 0;
+    for (i, p) in points.iter().enumerate() {
+        if p["t"].as_u64() != Some(i as u64) || p["j"].as_u64() != Some(1) {
+            return Err("fixed label ordering".into());
+        }
+        let zz = p["z"].as_array().ok_or("z array")?;
+        if zz.len() != 2 {
+            return Err("z length".into());
+        }
+        let param = Fp2 {
+            a: number(&f, &zz[0])?,
+            b: number(&f, &zz[1])?,
+        };
+        if param.norm(&f) != one()
+            || param != s.h.pow(&(one() + BigUint::from(s.order_factor) * i), &f)
+            || !seen.insert((param.a.clone(), param.b.clone()))
+        {
+            return Err("original coset/norm/index replay".into());
+        }
+        let t = param.a.clone();
+        let delta = f.mul(&half, &f.inv(&t)?);
+        let branch = p["branch"].as_u64().ok_or("branch")?;
+        let x = match branch {
+            0 => f.add(&center, &delta),
+            1 => f.sub(&center, &delta),
+            _ => return Err("branch range".into()),
+        };
+        let rel = relation(&f, &curve.a, &t)?;
+        let os = p["orientations"].as_array().ok_or("orientations")?;
+        if os.len() != 2 {
+            return Err("signed stream length".into());
+        }
+        let mut prior_y = None;
+        for (sign, o) in os.iter().enumerate() {
+            if o["negative"].as_bool() != Some(sign == 1)
+                || o["indexed_coefficient"].as_i64() != Some(if sign == 0 { 1 } else { -1 })
+            {
+                return Err("orientation role".into());
+            }
+            let raw = point(&f, &o["point"])?;
+            let (u, v) = raw.as_ref().unwrap();
+            if u != &x
+                || v.is_zero()
+                || !curve.contains(&raw)
+                || curve.times(&raw, 8)? != point(&f, &o["image"])?
+            {
+                return Err("original raw map/curve/eightfold replay".into());
+            }
+            if sign == 0 {
+                if v > &f.sub(&z(), v) {
+                    return Err("canonical sign".into());
+                }
+                prior_y = Some(v.clone());
+            } else if v != &f.sub(&z(), prior_y.as_ref().unwrap()) {
+                return Err("paired sign".into());
+            }
+            let w = f.sub(&z(), &f.mul(u, v));
+            if sign == 0 && number(&f, &p["received_positive"])? != w {
+                return Err("original received role".into());
+            }
+            let evaluation = row(&f, &t, &w);
+            if !eval(&f, &rel, &w).is_zero() || !dot(&f, &evaluation, &g).is_zero() {
+                return Err("received universal residual".into());
+            }
+            emit(
+                out,
+                json!({"kind":"point_control","t":i,"negative":sign==1,"tau":t.to_string(),"w":w.to_string(),"branch":branch,"monic_quartic":enc(&rel),"universal_residual_zero":true,"raw_map_curve_image_replay":true}),
+            )?;
+            matrices[sign].push(evaluation);
+            signed += 1;
+        }
+    }
+    let mut extras = 0;
+    let mut quotient_ranks = vec![];
+    for (sign, matrix) in matrices.iter().enumerate() {
+        kernel_check(&f, matrix, &g)?;
+        let r = reduce(&f, matrix)?;
+        let basis = kernels(&f, &r, COLS);
+        let mut normalized = vec![];
+        for v in &basis {
+            kernel_check(&f, matrix, v)?;
+            let n = normalize(&f, v, &g)?;
+            if n.iter().any(|x| !x.is_zero()) {
+                kernel_check(&f, matrix, &n)?;
+                extras += 1
+            }
+            normalized.push(n)
+        }
+        let qmat: Matrix = matrix.iter().map(|r| r[..PIVOT].to_vec()).collect();
+        let qr = reduce(&f, &qmat)?;
+        if qr.pivots.len() != r.pivots.len() {
+            return Err("quotient rank mismatch".into());
+        }
+        quotient_ranks.push(qr.pivots.len());
+        let cert = if qr.pivots.len() == PIVOT {
+            let minor: Matrix = qr.ids.iter().map(|&i| qmat[i].clone()).collect();
+            let det = determinant_lu(&f, &minor)?;
+            if det.is_zero() || det != determinant_bareiss(&f, &minor)? {
+                return Err("independent determinant mismatch".into());
+            }
+            let inv = f.inv(&det)?;
+            if f.mul(&det, &inv) != one() {
+                return Err("determinant inverse".into());
+            }
+            json!({"original_rows":qr.ids,"minor":enc_matrix(&minor),"determinant":det.to_string(),"determinant_inverse":inv.to_string(),"bareiss_replay":true})
+        } else {
+            json!({"quotient_kernel":kernels(&f,&qr,PIVOT).iter().map(|v|enc(v)).collect::<Vec<_>>()})
+        };
+        let mut corrupt = g.clone();
+        corrupt[0] = f.add(&corrupt[0], &one());
+        if kernel_check(&f, matrix, &corrupt).is_ok() {
+            return Err("corrupt universal accepted".into());
+        }
+        emit(
+            out,
+            json!({"kind":"quotient_case","negative":sign==1,"rows":matrix.len(),"columns":COLS,"rank":r.pivots.len(),"kernel_dimension":basis.len(),"kernel":basis.iter().map(|v|enc(v)).collect::<Vec<_>>(),"normalized_kernel":normalized.iter().map(|v|enc(v)).collect::<Vec<_>>(),"matrix":enc_matrix(matrix),"quotient_columns":PIVOT,"quotient_rank":qr.pivots.len(),"certificate":cert,"corruption_refused":true,"scope":"fixed bounded box only"}),
+        )?;
+    }
+    emit(
+        out,
+        json!({"kind":"complete","parameters":108,"signed_raw_replays":signed,"boxes":2,"signs_not_independent":true,"columns":COLS,"universal_direction":1,"quotient_columns":PIVOT,"quotient_ranks":quotient_ranks,"nonuniversal_normalized_kernel_vectors":extras,"decoder_calls":0,"new_roots":0}),
+    )
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn small_exact_controls() -> Result<()> {
+        controls()?;
+        Ok(())
+    }
+    #[test]
+    fn singular_kernel() -> Result<()> {
+        let f = Field::new(101u32.into())?;
+        let m = vec![vec![one(), 2u32.into()], vec![2u32.into(), 4u32.into()]];
+        let r = reduce(&f, &m)?;
+        assert_eq!(r.pivots.len(), 1);
+        for v in kernels(&f, &r, 2) {
+            kernel_check(&f, &m, &v)?
+        }
+        assert!(determinant_lu(&f, &m)?.is_zero());
+        assert!(determinant_bareiss(&f, &m)?.is_zero());
+        Ok(())
+    }
+    #[test]
+    fn monic_identity_at_fixed_points() -> Result<()> {
+        let f = Field::new(101u32.into())?;
+        for t in [1u32, 2, 7, 19] {
+            let rel = relation(&f, &95u32.into(), &t.into())?;
+            let p = mul(&f, &rel, &[one(), 2u32.into(), 3u32.into()]);
+            let (q, r) = divide_monic(&f, &p, &rel)?;
+            assert_eq!(q, vec![one(), 2u32.into(), 3u32.into()]);
+            assert!(r.is_empty());
+        }
+        Ok(())
+    }
+}

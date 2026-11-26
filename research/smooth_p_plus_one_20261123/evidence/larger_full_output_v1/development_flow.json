@@ -1,0 +1,836 @@
+{
+  "schema": "dickson.development_flow/v1",
+  "scope": "local recorded-output qualification; canonical experiment export not validated",
+  "planned_recovery_suites": 2,
+  "completed_recovery_suites": 2,
+  "planned_recovery_arms": 6,
+  "completed_recovery_arms": 6,
+  "recovered_arms": 1,
+  "incomplete_recovery_arms": 5,
+  "planned_audits": 4,
+  "completed_audits": 4,
+  "excluded": 0,
+  "unrun": 0,
+  "retries": 0,
+  "records_added_to_local_spool": 174,
+  "runs": [
+    {
+      "name": "audit_f127_full",
+      "records": 1,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "arms": [
+            {
+              "complete_queries_checked": 2,
+              "consumed_rows_replayed": 14,
+              "consumer_rank": 9,
+              "draws": 2,
+              "incomplete_queries_preserved": 0,
+              "mode": "Direct",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 17,
+              "scalar": 69,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 7,
+              "consumed_rows_replayed": 10,
+              "consumer_rank": 9,
+              "draws": 7,
+              "incomplete_queries_preserved": 0,
+              "mode": "Refined",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 11,
+              "scalar": 69,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 2,
+              "consumed_rows_replayed": 13,
+              "consumer_rank": 9,
+              "draws": 5,
+              "incomplete_queries_preserved": 3,
+              "mode": "ProductionCofactorMsolve",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 21,
+              "scalar": 69,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            }
+          ],
+          "depth": 4,
+          "format_version": 1,
+          "kind": "account_replay",
+          "limitations": "shared fixture/reference/consumer source; incomplete oracle outputs are not certified; audit work is separate from recorded recovery intervals",
+          "prime": 127,
+          "scope": "post-run exhaustive oracle-set comparison and production-consumer replay; local and unsigned",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "audit_f127_lookup",
+      "records": 1,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "arms": [
+            {
+              "complete_queries_checked": 1,
+              "consumed_rows_replayed": 13,
+              "consumer_rank": 9,
+              "draws": 3,
+              "incomplete_queries_preserved": 0,
+              "mode": "Direct",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 11,
+              "scalar": 69,
+              "singleton_rows": 2,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 4,
+              "consumed_rows_replayed": 9,
+              "consumer_rank": 9,
+              "draws": 7,
+              "incomplete_queries_preserved": 0,
+              "mode": "Refined",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 7,
+              "scalar": 69,
+              "singleton_rows": 3,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 1,
+              "consumed_rows_replayed": 13,
+              "consumer_rank": 9,
+              "draws": 3,
+              "incomplete_queries_preserved": 0,
+              "mode": "ProductionCofactorMsolve",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 11,
+              "scalar": 69,
+              "singleton_rows": 2,
+              "skipped_draws": 0
+            }
+          ],
+          "depth": 4,
+          "format_version": 1,
+          "kind": "account_replay",
+          "limitations": "shared fixture/reference/consumer source; incomplete oracle outputs are not certified; audit work is separate from recorded recovery intervals",
+          "prime": 127,
+          "scope": "post-run exhaustive oracle-set comparison and production-consumer replay; local and unsigned",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "f8191_d4",
+      "records": 96,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 30,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_x_target_disjoint"
+          },
+          "base_size": 7,
+          "calls": 30,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 56,
+            "fp_multiplications": 1642,
+            "group_additions": 61,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 1,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 640,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 4,
+            "dedup_word_comparisons": 0,
+            "dependent": 0,
+            "distinct_rows": 1,
+            "duplicates": 0,
+            "group_equalities_checked": 1,
+            "independent": 1,
+            "input_signed_terms": 4,
+            "mod_n": {
+              "additions": 0,
+              "coefficient_scans": 20,
+              "coefficient_updates": 16,
+              "inversions": 2,
+              "multiplications": 62,
+              "subtractions": 0
+            },
+            "persistent_coefficient_bytes_floor": 144,
+            "rejected": 0,
+            "scalar_replays": 0,
+            "submitted": 1
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 4,
+          "draws": 30,
+          "error": null,
+          "final_scalar_replay": null,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 1,
+            "oracle_rows_returned": 1,
+            "oracle_rows_unconsumed": 0
+          },
+          "incomplete_queries": 0,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "Direct",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": null,
+          "scope": "signed_base_singletons_or_four_distinct_x_target_disjoint",
+          "seed": 781815,
+          "selected": 1,
+          "skipped": 0,
+          "status": "incomplete",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 1660,
+              "base_setup": 4919,
+              "consume_relation": 10064,
+              "consumer_setup": 13885,
+              "final_verification": 0,
+              "input_validation": 6436,
+              "mask_generation": 148031,
+              "oracle_build_solve_extract": 568193,
+              "oracle_setup": 107681,
+              "record_emission": 199897
+            },
+            "total_to_summary_ns": 1146013,
+            "unattributed_ns": 85247
+          }
+        },
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 30,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_coarse_images_target_disjoint"
+          },
+          "base_size": 7,
+          "calls": 30,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 640,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 0,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 640,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 0,
+            "dedup_word_comparisons": 0,
+            "dependent": 0,
+            "distinct_rows": 0,
+            "duplicates": 0,
+            "group_equalities_checked": 0,
+            "independent": 0,
+            "input_signed_terms": 0,
+            "mod_n": {
+              "additions": 0,
+              "coefficient_scans": 0,
+              "coefficient_updates": 0,
+              "inversions": 0,
+              "multiplications": 0,
+              "subtractions": 0
+            },
+            "persistent_coefficient_bytes_floor": 0,
+            "rejected": 0,
+            "scalar_replays": 0,
+            "submitted": 0
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 4,
+          "draws": 30,
+          "error": null,
+          "final_scalar_replay": null,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 0,
+            "oracle_rows_returned": 0,
+            "oracle_rows_unconsumed": 0
+          },
+          "incomplete_queries": 0,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "Refined",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": null,
+          "scope": "signed_base_singletons_or_four_distinct_coarse_images_target_disjoint",
+          "seed": 781815,
+          "selected": 0,
+          "skipped": 0,
+          "status": "incomplete",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 1593,
+              "base_setup": 4152,
+              "consume_relation": 0,
+              "consumer_setup": 9510,
+              "final_verification": 0,
+              "input_validation": 6236,
+              "mask_generation": 307260,
+              "oracle_build_solve_extract": 15544,
+              "oracle_setup": 72097,
+              "record_emission": 124074
+            },
+            "total_to_summary_ns": 592785,
+            "unattributed_ns": 52319
+          }
+        },
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 30,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_x_target_disjoint"
+          },
+          "base_size": 7,
+          "calls": 30,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 56,
+            "fp_multiplications": 1642,
+            "group_additions": 61,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 1,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 640,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 4,
+            "dedup_word_comparisons": 0,
+            "dependent": 0,
+            "distinct_rows": 1,
+            "duplicates": 0,
+            "group_equalities_checked": 1,
+            "independent": 1,
+            "input_signed_terms": 4,
+            "mod_n": {
+              "additions": 0,
+              "coefficient_scans": 20,
+              "coefficient_updates": 16,
+              "inversions": 2,
+              "multiplications": 62,
+              "subtractions": 0
+            },
+            "persistent_coefficient_bytes_floor": 144,
+            "rejected": 0,
+            "scalar_replays": 0,
+            "submitted": 1
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 4,
+          "draws": 30,
+          "error": null,
+          "final_scalar_replay": null,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 1,
+            "oracle_rows_returned": 1,
+            "oracle_rows_unconsumed": 0
+          },
+          "incomplete_queries": 0,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "ProductionCofactorMsolve",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": null,
+          "scope": "signed_base_singletons_or_four_distinct_x_target_disjoint",
+          "seed": 781815,
+          "selected": 1,
+          "skipped": 0,
+          "status": "incomplete",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 6210,
+              "base_setup": 4217,
+              "consume_relation": 11688,
+              "consumer_setup": 10834,
+              "final_verification": 0,
+              "input_validation": 6264,
+              "mask_generation": 259089,
+              "oracle_build_solve_extract": 394466410,
+              "oracle_setup": 45308,
+              "record_emission": 4282821
+            },
+            "total_to_summary_ns": 399576270,
+            "unattributed_ns": 483429
+          }
+        }
+      ]
+    },
+    {
+      "name": "f8191_d5",
+      "records": 74,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 8,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_x_target_disjoint"
+          },
+          "base_size": 14,
+          "calls": 8,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 611,
+            "fp_multiplications": 17555,
+            "group_additions": 659,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 15,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 668,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 60,
+            "dedup_word_comparisons": 294,
+            "dependent": 0,
+            "distinct_rows": 15,
+            "duplicates": 0,
+            "group_equalities_checked": 15,
+            "independent": 15,
+            "input_signed_terms": 60,
+            "mod_n": {
+              "additions": 1,
+              "coefficient_scans": 611,
+              "coefficient_updates": 907,
+              "inversions": 30,
+              "multiplications": 1598,
+              "subtractions": 558
+            },
+            "persistent_coefficient_bytes_floor": 3840,
+            "rejected": 0,
+            "scalar_replays": 1,
+            "submitted": 15
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 5,
+          "draws": 8,
+          "error": null,
+          "final_scalar_replay": true,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 15,
+            "oracle_rows_returned": 19,
+            "oracle_rows_unconsumed": 4
+          },
+          "incomplete_queries": 0,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "Direct",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": 4356,
+          "scope": "signed_base_singletons_or_four_distinct_x_target_disjoint",
+          "seed": 781815,
+          "selected": 15,
+          "skipped": 0,
+          "status": "recovered",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 840,
+              "base_setup": 11718,
+              "consume_relation": 125438,
+              "consumer_setup": 16870,
+              "final_verification": 2159,
+              "input_validation": 6280,
+              "mask_generation": 40536,
+              "oracle_build_solve_extract": 694229,
+              "oracle_setup": 151621,
+              "record_emission": 118555
+            },
+            "total_to_summary_ns": 1333152,
+            "unattributed_ns": 164906
+          }
+        },
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 30,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_coarse_images_target_disjoint"
+          },
+          "base_size": 14,
+          "calls": 30,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 374,
+            "fp_multiplications": 10769,
+            "group_additions": 403,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 9,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 668,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 36,
+            "dedup_word_comparisons": 104,
+            "dependent": 0,
+            "distinct_rows": 9,
+            "duplicates": 0,
+            "group_equalities_checked": 9,
+            "independent": 9,
+            "input_signed_terms": 36,
+            "mod_n": {
+              "additions": 0,
+              "coefficient_scans": 338,
+              "coefficient_updates": 354,
+              "inversions": 18,
+              "multiplications": 768,
+              "subtractions": 116
+            },
+            "persistent_coefficient_bytes_floor": 2304,
+            "rejected": 0,
+            "scalar_replays": 0,
+            "submitted": 9
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 5,
+          "draws": 30,
+          "error": null,
+          "final_scalar_replay": null,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 9,
+            "oracle_rows_returned": 9,
+            "oracle_rows_unconsumed": 0
+          },
+          "incomplete_queries": 0,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "Refined",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": null,
+          "scope": "signed_base_singletons_or_four_distinct_coarse_images_target_disjoint",
+          "seed": 781815,
+          "selected": 9,
+          "skipped": 0,
+          "status": "incomplete",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 13528,
+              "base_setup": 9328,
+              "consume_relation": 542188,
+              "consumer_setup": 9462,
+              "final_verification": 0,
+              "input_validation": 6284,
+              "mask_generation": 237605,
+              "oracle_build_solve_extract": 26061013156,
+              "oracle_setup": 71877,
+              "record_emission": 2316346
+            },
+            "total_to_summary_ns": 26065484898,
+            "unattributed_ns": 1265124
+          }
+        },
+        {
+          "accounting": "local_development_only",
+          "base_lookup": {
+            "checks": 30,
+            "hits": 0,
+            "lookup": "public affine point in the signed BTreeMap; its construction is included in base_setup",
+            "oracle_scope": "four_distinct_x_target_disjoint"
+          },
+          "base_size": 14,
+          "calls": 30,
+          "consumer_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 668,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_interval": "canonicalization, equality replay, dedup, rank, linear algebra and consumer scalar replay",
+          "consumer_rank": 0,
+          "consumer_setup_arithmetic": {
+            "extraction_nodes": 0,
+            "fp_inversions": 21,
+            "fp_multiplications": 668,
+            "group_additions": 23,
+            "polynomial_evaluations": 0,
+            "scalar_inversions": 0,
+            "scalar_multiplications": 0
+          },
+          "consumer_work": {
+            "canonical_signed_terms": 0,
+            "dedup_word_comparisons": 0,
+            "dependent": 0,
+            "distinct_rows": 0,
+            "duplicates": 0,
+            "group_equalities_checked": 0,
+            "independent": 0,
+            "input_signed_terms": 0,
+            "mod_n": {
+              "additions": 0,
+              "coefficient_scans": 0,
+              "coefficient_updates": 0,
+              "inversions": 0,
+              "multiplications": 0,
+              "subtractions": 0
+            },
+            "persistent_coefficient_bytes_floor": 0,
+            "rejected": 0,
+            "scalar_replays": 0,
+            "submitted": 0
+          },
+          "counter_scope": "partial consumer counters; not a total arithmetic price",
+          "depth": 5,
+          "draws": 30,
+          "error": null,
+          "final_scalar_replay": null,
+          "format_version": 3,
+          "full_output": {
+            "oracle_rows_consumed": 0,
+            "oracle_rows_returned": 0,
+            "oracle_rows_unconsumed": 0
+          },
+          "incomplete_queries": 30,
+          "kind": "account_summary",
+          "max_draws": 30,
+          "mode": "ProductionCofactorMsolve",
+          "prime": 8191,
+          "query_budget_ms": 3000,
+          "rank_coordinates": "base coefficients plus the target scalar",
+          "relation_policy": "all_until_recovery",
+          "scalar": null,
+          "scope": "signed_base_singletons_or_four_distinct_x_target_disjoint",
+          "seed": 781815,
+          "selected": 0,
+          "skipped": 0,
+          "status": "incomplete",
+          "wall": {
+            "excludes": "summary serialization and process teardown; parent receipt includes both",
+            "phase_ns": {
+              "base_lookup": 14506,
+              "base_setup": 11836,
+              "consume_relation": 0,
+              "consumer_setup": 11629,
+              "final_verification": 0,
+              "input_validation": 6768,
+              "mask_generation": 195854,
+              "oracle_build_solve_extract": 90199989979,
+              "oracle_setup": 149863,
+              "record_emission": 22265763
+            },
+            "total_to_summary_ns": 90224358946,
+            "unattributed_ns": 1712748
+          }
+        }
+      ]
+    },
+    {
+      "name": "audit_f8191_d4",
+      "records": 1,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "arms": [
+            {
+              "complete_queries_checked": 30,
+              "consumed_rows_replayed": 1,
+              "consumer_rank": 1,
+              "draws": 30,
+              "incomplete_queries_preserved": 0,
+              "mode": "Direct",
+              "recovery_status": "incomplete",
+              "returned_rows_checked": 1,
+              "scalar": null,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 30,
+              "consumed_rows_replayed": 0,
+              "consumer_rank": 0,
+              "draws": 30,
+              "incomplete_queries_preserved": 0,
+              "mode": "Refined",
+              "recovery_status": "incomplete",
+              "returned_rows_checked": 0,
+              "scalar": null,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 30,
+              "consumed_rows_replayed": 1,
+              "consumer_rank": 1,
+              "draws": 30,
+              "incomplete_queries_preserved": 0,
+              "mode": "ProductionCofactorMsolve",
+              "recovery_status": "incomplete",
+              "returned_rows_checked": 1,
+              "scalar": null,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            }
+          ],
+          "depth": 4,
+          "format_version": 1,
+          "kind": "account_replay",
+          "limitations": "shared fixture/reference/consumer source; incomplete oracle outputs are not certified; audit work is separate from recorded recovery intervals",
+          "prime": 8191,
+          "scope": "post-run exhaustive oracle-set comparison and production-consumer replay; local and unsigned",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "audit_f8191_d5",
+      "records": 1,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "summaries": [
+        {
+          "arms": [
+            {
+              "complete_queries_checked": 8,
+              "consumed_rows_replayed": 15,
+              "consumer_rank": 15,
+              "draws": 8,
+              "incomplete_queries_preserved": 0,
+              "mode": "Direct",
+              "recovery_status": "recovered",
+              "returned_rows_checked": 19,
+              "scalar": 4356,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 30,
+              "consumed_rows_replayed": 9,
+              "consumer_rank": 9,
+              "draws": 30,
+              "incomplete_queries_preserved": 0,
+              "mode": "Refined",
+              "recovery_status": "incomplete",
+              "returned_rows_checked": 9,
+              "scalar": null,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            },
+            {
+              "complete_queries_checked": 0,
+              "consumed_rows_replayed": 0,
+              "consumer_rank": 0,
+              "draws": 30,
+              "incomplete_queries_preserved": 30,
+              "mode": "ProductionCofactorMsolve",
+              "recovery_status": "incomplete",
+              "returned_rows_checked": 0,
+              "scalar": null,
+              "singleton_rows": 0,
+              "skipped_draws": 0
+            }
+          ],
+          "depth": 5,
+          "format_version": 1,
+          "kind": "account_replay",
+          "limitations": "shared fixture/reference/consumer source; incomplete oracle outputs are not certified; audit work is separate from recorded recovery intervals",
+          "prime": 8191,
+          "scope": "post-run exhaustive oracle-set comparison and production-consumer replay; local and unsigned",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

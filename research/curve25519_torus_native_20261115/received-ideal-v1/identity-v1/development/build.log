@@ -1,0 +1,19 @@
+   Compiling received-branch-identity-certificate v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/identity-v1)
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:380:24
+    |
+380 |     format!("IDC1h{}", hex::encode(&h[..8]))
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../../src/cryptanalysis/identity_certificate.rs:434:5
+    |
+434 |     hex::encode(sha256(&buf))
+    |     ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `received-branch-identity-certificate` (bin "received-branch-identity-certificate") due to 2 previous errors

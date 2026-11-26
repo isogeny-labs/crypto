@@ -1,0 +1,12 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.3", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#355a7a", fontname="Helvetica", fontsize=11];
+  edge [color="#52616b", arrowsize=0.7];
+  source [label="Qualified source\nCanonical forms + semantic guard"];
+  admission [label="Required before launch\nProtocol + image + checkpoint\nAccess + capacity + budget", fillcolor="#fff2d7"];
+  panels [label="Three fixed panels\n13 targets / 26 planned answers"];
+  full [label="Complete signed sets\nCompare every answer to Direct", fillcolor="#e7f3e7"];
+  retained [label="Retain all incomplete / bad output\nMismatch stops its panel\nNo automatic retry", fillcolor="#f8e8e8"];
+  source -> admission -> panels -> full;
+  panels -> retained;
+}

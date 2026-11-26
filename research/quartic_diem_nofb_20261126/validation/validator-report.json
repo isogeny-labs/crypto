@@ -1,0 +1,552 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/quartic_diem_nofb_20261126",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "verdict": "validated-with-errata",
+ "validated_commit": "cc7e5c5488a82277131c1dfe9e90d2aa64c54a50",
+ "study_tree": "ffd48ea7ca012552dc9ee5fa93d830881af24310",
+ "report": "the prose report was returned to the dispatching session (subagent hand-back); this file carries its errata and process findings as data",
+ "raw_data": [
+  {
+   "path": "../raw/run.jsonl",
+   "sha256": "b93c0013c22e8a79bf9566eb054bdaca5a6e78bd4a9f58107ac1776880fbd66d"
+  },
+  {
+   "path": "../raw/run131101.jsonl",
+   "sha256": "5286e5680d6dc73429ef565a34e72fc488013eb084584a4655d44c5ee377f1e0"
+  }
+ ],
+ "headline": [
+  {
+   "name": "pooled paired GAE_1.0 nofb/sge, primary_seeds_3_4 (gm, equal weight per prime)",
+   "claimed": 0.8324605695547613,
+   "recomputed": 0.8324605695547613
+  },
+  {
+   "name": "pooled paired GAE_0.1 nofb/sge, primary_seeds_3_4 (gm, equal weight per prime)",
+   "claimed": 0.8326009800723707,
+   "recomputed": 0.8326009800723707
+  },
+  {
+   "name": "pooled paired GAE_0.0 nofb/sge, primary_seeds_3_4 (gm, equal weight per prime)",
+   "claimed": 0.9970757056957934,
+   "recomputed": 0.9970757056957934
+  },
+  {
+   "name": "pooled paired la_total nofb/sge, primary_seeds_3_4",
+   "claimed": 0.7866022989335828,
+   "recomputed": 0.7866022989335828
+  },
+  {
+   "name": "pooled paired native_all nofb/sge, primary_seeds_3_4",
+   "claimed": 0.83244495024993,
+   "recomputed": 0.83244495024993
+  },
+  {
+   "name": "pooled paired GAE_1.0 nofb/sge, all_seeds_1_4 (gm, equal weight per prime)",
+   "claimed": 0.825858683349888,
+   "recomputed": 0.825858683349888
+  },
+  {
+   "name": "pooled paired GAE_0.1 nofb/sge, all_seeds_1_4 (gm, equal weight per prime)",
+   "claimed": 0.8260129018198628,
+   "recomputed": 0.8260129018198628
+  },
+  {
+   "name": "pooled paired GAE_0.0 nofb/sge, all_seeds_1_4 (gm, equal weight per prime)",
+   "claimed": 0.9971710350309705,
+   "recomputed": 0.9971710350309705
+  },
+  {
+   "name": "pooled paired la_total nofb/sge, all_seeds_1_4",
+   "claimed": 0.7756487860372705,
+   "recomputed": 0.7756487860372705
+  },
+  {
+   "name": "pooled paired native_all nofb/sge, all_seeds_1_4",
+   "claimed": 0.8258415259545852,
+   "recomputed": 0.8258415259545852
+  },
+  {
+   "name": "paired gae_1.0 nofb/sge p=4099, all seeds (gm over 5 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0
+  },
+  {
+   "name": "paired la_total nofb/sge p=4099, all seeds (gm over 5 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0
+  },
+  {
+   "name": "paired gae_1.0 nofb/sge p=16411, all seeds (gm over 5 curves)",
+   "claimed": 0.682964096324912,
+   "recomputed": 0.682964096324912
+  },
+  {
+   "name": "paired la_total nofb/sge p=16411, all seeds (gm over 5 curves)",
+   "claimed": 0.5924454630086363,
+   "recomputed": 0.5924454630086363
+  },
+  {
+   "name": "paired gae_1.0 nofb/sge p=65537, all seeds (gm over 5 curves)",
+   "claimed": 0.9026521594736758,
+   "recomputed": 0.9026521594736758
+  },
+  {
+   "name": "paired la_total nofb/sge p=65537, all seeds (gm over 5 curves)",
+   "claimed": 0.8723982024712642,
+   "recomputed": 0.8723982024712642
+  },
+  {
+   "name": "paired gae_1.0 nofb/sge p=131101, all seeds (gm over 5 curves)",
+   "claimed": 0.7545789036102941,
+   "recomputed": 0.7545789036102941
+  },
+  {
+   "name": "paired la_total nofb/sge p=131101, all seeds (gm over 5 curves)",
+   "claimed": 0.7003212886923349,
+   "recomputed": 0.7003212886923349
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=4099 w=0.0",
+   "claimed": 0.0025081097327793412,
+   "recomputed": 0.0025081097327793412
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=16411 w=0.0",
+   "claimed": 0.0008448664771146391,
+   "recomputed": 0.0008448664771146391
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=65537 w=0.0",
+   "claimed": 0.00030804398952937687,
+   "recomputed": 0.00030804398952937687
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=131101 w=0.0",
+   "claimed": 0.00016998766261717253,
+   "recomputed": 0.00016998766261717253
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=4099 w=0.1",
+   "claimed": 0.8857130850573212,
+   "recomputed": 0.8857130850573212
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=16411 w=0.1",
+   "claimed": 0.7559468190340253,
+   "recomputed": 0.7559468190340253
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=65537 w=0.1",
+   "claimed": 0.2980522618654119,
+   "recomputed": 0.2980522618654119
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=131101 w=0.1",
+   "claimed": 0.2631606278451402,
+   "recomputed": 0.2631606278451402
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=4099 w=1.0",
+   "claimed": 8.833443028251784,
+   "recomputed": 8.833443028251784
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=16411 w=1.0",
+   "claimed": 7.551347115734903,
+   "recomputed": 7.551347115734903
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=65537 w=1.0",
+   "claimed": 2.9774856228519075,
+   "recomputed": 2.9774856228519075
+  },
+  {
+   "name": "IC/ideal neg. rho sge p=131101 w=1.0",
+   "claimed": 2.6299004659708833,
+   "recomputed": 2.6299004659708833
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=0.0",
+   "claimed": 0.0025081097327793412,
+   "recomputed": 0.0025081097327793412
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=0.0",
+   "claimed": 0.0008374521312255298,
+   "recomputed": 0.0008374521312255298
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=0.0",
+   "claimed": 0.00030774452758075115,
+   "recomputed": 0.00030774452758075115
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=0.0",
+   "claimed": 0.0001697252702911615,
+   "recomputed": 0.0001697252702911615
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=0.1",
+   "claimed": 0.8857130850573212,
+   "recomputed": 0.8857130850573212
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=0.1",
+   "claimed": 0.5165325576868444,
+   "recomputed": 0.5165325576868444
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=0.1",
+   "claimed": 0.26905739631271547,
+   "recomputed": 0.26905739631271547
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=0.1",
+   "claimed": 0.19861372965676133,
+   "recomputed": 0.19861372965676133
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=1.0",
+   "claimed": 8.833443028251784,
+   "recomputed": 8.833443028251784
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=1.0",
+   "claimed": 5.157298958933619,
+   "recomputed": 5.157298958933619
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=1.0",
+   "claimed": 2.687633827269097,
+   "recomputed": 2.687633827269097
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=1.0",
+   "claimed": 1.9844674102165105,
+   "recomputed": 1.9844674102165105
+  },
+  {
+   "name": "runs certified, re-verified with validator arithmetic (RESULTS: 160)",
+   "claimed": 160,
+   "recomputed": 160
+  },
+  {
+   "name": "C0: baseline seeds 1-2 rows identical to the parent's 2lp-sfb-sge rows (RESULTS: 40)",
+   "claimed": 40,
+   "recomputed": 40
+  },
+  {
+   "name": "baseline fallbacks (RESULTS: 16)",
+   "claimed": 16,
+   "recomputed": 16
+  },
+  {
+   "name": "fallback pairs (RESULTS: 15)",
+   "claimed": 15,
+   "recomputed": 15
+  },
+  {
+   "name": "rescues (RESULTS: 0), by the counter",
+   "claimed": 0,
+   "recomputed": 0
+  },
+  {
+   "name": "pairs whose attempts differ (0 implies no rescue, independently of the counter)",
+   "claimed": 0,
+   "recomputed": 0
+  },
+  {
+   "name": "nofb skipped fallbacks (RESULTS: 16)",
+   "claimed": 16,
+   "recomputed": 16
+  },
+  {
+   "name": "fallback-pair la ratio nofb/sge, minimum (RESULTS: 20.2%)",
+   "claimed": 0.20229603154112658,
+   "recomputed": 0.20229603154112658
+  },
+  {
+   "name": "fallback-pair la ratio nofb/sge, maximum (RESULTS: 27.3%)",
+   "claimed": 0.2728250218412682,
+   "recomputed": 0.2728250218412682
+  }
+ ],
+ "checks": {
+  "headline_agreement_1e-9": true,
+  "bootstrap_ci_producer_endpoints_inside_mc_noise": true,
+  "bootstrap_ci_max_rel_diff_vs_exact": 0.006829845118432631,
+  "certificates_independent": {
+   "curves": 20,
+   "curves_all_ok": 20,
+   "rows_checked": 160,
+   "rows_cert_ok": 160
+  },
+  "replay": {
+   "rows_replayed": 268,
+   "rows_bytes_equal": 268,
+   "rows_fields_equal": 268,
+   "runs_replayed": 160,
+   "runs_certified_and_correct": 160,
+   "by_kind_replayed_equal": {
+    "cell": [
+     8,
+     8
+    ],
+    "instance": [
+     20,
+     20
+    ],
+    "run": [
+     160,
+     160
+    ],
+    "skip": [
+     80,
+     80
+    ]
+   },
+   "fallback_runs_replayed": 15,
+   "skip_runs_replayed": 15,
+   "duplicate_replayed_keys": 0,
+   "committed_rows": 268,
+   "committed_rows_covered": 268,
+   "configs_byte_identical": true,
+   "wall_ratio_range": [
+    0.525711267095923,
+    1.630804684776286
+   ]
+  },
+  "integrity_pairs_C0_rescues": true,
+  "pair_identities_all_fields": {
+   "pairs": 80,
+   "violations": [],
+   "nofb_componentwise_dominates_sge": true
+  },
+  "frozen_decision_IMPROVEMENT_reproduced_exact_law": true,
+  "decision_exact_upper95": {
+   "0.0": 0.9983963098963226,
+   "0.1": 0.9077423807095271,
+   "1.0": 0.9076413803730818
+  },
+  "ic_over_rho_every_cell_unresolved": true,
+  "bindings_manifests_binary": true,
+  "binary_to_commit_by_cargo_dep_info": true,
+  "freeze_before_grid_data": true,
+  "analysis_json_byte_reproduced_by_frozen_script_committed_and_replay_raw": true,
+  "structural_counter_identities_and_5a_fields": true,
+  "diag_flag_leaves_committed_fields_unchanged": true,
+  "rescue_mechanism": {
+   "failed_attempts": 32,
+   "failed_attempts_t_determined": 0,
+   "rescue_possible_in_any_failed_attempt": false,
+   "by_seed_panel": {
+    "seeds_1_2": {
+     "multi_attempt_runs": 16,
+     "failed_attempts": 16,
+     "failed_attempts_t_determined": 0
+    },
+    "seeds_3_4_held_out": {
+     "multi_attempt_runs": 14,
+     "failed_attempts": 16,
+     "failed_attempts_t_determined": 0
+    }
+   }
+  },
+  "documents_displayed_numbers_checked": 38,
+  "documents_rounding_errors": [
+   [
+    "RESULTS.md",
+    32,
+    [
+     "0.833",
+     "0.758",
+     "0.907"
+    ],
+    [
+     "0.832",
+     "0.758",
+     "0.907"
+    ]
+   ],
+   [
+    "RESULTS.md",
+    52,
+    [
+     "0.833"
+    ],
+    [
+     "0.832"
+    ]
+   ],
+   [
+    "RESULTS.md",
+    60,
+    [
+     "0.269",
+     "0.264",
+     "0.275"
+    ],
+    [
+     "0.269",
+     "0.263",
+     "0.275"
+    ]
+   ],
+   [
+    "RESULTS.md",
+    61,
+    [
+     "0.199",
+     "0.184",
+     "0.217"
+    ],
+    [
+     "0.199",
+     "0.184",
+     "0.216"
+    ]
+   ],
+   [
+    "report.typ",
+    20,
+    [
+     "0.833",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ],
+    [
+     "0.832",
+     "0.758",
+     "0.907",
+     "0.826",
+     "0.773",
+     "0.881"
+    ]
+   ]
+  ]
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "where": [
+    "RESULTS.md:32",
+    "RESULTS.md:52",
+    "reports/run-20261126T0333Z/report.typ:20 (and report.pdf)",
+    "benchmarks/records/20261126T0333Z-quartic-diem-nofb.json summary",
+    "subject of commit cc7e5c5488a"
+   ],
+   "displayed": "0.833",
+   "correct": "0.832",
+   "value": 0.8324605695547613,
+   "text": "The held-out pooled paired GAE_1 ratio nofb/sge is 0.8324606; rounded once it is 0.832. 0.833 is a double rounding (0.83246 -> 0.8325 -> 0.833). Cite 0.832 [0.758, 0.907]. The bench record's metric value is correct.",
+   "confirmed_by_check": true
+  },
+  {
+   "id": "E2",
+   "where": [
+    "RESULTS.md:60"
+   ],
+   "displayed": "[0.264, 0.275]",
+   "correct": "[0.263, 0.275]",
+   "value": [
+    0.2634979809379867,
+    0.27473410708074764
+   ],
+   "text": "nofb IC/rho w = 0.1 at p = 65537: lower end 0.2634980 rounds to 0.263",
+   "confirmed_by_check": true
+  },
+  {
+   "id": "E3",
+   "where": [
+    "RESULTS.md:61"
+   ],
+   "displayed": "[0.184, 0.217]",
+   "correct": "[0.184, 0.216]",
+   "value": [
+    0.18370261450533565,
+    0.21648645915387113
+   ],
+   "text": "nofb IC/rho w = 0.1 at p = 131101: upper end 0.2164865 rounds to 0.216",
+   "confirmed_by_check": true
+  },
+  {
+   "id": "E4",
+   "where": [
+    "RESULTS.md:69",
+    "reports/run-20261126T0333Z/report.typ:36"
+   ],
+   "displayed": "about twice / about double",
+   "correct": "1.50-1.90x (two-attempt runs); 2.25x (the one three-attempt run)",
+   "value": {
+    "two_attempt_range": [
+     1.5043226702996144,
+     1.9002646838331405
+    ],
+    "three_attempt": [
+     2.2495164970626873
+    ]
+   },
+   "text": "GAE_1 of each multi-attempt nofb run over the geometric mean of the same curve's single-attempt nofb runs"
+  },
+  {
+   "id": "E5",
+   "where": [
+    "analysis.json:835",
+    "analyze.py:218",
+    "analyze.py:201"
+   ],
+   "displayed": "PROTOCOL.md section 6",
+   "correct": "PROTOCOL.md section 5",
+   "text": "the decision rule is PROTOCOL.md section 5 (section 6 is Outputs); RESULTS.md:26 cites section 5"
+  }
+ ],
+ "process_findings": [
+  {
+   "id": "P1",
+   "text": "section 13 artifact store: raw/run.jsonl (254,691 B) and raw/run131101.jsonl (89,012 B) are .jsonl over 64 KiB committed to Git, no .artifacts.json, bench record raw uploaded=false; the binary lives only at a scratch path (binary.sha256)"
+  },
+  {
+   "id": "P2",
+   "text": "section 5a w_cal is not recorded; the pair's order does not depend on it: nofb is no costlier than sge in every counted component on all 80 pairs, so the order holds at every w >= 0, including w_cal and 10 w_cal"
+  },
+  {
+   "id": "P3",
+   "text": "section 3a cost chain not written in RESULTS.md; its premise holds: the only differing fields on the 15 fallback pairs are the fallback's Wiedemann splits (spmv, bm, vec), its failed certificate (group_ops, cantor_mul, cantor_inv) and the two fallback counters"
+  },
+  {
+   "id": "P4",
+   "text": "frozen analyze.py: C0 reads with .get; completeness against the seeds.json panel is not checked; the pair-identity check compares a subset of fields; IC/rho uses runs.get. No effect here: 160 of 160 runs present, every key exists, all fields equal on the 65 no-fallback pairs"
+  },
+  {
+   "id": "P5",
+   "text": "seeds.json against docs/experiment-seeds.md: master_seed is null; two seeded streams on the study path are not listed (BSGS order computation, quartic_ladder.rs:1241, curve_seed ^ 0xB5B5_0DD5_0DD5_B5B5; sampled factor base, quartic_ladder.rs:1888, 0x5AFB_0000_0000_0000 ^ q); the solver stream StdRng::seed_from_u64(solver_seed) is not keyed by instance or domain-separated (declared as inherited); derived seeds are not retained. Pairing and arm exclusion are correct and the replay is byte-identical"
+  },
+  {
+   "id": "P6",
+   "text": "bench record: commit 8bc5537a844 with commit_dirty true (the record was opened 9 s before the freeze commit); the driver run_all.sh ran uncommitted and was committed 51 s after the run started (a8fa56ebb34); it is not frozen and only calls the frozen scripts"
+  },
+  {
+   "id": "P7",
+   "text": "unit test sfb_sge_nofb_pairs_with_sge met no fallback (producer's log: 24 cases, 0 fallbacks), so its fallback branch is untested by the test; PROTOCOL section 5 discloses this and the grid check covers 15 fallback pairs. The validator ran no cargo test (no builds)"
+  }
+ ],
+ "scripts": [
+  "replay.sh",
+  "compare_replay.py",
+  "verify_certificates.py",
+  "picarith.py",
+  "recompute.py",
+  "checks_extra.py",
+  "diag.sh",
+  "diag_check.py",
+  "build_gate_artifacts.py"
+ ],
+ "label": "[pcc:unverified] (no pcc claim was created by the validator)"
+}

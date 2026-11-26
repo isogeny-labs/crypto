@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T03:02:39Z",
+ "id": "PCC-20261125-475c5c",
+ "kind": "execution",
+ "producer": {
+  "commit": "55f8d14f3b5fb1c997740ce8952360c2a31535e6",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/semantic_guard_v1/feature_tests_1.txt",
+    "sha256": "2a35c0c229329aded4233eda6a2e5569fb47d3b6665cca295b930f235cf5135d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/semantic_guard_v1/default_tests_1.txt",
+    "sha256": "1db260a23915d736c5031df9a7efbd0b3d49b1f7367ee49ca0a6a803071661ca"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/semantic_guard_v1/build_1.txt",
+    "sha256": "bbe5471fc7fe3a88248f662158e92300fa1457f1a69a2052289195f66ef18a11"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/semantic_guard_v1/build_identity.json",
+    "sha256": "7c3563e4b670a73968e44204b5f23ba22f1e685ddccda124660c4f68d789399e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-semantic-guard",
+ "statement": "At source 55f8d14f3b5fb1c997740ce8952360c2a31535e6, both fixed-form callers use zero-free serialization and a deadline-bounded complete-equation polynomial-residue check before signed extraction. The feature suite passes sixty tests, the overlapping default suite passes thirty-two, and the release build succeeds. Saved-output and stub-solver controls reject the retained form/equation failures while preserving raw output and stopping without extra semantic retries. Empty solver markers remain explicitly unchecked. No corrected-policy scientific msolve panel or performance comparison is included."
+}

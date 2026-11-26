@@ -982,6 +982,36 @@ pub struct PkmSemaevOracle {
 }
 
 impl PkmSemaevOracle {
+    /// Record which normalized projective chart supplied an exact, signed
+    /// relation. Classification is made from the lifted points, not from an
+    /// algebraic root alone: the first two summands reach `(1:0)` exactly
+    /// when they are inverses. The zero-valued invalid-row counter is
+    /// materialized as well so evidence consumers need not interpret a
+    /// missing key as a successful verification.
+    fn record_projective_chart(
+        &mut self,
+        curve: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        idx: &[usize],
+    ) {
+        if self.mode != PkmMode::Projective || idx.len() != 3 {
+            return;
+        }
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        let p = curve.p;
+        let a = fb.points[idx[0]];
+        let b = fb.points[idx[1]];
+        let identity = !a.infinity && !b.infinity && a.x == b.x && addm(a.y, b.y, p) == 0;
+        self.bump(
+            if identity {
+                "pkm_projective_identity_chart_hits"
+            } else {
+                "pkm_projective_affine_chart_hits"
+            },
+            1,
+        );
+    }
+
     /// `m` summands over the Kummer tower `g·μ_{2^t}`.
     pub fn new(m: u32, t: u32, g: u64) -> Self {
         PkmSemaevOracle {
@@ -1315,6 +1345,9 @@ impl PkmSemaevOracle {
                 "pkm-semaev: guess = {} must be below the tower height {} and at most 12",
                 self.guess, self.t
             ));
+        }
+        if self.mode == PkmMode::Projective && self.m != 3 {
+            return Err("pkm-semaev: projective mode currently needs m=3".into());
         }
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
@@ -3284,6 +3317,7 @@ impl PkmSemaevOracle {
                     any = true;
                     if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                         if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                            self.record_projective_chart(curve, fb, &idx);
                             if i != 0 {
                                 self.bump("pkm_lift_hits_nonidentity", 1);
                             }
@@ -3302,6 +3336,7 @@ impl PkmSemaevOracle {
                     any = true;
                     if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                         if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                            self.record_projective_chart(curve, fb, &idx);
                             if i != 0 {
                                 self.bump("pkm_lift_hits_nonidentity", 1);
                             }
@@ -3375,7 +3410,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 2 or 3"),
+            ("m", "summands, 2 to the selected mode's maximum"),
             (
                 "mode",
                 "chain (default for m ≥ 3: affine S₃ links), projective (m=3: homogeneous link with identity chart), full (S_(m+1)), or sym (m≤4: elementary-symmetric form)",
@@ -3639,6 +3674,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        if self.mode == PkmMode::Projective {
+            self.native
+                .entry("pkm_projective_affine_chart_hits".into())
+                .or_insert(0);
+            self.native
+                .entry("pkm_projective_identity_chart_hits".into())
+                .or_insert(0);
+        }
         if !self.in_lift {
             self.shared_pts.clear();
             if let Some(ks) = self
@@ -4065,6 +4109,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                 if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
+                    self.record_projective_chart(curve, fb, &idx);
                     return Some(idx);
                 }
             }

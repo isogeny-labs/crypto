@@ -1,0 +1,102 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.73in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,booktabs,xcolor,hyperref}
+\definecolor{ink}{HTML}{253C59}
+\hypersetup{colorlinks=true,urlcolor=ink,linkcolor=ink}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+{\Large\bfseries\color{ink} Complete-model replay for Curve25519 spectra}\par
+{\small 23 November 2026 \quad Native adapter; one capped public-target attempt}
+
+\textbf{Implemented.} A separate Rust adapter consumes the unchanged compact
+spectrum compiler. Its solve API takes only public parameters, $R$, $Q=[8]R$,
+backend identity and declared limits. It sends complete field equations and
+requests every semantic input only after SAT. Known coefficients, labels,
+signs, scalars and witness fixtures are absent from this query API.
+
+\textbf{Candidate acceptance.} Strict model grammar checks the exact binding
+set, duplicates, modulus and canonical values. The adapter re-evaluates every
+gate and verifies every constraint. It derives the coefficients and labels,
+then applies the unchanged numeric support and original local sign/index/group
+replay. Only a candidate passing every stage becomes a checked relation.
+Parser/constraint refusal and unsupported projection remain scoped to that
+candidate. [pcc:PCC-20261123-ab3e5b]
+
+\begin{center}
+\begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+\toprule
+Fixed development control & Observed outcome\\
+\midrule
+12 supplied complete model responses & Full gate/original replay passes; zero-inverse variants refuse. These are synthetic responses.\\
+Native two-input quadratic, F101 & SAT model passes independent native gate check.\\
+Inconsistent variant & UNSAT; no get-value request sent.\\
+Bounded native output & Truncation explicit; process refuses.\\
+Public section, p101/q3/k8 & Backend reports timeout at the frozen 5000ms resource limit; no model.\\
+\bottomrule
+\end{tabular}
+\end{center}
+The resource limit is not a measured solver rate. The native output-cap
+control retains its declared bounded capture, not a full uncapped response.
+[pcc:PCC-20261123-ab3e5b]
+
+\textbf{The public curve query.} Fixed $R=(89,27)$, $Q=[8]R$; 3511 variables,
+3519 quadratic equations and 44 semantic inputs. No supplied unknown enters
+the query. Captured stderr says \texttt{cvc5 interrupted by timeout.}
+The later pipe write refuses; get-value is not sent. The adapter records a
+resource/backend refusal. No root or target-absence certificate results;
+there is no retry. [pcc:PCC-20261123-ab3e5b]
+
+\textbf{Evidence.} Three focused release tests, rustfmt and strict all-target
+Clippy pass locally. Composite source identity: unchanged 76-input compiler
+archive plus new 9-input delta, all 85 source hashes checked; seven compiled-in
+new crate hashes. Distinct write-once build/precall/postcall records and
+matching retained executable pre/post hashes. Full captured native streams,
+including exact queries, roundtrip through one 37368-byte archive. All producer
+standing is unsigned/unverified. [pcc:PCC-20261123-ab3e5b]
+
+\newpage
+{\large\bfseries\color{ink} What remains to change the solver cost}
+\begin{center}\includegraphics[width=\linewidth]{diagram.pdf}\end{center}
+
+\textbf{Established interface, open operation.} Complete model extraction and
+original projection are available. The synthetic model controls establish
+those interfaces; they are not root discovery. The only public curve query
+ended at its declared cap. It gives no lower bound, general failure result,
+scaling fit or attack exponent. UNSAT without an independently checked
+certificate also remains an observation. [pcc:unverified]
+
+\textbf{Next comparison.} Build an independent direct-point adapter on the
+same public target with all original equations and witness replay. The old
+actual-field original point representation already has 1059 replay values;
+the compact coefficient export has 15231 variables. Size alone chooses no
+solver. Comparative campaigns require a newly frozen complete-cost protocol
+and the authorized EKS route; no campaign or paid worker is running here.
+
+\textbf{Next algorithmic object.} Specify a block-specific elimination step
+between the quotient/Chebyshev computation and the six characteristic
+coefficients, with exact interface equations, extension/projection and full
+work charged. Classical BitSplit separates bit sums from nonlinear equations;
+it does not supply this block elimination automatically. Rank six of the
+candidate quotient is not a coefficient solution-ideal dimension bound.
+Increasing a generic cap supplies no such operation. [pcc:unverified]
+
+\textbf{Interpretation discipline.} Resource/backend refusal, unknown, invalid
+model and projection refusal remain distinct. The complete stderr and pipe
+symptom are preserved; v1 does not record or infer the native signal number.
+All old source/proof/criteria and published histories remain byte-equal.
+The old 8d8628 record remedy, journal conflict and five previous selected
+artifact migrations are separate open dependencies; this component introduces
+no exemption, record rewrite or fabricated receipt.
+
+\textbf{Sources and fidelity.} Native statement PCC-20261123-ab3e5b;
+\par Evidence map: \texttt{PROTOCOL.md} and \texttt{SOURCE\_QUALIFICATION.json}.\par
+Raw inventory: \texttt{native-v1/RAW\_MANIFEST.json}.\par
+No new Lean endpoint or formal compiler /
+group / cost theorem is claimed. Ozdemir et al., \emph{Split Gr\"obner Bases for
+Satisfiability Modulo Finite Fields}, CAV 2024, \S\S4--5,
+\href{https://theory.stanford.edu/~barrett/pubs/OPB+24.pdf}{author PDF};
+\href{https://cvc5.github.io/docs/cvc5-1.4.2/theories/finite_field.html}{cvc5 theory reference}
+and pinned options. KB unavailable (wrapper127/no connector); repository
+source plus primary paper/docs supplied the bounded review. No novelty is
+claimed for the established solver or algebraic primitives.
+\end{document}

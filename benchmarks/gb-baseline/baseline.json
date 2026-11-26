@@ -1,14 +1,14 @@
 {
   "host": {
-    "commit": "476d2d1e98f46d5527903036a3957c3ef319a7af",
-    "cpu": "AMD EPYC 7763 64-Core Processor",
+    "commit": "c6b8dd6aff5a39c3625702685c2359d58bf63a74",
+    "cpu": "AMD EPYC 9V45 96-Core Processor",
     "cpus": 4,
     "host": "runnervm0hi8g",
     "python": "3.12.16",
     "ref": "refs/heads/main",
-    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45786820917",
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45784842229",
     "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
-    "utc": "2026-11-26T09:13:16Z"
+    "utc": "2026-11-26T08:49:30Z"
   },
   "rows": [
     {
@@ -25,7 +25,7 @@
       "solving_degree_max": 4,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.002073346
+      "wall_s": 0.001435452
     },
     {
       "N": 6,
@@ -34,14 +34,14 @@
       "cost": 1845432,
       "cost_unit": "multiply-adds (F_p elimination)",
       "curve": "M31",
-      "elapsed_s": 0.032,
+      "elapsed_s": 0.016,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 3,
       "solving_degree_max": 5,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.019140347
+      "wall_s": 0.011813114
     },
     {
       "N": 8,
@@ -50,19 +50,19 @@
       "cost": 214289944,
       "cost_unit": "multiply-adds (F_p elimination)",
       "curve": "M31",
-      "elapsed_s": 0.265,
+      "elapsed_s": 0.164,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 4,
       "solving_degree_max": 6,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.219395171
+      "wall_s": 0.132882426
     },
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 5 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m5.jsonl",
       "curve": "M31",
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.001,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 5,
@@ -102,7 +102,7 @@
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 9 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m9.jsonl",
       "curve": "M31",
-      "elapsed_s": 0.002,
+      "elapsed_s": 0.001,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 9,
@@ -117,11 +117,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 193172,
+        "build_ns": 136075,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 1011,
+        "reduce_ns": 901,
         "reductions": 4,
         "splits": 0
       },
@@ -132,7 +132,7 @@
       "matrix_cols": 144,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.000613607
+      "wall_s": 0.000430738
     },
     {
       "answer_digest": "10055e840b7b42c7",
@@ -142,22 +142,22 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 167028722,
+        "build_ns": 102864402,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 1796293,
+        "reduce_ns": 1257875,
         "reductions": 568,
         "splits": 248
       },
-      "elapsed_s": 0.214,
+      "elapsed_s": 0.164,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 3,
       "matrix_cols": 443700,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.186646665
+      "wall_s": 0.116510385
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -182,7 +182,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.3544e-05
+      "wall_s": 1.6004e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -200,14 +200,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.003,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 5,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.9817e-05
+      "wall_s": 1.5374e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -225,14 +225,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.003,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 6,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.9156e-05
+      "wall_s": 1.3941e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -250,14 +250,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.003,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 7,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.9055e-05
+      "wall_s": 1.5984e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -275,14 +275,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.003,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 8,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.156e-05
+      "wall_s": 2.1412e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -300,14 +300,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.003,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 9,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.2612e-05
+      "wall_s": 1.963e-05
     }
   ],
   "schema": "gb-baseline.baseline/v1",

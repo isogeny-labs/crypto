@@ -1,0 +1,68 @@
+ok 1 - complete synthetic custody verifies without executing any payload
+ok 2 - transport rejects self-consistent build manifest: missing_payload
+ok 3 - transport rejects self-consistent build manifest: empty_payload
+ok 4 - transport rejects self-consistent build manifest: missing_metadata
+ok 5 - transport rejects self-consistent build manifest: empty_metadata
+ok 6 - transport rejects self-consistent build manifest: missing_wrapper
+ok 7 - transport rejects self-consistent build manifest: extra_key
+ok 8 - transport rejects self-consistent build manifest: malformed_digest
+ok 9 - transport rejects self-consistent build manifest: bad_schema
+ok 10 - transport rejects self-consistent build manifest: bad_repository
+ok 11 - transport rejects self-consistent build manifest: bad_architecture
+ok 12 - transport rejects self-consistent build manifest: declared_extraction
+ok 13 - transport rejects changed bundled bytes: protocol_bytes
+ok 14 - transport rejects changed bundled bytes: payload_bytes
+ok 15 - transport rejects changed bundled bytes: metadata_bytes
+ok 16 - transport rejects changed bundled bytes: bundle_symlink
+ok 17 - transport rejects actual runtime identity mismatch: job_image
+ok 18 - transport rejects actual runtime identity mismatch: job_name
+ok 19 - transport rejects actual runtime identity mismatch: job_command
+ok 20 - transport rejects actual runtime identity mismatch: job_args
+ok 21 - transport rejects actual runtime identity mismatch: job_retry
+ok 22 - transport rejects actual runtime identity mismatch: job_deadline
+ok 23 - transport rejects actual runtime identity mismatch: job_memory
+ok 24 - transport rejects actual runtime identity mismatch: pod_image
+ok 25 - transport rejects actual runtime identity mismatch: pod_image_id
+ok 26 - transport rejects actual runtime identity mismatch: pod_uid
+ok 27 - transport rejects actual runtime identity mismatch: pod_owner
+ok 28 - transport rejects actual runtime identity mismatch: pod_node
+ok 29 - transport rejects actual runtime identity mismatch: pod_command
+ok 30 - transport rejects actual runtime identity mismatch: pod_args
+ok 31 - transport rejects actual runtime identity mismatch: pod_restart
+ok 32 - transport rejects actual runtime identity mismatch: pod_restart_count
+ok 33 - transport rejects actual runtime identity mismatch: pod_cpu
+ok 34 - transport rejects multiple JSON values in image.json
+ok 35 - transport rejects multiple JSON values in request.json
+ok 36 - transport rejects multiple JSON values in client/result.json
+ok 37 - transport rejects multiple JSON values in launcher/pods.json
+ok 38 - transport rejects multiple JSON values in launcher/manifest.json
+ok 39 - transport rejects multiple JSON values in launcher/result.json
+ok 40 - transport rejects multiple JSON values in launcher/request.json
+ok 41 - transport rejects multiple JSON values in payload/job-exit.json
+ok 42 - transport rejects multiple JSON values in build-info
+ok 43 - transport rejects unsafe/incomplete checksum inventory: parent_path
+ok 44 - transport rejects unsafe/incomplete checksum inventory: absolute_path
+ok 45 - transport rejects unsafe/incomplete checksum inventory: dot_component
+ok 46 - transport rejects unsafe/incomplete checksum inventory: duplicate
+ok 47 - transport rejects unsafe/incomplete checksum inventory: missing_entry
+ok 48 - transport rejects unsafe/incomplete checksum inventory: missing_file
+ok 49 - transport rejects unsafe/incomplete checksum inventory: extra_file
+ok 50 - transport rejects unsafe/incomplete checksum inventory: changed_bytes
+ok 51 - transport rejects unsafe/incomplete checksum inventory: symlink
+ok 52 - four mock call replays pass while independent completeness and cold-cost remain unclaimed
+ok 53 - replay preserves truthful failure/identity outcomes: pre_identity
+ok 54 - replay preserves truthful failure/identity outcomes: pre_stream
+ok 55 - replay preserves truthful failure/identity outcomes: post_failure
+ok 56 - replay preserves truthful failure/identity outcomes: post_stream
+ok 57 - replay preserves truthful failure/identity outcomes: missing_call
+ok 58 - replay preserves truthful failure/identity outcomes: checker_failure
+ok 59 - replay preserves truthful failure/identity outcomes: checker_timeout
+ok 60 - replay preserves truthful failure/identity outcomes: failed_job
+ok 61 - replay preserves truthful failure/identity outcomes: sequence_stream
+ok 62 - replay preserves truthful failure/identity outcomes: sequence_failed
+ok 63 - replay preserves truthful failure/identity outcomes: followups_not_run
+ok 64 - collection retains independent download outcomes without executing payload: good
+ok 65 - collection retains independent download outcomes without executing payload: launcher_failure
+ok 66 - collection retains independent download outcomes without executing payload: payload_failure
+ok 67 - collection retains independent download outcomes without executing payload: both_failures
+1..67
