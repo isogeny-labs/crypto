@@ -303,6 +303,14 @@ the existing active-call source ledger while leaving recursive history and
 precision refinement open.
 `[pcc:unverified]`
 
+The producer control constructs `NodeDimensions` from every bounded
+certificate. Of the 596 three- through five-edge partition certificates, 285
+satisfy `K L<=3M`; their packet length, tile period, per-weight and total mode
+ceilings, and tuple-log2 ceiling equal the independent BigUint audit exactly.
+The other 311, plus the correlated two-edge fixture, are retained only as
+algebraic controls and are explicitly rejected by the source packing premise.
+`[pcc:unverified]`
+
 The verifier is now a public module separate from recursive contraction and a
 native `factorization-certificate-check` executable. It imports exact ring
 arithmetic but no contraction, deformation, packing, child, or packet-tensor

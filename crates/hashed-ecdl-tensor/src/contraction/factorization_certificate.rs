@@ -1,6 +1,7 @@
 //! Production-side certificate controls for the standalone verifier.
 
 use super::*;
+use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
     description_envelope, verify as standalone_verify, verify_with_ring as check, Certificate,
@@ -10,6 +11,46 @@ use crate::network::FnPredicate;
 use crate::Limits;
 use std::collections::BTreeSet;
 use std::sync::Arc;
+
+fn assert_source_count_bridge(
+    certificate: &Certificate,
+    parameters: &Parameters,
+    coordinate: usize,
+) -> bool {
+    let dimensions = NodeDimensions {
+        edges: certificate.edge_count.into(),
+        packets: certificate.packets.len().into(),
+        a: u32::try_from(parameters.a).unwrap(),
+        u: u32::try_from(parameters.u).unwrap(),
+        coordinate: u32::try_from(coordinate).unwrap(),
+        precision: certificate.precision.into(),
+    };
+    let audit = audit_node_dimensions(&dimensions);
+    let packing_capacity = BigUint::from(certificate.packets.len())
+        * BigUint::from(parameters.length)
+        <= BigUint::from(3u8) * BigUint::from(certificate.edge_count);
+    assert_eq!(audit.is_ok(), packing_capacity);
+    let Ok(audit) = audit else {
+        return false;
+    };
+    let envelope = description_envelope(certificate).unwrap();
+    assert_eq!(audit.packet_length, parameters.length.into());
+    assert_eq!(audit.packet_length, envelope.packet_length.into());
+    assert_eq!(audit.tiles, envelope.tiles.into());
+    assert_eq!(
+        audit.modes_per_weight_bound,
+        envelope.modes_per_weight_bound.into()
+    );
+    assert_eq!(
+        audit.attempted_modes_bound,
+        envelope.attempted_modes_bound.into()
+    );
+    assert_eq!(
+        audit.mode_tuple_log2_bound,
+        envelope.tuple_log2_bound.into()
+    );
+    true
+}
 
 fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     Arc::new(Tensor {
@@ -367,6 +408,11 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     let serialized = serde_json::to_vec(&produced).unwrap();
     assert_eq!(serialized.len(), 2_172);
     let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+    assert!(!assert_source_count_bridge(
+        &certificate,
+        &parameters,
+        coordinate
+    ));
     assert_eq!(serde_json::to_vec(&certificate).unwrap(), serialized);
     assert!(serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound);
     let mut standalone_meter = Meter::new(Limits {
@@ -494,6 +540,7 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
     let mut total_bytes = 0usize;
     let mut maximum_bytes = 0usize;
     let mut maximum_case = None;
+    let mut source_admitted = 0usize;
     for left_groups in &partitions {
         for right_groups in &partitions {
             for schedule in 0..4 {
@@ -523,6 +570,8 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
                     maximum_case = Some((*left_groups, *right_groups, schedule));
                 }
                 let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+                source_admitted +=
+                    usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
                 assert!(
                     serialized.len()
                         <= description_envelope(&certificate).unwrap().json_bytes_bound
@@ -540,6 +589,7 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
     assert_eq!(total_bytes, 318_734);
     assert_eq!(maximum_bytes, 10_146);
     assert_eq!(maximum_case, Some(([0, 1, 1], [0, 1, 1], 3)));
+    assert_eq!(source_admitted, 52);
 }
 
 #[test]
@@ -563,6 +613,7 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
     let mut total_bytes = 0usize;
     let mut maximum_bytes = 0usize;
     let mut maximum_case = None;
+    let mut source_admitted = 0usize;
     for (left_groups, right_groups) in representatives {
         for schedule in 0..4 {
             let graph = partition_graph(&left_groups, &right_groups);
@@ -590,6 +641,8 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            source_admitted +=
+                usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
             assert!(
                 serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound
             );
@@ -603,6 +656,7 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
     assert_eq!(total_bytes, 792_556);
     assert_eq!(maximum_bytes, 20_777);
     assert_eq!(maximum_case, Some((vec![0, 0, 1, 1], vec![0, 0, 1, 1], 3)));
+    assert_eq!(source_admitted, 87);
 }
 
 #[test]
@@ -628,6 +682,7 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
     let mut maximum_case = None;
     let mut maximum_json_bound = 0usize;
     let mut maximum_binary_bits_bound = 0usize;
+    let mut source_admitted = 0usize;
     for (left_groups, right_groups) in representatives {
         for schedule in 0..4 {
             let graph = partition_graph(&left_groups, &right_groups);
@@ -655,6 +710,8 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            source_admitted +=
+                usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
             let envelope = description_envelope(&certificate).unwrap();
             assert!(serialized.len() <= envelope.json_bytes_bound);
             maximum_json_bound = maximum_json_bound.max(envelope.json_bytes_bound);
@@ -675,4 +732,5 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
     );
     assert_eq!(maximum_json_bound, 32_519_488);
     assert_eq!(maximum_binary_bits_bound, 19_154_282);
+    assert_eq!(source_admitted, 146);
 }

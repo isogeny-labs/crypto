@@ -180,6 +180,16 @@ are `tau=2`, `n=4`, `Q<=16`, and `log2 T<=25`. The gap records the
 `2^(2L)` worst-case concentration and uniform framing constants.
 `[pcc:unverified]`
 
+The production-side controls also instantiate the independent BigUint
+`NodeDimensions` audit from each certificate's live `M,K,L,tau,p` objects.
+Among the 596 three- through five-edge partition-shape certificates, 285 meet
+the source packing premise `K L<=3M`; all 285 agree exactly on `L`, `tau`,
+`K tau`, `K tau(p-1)`, and the tuple-log2 ceiling. The remaining 311 are useful
+algebraic factorization shapes but the dimension audit rejects them at the
+packing-capacity boundary. The correlated two-edge fixture is rejected there
+as well. This pinned split prevents a finite factorization control from being
+misreported as an admitted recursive node. `[pcc:unverified]`
+
 This closes a finite description-counting obligation, not the entire
 subexponential theorem. A full result still needs the recursive-history and
 precision induction, plus the external contraction/reduction theorems. It

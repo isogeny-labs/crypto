@@ -219,6 +219,13 @@ evidence to the active-call dimension ledger without trusting the producer's
 reported `Q` or `T`. It does not yet join the separate packing and precision
 premises to every node of an arbitrary recursive history. `[pcc:unverified]`
 
+An object-level cross-check now makes the packing boundary explicit. Of those
+596 partition certificates, 285 satisfy `K L<=3M` and match the independent
+BigUint `NodeDimensions` result field for field; 311 fail that source premise
+and remain algebraic controls only. The next gate therefore targets actual
+recursive histories, not a larger fixed-edge certificate census.
+`[pcc:unverified]`
+
 ### Uniform source-history bridge
 
 The capacity and normalized-precision premises are now bound to the successful

@@ -193,6 +193,9 @@ Schema 2 validates one tile residue key per packet and positive weight, giving
 `Q<=K tau (p-1)`, and checks exact retained tuples against
 `log2 T<=5 ceil(sqrt(K tau p))`. These are the same local bounds as the
 active-call dimension ledger, without trusting producer-supplied counts.
+An object-level cross-check instantiates that BigUint ledger for every bounded
+partition certificate: all 285 of 596 shapes satisfying `K L<=3M` agree on
+every source-count field, while the other 311 fail that premise explicitly.
 `[pcc:unverified]`
 
 The native `factorization-certificate-check` command now reads that JSON from a
