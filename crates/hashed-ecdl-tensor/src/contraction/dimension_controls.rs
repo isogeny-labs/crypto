@@ -495,16 +495,17 @@ fn recursion_composition_has_depth_independent_constants() {
     // sqrt(204)<15, and the ceiling contributes at most five more units.
     assert!(204u16 < 15u16.pow(2));
     assert_eq!(5 * 15 + 5, 80);
-    // Active-node, sample, and radix terms use the remaining 16 units.
-    assert_eq!(80 + 4 + 5 + 6, 95);
-    assert!(audit.local_child_exponent_constant >= 95);
+    // Description overhead plus active-node, sample, and radix terms use the
+    // remaining 16 units.
+    assert_eq!(80 + 1 + 4 + 5 + 6, 96);
+    assert_eq!(audit.local_child_exponent_constant, 96);
 }
 
 #[test]
 fn symbolic_history_certificate_has_independent_exact_replay() {
     let produced = symbolic_history_certificate(UNIFORM_HISTORY_LAMBDA_THRESHOLD).unwrap();
     let serialized = serde_json::to_vec(&produced).unwrap();
-    assert_eq!(serialized.len(), 5_435);
+    assert_eq!(serialized.len(), 7_354);
     assert_eq!(
         serialized,
         include_bytes!("../../examples/symbolic-history-certificate.json")
@@ -518,6 +519,7 @@ fn symbolic_history_certificate_has_independent_exact_replay() {
     assert_eq!(summary.root_u, 512);
     assert_eq!(summary.active_depths, 5);
     assert_eq!(summary.normalized_coordinate_witnesses, 10);
+    assert_eq!(summary.description_overhead_constant, 1);
     assert_eq!(summary.tuple_exponent_constant, 80);
     assert_eq!(summary.total_root_u_exponent_constant, 290);
     assert_eq!(summary.total_root_log_exponent_constant, 148_480);
@@ -548,6 +550,13 @@ fn symbolic_history_certificate_has_independent_exact_replay() {
     assert_eq!(
         verify_symbolic_history(&bad_dimensions).unwrap_err(),
         "symbolic normalized dimension mismatch"
+    );
+
+    let mut bad_description = certificate.clone();
+    bad_description.depths[3].description_overhead_exponent += BigUint::one();
+    assert_eq!(
+        verify_symbolic_history(&bad_description).unwrap_err(),
+        "symbolic history depth mismatch"
     );
 
     let mut bad_composition = certificate;

@@ -8,7 +8,7 @@ use crate::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const SCHEMA: u32 = 3;
+pub(crate) const SCHEMA: u32 = 4;
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 const MINIMUM_LAMBDA: u64 = 1 << 26;
 
@@ -27,6 +27,10 @@ pub(crate) struct DepthCertificate {
     pub(crate) normalized_packets: BigUint,
     pub(crate) normalized_first_precision: BigUint,
     pub(crate) normalized_last_precision: BigUint,
+    pub(crate) description_overhead_exponent: BigUint,
+    pub(crate) description_absorption_lhs: BigUint,
+    pub(crate) description_absorption_rhs_exponent: u64,
+    pub(crate) description_absorbed: bool,
     pub(crate) inherited_lhs: BigUint,
     pub(crate) inherited_rhs_exponent: u64,
     pub(crate) evaluation_lhs: BigUint,
@@ -49,6 +53,7 @@ pub struct Certificate {
     pub(crate) mode_precision_product_constant: u64,
     pub(crate) tuple_square_root_ceiling: u64,
     pub(crate) tuple_exponent_constant: u64,
+    pub(crate) description_overhead_constant: u64,
     pub(crate) depths: Vec<DepthCertificate>,
     pub(crate) local_child_exponent_constant: u64,
     pub(crate) path_sum_constant: u64,
@@ -73,6 +78,8 @@ pub struct VerificationSummary {
     pub active_depths: usize,
     /// Number of endpoint dimension witnesses checked across all depths.
     pub normalized_coordinate_witnesses: usize,
+    /// Local exponent unit reserved for factorization-certificate descriptions.
+    pub description_overhead_constant: u64,
     /// Constant in `log2(T) <= C*M/sqrt(u)` from the source mode bounds.
     pub tuple_exponent_constant: u64,
     /// Root-`u` exponent constant for the complete recursion composition.
@@ -183,6 +190,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         5,
         "tuple exponent",
     )?;
+    let description_overhead_constant = 1u64;
     if leaf_divisor <= 1
         || root_u == 0
         || certificate.leaf_divisor != leaf_divisor
@@ -195,6 +203,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         || certificate.mode_precision_product_constant != mode_precision_product_constant
         || certificate.tuple_square_root_ceiling != tuple_square_root_ceiling
         || certificate.tuple_exponent_constant != tuple_exponent_constant
+        || certificate.description_overhead_constant != description_overhead_constant
         || (tuple_square_root_ceiling - 1).pow(2) >= mode_precision_product_constant
         || tuple_square_root_ceiling.pow(2) < mode_precision_product_constant
     {
@@ -226,6 +235,34 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         let packet_length = power_of_two(current_a, "normalized packet length")?;
         let normalized_edges = BigUint::from(u) * &packet_length;
         let normalized_packets = BigUint::from(3u8) * BigUint::from(u);
+        let description_polynomial = checked_mul(
+            16,
+            checked_add(
+                checked_add(
+                    checked_add(certificate.lambda, current_a, "description exponent")?,
+                    u,
+                    "description exponent",
+                )?,
+                1,
+                "description exponent",
+            )?,
+            "description exponent",
+        )?;
+        let description_overhead_exponent =
+            BigUint::from(2u8) * &packet_length + BigUint::from(description_polynomial);
+        let floor_root = floor_sqrt(u);
+        let ceiling_root = floor_root + u64::from(floor_root * floor_root != u);
+        let description_absorption_lhs = &description_overhead_exponent
+            * BigUint::from(leaf_divisor)
+            * BigUint::from(ceiling_root);
+        let description_absorption_rhs_exponent = certificate
+            .lambda
+            .checked_sub(1)
+            .ok_or_else(|| "description absorption exponent".to_string())?;
+        let description_absorbed = at_most_power_of_two(
+            &description_absorption_lhs,
+            description_absorption_rhs_exponent,
+        );
         let inherited_lhs = BigUint::from(81u8) * BigUint::from(leaf_divisor) * BigUint::from(u);
         let inherited_rhs_exponent = checked_add(u, 1, "inherited exponent")?;
         let evaluation_lhs = BigUint::from(8u8)
@@ -252,6 +289,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             || case.last_distance_exponent != last_distance_exponent
             || case.normalized_edges != normalized_edges
             || case.normalized_packets != normalized_packets
+            || case.description_overhead_exponent != description_overhead_exponent
+            || case.description_absorption_lhs != description_absorption_lhs
+            || case.description_absorption_rhs_exponent != description_absorption_rhs_exponent
+            || case.description_absorbed != description_absorbed
             || case.inherited_lhs != inherited_lhs
             || case.inherited_rhs_exponent != inherited_rhs_exponent
             || case.evaluation_lhs != evaluation_lhs
@@ -292,6 +333,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             || !at_most_power_of_two(&inherited_lhs, inherited_rhs_exponent)
             || !at_most_power_of_two(&evaluation_lhs, evaluation_rhs_exponent)
             || !geometric_holds
+            || !description_absorbed
         {
             return Err("symbolic history depth inequality".into());
         }
@@ -307,7 +349,8 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     }
 
     let local_child_exponent_constant = 96u64;
-    let accounted_local_constant = tuple_exponent_constant + 4 + 5 + 6;
+    let accounted_local_constant =
+        tuple_exponent_constant + description_overhead_constant + 4 + 5 + 6;
     if local_child_exponent_constant < accounted_local_constant {
         return Err("symbolic history local exponent".into());
     }
@@ -367,6 +410,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         root_u,
         active_depths: index,
         normalized_coordinate_witnesses: 2 * index,
+        description_overhead_constant,
         tuple_exponent_constant,
         total_root_u_exponent_constant,
         total_root_log_exponent_constant,

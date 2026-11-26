@@ -22,7 +22,7 @@ plain fields it independently reconstructs:
 6. leaf-scale and packet-entry absorption; and
 7. the reported constants `96`, `3`, `288`, `290`, and `148480`.
 
-Schema 3 also commits to the local source-bound chain
+Schema 4 also commits to the local source-bound chain
 
 ```text
 K L <= 3M,
@@ -53,6 +53,31 @@ whole coordinate range. They show that the scalar obligations are mutually
 compatible and bind concrete `M,K,L,tau,p` values; they still do not prove that
 a graph or packing realizes the witness. `[pcc:unverified]`
 
+Schema 4 also charges the schema-2 factorization-certificate description
+envelope. After the tuple count `T` has been charged, every remaining scalar,
+coefficient-width, container, and framing factor in the JSON and canonical
+binary bounds is covered by the deliberately coarse exponent
+
+```text
+Delta_d = 2 L_d + 16 (lambda + a_d + u_d + 1).
+```
+
+Here `log2(S)<=2L+1`, `d=4lambda`, `M<=s<=2^lambda`, and the checked source
+bounds give `Q<=204M^2/u`; no description term contains more than one factor
+of `T`. Thus `log2(description bits)<=log2(T)+Delta_d`. For an active node,
+`M>s/h` and `s>2^(lambda-1)`, where `h=floor(sqrt(lambda))`. The verifier
+checks at every retained depth that
+
+```text
+Delta_d h ceil(sqrt(u_d)) <= 2^(lambda-1),
+```
+
+so `Delta_d<=M/sqrt(u_d)`. The local ledger is now exactly
+`80+1+4+5+6=96`: tuple count, description overhead, active nodes,
+interpolation samples, and radix. The global constants therefore remain
+unchanged. This is an arithmetic replay of the description formulas, still
+conditional on the source and active-node premises. `[pcc:unverified]`
+
 Missing, extra, reordered, or altered depth rows fail closed. Schema,
 precision-transition, and final-composition mutations are explicit negative
 controls. `[pcc:unverified]`
@@ -74,7 +99,7 @@ verifier checks both endpoint identities
 `1+a = u+(a-u+1) = a+1`, which proves `tau D=2L` uniformly for every
 coordinate between them.
 
-The newline-terminated schema-3 JSON fixture is 5,436 bytes. The native command
+The newline-terminated schema-4 JSON fixture is 7,355 bytes. The native command
 
 ```text
 cargo run --locked \
@@ -83,10 +108,11 @@ cargo run --locked \
   crates/hashed-ecdl-tensor/examples/symbolic-history-certificate.json
 ```
 
-reports five active depths, ten normalized endpoint witnesses, root `u=512`,
-total root-`u` exponent constant `290`, root-log constant `148480`, and tuple
-exponent constant `80`. The companion native emitter deterministically
-regenerates the fixture. Verifier input is capped at 1 MiB.
+reports five active depths, ten normalized endpoint witnesses, description
+overhead constant `1`, root `u=512`, total root-`u` exponent constant `290`,
+root-log constant `148480`, and tuple exponent constant `80`. The companion
+native emitter deterministically regenerates the fixture. Verifier input is
+capped at 1 MiB.
 `[pcc:unverified]`
 
 ## Remaining refinement boundary
@@ -97,5 +123,5 @@ family satisfying them. It does not show that a symbolic graph realizes those
 normalized rows, or that the external contraction theorem applies. The next
 useful certificate layer must define a graph/packing realization interface to
 the schema-2 factorization obligations while keeping the external theorem an
-explicit independent premise. It must also include certificate-description
-bits in the complete depth-first composition. `[pcc:unverified]`
+explicit independent premise. An independent or kernel-checked derivation of
+the description-composition inequality also remains open. `[pcc:unverified]`

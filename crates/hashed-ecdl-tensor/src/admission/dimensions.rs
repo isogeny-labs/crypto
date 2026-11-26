@@ -530,8 +530,9 @@ pub fn audit_uniform_history(lambda: u64) -> Result<UniformHistoryAudit> {
 /// Compose the active-call exponent over the entire strict-shrink recursion.
 ///
 /// The local constant 96 covers the weighted-tuple exponent after the
-/// normalized-precision bound, active nodes, interpolation samples, and the
-/// fixed radix.  Since `M_d<=s/8^d` and
+/// normalized-precision bound, factorization-certificate description
+/// overhead, active nodes, interpolation samples, and the fixed radix. Since
+/// `M_d<=s/8^d` and
 /// `u_0<=4^(d+1)*u_d`, the geometric path sum is below
 /// `3*s/sqrt(u_0)`.  Direct leaves and packet-entry choice traversal each
 /// add at most one further unit.  All remaining arithmetic widths and direct
@@ -652,6 +653,28 @@ pub fn symbolic_history_certificate(
             let last_distance = BigUint::one()
                 << usize::try_from(last_distance_exponent)
                     .map_err(|_| invalid("symbolic distance width"))?;
+            let description_polynomial = history
+                .lambda
+                .checked_add(history_case.current_a)
+                .and_then(|value| value.checked_add(history_case.u))
+                .and_then(|value| value.checked_add(1))
+                .and_then(|value| value.checked_mul(16))
+                .ok_or_else(|| invalid("symbolic description exponent width"))?;
+            let description_overhead_exponent =
+                BigUint::from(2u8) * &packet_length + BigUint::from(description_polynomial);
+            let floor_root = floor_sqrt_u64(history_case.u);
+            let ceiling_root = floor_root + u64::from(floor_root * floor_root != history_case.u);
+            let description_absorption_lhs = &description_overhead_exponent
+                * BigUint::from(history.leaf_divisor)
+                * BigUint::from(ceiling_root);
+            let description_absorption_rhs_exponent = history
+                .lambda
+                .checked_sub(1)
+                .ok_or_else(|| invalid("symbolic description absorption width"))?;
+            let description_absorbed = at_most_power_of_two(
+                &description_absorption_lhs,
+                description_absorption_rhs_exponent,
+            );
             Ok(DepthCertificate {
                 depth: history_case.depth,
                 shrink_factor: history_case.shrink_factor.clone(),
@@ -666,6 +689,10 @@ pub fn symbolic_history_certificate(
                 normalized_packets,
                 normalized_first_precision: BigUint::from(34u8) * &packet_length * first_distance,
                 normalized_last_precision: BigUint::from(34u8) * &packet_length * last_distance,
+                description_overhead_exponent,
+                description_absorption_lhs,
+                description_absorption_rhs_exponent,
+                description_absorbed,
                 inherited_lhs: history_case.inherited_absorption_lhs.clone(),
                 inherited_rhs_exponent: history_case.inherited_absorption_rhs_exponent,
                 evaluation_lhs: history_case.evaluation_absorption_lhs.clone(),
@@ -687,6 +714,7 @@ pub fn symbolic_history_certificate(
         mode_precision_product_constant: 204,
         tuple_square_root_ceiling: 15,
         tuple_exponent_constant: 80,
+        description_overhead_constant: 1,
         depths,
         local_child_exponent_constant: composition.local_child_exponent_constant,
         path_sum_constant: composition.path_sum_constant,

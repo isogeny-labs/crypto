@@ -122,14 +122,21 @@ quadratic left bound grows by less than two.  For evaluation,
 
 The schema-versioned transcript in `SYMBOLIC_HISTORY_CERTIFICATE.md` gives a
 separate executable scalar boundary. Its verifier independently reconstructs
-all five threshold depths and composition constants from a 5,436-byte JSON
-fixture without importing the producer dimension audit or graph code. Schema 3
+all five threshold depths and composition constants from a 7,355-byte JSON
+fixture without importing the producer dimension audit or graph code. Schema 4
 also reconstructs a normalized `M,K,L,tau,p` family at both coordinate
 endpoints of every depth and checks the exact local identities `KL=3M`,
 `tau D=2L`, `nD=6M`, `pu=34MD`, `npu=204M^2`, and the tuple exponent
 constant `80`. This strengthens R2's finite replay and proves consistency of
 its scalar premises, but does not discharge R1's graph-realization premise.
 `[pcc:unverified]`
+
+For the schema-2 factorization description, the same verifier reconstructs
+`Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks
+`Delta_d floor(sqrt(lambda)) ceil(sqrt(u_d))<=2^(lambda-1)` at every retained
+depth. Hence `Delta_d<=M_d/sqrt(u_d)` at any active node. The local exponent
+ledger becomes exactly `80+1+4+5+6=96`, so description output is included in
+R3 without changing its constant. `[pcc:unverified]`
 
 ## R3 — One active-call cost
 

@@ -315,7 +315,7 @@ passes 14/14 controls. [pcc:unverified]
 `SYMBOLIC_HISTORY_CERTIFICATE.md` now separates this transcript from its
 producer. A standalone module reconstructs the five-depth schedule, both
 precision absorptions, geometric path comparisons, packet-entry absorption,
-and final constants from a stable 5,436-byte JSON fixture. Schema 3 additionally
+and final constants from a stable 7,355-byte JSON fixture. Schema 4 additionally
 checks the chain from `K L<=3M`, `tau D=2L`, and `p u<=34 M D` to
 `n p<=204 M^2/u` and tuple exponent constant `80`. Every depth now binds the
 normalized family `M=uL`, `K=3u`, and `p_i=34L(L/2^i)` at both coordinate
@@ -327,6 +327,17 @@ contraction/packing/factorization code. Schema, missing-depth,
 precision-transition, normalized-dimension, source-constant, and final-constant
 mutations are rejected. This is an independent normalized scalar replay, not
 graph realization or a proof of the external theorem.
+`[pcc:unverified]`
+
+The same certificate now charges the schema-2 factorization-description
+envelope. After the tuple factor, it bounds every remaining JSON/canonical
+binary factor by
+`Delta=2L+16(lambda+a+u+1)` and checks
+`Delta*h*ceil(sqrt(u))<=2^(lambda-1)` at all five depths. Active-node size then
+gives `Delta<=M/sqrt(u)`, using the final spare local unit:
+`80+1+4+5+6=96`. This keeps the composed constants `290` and `148480`
+unchanged while making description serialization explicit. The argument is
+still conditional on graph realization and the external theorem.
 `[pcc:unverified]`
 
 This threshold is asymptotic: it means a root edge count on the order of
