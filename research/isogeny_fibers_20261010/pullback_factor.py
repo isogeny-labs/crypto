@@ -29,12 +29,16 @@ def report(a, b, x0, ell):
     num = Poly(expand(num), x1, x2, x3, modulus=p)
     base = Poly(S3(a, b, x1, x2, x3), x1, x2, x3, modulus=p)
     q, rem = num.div(base)
+    assert rem.is_zero, f"ell={ell}: pulled-back numerator does not factor by S3"
+    assert all(num.degree(x) == 2*ell for x in (x1, x2, x3)), f"ell={ell}: unexpected numerator degree"
+    assert all(q.degree(x) == 2*ell - 2 for x in (x1, x2, x3)), f"ell={ell}: unexpected cofactor degree"
     print(f"ell={ell}, kernel x0={x0}: E1: y^2=x^3+{a}x+{b}  ->  E2: y^2=x^3+{A}x+{B}")
     print(f"  deg_x1 of pulled-back numerator: {num.degree(x1)} (= 2*ell), terms: {len(num.terms())}")
     print(f"  divisible by S3^E1: {rem.is_zero}")
     print(f"  cofactor degrees (x1,x2,x3) = {q.degree(x1)},{q.degree(x2)},{q.degree(x3)}, terms: {len(q.terms())}")
     # symmetric?
     qs = Poly(q.as_expr().subs({x1: x2, x2: x1}, simultaneous=True), x1, x2, x3, modulus=p)
+    assert qs == q, f"ell={ell}: cofactor is not symmetric"
     print(f"  cofactor symmetric in x1<->x2: {qs == q}")
     # the cofactor vanishes exactly on triples with P1+P2+P3 = +-T: check numerically on the curve
     import random
@@ -51,6 +55,7 @@ def report(a, b, x0, ell):
         s3 = E.add(S, P3); s3n = E.add(S, E.neg(P3))
         kernel_hit = any(E.add(s, E.neg(k)) is None for s in (s3, s3n) for k in ker[1:])
         if kernel_hit: tot += 1; hits += (val == 0)
+    assert tot > 0 and hits == tot, f"ell={ell}: sampled kernel triples pass {hits}/{tot}"
     print(f"  cofactor vanishes on sampled triples with P1+-P2+-P3 in ker minus O: {hits}/{tot}")
     # and forced: choose P3 = T - P1 - P2 so that P1+P2+P3 = T
     ok = tried = 0
@@ -61,6 +66,7 @@ def report(a, b, x0, ell):
         tried += 1
         val = int(q.as_expr().subs({x1: P1[0][0], x2: P2[0][0], x3: P3[0][0]})) % p
         ok += (val == 0)
+    assert ok == tried, f"ell={ell}: forced triples pass {ok}/{tried}"
     print(f"  cofactor vanishes on 50 forced non-degenerate triples with P1+P2+P3 = T: {ok}/50")
 
 # E1: y^2 = x^3 + x + 3 over F_211 (from fiber_probe): 2-torsion x0 and 3-torsion x0 = 77
