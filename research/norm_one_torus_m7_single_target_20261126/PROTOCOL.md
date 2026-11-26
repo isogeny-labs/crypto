@@ -13,7 +13,7 @@ that same target?
 
 This is a generic point-decomposition component experiment. It is not a full
 ECDLP recovery, a PKM/Amadori polynomial-system solver, or evidence of an
-asymptotic improvement over generic discrete-log algorithms.
+asymptotic improvement over generic discrete-log algorithms. [pcc:unverified]
 
 ## Literature boundary and prediction
 
@@ -151,5 +151,5 @@ independent affine replay are transparent correctness and reproducibility
 evidence. They are not a zero-knowledge proof, do not prove unbiased seed
 generation, and do not attest which host produced a timing. The witness is
 intentionally public, so hiding it would work against independent replay. No ZK
-or producer-attestation claim will be made in this lane.
+or producer-attestation claim will be made in this lane. [pcc:unverified]
 

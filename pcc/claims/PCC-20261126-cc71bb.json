@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-26T21:27:39Z",
+ "id": "PCC-20261126-cc71bb",
+ "kind": "speedup",
+ "producer": {
+  "commit": "8936c637a4c78a4bcbd7dbe9ff60d0e307d94b59",
+  "model": "OpenAI Codex; independent CI signatures pending",
+  "session": "codex/norm-one-torus-m7-single-target"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/norm_one_torus_m7_single_target_20261126/public-precommit/validator-report.json",
+   "sha256": "d87fc3ef456ddfe2c18f978e11c0f2b2c0edb2f7f20b6d1f5f178a20eac46b20"
+  },
+  {
+   "kind": "replay",
+   "path": "research/norm_one_torus_m7_single_target_20261126/public-precommit/replay-certificate.json",
+   "sha256": "1a14d547f60c5a99ca734818e56c51650c7d475fe63a88700db0f93151599148"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/norm_one_torus_m7_single_target_20261126; curve icv1-fp31-tm3989-ae9db972; one public target; arity m=7; every table rebuilt per arm and round; no cross-target amortization; local producer evidence",
+ "statement": "On the frozen one-target Prime31 norm-one-torus m=7 generic decomposition component, retain3-prefix16-affine-leaf scans the same 971635 terminal candidates and performs the same 1028789 query additions as retain3-prefix16-centered while reducing query multiplications from 13029908 to 5585265 (2.332908x, 57.1350% removed) and squarings from 5086791 to 1254991 (4.053249x, 75.3284% removed), with one extra inversion. The archived non-isolated producer replay records total medians 59.017 ms versus 71.372 ms (1.209346x); this is a single-target component result, not a full ECDLP, rho, asymptotic, zero-knowledge, or host-execution claim."
+}
