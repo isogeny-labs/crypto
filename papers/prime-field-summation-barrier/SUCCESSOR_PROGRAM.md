@@ -52,6 +52,7 @@ The status of the program is:
 | Theorem 26 | unconditional in the explicit global-map catalogue model | compact single-valued rational branches satisfy a degree-free square-root direct sum |
 | Proposition 27 | exact finite-domain boundary | arbitrary subgroup-point selectors exist in the reduced evaluation algebra, so global-map rigidity cannot extend without a compression/query hypothesis |
 | Theorem 28 | unconditional in the symbolic straight-line recovery model | rational recovery from a succinct correspondence produces a global selector section and inherits Theorem 26's square-root direct sum |
+| Proposition 29 | exact finite-field root-recovery counterexample | compact exponentiation recovers roots on many finite-field targets even when the generic correspondence has no rational section |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2305,6 +2306,56 @@ The first case requires an explicit root-recovery cost model; the latter two
 are the finite-domain compression problem isolated by Proposition 27.
 [pcc:unverified]
 
+### Proposition 29 (finite-field root recovery need not be a section)
+
+Let \(p\equiv3\pmod4\), and consider the correspondence over the affine target
+line
+
+\[
+X:\quad y^2=t.
+\]
+
+There is no rational section over the generic target:
+\(t\) is not a square in \(\mathbb F_p(t)\).  Nevertheless, on every
+quadratic-residue target \(t\in\mathbb F_p\), including \(t=0\),
+
+\[
+y(t)=t^{(p+1)/4}
+\]
+
+satisfies \(y(t)^2=t\).  Binary exponentiation evaluates this finite-domain
+root selector using \(O(\log p)\) multiplications, although its expanded
+polynomial degree is \((p+1)/4\).  It succeeds on \((p+1)/2\) of the \(p\)
+targets. [pcc:unverified]
+
+#### Proof
+
+The \(t\)-adic valuation of a square in \(\mathbb F_p(t)\) is even, whereas
+\(v_t(t)=1\), so \(t\) has no square root in the target function field.  For
+a nonzero quadratic residue, Euler's criterion gives
+\(t^{(p-1)/2}=1\).  Hence
+
+\[
+\left(t^{(p+1)/4}\right)^2
+=t^{(p+1)/2}
+=t\,t^{(p-1)/2}
+=t.
+\]
+
+The identity also holds at zero.  There are \((p-1)/2\) nonzero quadratic
+residues, and binary powering has logarithmic straight-line complexity.
+\(\square\)
+
+Proposition 29 is not an elliptic relation algorithm: it neither enforces a
+factor base nor recovers an \(m\)-leaf decomposition.  It is a sharp
+counterexample to extending Theorem 28 from generic symbolic recovery to
+finite-field root algorithms by circuit size or expanded degree alone.
+Frobenius identities and exponentiation can select roots on a large finite
+target set without producing a rational section.  A complete compact-circuit
+barrier must therefore charge finite-field root extraction or prove that its
+outputs still cannot hit the structured elliptic factor base often enough.
+[pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2514,11 +2565,13 @@ branch catalogue.  The remaining Gate 2 extension is to succinct multivalued
 correspondences recovered through genuine algebraic root operations,
 finite-domain coordinate formulas, and control DAGs that implicitly generate
 exponentially many output branches.  Theorem 28 closes symbolic straight-line
-recovery that remains in the target function field.  A width or monomial
-lower bound counts only if a simulation theorem charges the remaining compact
-representations.  Theorems 21--22 and Proposition 23 further show that this
-extension must cover joint or target-dependent witness search, rather than
-only exact labels, false-positive verification, or target-shifted scans.
+recovery that remains in the target function field, while Proposition 29
+shows that compact finite-field root extraction need not define a generic
+section.  A width or monomial lower bound counts only if a simulation theorem
+charges the remaining compact representations.  Theorems 21--22 and
+Proposition 23 further show that this extension must cover joint or
+target-dependent witness search, rather than only exact labels,
+false-positive verification, or target-shifted scans.
 `[pcc:unverified]`
 
 ### Gate 3: square-root closure
@@ -2554,5 +2607,7 @@ measure.  Theorems 21--22 close exact and one-sided target-independent
 separate labels, Proposition 23 audits the simplest target-dependent
 coordinate filter, Theorem 26 closes compact global single-valued maps, and
 Theorem 28 closes straight-line rational recovery from correspondences.
-Research should now concentrate on algebraic root extraction, finite-domain
-branching, implicit branch generation, and multi-target sharing.
+Proposition 29 shows why finite-field root extraction is a distinct case.
+Research should now concentrate on factor-base hit bounds for such root
+selectors, finite-domain branching, implicit branch generation, and
+multi-target sharing.

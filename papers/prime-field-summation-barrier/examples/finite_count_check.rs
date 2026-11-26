@@ -557,4 +557,34 @@ fn finite_domain_selectors_need_not_be_constant_or_injective() {
     assert!(image_sizes.iter().all(|size| *size < group_order));
 }
 
+fn modular_power(mut base: u128, mut exponent: u128, modulus: u128) -> u128 {
+    let mut result = 1_u128;
+    while exponent > 0 {
+        if exponent & 1 == 1 {
+            result = result * base % modulus;
+        }
+        base = base * base % modulus;
+        exponent >>= 1;
+    }
+    result
+}
+
+#[test]
+fn finite_field_root_selector_works_without_generic_section() {
+    for prime in [7_u128, 11, 19, 23, 31] {
+        assert_eq!(prime % 4, 3);
+        let mut selected_targets = 0_u128;
+        for target in 0..prime {
+            let is_residue = target == 0
+                || modular_power(target, (prime - 1) / 2, prime) == 1;
+            if is_residue {
+                let root = modular_power(target, (prime + 1) / 4, prime);
+                assert_eq!(root * root % prime, target);
+                selected_targets += 1;
+            }
+        }
+        assert_eq!(selected_targets, (prime + 1) / 2);
+    }
+}
+
 fn main() {}
