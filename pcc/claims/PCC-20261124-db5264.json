@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:53:50Z",
+ "id": "PCC-20261124-db5264",
+ "kind": "execution",
+ "producer": {
+  "commit": "709a68ad6367751e0d2b7362de22bca35cb3d631",
+  "model": "GPT-6 Astra Pro",
+  "session": "m31-integrated-build-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/m31_integrated_build_20261123/evidence/verification.json",
+    "sha256": "b4709e49ecfcce13c27c494e8f102fd6e89facfde335121bbb090fc0b4e2898a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/m31_integrated_build_20261123/reports/REPORT.md",
+    "sha256": "5b977496c166ca51793c4a1fc8417540e4400bef510c7256280e76513b0d34d4"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "M31 source implementation and bounded local component qualification; no signed execution verdict, general complexity or end-to-end performance claim",
+ "statement": "Native M31 graph, structured Semaev/F4 and RR5 streaming components were implemented; retained local release gates report 7 graph, 13 structured and 50 RR5 tests passing. These are unsigned producer development observations. The full root gate is not passed; no scientific performance or B677 extraction panel was launched."
+}

@@ -1,0 +1,17 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T21:17:50Z",
+  "admission":"user-authorized bounded local E(F_p) run; prior S3 HTTP 403 and missing .resume gates remain unqualified; no cloud spend",
+  "conductor_endpoint":"https://127.0.0.1:8443",
+  "conductor_task":"T-21",
+  "worktree_commit":"eeebd2563bdd9f43bcf4508c73aad1b229fccf60",
+  "source":{"path":"WS68_YIELD_BASE.rs","sha256":"01469bc286c04c2017552d77ffd08effe9eb895ce8bc1a23848e8ad24ddf4404"},
+  "immutable_qualifier":{"path":"WS68_YIELD_BASE.qualifier.rs","sha256":"01469bc286c04c2017552d77ffd08effe9eb895ce8bc1a23848e8ad24ddf4404"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_YIELD_BASE","WS68_YIELD_BASE.qualifier.rs","-o","WS68_YIELD_BASE.bin"],
+  "input":{"curve":"E/F_1009: y^2=x^3+x+14","generator":[0,425],"subgroup_order":1013,"targets":[123,277,411,509,701,827,941,1003],"ordered_candidates_per_target":512,"seed_rule":"0x6e71_2026_1124 XOR target scalar","candidate_rule":"R=[a]G+Q, xorshift a mod 1013","factor_base":"first 8 or 16 x-ordered canonical points","relation_predicate":"R is a sum of two factor-base points"},
+  "arms":{"fixed8":"B=8 throughout","fixed16":"B=16 throughout","yield64":"B=8 for first 64 trials; if fewer than 2 accepted rows by trial 64, expand to B=16; else stay B=8"},
+  "controls":"Same exact 512 ordered candidates per target across arms, setup and trial group additions counted; anchor log_G(G)=1; modular ranks, target pin and scalar check required; retain all arms and censoring.",
+  "expected":"Print 4096 candidate rows and 24 arm summaries, record expansion decisions, rank, target coverage, setup/trial additions and base scans separately. No winning-arm expectation registered.",
+  "limits":"Prior V2 used these same target streams; this is a same-stream policy diagnostic, not held-out tuning. Pair-sum collector is a small public EC component, not a general index-calculus oracle. Modular elimination, wall time and target descent costs unpriced."
+}

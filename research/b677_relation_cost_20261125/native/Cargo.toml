@@ -1,0 +1,31 @@
+[package]
+name = "b677-relation-cost"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+# Baseline arm: the frozen PR #5097 source, compiled byte-for-byte.
+[[bin]]
+name = "baseline-mitm"
+path = "../../prime31_graph_ecdlp_20261123/native/mitm_four.rs"
+
+# Same-target rho control, compiled byte-for-byte.
+[[bin]]
+name = "baseline-rho"
+path = "../../prime31_graph_ecdlp_20261123/native/rho_control.rs"
+
+# Candidate arms.
+[[bin]]
+name = "cost-v2"
+path = "cost_v2.rs"
+
+[[bin]]
+name = "rho-batched"
+path = "rho_batched.rs"
+
+[dependencies]
+prime31-four-summand = { path = "shim" }
+prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native" }
+serde_json = "1"

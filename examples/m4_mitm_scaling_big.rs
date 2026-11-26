@@ -23,7 +23,7 @@
 use std::collections::HashMap;
 use std::time::Instant;
 
-use num_bigint::{BigInt, BigUint};
+use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -84,17 +84,8 @@ fn largest_prime_below_pow2(bits: u32, res_mod4: u32) -> BigUint {
 }
 
 fn modinv(a: &BigUint, p: &BigUint) -> BigUint {
-    let (mut t, mut newt) = (BigInt::zero(), BigInt::one());
-    let (mut r, mut newr) = (BigInt::from(p.clone()), BigInt::from((a % p).clone()));
-    while !newr.is_zero() {
-        let q = &r / &newr;
-        let next_t = &t - &q * &newt;
-        t = std::mem::replace(&mut newt, next_t);
-        let next_r = &r - &q * &newr;
-        r = std::mem::replace(&mut newr, next_r);
-    }
-    let m = BigInt::from(p.clone());
-    (((t % &m) + &m) % &m).to_biguint().unwrap()
+    // Shared inverse; the old unchecked Euclid returned 0 for a ≡ 0 (p prime).
+    crypto_lib::gcd::int::modinv_big(a, p).unwrap_or_else(BigUint::zero)
 }
 
 #[derive(Clone, PartialEq, Eq)]

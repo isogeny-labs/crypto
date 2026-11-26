@@ -42,6 +42,8 @@ impl Default for Limits {
 pub enum Status {
     Complete,
     Empty,
+    /// A signed-relation consumer stopped traversal; the chart is not exhausted.
+    ConsumerStopped,
     UnsupportedChart,
     InvalidInput,
     BuildLimit,
@@ -82,21 +84,6 @@ pub struct ResultRow {
     pub relations: Vec<SignedRelation>,
     pub diagnostics: Diagnostics,
     pub traversal: Option<VisitReport>,
-}
-
-/// Validated equations from the same construction boundary used by native F4.
-/// Variables are b,c,d followed by the monic cofactor's lower coefficients.
-/// The unscaled quartic coefficients are in ascending X order. This is input data,
-/// not a solved system or an assertion of completeness.
-#[derive(Clone, Debug, Serialize)]
-pub struct PreparedCofactor {
-    pub prime: u64,
-    pub variables: usize,
-    pub equations: Vec<Poly>,
-    /// Each normalized equation is this scalar times its raw U*W-h coefficient.
-    pub equation_multipliers: Vec<u64>,
-    pub quartic: Vec<Poly>,
-    pub diagnostics: Diagnostics,
 }
 
 pub(crate) struct Builder {
@@ -327,15 +314,95 @@ fn is_nonzero_constant(g: &Poly) -> bool {
     !g.is_empty() && g.iter().all(|(e, _)| e.iter().all(|k| *k == 0))
 }
 
+enum LiftOutcome {
+    Accepted(SignedRelation),
+    Rejected,
+    Deadline,
+}
+
+/// Common literal signed lift for buffered and streaming traversal. No
+/// factor-base pair or tuple search is introduced by either consumer mode.
+#[allow(clippy::too_many_arguments)]
+fn lift_signed_assignment(
+    e: Curve,
+    target: (u64, u64),
+    a: &[u64; 3],
+    u: &[MPoly],
+    index: &BTreeMap<u64, (usize, u64)>,
+    deadline: Instant,
+    root_multiplications: &mut u64,
+    ar: &mut Arithmetic,
+) -> LiftOutcome {
+    let coeff: Vec<_> = u.iter().map(|f| eval(f, a, e.p)).collect();
+    let Some(roots) = poly_roots_fp_counted_until(
+        &coeff, e.p, 0x5252355f524f4f54, root_multiplications, Some(deadline),
+    ) else {
+        return LiftOutcome::Deadline;
+    };
+    if roots.len() != 4 {
+        return LiftOutcome::Rejected;
+    }
+    let mut terms = Vec::with_capacity(4);
+    let mut sum = None;
+    for x in roots {
+        let Some(&(idx, canonical_y)) = index.get(&x) else {
+            return LiftOutcome::Rejected;
+        };
+        let den = (x + a[0]) % e.p;
+        if den == 0 {
+            return LiftOutcome::Rejected;
+        }
+        let a0 = (mm(a[1], x, e.p) + a[2]) % e.p;
+        let fraction = mm(
+            mm((x + e.p - target.0) % e.p, a0, e.p),
+            pow(den, e.p - 2, e.p), e.p,
+        );
+        let y = (2 * e.p - target.1 - fraction) % e.p;
+        let sign = if y == canonical_y {
+            1
+        } else if y == (e.p - canonical_y) % e.p {
+            -1
+        } else {
+            return LiftOutcome::Rejected;
+        };
+        if !ar.on_curve(e, Some((x, y))) {
+            return LiftOutcome::Rejected;
+        }
+        sum = ar.add(e, sum, Some((x, y)));
+        terms.push((idx, sign));
+    }
+    terms.sort_unstable();
+    if sum == Some(target) && terms.len() == 4 {
+        LiftOutcome::Accepted(SignedRelation { terms })
+    } else {
+        LiftOutcome::Rejected
+    }
+}
+
 /// No scalar or decomposition hint is accepted by this interface.
 pub fn extract(e: Curve, base: &[(u64, u64)], q: Point, limits: Limits) -> ResultRow {
+    extract_internal(e, base, q, limits, Presentation::Automatic, None, None)
+}
+
+/// Deliver each distinct signed, point-replayed row as soon as its algebraic
+/// coefficient solution is available. Return true to stop. Emitted rows are
+/// also retained in the returned bounded prefix. A stop is never Complete or
+/// Empty, even if the last possible solution happened to trigger it.
+///
+/// Deadlines are checked cooperatively around native work and after callbacks;
+/// an in-progress callback cannot be preempted. Use a process supervisor when
+/// a hard elapsed-time ceiling is required.
+///
+/// The existing batch entry point keeps its original buffered lifting order.
+pub fn extract_visit(
+    e: Curve,
+    base: &[(u64, u64)],
+    q: Point,
+    limits: Limits,
+    mut visitor: impl FnMut(&SignedRelation) -> bool,
+) -> ResultRow {
     extract_internal(
-        e,
-        base,
-        q,
-        limits,
-        Presentation::Automatic,
-        Execution::F4(None),
+        e, base, q, limits, Presentation::Automatic, None, Some(&mut visitor),
     )
 }
 
@@ -353,30 +420,26 @@ pub fn extract_cofactor(
         q,
         limits,
         Presentation::Cofactor,
-        Execution::F4(Some(resource_limits)),
+        Some(resource_limits),
+        None,
     )
 }
 
-/// Build the exact cofactor equations without invoking F4 or root extraction.
-/// Input validation, chart omissions and construction limits are unchanged.
-/// A pre-construction Empty/UnsupportedChart/etc. is returned in the error
-/// channel so that callers cannot mistake it for a prepared equation system.
-pub fn prepare_cofactor(
+/// Streaming counterpart of the monic-cofactor reference. All F4 allocation
+/// limits and the shared cooperative construction/root/visitor deadline remain
+/// active. An in-progress callback cannot be preempted.
+pub fn extract_cofactor_visit(
     e: Curve,
     base: &[(u64, u64)],
     q: Point,
     limits: Limits,
-) -> Result<PreparedCofactor, Box<ResultRow>> {
-    let mut prepared = None;
-    let result = extract_internal(
-        e,
-        base,
-        q,
-        limits,
-        Presentation::Cofactor,
-        Execution::Prepare(&mut prepared),
-    );
-    prepared.ok_or_else(|| Box::new(result))
+    resource_limits: F4ResourceLimits,
+    mut visitor: impl FnMut(&SignedRelation) -> bool,
+) -> ResultRow {
+    extract_internal(
+        e, base, q, limits, Presentation::Cofactor,
+        Some(resource_limits), Some(&mut visitor),
+    )
 }
 
 /// The validated original hybrid base; no scalar or decomposition enters here.
@@ -392,7 +455,23 @@ pub fn extract_hybrid677(
         q,
         limits,
         Presentation::Hybrid(base),
-        Execution::F4(Some(resource_limits)),
+        Some(resource_limits),
+        None,
+    )
+}
+
+/// Streaming counterpart of the existing structured B677 chart. This changes
+/// no fixture, selector, frozen protocol or admission condition.
+pub fn extract_hybrid677_visit(
+    base: &Hybrid677,
+    q: Point,
+    limits: Limits,
+    resource_limits: F4ResourceLimits,
+    mut visitor: impl FnMut(&SignedRelation) -> bool,
+) -> ResultRow {
+    extract_internal(
+        prime31_algebraic_ic::PRIME31, base.points(), q, limits,
+        Presentation::Hybrid(base), Some(resource_limits), Some(&mut visitor),
     )
 }
 
@@ -424,18 +503,14 @@ enum Presentation<'a> {
     HybridSplit22(&'a Hybrid677, usize),
 }
 
-enum Execution<'a> {
-    F4(Option<F4ResourceLimits>),
-    Prepare(&'a mut Option<PreparedCofactor>),
-}
-
 fn extract_internal(
     e: Curve,
     base: &[(u64, u64)],
     q: Point,
     limits: Limits,
     presentation: Presentation<'_>,
-    execution: Execution<'_>,
+    resource_limits: Option<F4ResourceLimits>,
+    mut visitor: Option<&mut dyn FnMut(&SignedRelation) -> bool>,
 ) -> ResultRow {
     let use_product = matches!(presentation, Presentation::Cofactor)
         || matches!(presentation, Presentation::Automatic) && (5..=8).contains(&base.len());
@@ -581,35 +656,6 @@ fn extract_internal(
         .flat_map(|f| f.iter().map(|(e, _)| e.iter().sum()))
         .max()
         .unwrap_or(0);
-    let resource_limits = match execution {
-        Execution::F4(limits) => limits,
-        Execution::Prepare(output) => {
-            result.diagnostics.curve_work = ar.counts;
-            let equation_multipliers = constraints
-                .iter()
-                .zip(&equations)
-                .map(|(raw, normalized)| {
-                    normalized.first().map_or(1, |(exponents, coefficient)| {
-                        mm(*coefficient, pow(raw[exponents], e.p - 2, e.p), e.p)
-                    })
-                })
-                .collect();
-            *output = Some(PreparedCofactor {
-                prime: e.p,
-                variables,
-                equations,
-                equation_multipliers,
-                quartic: u
-                    .iter()
-                    .map(|f| f.iter().map(|(e, c)| (e.clone(), *c)).collect())
-                    .collect(),
-                diagnostics: result.diagnostics.clone(),
-            });
-            result.status = Status::Inconclusive;
-            result.reason = "cofactor equations prepared; solving not attempted".into();
-            return result;
-        }
-    };
     let mut opts = F4Options::new(ordering, limits.max_degree);
     if let Presentation::HybridSplit22(_, pair_batch) = presentation {
         opts.max_pairs_per_step = Some(pair_batch);
@@ -617,7 +663,11 @@ fn extract_internal(
     opts.deadline = Some(deadline);
     opts.resource_limits = resource_limits;
     let mut assignments = Vec::new();
+    let mut assignments_seen = 0usize;
     let mut output_cap = false;
+    let mut consumer_stopped = false;
+    let mut lift_deadline = false;
+    let mut distinct = BTreeSet::new();
     let mut refused = 0usize;
     let traversal = solve_visit_traced(
         &equations,
@@ -626,14 +676,42 @@ fn extract_internal(
         &opts,
         &vec![None; variables],
         |a| {
-            if assignments.len() >= limits.max_assignments {
+            if assignments_seen >= limits.max_assignments {
                 output_cap = true;
                 return true;
             }
+            assignments_seen += 1;
             // The native visitor replays every original equation on the full
             // assignment before this callback. The monic cofactor is unique,
             // so only the three RR5 parameters are needed for signed lifting.
-            assignments.push([a[0], a[1], a[2]]);
+            let parameters = [a[0], a[1], a[2]];
+            if let Some(consume) = visitor.as_mut() {
+                match lift_signed_assignment(
+                    e, target, &parameters, &u, &index, deadline,
+                    &mut result.diagnostics.root_multiplications, &mut ar,
+                ) {
+                    LiftOutcome::Accepted(relation) => {
+                        if distinct.insert(relation.terms.clone()) {
+                            result.relations.push(relation);
+                            if consume(result.relations.last().unwrap()) {
+                                consumer_stopped = true;
+                                return true;
+                            }
+                        }
+                    }
+                    LiftOutcome::Rejected => result.diagnostics.rejected_assignments += 1,
+                    LiftOutcome::Deadline => {
+                        lift_deadline = true;
+                        return true;
+                    }
+                }
+                if Instant::now() >= deadline {
+                    lift_deadline = true;
+                    return true;
+                }
+            } else {
+                assignments.push(parameters);
+            }
             false
         },
         |event| {
@@ -669,13 +747,19 @@ fn extract_internal(
     };
     result.diagnostics.forbidden_branch_attempts = traversal.full_field_branches;
     result.diagnostics.forbidden_domain_evaluations = traversal.domain_evaluations;
-    result.diagnostics.assignments_extracted = assignments.len();
+    result.diagnostics.assignments_extracted = assignments_seen;
     let complete = traversal.complete
         && !traversal.timed_out
         && !traversal.trace_stopped
         && traversal.resource_limit.is_none()
-        && !output_cap;
-    result.status = if output_cap {
+        && !output_cap
+        && !consumer_stopped
+        && !lift_deadline;
+    result.status = if consumer_stopped {
+        Status::ConsumerStopped
+    } else if lift_deadline {
+        Status::Deadline
+    } else if output_cap {
         Status::OutputLimit
     } else if traversal.resource_limit.is_some() {
         Status::ResourceLimit
@@ -686,7 +770,11 @@ fn extract_internal(
     } else {
         Status::Complete
     };
-    result.reason = traversal
+    result.reason = if consumer_stopped {
+        "signed-relation consumer stopped; chart not exhausted".into()
+    } else if lift_deadline {
+        "signed lift or consumer reached the shared deadline".into()
+    } else { traversal
         .resource_limit
         .as_ref()
         .map(ToString::to_string)
@@ -697,74 +785,33 @@ fn extract_internal(
             } else {
                 "incomplete algebraic traversal".into()
             }
-        });
+        }) };
     result.traversal = Some(traversal);
-    let mut distinct = BTreeSet::new();
     for a in assignments {
-        let coeff: Vec<_> = u.iter().map(|f| eval(f, &a, e.p)).collect();
-        let roots = poly_roots_fp_counted_until(
-            &coeff,
-            e.p,
-            0x5252355f524f4f54,
-            &mut result.diagnostics.root_multiplications,
-            Some(deadline),
-        );
-        let Some(roots) = roots else {
-            result.status = Status::Deadline;
-            result.reason = "quartic root extraction deadline".into();
-            break;
-        };
-        if roots.len() != 4 {
-            result.diagnostics.rejected_assignments += 1;
-            continue;
-        }
-        let mut terms = Vec::new();
-        let mut sum = None;
-        let mut valid = true;
-        for x in roots {
-            let Some(&(idx, canonical_y)) = index.get(&x) else {
-                valid = false;
-                break;
-            };
-            let den = (x + a[0]) % e.p;
-            if den == 0 {
-                valid = false;
+        match lift_signed_assignment(
+            e, target, &a, &u, &index, deadline,
+            &mut result.diagnostics.root_multiplications, &mut ar,
+        ) {
+            LiftOutcome::Accepted(relation) => {
+                if distinct.insert(relation.terms.clone()) {
+                    result.relations.push(relation);
+                }
+            }
+            LiftOutcome::Rejected => result.diagnostics.rejected_assignments += 1,
+            LiftOutcome::Deadline => {
+                result.status = Status::Deadline;
+                result.reason = "quartic root extraction deadline".into();
                 break;
             }
-            let a0 = (mm(a[1], x, e.p) + a[2]) % e.p;
-            let fraction = mm(
-                mm((x + e.p - target.0) % e.p, a0, e.p),
-                pow(den, e.p - 2, e.p),
-                e.p,
-            );
-            let y = (2 * e.p - target.1 - fraction) % e.p;
-            let sign = if y == canonical_y {
-                1
-            } else if y == (e.p - canonical_y) % e.p {
-                -1
-            } else {
-                valid = false;
-                break;
-            };
-            if !ar.on_curve(e, Some((x, y))) {
-                valid = false;
-                break;
-            }
-            sum = ar.add(e, sum, Some((x, y)));
-            terms.push((idx, sign));
-        }
-        terms.sort_unstable();
-        if valid && sum == q && terms.len() == 4 {
-            if distinct.insert(terms.clone()) {
-                result.relations.push(SignedRelation { terms });
-            }
-        } else {
-            result.diagnostics.rejected_assignments += 1;
         }
     }
     if result.diagnostics.rejected_assignments > 0 {
-        result.status = Status::Inconclusive;
-        result.reason = "an algebraic assignment failed signed chart replay".into();
+        if matches!(result.status, Status::Complete | Status::Empty) {
+            result.status = Status::Inconclusive;
+        }
+        // Preserve the specific cap/deadline/consumer termination reason;
+        // failed signed lifting is additional incomplete evidence.
+        result.reason.push_str("; an algebraic assignment failed signed chart replay");
     } else if result.status == Status::Complete && result.relations.is_empty() {
         result.status = Status::Empty;
     }

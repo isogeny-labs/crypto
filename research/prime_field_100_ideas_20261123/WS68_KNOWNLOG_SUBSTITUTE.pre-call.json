@@ -1,0 +1,15 @@
+{
+  "record_type": "immutable_pre_call",
+  "created_utc": "2026-11-25T05:46:40Z",
+  "admission": "user-authorized local E(F_p) run; prior S3 HTTP 403 and missing .resume gates remain unqualified; no cloud spend",
+  "conductor_task": "T-12338",
+  "worktree_commit": "0b9e7498456145108c5acc880c6e5e2a7c86631a",
+  "source": {"path": "WS68_KNOWNLOG_SUBSTITUTE.rs", "sha256": "cd05e7f77a9a2cfcd802961d3ab9ae1cc34207839aa60172685c226a43bde1f7"},
+  "immutable_qualifier": {"path": "WS68_KNOWNLOG_SUBSTITUTE.qualifier.rs", "sha256": "cd05e7f77a9a2cfcd802961d3ab9ae1cc34207839aa60172685c226a43bde1f7"},
+  "compiler": {"path": "/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc", "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv": ["rustc", "-O", "--edition", "2021", "--crate-name", "WS68_KNOWNLOG_SUBSTITUTE", "WS68_KNOWNLOG_SUBSTITUTE.qualifier.rs", "-o", "WS68_KNOWNLOG_SUBSTITUTE.bin"],
+  "input": {"curve": "E/F_1009: y^2=x^3+x+14", "generator": [0,425], "order": 1013, "rows": "six A/B rows in EC_GRAPH_RANK_GP_V2.gp", "producer_stdout_sha256": "1a2f0f09992538dd789f38fda43a5bd20765580f952dba7181e3e99b81e59f83", "known_log_P0": 1, "retained_target": "P2=3G"},
+  "control": "blind deletion of column P0 with unchanged RHS",
+  "expected": {"six_original_group_identities": true, "six_substituted_group_identities": true, "blind_deletion_invalid_rows": 4, "reduced_rank_each": 2, "recovered_retained_logs": [2,3], "target_P2_covered": true},
+  "claim_boundary": "Exact substitution component after a known log is supplied; no exhausted-prime selection policy, relation-discovery gain or full-cost speedup."
+}

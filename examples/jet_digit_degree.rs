@@ -47,15 +47,7 @@ fn powmod(mut a: u128, mut e: u128, m: u128) -> u128 {
 }
 /// Inverse of `a` modulo `m` (extended Euclid); requires gcd(a, m) = 1.
 fn invmod(a: u128, m: u128) -> u128 {
-    let (mut r0, mut r1) = (m as i128, (a % m) as i128);
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    assert_eq!(r0, 1, "invmod: gcd(a, m) != 1");
-    t0.rem_euclid(m as i128) as u128
+    crypto_lib::gcd::int::inv_mod_u128(a, m).expect("invmod: gcd(a, m) != 1")
 }
 
 // ------------------------------------------------------------ complete curve

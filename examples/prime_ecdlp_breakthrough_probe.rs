@@ -80,19 +80,8 @@ fn neg_mod(a: u64, n: u64) -> u64 {
 }
 
 fn inv_mod(a: u64, n: u64) -> u64 {
-    // n prime; a != 0
-    let (mut old_r, mut r) = (a as i128, n as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        let t = old_r - q * r;
-        old_r = r;
-        r = t;
-        let t = old_s - q * s;
-        old_s = s;
-        s = t;
-    }
-    old_s.rem_euclid(n as i128) as u64
+    // n prime; a != 0.  Unchecked as before: 0 when a is not a unit.
+    crypto_lib::gcd::int::inv_mod_u64(a, n).unwrap_or(0)
 }
 
 /// Target-independent walk: table entries are `[u_j]G` only.

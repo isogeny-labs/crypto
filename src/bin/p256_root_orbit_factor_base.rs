@@ -855,7 +855,9 @@ fn projection(columns: u64, classes: u64, curve: &CurveParams) -> Projection {
 }
 
 fn mod_inverse(value: &BigUint, modulus: &BigUint) -> BigUint {
-    value.modpow(&(modulus - 2u8), modulus)
+    // Was Fermat value^(modulus-2); every modulus here is prime (P-256 p or n,
+    // 101 in tests), so the shared inverse is equal, and 0 for value ≡ 0 as before.
+    crypto_lib::gcd::int::modinv_big(value, modulus).unwrap_or_else(BigUint::zero)
 }
 
 fn hex_field(value: &BigUint) -> String {

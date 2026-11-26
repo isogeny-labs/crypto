@@ -17,6 +17,8 @@ pub mod projection;
 pub mod quotient;
 pub mod replay;
 pub mod workload;
+pub mod relation_labels;
+pub mod degree_space;
 
 // Only the explicit native-owned factory selects these mathematically identical
 // kernel variants. Legacy public paths start in mode zero on every thread.

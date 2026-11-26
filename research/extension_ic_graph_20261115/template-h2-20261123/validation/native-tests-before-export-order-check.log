@@ -1,0 +1,42 @@
+    Updating crates.io index
+     Locking 22 packages to highest compatible versions
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding sha2 v0.10.9 (available: v0.11.1)
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling generic-array v0.14.7
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling syn v3.0.10
+   Compiling itoa v1.0.19
+   Compiling memchr v2.8.3
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling digest v0.10.7
+   Compiling cfg-if v1.0.5
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling certified-relations v0.1.0 (/workspace/crypto-action-local-20261123/crates/certified-relations)
+   Compiling nagao-template-probe v0.1.0 (/workspace/crypto-action-local-20261123/research/extension_ic_graph_20261115/template-h2-20261123/native)
+    Finished `release` profile [optimized] target(s) in 15.39s
+     Running unittests ../../../../src/cryptanalysis/jv_nagao_template.rs (/tmp/ic-h2-template-target/release/build/nagao-template-probe/82d285ed957bdbfe/out/nagao_template-82d285ed957bdbfe)
+
+running 9 tests
+test tests::changed_support_and_arity_refuse ... ok
+test tests::inconsistent_training_and_rank_drop_are_distinguished ... ok
+test tests::changed_dimension_refuses_instead_of_returning_empty_roots ... ok
+test tests::malformed_proof_indices_and_exponents_refuse_without_checker_panic ... ok
+test tests::mutated_development_provenance_is_rejected ... ok
+test tests::mutual_containment_rejects_changed_constant ... ok
+test tests::nonradical_degree_drop_in_constant_is_complete ... ok
+test tests::nonprime_empty_and_resource_caps_refuse ... ok
+test tests::ordinary_parameter_change_has_complete_provenance ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

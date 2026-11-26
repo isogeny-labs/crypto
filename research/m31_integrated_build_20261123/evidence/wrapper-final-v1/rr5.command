@@ -1,0 +1,1 @@
+timeout 180 /workspace/scratch/cdbe94c88979/toolchain/rustup/toolchains/1.100.0-x86_64-unknown-linux-gnu/bin/cargo test --offline --locked --release --manifest-path research/prime31_four_summand_20261122/native/Cargo.toml --all-targets -j1 -- --test-threads=1 

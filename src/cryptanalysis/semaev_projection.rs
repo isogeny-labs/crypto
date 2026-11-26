@@ -1978,13 +1978,37 @@ impl PairProjection {
                 return (witness, stats);
             }
         }
-        let pts: Vec<(u64, u64)> = self
-            .fast_finite_list
-            .iter()
-            .map(|&(u, yu, _, _)| (u, yu))
-            .collect();
-        let all_roots = roots_batch(&self.curve, &pts, target, yt);
-        for (&(u, _, x1, x2), roots) in self.fast_finite_list.iter().zip(all_roots) {
+        // With early exit, compute roots block by block so a hit near the
+        // front of the list does not pay for the whole table. A full scan
+        // keeps one batch (unchanged cost and results).
+        let block = if early_exit {
+            QUERY_BATCH
+        } else {
+            self.fast_finite_list.len().max(1)
+        };
+        let mut pts: Vec<(u64, u64)> = Vec::with_capacity(block);
+        for chunk in self.fast_finite_list.chunks(block) {
+            pts.clear();
+            pts.extend(chunk.iter().map(|&(u, yu, _, _)| (u, yu)));
+            let roots_block = roots_batch(&self.curve, &pts, target, yt);
+            if self.scan_fast_block(chunk, roots_block, &mut witness, &mut stats, early_exit) {
+                break;
+            }
+        }
+        (witness, stats)
+    }
+
+    /// Scan one block of `fast_finite_list` against its precomputed roots.
+    /// Returns true when the caller should stop (early exit with a witness).
+    fn scan_fast_block(
+        &self,
+        chunk: &[(u64, u64, u64, u64)],
+        roots_block: Vec<QuadraticRoots>,
+        witness: &mut Option<FourSumWitness>,
+        stats: &mut QueryStats,
+        early_exit: bool,
+    ) -> bool {
+        for (&(u, _, x1, x2), roots) in chunk.iter().zip(roots_block) {
             stats.quadratics += 1;
             match roots {
                 QuadraticRoots::None => {}
@@ -2015,10 +2039,10 @@ impl PairProjection {
                 }
             }
             if early_exit && witness.is_some() {
-                break;
+                return true;
             }
         }
-        (witness, stats)
+        false
     }
 
     /// Reference four-summand query: per-`u` `invm` + `sqrtm`, full scan.
@@ -2565,6 +2589,41 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// Block-wise early exit must return exactly the full scan's first witness,
+    /// including when the hit lies beyond the first `QUERY_BATCH` block.
+    #[test]
+    fn first_blockwise_matches_full_scan_first_witness() {
+        // Sparse regime: about 870 pair roots in a field of 100003 elements,
+        // so the first hit typically lies beyond the first 64-entry block.
+        let e = Curve {
+            p: 100_003,
+            a: 2,
+            b: 3,
+        };
+        let base = interval_factor_base(&e, 60);
+        let proj = PairProjection::build_fast(e, &base).unwrap();
+        assert!(proj.fast_finite_list.len() > 4 * QUERY_BATCH);
+        let (mut hits, mut beyond_first_block) = (0, 0);
+        for t in 0..4_000 {
+            if sqrtm(e.rhs(t), e.p).is_none() {
+                continue;
+            }
+            let (full, _) = proj.decompose_four_fast_path(t);
+            let (first, stats) = proj.decompose_four_first(t);
+            assert_eq!(first, full, "target {t}");
+            if first.is_some() {
+                hits += 1;
+                if stats.quadratics > QUERY_BATCH as u64 {
+                    beyond_first_block += 1;
+                }
+            }
+        }
+        assert!(
+            hits > 0 && beyond_first_block > 0,
+            "{hits} {beyond_first_block}"
+        );
     }
 
     #[test]

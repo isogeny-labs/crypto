@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:08:23Z",
+ "id": "PCC-20261124-f702de",
+ "kind": "execution",
+ "producer": {
+  "commit": "f4a3066e3b6b5e3eceff87fcd6f43acfb4c9f4f0",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/koszul-tests.log",
+    "sha256": "b25ee09c61901e95f106ddb1803b85ca1881fc421ec0636f8edf8f9afb0d45d2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/koszul-clippy.log",
+    "sha256": "24838410547c523a34b70aa94c09263ea217de8c39eb3f23e3f7ebb6612827d1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/koszul-source-and-binary.sha256",
+    "sha256": "508d2b591fd96934586434535c6179551e5298e7ec2747e4134564fa3c9c4449"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The exact H2 principal-syzygy module passes eleven native release controls, including bounded pruned/unpruned row-space equality, complete ordinary/nonradical ideals and changed-input-leading-term refusal; release build and strict all-target no-deps Clippy D warnings pass. This qualifies source only; the frozen degree-5/6 saved-case probe is not yet executed and no parity or cost gain asserted."
+}

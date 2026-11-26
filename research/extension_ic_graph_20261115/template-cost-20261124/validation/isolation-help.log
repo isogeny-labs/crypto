@@ -1,0 +1,13 @@
+Run a benchmark on a reserved, pinned CPU and record what else was running
+
+Usage: isolated-bench <COMMAND>
+
+Commands:
+  run      Run one command pinned to the reserved CPUs
+  reserve  Reserve the CPUs and monitor the machine for a harness that pins its own children
+  busy     Run heavy work that is not a benchmark under the same lock
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version

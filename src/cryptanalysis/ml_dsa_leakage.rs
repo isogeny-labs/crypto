@@ -69,24 +69,7 @@ pub const N: usize = 256;
 /// `a^{-1} mod q` by the extended Euclidean algorithm. `q` is prime, so this
 /// exists for every `a ≢ 0`.
 pub fn inv_mod_q(a: i64) -> Option<i64> {
-    let a = a.rem_euclid(Q);
-    if a == 0 {
-        return None;
-    }
-    let (mut old_r, mut r) = (a, Q);
-    let (mut old_s, mut s) = (1i64, 0i64);
-    while r != 0 {
-        let quot = old_r / r;
-        let (nr, ns) = (old_r - quot * r, old_s - quot * s);
-        old_r = r;
-        r = nr;
-        old_s = s;
-        s = ns;
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(Q))
+    crate::gcd::int::inv_mod_i64(a, Q)
 }
 
 /// Solve `M·x ≡ b (mod q)` for `x ∈ Z_q^n` by Gaussian elimination.

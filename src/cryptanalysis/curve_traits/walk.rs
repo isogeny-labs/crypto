@@ -548,19 +548,8 @@ impl Word {
     }
     /// The monic gcd; empty when both are zero.
     fn gcd(&self, a: &[u64], b: &[u64]) -> Vec<u64> {
-        let (mut a, mut b) = (Self::strip(a.to_vec()), Self::strip(b.to_vec()));
-        while !b.is_empty() {
-            let r = self.rem(&a, &b);
-            a = b;
-            b = r;
-        }
-        match a.last() {
-            None => a,
-            Some(&lead) => {
-                let lead = self.inv(lead);
-                a.iter().map(|&c| self.m(c, lead)).collect()
-            }
-        }
+        let red = |v: &[u64]| -> Vec<u64> { v.iter().map(|&c| c % self.p).collect() };
+        crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(self.p), &red(a), &red(b))
     }
     fn mulmod(&self, a: &[u64], b: &[u64], f: &[u64]) -> Vec<u64> {
         if a.is_empty() || b.is_empty() {

@@ -1,0 +1,1 @@
+cmp /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/expected-producer-sources.sha256 /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/producer/research/prime31_graph_ecdlp_20261123/evidence/mitm-b677-control-01/sources.sha256 

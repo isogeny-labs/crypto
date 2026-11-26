@@ -224,63 +224,24 @@ fn poly_mul_mod_q(a: &[i64], b: &[i64]) -> Vec<i64> {
     out
 }
 
-/// Inverse of `p` in Z_q[x]/(xⁿ+1) by Gaussian elimination on the
-/// multiplication matrix; `None` if not invertible.
+/// Inverse of `p` in Z_q[x]/(xⁿ+1) (shared extended Euclid,
+/// `crate::gcd::poly::inv_mod`); `None` if not invertible.
 fn poly_inv_mod_q(p: &[i64]) -> Option<Vec<i64>> {
-    let inv_mod = |a: i64| -> Option<i64> {
-        // Fermat: q prime.
-        let mut r = 1i64;
-        let mut b = a.rem_euclid(Q);
-        if b == 0 {
-            return None;
-        }
-        let mut e = Q - 2;
-        while e > 0 {
-            if e & 1 == 1 {
-                r = r * b % Q;
-            }
-            b = b * b % Q;
-            e >>= 1;
-        }
-        Some(r)
-    };
-    // Multiplication matrix over Z_q.
-    let mut m = vec![vec![0i64; N]; N];
-    for j in 0..N {
-        for i in 0..N {
-            let k = i + j;
-            if k < N {
-                m[k][j] = (m[k][j] + p[i]).rem_euclid(Q);
-            } else {
-                m[k - N][j] = (m[k - N][j] - p[i]).rem_euclid(Q);
-            }
-        }
+    // Q is prime, so Z_q[x]/(xⁿ+1) inverses are unique: the shared extended
+    // Euclid gives the value the old Gaussian elimination did, with
+    // coefficients in [0, Q) and length N.
+    use crate::gcd::poly::{inv_mod, Fp64};
+    let field = Fp64::new(Q as u64);
+    let a: Vec<u64> = p[..N].iter().map(|&c| c.rem_euclid(Q) as u64).collect();
+    let mut modulus = vec![0u64; N + 1];
+    modulus[0] = 1;
+    modulus[N] = 1;
+    let inv = inv_mod(&field, &a, &modulus)?;
+    let mut out = vec![0i64; N];
+    for (o, &c) in out.iter_mut().zip(&inv) {
+        *o = c as i64;
     }
-    let mut inv = vec![vec![0i64; N]; N];
-    for (i, row) in inv.iter_mut().enumerate() {
-        row[i] = 1;
-    }
-    for col in 0..N {
-        let pivot = (col..N).find(|&r| m[r][col] != 0)?;
-        m.swap(col, pivot);
-        inv.swap(col, pivot);
-        let piv = inv_mod(m[col][col])?;
-        for j in 0..N {
-            m[col][j] = m[col][j] * piv % Q;
-            inv[col][j] = inv[col][j] * piv % Q;
-        }
-        for r in 0..N {
-            if r != col && m[r][col] != 0 {
-                let f = m[r][col];
-                for j in 0..N {
-                    m[r][j] = (m[r][j] - f * m[col][j]).rem_euclid(Q);
-                    inv[r][j] = (inv[r][j] - f * inv[col][j]).rem_euclid(Q);
-                }
-            }
-        }
-    }
-    // First column of the inverse matrix = p⁻¹ (action on 1).
-    Some((0..N).map(|i| inv[i][0]).collect())
+    Some(out)
 }
 
 // ── NTRU equation: find F, G with f·G − g·F = q ──────────────────────────────

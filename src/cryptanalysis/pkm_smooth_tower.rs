@@ -67,7 +67,11 @@ pub mod opcount {
     }
     /// `(sqrtm, invm, mulm)`; mulm includes those inside powm/invm/sqrtm.
     pub fn snapshot() -> (u64, u64, u64) {
-        (SQRTM.with(|c| c.get()), INVM.with(|c| c.get()), MULM.with(|c| c.get()))
+        (
+            SQRTM.with(|c| c.get()),
+            INVM.with(|c| c.get()),
+            MULM.with(|c| c.get()),
+        )
     }
 }
 
@@ -1286,16 +1290,12 @@ fn poly_monic(a: &Poly, p: u64) -> Poly {
 }
 /// Monic gcd.
 pub fn poly_gcd(a: &Poly, b: &Poly, p: u64) -> Poly {
-    let (mut a, mut b) = (poly_trim(a.clone()), poly_trim(b.clone()));
-    while !poly_is_zero(&b) {
-        let r = poly_divrem(&a, &b, p).1;
-        a = b;
-        b = r;
-    }
-    if poly_is_zero(&a) {
-        a
+    // Shared monic gcd; this module writes the zero polynomial as `[0]`.
+    let g = crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(p), a, b);
+    if g.is_empty() {
+        vec![0]
     } else {
-        poly_monic(&a, p)
+        g
     }
 }
 fn poly_powmod(base: &Poly, mut e: u64, f: &Poly, p: u64) -> Poly {

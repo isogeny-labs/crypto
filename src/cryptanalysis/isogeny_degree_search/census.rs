@@ -486,11 +486,7 @@ pub fn subfield_j_count(n: u32) -> u64 {
 }
 
 fn gcd(a: u32, b: u32) -> u32 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crate::gcd::int::gcd_u64(a as u64, b as u64) as u32
 }
 
 #[cfg(test)]
