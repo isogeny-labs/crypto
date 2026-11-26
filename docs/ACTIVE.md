@@ -358,7 +358,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
-- [ ] Test shared-coefficient membership nonenumeratively with blinded B=4/8 controls and a fully charged B=31 one-target solve, compared with cached BSGS and optimized Pollard rho across at least six growing sizes (Codex, started 2026-11-18, branch codex/shared-coefficient-membership-20261118-v2, PR #4692; follow-up to merged setup PR #4675)
+- [ ] Test shared-coefficient membership nonenumeratively with blinded B=4/8 controls and a fully charged B=31 one-target solve, compared with cached BSGS and optimized Pollard rho across at least six growing sizes (Codex, started 2026-11-18; continued 2026-11-25 on branch codex/rr9-full8-accounting-20261125, PR #5203; prior implementation PR #4692 merged without scientific rows)
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
 
 - [ ] Benchmark the Boolean Faugère–Lachartre F4 split and enforce canonical binary-field profiles across Gröbner/Semaev workloads (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4710)
