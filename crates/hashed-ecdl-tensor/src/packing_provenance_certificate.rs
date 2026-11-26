@@ -81,6 +81,144 @@ pub struct VerificationSummary {
     pub source_bounds_verified: bool,
 }
 
+/// Coarse structural description ceiling for one packing-provenance object.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct DescriptionEnvelope {
+    /// Primitive numeric, Boolean, null, and tuple atoms.
+    pub scalar_atoms: usize,
+    /// JSON arrays and objects.
+    pub containers: usize,
+    /// Named JSON object fields.
+    pub named_fields: usize,
+    /// Maximum bit width of any serialized integer, with minimum one.
+    pub integer_width: usize,
+    /// Coarse JSON byte ceiling.
+    pub json_bytes_bound: usize,
+    /// Coarse canonical length-prefixed binary bit ceiling.
+    pub canonical_binary_bits_bound: usize,
+}
+
+fn checked_sum(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(0usize, |sum, &value| {
+        sum.checked_add(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn checked_product(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(1usize, |product, &value| {
+        product
+            .checked_mul(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn bit_width(value: usize) -> usize {
+    (usize::BITS as usize - value.leading_zeros() as usize).max(1)
+}
+
+/// Derive a structural description ceiling without serializing the object.
+///
+/// The JSON bound charges 64 bytes per primitive, container, field, and one
+/// framing unit. Canonical binary charges the actual maximum integer width per
+/// primitive and 64 framing bits per container and field.
+pub fn description_envelope(certificate: &Certificate) -> Result<DescriptionEnvelope, String> {
+    let edges = certificate.edges.len();
+    let rows = certificate.row_labels.len();
+    let columns = certificate.column_labels.len();
+    let packets = certificate.packet_pairs.len();
+    let pair_count = certificate
+        .packet_pairs
+        .iter()
+        .try_fold(0usize, |sum, pairs| {
+            sum.checked_add(pairs.len())
+                .ok_or_else(|| "packing provenance pair count overflow".to_string())
+        })?;
+    let vertices = rows
+        .checked_add(columns)
+        .ok_or_else(|| "packing provenance vertex count overflow".to_string())?;
+    let scalar_atoms = checked_sum(
+        &[
+            6,
+            checked_product(&[4, edges], "packing provenance edge atoms")?,
+            checked_product(&[2, vertices], "packing provenance vertex atoms")?,
+            checked_product(&[2, pair_count], "packing provenance pair atoms")?,
+        ],
+        "packing provenance scalar atoms",
+    )?;
+    let containers = checked_sum(
+        &[7, edges, packets, pair_count],
+        "packing provenance containers",
+    )?;
+    let named_fields = checked_sum(
+        &[
+            12,
+            checked_product(&[4, edges], "packing provenance edge fields")?,
+        ],
+        "packing provenance fields",
+    )?;
+    let maximum = std::iter::once(certificate.schema as usize)
+        .chain(std::iter::once(certificate.radix))
+        .chain(std::iter::once(certificate.packet_exponent as usize))
+        .chain(std::iter::once(certificate.coordinate as usize))
+        .chain(certificate.source_degree_cap)
+        .chain(
+            certificate
+                .edges
+                .iter()
+                .flat_map(|edge| [edge.left, edge.left_port, edge.right, edge.right_port]),
+        )
+        .chain(certificate.row_labels.iter().copied())
+        .chain(certificate.column_labels.iter().copied())
+        .chain(certificate.row_creation_precisions.iter().copied())
+        .chain(certificate.column_creation_precisions.iter().copied())
+        .chain(
+            certificate
+                .packet_pairs
+                .iter()
+                .flatten()
+                .flat_map(|&(left, right)| [left, right]),
+        )
+        .max()
+        .unwrap_or(0);
+    let integer_width = bit_width(maximum);
+    let structural_units = checked_sum(
+        &[scalar_atoms, containers, named_fields, 1],
+        "packing provenance structural units",
+    )?;
+    let json_bytes_bound = checked_product(
+        &[64, structural_units],
+        "packing provenance JSON description",
+    )?;
+    let canonical_binary_bits_bound = checked_sum(
+        &[
+            checked_product(
+                &[scalar_atoms, integer_width],
+                "packing provenance binary atoms",
+            )?,
+            checked_product(
+                &[
+                    64,
+                    checked_sum(
+                        &[containers, named_fields, 1],
+                        "packing provenance binary framing units",
+                    )?,
+                ],
+                "packing provenance binary framing",
+            )?,
+        ],
+        "packing provenance binary description",
+    )?;
+    Ok(DescriptionEnvelope {
+        scalar_atoms,
+        containers,
+        named_fields,
+        integer_width,
+        json_bytes_bound,
+        canonical_binary_bits_bound,
+    })
+}
+
 fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
     radix
         .checked_pow(coordinate)

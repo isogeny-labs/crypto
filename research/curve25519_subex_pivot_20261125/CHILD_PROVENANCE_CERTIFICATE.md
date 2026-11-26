@@ -56,6 +56,8 @@ This closes the finite checked interface from parent tensor references and
 topology through creation precision to the selected packet coefficient tables.
 The packet values and mode coefficients are established by the separately
 accepted factorization certificate; arbitrary old tensors remain referenced,
-not re-serialized. It does not prove a uniform arbitrary-size object
-refinement or the external contraction theorem. No practical Curve25519 attack
-follows. `[pcc:unverified]`
+not re-serialized. `PROVENANCE_DESCRIPTION_ENVELOPE.md` shows that the complete
+family is `T` times a polynomial structural factor, not a second tuple
+exponential. It does not prove a uniform arbitrary-size object refinement or
+the external contraction theorem. No practical Curve25519 attack follows.
+`[pcc:unverified]`

@@ -120,6 +120,14 @@ only with both guards at radix 64. The small control correctly reports false.
 This strengthens R1 items 2–3 through a generic finite tensor-table interface;
 uniform arbitrary-size refinement remains open. `[pcc:unverified]`
 
+The provenance-description envelope counts the schema-3 packing object and
+the complete schema-2 child family from structural atoms, containers and
+fields. Exact family coverage gives child atoms
+`T R(2+Q+2K)+4TV+8TM`, so this trace is `T` times a polynomial factor rather
+than a second tuple exponential. Source isolates are charged through `V` and
+the original description length. Schema-5 absorption of this exact formula
+remains to be rederived. `[pcc:unverified]`
+
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to
 one group, so a child has at most `6M/64` edges and

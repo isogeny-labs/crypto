@@ -3,6 +3,7 @@
 use super::*;
 use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
 use crate::child_provenance_certificate::{
+    family_description_envelope as child_family_description_envelope,
     verify as verify_child_provenance, verify_family as verify_child_family,
     Certificate as ChildProvenanceCertificate, ChildEdge as ProvenanceChildEdge, OldTensorSource,
     ParentSide, SCHEMA as CHILD_PROVENANCE_SCHEMA,
@@ -15,8 +16,9 @@ use crate::factorization_certificate::{
 };
 use crate::network::FnPredicate;
 use crate::packing_provenance_certificate::{
-    verify as verify_packing_provenance, Certificate as PackingProvenanceCertificate,
-    EdgeEndpoints, SCHEMA as PACKING_PROVENANCE_SCHEMA,
+    description_envelope as packing_description_envelope, verify as verify_packing_provenance,
+    Certificate as PackingProvenanceCertificate, EdgeEndpoints,
+    SCHEMA as PACKING_PROVENANCE_SCHEMA,
 };
 use crate::Limits;
 use std::collections::BTreeSet;
@@ -530,6 +532,13 @@ fn produce(
             }
             verify_packing_provenance(&certificate, &parsed_provenance, meter)
                 .map_err(|_| integrity("packing provenance replay"))?;
+            if serialized_provenance.len()
+                > packing_description_envelope(&parsed_provenance)
+                    .map_err(|_| integrity("packing provenance description"))?
+                    .json_bytes_bound
+            {
+                return Err(integrity("packing provenance description"));
+            }
             let expected_children = certificate
                 .tuples
                 .len()
@@ -540,9 +549,13 @@ fn produce(
             }
             meter.vector(child_certificates.len(), "child provenance certificates")?;
             let mut parsed_children = Vec::with_capacity(child_certificates.len());
+            let mut serialized_child_bytes = 0usize;
             for child in child_certificates {
                 let serialized_child = serde_json::to_vec(&child)
                     .map_err(|_| invalid("child provenance serialization"))?;
+                serialized_child_bytes = serialized_child_bytes
+                    .checked_add(serialized_child.len())
+                    .ok_or_else(|| overflow("child provenance description"))?;
                 let parsed_child: ChildProvenanceCertificate =
                     serde_json::from_slice(&serialized_child)
                         .map_err(|_| invalid("child provenance parsing"))?;
@@ -556,6 +569,13 @@ fn produce(
             }
             verify_child_family(&parsed_provenance, &certificate, &parsed_children, meter)
                 .map_err(|_| integrity("child provenance family replay"))?;
+            if serialized_child_bytes
+                > child_family_description_envelope(&parsed_children)
+                    .map_err(|_| integrity("child provenance family description"))?
+                    .json_bytes_bound
+            {
+                return Err(integrity("child provenance family description"));
+            }
             return Ok(certificate);
         }
     }
@@ -805,6 +825,26 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(!family_summary.eightfold_edge_shrink_admitted);
     assert!(!family_summary.packet_degree_guard_admitted);
     assert!(!family_summary.strict_source_refinement_admitted);
+    let packing_description = packing_description_envelope(&conditional_provenance).unwrap();
+    assert_eq!(
+        serde_json::to_vec(&conditional_provenance).unwrap().len(),
+        414
+    );
+    assert_eq!(packing_description.scalar_atoms, 34);
+    assert_eq!(packing_description.json_bytes_bound, 4_672);
+    assert_eq!(packing_description.canonical_binary_bits_bound, 2_564);
+    let child_description = child_family_description_envelope(&conditional_children).unwrap();
+    assert_eq!(child_description.certificates, 8);
+    assert_eq!(child_description.scalar_atoms, 256);
+    assert_eq!(child_description.json_bytes_bound, 37_440);
+    assert_eq!(child_description.canonical_binary_bits_bound, 21_824);
+    assert_eq!(
+        conditional_children
+            .iter()
+            .map(|child| serde_json::to_vec(child).unwrap().len())
+            .sum::<usize>(),
+        3_764
+    );
     let mut missing_child = conditional_children.clone();
     missing_child.pop();
     assert_eq!(

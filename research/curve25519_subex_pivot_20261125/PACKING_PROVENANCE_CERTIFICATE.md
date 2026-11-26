@@ -65,6 +65,8 @@ This closes finite replay from an edge skeleton through conditional label
 selection, source packing bounds, packet slots, and active factorization groups.
 The endpoint ports and source creation precisions also feed the separate
 schema-2 child provenance replay in `CHILD_PROVENANCE_CERTIFICATE.md`.
+`PROVENANCE_DESCRIPTION_ENVELOPE.md` gives the checked structural description
+ceiling for this object and the complete child family.
 It does not prove a uniform theorem about arbitrary-size label selection,
 construct an asymptotic graph family satisfying the complete recursion
 premises, or prove the external contraction theorem. Those are the next

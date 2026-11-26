@@ -117,6 +117,174 @@ pub struct FamilyVerificationSummary {
     pub strict_source_refinement_admitted: bool,
 }
 
+/// Coarse structural description ceiling for a complete child family.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct FamilyDescriptionEnvelope {
+    /// Number of serialized child certificates.
+    pub certificates: usize,
+    /// Primitive numeric and side-tag atoms.
+    pub scalar_atoms: usize,
+    /// JSON arrays and objects.
+    pub containers: usize,
+    /// Named JSON object fields.
+    pub named_fields: usize,
+    /// Maximum bit width of any serialized integer, with minimum one.
+    pub integer_width: usize,
+    /// Coarse JSON byte ceiling.
+    pub json_bytes_bound: usize,
+    /// Coarse canonical length-prefixed binary bit ceiling.
+    pub canonical_binary_bits_bound: usize,
+}
+
+fn checked_sum(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(0usize, |sum, &value| {
+        sum.checked_add(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn checked_product(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(1usize, |product, &value| {
+        product
+            .checked_mul(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn bit_width(value: usize) -> usize {
+    (usize::BITS as usize - value.leading_zeros() as usize).max(1)
+}
+
+/// Derive a structural description ceiling for serialized child certificates.
+pub fn family_description_envelope(
+    children: &[Certificate],
+) -> Result<FamilyDescriptionEnvelope, String> {
+    let mut scalar_atoms = 0usize;
+    let mut containers = 0usize;
+    let mut named_fields = 0usize;
+    let mut maximum = 0usize;
+    for child in children {
+        let old_sources = child.old_tensor_sources.len();
+        let edges = child.edges.len();
+        scalar_atoms = checked_sum(
+            &[
+                scalar_atoms,
+                2,
+                child.beta.len(),
+                child.old_vertex_degrees.len(),
+                checked_product(&[2, old_sources], "child provenance source atoms")?,
+                child.old_creation_precisions.len(),
+                child.packet_vertex_degrees.len(),
+                child.packet_creation_precisions.len(),
+                checked_product(&[4, edges], "child provenance edge atoms")?,
+            ],
+            "child provenance family scalar atoms",
+        )?;
+        containers = checked_sum(
+            &[containers, 8, old_sources, edges],
+            "child provenance family containers",
+        )?;
+        named_fields = checked_sum(
+            &[
+                named_fields,
+                9,
+                checked_product(&[2, old_sources], "child provenance source fields")?,
+                checked_product(&[4, edges], "child provenance edge fields")?,
+            ],
+            "child provenance family fields",
+        )?;
+        maximum = maximum
+            .max(child.schema as usize)
+            .max(child.group)
+            .max(child.beta.iter().copied().max().unwrap_or(0))
+            .max(child.old_vertex_degrees.iter().copied().max().unwrap_or(0))
+            .max(
+                child
+                    .old_tensor_sources
+                    .iter()
+                    .map(|source| source.vertex)
+                    .max()
+                    .unwrap_or(0),
+            )
+            .max(
+                child
+                    .old_creation_precisions
+                    .iter()
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            )
+            .max(
+                child
+                    .packet_vertex_degrees
+                    .iter()
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            )
+            .max(
+                child
+                    .packet_creation_precisions
+                    .iter()
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            )
+            .max(
+                child
+                    .edges
+                    .iter()
+                    .flat_map(|edge| {
+                        [
+                            edge.left_vertex,
+                            edge.left_port,
+                            edge.right_vertex,
+                            edge.right_port,
+                        ]
+                    })
+                    .max()
+                    .unwrap_or(0),
+            );
+    }
+    let integer_width = bit_width(maximum);
+    let structural_units = checked_sum(
+        &[scalar_atoms, containers, named_fields, 1],
+        "child provenance family structural units",
+    )?;
+    let json_bytes_bound = checked_product(
+        &[64, structural_units],
+        "child provenance family JSON description",
+    )?;
+    let canonical_binary_bits_bound = checked_sum(
+        &[
+            checked_product(
+                &[scalar_atoms, integer_width],
+                "child provenance family binary atoms",
+            )?,
+            checked_product(
+                &[
+                    64,
+                    checked_sum(
+                        &[containers, named_fields, 1],
+                        "child provenance family binary framing units",
+                    )?,
+                ],
+                "child provenance family binary framing",
+            )?,
+        ],
+        "child provenance family binary description",
+    )?;
+    Ok(FamilyDescriptionEnvelope {
+        certificates: children.len(),
+        scalar_atoms,
+        containers,
+        named_fields,
+        integer_width,
+        json_bytes_bound,
+        canonical_binary_bits_bound,
+    })
+}
+
 fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
     radix
         .checked_pow(coordinate)

@@ -381,6 +381,15 @@ strict source refinement only when both hold at radix 64. The small finite
 control correctly remains non-strict. The uniform arbitrary-size refinement
 and external contraction theorem remain separate. `[pcc:unverified]`
 
+`PROVENANCE_DESCRIPTION_ENVELOPE.md` counts the complete packing/child trace.
+Exact family identities reduce its child portion to
+`T R(2+Q+2K)+4TV+8TM` primitive atoms, with similarly explicit container and
+field counts. The native producer checks 64-byte-per-structural-unit JSON and
+actual-width canonical-binary ceilings on every path. The trace is therefore
+`T` times a polynomial structural factor, not a second tuple exponential;
+isolates remain charged through the original vertex-description length.
+`[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by
