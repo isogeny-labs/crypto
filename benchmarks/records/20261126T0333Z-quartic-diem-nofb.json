@@ -1,7 +1,17 @@
 {
   "branch": "claude/hyperelliptic-index-calculus-td1fdn",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-26T04:05:44+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/quartic_diem_nofb_20261126/run_all.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-26T03:33:48+00:00",
+      "wall_s": 1802.105
+    }
+  ],
   "commit": "8bc5537a8441f5c4e9edc57f0791dd0bc8f2d02e",
   "commit_dirty": true,
   "created_utc": "2026-11-26T03:33:26+00:00",
@@ -17,19 +27,76 @@
     "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
   },
   "id": "20261126T0333Z-quartic-diem-nofb",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 40,
+      "name": "paired_gae1_nofb_over_sge_heldout_pooled",
+      "note": "paired GAE_1 2lp-sfb-sge-nofb/2lp-sfb-sge, held-out seeds 3-4, equal weight per prime, cluster boot95",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.7580108149319122,
+        0.9066146062794362
+      ],
+      "unit": "ratio",
+      "value": 0.8324605695547613
+    },
+    {
+      "baseline": 2.6299004659708833,
+      "better": "lower",
+      "n": 20,
+      "name": "ic_over_ideal_rho_gae1_p131101_nofb",
+      "note": "ideal negation rho sqrt(pi r/4); baseline = 2lp-sfb-sge same instances",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.8354226870568757,
+        2.1632340213236523
+      ],
+      "unit": "ratio",
+      "value": 1.9844674102165105
+    }
+  ],
   "problem": "ic:quartic-diem-2lp-la",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 254691,
+      "path": "research/quartic_diem_nofb_20261126/raw/run.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b9/b93c0013c22e8a79bf9566eb054bdaca5a6e78bd4a9f58107ac1776880fbd66d",
+      "sha256": "b93c0013c22e8a79bf9566eb054bdaca5a6e78bd4a9f58107ac1776880fbd66d",
+      "uploaded": false
+    },
+    {
+      "bytes": 89012,
+      "path": "research/quartic_diem_nofb_20261126/raw/run131101.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/5286e5680d6dc73429ef565a34e72fc488013eb084584a4655d44c5ee377f1e0",
+      "sha256": "5286e5680d6dc73429ef565a34e72fc488013eb084584a4655d44c5ee377f1e0",
+      "uploaded": false
+    },
+    {
+      "bytes": 15526,
+      "path": "research/quartic_diem_nofb_20261126/analysis.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a9/a9575d5fb1e2e6d856f2fdf91ec057bb2207ac0bd1b3625b53d70613d22b276f",
+      "sha256": "a9575d5fb1e2e6d856f2fdf91ec057bb2207ac0bd1b3625b53d70613d22b276f",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/quartic_diem_nofb_20261126/reports/run-20261126T0333Z/report.pdf",
+    "png": [
+      "research/quartic_diem_nofb_20261126/fig_nofb.png"
+    ],
+    "svg": [
+      "research/quartic_diem_nofb_20261126/fig_nofb.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "quartic-diem-nofb",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "IMPROVEMENT, order holds across the band (frozen rule): skipping the full-core fallback cuts quartic Diem 2lp-sfb-sge GAE_1 to 0.833x [0.758,0.907] (held-out seeds), 0 rescues of 16; IC/rho 131101 w=1 2.63 -> 1.98 [pcc:unverified]",
   "validation": null
 }
