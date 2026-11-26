@@ -112,8 +112,14 @@ contractions, records a nonempty child visit at depth three, and matches the
 independent direct count.  It uses the production deformation, child,
 interpolation and recovery routines with the smaller diagnostic taper
 `u=1,a=1,L=2`; the `a=2,L=4` preflight exceeded 60 seconds and is not retained
-as a routine gate.  These are bounded exact controls, not a proof of the
-asymptotic induction. [pcc:unverified]
+as a routine gate. The executed callback tree now also serializes and
+independently verifies one schema-2 factorization certificate at every active
+visit through depth two: 1, 20, and 412 certificates, respectively, totaling
+390,237 bytes. The three unique depth records have working precisions
+`3,67,131`, one mode, two tuples, and tuple-log2 ceilings `15,60,85`.
+These are bounded exact controls under non-strict diagnostic recursion; the
+one-edge child does not meet the source shrink premise, so this is not a live
+strict history or a proof of the asymptotic induction. `[pcc:unverified]`
 
 A heterogeneous attempt with a two-taper `u=2,a=2,L=4` root and two compact
 nested levels remained live past 90 seconds and was interrupted without a

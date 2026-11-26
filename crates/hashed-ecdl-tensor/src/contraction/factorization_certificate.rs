@@ -366,6 +366,36 @@ fn produce(
     }
 }
 
+pub(super) fn capture_executed_source_checked(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+    ring: &Ring,
+    meter: &mut Meter,
+) -> Result<(usize, crate::factorization_certificate::DescriptionEnvelope)> {
+    let t = 1i64
+        .checked_shl(u32::try_from(coordinate).map_err(|_| overflow("certificate valuation"))?)
+        .ok_or_else(|| overflow("certificate valuation"))?;
+    let kernel = deformation::Cauchy::new(parameters, t, &ring.one(), ring, meter)?;
+    let modes = deformation::modes(graph, packing, coordinate, parameters, &kernel, meter)?;
+    let produced = produce(
+        graph, packing, parameters, coordinate, &kernel, &modes, meter,
+    )?;
+    let serialized = serde_json::to_vec(&produced)
+        .map_err(|_| invalid("executed source certificate serialization"))?;
+    let certificate: Certificate = serde_json::from_slice(&serialized)
+        .map_err(|_| invalid("executed source certificate parsing"))?;
+    standalone_verify(&certificate, meter)
+        .map_err(|_| integrity("executed source certificate verification"))?;
+    if !assert_source_count_bridge(&certificate, parameters, coordinate) {
+        return Err(invalid("executed source certificate dimensions"));
+    }
+    let envelope = description_envelope(&certificate)
+        .map_err(|_| integrity("executed source certificate envelope"))?;
+    Ok((serialized.len(), envelope))
+}
+
 #[test]
 fn independent_certificate_checks_all_six_factorization_obligations() {
     let mut meter = Meter::new(Limits {

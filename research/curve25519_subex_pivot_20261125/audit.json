@@ -213,11 +213,12 @@
       "array": 4,
       "requested_active_layers": 3
     },
-    "observed_gate": "a nonempty child call was recorded at depth three and the recovered value equaled independent direct contraction",
-    "focused_result": "1 passed in 0.57 seconds",
+    "observed_gate": "the recovered value equaled independent direct contraction; visits were [1,20,412,9080] through depths zero to three; every active visit through depth two emitted a serialized schema-2 certificate that passed standalone verification and the independent NodeDimensions cross-check",
+    "certificate_transcript": "433 certificates total: counts [1,20,412] and bytes [641,15500,374096] at depths [0,1,2], 390237 bytes total; unique records (depth,edges,precision,bytes,modes,tuples,tuple_log2_bound) are (0,1,3,641,1,2,15), (1,1,67,775,1,2,60), and (2,1,131,908,1,2,85)",
+    "focused_result": "1 passed in 6.39 seconds with certificate capture under Rust 1.78 debug",
     "complete_library_result": "183 passed; 0 failed",
     "discarded_preflight": "the larger diagnostic taper a=2,length=4 at every level exceeded 60 seconds; a heterogeneous u=2 root plus two compact levels remained live past 90 seconds; both were interrupted and no result from either is claimed",
-    "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines; not an asymptotic induction proof"
+    "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines with executed-node certificates; diagnostic recursion is non-strict and the one-edge child does not satisfy source shrinkage, so this is not a source-admitted history or asymptotic induction proof"
   },
   "multi_taper_hermite_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
@@ -378,5 +379,5 @@
     "complete_library_result": "183 passed; 0 failed",
     "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
   },
-  "next_gate": "compose schema-2 certificate dimensions with every live recursive node: independently bind K,L,tau,p to the checked packing and precision history, then prove the depth-first sum of tuple/child exponents and description bits is at most C*s/sqrt(log s) plus polynomial overhead; preserve the exact total-work reduction ledger and accept a counterexample to any premise as decisive"
+  "next_gate": "capture a source-admitted strict recursive history rather than the current non-shrinking diagnostic tree; independently bind every node's K,L,tau,p to checked packing, shrinkage and precision history, then prove the depth-first sum of tuple/child exponents and description bits is at most C*s/sqrt(log s) plus polynomial overhead; preserve the exact total-work reduction ledger and accept a counterexample to any premise as decisive"
 }

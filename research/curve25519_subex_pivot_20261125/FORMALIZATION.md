@@ -338,7 +338,11 @@ kernel-checked refinement. `[pcc:unverified]`
 
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
-control.  An isolated recovery control additionally covers `u=2` and `u=3`,
+control. That callback tree now carries 433 independently verified serialized
+node certificates through active depths zero, one, and two, with exact counts
+`1,20,412` and working precisions `3,67,131`. It remains a non-strict,
+non-shrinking diagnostic and therefore does not establish a source-admitted
+history. An isolated recovery control additionally covers `u=2` and `u=3`,
 all their taper valuations, root precisions 3/5/7 at `u=2`, and scalar plus
 nontrivial extension-coordinate polynomials.  A combined two-taper/deep
 diagnostic remained live past 90 seconds, so these bounded tests do not close

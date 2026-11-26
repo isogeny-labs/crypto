@@ -170,7 +170,11 @@ and crossing groups, zero, unit, and nontrivial extension sample values, and
 vertices on both sides of the group partition. The mutation gate additionally
 detects both a removed mode and a wrong target group against the direct oracle.
 End-to-end controls then recover the original direct tensor count at one and
-three active levels and across two taper coordinates.
+three active levels and across two taper coordinates. The three-level control
+also captures, serializes, parses, independently verifies, and dimension-checks
+433 node certificates across its first three depths. This executes on the
+production callback tree, but the diagnostic recursion is non-strict and does
+not satisfy the source shrink premise. `[pcc:unverified]`
 
 A second global control exhausts all five set partitions of three labeled
 edges on each side, all 64 delta-basis tensor configurations for every

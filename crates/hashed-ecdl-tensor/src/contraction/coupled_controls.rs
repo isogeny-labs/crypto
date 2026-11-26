@@ -592,6 +592,33 @@ fn forced_at(
     visits: &mut Vec<usize>,
     meter: &mut Meter,
 ) -> Result<Element> {
+    forced_at_observed(
+        graph,
+        ring,
+        rows,
+        columns,
+        layers,
+        depth,
+        parameters,
+        visits,
+        &mut |_, _, _, _, _, _| Ok(()),
+        meter,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn forced_at_observed(
+    graph: &Bipartite,
+    ring: &Ring,
+    rows: Vec<usize>,
+    columns: Vec<usize>,
+    layers: usize,
+    depth: usize,
+    parameters: &Parameters,
+    visits: &mut Vec<usize>,
+    observe: &mut impl FnMut(usize, &Bipartite, &Ring, &Parameters, &Packing, &mut Meter) -> Result<()>,
+    meter: &mut Meter,
+) -> Result<Element> {
     if visits.len() <= depth {
         visits.resize(depth + 1, 0);
     }
@@ -600,6 +627,7 @@ fn forced_at(
         return brute_tensor(graph, ring, &mut Statistics::default(), meter);
     }
     let packing = packing::pack_labels(graph, parameters, rows, columns, false, meter)?;
+    observe(depth, graph, ring, parameters, &packing, meter)?;
     active(
         graph,
         ring,
@@ -608,7 +636,7 @@ fn forced_at(
         false,
         usize::MAX,
         &mut |child, child_ring, work| {
-            forced_at(
+            forced_at_observed(
                 child,
                 child_ring,
                 vec![0; child.left.len()],
@@ -617,6 +645,7 @@ fn forced_at(
                 depth + 1,
                 parameters,
                 visits,
+                observe,
                 work,
             )
         },
@@ -1305,7 +1334,8 @@ fn three_nested_contractions_reach_the_third_child_and_match_direct_count() {
         array: 4,
     };
     let mut visits = Vec::new();
-    let actual = forced_at(
+    let mut captures = Vec::new();
+    let actual = forced_at_observed(
         &graph,
         &ring,
         vec![0],
@@ -1314,11 +1344,58 @@ fn three_nested_contractions_reach_the_third_child_and_match_direct_count() {
         0,
         &parameters,
         &mut visits,
+        &mut |depth, node, node_ring, node_parameters, packing, work| {
+            let (bytes, envelope) =
+                super::factorization_certificate::capture_executed_source_checked(
+                    node,
+                    packing,
+                    node_parameters,
+                    0,
+                    node_ring,
+                    work,
+                )?;
+            captures.push((
+                depth,
+                node.edges.len(),
+                node_ring.precision(),
+                bytes,
+                envelope.modes,
+                envelope.tuples,
+                envelope.tuple_log2_bound,
+            ));
+            Ok(())
+        },
         &mut meter,
     )
     .unwrap();
     assert_eq!(actual, expected);
     assert!(visits.get(3).copied().unwrap_or(0) > 0, "visits={visits:?}");
+    let capture_counts: Vec<_> = (0..3)
+        .map(|depth| captures.iter().filter(|capture| capture.0 == depth).count())
+        .collect();
+    let capture_bytes: Vec<usize> = (0..3)
+        .map(|depth| {
+            captures
+                .iter()
+                .filter(|capture| capture.0 == depth)
+                .map(|capture| capture.3)
+                .sum()
+        })
+        .collect();
+    let unique: BTreeSet<_> = captures.iter().cloned().collect();
+    assert_eq!(visits, [1, 20, 412, 9_080]);
+    assert_eq!(capture_counts, visits[..3]);
+    assert_eq!(capture_bytes, [641, 15_500, 374_096]);
+    assert_eq!(captures.len(), 433);
+    assert_eq!(capture_bytes.iter().sum::<usize>(), 390_237);
+    assert_eq!(
+        unique.into_iter().collect::<Vec<_>>(),
+        [
+            (0, 1, 3, 641, 1, 2, 15),
+            (1, 1, 67, 775, 1, 2, 60),
+            (2, 1, 131, 908, 1, 2, 85),
+        ]
+    );
 }
 
 #[test]
