@@ -1,0 +1,16 @@
+digraph composition {
+  rankdir=LR;
+  graph [bgcolor="white", nodesep=.35, ranksep=.50];
+  node [shape=box, fontname="Helvetica", fontsize=11, margin=".12,.08"];
+  edge [fontname="Helvetica", fontsize=10];
+  E0 [label="E"];
+  H [label="J(H)"];
+  C [label="J(C)"];
+  E1 [label="E"];
+  E0 -> H [label="pi pullback"];
+  H -> C [label="actual cubic graph: phi"];
+  C -> E1 [label="actual f pushforward: B"];
+  E0 -> E1 [label="composition = [6]",color="#17633d",fontcolor="#17633d",constraint=false];
+  trace [label="Exact differential: 6\nDifference degree <= 6084 < p",color="#17633d"];
+  C -> trace [style=dotted,arrowhead=none];
+}
