@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:55:07Z",
+ "id": "PCC-20261123-9a757d",
+ "kind": "statement",
+ "producer": {
+  "commit": "0a2e495ef2d5ec76f9a4c2a8ef5c200f93a6e7f4",
+  "model": "",
+  "session": "codex-ecc2k-cold50-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/grid-audit.json",
+    "sha256": "f4eeb237f2dc0d01f6d1c954ecb40e162229978ca3601473156c2e78ef3594e1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/summary.json",
+    "sha256": "80b6ecddb1fae6b6869d99c8a11c4d12cc38602901f7533d82cd1e14e1c125ac"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/frozen-reference.json",
+    "sha256": "a73644f3778278643a51246f795e62954f54024ccac3c27fcc30df7ec139ec08"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Final unchanged ECC2K-130 d12 uniform candidate median is21360373 complete coldIr. It meets the fixed original22011702 ceiling from44023404Ir, with the secondary Rust fixed-reference arithmetic retained separately. The simultaneous matched original median is44038338Ir (51.49596% removed by frozen Rust audit); incumbent34999978Ir. Complete oracle median is13811466 versus18083340 original (23.62326% removed). All120 primary rows/controls pass and80 tuples replay. Producer evidence, unsigned; no native-runtime or warmed-collector claim."
+}

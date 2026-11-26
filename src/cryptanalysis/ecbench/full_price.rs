@@ -108,6 +108,7 @@ fn rule(counter: &str) -> Option<Rule> {
         | "trials"
         | "unliftable_systems"
         | "walk_jumps"
+        | "walk_jumps_materialised"
         | "walk_pool_offsets"
         | "walk_pool_ops"
         | "walk_pool_restarts"

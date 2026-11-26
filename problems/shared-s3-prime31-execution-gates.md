@@ -149,3 +149,47 @@ checkpoint, protocol and admission evidence enables that step. It does not
 predetermine a favorable result. If the initial algebraic stage has no useful
 consequence under the bound, retain Unknown and use that observation to choose
 the next scoped change.
+
+## Projective preclosure continuation, PR #5087, 2026-11-23 Pacific
+
+The [native projective component](../summation_split/m31_native/README.md)
+uses the same coordinate prime p=2147483647 but fixes the distinct curve
+`y^2=x^3-3x+21`; it does not inherit the subgroup modulus or cold-solving
+claims of the other lanes in this record. Its
+[protocol](../summation_split/m31_native/PROTOCOL.md) requires monolithic,
+preclosed sequential, preclosed balanced and guarded multiplicity arms,
+at least 50 complete projected solver outputs per configuration, actual
+matrix degrees, full interval costs and process RSS.
+
+The old algebra-toolchain blocker is resolved locally: fresh version/smoke
+checks found Sage10.10, Singular4.4.1, msolve0.11.0 and Rust/Cargo1.100.0.
+Workspace PR#109 remains open and owns the authenticated Cloudflare
+connection work for research-KB and Conductor. Current verified access
+still lacks that shared coordination, an authenticated EKS submission/live
+capacity view, and checkpoint/S3 transport. The main IsoLab workflow now
+contains source-revision builds and resumable support; its presence alone
+does not establish caller permission, capacity, budget or an admitted image.
+[pcc:unverified]
+
+Local native correctness work proceeds under AGENTS section9a. It supplies
+the guarded multiplicity derivation, 500 specialized fibers, 50 witnesses
+per projective configuration and a bounded quotient-F4 prototype. One
+unique m=3 coupled system has a completed basis and ordinary-polynomial
+two-containment check. These do not close the requested comparative run or
+replace its 50 complete projected outputs. Native source, input preparation,
+failed verifier attempts and source-bound development receipts are retained
+in the component's evidence directory. [pcc:unverified]
+
+Exit condition for this continuation: publish/checkpoint the exact protocol
+and input stream; acquire the existing shared lease and supported runner
+admission under its finite budget; execute and independently replay every
+required configuration, retaining all censored cases. No local replacement
+control plane, undeclared smaller field, permission bypass or unmeasured
+speedup closes this access gap.
+
+The native component is published at c418251c7a442cd7360986f7711daa3820395e7c.
+Its two bounded full-root build attempts stopped in compilation before tests.
+The older branch's PCC ledger is internally append-only but is not yet a
+prefix-preserving extension of current main; normal ledger/journal integration
+remains a merge gate. No old entries or evidence were rewritten. See the
+component HANDOFF.md and retained ledger receipts. [pcc:unverified]
