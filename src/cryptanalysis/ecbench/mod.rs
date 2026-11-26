@@ -112,6 +112,7 @@ pub mod oracle;
 pub mod orbit_ic;
 pub mod panel;
 pub mod plane_quartic;
+pub mod prime_fixed_controls;
 pub mod prime_mont4;
 pub mod prime_orbit;
 pub mod record;
