@@ -1,0 +1,89 @@
+# Prime31 native admission development receipt — 2026-11-23
+
+**Standing: unsigned producer development evidence [pcc:unverified].** The fixed planted-control qualification passed seven native admission tests and the source-exact graph harness passed 41 integration tests. Both positive CLI exports matched their expected bytes. All five negative CLI cases exited 1 with empty stdout. This receipt binds those observations to the recorded source and raw outputs; it does not assert scientific verification, performance, or complete cost.
+
+## Source and CI identity
+
+| Item | Recorded identity |
+| --- | --- |
+| Repository | `isogeny-labs/crypto` |
+| Source commit | `b4b87e654950ad57d264e518ec6bb190efd88bba` |
+| Branch | `automation/graph-ic-prime31-group-admission-20261123` |
+| Workflow | `.github/workflows/graph-ic-gain-dsu-native.yml` |
+| Run | [45258713611](https://github.com/isogeny-labs/crypto/actions/runs/45258713611), completed, success |
+| Job | [137987328432](https://github.com/isogeny-labs/crypto/actions/runs/45258713611/job/137987328432), `source-exact-graph`, completed, success |
+| Artifact | `14857459488`, `graph-ic-prime31-qualification-45258713611-1` |
+| ZIP | 1,389,093 bytes; SHA-256 `c7e76b6397f5c58b978ef8822a00ede7cf39584a347a07a80742a0ca45e63ee7` |
+| Artifact expiry | `2026-12-07T20:25:09Z` |
+
+The exact [API metadata](raw/api-metadata.json) records GitHub's actual creation/update times, job steps and artifact digest. No additional observation timestamp is invented. [checkout.txt](raw/qualification/checkout.txt) records the tested commit. [metadata.json](metadata.json) supplies exact repository paths, hashes, result fields and limitations.
+
+## Qualified development observations
+
+| Observation | Exact raw evidence | Result |
+| --- | --- | --- |
+| Dedicated native admission tests | [native-tests.stdout](raw/qualification/native-tests.stdout), [native-tests.exit](raw/qualification/native-tests.exit) | 7 passed, 0 failed; exit 0 |
+| Source-exact native graph integration tests | [job.log](raw/job.log) | 41 passed, 0 failed |
+| Fixed admission CLI suite | [cli-suite.stdout](raw/qualification/cli-suite.stdout), [cli-suite.exit](raw/qualification/cli-suite.exit) | Exit 0 |
+| Planted valid control | [valid.stdout](raw/qualification/valid.stdout), [expected.jsonl](raw/qualification/controls/expected.jsonl) | Exit 0; byte-identical export |
+| Planted negative-target control | [negative-target.stdout](raw/qualification/negative-target.stdout), [negative-target-expected.jsonl](raw/qualification/controls/negative-target-expected.jsonl) | Exit 0; byte-identical export |
+| Native graph evaluation of five admitted rows | [graph-evaluation.json](raw/qualification/graph-evaluation.json), [mst-disposition.txt](raw/qualification/mst-disposition.txt) | Forest, pivot and MST each accepted; useful small rank 2, augmented rank 2, 3 witnesses replayed, 0 source replay failures |
+
+The negative cases are `invalid-final-row`, `malformed-json`, `oversized-input`, `missing-argument` and `extra-argument`. Each retains its original `.command`, `.exit`, `.stdout` and `.stderr` under `raw/qualification/`; all five `.exit` files contain 1 and all five `.stdout` files have zero bytes. The late invalid row therefore produced no partial output. Every record is named individually in the artifact manifest and in the CLI section of the metadata.
+
+The two exact export SHA-256 values are:
+
+- Valid export and expected file: `ae70168b4a45de7c43280f4da6894e5a8a439d96417a91d33c69006cb1af174e`.
+- Negative-target export and expected file: `6494f63e8da2424642a78be5f1fa8d31c4cba61b3aa28dbbbda830887d4da73b`.
+
+The control label is `planted-prime31-admission-correctness-only`; its graph modulus is `2147446831`. Raw evaluator timing fields, test durations and build timings are preserved unchanged and are ignored here. They are not a benchmark or a speedup measurement.
+
+## Source, binaries and dependency provenance
+
+The before/after SHA lists for `source`, `executables`, `toolchain`, `controls` and `generated-graph-lock` are retained at their original basenames under `raw/qualification/`. All five pairs are byte-identical. The source lists contain 23 paths. A separate reviewer within the same assistant team independently retrieved all 23 paths at the recorded commit and matched every source hash, and checked the archived executable, control and lock hashes. This was unsigned static review, without a new execution or independent-runner standing.
+
+The recorded toolchain is `rustc 1.100.0 (0ef1bc386 2026-11-09)` and `cargo 1.100.0 (3acc79c0c 2026-11-05)`; full version outputs are retained. Compiler binaries were not included in the artifact. Their reported pre/post hashes are consistent, but their binary hashes were not independently recomputed from archived compiler bytes.
+
+Both lock copies and [PROVENANCE.txt](raw/qualification/locks/PROVENANCE.txt) are retained. The Prime31 lock is the committed lock. The graph lock was generated by preceding existing graph CI steps and was **not committed or frozen**. The full root crate remains unqualified; the original graph modules and integration-test source were exercised through the isolated `native_gain_dsu` harness, alongside the dedicated admission target.
+
+The pre-existing same-seed default/exact/capped workflow section includes Python assertions. The entire workflow is therefore not described as Python-free. The admission target and graph integration tests reported above are native Rust executions; local receipt assembly used shell, `jq`, native `sha256sum` and byte comparisons.
+
+## Exact retention and custody
+
+[artifact-manifest.json](artifact-manifest.json) inventories **all 125 original artifact files**, totaling 11,855,993 uncompressed bytes. Every entry carries its original archive-relative path, byte count, SHA-256, retention status, custody status and exact repository path when retained. Hashes were computed with native `sha256sum` over original bytes.
+
+The receipt keeps **121 small artifact files byte-exact**, with their original basenames and internal control/lock subdirectories, plus the complete 60,808-byte job log and the exact 3,424-byte sanitized API metadata. [RAW_SHA256SUMS](RAW_SHA256SUMS) covers all **123 retained raw files**. No raw output has been rewritten or compressed.
+
+**AGENTS §13a loose-path exception:** the manifest names every one of the 121 retained artifact records by its repository path and hash, and `metadata.json` separately names the job log and API metadata by repository path and hash. Those 123 raw records must remain loose because these paths must resolve. All retained files and the administrative manifests are below the applicable 64 KiB data-file threshold. The inventory is compact JSON to keep the complete manifest below that threshold; it is not a compressed data archive.
+
+Four original files are deliberately absent from Git:
+
+| Original path below the qualification root | Bytes | Retention |
+| --- | ---: | --- |
+| `controls/oversized.json` | 8,388,609 | Full Actions artifact and local extraction only |
+| `executables/lp_graph_eval` | 1,162,376 | Full Actions artifact and local extraction only |
+| `executables/prime31_lp_group_admission` | 703,048 | Full Actions artifact and local extraction only |
+| `executables/prime31_lp_group_admission-tests` | 1,463,688 | Full Actions artifact and local extraction only |
+
+Their exact hashes appear in `artifact-manifest.json` and in the original control/executable SHA lists. The full ZIP was downloaded and verified locally against GitHub's digest. The ZIP is not copied into Git. Local scratch custody is ephemeral, and the GitHub artifact has the recorded expiry.
+
+**Durable artifact-store upload remains unavailable:** the local AWS CLI is absent, no AWS/S3 environment-variable names are present, and the default AWS credentials and config files are absent. No upload to `s3://setec-astronomy-artifacts` was performed. This directory contains no invented `.artifacts.json` store receipt and asserts no S3 success. The missing durable custody for the full ZIP and four omitted files remains an explicit limitation.
+
+## Integrity references
+
+| File | SHA-256 |
+| --- | --- |
+| `artifact-manifest.json` | `bdabba3fa614466f1885482f75de64e9ea20f7c52b66006664f9ec3d5251b3c6` |
+| `RAW_SHA256SUMS` | `bfda1031bc5d404fb03bab59cabefd8916b38cb105ea4113c44f1e9f8816fdc6` |
+| `metadata.json` | `778f99f7611a5c67247910b6b78c3fc6f82846524711ab92fb98793879762305` |
+| `raw/api-metadata.json` | `a00ef053254905b9ea9f0c5f0432fe2f4ea0f89031863975002ca9916c0bc3aa` |
+| `raw/job.log` | `16a97f247f7760db545f9d653cadcf8d1776eb0fa124d5a9dd2cbdb85bd84b58` |
+| `raw/qualification/graph-evaluation.json` | `a78a7f0537f894ffaaf8aa083d7c929ef833bc9071c73670682b2e15a05323b9` |
+
+To check retained raw bytes from this directory:
+
+```sh
+sha256sum -c RAW_SHA256SUMS
+```
+
+This receipt establishes bounded development observations on explicitly planted controls. It supplies no natural collector-custodied two-LP relation stream, cold target recovery, speedup, complete-cost comparison or signed scientific verification. Every administrative metadata record remains **[pcc:unverified]**.

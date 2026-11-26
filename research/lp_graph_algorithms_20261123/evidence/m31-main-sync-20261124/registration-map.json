@@ -1,0 +1,90 @@
+{
+  "branch_commit": "8233cbb8fc844b7321616923f52b8d4805e95e52",
+  "candidates": {
+    "active_sha256": "d2f904f816f8cdaa78394f7816b8d6b10b569786ef3af1480fc0987def948520",
+    "ledger_sha256": "517ab3c2d44457e90a762efbfd82e47cbd38654ef47022c3cf4a64f7e5762121"
+  },
+  "canonical_main": {
+    "bytes": 1020849,
+    "entries": 1845,
+    "git_blob": "cdab7bd6f9f7fad4c0f0bd6e760e6ac593e404c5",
+    "ledger_sha256": "b7b9b92ceb770b337fcbda3dddacc2b90092999f0aeb1e53ec83ede96fef542e",
+    "tail": "6a5985675acea05718a869585e1ed58df23f13419f4a8c206731203b851b7b2d"
+  },
+  "checks": {
+    "active_conflict_is_insertion_only": true,
+    "active_keeps_all_main_bytes_plus_unchanged_M31_line": true,
+    "active_native_merge_conflicts": 1,
+    "base_exact_prefix_of_branch": true,
+    "base_exact_prefix_of_main": true,
+    "branch_chain_via_verified_common_prefix_and_original_envelope": true,
+    "candidate_chain_hashes": true,
+    "claim_body_unchanged": true,
+    "claim_digest_matches_original_body": true,
+    "exactly_one_envelope_appended": true,
+    "input_hashes_unchanged": true,
+    "main_chain_hashes": true,
+    "main_claim_absent": true,
+    "main_exact_byte_prefix_of_candidate": true,
+    "original_envelope_bytes_preserved": true
+  },
+  "claim": {
+    "canonical_sha256": "159e292d4bb26867ecd759e73f0d5240ebdb4fce26cf723ce77564d28f436113",
+    "git_blob": "ba81d9e3cb4c1c60173836d3b865217eadcd6f9a",
+    "path": "pcc/claims/PCC-20261123-c7e76c.json",
+    "raw_sha256": "07073088615356b55411c6fed460405d1b42f85dd283c8f65545591616c8dfcd",
+    "unchanged": true
+  },
+  "common_base": "da7777094392d3ccd37db78dcfc761c32e7e7813",
+  "main_commit": "81f0308c75204f3a1c0ec52fdf78396eee0898ed",
+  "new_envelope": {
+    "entry": {
+      "at": "2026-11-24T01:55:23Z",
+      "body": {
+        "claim_id": "PCC-20261123-c7e76c",
+        "claim_sha256": "159e292d4bb26867ecd759e73f0d5240ebdb4fce26cf723ce77564d28f436113",
+        "path": "pcc/claims/PCC-20261123-c7e76c.json"
+      },
+      "hash": "8c6e40d3a9814ae2d4810242b338eb8738f16e58ff843e2eec2368ba5402854a",
+      "prev": "6a5985675acea05718a869585e1ed58df23f13419f4a8c206731203b851b7b2d",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1845,
+      "type": "claim"
+    },
+    "path": "research/lp_graph_algorithms_20261123/evidence/m31-main-sync-20261124/new-envelope.jsonl",
+    "sha256": "98c3b5a4f2663b3a8fc09dbf1f6eeaeadef6f5a83683ea660a0f7f85ba44f745"
+  },
+  "original_envelope": {
+    "entry": {
+      "at": "2026-11-23T20:42:10Z",
+      "body": {
+        "claim_id": "PCC-20261123-c7e76c",
+        "claim_sha256": "159e292d4bb26867ecd759e73f0d5240ebdb4fce26cf723ce77564d28f436113",
+        "path": "pcc/claims/PCC-20261123-c7e76c.json"
+      },
+      "hash": "88f8ab42dd8ca69561ce94f71d3732665cb4c1b3726f0752c5359b56ee8da436",
+      "prev": "8aa9d5f9b3b5607066439e473e6427fe3b1edf25bbe86533e7ef679ce9c61c1c",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1827,
+      "type": "claim"
+    },
+    "path": "research/lp_graph_algorithms_20261123/evidence/m31-main-sync-20261124/branch-envelope.jsonl",
+    "sha256": "929e722607237c3efd103cd90bf926688fddd44825672cf5983ef24a9d72e93b"
+  },
+  "python_executed": false,
+  "registration_at": "2026-11-24T01:55:23Z",
+  "reproducibility": {
+    "arguments": [
+      "REPOSITORY_PATH",
+      "NEW_OUTPUT_DIRECTORY",
+      "2026-11-24T01:55:23Z"
+    ],
+    "helper_path": "reconcile_metadata.sh",
+    "helper_sha256": "bbd632877a698e3e25e231e77512f702037c3cdcae464d20cfb17ae37c4ae748"
+  },
+  "schema": "graph-ic.pcc-main-reconciliation/v1",
+  "scientific_verifier_run": false,
+  "scope": "Unsigned metadata transport only; no scientific verification, signing, new claim, or standing change.",
+  "signature_created": false,
+  "standing": "unverified"
+}

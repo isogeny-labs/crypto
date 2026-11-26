@@ -11,6 +11,15 @@ on:
       - examples/lp_graph_collect.rs
       - examples/lp_graph_eval.rs
       - research/lp_graph_algorithms_20261123/native_gain_dsu/**
+      - research/prime31_ic_20261115/native/examples/prime31_lp_group_admission.rs
+      - research/prime31_ic_20261115/native/examples/prime31_b677_capture.rs
+      - research/prime31_ic_20261115/native/lib.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
+      - research/prime31_four_summand_20261122/native/b677_fixture.rs
+      - research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv
+      - src/cryptanalysis/f4_fp_tower.rs
+      - src/cryptanalysis/sig_fp_tower.rs
       - .github/workflows/graph-ic-gain-dsu-native.yml
   workflow_dispatch:
 
@@ -27,6 +36,8 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: dtolnay/rust-toolchain@stable
       - name: Record source identities
         shell: bash
@@ -92,3 +103,55 @@ jobs:
           assert 'exact_projected_rank' not in cap['pivot_filter']
           print('same-seed default / opt-in / cap checks PASS')
           PY
+      - name: Qualify original Prime31 admission on fixed native controls
+        # Development correctness only: no collector, parameter search, paid
+        # runner, or interpretation of the evaluator's timing fields.
+        shell: bash
+        env:
+          CARGO_BUILD_JOBS: "1"
+          RUST_TEST_THREADS: "1"
+          RAYON_NUM_THREADS: "1"
+          PRIME31_QUALIFICATION_ARTIFACT_DIR: ${{ runner.temp }}/prime31-group-admission-qualification
+        run: |
+          mkdir -p "$PRIME31_QUALIFICATION_ARTIFACT_DIR"
+          ulimit -v 4194304
+          set +e
+          timeout --signal=TERM --kill-after=5s 300s bash research/lp_graph_algorithms_20261123/native_gain_dsu/qualify_prime31_admission.sh >"$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stdout" 2>"$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stderr"
+          qualification_status=$?
+          printf '%s\n' "$qualification_status" >"$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.exit"
+          cat "$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stdout"
+          cat "$PRIME31_QUALIFICATION_ARTIFACT_DIR/qualification.stderr" >&2
+          exit "$qualification_status"
+      - name: Replay frozen M31 capture with original native consumers
+        # Analysis of retained results only. The exact producer source and
+        # capture are archived; the collector is never compiled or invoked.
+        shell: bash
+        env:
+          CARGO_BUILD_JOBS: "1"
+          RUST_TEST_THREADS: "1"
+          RAYON_NUM_THREADS: "1"
+          PRIME31_QUALIFICATION_ARTIFACT_DIR: ${{ runner.temp }}/prime31-group-admission-qualification
+          M31_CAPTURE_REPLAY_ARTIFACT_DIR: ${{ runner.temp }}/prime31-group-admission-qualification/m31-retained-capture
+        run: |
+          mkdir -p "$M31_CAPTURE_REPLAY_ARTIFACT_DIR"
+          ulimit -v 4194304
+          set +e
+          timeout --signal=TERM --kill-after=5s 300s bash research/lp_graph_algorithms_20261123/native_gain_dsu/replay_m31_capture.sh >"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stdout" 2>"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stderr"
+          replay_status=$?
+          printf '%s\n' "$replay_status" >"$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.exit"
+          cat "$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stdout"
+          cat "$M31_CAPTURE_REPLAY_ARTIFACT_DIR/replay.stderr" >&2
+          exit "$replay_status"
+      - name: Retain native qualification evidence on success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-ic-prime31-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/prime31-group-admission-qualification/
+            /tmp/graph-default.json
+            /tmp/graph-exact.json
+            /tmp/graph-capped.json
+          if-no-files-found: warn
+          retention-days: 14
+
