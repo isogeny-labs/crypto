@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Implement and separately check direct P-192 elliptic pushforward from valid rational KM class-space input, including infinity normalization, finite divisor extraction, multiplicities and map poles; retain full costs and unchanged limits/user waiver (Codex, started 2026-11-26, branch lane/p192-km-pushforward-20261126; follows PR #5256).
+
 - [x] Establish f_*phi*pi^*=[6] on the retained smooth P-192 models using separate actual-coordinate differential traces and a 6084<p difference-degree bound; bind the exact source-infinity reference, retain eight controls, failures and all149.116s wrapper costs (Codex, completed component 2026-11-26, branch lane/p192-composition-verification-20261126, PR #5256, follow-up to PR #5255; old software transpose, independent signing and original synthesis accounting remain open). [pcc:unverified]
 
 - [x] Complete the declared P-192 curve-map boundary panel and rational KM infinity normalization: all four geometric infinity points, retained affine pole, actual projective principal relation and external valid class-input normalization; native evidence/report retained under the user coordinate-screen/matched-rho waiver and unchanged limits (Codex, completed component 2026-11-26, branch lane/p192-projective-verification-20261126, PR #5255; general individual-point transpose, signed verification and original synthesis accounting remain open). [pcc:unverified]
