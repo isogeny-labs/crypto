@@ -298,10 +298,11 @@
   "weighted_tuple_enumeration_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
     "test": "contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials",
-    "cases": "three Cartesian-oracle fixtures; one/two packets; both target groups; repeated modes; weights 1/2/3; precisions 5/6/7",
+    "cases": "83,970 exhaustive small-state configurations over zero through four modes, two target groups, weights 1/2/3, bounds 0/1/2, and precisions 1 through 6; plus two multi-packet fixtures",
     "observed_gate": "production next_tuple enumerates every and only admissible exponent vector exactly once",
+    "producer_proof": "research/curve25519_subex_pivot_20261125/WEIGHTED_TUPLE_ITERATOR.md",
     "complete_library_result": "175 passed; 0 failed",
-    "claim_boundary": "finite exact enumeration controls; all-shape iterator refinement remains unverified"
+    "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
   },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

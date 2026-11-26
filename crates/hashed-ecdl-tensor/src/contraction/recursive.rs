@@ -736,6 +736,36 @@ mod tests {
 
     #[test]
     fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
+        fn production(
+            modes: &[Mode],
+            bounds: &[usize],
+            precision: usize,
+            radix: usize,
+            meter: &mut Meter,
+        ) -> BTreeSet<Vec<usize>> {
+            let mut beta = vec![0; modes.len()];
+            let mut usage = vec![0; bounds.len()];
+            let mut weight = 0;
+            let mut actual = BTreeSet::new();
+            loop {
+                assert!(actual.insert(beta.clone()));
+                if !next_tuple(
+                    &mut beta,
+                    modes,
+                    &mut usage,
+                    bounds,
+                    &mut weight,
+                    precision,
+                    radix,
+                    meter,
+                )
+                .unwrap()
+                {
+                    return actual;
+                }
+            }
+        }
+
         fn independent(
             modes: &[Mode],
             bounds: &[usize],
@@ -790,12 +820,40 @@ mod tests {
         }
 
         let mut meter = Meter::new(Limits::default());
+        for mode_count in 0..=4usize {
+            let descriptions = 6usize.pow(mode_count as u32);
+            for description in 0..descriptions {
+                let mut remaining = description;
+                let mut modes = Vec::new();
+                for _ in 0..mode_count {
+                    let digit = remaining % 6;
+                    remaining /= 6;
+                    let target = digit / 3;
+                    modes.push(Mode {
+                        packet: 0,
+                        source: target ^ 1,
+                        target,
+                        weight: digit % 3 + 1,
+                        rows: vec![],
+                        columns: vec![],
+                    });
+                }
+                for bound_0 in 0..=2 {
+                    for bound_1 in 0..=2 {
+                        let bounds = [bound_0, bound_1];
+                        for precision in 1..=6 {
+                            assert_eq!(
+                                production(&modes, &bounds, precision, 2, &mut meter),
+                                independent(&modes, &bounds, precision, 2),
+                                "mode_count={mode_count}, description={description}, bounds={bounds:?}, precision={precision}",
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
         let cases = [
-            (
-                vec![(0usize, 0usize, 1usize), (0, 0, 2), (0, 0, 3)],
-                vec![2, 0],
-                5,
-            ),
             (
                 vec![(0, 0, 1), (0, 1, 2), (1, 0, 1), (1, 0, 3)],
                 vec![1, 2, 2, 0],
@@ -819,28 +877,10 @@ mod tests {
                     columns: vec![],
                 })
                 .collect();
-            let mut beta = vec![0; modes.len()];
-            let mut usage = vec![0; bounds.len()];
-            let mut weight = 0;
-            let mut actual = BTreeSet::new();
-            loop {
-                assert!(actual.insert(beta.clone()));
-                if !next_tuple(
-                    &mut beta,
-                    &modes,
-                    &mut usage,
-                    &bounds,
-                    &mut weight,
-                    precision,
-                    2,
-                    &mut meter,
-                )
-                .unwrap()
-                {
-                    break;
-                }
-            }
-            assert_eq!(actual, independent(&modes, &bounds, precision, 2));
+            assert_eq!(
+                production(&modes, &bounds, precision, 2, &mut meter),
+                independent(&modes, &bounds, precision, 2),
+            );
         }
     }
 

@@ -238,10 +238,11 @@ tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in
-three multi-group fixtures spanning repeated modes, two packets, weights
-1/2/3, unequal target bounds, and precisions 5/6/7. This strengthens the finite
-completeness/uniqueness gate for the exponent tuple without replacing its
-all-shape proof obligation. `[pcc:unverified]`
+83,970 exhaustive small-state configurations, plus two multi-packet fixtures.
+`WEIGHTED_TUPLE_ITERATOR.md` states the general positive-weight cached-state,
+arithmetic-safety, termination, and restricted-odometer argument. This closes
+the producer-side iterator subargument without replacing independent or
+kernel-checked refinement. `[pcc:unverified]`
 
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper

@@ -76,10 +76,11 @@ It therefore vanishes modulo `2^p` once the tuple weight reaches `p`.
 `next_tuple` enumerates exactly the nonnegative exponent vectors below this
 weight, subject to the target-row degree bounds. The native enumeration
 control now compares production traversal with an independent Cartesian
-oracle in three fixtures, including repeated modes, two packets, both target
-groups, unequal group bounds, weights 1/2/3, and precisions 5/6/7. Every
-admissible tuple appears once and no inadmissible tuple appears, but the
-all-shape statement remains part of the refinement obligation.
+oracle over 83,970 exhaustive small-state configurations, plus two fixtures
+with distinct packets and four physical group slots. Every admissible tuple
+appears once and no inadmissible tuple appears. `WEIGHTED_TUPLE_ITERATOR.md`
+states the general cached-state and restricted-odometer proof; independent or
+kernel-checked refinement remains open.
 `[pcc:unverified]`
 
 ## Evidence and remaining gate
