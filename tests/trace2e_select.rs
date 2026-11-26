@@ -181,7 +181,7 @@ fn trace2e_base_recovers_a_planted_logarithm() {
             seed: 7,
             ..Default::default()
         };
-        spec.factor_base_params.set("dimension", &d.to_string());
+        spec.factor_base_params.set("dimension", d.to_string());
         spec.factor_base_params.set("select", "trace2e");
         let report = run_pipeline(
             &c,
