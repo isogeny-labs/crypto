@@ -1,0 +1,12 @@
+digraph pipeline {
+  rankdir=LR;
+  graph [bgcolor="white",ranksep=.28,nodesep=.25];
+  node [shape=box,fontname="Helvetica",fontsize=11,margin=".10,.08"];
+  edge [fontname="Helvetica",fontsize=9];
+  input [label="Supplied class_space\n22 x 85 coordinates"];
+  norm [label="Infinity normalization\nactual KM equality",color="#244c8c"];
+  rr [label="RR degree-3 extraction\nre-encode original class",color="#244c8c"];
+  map [label="Actual f on closed points\nretain multiplicities/poles",color="#17633d"];
+  result [label="Frobenius traces\nminus actual reference\nelliptic point",color="#17633d"];
+  input -> norm -> rr -> map -> result;
+}
