@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Publish the norm-one torus five-term toy decomposition prototype (Codex, started 2026-11-26, branch codex/norm-one-torus-five-term-toy)
+- [x] Publish the norm-one torus five-term toy decomposition prototype (Codex, completed 2026-11-26, branch codex/norm-one-torus-five-term-toy, PR #5220)
 - [x] Package the M31 shared-selector capacity checker and archived public-tag replay with Rust targets, retained evidence, and portable CI; integration follow-up to tracking PR #5206 (Codex, completed local checks 2026-11-25, branch lane/m31-shared-selector-integration-20261125, PR #5213; unsigned producer evidence). [pcc:unverified]
 - [x] Submit the Rust prime-field polynomial and map profiler (Codex, completed 2026-11-25, branch codex/rust-prime-field-experiments, PR #5200)
 - [x] Unify two runnable cryptanalysis leads under one frozen, same-target ECbench end-to-end panel with retained records and replay (Codex, completed local integration 2026-11-25, branch codex/lead-e2e-unify-20261125, PR #5204; K1-17, 16/16 verified and replayed, L0)
