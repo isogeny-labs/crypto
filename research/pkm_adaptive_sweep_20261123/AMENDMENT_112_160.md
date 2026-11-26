@@ -1,0 +1,5 @@
+# 2026-11-23 continuation amendment
+
+The first valid store contains 102 chains (seeds 9–110) and a censored seed 111. Continue in the same store through seed 160, with at most 120 seconds wall for this invocation. The runner now starts a seed only when at least 30 seconds remain, to give the generator its full timeout. This changes only timeout handling, not the curve, target points, candidate family, interval matching, relation enumerator, alpha-spending rule or cost calculation. Seed 111 remains a censored record, not a negative relation observation.
+
+Expected information gain: another bounded block samples distinct auxiliary curves and Vélu chains, tests whether any confirmed paired yield and setup-charged relation-cost advantage appears, and measures whether the negative CPU ratio trend persists. The precommitted criterion remains `component_candidate` in `adaptive.py`; this is a screening criterion and requires independent replay plus full same-target IC/rho qualification before any breakthrough claim.

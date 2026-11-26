@@ -1,0 +1,31 @@
+{
+  "arm": "interval",
+  "command": [
+    "/Volumes/SSD990-2/crypto/target/release/ic",
+    "bench",
+    "--bits",
+    "10",
+    "--family",
+    "generic",
+    "--max-trials",
+    "100",
+    "--rho-runs",
+    "1",
+    "--repeats",
+    "1",
+    "--seed",
+    "20261123",
+    "--targets",
+    "walk",
+    "--solver-budget-seconds",
+    "5",
+    "--json",
+    "--factor-base",
+    "prime-abscissa:below=8",
+    "--oracle",
+    "pkm-semaev:m=2,engine=f4,degree=8,bits=3,lo=0,mode=chain"
+  ],
+  "exit_code": 0,
+  "wall_s": 0.33728041699987443,
+  "child_cpu_s": 0.7967
+}

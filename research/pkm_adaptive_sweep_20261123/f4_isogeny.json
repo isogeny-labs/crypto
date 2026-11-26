@@ -1,0 +1,340 @@
+{
+  "all_verified": false,
+  "calibration": {
+    "ns_per_add": 37.506045,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 36.043421763135,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": 16.433086086525,
+    "ns_per_legendre": 9.651318041715,
+    "ns_per_lookup": 0.46537500636,
+    "ns_per_row_op": 0.62170020192,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 11.340665320605,
+    "ns_per_word_xor": 0.08858927829,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.130264667,
+  "instance": "icv1-fp10-t5-192cb216",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp10-t5-192cb216 | prime-isogeny[aux=ordinary,seed=1,t=3] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 8 | 4 | 2.0 | 0.030 | 100 | 3 | 3 | 5.0 | — | 119859.973 | 42981.75× | gave up |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 2.7886246975029994,
+    "mean_s": 2.7886246975029994,
+    "mean_s_walk": 0.6274405569381748,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 2.7886246975029994,
+    "per_run": [
+      {
+        "planted": 468,
+        "s": 2.7886246975029994,
+        "s_walk": 0.6274405569381748,
+        "seed": 1400727043,
+        "steps": 14,
+        "steps_over_expected": 0.7079908530398422,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 20.70553837895977,
+    "mean_s": 20.70553837895977,
+    "mean_s_walk": 1.1851654964387748,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 20.70553837895977,
+    "per_run": [
+      {
+        "planted": 468,
+        "s": 20.70553837895977,
+        "s_walk": 1.1851654964387748,
+        "seed": 1400727043,
+        "steps": 34,
+        "steps_over_expected": 0.9456252516047616,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 3436917.224176813,
+          "group_ops": {
+            "adds": 337,
+            "doubles": 413,
+            "scalar_mults": 52
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 1,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 3,
+            "pkm_descent_deferred_to_grid": 3,
+            "pkm_grid_fp_mults_uncharged": 360,
+            "pkm_system_fp_mults_uncharged": 1656,
+            "pkm_system_specialisations": 92,
+            "pkm_system_terms": 1467,
+            "relations": 3,
+            "repeated_targets_skipped": 8,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 92,
+            "solver_ops": 3969316,
+            "sqrt_solves": 0,
+            "target_guard_probes": 100,
+            "trials": 100,
+            "unliftable_systems": 0,
+            "walk_jumps": 25,
+            "walk_pool_offsets": 9,
+            "walk_pool_ops": 218,
+            "walk_pool_restarts": 9,
+            "walk_restarts": 10,
+            "walk_steps": 91
+          },
+          "wall_ns": 129851542,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 169,
+            "walk_mix_hashes": 91,
+            "walk_modr_adds": 200
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 3, mode chain, engine f4",
+        "gae_before_solver": 751.2408,
+        "hit_rate": 0.03,
+        "name": "pkm-semaev",
+        "relations_found": 3,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 44833
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 92,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 63,
+            "max_nnz_max": 2109,
+            "max_rows_max": 89,
+            "refutations": 89,
+            "staircase_stops": 0,
+            "steps": 653
+          },
+          "gae": 3436165.983376813,
+          "name": "f4-fp-tower",
+          "ns_per_op": 32.46831343233948,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 3969316,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 460,
+          "wall_ns": 128876996
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 7,
+          "n_vars": 6,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 100
+      },
+      "exhausted": true,
+      "factor_base": {
+        "abscissae": 4,
+        "columns": 4,
+        "cost": {
+          "gae": 1622.615203,
+          "group_ops": {
+            "adds": 613,
+            "doubles": 920,
+            "scalar_mults": 155
+          },
+          "native": {
+            "aux_bsgs_table_entries": 164,
+            "aux_count_gae": 413,
+            "aux_curves_filtered_out": 14,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 23,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 211,
+            "aux_orders_computed": 9,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 804,
+            "aux_sqrt_solves": 106,
+            "aux_tower_build_gae": 729,
+            "aux_two_sylow_rejected": 8,
+            "legendre_symbols": 219,
+            "sqrt_solves": 110,
+            "velu_evaluations_uncharged": 6
+          },
+          "wall_ns": 90416,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 24,
+            "index_point_negations": 8,
+            "index_sort_word_ops": 16
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 3, seed = 1; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 8
+      },
+      "group_order": 823,
+      "instance": "icv1-fp10-t5-192cb216",
+      "label": "prime-isogeny[aux=ordinary,seed=1,t=3] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 0.265216,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 5,
+            "pinned_by_repeated_row": 0,
+            "rank": 3,
+            "repeated_column_rows": 0,
+            "row_ops": 16,
+            "rows": 3,
+            "single_column_rows": 0,
+            "two_column_rows": 3
+          },
+          "wall_ns": 7542,
+          "work_native": {
+            "column_part_inserts": 3,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 47,
+            "pivot_inversion_steps": 60,
+            "row_build_modr_adds": 9,
+            "row_build_modr_muls": 6,
+            "row_build_words": 39,
+            "row_key_mixes": 6
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 3,
+        "rows": 3,
+        "work": 16,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 9.684748620421626,
+      "r": 823,
+      "recovered": null,
+      "rho_s": 2.7886246975029994,
+      "s": 119859.97323788037,
+      "s_over_rho": 42981.75130744766,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "1",
+          "t": "3"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 100,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20261123,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 3438540.104595813,
+      "verified": false,
+      "verify": {
+        "gae": 0.0,
+        "group_ops": {
+          "adds": 0,
+          "doubles": 0,
+          "scalar_mults": 0
+        },
+        "native": {},
+        "wall_ns": 0
+      },
+      "wall_seconds": 0.130044958
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "217cb14dba455c846e1069d7afc1a833791ba87077b8f425ffa5620a03004d7a",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "incomplete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

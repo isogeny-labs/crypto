@@ -1,0 +1,327 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 38.0325,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 36.5493465975,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": 16.6637497125,
+    "ns_per_legendre": 9.786789127499999,
+    "ns_per_lookup": 0.47190726,
+    "ns_per_row_op": 0.63042672,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 11.4998489925,
+    "ns_per_word_xor": 0.089832765,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.116865875,
+  "instance": "icv1-fp10-t5-192cb216",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp10-t5-192cb216 | prime-abscissa[below=8] + pkm-semaev[bits=3,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 8 | 4 | 2.0 | 0.059 | 85 | 5 | 5 | 5.0 | — | 105376.332 | 37787.92× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 2.7886246975029994,
+    "mean_s": 2.7886246975029994,
+    "mean_s_walk": 0.6274405569381748,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 2.7886246975029994,
+    "per_run": [
+      {
+        "planted": 468,
+        "s": 2.7886246975029994,
+        "s_walk": 0.6274405569381748,
+        "seed": 1400727043,
+        "steps": 14,
+        "steps_over_expected": 0.7079908530398422,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 20.70553837895977,
+    "mean_s": 20.70553837895977,
+    "mean_s_walk": 1.1851654964387748,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 20.70553837895977,
+    "per_run": [
+      {
+        "planted": 468,
+        "s": 20.70553837895977,
+        "s_walk": 1.1851654964387748,
+        "seed": 1400727043,
+        "steps": 34,
+        "steps_over_expected": 0.9456252516047616,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 3023018.2504336317,
+          "group_ops": {
+            "adds": 323,
+            "doubles": 400,
+            "scalar_mults": 50
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 5,
+            "pkm_descent_deferred_to_grid": 5,
+            "pkm_grid_fp_mults_uncharged": 600,
+            "pkm_system_fp_mults_uncharged": 4389,
+            "pkm_system_specialisations": 77,
+            "pkm_system_terms": 3771,
+            "relations": 5,
+            "repeated_targets_skipped": 8,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 77,
+            "solver_ops": 6704397,
+            "sqrt_solves": 0,
+            "target_guard_probes": 85,
+            "trials": 85,
+            "unliftable_systems": 0,
+            "walk_jumps": 24,
+            "walk_pool_offsets": 8,
+            "walk_pool_ops": 197,
+            "walk_pool_restarts": 8,
+            "walk_restarts": 9,
+            "walk_steps": 76
+          },
+          "wall_ns": 115894293,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 154,
+            "walk_mix_hashes": 76,
+            "walk_modr_adds": 168
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 3, mode chain, engine f4",
+        "gae_before_solver": 724.05468,
+        "hit_rate": 0.058823529411764705,
+        "name": "pkm-semaev",
+        "relations_found": 5,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 319708
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 77,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 63,
+            "max_nnz_max": 2237,
+            "max_rows_max": 104,
+            "refutations": 72,
+            "staircase_stops": 0,
+            "steps": 477
+          },
+          "gae": 3022294.1957536316,
+          "name": "f4-fp-tower",
+          "ns_per_op": 17.144778866764604,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 6704397,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 385,
+          "wall_ns": 114945404
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 7,
+          "n_vars": 6,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 85
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 4,
+        "columns": 4,
+        "cost": {
+          "gae": 2.753438,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 6,
+            "legendre_symbols": 6,
+            "sqrt_solves": 4
+          },
+          "wall_ns": 126459,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 12,
+            "index_point_negations": 4,
+            "index_sort_word_ops": 16
+          }
+        },
+        "description": "every abscissa in [1, 8) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 8
+      },
+      "group_order": 823,
+      "instance": "icv1-fp10-t5-192cb216",
+      "label": "prime-abscissa[below=8] + pkm-semaev[bits=3,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 0.74592,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 5,
+            "pinned_by_repeated_row": 0,
+            "rank": 5,
+            "repeated_column_rows": 0,
+            "row_ops": 45,
+            "rows": 5,
+            "single_column_rows": 2,
+            "two_column_rows": 3
+          },
+          "wall_ns": 19166,
+          "work_native": {
+            "column_part_inserts": 5,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 105,
+            "pivot_inversion_steps": 100,
+            "row_build_modr_adds": 15,
+            "row_build_modr_muls": 10,
+            "row_build_words": 65,
+            "row_key_mixes": 8
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 5,
+        "rows": 5,
+        "work": 45,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 9.684748620421626,
+      "r": 823,
+      "recovered": 468,
+      "rho_s": 2.7886246975029994,
+      "s": 105376.33220067559,
+      "s_over_rho": 37787.921872395396,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "8"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 300,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "3",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20261123,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 3023033.749791632,
+      "verified": true,
+      "verify": {
+        "gae": 12.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 8,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 708
+      },
+      "wall_seconds": 0.116565208
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "217cb14dba455c846e1069d7afc1a833791ba87077b8f425ffa5620a03004d7a",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}
