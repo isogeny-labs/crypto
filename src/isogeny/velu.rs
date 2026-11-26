@@ -440,7 +440,8 @@ pub fn dual_isogeny_naive(phi: &VeluIsogeny) -> Option<VeluIsogeny> {
         if candidates.is_empty() {
             return None;
         }
-        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), phi.domain.p) else {
+        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), phi.domain.p)
+        else {
             continue;
         };
         let point = crate::ecc::point::Point::Affine {
@@ -487,7 +488,11 @@ pub fn compose_isogenies(phi: &VeluIsogeny, psi: &VeluIsogeny) -> Option<VeluIso
         let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), p) else {
             continue;
         };
-        if phi.evaluate(x, y).and_then(|(u, v)| psi.evaluate(u, v)).is_none() {
+        if phi
+            .evaluate(x, y)
+            .and_then(|(u, v)| psi.evaluate(u, v))
+            .is_none()
+        {
             kernel.push((x, y));
         }
     }
