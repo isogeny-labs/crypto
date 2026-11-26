@@ -214,6 +214,11 @@ product and that either removing a generated mode or flipping its target group
 changes the result. This makes both pieces load-bearing in a finite fixture;
 it is not the quantified factorization theorem. `[pcc:unverified]`
 
+`GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
+coefficient identity, maps its constants, incoming coefficients, exponent
+tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
+`[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,

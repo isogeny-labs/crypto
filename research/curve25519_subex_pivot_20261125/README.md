@@ -476,6 +476,8 @@ kernel-check the whole asymptotic chain. [pcc:unverified]
   [`FORMALIZATION.md`](FORMALIZATION.md)
 - Tapered recovery identity and precision obligation:
   [`HERMITE_IDENTITY.md`](HERMITE_IDENTITY.md)
+- Mode-to-group packet factorization identity:
+  [`GROUP_FACTORIZATION.md`](GROUP_FACTORIZATION.md)
 - Pair-image degree gate:
   `research/curve25519_pair_image_gate_20261125/README.md`
 
