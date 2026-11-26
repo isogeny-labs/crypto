@@ -1,25 +1,93 @@
 #!/usr/bin/env bash
-# Trusted-main caller: archive a source revision and frozen inputs, upload a
-# private S3 checkpoint, and verify its readback. Does not execute an experiment.
+# Trusted-main caller: archive immutable executable source S plus finalized
+# experiment controls F, upload a private S3 checkpoint, and verify readback.
+# Does not execute an experiment.
 set -euo pipefail
-[[ $# == 5 ]] || { echo 'usage: checkpoint-source SOURCE SHA SPEC PROTOCOL NEW_OUTPUT' >&2; exit 2; }
-source_dir=$(realpath "$1")
-revision=$2
-spec=$3
-protocol=$4
-output=$5
-control=$(cd -- "$(dirname -- "$0")/../../.." && pwd)
+if [[ $# == 8 ]]; then
+  source_dir=$(realpath "$1")
+  revision=$2
+  control_dir=$(realpath "$3")
+  control_revision=$4
+  spec=$5
+  protocol=$6
+  plan=$7
+  output=$8
+  two_revision=1
+elif [[ $# == 5 ]]; then
+  # Legacy source-only captures remain readable. New workflow callers always
+  # use the strict two-revision form above.
+  source_dir=$(realpath "$1")
+  revision=$2
+  control_dir=$source_dir
+  control_revision=$revision
+  spec=$3
+  protocol=$4
+  plan=
+  output=$5
+  two_revision=0
+else
+  echo 'usage: checkpoint-source SOURCE_DIR SOURCE_SHA CONTROL_DIR CONTROL_SHA SPEC PROTOCOL PLAN NEW_OUTPUT' >&2
+  echo 'legacy: checkpoint-source SOURCE_DIR SOURCE_SHA SPEC PROTOCOL NEW_OUTPUT' >&2
+  exit 2
+fi
+tooling_root=$(cd -- "$(dirname -- "$0")/../../.." && pwd)
 [[ $revision =~ ^[a-f0-9]{40}$ ]] || exit 2
-for relative in "$spec" "$protocol"; do
+[[ $control_revision =~ ^[a-f0-9]{40}$ ]] || exit 2
+control_files=("$spec" "$protocol")
+[[ $two_revision == 0 ]] || control_files+=("$plan")
+for relative in "${control_files[@]}"; do
   [[ $relative =~ ^[a-zA-Z0-9_./-]+\.json$ && $relative != /* && "/$relative/" != *'/../'* ]] || exit 2
-  [[ -f $source_dir/$relative ]] || exit 2
-  [[ $(realpath -- "$source_dir/$relative") == "$source_dir/"* ]] || exit 2
+  [[ -f $control_dir/$relative && ! -L $control_dir/$relative ]] || exit 2
+  [[ $(realpath -- "$control_dir/$relative") == "$control_dir/"* ]] || exit 2
 done
 [[ $(git -C "$source_dir" rev-parse HEAD) == "$revision" ]] || exit 2
 git -C "$source_dir" diff --quiet HEAD || { echo 'source checkout is dirty' >&2; exit 2; }
 [[ -z $(git -C "$source_dir" ls-files --others --exclude-standard) ]] || { echo 'source checkout has untracked files' >&2; exit 2; }
-jq -e '.schema == "ecbench.spec/v1"' "$source_dir/$spec" >/dev/null
-jq -e '.schema == "experiment.protocol/v1" and .freeze.status == "frozen" and .freeze.filed_before_affected_data == true' "$source_dir/$protocol" >/dev/null
+[[ $(git -C "$control_dir" rev-parse HEAD) == "$control_revision" ]] || exit 2
+git -C "$control_dir" diff --quiet HEAD || { echo 'control checkout is dirty' >&2; exit 2; }
+[[ -z $(git -C "$control_dir" ls-files --others --exclude-standard) ]] || { echo 'control checkout has untracked files' >&2; exit 2; }
+jq -e '.schema | test("^ecbench\\.spec/v[123]$")' "$control_dir/$spec" >/dev/null
+jq -e '.schema == "experiment.protocol/v1" and .freeze.status == "frozen" and .freeze.filed_before_affected_data == true' "$control_dir/$protocol" >/dev/null
+protocol_body_hash=
+if [[ $two_revision == 1 ]]; then
+  command -v python3 >/dev/null
+  jq -e '.schema == "ecbench.plan/v1"' "$control_dir/$plan" >/dev/null
+  protocol_body_hash=$(python3 - "$control_dir/$protocol" "$revision" "$control_dir/$plan" <<'PY'
+import hashlib
+import json
+import re
+import sys
+
+protocol_path, source_revision, plan_path = sys.argv[1:]
+with open(protocol_path, "rb") as stream:
+    protocol = json.load(stream)
+if not isinstance(protocol, dict) or protocol.get("schema") != "experiment.protocol/v1":
+    raise SystemExit("unsupported protocol")
+freeze = protocol.get("freeze")
+if not isinstance(freeze, dict) or freeze.get("status") != "frozen" or freeze.get("filed_before_affected_data") is not True:
+    raise SystemExit("protocol is not a prospective freeze")
+if freeze.get("commit") != source_revision:
+    raise SystemExit("protocol freeze commit differs from executable source")
+if not re.fullmatch(r"[0-9a-f]{40}", source_revision):
+    raise SystemExit("invalid executable source revision")
+for arm in protocol.get("arms", []):
+    commit = arm.get("instrument", {}).get("commit")
+    if commit is not None and commit != source_revision:
+        raise SystemExit("protocol arm commit differs from executable source")
+body = dict(protocol)
+body.pop("freeze", None)
+canonical = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode()
+body_hash = hashlib.sha256(canonical).hexdigest()
+if freeze.get("protocol_sha256") != body_hash:
+    raise SystemExit("protocol canonical body hash mismatch")
+with open(plan_path, "rb") as stream:
+    plan_hash = hashlib.sha256(stream.read()).hexdigest()
+if protocol.get("extensions", {}).get("aps_export", {}).get("plan_sha256") != plan_hash:
+    raise SystemExit("protocol does not pin the exact ecbench plan")
+print(body_hash)
+PY
+  )
+fi
 [[ ! -e $output ]] || { echo 'checkpoint receipt directory already exists' >&2; exit 2; }
 mkdir -- "$output"
 output=$(realpath "$output")
@@ -27,11 +95,14 @@ command -v aws >/dev/null
 command -v jq >/dev/null
 aws sts get-caller-identity --output json | jq -e '.Account == "104186811093"' > "$output/caller-account-check.txt"
 cd -- "$source_dir"
-for temporary in isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz .resume; do
+staged=(isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz .resume)
+[[ $two_revision == 0 ]] || staged+=(isolab-ecbench-plan.json)
+for temporary in "${staged[@]}"; do
   [[ ! -e $temporary && ! -L $temporary ]] || { echo 'checkpoint staging path already exists' >&2; exit 2; }
 done
-cp -- "$spec" isolab-ecbench-spec.json
-cp -- "$protocol" isolab-experiment-protocol.json
+cp -- "$control_dir/$spec" isolab-ecbench-spec.json
+cp -- "$control_dir/$protocol" isolab-experiment-protocol.json
+[[ $two_revision == 0 ]] || cp -- "$control_dir/$plan" isolab-ecbench-plan.json
 # Preserve native build sources and store pointers as data. No source-selected
 # command is executed with the uploader's credentials.
 git archive --format=tar.gz "$revision" -- Cargo.toml Cargo.lock src crates isogeny_algos \
@@ -41,7 +112,9 @@ git archive --format=tar.gz "$revision" -- Cargo.toml Cargo.lock src crates isog
   research/pencil_large_prime_20261029 research/five_leads_e2e_20261019/native \
   > isolab-source-snapshot.tar.gz
 [[ $(stat -c %s isolab-source-snapshot.tar.gz) -le 134217728 ]] || { echo 'source checkpoint exceeds 128MiB; no upload/experiment' >&2; exit 1; }
-sha256sum isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz > "$output/payload.sha256"
+payload=(isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz)
+[[ $two_revision == 0 ]] || payload+=(isolab-ecbench-plan.json)
+sha256sum "${payload[@]}" > "$output/payload.sha256"
 mkdir -p .resume
 cat > .resume/RESUME.md <<EOF
 # Resume: native hashed ECDLP ECBench
@@ -55,8 +128,9 @@ Measure source, selector, width and partial native backends. No achieved
 speedup, sub-rho result or challenge scalar is asserted by this checkpoint.
 
 ## Spec
-Source $revision; trusted workflow revision ${GITHUB_SHA:-manual}; frozen spec $spec; protocol $protocol. Exact copies and
-the native build source snapshot are in this checkpoint's untracked payload.
+Executable source S $revision; finalized control F $control_revision; trusted workflow revision ${GITHUB_SHA:-manual};
+frozen spec $spec; protocol $protocol${plan:+; deterministic plan $plan}. Exact control copies and the native build
+source snapshot are in this checkpoint's untracked payload.
 
 ## State
 Checkpoint-only infrastructure step in GitHub run ${GITHUB_RUN_ID:-manual}
@@ -83,8 +157,8 @@ is invalid. Both challenge solves and independent general audit stay open.
 EOF
 export CHECKPOINT_MAX_FILE_MB=128 CHECKPOINT_MAX_TOTAL_MB=300
 export CHECKPOINT_PREFIX="checkpoints/isolab-ecbench/${GITHUB_RUN_ID:-manual}-${GITHUB_RUN_ATTEMPT:-1}"
-"$control/scripts/checkpoint.sh" push --force > "$output/upload.txt"
-"$control/scripts/checkpoint.sh" gate > "$output/gate.txt"
+"$tooling_root/scripts/checkpoint.sh" push --force > "$output/upload.txt"
+"$tooling_root/scripts/checkpoint.sh" gate > "$output/gate.txt"
 read -r fingerprint stamp uri < .resume/.last-push
 [[ $uri == s3://setec-astronomy-artifacts/checkpoints/isolab-ecbench/*/ ]] || exit 1
 aws s3 cp --only-show-errors "${uri}checkpoint.tar.gz" "$output/checkpoint.tar.gz"
@@ -93,12 +167,26 @@ tar -xzf "$output/checkpoint.tar.gz" -C "$output/readback" -- ./meta.json ./RESU
 jq -e --arg sha "$revision" '.head == $sha' "$output/readback/meta.json" > "$output/source-check.txt"
 cmp .resume/RESUME.md "$output/readback/RESUME.md"
 mkdir "$output/readback/payload"
-tar -xzf "$output/readback/untracked.tar.gz" -C "$output/readback/payload" -- \
-  isolab-ecbench-spec.json isolab-experiment-protocol.json isolab-source-snapshot.tar.gz
+tar -xzf "$output/readback/untracked.tar.gz" -C "$output/readback/payload" -- "${payload[@]}"
 (cd "$output/readback/payload" && sha256sum -c "$output/payload.sha256") > "$output/payload-readback.txt"
 archive_hash=$(sha256sum "$output/checkpoint.tar.gz" | cut -d' ' -f1)
 spec_hash=$(sha256sum isolab-ecbench-spec.json | cut -d' ' -f1)
 protocol_hash=$(sha256sum isolab-experiment-protocol.json | cut -d' ' -f1)
-jq -n --arg source "$revision" --arg control "${GITHUB_SHA:-}" --arg uri "$uri" --arg digest "$archive_hash" --arg spec "$spec_hash" --arg protocol "$protocol_hash" \
-  '{schema:"isolab.source-checkpoint/v1",source_revision:$source,workflow_revision:(if $control=="" then null else $control end),checkpoint_uri:$uri,archive_sha256:$digest,spec_sha256:$spec,protocol_sha256:$protocol,upload_readback_verified:true,experiment_submitted:false}' > "$output/checkpoint.json"
+snapshot_hash=$(sha256sum isolab-source-snapshot.tar.gz | cut -d' ' -f1)
+if [[ $two_revision == 1 ]]; then
+  plan_hash=$(sha256sum isolab-ecbench-plan.json | cut -d' ' -f1)
+  jq -n --arg source "$revision" --arg controls "$control_revision" --arg workflow "${GITHUB_SHA:-}" \
+    --arg uri "$uri" --arg digest "$archive_hash" --arg snapshot "$snapshot_hash" \
+    --arg spec "$spec_hash" --arg protocol "$protocol_hash" --arg body "$protocol_body_hash" --arg plan "$plan_hash" \
+    '{schema:"isolab.source-checkpoint/v2",source_revision:$source,control_revision:$controls,
+      workflow_revision:(if $workflow=="" then null else $workflow end),checkpoint_uri:$uri,
+      archive_sha256:$digest,source_snapshot_sha256:$snapshot,spec_sha256:$spec,
+      protocol_file_sha256:$protocol,protocol_body_sha256:$body,plan_sha256:$plan,
+      upload_readback_verified:true,experiment_submitted:false}' > "$output/checkpoint.json"
+  jq -n --arg source "$revision" --arg controls "$control_revision" --arg body "$protocol_body_hash" \
+    '{source_revision:$source,control_revision:$controls,protocol_body_sha256:$body,verified:true}' > "$output/control-check.txt"
+else
+  jq -n --arg source "$revision" --arg workflow "${GITHUB_SHA:-}" --arg uri "$uri" --arg digest "$archive_hash" --arg spec "$spec_hash" --arg protocol "$protocol_hash" \
+    '{schema:"isolab.source-checkpoint/v1",source_revision:$source,workflow_revision:(if $workflow=="" then null else $workflow end),checkpoint_uri:$uri,archive_sha256:$digest,spec_sha256:$spec,protocol_sha256:$protocol,upload_readback_verified:true,experiment_submitted:false}' > "$output/checkpoint.json"
+fi
 printf 'Source checkpoint uploaded and independently read back; no experiment submitted.\n'

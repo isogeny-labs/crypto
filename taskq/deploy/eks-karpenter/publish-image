@@ -11,7 +11,9 @@ for name in ecbench isolab-fresh-owner build-info.json; do
   [[ -f "$bundle/$name" && ! -L "$bundle/$name" ]]
 done
 jq -e --arg revision "$revision" '
- .source_revision==$revision and .source_repository=="https://github.com/aburan28/crypto"
+ .source_revision==$revision
+ and (.source_repository=="https://github.com/isogeny-labs/crypto"
+      or .source_repository=="https://github.com/aburan28/crypto")
  and .architecture=="linux/amd64" and .target=="x86_64-unknown-linux-musl"
  and .default_features==false and (.ecbench_sha256|test("^[a-f0-9]{64}$"))
 ' "$bundle/build-info.json" >/dev/null

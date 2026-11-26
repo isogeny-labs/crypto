@@ -23,7 +23,7 @@ owner_binary=$(sha256sum "$tmp/bundle/isolab-fresh-owner" | cut -d' ' -f1)
 revision=$(printf 'a%.0s' {1..40})
 binary=$(sha256sum "$tmp/bundle/ecbench" | cut -d' ' -f1)
 jq -n --arg revision "$revision" --arg binary "$binary" --arg owner_binary "$owner_binary" \
-  '{source_revision:$revision,ecbench_sha256:$binary,fresh_owner_sha256:$owner_binary,source_repository:"https://github.com/aburan28/crypto",
+  '{source_revision:$revision,ecbench_sha256:$binary,fresh_owner_sha256:$owner_binary,source_repository:"https://github.com/isogeny-labs/crypto",
     architecture:"linux/amd64",target:"x86_64-unknown-linux-musl",default_features:false}' > "$tmp/bundle/build-info.json"
 cat > "$tmp/bin/aws" <<'EOF'
 #!/usr/bin/env bash

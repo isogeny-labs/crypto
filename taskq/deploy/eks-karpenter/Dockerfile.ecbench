@@ -1,6 +1,6 @@
 FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39
 ARG SOURCE_REVISION
-LABEL org.opencontainers.image.source="https://github.com/aburan28/crypto" \
+LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" \
       org.opencontainers.image.revision="${SOURCE_REVISION}"
 # Build context contains only explicit binaries/metadata, never a repository or keys.
 COPY ecbench /usr/local/bin/ecbench
