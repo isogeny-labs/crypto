@@ -51,6 +51,7 @@ The status of the program is:
 | Proposition 25 | unconditional compact-degree counterexample | multiplication-by-\(k\) has degree \(k^2\) but an \(O(\log k)\) group-law DAG, so expanded degree cannot be charged as compact-circuit work |
 | Theorem 26 | unconditional in the explicit global-map catalogue model | compact single-valued rational branches satisfy a degree-free square-root direct sum |
 | Proposition 27 | exact finite-domain boundary | arbitrary subgroup-point selectors exist in the reduced evaluation algebra, so global-map rigidity cannot extend without a compression/query hypothesis |
+| Theorem 28 | unconditional in the symbolic straight-line recovery model | rational recovery from a succinct correspondence produces a global selector section and inherits Theorem 26's square-root direct sum |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2242,6 +2243,68 @@ total work.  Proving that impossible is a static data-structure or
 finite-function circuit lower bound; morphism degree, properness, and the
 elliptic rigidity lemma alone cannot supply it. [pcc:unverified]
 
+### Theorem 28 (straight-line correspondence recovery becomes a section)
+
+Let \(K=\mathbb F_p(E)\) be the target function field.  For each branch \(j\),
+let \(X_j\) be an irreducible algebraic correspondence with a dominant target
+map
+
+\[
+\pi_j:X_j\dashrightarrow E
+\]
+
+and rational leaf maps \(g_{j,i}:X_j\dashrightarrow E\).
+Suppose a symbolic query program, after curve-specific preprocessing, uses
+only additions, subtractions, multiplications, and verified inversions in
+\(K\), with no algebraic root oracle or target-dependent zero-test branch. [pcc:unverified]
+If it generically recovers a point of \(X_j\) above the target, then it defines
+a rational section
+
+\[
+s_j:E\dashrightarrow X_j,\qquad \pi_j\circ s_j=\operatorname{id}_E.
+\]
+
+The recovered leaf maps
+
+\[
+f_{j,i}=g_{j,i}\circ s_j:E\dashrightarrow E
+\]
+
+are therefore global rational maps.  An explicit catalogue of \(r\) such
+recovery branches satisfies Theorem 26:
+
+\[
+\mathbb E Z\le\frac{BNr}{n},\qquad
+P+B+T_{\rm verify}\ge2\sqrt{cn}
+\]
+
+when \(cN\) expected relation rows are required.  This conclusion is
+independent of the degrees and compact representations of \(X_j\), \(s_j\),
+and the leaf maps. [pcc:unverified]
+
+#### Proof
+
+Every register of the straight-line program is an element of \(K\), because
+the four permitted operations do not leave the target function field.
+The output coordinates satisfy the defining equations of \(X_j\) over the
+generic point of \(E\) and project to that generic point.  Equivalently, they
+give a \(K\)-rational point of the generic fibre of \(\pi_j\), which is the
+same as a rational section \(s_j\).
+
+Composing with each rational leaf projection gives
+\(f_{j,i}:E\dashrightarrow E\).  Properness extends these maps across their
+indeterminacies.  They are exactly the compact global selector maps covered
+by Theorem 26, whose constant-or-injective subgroup argument and
+preprocessing/query calculation give the displayed bounds. \(\square\)
+
+Thus a succinct multivalued correspondence is not by itself an escape.  A
+query algorithm outside Theorem 28 must perform a genuine algebraic extension
+or root extraction, branch using target-dependent finite-field tests, or be
+correct only on a finite target set without defining a generic section.
+The first case requires an explicit root-recovery cost model; the latter two
+are the finite-domain compression problem isolated by Proposition 27.
+[pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2448,9 +2511,11 @@ branching.  Theorem 24 supplies the corresponding square-root direct sum for
 degree-explicit algebraic selectors with adaptive branch choice.  Theorem 26
 removes the degree charge for compact single-valued global maps in an explicit
 branch catalogue.  The remaining Gate 2 extension is to succinct multivalued
-correspondences, finite-domain coordinate formulas, and control DAGs that
-implicitly generate exponentially many output branches.  A width or monomial
-lower bound counts only if a simulation theorem charges those compact
+correspondences recovered through genuine algebraic root operations,
+finite-domain coordinate formulas, and control DAGs that implicitly generate
+exponentially many output branches.  Theorem 28 closes symbolic straight-line
+recovery that remains in the target function field.  A width or monomial
+lower bound counts only if a simulation theorem charges the remaining compact
 representations.  Theorems 21--22 and Proposition 23 further show that this
 extension must cover joint or target-dependent witness search, rather than
 only exact labels, false-positive verification, or target-shifted scans.
@@ -2487,6 +2552,7 @@ Theorem 1 makes “global low tensor rank” an unpromising escape, while
 Propositions 11 and 12 show that expanded support is not a general circuit
 measure.  Theorems 21--22 close exact and one-sided target-independent
 separate labels, Proposition 23 audits the simplest target-dependent
-coordinate filter, and Theorem 26 closes compact global single-valued maps.
-Research should now concentrate on succinct correspondences, implicit branch
-generation, joint target-adaptive search, and multi-target sharing.
+coordinate filter, Theorem 26 closes compact global single-valued maps, and
+Theorem 28 closes straight-line rational recovery from correspondences.
+Research should now concentrate on algebraic root extraction, finite-domain
+branching, implicit branch generation, and multi-target sharing.

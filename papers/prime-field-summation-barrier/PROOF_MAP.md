@@ -23,6 +23,7 @@ proof obligations from computational-model assumptions.
 | compact-degree separation | successor Proposition 25 | degree of multiplication-by-`k` and binary addition-chain evaluation | exact construction and standard degree identity, unreviewed `[pcc:unverified]` | independent elliptic-map review |
 | degree-free compact global-map direct sum | successor Theorem 26 | rigidity lemma for elliptic-curve morphisms, prime-order kernel dichotomy, uniform-target expectation, and AM--GM | exact hand proof plus bounded affine-map replay, unreviewed `[pcc:unverified]` | independent algebraic-group and model review |
 | finite-domain selector boundary | successor Proposition 27 | coordinate algebra of a reduced finite rational-point scheme and explicit table lookup | exact algebraic identification plus bounded selector replay, unreviewed `[pcc:unverified]` | independent finite-scheme and model review |
+| symbolic correspondence recovery | successor Theorem 28 | closure of straight-line registers in the target function field, generic-fibre/section equivalence, and Theorem 26 | exact hand reduction, unreviewed `[pcc:unverified]` | independent function-field and recovery-model review |
 | unrestricted compact-circuit barrier | successor programme | new preprocessing/query direct-sum theorem | **open; not claimed** | formulate a narrow model with a falsifiable lower-bound target |
 
 ## Explicit non-implications

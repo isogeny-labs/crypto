@@ -113,6 +113,15 @@ rigidity alone cannot handle finite-domain formulas.  The remaining problem
 is genuinely one of compressing and querying those selector tables or
 recovering witnesses from succinct correspondences. `[pcc:unverified]`
 
+Theorem 28 closes symbolic straight-line recovery from those correspondences.
+If a query program stays inside the target function field and uses only field
+operations and inversions, a generically correct recovered root is a rational
+section of the correspondence.  Its leaf outputs are global rational maps,
+so Theorem 26 applies without a degree charge.  Any remaining succinct
+correspondence attack must use genuine algebraic root extraction,
+finite-field-specific branching, or correctness restricted to a finite target
+set. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
