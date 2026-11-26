@@ -2,12 +2,13 @@ name: Rootfind Round 147 source-exact Rust A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round147-general-primes-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round147/**
       - .github/workflows/rootfind_round147.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

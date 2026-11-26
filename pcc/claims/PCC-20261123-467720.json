@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T18:54:25Z",
+ "id": "PCC-20261123-467720",
+ "kind": "statement",
+ "producer": {
+  "commit": "065176db5621a0cfc5d94a1be0551e158e6e0fa1",
+  "model": "",
+  "session": "codex-ecc2k-halftrace-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/checks/profile-receipt.json",
+    "sha256": "31da287d37c5f63cc7342f1df0d38a4d17bd5c1340ed70690cd4f72dcc6139a9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/profiles/baseline-cold/annotate-inclusive.txt",
+    "sha256": "4617ed2527eb49f2e3f8f3e5ecc914d717df92dba4ef31a2723e55f790c6da8c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR5057, fixed n131 d12 unmodified landed adjoint baseline, simulated instructions; unsigned producer evidence.",
+ "statement": "Two fresh source-identical baseline A/A Callgrind profiles complete with matching valid fixed ECC2K-130 uniform query output. The retained inclusive annotation attributes9,844,704 instructions (22.35% of this profile) to half-trace basis-image construction. This is hotspot discovery, not a gain or native-runtime result."
+}

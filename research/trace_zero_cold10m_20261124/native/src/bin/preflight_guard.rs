@@ -1,0 +1,11 @@
+//! Native preflight validity and fixed-budget metadata guard; no row exclusions.
+use serde_json::{json,Value};
+use std::{env,fs,path::Path,time::{SystemTime,UNIX_EPOCH}};
+fn read(p:&Path)->Value{serde_json::from_slice(&fs::read(p).unwrap()).unwrap()}
+fn main(){let args:Vec<_>=env::args().collect();let p=Path::new(&args[1]);assert!(read(&p.join("calibration.json"))["passes"]==true);
+let pilot=read(&p.join("preflight.json"));let rows=pilot["rows"].as_array().unwrap();assert_eq!(rows.len(),16);
+for row in rows {assert_eq!(row["result"]["valid"],true);let id=row["instance"].as_str().unwrap();if id.contains("distinct-planted"){assert_eq!(row["result"]["outcome"],"Found");assert_eq!(row["result"]["replay"],true);}let reference=rows.iter().find(|r|r["instance"]==row["instance"]&&r["arm"]=="baseline").unwrap();for key in ["outcome","replay","indices","points","models","patterns_attempted","patterns_refuted","reason","common","projected","group"]{assert_eq!(row["result"][key],reference["result"][key],"{id}/{key}");}}
+let mut cost=0f64;for n in [83,131]{for arm in ["baseline","baseline-aa","incumbent","elimination"] {let max=rows.iter().filter(|r|r["n"]==n&&r["arm"]==arm).map(|r|r["engineering_elapsed_seconds"].as_f64().unwrap()).fold(0f64,f64::max);assert!(max>0.);cost+=15.*max;}}
+let epoch:u64=fs::read_to_string(p.join("start.epoch")).unwrap().trim().parse().unwrap();let fixed=SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs_f64()-epoch as f64;let estimated=fixed+cost;
+let mut q=read(&p.join("protocol.json"));q["sample_size"]["preflight_runtime"]=json!({"fixed_seconds":fixed,"per_sample_seconds":cost/120.,"threads":1,"estimated_total_seconds":estimated,"measured_on":"Fresh16-call pilot; each field/arm maximum times15. Original epoch retained; fixed120-row primary, no downscale or deadline reset."});fs::write(p.join("protocol.json"),serde_json::to_vec_pretty(&q).unwrap()).unwrap();
+let gate=json!({"calls":16,"calibration_passes":true,"validity_passes":true,"positive_passes":true,"exact_common_outputs":true,"estimated_total_seconds":estimated,"fits_original600":estimated<600.});fs::write(p.join("preflight-gate.json"),serde_json::to_vec_pretty(&gate).unwrap()).unwrap();assert!(estimated<600.,"Original600second envelope cannot fit unchanged120 rows");println!("{gate}");}

@@ -1,0 +1,79 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-24T02:28:54+00:00",
+  "commands": [
+    {
+      "argv": [
+        "timeout",
+        "600",
+        "bash",
+        "research/trace_zero_cold50x_20261124/checks/run-profile.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T02:13:28+00:00",
+      "wall_s": 2.257
+    }
+  ],
+  "commit": "e65dc230265ebdfa6e9ed7318f4eec25c5c601c3",
+  "commit_dirty": false,
+  "created_utc": "2026-11-24T02:12:59+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261124T0212Z-ecc2k-cold50x-current-profile",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "complete_cold_profile_ir",
+      "note": "Two identical descriptive A/A calls; no native-time or new gain claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        21360464.0,
+        21360464.0
+      ],
+      "unit": "ir",
+      "value": 21360464.0
+    }
+  ],
+  "problem": "ecc2k130-index-calculus-cold-query",
+  "raw": [
+    {
+      "bytes": 203108,
+      "path": "research/trace_zero_cold50x_20261124/profiles/baseline-cold/callgrind.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4c/4cbb0ff602755bf4171248eef3425cd900aa3843146d161c009d0c2f1f3a5514",
+      "sha256": "4cbb0ff602755bf4171248eef3425cd900aa3843146d161c009d0c2f1f3a5514",
+      "uploaded": false
+    },
+    {
+      "bytes": 203108,
+      "path": "research/trace_zero_cold50x_20261124/profiles/baseline-aa-cold/callgrind.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24a68c57e4d2046174c5630aeb83acde9a5f10b5ca1ce36c490a96e682288264",
+      "sha256": "24a68c57e4d2046174c5630aeb83acde9a5f10b5ca1ce36c490a96e682288264",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold50x_20261124/profile.pdf",
+    "png": [],
+    "svg": [
+      "research/trace_zero_cold50x_20261124/profiles/baseline-cold/hotspots.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50x-current-profile",
+  "status": "measured",
+  "summary": "Descriptive fixed query profile only; both Ir21360464. Persistent local envelope, complete raw retained, unsigned.",
+  "validation": null
+}

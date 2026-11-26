@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:10:00Z",
+ "id": "PCC-20261124-a6190c",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "GPT-6 Astra Pro",
+  "session": "graph-source-id-order-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/lp_graph_algorithms_20261123/source_id_order/receipt.json",
+    "sha256": "07b41c32519072eb39c1341e1cc661b1f75251ef0725762087e625f19c57de7e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Graph witness source-ID canonicalization. Exact source and evidence hashes in the pinned receipt. Local source materialization has no Git HEAD; producer.commit remains unset and the receipt supplies the actual base/protocol/published-source identities. No full root crate or curve solver qualification.",
+ "statement": "Retained local Rust 1.100 development logs record both new M31 source-ID regressions failing on unchanged witness code, followed by 45 of 45 original-module integration tests passing on the published candidate e7084130837c91ff5c3c2b14dc058048b6a21c5e. Four new scalar-field tests cover eager/lazy witnesses, six input permutations and atomic refusal guards at ell=2147446831. This is unsigned producer evidence, not signed execution verification or a performance measurement. [pcc:unverified]"
+}
