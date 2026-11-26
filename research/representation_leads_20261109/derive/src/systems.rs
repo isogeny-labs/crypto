@@ -3,6 +3,7 @@
 //!
 //! - `Chain`: S_3(x_a, x_b, x_c) = 0 per merge (cubic in bits while x_a, x_b, x_c are unknown);
 //! - `QuadGeneric`: Chain plus a structureless auxiliary w = x_a x_b (the confound control);
+//! - `QuadAc` / `QuadBc`: matched quadratic lifts of the other two product edges;
 //! - `E2Aux`: the norm form of the line through the merge, auxiliary mu = e_2;
 //! - `Line`: E2Aux plus the slope lambda with lambda^2 + lambda = x_a + x_b + x_c + a;
 //! - `ChainTrace`: Chain plus the implied linear equation Tr(x_a + x_b + x_c + a) = 0 per merge.
@@ -19,6 +20,8 @@ pub enum Rep {
     Chain,
     ChainTrace,
     QuadGeneric,
+    QuadAc,
+    QuadBc,
     E2Aux,
     Line,
 }
@@ -28,11 +31,15 @@ impl Rep {
     pub const ALL: [Rep; 4] = [Rep::Chain, Rep::QuadGeneric, Rep::E2Aux, Rep::Line];
     /// The four arms of PROTOCOL.md.
     pub const PROTOCOL: [Rep; 4] = [Rep::Chain, Rep::QuadGeneric, Rep::E2Aux, Rep::ChainTrace];
+    /// Matched one-product quadratisations used by the edge-lift support census.
+    pub const EDGES: [Rep; 3] = [Rep::QuadGeneric, Rep::QuadAc, Rep::QuadBc];
     pub fn name(self) -> &'static str {
         match self {
             Rep::Chain => "chain_s3",
             Rep::ChainTrace => "chain_trace",
             Rep::QuadGeneric => "quad_generic",
+            Rep::QuadAc => "quad_ac",
+            Rep::QuadBc => "quad_bc",
             Rep::E2Aux => "e2_aux",
             Rep::Line => "line",
         }
@@ -221,14 +228,47 @@ fn build_inner(c: &Curve, rep: Rep, basis: &[u64], m: usize, xr: u64, p: Option<
                 let z = cx.add(&cx.add(&xa, &xb), &cx.add(&xc, &aconst));
                 bool_eqs.push(cx.trace(&z));
             }
-            Rep::QuadGeneric => {
+            Rep::QuadGeneric | Rep::QuadAc | Rep::QuadBc => {
                 if cubic {
                     let w = cx.free();
-                    if let Some((_, _, xav, xbv, _)) = vals {
-                        push_value(&mut planted, f, f.mul(xav, xbv));
+                    if let Some((_, _, xav, xbv, xcv)) = vals {
+                        let wv = match rep {
+                            Rep::QuadGeneric => f.mul(xav, xbv),
+                            Rep::QuadAc => f.mul(xav, xcv),
+                            Rep::QuadBc => f.mul(xbv, xcv),
+                            _ => unreachable!(),
+                        };
+                        push_value(&mut planted, f, wv);
                     }
-                    eqs.push(cx.add(&w, &cx.mul(&xa, &xb)));
-                    eqs.push(s3(&cx, Some(&w)));
+                    let (lifted_product, square_sum, cubic_term) = match rep {
+                        Rep::QuadGeneric => (
+                            cx.mul(&xa, &xb),
+                            cx.add(
+                                &cx.add(&cx.sq(&w), &cx.mul(&cx.sq(&xa), &cx.sq(&xc))),
+                                &cx.mul(&cx.sq(&xb), &cx.sq(&xc)),
+                            ),
+                            cx.mul(&w, &xc),
+                        ),
+                        Rep::QuadAc => (
+                            cx.mul(&xa, &xc),
+                            cx.add(
+                                &cx.add(&cx.sq(&w), &cx.mul(&cx.sq(&xa), &cx.sq(&xb))),
+                                &cx.mul(&cx.sq(&xb), &cx.sq(&xc)),
+                            ),
+                            cx.mul(&w, &xb),
+                        ),
+                        Rep::QuadBc => (
+                            cx.mul(&xb, &xc),
+                            cx.add(
+                                &cx.add(&cx.sq(&w), &cx.mul(&cx.sq(&xa), &cx.sq(&xb))),
+                                &cx.mul(&cx.sq(&xa), &cx.sq(&xc)),
+                            ),
+                            cx.mul(&w, &xa),
+                        ),
+                        _ => unreachable!(),
+                    };
+                    eqs.push(cx.add(&w, &lifted_product));
+                    eqs.push(cx.add(&cx.add(&square_sum, &cubic_term), &bconst));
                 } else {
                     eqs.push(s3(&cx, None));
                 }
