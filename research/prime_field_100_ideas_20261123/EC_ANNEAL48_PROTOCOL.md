@@ -1,0 +1,33 @@
+# Bounded simulated annealing on an EC relation factor graph (#48)
+
+Date: 2026-11-24, America/Los_Angeles. **Status before run:** frozen, unexecuted. Conductor task `T-12359` reserves source, qualifier, protocol and raw output. The current `scripts/checkpoint.sh gate` fails for missing `.resume/RESUME.md`; the earlier HTTP 403 was a distinct reported S3 failure. The user's explicit local-bypass instruction and renewed request to run E(F_p) leads admit this one small local public experiment, not cloud spending or a claim that the S3 gate passed.
+
+## Frozen instance and mechanism
+
+`E/F_1009: y²=x³+x+14`, `Q=(0,425)`, two triples of checked factor-base points: `(4,456),(10,32),(29,35)` and `(5,12),(10,32),(25,23)`. A four-spin state is one of 16 choices: one triple bit and three sign bits. The single high-order factor evaluates the EC point sum. Its energy is cyclic distance of the resulting affine `(x,y)` from `Q` in each coordinate, summed; infinity has energy `2018`. Zero energy is exactly the EC relation predicate. The earlier independent witness stream predicts marked masks `5` and `14`, checked by an exhaustive 16-mask positive control before trials. This factor graph is a minimal EC adaptation of the proposal, not prime-integer factorization.
+
+The algorithm is Metropolis simulated annealing with one uniformly chosen bit flip per proposal and temperatures `500, 250, 125, 62.5` in successive blocks of four proposals. Non-increasing energy is accepted; increasing energy is accepted with probability approximated by `floor(10^6 exp(-ΔE/T))/10^6`. Each of 128 deterministic seeds `202611240001..202611240128` starts at a uniform mask and has at most 16 EC energy evaluations (one start plus 15 proposals); it stops at the first verified zero. An uphill proposal/acceptance count shows whether the annealing branch ran. No parameter is tuned after output. `[pcc:unverified]`
+
+Controls: (1) the fixed ascending exhaustive scan finds first marked mask after six evaluations and a full scan costs 16; (2) a uniform independent mask sampler with replacement uses the same seed range and 16-evaluation cap. Each energy call performs three sign multiplications and two EC additions; record additions as `2 × evaluations`. The 16 positive-control evaluations and on-curve setup checks are shared setup, excluded from both arms and must be stated separately. Compare success counts and charged evaluations, without asserting speedup from a small sample. The score is group-equation hit rate, not a complete ECDLP solve or an asymptotic work bound. `[pcc:unverified]`
+
+The native GP template and separately copied immutable qualifier SHA-256 are `ecad11a552ea8a334b1c849e7bf1aed4c2a0a997636b29904b90d396e2519ff4`; GP version 2.17.3 arm64. Run once from repository root with `timeout 60 gp -q < research/prime_field_100_ideas_20261123/EC_ANNEAL48_QUALIFIER.gp`, preserving stdout, stderr and exit separately. Require empty stderr, exit 0, positive-control mark set, exercised uphill branch and final `complete_anneal48_control` sentinel. No silent retry or post-output schedule change. Expected output under 1 KiB. This test cannot establish a universal annealing advantage or a gain on cryptographic-scale EC relations.
+
+## V1 attempt — failed parser acceptance
+
+The single V1 invocation produced [empty stdout](EC_ANNEAL48.stdout.txt) (SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`) and [stderr](EC_ANNEAL48.stderr.txt) (SHA-256 `094c54ccb458b7b87b4045fc350a4ac56a50ee945f7cc124525e30a5e97c7a8b`) containing `*** run-away string`. The [exit file](EC_ANNEAL48.exit.txt) contains `0`; GP did not signal the parse failure through the process status. No trial or positive control ran. Read-only inspection found the exact syntax error on the last diagnostic line: `print("ascending_exhaustive_first_hit_ec_evals=",exact_calls," full_scan_ec_evals=16);` lacks the closing double quote before `);`. V1 source and raw files are preserved. This attempt supplies no #48 algorithm result; a V2 parser repair needs a separate source and admission.
+
+## V2 parser-repair admission — 2026-11-24, 21:58 PST
+
+The parent explicitly authorized a separately frozen V2 parser repair after the V1 failure. [`EC_ANNEAL48_V2_GP.gp`](EC_ANNEAL48_V2_GP.gp) and its separate immutable [`qualifier`](EC_ANNEAL48_V2_QUALIFIER.gp) have SHA-256 `ea682a01712d5f0336efc33c4770c52d628137323e13043bc79a57d21cb8dcb5`. The diff from V1 inserts only the missing double quote on the final diagnostic print line. Curve, target, candidate triples, factor energy, 128 seeds, schedule, 16-query cap, positive control and comparison arms are unchanged. V1 source/raw stay intact. Run V2 once locally under the same explicit user bypass with `timeout 60 gp -q < research/prime_field_100_ideas_20261123/EC_ANNEAL48_V2_QUALIFIER.gp`; preserve V2 stdout/stderr/exit separately. Stop on any GP error or failed guard; no automatic further retry.
+
+## V2 result — bounded negative on this instance
+
+The one V2 invocation passed the positive-control mark set, on-curve guards, uphill-branch guard, zero-stderr/zero-exit rule, and final sentinel. [Raw stdout](EC_ANNEAL48_V2.stdout.txt) SHA-256 `6e5fe5dddf9fb5eef60d9a80590180e82fa6daf73f35e2c2f506e5eabb8ce483` reports:
+
+| Arm | Checked hits / 128 fixed seeds | EC energy evaluations (to hit or cap) | Charged EC additions |
+|---|---:|---:|---:|
+| Metropolis annealing, fixed cooling schedule | 90 | 1083 | 2166 |
+| Independent uniform masks with replacement | 116 | 926 | 1852 |
+| Fixed ascending exhaustive order | first hit at 6; all 16 states cover both hits | 16 for complete scan | 32 |
+
+The annealing arm proposed 582 uphill moves and accepted 262, confirming that its Metropolis branch executed. Each arm had the same 16-query cap per seed; the exhaustive 16-query positive-control scan and seven on-curve setup checks (target plus six factor-point occurrences) were shared setup outside the two stochastic arms. [Stderr](EC_ANNEAL48_V2.stderr.txt) is empty (SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`); [exit](EC_ANNEAL48_V2.exit.txt) contains `0` (SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`). On this fixed public four-spin EC relation factor and schedule, annealing had fewer successful capped trials while charging more group-equation evaluations than the uniform control. This is not a general result about simulated annealing, larger EC factor graphs, different energy definitions or complete ECDLP cost. No wall-time benchmark or signed repository proof-carrying verdict is claimed.
