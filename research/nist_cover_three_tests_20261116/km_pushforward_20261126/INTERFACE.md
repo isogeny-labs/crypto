@@ -33,3 +33,10 @@ checkout first run run.sh into a fresh directory, then name that same directory
 as the second run-eval.sh argument. The historical default and all frozen
 arithmetic/criteria remain unchanged. Qualify this mode in eval-v2 using
 the same fixed already qualified extraction tree.
+
+Class-only qualification frozen before its affected call: select only the
+class_space field from the unchanged public F(G) fixture using JSON metadata
+bookkeeping. Pass that single-key file through the full facade. Require its
+result to equal the existing separate public-point result in native comparison
+mode. Record the fresh wrapper and nested extraction/evaluation/comparison
+costs, digests and exits under the same one-CPU/1GiB/600s native caps.
