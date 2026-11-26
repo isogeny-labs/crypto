@@ -495,14 +495,8 @@ fn signed_mod(v: i64, n: u64) -> u64 {
 
 /// `a⁻¹ mod n` by the extended Euclidean algorithm, `n` prime.
 fn inv_mod(a: u64, n: u64) -> Option<u64> {
-    let (mut r0, mut r1) = (i128::from(n), i128::from(a % n));
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    (r0 == 1).then(|| t0.rem_euclid(i128::from(n)) as u64)
+    assert!(n != 0, "inv_mod: zero modulus");
+    crate::gcd::int::inv_mod_u64(a, n)
 }
 
 /// The thread's `combine_partials`: `e₂·r₁ − e₁·r₂` eliminates the shared
