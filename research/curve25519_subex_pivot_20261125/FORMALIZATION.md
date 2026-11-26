@@ -96,8 +96,10 @@ packet orientation patterns it reconstructs every label class, padding/copy
 index, packet slot, and active endpoint group, then requires exact agreement
 with the accepted schema-2 factorization object. This covers all 596 bounded
 partition certificates and the executed diagnostic. It begins after labels
-have been chosen, so conditional-expectation label selection, its variance and
-group-balance bounds, and the asymptotic R1 object remain open.
+have been chosen for that corpus. A separate admitted three-edge control also
+replays the greedy conditional-expectation label selection, exact variance
+inequality, packet capacity, and every-coordinate group balance. The uniform
+arbitrary-size argument and the asymptotic R1 object remain open.
 `[pcc:unverified]`
 
 ## R2 — Uniform precision history

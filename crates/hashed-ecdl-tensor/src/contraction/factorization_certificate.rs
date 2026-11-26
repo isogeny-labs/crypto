@@ -266,12 +266,15 @@ fn packing_provenance(
     packing: &Packing,
     parameters: &Parameters,
     coordinate: usize,
+    source_degree_cap: Option<usize>,
 ) -> PackingProvenanceCertificate {
     PackingProvenanceCertificate {
         schema: PACKING_PROVENANCE_SCHEMA,
         radix: parameters.radix,
         packet_exponent: u32::try_from(parameters.a).unwrap(),
         coordinate: u32::try_from(coordinate).unwrap(),
+        conditional_labels: source_degree_cap.is_some(),
+        source_degree_cap,
         edges: graph
             .edges
             .iter()
@@ -297,6 +300,7 @@ fn produce(
     coordinate: usize,
     kernel: &deformation::Cauchy,
     modes: &[deformation::Mode],
+    source_degree_cap: Option<usize>,
     meter: &mut Meter,
 ) -> Result<Certificate> {
     let left_groups: Vec<_> = graph
@@ -426,7 +430,8 @@ fn produce(
             parameters.radix,
             meter,
         )? {
-            let provenance = packing_provenance(graph, packing, parameters, coordinate);
+            let provenance =
+                packing_provenance(graph, packing, parameters, coordinate, source_degree_cap);
             let serialized_provenance = serde_json::to_vec(&provenance)
                 .map_err(|_| invalid("packing provenance serialization"))?;
             let parsed_provenance: PackingProvenanceCertificate =
@@ -459,7 +464,7 @@ pub(super) fn capture_executed_source_checked(
     let kernel = deformation::Cauchy::new(parameters, t, &ring.one(), ring, meter)?;
     let modes = deformation::modes(graph, packing, coordinate, parameters, &kernel, meter)?;
     let produced = produce(
-        graph, packing, parameters, coordinate, &kernel, &modes, meter,
+        graph, packing, parameters, coordinate, &kernel, &modes, None, meter,
     )?;
     let serialized = serde_json::to_vec(&produced)
         .map_err(|_| invalid("executed source certificate serialization"))?;
@@ -511,6 +516,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         coordinate,
         &kernel,
         &modes,
+        None,
         &mut meter,
     )
     .unwrap();
@@ -531,7 +537,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     });
     standalone_verify(&certificate, &mut standalone_meter).unwrap();
     check(&certificate, &ring, &mut meter).unwrap();
-    let provenance = packing_provenance(&graph, &packing, &parameters, coordinate);
+    let provenance = packing_provenance(&graph, &packing, &parameters, coordinate, None);
     let provenance_summary =
         verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();
     assert_eq!(provenance_summary.edges, 2);
@@ -543,6 +549,84 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(
         verify_packing_provenance(&certificate, &bad_provenance, &mut meter).unwrap_err(),
         "packing provenance replay"
+    );
+
+    let conditional_parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 1,
+        length: 2,
+        array: 4,
+    };
+    let conditional_vertices: Vec<_> = (0..3)
+        .map(|edge| TensorVertex {
+            tensor: true_predicate(1),
+            edges: vec![edge],
+        })
+        .collect();
+    let conditional_graph = Bipartite {
+        left: conditional_vertices.clone(),
+        right: conditional_vertices,
+        edges: (0..3)
+            .map(|vertex| Edge {
+                left: (vertex, 0),
+                right: (vertex, 0),
+            })
+            .collect(),
+    };
+    conditional_graph.validate().unwrap();
+    let conditional_packing =
+        packing::pack(&conditional_graph, &conditional_parameters, 2, &mut meter).unwrap();
+    let conditional_kernel =
+        deformation::Cauchy::new(&conditional_parameters, 1, &ring.one(), &ring, &mut meter)
+            .unwrap();
+    let conditional_modes = deformation::modes(
+        &conditional_graph,
+        &conditional_packing,
+        0,
+        &conditional_parameters,
+        &conditional_kernel,
+        &mut meter,
+    )
+    .unwrap();
+    let conditional_certificate = produce(
+        &conditional_graph,
+        &conditional_packing,
+        &conditional_parameters,
+        0,
+        &conditional_kernel,
+        &conditional_modes,
+        Some(2),
+        &mut meter,
+    )
+    .unwrap();
+    let conditional_provenance = packing_provenance(
+        &conditional_graph,
+        &conditional_packing,
+        &conditional_parameters,
+        0,
+        Some(2),
+    );
+    let conditional_summary = verify_packing_provenance(
+        &conditional_certificate,
+        &conditional_provenance,
+        &mut meter,
+    )
+    .unwrap();
+    assert!(conditional_summary.conditional_labels_verified);
+    assert!(conditional_summary.source_bounds_verified);
+    assert!(conditional_summary.source_capacity_admitted);
+
+    let mut bad_conditional_labels = conditional_provenance;
+    bad_conditional_labels.row_labels[0] ^= 1;
+    assert_eq!(
+        verify_packing_provenance(
+            &conditional_certificate,
+            &bad_conditional_labels,
+            &mut meter
+        )
+        .unwrap_err(),
+        "packing provenance conditional labels"
     );
 
     let mut bad_context = certificate.clone();
@@ -683,6 +767,7 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
                     0,
                     &kernel,
                     &modes,
+                    None,
                     &mut meter,
                 )
                 .unwrap();
@@ -758,6 +843,7 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
                 0,
                 &kernel,
                 &modes,
+                None,
                 &mut meter,
             )
             .unwrap();
@@ -831,6 +917,7 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
                 0,
                 &kernel,
                 &modes,
+                None,
                 &mut meter,
             )
             .unwrap();

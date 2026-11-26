@@ -347,9 +347,12 @@ code, its verifier reconstructs every label class, padding/copy index, packet
 slot, and active endpoint group, then requires exact agreement with the
 schema-2 factorization certificate. Every producer path in the 596-case corpus
 and the executed diagnostic performs a serialize/parse/round-trip/replay gate.
-This proves finite provenance from chosen labels to packet/group objects, not
-the conditional-expectation label choice, asymptotic graph realization, or the
-external theorem. `[pcc:unverified]`
+A dedicated admitted three-edge control also replays the actual greedy
+conditional-expectation label choice, first-minimum tie breaking, variance
+inequality, packet capacity, and every-coordinate group balance. This proves a
+complete finite path from an edge skeleton to packet/group objects, not a
+uniform arbitrary-size theorem, asymptotic graph realization, or the external
+contraction theorem. `[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
