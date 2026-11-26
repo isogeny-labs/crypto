@@ -599,13 +599,7 @@ struct ClosureResult {
 }
 
 fn gcd(a: i128, b: i128) -> i128 {
-    let (mut a, mut b) = (a.abs(), b.abs());
-    while b != 0 {
-        let t = a % b;
-        a = b;
-        b = t;
-    }
-    a
+    crypto_lib::gcd::int::gcd_i128(a, b) as i128
 }
 
 impl Closure {

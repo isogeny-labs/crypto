@@ -64,14 +64,9 @@ fn powmod(mut b: u64, mut e: u64, p: u64) -> u64 {
 }
 
 fn invmod(a: u64, p: u64) -> u64 {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut r, mut nr) = (p as i128, a as i128 % p as i128);
-    while nr != 0 {
-        let q = r / nr;
-        (t, nt) = (nt, t - q * nt);
-        (r, nr) = (nr, r - q * nr);
-    }
-    t.rem_euclid(p as i128) as u64
+    // The old body returned `t mod p` unchecked, which is 0 for `a ≡ 0`
+    // modulo the prime `p`; keep returning 0 for a non-unit.
+    crate::gcd::int::inv_mod_u64(a, p).unwrap_or(0)
 }
 
 /// Affine addition of distinct points with `x1 != x2`.

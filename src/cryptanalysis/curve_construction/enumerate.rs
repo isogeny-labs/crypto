@@ -111,10 +111,6 @@ fn empty_results(targets: &[Target]) -> Vec<TargetResult> {
 // F_2[x] as u64 bit vectors
 // ---------------------------------------------------------------------------
 
-fn pdeg(a: u64) -> i32 {
-    63 - a.leading_zeros() as i32
-}
-
 fn pmul(mut a: u64, mut b: u64) -> u64 {
     let mut r = 0u64;
     while b != 0 {
@@ -127,21 +123,9 @@ fn pmul(mut a: u64, mut b: u64) -> u64 {
     r
 }
 
-fn pmod(mut a: u64, m: u64) -> u64 {
-    let dm = pdeg(m);
-    while a != 0 && pdeg(a) >= dm {
-        a ^= m << (pdeg(a) - dm);
-    }
-    a
-}
-
-fn pgcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let r = pmod(a, b);
-        a = b;
-        b = r;
-    }
-    a
+fn pgcd(a: u64, b: u64) -> u64 {
+    // GF(2)[x] gcd (shared implementation).
+    crate::gcd::gf2::gcd_word(a, b)
 }
 
 /// Formal derivative in characteristic 2: odd-degree terms shift down.

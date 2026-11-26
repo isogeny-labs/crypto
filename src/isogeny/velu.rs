@@ -185,24 +185,7 @@ fn mod_inv(a: u128, p: u128) -> Option<u128> {
     if a.is_multiple_of(p) {
         return None;
     }
-    // Binary extended gcd — `O(log p)` vs Fermat `O(log p)` multiplies with
-    // a much smaller constant (Round-4 leftover from educational Vélu).
-    let mut t = 0i128;
-    let mut newt = 1i128;
-    let mut r = p as i128;
-    let mut newr = (a % p) as i128;
-    while newr != 0 {
-        let q = r / newr;
-        (t, newt) = (newt, t - q * newt);
-        (r, newr) = (newr, r - q * newr);
-    }
-    if r > 1 {
-        return None;
-    }
-    if t < 0 {
-        t += p as i128;
-    }
-    Some(t as u128)
+    crate::gcd::int::inv_mod_u128(a, p)
 }
 
 // ── Vélu codomain construction ────────────────────────────────────────────────
@@ -457,7 +440,8 @@ pub fn dual_isogeny_naive(phi: &VeluIsogeny) -> Option<VeluIsogeny> {
         if candidates.is_empty() {
             return None;
         }
-        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), phi.domain.p) else {
+        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), phi.domain.p)
+        else {
             continue;
         };
         let point = crate::ecc::point::Point::Affine {
@@ -504,7 +488,11 @@ pub fn compose_isogenies(phi: &VeluIsogeny, psi: &VeluIsogeny) -> Option<VeluIso
         let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), p) else {
             continue;
         };
-        if phi.evaluate(x, y).and_then(|(u, v)| psi.evaluate(u, v)).is_none() {
+        if phi
+            .evaluate(x, y)
+            .and_then(|(u, v)| psi.evaluate(u, v))
+            .is_none()
+        {
             kernel.push((x, y));
         }
     }

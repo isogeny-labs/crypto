@@ -30,6 +30,9 @@ pub(crate) struct Mont<const N: usize> {
     one: [u64; N],
     /// `R³ mod p`: converts a plain inverse `(aR)⁻¹` back to `a⁻¹R`.
     r3: [u64; N],
+    /// `p` followed by `n0` (`pn0[N] = n0`), contiguous for the ADX kernel,
+    /// which reads both through one pointer register.
+    pn0: [u64; 10],
 }
 
 fn limbs<const N: usize>(v: &BigUint) -> Option<[u64; N]> {
@@ -93,12 +96,16 @@ impl<const N: usize> Mont<N> {
         let one = limbs::<N>(&(&r % modulus))?;
         let r2 = limbs::<N>(&((&r * &r) % modulus))?;
         let r3 = limbs::<N>(&((&r * &r * &r) % modulus))?;
+        let mut pn0 = [0u64; 10];
+        pn0[..N].copy_from_slice(&p);
+        pn0[N] = inv.wrapping_neg();
         Some(Mont {
             p,
             n0: inv.wrapping_neg(),
             r2,
             one,
             r3,
+            pn0,
         })
     }
 
@@ -559,6 +566,407 @@ impl MulKernel for TunedKernel {
         } else {
             ctx.mul(a, a)
         }
+    }
+}
+
+/// Whether this CPU has ADX and BMI2 (`adcx`/`adox`/`mulx`), detected once.
+#[cfg(target_arch = "x86_64")]
+pub(crate) fn has_adx() -> bool {
+    use std::sync::OnceLock;
+    static HAS: OnceLock<bool> = OnceLock::new();
+    *HAS.get_or_init(|| {
+        std::is_x86_feature_detected!("adx") && std::is_x86_feature_detected!("bmi2")
+    })
+}
+
+#[cfg(not(target_arch = "x86_64"))]
+pub(crate) fn has_adx() -> bool {
+    false
+}
+
+/// `a·b·R⁻¹ mod p` for four-word `a, b < p` by CIOS on `mulx`/`adcx`/`adox`
+/// (two independent carry chains per row), in `[0, p)`.  `pn0` is
+/// `[p₀, p₁, p₂, p₃, n0]`.
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul4_adx(a: &[u64; 4], b: &[u64; 4], pn0: &[u64]) -> [u64; 4] {
+    debug_assert!(pn0.len() >= 5);
+    // Four unrolled CIOS rows.  Row i: t += a·b[i] with the low halves of
+    // the mulx products on the adcx (CF) chain and the high halves on the
+    // adox (OF) chain, then t += m·p for m = t₀·n0.  The register holding t₀
+    // is then exactly zero and becomes the next row's top word, so the
+    // one-word shift is a renaming (r8..r13 rotate) instead of moves.
+    // rsi = a, rdi = b, rcx = [p₀, p₁, p₂, p₃, n0], rax = 0 after each xor.
+    let (t0, t1, t2, t3, t4): (u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        // row 0
+        "mov rdx, [rdi + 0]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adcx r12, rax",
+        "adox r13, rax",
+        "adcx r13, rax",
+        "mov rdx, r8",
+        "imul rdx, [rcx + 32]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adcx r12, rax",
+        "adox r13, rax",
+        "adcx r13, rax",
+        // row 1
+        "mov rdx, [rdi + 8]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adcx r13, rax",
+        "adox r8, rax",
+        "adcx r8, rax",
+        "mov rdx, r9",
+        "imul rdx, [rcx + 32]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adcx r13, rax",
+        "adox r8, rax",
+        "adcx r8, rax",
+        // row 2
+        "mov rdx, [rdi + 16]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "adcx r8, rax",
+        "adox r9, rax",
+        "adcx r9, rax",
+        "mov rdx, r10",
+        "imul rdx, [rcx + 32]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "adcx r8, rax",
+        "adox r9, rax",
+        "adcx r9, rax",
+        // row 3
+        "mov rdx, [rdi + 24]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, rax",
+        "adox r10, rax",
+        "adcx r10, rax",
+        "mov rdx, r11",
+        "imul rdx, [rcx + 32]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, rax",
+        "adox r10, rax",
+        "adcx r10, rax",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") _,
+        out("rdx") _,
+        out("r12") t0,
+        out("r13") t1,
+        out("r8") t2,
+        out("r9") t3,
+        out("r10") t4,
+        out("r11") _,
+        out("r14") _,
+        out("r15") _,
+        options(pure, readonly, nostack),
+    );
+    // t₄·2^256 + t < 2p: subtract p once when t₄ = 1 or t ≥ p.
+    let mut t = [t0, t1, t2, t3];
+    let p = [pn0[0], pn0[1], pn0[2], pn0[3]];
+    if t4 != 0 || geq(&t, &p) {
+        sub_in_place(&mut t, &p);
+    }
+    t
+}
+
+impl<const N: usize> Mont<N> {
+    /// CIOS on the `mulx` / `addcarry` intrinsics for any `N`, compiled for
+    /// ADX+BMI2 (the compiler chooses the instructions; it usually emits
+    /// `mulx` and a single `adc` chain).  Equal to [`mul`](Self::mul).
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2 ([`has_adx`]).
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "adx,bmi2")]
+    pub(crate) unsafe fn mul_mulx(&self, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        use core::arch::x86_64::{_addcarry_u64, _mulx_u64};
+        let mut t = [0u64; N];
+        let mut t_n: u64 = 0;
+        for i in 0..N {
+            let bi = b[i];
+            let mut carry_hi = 0u64;
+            let mut c = 0u8;
+            for j in 0..N {
+                let mut hi = 0u64;
+                let lo = _mulx_u64(a[j], bi, &mut hi);
+                // t[j] + lo + carry_hi (+ propagated)
+                let mut s = 0u64;
+                let c1 = _addcarry_u64(0, t[j], lo, &mut s);
+                let mut s2 = 0u64;
+                let c2 = _addcarry_u64(c, s, carry_hi, &mut s2);
+                t[j] = s2;
+                c = c2;
+                carry_hi = hi.wrapping_add(c1 as u64);
+            }
+            let mut s = 0u64;
+            let c3 = _addcarry_u64(c, t_n, carry_hi, &mut s);
+            t_n = s;
+            let t_n1 = c3 as u64;
+
+            let m = t[0].wrapping_mul(self.n0);
+            let mut hi = 0u64;
+            let lo = _mulx_u64(m, self.p[0], &mut hi);
+            let mut s = 0u64;
+            let c1 = _addcarry_u64(0, t[0], lo, &mut s);
+            let mut carry_hi = hi.wrapping_add(c1 as u64);
+            let mut c = 0u8;
+            for j in 1..N {
+                let mut hi = 0u64;
+                let lo = _mulx_u64(m, self.p[j], &mut hi);
+                let mut s = 0u64;
+                let c1 = _addcarry_u64(0, t[j], lo, &mut s);
+                let mut s2 = 0u64;
+                let c2 = _addcarry_u64(c, s, carry_hi, &mut s2);
+                t[j - 1] = s2;
+                c = c2;
+                carry_hi = hi.wrapping_add(c1 as u64);
+            }
+            let mut s = 0u64;
+            let c3 = _addcarry_u64(c, t_n, carry_hi, &mut s);
+            t[N - 1] = s;
+            t_n = t_n1 + c3 as u64;
+        }
+        if t_n != 0 || geq(&t, &self.p) {
+            sub_in_place(&mut t, &self.p);
+        }
+        t
+    }
+
+    /// [`mont_mul4_adx`] when `N = 4`, without the CPU check: the caller
+    /// has established [`has_adx`] once (the kernels below are only
+    /// dispatched after it).  Other `N`: `None`.
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2.
+    #[inline(always)]
+    pub(crate) unsafe fn mul_adx4_unchecked(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        if N == 4 {
+            let a4 = &*(a as *const [u64; N] as *const [u64; 4]);
+            let b4 = &*(b as *const [u64; N] as *const [u64; 4]);
+            let r = mont_mul4_adx(a4, b4, &self.pn0);
+            return Some(*(&r as *const [u64; 4] as *const [u64; N]));
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mont_mul4_adx`] when `N = 4` and the CPU has ADX, else `None`.
+    #[inline(always)]
+    pub(crate) fn mul_adx4(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        if N == 4 && has_adx() {
+            // SAFETY: N == 4, so the casts are between identical layouts;
+            // has_adx() checked the CPU features.
+            unsafe {
+                let a4 = &*(a as *const [u64; N] as *const [u64; 4]);
+                let b4 = &*(b as *const [u64; N] as *const [u64; 4]);
+                let r = mont_mul4_adx(a4, b4, &self.pn0);
+                return Some(*(&r as *const [u64; 4] as *const [u64; N]));
+            }
+        }
+        let _ = (a, b);
+        None
+    }
+}
+
+/// ADX/MULX kernel: the inline-asm dual-carry-chain product at `N = 4`
+/// (squares too, as `a·a`), the [`TunedKernel`] at other widths.  Only
+/// dispatch it after [`has_adx`] returned true: its methods do not re-check.
+pub(crate) struct AdxKernel;
+/// [`AdxKernel`] products with [`TunedKernel`] squares (dedicated squaring).
+pub(crate) struct AdxSqrKernel;
+/// The `mulx`/`addcarry` intrinsic CIOS for every `N` (products and
+/// squares), the [`TunedKernel`] without ADX.
+pub(crate) struct MulxKernel;
+
+impl MulKernel for AdxKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx() (see the type's docs).
+        unsafe { ctx.mul_adx4_unchecked(a, b) }.unwrap_or_else(|| TunedKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        // SAFETY: as above.
+        unsafe { ctx.mul_adx4_unchecked(a, a) }.unwrap_or_else(|| TunedKernel::sqr(ctx, a))
+    }
+}
+
+impl MulKernel for AdxSqrKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: as for AdxKernel.
+        unsafe { ctx.mul_adx4_unchecked(a, b) }.unwrap_or_else(|| TunedKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        TunedKernel::sqr(ctx, a)
+    }
+}
+
+impl MulKernel for MulxKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { ctx.mul_mulx(a, b) };
+        }
+        TunedKernel::mul(ctx, a, b)
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { ctx.mul_mulx(a, a) };
+        }
+        TunedKernel::sqr(ctx, a)
+    }
+}
+
+/// Production kernel on CPUs with ADX+BMI2, from the 2026-11-25 ADX run
+/// (`docs/notes/adx-hgcd-20261125/`): the inline-asm dual-carry-chain
+/// product at `N = 4` with [`TunedKernel`] squares (+1.5% end to end), the
+/// `mulx` intrinsic CIOS for products and squares at `N ≥ 6` (+5–12%), and
+/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  Dispatch only
+/// after [`has_adx`] returned true.
+pub(crate) struct ProdAdxKernel;
+
+impl MulKernel for ProdAdxKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        {
+            if N == 4 {
+                // SAFETY: dispatched only after has_adx().
+                if let Some(r) = unsafe { ctx.mul_adx4_unchecked(a, b) } {
+                    return r;
+                }
+            }
+            if N >= 6 {
+                // SAFETY: as above.
+                return unsafe { ctx.mul_mulx(a, b) };
+            }
+        }
+        TunedKernel::mul(ctx, a, b)
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if N >= 6 {
+            // SAFETY: dispatched only after has_adx().
+            return unsafe { ctx.mul_mulx(a, a) };
+        }
+        TunedKernel::sqr(ctx, a)
     }
 }
 
@@ -1144,6 +1552,53 @@ mod tests {
         kernels_match::<8>(&(two(512) - 1u32), &mut rng);
         kernels_match::<9>(&(two(521) - 1u32), &mut rng);
         kernels_match::<9>(&(two(576) - 3u32), &mut rng);
+    }
+
+    /// The ADX inline-asm product (4 limbs) and the `mulx` intrinsic CIOS
+    /// (every width) equal CIOS, on random and edge residues.
+    #[test]
+    fn adx_and_mulx_match_cios() {
+        if !has_adx() {
+            eprintln!("skipping: no ADX/BMI2 on this CPU");
+            return;
+        }
+        let mut rng = StdRng::seed_from_u64(0x6164_7834);
+        let two = |e: u32| BigUint::from(1u8) << e;
+        fn check<const N: usize>(m: &BigUint, rng: &mut StdRng) {
+            let ctx = Mont::<N>::new(m).unwrap();
+            let mut vals = vec![
+                BigUint::from(0u8),
+                BigUint::from(1u8),
+                m - 1u32,
+                m - 2u32,
+                m >> 1,
+            ];
+            for _ in 0..300 {
+                vals.push(rng.gen_biguint_below(m));
+            }
+            let ms: Vec<_> = vals.iter().map(|v| ctx.enter(v).unwrap()).collect();
+            for a in &ms {
+                for b in ms.iter().take(16) {
+                    let want = ctx.mul(a, b);
+                    // SAFETY: the caller checked has_adx().
+                    assert_eq!(unsafe { ctx.mul_mulx(a, b) }, want, "mulx N={N} m={m}");
+                    if N == 4 {
+                        assert_eq!(ctx.mul_adx4(a, b), Some(want), "adx m={m}");
+                    }
+                }
+            }
+        }
+        for m in moduli().into_iter().take(6) {
+            check::<4>(&m, &mut rng);
+        }
+        check::<4>(&(two(255) - 19u32), &mut rng);
+        check::<4>(&(two(193) + two(64) * 3u32 + 1u32), &mut rng);
+        check::<2>(&(two(127) - 1u32), &mut rng);
+        check::<3>(&(two(192) - two(64) - 1u32), &mut rng);
+        check::<5>(&(two(320) - 197u32), &mut rng);
+        check::<6>(&(two(384) - two(128) - two(96) + two(32) - 1u32), &mut rng);
+        check::<9>(&(two(521) - 1u32), &mut rng);
+        check::<9>(&(two(576) - 3u32), &mut rng);
     }
 
     /// The binary-GCD inverse is the Fermat inverse on primes, and `None`

@@ -491,19 +491,9 @@ impl Gf {
         }
         true
     }
-    fn poly_gcd(mut a: u64, mut b: u64) -> u64 {
-        while b != 0 {
-            let (da, db) = (63 - a.leading_zeros(), 63 - b.leading_zeros());
-            if a == 0 {
-                return b;
-            }
-            if da < db {
-                std::mem::swap(&mut a, &mut b);
-                continue;
-            }
-            a ^= b << (da - db);
-        }
-        a
+    fn poly_gcd(a: u64, b: u64) -> u64 {
+        // GF(2)[x] gcd of single-word polynomials (shared implementation).
+        crypto_lib::gcd::gf2::gcd_word(a, b)
     }
     #[inline]
     fn mul(&self, a: u64, b: u64) -> u64 {

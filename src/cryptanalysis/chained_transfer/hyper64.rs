@@ -158,15 +158,10 @@ impl Poly {
 #[inline]
 fn inv_mod_p(p: u64, a: u64) -> u64 {
     debug_assert!(a != 0 && a < p);
-    let (mut r0, mut r1) = (p as i64, a as i64);
-    let (mut t0, mut t1) = (0i64, 1i64);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    debug_assert_eq!(r0, 1);
-    t0.rem_euclid(p as i64) as u64
+    let inv = crate::gcd::int::inv_mod_u64(a, p);
+    debug_assert!(inv.is_some(), "inv_mod_p: {a} is not a unit mod {p}");
+    // Release builds returned a value without checking; keep returning one.
+    inv.unwrap_or(0)
 }
 
 fn padd(k: &Fp, a: &Poly, b: &Poly) -> Poly {
@@ -268,25 +263,18 @@ fn pmonic(k: &Fp, a: &Poly) -> Poly {
 
 /// `(g, s, t)` with `s·a + t·b = g`, `g` monic (zero only for `a = b = 0`).
 fn pxgcd(k: &Fp, a: &Poly, b: &Poly) -> (Poly, Poly, Poly) {
-    let (mut r0, mut r1) = (*a, *b);
-    let (mut s0, mut s1) = (Poly::constant(1), Poly::ZERO);
-    let (mut t0, mut t1) = (Poly::ZERO, Poly::constant(1));
-    while !r1.is_zero() {
-        let (q, r) = pdivrem(k, &r0, &r1);
-        r0 = r1;
-        r1 = r;
-        let s = psub(k, &s0, &pmul(k, &q, &s1));
-        s0 = s1;
-        s1 = s;
-        let t = psub(k, &t0, &pmul(k, &q, &t1));
-        t0 = t1;
-        t1 = t;
+    if a.is_zero() && b.is_zero() {
+        // Old convention for gcd(0, 0): s = 1.
+        return (Poly::ZERO, Poly::constant(1), Poly::ZERO);
     }
-    if r0.is_zero() {
-        return (r0, s0, t0);
-    }
-    let li = inv_mod_p(k.p, r0.lead());
-    (pscale(k, &r0, li), pscale(k, &s0, li), pscale(k, &t0, li))
+    // Classical extended Euclid's cofactors, by the shared module.
+    let (g, s, t) =
+        crate::gcd::poly::xgcd(&crate::gcd::poly::Fp64::new(k.p), &a.c[..a.n], &b.c[..b.n]);
+    (
+        Poly::from_slice(&g),
+        Poly::from_slice(&s),
+        Poly::from_slice(&t),
+    )
 }
 
 fn peval(k: &Fp, a: &Poly, x: u64) -> u64 {
@@ -1528,14 +1516,8 @@ pub mod ic {
 
     /// `a⁻¹ mod n` by the extended Euclidean algorithm, `n` prime.
     fn inv_mod(a: u64, n: u64) -> Option<u64> {
-        let (mut r0, mut r1) = (i128::from(n), i128::from(a % n));
-        let (mut t0, mut t1) = (0i128, 1i128);
-        while r1 != 0 {
-            let q = r0 / r1;
-            (r0, r1) = (r1, r0 - q * r1);
-            (t0, t1) = (t1, t0 - q * t1);
-        }
-        (r0 == 1).then(|| t0.rem_euclid(i128::from(n)) as u64)
+        assert!(n != 0, "inv_mod: zero modulus");
+        crate::gcd::int::inv_mod_u64(a, n)
     }
 
     /// The thread's `combine_partials`: `e₂·r₁ − e₁·r₂` eliminates the shared
