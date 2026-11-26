@@ -635,6 +635,23 @@ pub fn symbolic_history_certificate(
             if history_case.depth != composition_case.depth {
                 return Err(integrity("symbolic history depth alignment"));
             }
+            let packet_shift = usize::try_from(history_case.current_a)
+                .map_err(|_| invalid("symbolic packet length width"))?;
+            let packet_length = BigUint::one() << packet_shift;
+            let normalized_edges = BigUint::from(history_case.u) * &packet_length;
+            let normalized_packets = BigUint::from(3u8) * BigUint::from(history_case.u);
+            let first_distance_exponent = history_case.current_a;
+            let last_distance_exponent = history_case
+                .current_a
+                .checked_sub(history_case.u)
+                .and_then(|value| value.checked_add(1))
+                .ok_or_else(|| invalid("symbolic tile-distance range"))?;
+            let first_distance = BigUint::one()
+                << usize::try_from(first_distance_exponent)
+                    .map_err(|_| invalid("symbolic distance width"))?;
+            let last_distance = BigUint::one()
+                << usize::try_from(last_distance_exponent)
+                    .map_err(|_| invalid("symbolic distance width"))?;
             Ok(DepthCertificate {
                 depth: history_case.depth,
                 shrink_factor: history_case.shrink_factor.clone(),
@@ -643,12 +660,12 @@ pub fn symbolic_history_certificate(
                 current_a: history_case.current_a,
                 first_tile_exponent: 1,
                 last_tile_exponent: history_case.u,
-                first_distance_exponent: history_case.current_a,
-                last_distance_exponent: history_case
-                    .current_a
-                    .checked_sub(history_case.u)
-                    .and_then(|value| value.checked_add(1))
-                    .ok_or_else(|| invalid("symbolic tile-distance range"))?,
+                first_distance_exponent,
+                last_distance_exponent,
+                normalized_edges,
+                normalized_packets,
+                normalized_first_precision: BigUint::from(34u8) * &packet_length * first_distance,
+                normalized_last_precision: BigUint::from(34u8) * &packet_length * last_distance,
                 inherited_lhs: history_case.inherited_absorption_lhs.clone(),
                 inherited_rhs_exponent: history_case.inherited_absorption_rhs_exponent,
                 evaluation_lhs: history_case.evaluation_absorption_lhs.clone(),

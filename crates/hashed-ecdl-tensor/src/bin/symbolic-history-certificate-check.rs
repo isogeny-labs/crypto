@@ -45,7 +45,7 @@ fn run() -> Result<(), String> {
         "valid": true,
         "input_bytes": bytes.len(),
         "summary": summary,
-        "scope": "exact scalar replay of the implicit strict-recursion schedule; not graph realization, an external theorem proof, or a practical Curve25519 attack"
+        "scope": "exact normalized-scalar replay of the implicit strict-recursion schedule; not graph realization, an external theorem proof, or a practical Curve25519 attack"
     });
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
     Ok(())

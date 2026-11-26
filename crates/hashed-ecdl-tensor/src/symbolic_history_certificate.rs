@@ -8,7 +8,7 @@ use crate::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const SCHEMA: u32 = 2;
+pub(crate) const SCHEMA: u32 = 3;
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 const MINIMUM_LAMBDA: u64 = 1 << 26;
 
@@ -23,6 +23,10 @@ pub(crate) struct DepthCertificate {
     pub(crate) last_tile_exponent: u64,
     pub(crate) first_distance_exponent: u64,
     pub(crate) last_distance_exponent: u64,
+    pub(crate) normalized_edges: BigUint,
+    pub(crate) normalized_packets: BigUint,
+    pub(crate) normalized_first_precision: BigUint,
+    pub(crate) normalized_last_precision: BigUint,
     pub(crate) inherited_lhs: BigUint,
     pub(crate) inherited_rhs_exponent: u64,
     pub(crate) evaluation_lhs: BigUint,
@@ -67,6 +71,8 @@ pub struct VerificationSummary {
     pub root_u: u64,
     /// Number of possible active depths reconstructed from strict shrinkage.
     pub active_depths: usize,
+    /// Number of endpoint dimension witnesses checked across all depths.
+    pub normalized_coordinate_witnesses: usize,
     /// Constant in `log2(T) <= C*M/sqrt(u)` from the source mode bounds.
     pub tuple_exponent_constant: u64,
     /// Root-`u` exponent constant for the complete recursion composition.
@@ -123,13 +129,44 @@ fn checked_mul(left: u64, right: u64, label: &str) -> Result<u64, String> {
         .ok_or_else(|| format!("{label} overflow"))
 }
 
+fn power_of_two(exponent: u64, label: &str) -> Result<BigUint, String> {
+    let shift = usize::try_from(exponent).map_err(|_| format!("{label} width"))?;
+    Ok(BigUint::one() << shift)
+}
+
+fn verify_normalized_coordinate(
+    edges: &BigUint,
+    packets: &BigUint,
+    packet_length: &BigUint,
+    u: u64,
+    tile_exponent: u64,
+    distance_exponent: u64,
+    precision: &BigUint,
+) -> Result<(), String> {
+    let tile_period = power_of_two(tile_exponent, "normalized tile")?;
+    let distance = power_of_two(distance_exponent, "normalized distance")?;
+    let modes_per_weight = packets * &tile_period;
+    let expected_precision = BigUint::from(34u8) * packet_length * &distance;
+    if precision != &expected_precision
+        || packets * packet_length != BigUint::from(3u8) * edges
+        || &tile_period * &distance != BigUint::from(2u8) * packet_length
+        || &modes_per_weight * &distance != BigUint::from(6u8) * edges
+        || precision * BigUint::from(u) != BigUint::from(34u8) * edges * &distance
+        || modes_per_weight * precision * BigUint::from(u) != BigUint::from(204u16) * edges * edges
+    {
+        return Err("symbolic normalized dimension mismatch".into());
+    }
+    Ok(())
+}
+
 /// Reconstruct and verify every field in an implicit strict-history transcript.
 ///
 /// Acceptance checks the complete depth schedule implied by eight-fold child
 /// shrinkage and the fixed leaf cutoff, both precision-absorption inequalities,
-/// the geometric path comparison, packet-entry absorption, and all reported
-/// exponent constants. It does not establish that any graph realizes the
-/// stated worst-case premises or prove the external contraction theorem.
+/// the geometric path comparison, normalized endpoint dimension identities,
+/// packet-entry absorption, and all reported exponent constants. It does not
+/// establish that any graph realizes the stated worst-case premises or prove
+/// the external contraction theorem.
 pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> {
     if certificate.schema != SCHEMA || certificate.lambda < MINIMUM_LAMBDA {
         return Err("symbolic history context".into());
@@ -186,6 +223,9 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             .and_then(|value| value.checked_add(1))
             .ok_or_else(|| "symbolic tile-distance range".to_string())?;
         let tile_distance_exponent = checked_add(current_a, 1, "tile-distance exponent")?;
+        let packet_length = power_of_two(current_a, "normalized packet length")?;
+        let normalized_edges = BigUint::from(u) * &packet_length;
+        let normalized_packets = BigUint::from(3u8) * BigUint::from(u);
         let inherited_lhs = BigUint::from(81u8) * BigUint::from(leaf_divisor) * BigUint::from(u);
         let inherited_rhs_exponent = checked_add(u, 1, "inherited exponent")?;
         let evaluation_lhs = BigUint::from(8u8)
@@ -210,6 +250,8 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
             || case.last_tile_exponent != last_tile_exponent
             || case.first_distance_exponent != first_distance_exponent
             || case.last_distance_exponent != last_distance_exponent
+            || case.normalized_edges != normalized_edges
+            || case.normalized_packets != normalized_packets
             || case.inherited_lhs != inherited_lhs
             || case.inherited_rhs_exponent != inherited_rhs_exponent
             || case.evaluation_lhs != evaluation_lhs
@@ -218,6 +260,24 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         {
             return Err("symbolic history depth mismatch".into());
         }
+        verify_normalized_coordinate(
+            &case.normalized_edges,
+            &case.normalized_packets,
+            &packet_length,
+            u,
+            first_tile_exponent,
+            first_distance_exponent,
+            &case.normalized_first_precision,
+        )?;
+        verify_normalized_coordinate(
+            &case.normalized_edges,
+            &case.normalized_packets,
+            &packet_length,
+            u,
+            last_tile_exponent,
+            last_distance_exponent,
+            &case.normalized_last_precision,
+        )?;
         if u < certificate.scale_floor
             || checked_add(
                 first_tile_exponent,
@@ -306,6 +366,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         lambda: certificate.lambda,
         root_u,
         active_depths: index,
+        normalized_coordinate_witnesses: 2 * index,
         tuple_exponent_constant,
         total_root_u_exponent_constant,
         total_root_log_exponent_constant,

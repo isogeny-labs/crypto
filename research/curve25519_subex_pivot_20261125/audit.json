@@ -135,13 +135,14 @@
     "producer_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
     "verifier_source": "crates/hashed-ecdl-tensor/src/symbolic_history_certificate.rs",
     "command_source": "crates/hashed-ecdl-tensor/src/bin/symbolic-history-certificate-check.rs",
+    "emitter_source": "crates/hashed-ecdl-tensor/src/bin/symbolic-history-certificate-emit.rs",
     "fixture": "crates/hashed-ecdl-tensor/examples/symbolic-history-certificate.json",
-    "wire_format": "schema-2 JSON, 2324-byte payload and 2325-byte newline-terminated fixture",
-    "checks": "exact leaf divisor and root scale; complete eight-fold-shrink depth coverage; every u, prior/current packet exponent and shrink factor; first/last tile and distance exponents proving tau*D=2L across each coordinate range; inherited and evaluation precision absorptions; geometric scale comparison; source chain KL<=3M, nD<=6M, pu<=34MD, np<=204M^2/u and tuple exponent constant 80; leaf and packet-entry absorption; local, tree, root-u and root-log exponent constants",
-    "mutations": "schema mismatch, missing depth, altered precision transition, altered source constant, altered final composition constant",
-    "standalone_gate": "2325-byte fixture accepted with five active depths, root u 512, tuple exponent constant 80, root-u exponent constant 290 and root-log exponent constant 148480; 1 MiB input cap",
+    "wire_format": "schema-3 JSON, 5435-byte payload and 5436-byte newline-terminated fixture",
+    "checks": "exact leaf divisor and root scale; complete eight-fold-shrink depth coverage; every u, prior/current packet exponent and shrink factor; first/last tile and distance exponents proving tau*D=2L across each coordinate range; normalized M=uL, K=3u and p=34LD endpoint witnesses; exact KL=3M, tauD=2L, nD=6M, pu=34MD and npu=204M^2 identities; inherited and evaluation precision absorptions; geometric scale comparison; tuple exponent constant 80; leaf and packet-entry absorption; local, tree, root-u and root-log exponent constants",
+    "mutations": "schema mismatch, missing depth, altered precision transition, altered normalized precision, altered source constant, altered final composition constant",
+    "standalone_gate": "5436-byte fixture accepted with five active depths, ten normalized coordinate witnesses, root u 512, tuple exponent constant 80, root-u exponent constant 290 and root-log exponent constant 148480; 1 MiB input cap",
     "dependency_boundary": "verifier imports exact integers and serialization only, not admission::dimensions, contraction, packing, deformation, factorization or graph code",
-    "claim_boundary": "independent exact scalar replay of declared source premises; no symbolic graph realization, external theorem proof, complete certificate-description composition or practical Curve25519 attack"
+    "claim_boundary": "independent exact replay of one normalized dimension family satisfying the scalar premises; no symbolic graph realization, external theorem proof, complete certificate-description composition or practical Curve25519 attack"
   },
   "arithmetic_and_tree_certificate": {
     "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
@@ -400,5 +401,5 @@
     "complete_library_result": "183 passed; 0 failed",
     "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
   },
-  "next_gate": "extend the independently replayed symbolic-history certificate with per-node K,L,tau,p commitments and a graph-realization/refinement premise, connect each row to schema-2 factorization source bounds, and prove the depth-first sum of tuple/child exponents plus certificate-description bits is at most C*s/sqrt(log s) with polynomial overhead; accept a counterexample to any premise as decisive"
+  "next_gate": "define and independently check a graph/packing realization interface from each normalized schema-3 dimension row to schema-2 factorization source bounds, then prove the depth-first sum of tuple/child exponents plus certificate-description bits is at most C*s/sqrt(log s) with polynomial overhead; accept a counterexample to any premise as decisive"
 }
