@@ -274,6 +274,7 @@ def toolchain(extra: dict[str, list[str]] | None = None) -> dict[str, Any]:
         "cc": ["cc", "--version"],
         "valgrind": ["valgrind", "--version"],
         "msolve": ["msolve", "-V"],
+        "m2": ["M2", "--version"],
     }
     probes.update(extra or {})
     out: dict[str, Any] = {
