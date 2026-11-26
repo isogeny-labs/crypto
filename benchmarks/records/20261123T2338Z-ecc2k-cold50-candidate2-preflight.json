@@ -1,0 +1,79 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T23:46:30+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50_20261123/candidate2/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:39:23+00:00",
+      "wall_s": 26.694
+    }
+  ],
+  "commit": "07c8c78a708d2ab1b65b0e9424fc2628c52acaef",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T23:38:36+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T2338Z-ecc2k-cold50-candidate2-preflight",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "pilot_calls",
+      "note": "Candidate2 engineering pilot;49.1996% uniform reduction misses50%; no primary rows attempted.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-cold50",
+  "raw": [
+    {
+      "bytes": 26562,
+      "path": "research/trace_zero_cold50_20261123/candidate2/preflight.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c9/c9c2cd88d3414910d078de67336f6da26d4fa633bfda7d2e599be2cea18eb8a4",
+      "sha256": "c9c2cd88d3414910d078de67336f6da26d4fa633bfda7d2e599be2cea18eb8a4",
+      "uploaded": false
+    },
+    {
+      "bytes": 1783,
+      "path": "research/trace_zero_cold50_20261123/candidate2/calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/67/6713e9a596eb9e113d2af820cfa04bcf25f1ff70ed7b8f0aff5743483bf06d5c",
+      "sha256": "6713e9a596eb9e113d2af820cfa04bcf25f1ff70ed7b8f0aff5743483bf06d5c",
+      "uploaded": false
+    },
+    {
+      "bytes": 177,
+      "path": "research/trace_zero_cold50_20261123/candidate2/preflight-gate.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0d/0d0af70354c6579b7fd92ef42b25dfe396f8fc1eaa2864e0ccb6ce2e3d32f6ec",
+      "sha256": "0d0af70354c6579b7fd92ef42b25dfe396f8fc1eaa2864e0ccb6ce2e3d32f6ec",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold50_20261123/candidate2/report.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50-candidate2-preflight",
+  "status": "measured",
+  "summary": "Candidate2 16-call engineering preflight and three calibrations valid;49.1996% uniform pilot reduction is below50%. Primary120 rows unattempted; candidate3 tests the unchanged goal with one index visit.",
+  "validation": null
+}

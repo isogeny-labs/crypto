@@ -19,6 +19,15 @@
       "notes": "Kernel-checked finite countermodel and controls plus the exact target-projection bridge. The natural stopping-time distribution remains open."
     },
     {
+      "id": "S-IC-NATURAL-CYCLE-STREAM-2026",
+      "title": "Natural M31 relation stream: balanced-circuit and solver stopping events",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "crypto repository, research/ic_natural_cycle_stream_20261126 (2026-11-26)",
+      "repository_path": "research/ic_natural_cycle_stream_20261126/README.md",
+      "notes": "Unsigned exact replay of one fixed, source-ordered retained stream at declared K=168. It measures graph closure, LP dependency, target projection and exact solver rank separately; it does not establish an asymptotic law or speedup. [pcc:unverified]"
+    },
+    {
       "id": "S-GRAPH-ZASLAVSKY-1982",
       "title": "Signed graphs",
       "kind": "primary_publication",
@@ -250,15 +259,29 @@
       "formal": {"state": "kernel_checked", "artifacts": [{"path": "papers/ic-negative-results/lean/IcNegative/CycleClosure.lean", "decl": "IcNegative.CycleClosure.recover_target_of_projected_dependency"}]}
     },
     {
+      "id": "MEAS-RP-NATURAL-CYCLE-STOPPING-M31",
+      "label": "M31 natural stream: first useful balanced circuit at 97 exact-two-LP edges for K=168",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On one fixed source-ordered M31 prefix with declared large-prime pool K=168, the first ordinary graph cycle, balanced circuit, exact LP dependency, nonzero target projection and projected-rank increase coincide at exact-two-LP edge 97 (source position 457). Its target coefficient is 744325019 modulo 2147446831. Exact target uniqueness is not observed by the 512-admitted-row censor.",
+      "scope": "One retained stream and one K. The fixed ten-query collection boundary was independent of the measured events, but complete probe/reject custody is unavailable. This is an unsigned repository measurement, not an asymptotic exponent, concentration law, complete-cost result or ECDLP speedup. [pcc:unverified]",
+      "assumptions": ["The retained source-order prefix represents the producer's admitted order", "Arithmetic is over the declared prime scalar field"],
+      "source_refs": ["S-IC-NATURAL-CYCLE-STREAM-2026"],
+      "source_locations": ["research/ic_natural_cycle_stream_20261126/results.json", "research/ic_natural_cycle_stream_20261126/README.md"],
+      "tags": ["index-calculus", "relation-graph", "balanced-cycle", "stopping-time", "measurement"],
+      "evidence_class": "measurement"
+    },
+    {
       "id": "GAP-RP-CYCLE-CLOSURE-LAW",
       "label": "Two-summand useful balanced-circuit stopping law",
       "kind": "open_obligation",
       "status": "open",
       "model": "classical_unrestricted",
       "statement": "For the route's exact signed multigraph process, prove or measure without stopping bias the accepted-edge stopping law rho(K) for the first balanced circuit whose weighted target coefficient is nonzero. Determine whether rho(K) is concentrated, its power-law exponent if any, and whether the former rho(K)=K/2 specialization is conservative.",
-      "scope": "The deterministic incidence algebra is closed: arbitrary first-cycle closure is false over odd scalar fields. What remains is the natural edge/sign ensemble, useful-circuit arrival, target projection and repeated-target exclusion; this is distinct from reusable right/full-rank tables.",
+      "scope": "The deterministic incidence algebra is closed and one K=168 retained stream now gives rho(168)=97, with target uniqueness still absent at the censor. What remains is a preregistered multi-K, multi-seed natural edge/sign ensemble establishing useful-circuit concentration and scaling, target projection and repeated-target exclusion; this is distinct from reusable right/full-rank tables.",
       "assumptions": ["Declared natural signed-multigraph relation ensemble", "Complete accepted/rejected edge population", "Distinct target rows", "Odd scalar field"],
-      "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026", "S-IC-CYCLE-CLOSURE-FORMAL-2026", "S-GRAPH-ZASLAVSKY-1982"],
+      "source_refs": ["S-RP-IC-BOUNDARY-LEDGER", "S-IC-YIELD-RANK-FORMAL-2026", "S-IC-CYCLE-CLOSURE-FORMAL-2026", "S-IC-NATURAL-CYCLE-STREAM-2026", "S-GRAPH-ZASLAVSKY-1982"],
       "tags": ["index-calculus", "relation-graph", "balanced-cycle", "stopping-time", "open"],
       "evidence_class": "open"
     }
@@ -281,6 +304,9 @@
     {"id": "ICYRF-E-015", "from": "CEX-RP-ODD-CYCLE-NO-CLOSURE", "to": "CLAIM-RP-ANY-FIRST-CYCLE-CLOSES", "relation": "refutes", "statement": "A triangle is a cycle but its unsigned incidence rows are independent over F_3.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
     {"id": "ICYRF-E-016", "from": "THM-IC-SIGNLESS-INCIDENCE-RANK", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "Over an odd scalar field the relevant incidence circuits are balanced; an arbitrary first cycle is insufficient.", "source_refs": ["S-GRAPH-ZASLAVSKY-1982", "S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
     {"id": "ICYRF-E-017", "from": "THM-RP-BALANCED-CYCLE-CONTROLS", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "Even and parallel-edge circuits are finite positive controls, but do not determine their natural arrival time.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
-    {"id": "ICYRF-E-018", "from": "THM-RP-CYCLE-TARGET-PROJECTION", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "A balanced incidence circuit closes target elimination only when its weighted target coefficient is nonzero.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]}
+    {"id": "ICYRF-E-018", "from": "THM-RP-CYCLE-TARGET-PROJECTION", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "qualifies", "statement": "A balanced incidence circuit closes target elimination only when its weighted target coefficient is nonzero.", "source_refs": ["S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-019", "from": "MEAS-RP-NATURAL-CYCLE-STOPPING-M31", "to": "GAP-RP-CYCLE-CLOSURE-LAW", "relation": "measures", "statement": "One uncensored retained stream supplies rho(168)=97 and separates useful-circuit arrival from target uniqueness; multiple K and seeds are still required for a stopping law.", "source_refs": ["S-IC-NATURAL-CYCLE-STREAM-2026"]},
+    {"id": "ICYRF-E-020", "from": "MEAS-RP-NATURAL-CYCLE-STOPPING-M31", "to": "THM-RP-CYCLE-TARGET-PROJECTION", "relation": "instantiates", "statement": "The first balanced circuit in the exact-two-LP panel has a nonzero weighted target coefficient.", "source_refs": ["S-IC-NATURAL-CYCLE-STREAM-2026", "S-IC-CYCLE-CLOSURE-FORMAL-2026"]},
+    {"id": "ICYRF-E-021", "from": "MEAS-RP-NATURAL-CYCLE-STOPPING-M31", "to": "COND-RP-TWO-SUMMAND-FAMILY-LAW", "relation": "qualifies", "statement": "The single observation 97 > K/2 = 84 does not validate the rho(K)=K/2 specialization or any asymptotic improvement.", "source_refs": ["S-IC-NATURAL-CYCLE-STREAM-2026", "S-RP-IC-BOUNDARY-LEDGER"]}
   ]
 }

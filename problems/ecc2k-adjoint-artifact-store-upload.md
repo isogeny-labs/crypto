@@ -38,3 +38,10 @@ No direct Put around ambiguous Head403, alternative identity/provider, permissio
 Unresolved. The ready PR retains normal auto-merge subject to gates; it is not a waiver of any failed check. Completing this record does not complete migration or root-library validation.
 
 The preliminary unsigned statement PCC-20261123-e89520 mistakenly counted five requests as five distinct objects. The correction receipt retains that claim and identifies the actual four distinct keys; it is not relied on. [pcc:unverified]
+
+
+### 2026-11-23 — successor half-trace constructor, PR5070
+
+The separately frozen half-trace study hits the same HTTP403 symptom in original artifact-autofix run45247559161, while uploading source/protocol head8453eb6263. The exact failed step is [preserved](../research/trace_zero_halftrace_elimination_20261123/checks/artifact-autofix-source-freeze.txt); no common cause or object absence is inferred. [pcc:unverified]
+
+The successor retains complete [raw/executable archives and member hashes](../research/trace_zero_halftrace_elimination_20261123/README.md), with byte-exact local extraction checks. Its numerical panel and focused checks are complete; broad integration/admission and remote custody remain distinct. Original authenticated whole-object migration/read-back is still required; no direct-Put, alternate identity, policy waiver or unchanged retry. [pcc:unverified]

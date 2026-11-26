@@ -244,7 +244,7 @@ pub struct SupportProfile {
 /// Necessary cardinality condition for a closed support with this many fixed
 /// points. With no identity or two-torsion point, odd sizes fail explicitly.
 pub fn require_closed_cardinality(points: usize, fixed_points: usize) -> Result<(), Error> {
-    if fixed_points > points || (points - fixed_points) % 2 != 0 {
+    if fixed_points > points || !(points - fixed_points).is_multiple_of(2) {
         return Err(Error::InvalidClosedCardinality {
             points,
             fixed_points,

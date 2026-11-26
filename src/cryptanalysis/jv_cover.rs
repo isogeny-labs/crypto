@@ -21,7 +21,7 @@
 
 use std::cell::Cell;
 use std::collections::{BTreeSet, HashMap};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -4090,7 +4090,9 @@ pub fn run_cover_dlp_mode(
 pub struct StudyMode {
     pub name: String,
     pub f4_muls: u64,
+    /// The run and the full baseline completed with equal decompositions.
     pub same_found: bool,
+    /// The run and the full baseline completed with equal solution counts.
     pub same_fp_solutions: bool,
     pub stopped: bool,
     pub hilbert_applied: bool,
@@ -4178,26 +4180,26 @@ pub fn run_stop_study(
     for _ in 0..constructed {
         jobs.push((planted(&jac, &base, &mut rng).0, true));
     }
-    let mut modes: Vec<(String, F4Options)> = Vec::new();
-    modes.push(("full".into(), jv_options(24, 300.0)));
-    modes.push(("stop64".into(), jv_options_stopped(24, 300.0, 64)));
+    let full = F4Options::new(F4Ordering::Grevlex, 24).capturing_run_log();
+    let stopped = full.clone().stopping_below(64);
+    let mut modes = vec![
+        ("full".to_owned(), full.clone()),
+        ("stop64".to_owned(), stopped.clone()),
+    ];
     for &c in chunks {
-        let mut o = jv_options_stopped(24, 300.0, 64);
+        let mut o = stopped.clone();
         o.max_pairs_per_step = Some(c);
         modes.push((format!("stop64_chunk{c}"), o));
     }
     modes.push((
         "hilbert".into(),
-        jv_options(24, 300.0).stopping_by_hilbert(usize::MAX),
+        full.clone().stopping_by_hilbert(usize::MAX),
     ));
     for &c in chunks {
         modes.push((
             format!("hilbert_chunk{c}"),
-            jv_options(24, 300.0).stopping_by_hilbert(c),
+            full.clone().stopping_by_hilbert(c),
         ));
-    }
-    for (_, opts) in &mut modes {
-        *opts = opts.clone().capturing_run_log();
     }
     let mut out = Vec::new();
     for (k, (r, pl)) in jobs.iter().enumerate() {
@@ -4234,23 +4236,24 @@ pub fn run_stop_study(
             top_staircase: rep.staircase_at_stop,
             modes: Vec::new(),
         };
-        let mut ref_found = None;
-        let mut ref_fp = 0usize;
-        for (name, opts) in &modes {
+        let mut reference = None;
+        for (index, (name, opts)) in modes.iter().enumerate() {
             let _ = f4_fp::take_run_log();
             let mut lrng =
                 StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, opts, &mut lrng);
+            let opts = opts.clone().with_budget(Duration::from_secs(300));
+            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, &opts, &mut lrng);
             let log = f4_fp::take_run_log();
-            if ref_found.is_none() {
-                ref_found = Some(found.clone());
-                ref_fp = cost.fp_solutions;
+            let completed = !cost.timed_out && !cost.incomplete;
+            if index == 0 && completed {
+                reference = Some((found.clone(), cost.fp_solutions));
             }
+            let baseline = reference.as_ref().filter(|_| completed);
             sys.modes.push(StudyMode {
                 name: name.clone(),
                 f4_muls: cost.f4_muls,
-                same_found: Some(&found) == ref_found.as_ref(),
-                same_fp_solutions: cost.fp_solutions == ref_fp,
+                same_found: baseline.is_some_and(|(decompositions, _)| &found == decompositions),
+                same_fp_solutions: baseline.is_some_and(|(_, count)| cost.fp_solutions == *count),
                 stopped: cost.stopped_at.is_some(),
                 hilbert_applied: cost.hilbert_applied,
                 hilbert_fallback: cost.hilbert_fallback,
@@ -4558,7 +4561,6 @@ mod tests {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let opts = jv_options(24, 120.0);
         let mut found_planted = 0;
         for trial in 0..6 {
             let mut idx: Vec<usize> = Vec::new();
@@ -4584,6 +4586,7 @@ mod tests {
             let want = Dec6 {
                 terms: core::array::from_fn(|k| terms[k]),
             };
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             let oracle = mitm6(&jac, &t, &r);
             assert!(oracle.contains(&want));
@@ -4603,7 +4606,6 @@ mod tests {
     #[test]
     fn sparse_linear_stage_agrees_with_dense() {
         let mut rng = StdRng::seed_from_u64(77);
-        let opts = jv_options(24, 120.0);
         let (mut used_fast, mut total) = (0usize, 0usize);
         for &p in &[53u64, 101] {
             for &n in &[4usize, 5, 6] {
@@ -4642,6 +4644,7 @@ mod tests {
                     let mut outs = Vec::new();
                     for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a, LinMode::Fast] {
                         let mut r = StdRng::seed_from_u64(5 + trial as u64);
+                        let opts = jv_options(24, 120.0);
                         let (sols, st) =
                             solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
                         assert!(!st.incomplete, "p={p} n={n} trial={trial} {mode:?}");
@@ -4736,9 +4739,9 @@ mod tests {
         // probability 1/p, a non-separating form likewise.  Plant many sums.
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 6);
         let jac = ctx.jac();
-        let opts = jv_options(24, 120.0);
         for trial in 0..120 {
             let (r, want) = planted(&jac, &base, &mut rng);
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             assert!(
                 !cost.incomplete && !cost.timed_out,
@@ -4763,10 +4766,10 @@ mod tests {
     fn solver_is_exact_on_1500_planted_sums_at_p61() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(61, 1);
         let jac = ctx.jac();
-        let opts = jv_options(24, 120.0);
         let (mut flagged, mut missed) = (0, 0);
         for _ in 0..1500 {
             let (r, want) = planted(&jac, &base, &mut rng);
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             if found.contains(&want) {
                 continue;
@@ -4789,8 +4792,6 @@ mod tests {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let full = jv_options(24, 120.0);
-        let stop = jv_options_stopped(24, 120.0, 64);
         let (mut stopped, mut cheaper, mut n) = (0, 0, 0);
         for k in 0..30 {
             let r = if k % 2 == 0 {
@@ -4799,7 +4800,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let full = jv_options(24, 120.0);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
@@ -4841,8 +4844,6 @@ mod tests {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let full = jv_options(24, 120.0);
-        let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
         let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
         // Some residuals are degenerate or exhaust a solver budget. Keep
         // sampling until the comparison includes 30 completed residuals.
@@ -4856,7 +4857,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let full = jv_options(24, 120.0);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &hil, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
@@ -5020,7 +5023,6 @@ mod tests {
         clear_traces();
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let stop = jv_options_stopped(24, 120.0, 64);
         let (mut replayed, mut cheaper, mut n, mut mismatches) = (0, 0, 0, 0);
         for k in 0..40 {
             let r = if k % 2 == 0 {
@@ -5029,7 +5031,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fb, cb) = nagao_decompose(&traced, &base, &by_x, &r, &stop, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
