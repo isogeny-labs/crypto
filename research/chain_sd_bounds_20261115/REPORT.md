@@ -19,7 +19,7 @@ beyond depth 14, and Lean proofs.
 | T3 | Admissible unit family: `p ≡ 1 (mod 2^(k+1))`, `E: y² = x³ + n²(n−1)x`, `t = n`, `n` a non-square; unit for every such `k`; infinitely many `p` for every `k` | proved (§4; Lean `family_S3_ne_zero`, `S3_ne_zero_of_cm`) |
 | T4 | Depth monotonicity: `LFD(k') ≤ LFD(k)` for `k' ≤ k`, same `(p, A, B, t)` | proved (§5; Lean `one_mem_closure_of_le`, `solvingDegree_mono`) |
 | T5 | ℤ-exponent (no-wrap) model: `π_k(W_c) ⊆ U_c(k)`; observed equality in all 6 tested cells | containment proved (§5), equality empirical |
-| T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `t ≠ 0`, `A ≠ −3t²`); `LFD(k) ≥ 3` for `k ≥ 2` and all `(A, B, t)` | `≥ 4` proved (§7, desk); `≥ 3` Lean (`one_not_mem_closure_two`, `two_lt_solvingDegree`) |
+| T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `p ≠ 2`, `A ≠ −3t²`; the earlier `t ≠ 0` is not needed); `LFD(k) ≥ 3` for `k ≥ 2` and all `(A, B, t)` | `≥ 4` **Lean** (2026-11-26: `one_not_mem_closure_three`, `three_lt_solvingDegree`, `LowerFour.lean`); `≥ 3` Lean (`one_not_mem_closure_two`, `two_lt_solvingDegree`) |
 | T7 | Upper bound `LFD(k) ≤ 2k + 1` for every unit instance, `k ≥ 1`: `A = 2, B = 1` | proved (§6, desk) |
 | T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; all 17 certificates verified by the independent checker) |
 | T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** [pcc:unverified]; reduced by T10 to the `k`-free Missing Lemma Π (§13.2), which a counting heuristic predicts to fail asymptotically (§13.4) |
@@ -233,7 +233,7 @@ earlier record `prime_field_m2_lfd_bound` (ml-cryptanalysis, not readable here) 
 
 ### 7.1 Theorem 6: constant lower bounds for every depth
 
-**Theorem 6.** Let `k ≥ 2`, `t ≠ 0`, `A ≠ −3t²` (any `B`). Then `LFD(k) ≥ 4`. (And `LFD(k) ≥ 3`
+**Theorem 6.** Let `k ≥ 2`, `t ≠ 0`, `A ≠ −3t²` (any `B`). *(2026-11-26: kernel-checked in `lean/ChainSd/LowerFour.lean` under `p ≠ 2` and `A ≠ −3t²` only; `t ≠ 0` is not used, since for `t = 0` the determinant below is `−2A`.)* Then `LFD(k) ≥ 4`. (And `LFD(k) ≥ 3`
 for every `k ≥ 2`, `A² − 4Bt` arbitrary.)
 
 *Proof.* `U_2 = span{g}` (no element of weight `≤ 1` to shift), and `1 ∉ span{g}` because `g` has the
@@ -361,7 +361,8 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | T4 depth monotonicity | `one_mem_closure_of_le`, `solvingDegree_mono` (concrete chain algebra, `AddMonoidAlgebra (ZMod p) (ZMod 2^k × ZMod 2^k)`, weight via `Nat.testBit`) | `k' ≤ k`, same `A B t` | checked |
 | T1 quotient reduction | — | Gröbner basis of the tower ideal | paper only (§2) |
 | T6, weak form `1 ∉ V_2` (`LFD ≥ 3`) | `one_not_mem_closure_two`, `two_lt_solvingDegree` (`LowerThree.lean`) | `k ≥ 2`, any `A B t` | checked |
-| T6 (`LFD ≥ 4`), T7 (`LFD ≤ 2k+1`) | — | | paper only (§6, §7.1) |
+| T6 (`LFD ≥ 4`), 2026-11-26 | `one_not_mem_closure_three_depth_two`, `one_not_mem_closure_three`, `three_lt_solvingDegree` (`LowerFour.lean`): depth 2 by the invariant subspace `span {g, σ_i g}`, all `k ≥ 2` by `one_mem_closure_of_le` | `k ≥ 2`, `p ≠ 2`, `A + 3t² ≠ 0`, any `B` (no `t ≠ 0`); non-vacuity `hyp_F1`, `hyp_F2` | checked, std axioms |
+| T7 (`LFD ≤ 2k+1`) | — | | paper only (§6) |
 | T9 linear lower bound | — | | open |
 | T10 Theorem A | `one_not_mem_closure_of_cofactorHyp` (generic `g`), `one_not_mem_chainSystem_of_cofactorHyp` (Semaev generator), `CofactorHyp`, `shift_avoids_top`, `inv_not_mem_avoidSub`, `popcount_add_le` (`Cofactor.lean`) | `k ≥ 2`, `g·ginv = 1`, `supp g ⊆ {0,1,2}²`, `g_(2,2) ≠ 0`, `g ∈ Q_{≤c}`, hypothesis `CofactorHyp g c` | checked |
 | T13 Theorem A′ | `one_not_mem_closure_of_shiftHyp`, `one_not_mem_chainSystem_of_shiftHyp`, `ShiftHyp`, `shiftHyp_of_cofactorHyp` | `g` unit supported on `{0,1,2}²`, `g₂₂ ≠ 0`, `k ≥ 2` | Lean |
