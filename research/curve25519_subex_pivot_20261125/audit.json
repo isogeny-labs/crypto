@@ -449,5 +449,14 @@
     "observed_gate": "lambda=2^26 transcript passes with a=1024, log2N=33553920, log2degree=33554944, delta exponents [60397977,60397978] and child exponent lambda-5; larger checked even exponents pass; altered degree and odd vertex parity fail",
     "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; no closure of old/packet children under the next conditional-label call, external contraction proof or practical Curve25519 attack"
   },
-  "next_gate": "prove or refute recursive closure of the symmetric root construction, potentially by exploiting packet-pattern symmetry and auxiliary packet vertices; then feed any closed family through the schema-1 node interface, and separately rederive the external contraction theorem"
+  "symmetric_child_closure_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_CHILD_CLOSURE.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/symmetric_child_controls.rs",
+    "schedule": "native radix-two complete-multigraph root at a=1, then production packet children and conditional packing at a=2 and a=3 along coordinate-zero/group-zero paths",
+    "under_scale_gate": "M=32 accepts a=2 with 10 packets, then the 32-edge degree-8 child rejects a=3 at packet padding: maximum class 2 and padded mass 512 exceed 3M=96; this model violates the next M>=LD=512 source guard",
+    "guard_compatible_gate": "ignored exhaustive debug control at M=512=LD: root packets 256; first child edges/degree 512/32 and a=2 packets 132; second child edges/degree 512/32; a=3 maximum class 10, padded mass 1024<=1536, packets 74 with KL=592<=1536, maximum one-side group load 261 with 2*261<=1536; measured about 107 seconds",
+    "proof_target": "uniformly prove maximum pair-label class<=2M/D, coordinate/group endpoint load on either side<=3M/64 and maximum degree<=delta from old-vertex and packet-pattern orbit counts",
+    "claim_boundary": "one exact finite positive path plus one exact under-scale rejection; no all-group, all-coordinate, all-depth or radix-64 closure theorem, external contraction proof or practical Curve25519 attack"
+  },
+  "next_gate": "derive the greedy conditional-label objective on packet-pattern/old-side orbit aggregates and prove max_class<=2M/D plus one-side group load<=3M/64 for every source-admitted child; test all finite branch orbits at the first guard-compatible schedule, then feed a uniform closed family through the schema-1 node interface and separately rederive the external contraction theorem"
 }

@@ -30,6 +30,10 @@ mod factorization_certificate;
 #[path = "port_mass_controls.rs"]
 mod port_mass_controls;
 
+#[cfg(test)]
+#[path = "symmetric_child_controls.rs"]
+mod symmetric_child_controls;
+
 #[derive(Clone, Debug)]
 pub(super) struct Parameters {
     pub radix: usize,

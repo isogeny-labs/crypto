@@ -64,7 +64,7 @@ fn objective(
     Ok(total)
 }
 
-fn conditional_labels(
+pub(super) fn conditional_labels(
     graph: &Bipartite,
     labels: usize,
     meter: &mut Meter,

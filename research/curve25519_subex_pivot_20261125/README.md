@@ -411,6 +411,17 @@ schema-6 threshold and larger even root exponents. The unresolved step is
 closure: the old/packet child graph is not yet proved to retain this symmetric
 family or balanced conditional labels. `[pcc:unverified]`
 
+`SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
+native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
+`M=32<LD=512` child fails exactly at packet padding, while the first
+guard-compatible `M=512=LD` group-zero/group-zero path accepts the next scale:
+maximum class 10, padded mass 1024 versus `3M=1536`, 74 packets, and maximum
+one-side group load 261. The positive run is an ignored 107-second
+reproducibility test; the routine suite retains the fast exact rejection
+control. This is one finite path, not radix-64 recursive closure. It sharpens
+the next target to proving `max_class<=2M/D` and each side's group load
+`<=3M/64` from packet-pattern orbit counts. `[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by

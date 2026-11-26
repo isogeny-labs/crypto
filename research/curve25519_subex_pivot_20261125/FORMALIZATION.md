@@ -147,6 +147,17 @@ the source degree, `LD`, and `2D^2 delta` guards by exponents. It passes at
 closure of the old/packet child shape under the next packing call remains open.
 `[pcc:unverified]`
 
+The native radix-two child probe separates an under-scale padding failure from
+the first schedule point satisfying `M>=LD`. At `a=3`, `L=8`, `D=64`, the
+`M=32` model is rejected because its padded class mass is 512, but the
+`M=512=LD` group-zero/group-zero path is accepted with maximum class 10,
+padded mass 1024, 74 packets, maximum one-side group load 261, and maximum
+degree 32. The exact 107-second positive run is retained as an ignored test.
+This does not discharge R1: all coordinates, groups, depths, and the radix-64
+orbit argument remain open. It identifies the sufficient local targets
+`max_class<=2M/D`, one-side group load `<=3M/64`, and degree `<=delta`.
+`[pcc:unverified]`
+
 The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to
 one group, so a child has at most `6M/64` edges and

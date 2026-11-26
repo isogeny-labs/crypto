@@ -101,3 +101,10 @@ member of the same family or that the next conditional-label call remains
 balanced. Proving such closure, or finding a different invariant family using
 packet vertices as auxiliary variables, is the next decisive lead. No
 practical Curve25519 attack follows. `[pcc:unverified]`
+
+The finite production probe in `SYMMETRIC_CHILD_CLOSURE.md` supplies one new
+positive datum without closing this gap: the first radix-two path satisfying
+the next `M>=LD` guard accepts the next packing scale. Its smaller under-scale
+analogue fails exactly at padding. The proof target is now an orbit-wise class
+cap `max_class<=2M/D` plus the existing one-side group-load and degree caps,
+uniformly over all source-admitted children. `[pcc:unverified]`
