@@ -34,6 +34,34 @@ The subsequent `cargo check --release --lib` completed successfully (2m 25s),
 so the new modules also type-check in the full library. That command does not
 execute the full library tests.
 
+## CI repair checks (2026-11-26 UTC)
+
+The PR's Rust 1.98 Clippy job reported ten diagnostics in four existing library
+files. The follow-up replaces equivalent integer predicates, restricts two
+dispatch wrappers to their existing test callers, removes a terminal `return`,
+and propagates packed-prefix pivots only into registers with unread rows.
+The changed-file formatter also reformats `ecbench/isogeny.rs`; independent
+comparison confirms that its only semantic edit is the equivalent bound
+`p <= 2^61 - 1` to `p < 2^61`.
+
+- All four affected files pass Rust 1.98 formatting and whitespace checks.
+- The existing packed-prefix scalar-comparison regression passes over 7,680
+  matrix cases. The temporary harness contains the current function and the
+  unchanged existing test byte-for-byte and compiles with `-D warnings`.
+- Five existing tests pass with the actual `binary_ecc/f2m.rs` compiled as a
+  temporary Cargo library: hex word boundaries, 131-bit multiplication and
+  squaring, and two half-trace controls. The isolated module emits warnings
+  for three integration helpers whose callers are outside that harness.
+- The complete maintained-target Clippy command was attempted with the pinned
+  compiler, then with one compiler job, no debug metadata, and incremental
+  compilation disabled. Both attempts terminated with `SIGKILL`. The second
+  exposed a further unused low-register assignment, addressed by the final
+  pending-register macro. No local whole-crate Clippy pass is claimed.
+
+The six focused regression passes do not replace the repository-wide job.
+Hosted CI on the published repair head remains the full strict-lint check.
+No workflow, lint rule, or test was disabled or suppressed.
+
 ## Data and model boundaries
 
 The analyzer retains 768 timed rows and their producer recovery flags; 672
@@ -49,10 +77,15 @@ speedup is produced. [pcc:unverified]
 
 ## Coordination and source access
 
-Conductor T-1 owns the eight declared paths. The supported attached-task
-conflict check returned `allow` after authenticated lease/fence verification.
-The control plane is local to this session; no shared endpoint was configured.
-No lease release/reclaim or policy suppression was used.
+The initial integration reserved eight paths in Conductor T-1. The CI repair
+follow-up reserved the four affected Rust files and the next UTC session log,
+bringing the task to thirteen scopes. After the former local service stopped,
+the documented stale-PID recovery restored its existing database. Conductor's
+normal reconciler expired the old attempt; a supported claim created attempt 2
+at fencing epoch 3. The attached-task conflict check returned `allow` after
+authenticated verification of that current lease and fence. The control plane
+is local to this session; no shared endpoint was configured. No coordination
+policy or fence checks were suppressed.
 
 The research KB wrapper returned exit 127 because its executable/catalog was
 unavailable. The fallback review covered PKM 2016 section 3.2, RFC 9380, the
