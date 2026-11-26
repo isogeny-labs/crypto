@@ -100,6 +100,52 @@ fn fixture() -> Bipartite {
     }
 }
 
+fn partition_graph(left_groups: &[usize], right_groups: &[usize]) -> Bipartite {
+    fn side(groups: &[usize]) -> (Vec<TensorVertex>, Vec<(usize, usize)>) {
+        let vertices = groups.iter().copied().max().map_or(0, |group| group + 1);
+        let mut ports = vec![Vec::new(); vertices];
+        let mut endpoints = vec![(0usize, 0usize); groups.len()];
+        for (edge, &vertex) in groups.iter().enumerate() {
+            endpoints[edge] = (vertex, ports[vertex].len());
+            ports[vertex].push(edge);
+        }
+        let tensors = ports
+            .into_iter()
+            .map(|edges| TensorVertex {
+                tensor: predicate(edges.len(), u8::MAX),
+                edges,
+            })
+            .collect();
+        (tensors, endpoints)
+    }
+
+    assert_eq!(left_groups.len(), right_groups.len());
+    let (left, left_endpoints) = side(left_groups);
+    let (right, right_endpoints) = side(right_groups);
+    Bipartite {
+        left,
+        right,
+        edges: (0..left_groups.len())
+            .map(|edge| Edge {
+                left: left_endpoints[edge],
+                right: right_endpoints[edge],
+            })
+            .collect(),
+    }
+}
+
+fn refinement_labels(vertices: usize, schedule: usize, side: usize) -> Vec<usize> {
+    (0..vertices)
+        .map(|vertex| match schedule {
+            0 => 0,
+            1 => (vertex + side) % 4,
+            2 => (3 * vertex + side + 1) % 4,
+            3 => 3 - (vertex + side) % 4,
+            _ => unreachable!(),
+        })
+        .collect()
+}
+
 fn producer_bounds(certificate: &Certificate) -> Vec<usize> {
     let mut out = vec![0usize; certificate.packets.len() * certificate.radix];
     for (packet, slots) in certificate.packets.iter().enumerate() {
@@ -743,4 +789,68 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(check(&bad_entry, &ring, &mut meter)
         .unwrap_err()
         .starts_with("packet coefficient table:"));
+}
+
+#[test]
+fn serialized_certificate_covers_every_three_edge_partition_shape() {
+    let mut meter = Meter::new(Limits {
+        steps: 100_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let kernel = deformation::Cauchy::new(&parameters, 1, &ring.one(), &ring, &mut meter).unwrap();
+    let partitions = [[0usize, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [0, 1, 2]];
+    let mut cases = 0usize;
+    let mut total_bytes = 0usize;
+    let mut maximum_bytes = 0usize;
+    let mut maximum_case = None;
+    for left_groups in &partitions {
+        for right_groups in &partitions {
+            for schedule in 0..4 {
+                let graph = partition_graph(left_groups, right_groups);
+                let rows = refinement_labels(graph.left.len(), schedule, 0);
+                let columns = refinement_labels(graph.right.len(), schedule, 1);
+                let packing =
+                    packing::pack_labels(&graph, &parameters, rows, columns, false, &mut meter)
+                        .unwrap();
+                let modes =
+                    deformation::modes(&graph, &packing, 0, &parameters, &kernel, &mut meter)
+                        .unwrap();
+                let produced = produce(
+                    &graph,
+                    &packing,
+                    &parameters,
+                    0,
+                    &kernel,
+                    &modes,
+                    &mut meter,
+                )
+                .unwrap();
+                let serialized = serde_json::to_vec(&produced).unwrap();
+                total_bytes += serialized.len();
+                if serialized.len() > maximum_bytes {
+                    maximum_bytes = serialized.len();
+                    maximum_case = Some((*left_groups, *right_groups, schedule));
+                }
+                let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+                check(&certificate, &ring, &mut meter).unwrap_or_else(|error| {
+                    panic!(
+                        "left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}"
+                    )
+                });
+                cases += 1;
+            }
+        }
+    }
+    assert_eq!(cases, 100);
+    assert_eq!(total_bytes, 317_734);
+    assert_eq!(maximum_bytes, 10_136);
+    assert_eq!(maximum_case, Some(([0, 1, 1], [0, 1, 1], 3)));
 }

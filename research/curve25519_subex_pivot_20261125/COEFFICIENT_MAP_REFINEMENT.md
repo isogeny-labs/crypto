@@ -163,7 +163,13 @@ dependencies. A schema-version mutation and a noncanonical ring coordinate are
 rejected before the six algebraic checks, an overflowing structural count fails
 closed, and reserialization is byte-for-byte stable. `[pcc:unverified]`
 
+A second positive control serializes and verifies all 25 left/right set-partition
+pairs of three labeled edges under four label schedules. The 100 certificates
+occupy 317,734 bytes in total (3,177.34 bytes on average); the maximum is 10,136
+bytes for partition pair `[0,1,1]/[0,1,1]` under schedule 3. The complete warm
+Rust 1.78 debug sweep verifies in 0.34 seconds. `[pcc:unverified]`
+
 This is not yet an external or theorem-assistant kernel. Producer and checker
 still compile in the same test-only Rust module, there is no standalone checker
-executable, and the positive control is a bounded correlated-port fixture.
+executable, and the positive controls remain bounded through three edges.
 `[pcc:unverified]`

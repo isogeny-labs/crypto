@@ -277,6 +277,11 @@ round-trips through a stable 2,162-byte JSON representation; schema mismatch
 and noncanonical ring-element mutations are also rejected, and an overflowing
 structural count fails closed. `[pcc:unverified]`
 
+The serialized checker also covers all 100 combinations of the 25 three-edge
+left/right set-partition pairs and four label schedules. Their total wire size
+is 317,734 bytes, the largest certificate is 10,136 bytes, and the warm Rust
+1.78 debug verification sweep takes 0.34 seconds. `[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
