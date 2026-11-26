@@ -1,0 +1,47 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "norm-one-torus-m7-single-target-public-precommit-20261126",
+  "frozen_before_execution_utc": "2026-11-26T19:11:02Z",
+  "precommit_intent": "This manifest must be committed and pushed to draft PR #5254 before its seed is expanded into indices or its single target is constructed.",
+  "master_seed_hex": "4c85d0b299da4b82f7e31a4a97794dff042b5eb0df725e1f75dc16d71a1c5b91",
+  "master_seed_derivation": "SHA-256 of the ASCII string isogeny-labs/norm-one-torus-m7-single-target/2026-11-26/v1",
+  "stream_derivation": {
+    "domain": "isogeny-labs/norm-one-torus-m7-single-target/public-precommit/2026-11-26/v1",
+    "construction": "SHA-256(domain || 0x00 || master_seed || 0x00 || stream_name || 0x00 || u64be(index)); reduce the big-endian digest modulo the requested range"
+  },
+  "configuration": {
+    "curve": "icv1-fp31-tm3989-ae9db972",
+    "dickson_height": 6,
+    "dickson_lo": 0,
+    "dickson_c_top": 0,
+    "targets": 1,
+    "target_kind": "planted-seven-distinct-indices-without-inverse-pairs",
+    "arity": 7,
+    "rounds": 9,
+    "query_block_size": 2048,
+    "prefix_bits": 16
+  },
+  "single_target_accounting": {
+    "cross_target_amortization": false,
+    "retained_table_rebuilt_per_arm_per_round": true,
+    "target_cache_shared_between_arms": false,
+    "scan_after_first_hit": "complete",
+    "setup_and_query_both_charged": true
+  },
+  "arms": [
+    "retain4-hash-sum",
+    "retain4-hash-centered",
+    "retain4-prefix16-centered",
+    "retain3-prefix16-centered"
+  ],
+  "round_order": "four-arm cyclic rotation by round index",
+  "primary_evidence": "exact cold setup/query operation vectors, state counts, lookup comparisons, memory accounting, result equality, and independent affine replay",
+  "secondary_evidence": "non-isolated local wall-clock diagnostics only",
+  "tuning_disclosure": {
+    "development_benchmark_runs": 0,
+    "public_precommit_seed_expanded_before_this_manifest": false,
+    "query_block_size_source": "fixed before execution; inherited scale from the earlier Rust batch-normalization study",
+    "prefix_width_source": "fixed before execution to keep the 65,537 u32 directory near 256 KiB while leaving about 7.4 retained four-sum states per finite bucket on average"
+  }
+}
+
