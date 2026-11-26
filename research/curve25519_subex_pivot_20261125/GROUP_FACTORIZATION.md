@@ -5,6 +5,34 @@ This note isolates the algebra implemented by `modes`, `child`,
 It is a producer proof target, not an independent or kernel-checked
 refinement. `[pcc:unverified]`
 
+## Direct deformation semantics
+
+Give every old edge `e` two independent incidence bits: `x_e` at its left
+endpoint and `y_e` at its right endpoint. For a packet `P`, let `s(e)` be an
+edge's packet slot and define `[pcc:unverified]`
+
+```text
+K_P(x,y) = product_(e in P)
+  (sum_(f in P) W(s(e),s(f))*y_f)                 when x_e=1,
+  (1-sum_(f in P) W(s(e),s(f))*y_f)               when x_e=0.
+```
+
+The direct deformed contraction is
+
+```text
+D(W) = sum_(x,y)
+  product_(left vertices v)  T_v(x on ports(v))
+  product_(right vertices v) T_v(y on ports(v))
+  product_(packets P) K_P(x,y).
+```
+
+At the zero deformation sample, `W` is the identity matrix and this reduces
+to the original contraction. At a general sample it is the semantic target
+that the mode/group construction must reproduce. The native
+`direct_deformed_contraction` oracle implements this formula directly: it
+does not call `modes`, `child`, `next_tuple`, `PacketTensor::entry`, or
+`evaluate_at`.
+
 ## Packet polynomial
 
 Fix one packet, one active coordinate, a Cauchy center `t`, and a sample `z`.
@@ -86,11 +114,15 @@ kernel-checked refinement remains open.
 ## Evidence and remaining gate
 
 The exhaustive packet oracle independently checks the coefficient-extraction
-identity on all 64 assignments of a mixed linear/quadratic fixture. The
-correlated two-port mutation gate checks that production `evaluate_at` equals
-the extracted modes-to-child group product and detects both a removed mode and
-a wrong target group. End-to-end controls then recover the independent direct
-tensor count at one and three active levels and across two taper coordinates.
+identity on all 64 assignments of a mixed linear/quadratic fixture. A separate
+global oracle compares the extracted modes-to-child product with `D(W)` for
+all 256 pairs of arity-two Boolean tables in each of three label/sample cases,
+768 configurations total. The cases include local and crossing groups, zero,
+unit, and nontrivial extension sample values, and correlated parallel ports.
+The mutation gate additionally detects both a removed mode and a wrong target
+group against the direct oracle. End-to-end controls then recover the original
+direct tensor count at one and three active levels and across two taper
+coordinates.
 
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust

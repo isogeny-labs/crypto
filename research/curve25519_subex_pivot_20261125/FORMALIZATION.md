@@ -223,14 +223,16 @@ enumerates every constant/incoming-mode choice per row and filters only by the
 requested exponent vector. It agrees with the production depth-first
 coefficient extractor on all 64 port assignments for four rows, two columns,
 two simultaneous incoming modes of total degree three, local affine terms,
-and two outgoing forms including a square. The remaining link is the global
-claim that `modes` assigns every scalar series term to exactly one target and
-source group and that multiplying the resulting child contractions preserves
-all old vertex correlations. A correlated two-port mutation gate now checks
-that the production evaluator agrees with the extracted modes-to-child group
-product and that either removing a generated mode or flipping its target group
-changes the result. This makes both pieces load-bearing in a finite fixture;
-it is not the quantified factorization theorem. `[pcc:unverified]`
+and two outgoing forms including a square. A separate direct deformation
+oracle sums over independent left/right incidence bits and applies the full
+Cauchy packet kernel without calling `modes`, `child`, `next_tuple`, packet
+entry, or `evaluate_at`. It agrees with the extracted modes-to-child product
+for all 256 pairs of arity-two Boolean tables in each of three label/sample
+cases, 768 configurations total. The cases cover local and crossing groups,
+zero/unit/extension samples, and correlated parallel ports. Removing a
+generated mode or flipping its target group is also detected against that
+direct oracle. The remaining link is the quantified refinement for every
+admitted graph, not an untested finite semantic target. `[pcc:unverified]`
 
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent

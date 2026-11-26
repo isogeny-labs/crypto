@@ -56,6 +56,71 @@ fn evaluate_generated_modes(
     }
 }
 
+fn direct_deformed_contraction(
+    graph: &Bipartite,
+    packing: &Packing,
+    kernel: &deformation::Cauchy,
+    meter: &mut Meter,
+) -> Result<Element> {
+    let incidences = graph
+        .edges
+        .len()
+        .checked_mul(2)
+        .ok_or_else(|| overflow("direct deformation incidences"))?;
+    let assignments = 1usize
+        .checked_shl(u32::try_from(incidences).map_err(|_| overflow("direct deformation shift"))?)
+        .ok_or_else(|| overflow("direct deformation assignments"))?;
+    let mut total = kernel.ring.zero();
+    for mask in 0..assignments {
+        let left_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << edge) != 0)
+            .collect();
+        let right_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << (graph.edges.len() + edge)) != 0)
+            .collect();
+        let mut product = kernel.ring.one();
+        for vertex in &graph.left {
+            let bits: Vec<_> = vertex.edges.iter().map(|&edge| left_bits[edge]).collect();
+            let value = vertex.tensor.entry(&bits, &kernel.ring, meter)?;
+            product = kernel.ring.mul(&product, &value, meter)?;
+        }
+        for vertex in &graph.right {
+            let bits: Vec<_> = vertex.edges.iter().map(|&edge| right_bits[edge]).collect();
+            let value = vertex.tensor.entry(&bits, &kernel.ring, meter)?;
+            product = kernel.ring.mul(&product, &value, meter)?;
+        }
+        for packet in &packing.packets {
+            for (row, &row_edge) in packet
+                .slots
+                .iter()
+                .enumerate()
+                .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+            {
+                let mut row_sum = kernel.ring.zero();
+                for (column, &column_edge) in packet
+                    .slots
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+                {
+                    if right_bits[column_edge] {
+                        let weight = kernel.weight(row, column, meter)?;
+                        row_sum = kernel.ring.add(&row_sum, &weight, meter)?;
+                    }
+                }
+                let factor = if left_bits[row_edge] {
+                    row_sum
+                } else {
+                    kernel.ring.sub(&kernel.ring.one(), &row_sum, meter)?
+                };
+                product = kernel.ring.mul(&product, &factor, meter)?;
+            }
+        }
+        total = kernel.ring.add(&total, &product, meter)?;
+    }
+    Ok(total)
+}
+
 fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     Arc::new(Tensor {
         creation_precision: 3,
@@ -216,6 +281,91 @@ fn coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes()
 }
 
 #[test]
+fn direct_deformation_matches_group_factorization_for_all_binary_tables() {
+    let mut meter = Meter::new(Limits {
+        steps: 5_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let cases = [
+        (0usize, 3usize, ring.zero()),
+        (1, 2, ring.one()),
+        (2, 2, ring.point(&2u8.into()).unwrap()),
+    ];
+    for (row_label, column_label, z) in cases {
+        for left_table in 0..16u8 {
+            for right_table in 0..16u8 {
+                let graph = Bipartite {
+                    left: vec![TensorVertex {
+                        tensor: predicate(2, left_table),
+                        edges: vec![0, 1],
+                    }],
+                    right: vec![TensorVertex {
+                        tensor: predicate(2, right_table),
+                        edges: vec![0, 1],
+                    }],
+                    edges: vec![
+                        Edge {
+                            left: (0, 0),
+                            right: (0, 0),
+                        },
+                        Edge {
+                            left: (0, 1),
+                            right: (0, 1),
+                        },
+                    ],
+                };
+                let packing = packing::pack_labels(
+                    &graph,
+                    &parameters,
+                    vec![row_label],
+                    vec![column_label],
+                    false,
+                    &mut meter,
+                )
+                .unwrap();
+                let t = 1i64;
+                let coordinate = deformation::valuation(t);
+                let kernel =
+                    deformation::Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+                let modes = deformation::modes(
+                    &graph,
+                    &packing,
+                    coordinate,
+                    &parameters,
+                    &kernel,
+                    &mut meter,
+                )
+                .unwrap();
+                let expected =
+                    direct_deformed_contraction(&graph, &packing, &kernel, &mut meter).unwrap();
+                let actual = evaluate_generated_modes(
+                    &graph,
+                    &packing,
+                    &parameters,
+                    coordinate,
+                    &kernel,
+                    &modes,
+                    &mut meter,
+                )
+                .unwrap();
+                assert_eq!(
+                    actual, expected,
+                    "labels={row_label}/{column_label}, tables={left_table}/{right_table}",
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn generated_mode_removal_or_reassignment_changes_the_group_product() {
     let mut meter = Meter::new(Limits {
         steps: 5_000_000_000,
@@ -265,7 +415,8 @@ fn generated_mode_removal_or_reassignment_changes_the_group_product() {
     )
     .unwrap();
     assert!(!modes.is_empty());
-    let expected = evaluate_generated_modes(
+    let expected = direct_deformed_contraction(&graph, &packing, &kernel, &mut meter).unwrap();
+    let extracted = evaluate_generated_modes(
         &graph,
         &packing,
         &parameters,
@@ -275,6 +426,7 @@ fn generated_mode_removal_or_reassignment_changes_the_group_product() {
         &mut meter,
     )
     .unwrap();
+    assert_eq!(extracted, expected);
     let production = evaluate_at(
         &graph,
         &packing,
