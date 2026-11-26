@@ -106,6 +106,45 @@ pub struct DescriptionEnvelope {
     pub canonical_binary_bits_bound: usize,
 }
 
+/// Scalar source coordinates used to refine an accepted factorization
+/// certificate to one active recursion node.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceDimensionWitness {
+    /// Packet-length exponent, so every packet has `L=2^a` slots.
+    pub a: u32,
+    /// Number of retained valuation levels.
+    pub u: u32,
+    /// Active valuation coordinate `i<u`.
+    pub coordinate: u32,
+}
+
+/// Independently reconstructed source dimensions for one accepted certificate.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct SourceDimensionSummary {
+    /// Serialized graph edge count `M`.
+    pub edges: BigUint,
+    /// Serialized packet count `K`.
+    pub packets: BigUint,
+    /// Reconstructed packet length `L=2^a`.
+    pub packet_length: BigUint,
+    /// Reconstructed tile period `tau=2^(i+1)`.
+    pub tile_period: BigUint,
+    /// Reconstructed interaction distance `D=L/2^i`.
+    pub interaction_distance: BigUint,
+    /// Serialized coefficient precision `p`.
+    pub precision: BigUint,
+    /// Nonnegative slack in `K L<=3M`.
+    pub packing_slack: BigUint,
+    /// Nonnegative slack in `p u<=34 M D`.
+    pub precision_slack: BigUint,
+    /// Recomputed `K tau` mode bound for each weight.
+    pub modes_per_weight_bound: usize,
+    /// Recomputed `K tau (p-1)` total mode bound.
+    pub attempted_modes_bound: usize,
+    /// Recomputed weighted-tuple base-two exponent ceiling.
+    pub tuple_log2_bound: usize,
+}
+
 fn checked_product(values: &[usize], label: &str) -> std::result::Result<usize, String> {
     values.iter().try_fold(1usize, |product, &value| {
         product
@@ -406,6 +445,93 @@ pub fn description_envelope(
         actual_ring_elements,
         json_bytes_bound,
         canonical_binary_bits_bound,
+    })
+}
+
+/// Bind an accepted finite certificate to the scalar source premises.
+///
+/// The caller must first run [`verify`]. This independent refinement checks
+/// uniform packet length, the tile/coordinate identity, packet capacity, and
+/// the normalized precision inequality directly from serialized dimensions.
+/// It does not prove that a graph or the source packing routine produced the
+/// certificate.
+pub fn verify_source_dimensions(
+    certificate: &Certificate,
+    witness: &SourceDimensionWitness,
+) -> std::result::Result<SourceDimensionSummary, String> {
+    if witness.u == 0
+        || witness.u > witness.a
+        || witness.coordinate >= witness.u
+        || certificate.edge_count == 0
+        || certificate.packets.is_empty()
+        || certificate.precision == 0
+    {
+        return Err("source dimension context".into());
+    }
+    let packet_length = 1usize
+        .checked_shl(witness.a)
+        .ok_or_else(|| "source packet length width".to_string())?;
+    if certificate
+        .packets
+        .iter()
+        .any(|packet| packet.len() != packet_length)
+    {
+        return Err("source packet length".into());
+    }
+    let tile_period = 1usize
+        .checked_shl(
+            witness
+                .coordinate
+                .checked_add(1)
+                .ok_or_else(|| "source tile width".to_string())?,
+        )
+        .ok_or_else(|| "source tile width".to_string())?;
+    if certificate.tiles != tile_period {
+        return Err("source tile period".into());
+    }
+    let interaction_distance = packet_length >> witness.coordinate;
+    let edges = BigUint::from(certificate.edge_count);
+    let packets = BigUint::from(certificate.packets.len());
+    let length = BigUint::from(packet_length);
+    let tiles = BigUint::from(tile_period);
+    let distance = BigUint::from(interaction_distance);
+    let precision = BigUint::from(certificate.precision);
+    if BigUint::from(witness.u) > edges {
+        return Err("source valuation levels".into());
+    }
+    let packing_lhs = &packets * &length;
+    let packing_rhs = BigUint::from(3u8) * &edges;
+    if packing_lhs > packing_rhs {
+        return Err("source packet capacity".into());
+    }
+    let modes_per_weight = &packets * &tiles;
+    if &modes_per_weight * &distance > BigUint::from(6u8) * &edges {
+        return Err("source mode distance".into());
+    }
+    let precision_lhs = &precision * BigUint::from(witness.u);
+    let precision_rhs = BigUint::from(34u8) * &edges * &distance;
+    if precision_lhs > precision_rhs {
+        return Err("source precision".into());
+    }
+    let envelope = description_envelope(certificate)?;
+    if envelope.packet_length != packet_length
+        || envelope.tiles != tile_period
+        || BigUint::from(envelope.modes_per_weight_bound) != modes_per_weight
+    {
+        return Err("source description refinement".into());
+    }
+    Ok(SourceDimensionSummary {
+        edges,
+        packets,
+        packet_length: length,
+        tile_period: tiles,
+        interaction_distance: distance,
+        precision,
+        packing_slack: packing_rhs - packing_lhs,
+        precision_slack: precision_rhs - precision_lhs,
+        modes_per_weight_bound: envelope.modes_per_weight_bound,
+        attempted_modes_bound: envelope.attempted_modes_bound,
+        tuple_log2_bound: envelope.tuple_log2_bound,
     })
 }
 

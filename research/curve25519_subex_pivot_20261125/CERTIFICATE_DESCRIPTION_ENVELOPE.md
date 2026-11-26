@@ -180,15 +180,24 @@ are `tau=2`, `n=4`, `Q<=16`, and `log2 T<=25`. The gap records the
 `2^(2L)` worst-case concentration and uniform framing constants.
 `[pcc:unverified]`
 
-The production-side controls also instantiate the independent BigUint
-`NodeDimensions` audit from each certificate's live `M,K,L,tau,p` objects.
+The standalone module now exposes `verify_source_dimensions`, which takes the
+source coordinates `(a,u,i)` and independently reconstructs
+`(M,K,L,tau,D,p)` from an already accepted serialized certificate. It requires
+uniform packet length and checks `K L<=3M`, `nD<=6M`, and `p u<=34MD`, then
+recomputes the same mode and tuple ceilings. The production controls compare
+that result field-for-field with the separate BigUint `NodeDimensions` audit.
 Among the 596 three- through five-edge partition-shape certificates, 285 meet
-the source packing premise `K L<=3M`; all 285 agree exactly on `L`, `tau`,
-`K tau`, `K tau(p-1)`, and the tuple-log2 ceiling. The remaining 311 are useful
-algebraic factorization shapes but the dimension audit rejects them at the
+the source packing premise; all 285 agree exactly. The remaining 311 are useful
+algebraic factorization shapes but both refinements reject them at the
 packing-capacity boundary. The correlated two-edge fixture is rejected there
 as well. This pinned split prevents a finite factorization control from being
-misreported as an admitted recursive node. `[pcc:unverified]`
+misreported as an admitted recursive node. It still does not prove that a
+graph or the source packing routine produced the certificate.
+`[pcc:unverified]`
+
+The native verifier exposes this refinement as
+`factorization-certificate-check [CERTIFICATE.json] --source A U I`; omitted
+source arguments preserve the ordinary algebraic certificate check.
 
 This closes a finite description-counting obligation, not the entire
 subexponential theorem. A full result still needs the recursive-history and

@@ -123,5 +123,8 @@ family satisfying them. It does not show that a symbolic graph realizes those
 normalized rows, or that the external contraction theorem applies. The next
 useful certificate layer must define a graph/packing realization interface to
 the schema-2 factorization obligations while keeping the external theorem an
-explicit independent premise. An independent or kernel-checked derivation of
-the description-composition inequality also remains open. `[pcc:unverified]`
+explicit independent premise. The finite standalone
+`verify_source_dimensions` interface now binds an accepted schema-2 object to
+the same `(M,K,L,tau,D,p)` vocabulary, but graph/packing provenance remains
+unproved. An independent or kernel-checked derivation of the
+description-composition inequality also remains open. `[pcc:unverified]`

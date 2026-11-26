@@ -329,6 +329,16 @@ mutations are rejected. This is an independent normalized scalar replay, not
 graph realization or a proof of the external theorem.
 `[pcc:unverified]`
 
+On the finite side, the standalone factorization module now provides the same
+scalar interface for an accepted schema-2 object. Given `(a,u,i)`, it
+reconstructs `(M,K,L,tau,D,p)`, requires uniform packet length, checks
+`KL<=3M`, `nD<=6M`, and `pu<=34MD`, and recomputes the mode/tuple ceilings.
+All 285 source-admitted certificates in the 596-case bounded corpus agree
+field-for-field with the separate BigUint audit; the other 311 remain explicit
+capacity-failing algebraic controls. This connects serialized evidence to the
+symbolic dimension vocabulary without claiming graph provenance.
+`[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by

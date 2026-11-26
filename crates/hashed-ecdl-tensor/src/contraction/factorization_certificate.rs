@@ -4,8 +4,9 @@ use super::*;
 use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, verify as standalone_verify, verify_with_ring as check, Certificate,
-    CertifiedElement, CertifiedMode, EntryTable, SCHEMA,
+    description_envelope, verify as standalone_verify, verify_source_dimensions,
+    verify_with_ring as check, Certificate, CertifiedElement, CertifiedMode, EntryTable,
+    SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::Limits;
@@ -26,15 +27,31 @@ fn assert_source_count_bridge(
         precision: certificate.precision.into(),
     };
     let audit = audit_node_dimensions(&dimensions);
+    let source = verify_source_dimensions(
+        certificate,
+        &SourceDimensionWitness {
+            a: u32::try_from(parameters.a).unwrap(),
+            u: u32::try_from(parameters.u).unwrap(),
+            coordinate: u32::try_from(coordinate).unwrap(),
+        },
+    );
     let packing_capacity = BigUint::from(certificate.packets.len())
         * BigUint::from(parameters.length)
         <= BigUint::from(3u8) * BigUint::from(certificate.edge_count);
     assert_eq!(audit.is_ok(), packing_capacity);
+    assert_eq!(source.is_ok(), packing_capacity);
     let Ok(audit) = audit else {
         return false;
     };
+    let source = source.unwrap();
     let envelope = description_envelope(certificate).unwrap();
     assert_eq!(audit.packet_length, parameters.length.into());
+    assert_eq!(source.edges, dimensions.edges);
+    assert_eq!(source.packets, dimensions.packets);
+    assert_eq!(source.packet_length, audit.packet_length);
+    assert_eq!(source.tile_period, audit.tiles);
+    assert_eq!(source.interaction_distance, audit.interaction_distance);
+    assert_eq!(source.precision, dimensions.precision);
     assert_eq!(audit.packet_length, envelope.packet_length.into());
     assert_eq!(audit.tiles, envelope.tiles.into());
     assert_eq!(
@@ -49,6 +66,12 @@ fn assert_source_count_bridge(
         audit.mode_tuple_log2_bound,
         envelope.tuple_log2_bound.into()
     );
+    assert_eq!(
+        source.modes_per_weight_bound,
+        envelope.modes_per_weight_bound
+    );
+    assert_eq!(source.attempted_modes_bound, envelope.attempted_modes_bound);
+    assert_eq!(source.tuple_log2_bound, envelope.tuple_log2_bound);
     true
 }
 

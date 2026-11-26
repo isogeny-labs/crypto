@@ -1,6 +1,8 @@
 //! Verify one serialized recursive-factorization certificate.
 
-use hashed_ecdl_tensor::factorization_certificate::{description_envelope, verify, Certificate};
+use hashed_ecdl_tensor::factorization_certificate::{
+    description_envelope, verify, verify_source_dimensions, Certificate, SourceDimensionWitness,
+};
 use hashed_ecdl_tensor::{Limits, Meter};
 use serde_json::json;
 use std::io::Read;
@@ -32,10 +34,30 @@ fn read_input(path: Option<&str>) -> Result<Vec<u8>, String> {
 
 fn run() -> Result<(), String> {
     let args: Vec<_> = std::env::args().skip(1).collect();
-    let path = match args.as_slice() {
-        [] => None,
-        [path] => Some(path.as_str()),
-        _ => return Err("usage: factorization-certificate-check [CERTIFICATE.json]".into()),
+    let parse_source =
+        |a: &str, u: &str, coordinate: &str| -> Result<SourceDimensionWitness, String> {
+            Ok(SourceDimensionWitness {
+                a: a.parse::<u32>().map_err(|error| format!("a: {error}"))?,
+                u: u.parse::<u32>().map_err(|error| format!("u: {error}"))?,
+                coordinate: coordinate
+                    .parse::<u32>()
+                    .map_err(|error| format!("coordinate: {error}"))?,
+            })
+        };
+    let (path, source) = match args.as_slice() {
+        [] => (None, None),
+        [path] => (Some(path.as_str()), None),
+        [flag, a, u, coordinate] if flag == "--source" => {
+            (None, Some(parse_source(a, u, coordinate)?))
+        }
+        [path, flag, a, u, coordinate] if flag == "--source" => {
+            (Some(path.as_str()), Some(parse_source(a, u, coordinate)?))
+        }
+        _ => {
+            return Err(
+                "usage: factorization-certificate-check [CERTIFICATE.json] [--source A U I]".into(),
+            )
+        }
     };
     let bytes = read_input(path)?;
     let certificate: Certificate =
@@ -43,12 +65,17 @@ fn run() -> Result<(), String> {
     let mut meter = Meter::new(Limits::default());
     verify(&certificate, &mut meter)?;
     let description = description_envelope(&certificate)?;
+    let source_dimensions = source
+        .as_ref()
+        .map(|source| verify_source_dimensions(&certificate, source))
+        .transpose()?;
     let report = json!({
         "schema": "hashed-ecdl-factorization-certificate-check/v1",
         "valid": true,
         "input_bytes": bytes.len(),
         "charged_steps": meter.used,
         "description_envelope": description,
+        "source_dimensions": source_dimensions,
         "scope": "finite certificate verification using exact ring arithmetic; not a theorem-assistant proof or practical Curve25519 attack"
     });
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
