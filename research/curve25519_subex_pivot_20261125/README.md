@@ -340,6 +340,17 @@ capacity-failing algebraic controls. This connects serialized evidence to the
 symbolic dimension vocabulary without claiming graph provenance.
 `[pcc:unverified]`
 
+`PACKING_PROVENANCE_CERTIFICATE.md` now closes the next finite part of that
+boundary. A separate schema-1 object serializes the labeled bipartite edge
+skeleton and packet orientation patterns. Without importing graph or packing
+code, its verifier reconstructs every label class, padding/copy index, packet
+slot, and active endpoint group, then requires exact agreement with the
+schema-2 factorization certificate. Every producer path in the 596-case corpus
+and the executed diagnostic performs a serialize/parse/round-trip/replay gate.
+This proves finite provenance from chosen labels to packet/group objects, not
+the conditional-expectation label choice, asymptotic graph realization, or the
+external theorem. `[pcc:unverified]`
+
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
 binary factor by

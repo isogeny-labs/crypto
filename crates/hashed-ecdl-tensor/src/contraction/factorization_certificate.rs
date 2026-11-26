@@ -9,6 +9,10 @@ use crate::factorization_certificate::{
     SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
+use crate::packing_provenance_certificate::{
+    verify as verify_packing_provenance, Certificate as PackingProvenanceCertificate,
+    EdgeEndpoints, SCHEMA as PACKING_PROVENANCE_SCHEMA,
+};
 use crate::Limits;
 use std::collections::BTreeSet;
 use std::sync::Arc;
@@ -257,6 +261,35 @@ fn producer_bounds(certificate: &Certificate) -> Vec<usize> {
     out
 }
 
+fn packing_provenance(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+) -> PackingProvenanceCertificate {
+    PackingProvenanceCertificate {
+        schema: PACKING_PROVENANCE_SCHEMA,
+        radix: parameters.radix,
+        packet_exponent: u32::try_from(parameters.a).unwrap(),
+        coordinate: u32::try_from(coordinate).unwrap(),
+        edges: graph
+            .edges
+            .iter()
+            .map(|edge| EdgeEndpoints {
+                left: edge.left.0,
+                right: edge.right.0,
+            })
+            .collect(),
+        row_labels: packing.row_labels.clone(),
+        column_labels: packing.column_labels.clone(),
+        packet_pairs: packing
+            .packets
+            .iter()
+            .map(|packet| packet.pairs.clone())
+            .collect(),
+    }
+}
+
 fn produce(
     graph: &Bipartite,
     packing: &Packing,
@@ -393,6 +426,20 @@ fn produce(
             parameters.radix,
             meter,
         )? {
+            let provenance = packing_provenance(graph, packing, parameters, coordinate);
+            let serialized_provenance = serde_json::to_vec(&provenance)
+                .map_err(|_| invalid("packing provenance serialization"))?;
+            let parsed_provenance: PackingProvenanceCertificate =
+                serde_json::from_slice(&serialized_provenance)
+                    .map_err(|_| invalid("packing provenance parsing"))?;
+            if serde_json::to_vec(&parsed_provenance)
+                .map_err(|_| invalid("packing provenance serialization"))?
+                != serialized_provenance
+            {
+                return Err(integrity("packing provenance round trip"));
+            }
+            verify_packing_provenance(&certificate, &parsed_provenance, meter)
+                .map_err(|_| integrity("packing provenance replay"))?;
             return Ok(certificate);
         }
     }
@@ -484,6 +531,19 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     });
     standalone_verify(&certificate, &mut standalone_meter).unwrap();
     check(&certificate, &ring, &mut meter).unwrap();
+    let provenance = packing_provenance(&graph, &packing, &parameters, coordinate);
+    let provenance_summary =
+        verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();
+    assert_eq!(provenance_summary.edges, 2);
+    assert_eq!(provenance_summary.packet_length, 4);
+    assert!(!provenance_summary.source_capacity_admitted);
+
+    let mut bad_provenance = provenance;
+    bad_provenance.packet_pairs[0][0].0 ^= 1;
+    assert_eq!(
+        verify_packing_provenance(&certificate, &bad_provenance, &mut meter).unwrap_err(),
+        "packing provenance replay"
+    );
 
     let mut bad_context = certificate.clone();
     bad_context.schema += 1;

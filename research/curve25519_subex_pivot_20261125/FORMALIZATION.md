@@ -90,6 +90,16 @@ all 262,144 packet vertices, including 254,016 isolates. This substantially
 tests items 2–5, but deliberately bypasses `Setup` admission and therefore
 does not close the live-object refinement. `[pcc:unverified]`
 
+The schema-1 packing-provenance verifier adds a separately implemented finite
+refinement for item 2. From serialized endpoint indices, vertex labels, and
+packet orientation patterns it reconstructs every label class, padding/copy
+index, packet slot, and active endpoint group, then requires exact agreement
+with the accepted schema-2 factorization object. This covers all 596 bounded
+partition certificates and the executed diagnostic. It begins after labels
+have been chosen, so conditional-expectation label selection, its variance and
+group-balance bounds, and the asymptotic R1 object remain open.
+`[pcc:unverified]`
+
 ## R2 — Uniform precision history
 
 Put `s=M_0`, `lambda=ceil(log2(s))`, and

@@ -31,6 +31,7 @@ pub mod joint;
 pub mod metrics;
 pub mod network;
 pub mod optimized;
+pub mod packing_provenance_certificate;
 pub mod partial;
 pub mod prepared;
 pub mod primality;
