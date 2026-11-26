@@ -104,6 +104,15 @@ map degree, compact group-law DAGs, and shared straight-line computation are
 allowed.  Succinct multivalued correspondences and implicitly exponential
 branching remain open. `[pcc:unverified]`
 
+Proposition 27 marks the exact finite-domain boundary.  On the reduced scheme
+of subgroup points, the coordinate algebra is the full function algebra
+`Map(G, F_p)`.  An arbitrary relation selector therefore has an explicit
+`O(n)` lookup representation whose leaf functions need not be constant or
+injective.  This costs far more than rho, but proves that elliptic morphism
+rigidity alone cannot handle finite-domain formulas.  The remaining problem
+is genuinely one of compressing and querying those selector tables or
+recovering witnesses from succinct correspondences. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -145,7 +154,7 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-eleven tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+twelve tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
@@ -154,6 +163,8 @@ one-sided false-positive lower bounds of Theorem 22 on bounded cyclic-group
 fixtures and the target-shift exponent arithmetic of Proposition 23.
 It also replays the finite fibre-count kernel of Theorem 24.
 The final check replays Theorem 26's constant-or-injective compact-map kernel.
+It also constructs the finite-domain selector counterexample of Proposition
+27 on a small cyclic group.
 `[pcc:unverified]`
 
 ## Owed before review-ready status

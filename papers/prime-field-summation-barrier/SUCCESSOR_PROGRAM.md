@@ -50,6 +50,7 @@ The status of the program is:
 | Theorem 24 | unconditional in the degree-explicit selector model | target-adaptive algebraic leaf correspondences satisfy a preprocessing/query direct sum and hence a square-root relation barrier |
 | Proposition 25 | unconditional compact-degree counterexample | multiplication-by-\(k\) has degree \(k^2\) but an \(O(\log k)\) group-law DAG, so expanded degree cannot be charged as compact-circuit work |
 | Theorem 26 | unconditional in the explicit global-map catalogue model | compact single-valued rational branches satisfy a degree-free square-root direct sum |
+| Proposition 27 | exact finite-domain boundary | arbitrary subgroup-point selectors exist in the reduced evaluation algebra, so global-map rigidity cannot extend without a compression/query hypothesis |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2195,6 +2196,51 @@ branch domain rather than defining a global rational map, or branching
 programs that implicitly encode exponentially many distinct rational output
 tuples while paying for only a compact control DAG.  Those are now the exact
 remaining compact-circuit cases. [pcc:unverified]
+
+### Proposition 27 (finite-domain selectors defeat global rigidity)
+
+Let \(G\subseteq E(\mathbb F_p)\) be a finite subgroup.  Its reduced
+evaluation algebra is
+
+\[
+\operatorname{Fun}(G,\mathbb F_p)
+\cong\prod_{T\in G}\mathbb F_p.
+\]
+
+Consequently every set-theoretic function on \(G\), including every choice
+function that assigns one verified factor-base decomposition to each target
+in an attainable set \(U\subseteq G\), is represented by elements of this [pcc:unverified]
+finite coordinate algebra.  Its leaf functions need not be restrictions of
+global rational maps \(E\dashrightarrow E\), and they may be neither constant
+nor injective.
+
+An explicit dense representation stores \(O(m|G|)\) field elements for an
+\(m\)-leaf selector.  A perfect hash on affine point coordinates, with a
+separate infinity record, gives \(O(1)\) expected lookup after
+\(O(|G|)\) preprocessing.  This is not a sub-rho algorithm: its preprocessing
+is already \(\Theta(n)\).  It is an exact counterexample to any attempt to
+extend Theorem 26 to finite-domain formulas using only the rigidity lemma.
+[pcc:unverified]
+
+#### Proof
+
+The reduced zero-dimensional scheme consisting of the rational points in
+\(G\) is a disjoint union of \(|G|\) copies of
+\(\operatorname{Spec}\mathbb F_p\).  Its coordinate algebra is therefore the
+displayed direct product, whose elements are precisely all scalar-valued
+functions on \(G\).  Encode each selected leaf by its affine coordinates and
+an infinity flag.  Coordinatewise evaluation represents an arbitrary tuple
+selector; the selected values satisfy the curve and relation equations on
+\(U\) by construction, even though the representing coordinate functions
+need not satisfy those identities on the ambient curve.  Storing and hashing
+the table gives the stated upper bounds. \(\square\)
+
+Proposition 27 isolates the remaining compact problem.  A useful attack must
+compress these finite-domain selector tables or recover their entries from a
+succinct multivalued correspondence while charging less than square-root
+total work.  Proving that impossible is a static data-structure or
+finite-function circuit lower bound; morphism degree, properness, and the
+elliptic rigidity lemma alone cannot supply it. [pcc:unverified]
 
 ### Exact remaining computational gap
 

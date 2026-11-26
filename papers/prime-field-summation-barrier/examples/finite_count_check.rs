@@ -518,4 +518,43 @@ fn compact_global_map_branches_are_constant_or_injective() {
     }
 }
 
+#[test]
+fn finite_domain_selectors_need_not_be_constant_or_injective() {
+    let group_order = 7_usize;
+    let factor = [0_usize, 1, 3];
+    let mut selector = Vec::new();
+
+    for target in 0..group_order {
+        let mut selected = None;
+        'search: for &left in &factor {
+            for &middle in &factor {
+                for &right in &factor {
+                    if (left + middle + right) % group_order == target {
+                        selected = Some([left, middle, right]);
+                        break 'search;
+                    }
+                }
+            }
+        }
+        selector.push(selected.expect("three-fold factor sum covers the group"));
+    }
+
+    for (target, leaves) in selector.iter().enumerate() {
+        assert!(leaves.iter().all(|leaf| factor.contains(leaf)));
+        assert_eq!(leaves.iter().sum::<usize>() % group_order, target);
+    }
+
+    let image_sizes: Vec<_> = (0..3)
+        .map(|index| {
+            selector
+                .iter()
+                .map(|leaves| leaves[index])
+                .collect::<BTreeSet<_>>()
+                .len()
+        })
+        .collect();
+    assert!(image_sizes.iter().any(|size| *size > 1));
+    assert!(image_sizes.iter().all(|size| *size < group_order));
+}
+
 fn main() {}
