@@ -727,6 +727,13 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.conditional_labels_verified);
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
+    let mut bad_degree_cap = conditional_provenance.clone();
+    bad_degree_cap.source_degree_cap = Some(0);
+    assert_eq!(
+        verify_packing_provenance(&conditional_certificate, &bad_degree_cap, &mut meter)
+            .unwrap_err(),
+        "packing provenance source degree cap"
+    );
 
     let zero_beta = vec![0usize; conditional_modes.len()];
     let mut first_child_provenance = None;
@@ -795,6 +802,9 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         family_summary.child_edges,
         conditional_certificate.tuples.len() * 2 * conditional_graph.edges.len()
     );
+    assert!(!family_summary.eightfold_edge_shrink_admitted);
+    assert!(!family_summary.packet_degree_guard_admitted);
+    assert!(!family_summary.strict_source_refinement_admitted);
     let mut missing_child = conditional_children.clone();
     missing_child.pop();
     assert_eq!(

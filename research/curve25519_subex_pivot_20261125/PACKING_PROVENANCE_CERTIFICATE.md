@@ -35,7 +35,8 @@ conditional-expectation selection. It starts with unknown labels, visits left
 then right vertices in source order, evaluates every label candidate using the
 exact edge-pair objective, preserves first-minimum tie breaking, and assigns
 zero to isolates. The reconstructed label arrays must match exactly. It then
-checks the variance inequality
+reconstructs every left/right source degree and requires it to be at most
+`delta`, then checks the variance inequality
 
 ```text
 array * sum_class count(class)^2 - M^2 <= 2 M delta array,
@@ -53,8 +54,10 @@ certificates, the correlated two-edge fixture, and the executed non-strict
 recursive diagnostic. A packet-pair mutation fails with
 `packing provenance replay`. A dedicated admitted three-edge control uses the
 actual conditional-expectation packing path; both the label-selection and all
-source-bound replays pass, while a label mutation fails with
-`packing provenance conditional labels`. `[pcc:unverified]`
+source-bound replays pass. A label mutation fails with
+`packing provenance conditional labels`, and lowering the claimed cap below an
+actual degree fails with `packing provenance source degree cap`.
+`[pcc:unverified]`
 
 ## Remaining boundary
 

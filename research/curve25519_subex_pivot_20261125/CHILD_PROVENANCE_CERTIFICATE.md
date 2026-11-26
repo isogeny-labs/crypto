@@ -42,9 +42,13 @@ covers the correlated fixture, all 596 three- through five-edge certificates,
 and the executed diagnostic. A standalone family verifier requires exact
 Cartesian tuple/group keys, rejects duplicates and omissions, checks exactly
 `2M` child incidences per tuple, and binds exactly one packet table per packet
-in every child. Existing port-mass controls separately cover 25,490 group-child
-calls across parallel ports, isolates, several radices, and packet geometries
-using direct source-object comparisons. `[pcc:unverified]`
+in every child. Its checked summary separately reports the actual eightfold
+edge-shrink test and the degree guard `max_degree<=delta` with `2L<=delta`; it
+marks strict source refinement only when both hold under the fixed radix 64.
+The small admitted control correctly reports these strict guards as false.
+Existing port-mass controls separately cover 25,490 group-child calls across
+parallel ports, isolates, several radices, and packet geometries using direct
+source-object comparisons. `[pcc:unverified]`
 
 ## Remaining boundary
 

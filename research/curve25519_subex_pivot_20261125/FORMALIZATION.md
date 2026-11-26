@@ -114,9 +114,11 @@ fail. Every producer path also replays every retained `(beta, group)` child for
 the correlated fixture, the 596-case corpus, and the executed diagnostic. This
 family gate requires the exact Cartesian key set, rejects omissions and
 duplicates, checks `2M` child incidences per tuple, and binds the exact packet
-table count. This strengthens R1 items 2–3 through a generic finite
-tensor-table interface; uniform arbitrary-size refinement remains open.
-`[pcc:unverified]`
+table count. The family summary tests actual eightfold edge shrink and the
+degree guard `max_degree<=delta` with `2L<=delta`, and admits strict refinement
+only with both guards at radix 64. The small control correctly reports false.
+This strengthens R1 items 2–3 through a generic finite tensor-table interface;
+uniform arbitrary-size refinement remains open. `[pcc:unverified]`
 
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to

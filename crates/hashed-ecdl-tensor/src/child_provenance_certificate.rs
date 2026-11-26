@@ -109,6 +109,12 @@ pub struct FamilyVerificationSummary {
     pub packet_entry_tables: usize,
     /// Total packet-entry values bound across all children.
     pub packet_entry_values: usize,
+    /// Whether every checked child has at most one eighth of the parent edges.
+    pub eightfold_edge_shrink_admitted: bool,
+    /// Whether every child degree is at most the claimed source cap and `2L`.
+    pub packet_degree_guard_admitted: bool,
+    /// Whether the fixed radix-64 source premises and both strict guards hold.
+    pub strict_source_refinement_admitted: bool,
 }
 
 fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
@@ -363,6 +369,21 @@ pub fn verify_family(
     {
         return Err("child provenance family coverage".into());
     }
+    let eightfold_edge_shrink_admitted = maximum_child_edges
+        .checked_mul(8)
+        .is_some_and(|edges| edges <= factorization.edge_count);
+    let packet_length = 1usize
+        .checked_shl(packing.packet_exponent)
+        .ok_or_else(|| "child provenance family packet width".to_string())?;
+    let packet_degree_guard_admitted = packing.source_degree_cap.is_some_and(|delta| {
+        packet_length
+            .checked_mul(2)
+            .is_some_and(|packet_degree| packet_degree <= delta && maximum_degree <= delta)
+    });
+    let strict_source_refinement_admitted = packing.source_degree_cap.is_some()
+        && packing.radix == 64
+        && eightfold_edge_shrink_admitted
+        && packet_degree_guard_admitted;
     Ok(FamilyVerificationSummary {
         tuples: factorization.tuples.len(),
         groups: factorization.radix,
@@ -372,5 +393,8 @@ pub fn verify_family(
         maximum_degree,
         packet_entry_tables,
         packet_entry_values,
+        eightfold_edge_shrink_admitted,
+        packet_degree_guard_admitted,
+        strict_source_refinement_admitted,
     })
 }

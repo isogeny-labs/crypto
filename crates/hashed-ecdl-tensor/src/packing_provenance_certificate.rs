@@ -38,7 +38,7 @@ pub struct Certificate {
     pub coordinate: u32,
     /// Whether labels are claimed to be the exact conditional-expectation output.
     pub conditional_labels: bool,
-    /// Source degree cap when variance, capacity, and group balance are claimed.
+    /// Source degree cap when degree, variance, capacity, and balance are claimed.
     pub source_degree_cap: Option<usize>,
     /// Edge endpoints in the factorization certificate's edge order.
     pub edges: Vec<EdgeEndpoints>,
@@ -77,7 +77,7 @@ pub struct VerificationSummary {
     pub source_capacity_admitted: bool,
     /// Whether conditional-expectation label selection was independently replayed.
     pub conditional_labels_verified: bool,
-    /// Whether variance, capacity, and all-coordinate group balance were checked.
+    /// Whether degree, variance, capacity, and all-coordinate balance were checked.
     pub source_bounds_verified: bool,
 }
 
@@ -275,6 +275,23 @@ pub fn verify(
         }
     }
     if let Some(delta) = provenance.source_degree_cap {
+        let mut row_degrees = vec![0usize; provenance.row_labels.len()];
+        let mut column_degrees = vec![0usize; provenance.column_labels.len()];
+        for edge in &provenance.edges {
+            row_degrees[edge.left] = row_degrees[edge.left]
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance row degree".to_string())?;
+            column_degrees[edge.right] = column_degrees[edge.right]
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance column degree".to_string())?;
+        }
+        if row_degrees
+            .iter()
+            .chain(&column_degrees)
+            .any(|&degree| degree > delta)
+        {
+            return Err("packing provenance source degree cap".into());
+        }
         let sum_squares: BigUint = classes
             .iter()
             .map(|class| BigUint::from(class.len()) * BigUint::from(class.len()))
