@@ -59,8 +59,43 @@ comparison confirms that its only semantic edit is the equivalent bound
   pending-register macro. No local whole-crate Clippy pass is claimed.
 
 The six focused regression passes do not replace the repository-wide job.
-Hosted CI on the published repair head remains the full strict-lint check.
-No workflow, lint rule, or test was disabled or suppressed.
+On repair head `2effde8e4cc87ae7a16818550c3af128a57e6ca8`, the hosted
+[strict maintained-target Clippy command](https://github.com/isogeny-labs/crypto/actions/runs/45770045007/job/139740580536)
+completed in 3m 48s. This compiles the selected test targets; it does not execute
+the full library test suite. No lint rule or test was suppressed.
+
+## Historical workflow repair
+
+Editing the shared polynomial module also triggered twenty historical
+rootfinding workflows, containing twenty-six matrix-expanded jobs. Seven
+failed before compilation because their baseline branch names had been
+deleted. Their baseline references now use the exact head commits recorded
+by merged PRs #4999, #5002, #5003, #5008, #5010, #5011 and #5014.
+
+All seven repaired workflows' existing native build and execution commands
+returned zero locally, using the unchanged candidate source and original
+arithmetic checks. These executions validate CI; their timing output is not a
+new performance result. The source and helper hashes were retained.
+
+The twenty workflows now follow the research lane in `AGENTS.md`: their
+original path filters apply to main and historical-branch pushes, with manual
+dispatch available. Parsed and byte-level comparisons retain all twenty-six
+job definitions, matrices, timeouts and test commands except the seven
+baseline-pin substitutions. Repository-wide actionlint 1.7.12 passes, as do
+the four YAML-parse tests over all 876 workflows and fifteen budget-regression
+tests. The seven native workflow executions used Rust 1.100.0.
+
+The full workflow budget checker still reports 117 pre-existing violations
+across 38 untouched workflow files. Each of those files was compared
+byte-for-byte with `origin/main`; none was changed by this repair. The twenty
+edited workflows went from 42 budget violations to zero. The full budget
+checker is therefore not reported as passing.
+
+The prior repair head had fifty-four counted checks. Moving this historical
+family off PR events projects twenty-eight counted checks, below the existing
+thirty-check cap. Actual check inventory and required outcomes must still be
+checked on the final published head. The merge checks and check cap are
+unchanged.
 
 ## Data and model boundaries
 
@@ -79,7 +114,9 @@ speedup is produced. [pcc:unverified]
 
 The initial integration reserved eight paths in Conductor T-1. The CI repair
 follow-up reserved the four affected Rust files and the next UTC session log,
-bringing the task to thirteen scopes. After the former local service stopped,
+initially bringing the task to thirteen scopes. Historical workflow repair
+subsequently added twenty workflow paths and `.github/CI.md`, for thirty-four
+reserved scopes. After the former local service stopped,
 the documented stale-PID recovery restored its existing database. Conductor's
 normal reconciler expired the old attempt; a supported claim created attempt 2
 at fencing epoch 3. The attached-task conflict check returned `allow` after

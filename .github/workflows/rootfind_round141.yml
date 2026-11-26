@@ -2,12 +2,13 @@ name: Rootfind Round 141 source-exact Rust A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round141-binary-inverse-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round141/**
       - .github/workflows/rootfind_round141.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
