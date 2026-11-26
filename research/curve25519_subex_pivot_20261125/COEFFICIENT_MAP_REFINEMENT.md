@@ -148,13 +148,13 @@ retained tuples, and black-box packet-entry tables. The verifier imports exact
 ring arithmetic but not contraction, deformation, packing, child construction,
 or packet tensors. `[pcc:unverified]`
 
-Four mutations are load-bearing: duplicate packet coverage, target-group
-reassignment, removal of a retained tuple, and alteration of one packet-table
-entry are each rejected. During implementation the checker detected and
-localized an indexing error in the new certificate producer: packet truth
-tables initially used global child-edge identifiers instead of local packet
-port indices. The corrected producer and independent checker now agree.
-`[pcc:unverified]`
+Five algebraic mutations are load-bearing: duplicate packet coverage,
+duplicated mode slots, target-group reassignment, removal of a retained tuple,
+and alteration of one packet-table entry are each rejected. During
+implementation the checker detected and localized an indexing error in the new
+certificate producer: packet truth tables initially used global child-edge
+identifiers instead of local packet port indices. The corrected producer and
+independent checker now agree. `[pcc:unverified]`
 
 The positive certificate is now serialized to JSON and parsed into fresh data
 before verification. Its exact wire size is 2,162 bytes under the pinned Rust
@@ -184,6 +184,13 @@ bytes in total (10,024.18 bytes on average); the maximum is 43,450 bytes for
 used 2.06 seconds in verification, 1.88 seconds in production, and 0.55 seconds
 in JSON work, for 4.93 seconds total. This passes the three-second verifier and
 six-second total admission targets. `[pcc:unverified]`
+
+`CERTIFICATE_DESCRIPTION_ENVELOPE.md` derives a reusable bound from
+`M,K,L,R,Q,T,d,p`. Its core entry-value term is
+`T K (2^(2L) + R - 1)`; native controls check the resulting JSON and
+canonical-binary ceilings on every serialized fixture through five edges.
+The bound remains conditional on separate source bounds for `Q` and `T`.
+`[pcc:unverified]`
 
 The native `factorization-certificate-check` command now reads that JSON from a
 file or standard input, caps input at 64 MiB, applies explicit work/vector/width

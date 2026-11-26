@@ -1,6 +1,6 @@
 //! Verify one serialized recursive-factorization certificate.
 
-use hashed_ecdl_tensor::factorization_certificate::{verify, Certificate};
+use hashed_ecdl_tensor::factorization_certificate::{description_envelope, verify, Certificate};
 use hashed_ecdl_tensor::{Limits, Meter};
 use serde_json::json;
 use std::io::Read;
@@ -42,11 +42,13 @@ fn run() -> Result<(), String> {
         serde_json::from_slice(&bytes).map_err(|error| format!("certificate JSON: {error}"))?;
     let mut meter = Meter::new(Limits::default());
     verify(&certificate, &mut meter)?;
+    let description = description_envelope(&certificate)?;
     let report = json!({
         "schema": "hashed-ecdl-factorization-certificate-check/v1",
         "valid": true,
         "input_bytes": bytes.len(),
         "charged_steps": meter.used,
+        "description_envelope": description,
         "scope": "finite certificate verification using exact ring arithmetic; not a theorem-assistant proof or practical Curve25519 attack"
     });
     println!("{}", serde_json::to_string_pretty(&report).unwrap());

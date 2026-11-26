@@ -3,8 +3,8 @@
 use super::*;
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    verify as standalone_verify, verify_with_ring as check, Certificate, CertifiedElement,
-    CertifiedMode, EntryTable, SCHEMA,
+    description_envelope, verify as standalone_verify, verify_with_ring as check, Certificate,
+    CertifiedElement, CertifiedMode, EntryTable, SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::Limits;
@@ -358,6 +358,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(serialized.len(), 2_162);
     let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
     assert_eq!(serde_json::to_vec(&certificate).unwrap(), serialized);
+    assert!(serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound);
     let mut standalone_meter = Meter::new(Limits {
         steps: 10_000_000_000,
         ..Limits::default()
@@ -413,6 +414,14 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         check(&bad_mode, &ring, &mut meter).unwrap_err().as_str(),
         "mode header" | "mode row placement" | "crossing mode series"
     ));
+
+    let mut duplicate_mode_slot = certificate.clone();
+    let repeated_row = duplicate_mode_slot.modes[0].rows[0].clone();
+    duplicate_mode_slot.modes[0].rows.push(repeated_row);
+    assert_eq!(
+        check(&duplicate_mode_slot, &ring, &mut meter).unwrap_err(),
+        "mode row duplicate"
+    );
 
     let mut bad_tuples = certificate.clone();
     bad_tuples.tuples.pop();
@@ -484,6 +493,10 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
                     maximum_case = Some((*left_groups, *right_groups, schedule));
                 }
                 let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+                assert!(
+                    serialized.len()
+                        <= description_envelope(&certificate).unwrap().json_bytes_bound
+                );
                 standalone_verify(&certificate, &mut meter).unwrap_or_else(|error| {
                     panic!(
                         "left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}"
@@ -547,6 +560,9 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            assert!(
+                serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound
+            );
             standalone_verify(&certificate, &mut meter).unwrap_or_else(|error| {
                 panic!("left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}")
             });
@@ -580,6 +596,8 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
     let mut total_bytes = 0usize;
     let mut maximum_bytes = 0usize;
     let mut maximum_case = None;
+    let mut maximum_json_bound = 0usize;
+    let mut maximum_binary_bits_bound = 0usize;
     for (left_groups, right_groups) in representatives {
         for schedule in 0..4 {
             let graph = partition_graph(&left_groups, &right_groups);
@@ -607,6 +625,11 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            let envelope = description_envelope(&certificate).unwrap();
+            assert!(serialized.len() <= envelope.json_bytes_bound);
+            maximum_json_bound = maximum_json_bound.max(envelope.json_bytes_bound);
+            maximum_binary_bits_bound =
+                maximum_binary_bits_bound.max(envelope.canonical_binary_bits_bound);
             standalone_verify(&certificate, &mut meter).unwrap_or_else(|error| {
                 panic!("left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}")
             });
@@ -620,4 +643,6 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
         maximum_case,
         Some((vec![0, 0, 0, 1, 1], vec![0, 0, 0, 1, 1], 3))
     );
+    assert_eq!(maximum_json_bound, 32_519_360);
+    assert_eq!(maximum_binary_bits_bound, 19_154_209);
 }

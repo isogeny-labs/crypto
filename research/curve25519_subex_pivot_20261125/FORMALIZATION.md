@@ -268,14 +268,14 @@ behind those maps, proves the producer implication `D=E=H`, maps each object
 to Rust, and lists the six checks required from an independent kernel.
 `[pcc:unverified]`
 
-A separate test-only certificate checker now implements those six checks over
-plain certificate data without invoking production child construction during
-verification. Duplicate packet coverage, mode-target reassignment, tuple
-removal, and packet-table mutation are rejected. The checker remains in the
-same crate and is not an external proof kernel. The positive certificate now
-round-trips through a stable 2,162-byte JSON representation; schema mismatch
-and noncanonical ring-element mutations are also rejected, and an overflowing
-structural count fails closed. `[pcc:unverified]`
+A separate public native certificate verifier now implements those six checks
+over plain certificate data without invoking production child construction
+during verification. Duplicate packet coverage, duplicated mode slots,
+mode-target reassignment, tuple removal, and packet-table mutation are rejected.
+The positive certificate round-trips through a stable 2,162-byte JSON
+representation; schema mismatch and noncanonical ring-element mutations are
+also rejected, and an overflowing structural count fails closed.
+`[pcc:unverified]`
 
 The serialized checker also covers all 100 combinations of the 25 three-edge
 left/right set-partition pairs and four label schedules. Their total wire size
@@ -291,6 +291,13 @@ For five edges, 91 relabeling orbits under four schedules give 364 serialized
 certificates, 3,648,802 total bytes, and a 43,450-byte maximum. The measured
 verifier phase is 2.06 seconds and the complete production/JSON/verification
 gate is 4.93 seconds, below the three-second and six-second targets.
+`[pcc:unverified]`
+
+`CERTIFICATE_DESCRIPTION_ENVELOPE.md` then bounds the complete certificate
+description from `M,K,L,R,Q,T,d,p`. The entry-value term follows from
+`sum_g 2^a_g <= 2^(2L)+R-1`; explicit JSON and canonical-binary ceilings are
+checked on every serialized fixture through five edges. This isolates the
+remaining need for independent source bounds on `Q` and `T`.
 `[pcc:unverified]`
 
 The verifier is now a public module separate from recursive contraction and a

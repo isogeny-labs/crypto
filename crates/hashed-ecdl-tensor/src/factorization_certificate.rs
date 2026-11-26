@@ -74,6 +74,250 @@ pub struct Certificate {
     pub(crate) entries: Vec<EntryTable>,
 }
 
+/// Explicit structural description bounds derived from certificate dimensions.
+#[derive(Clone, Debug, Serialize)]
+pub struct DescriptionEnvelope {
+    /// Maximum packet length present in the certificate.
+    pub packet_length: usize,
+    /// Number of generated modes.
+    pub modes: usize,
+    /// Number of retained exponent tuples.
+    pub tuples: usize,
+    /// Bound `T * R * K` on packet entry tables.
+    pub entry_tables_bound: usize,
+    /// Bound `T * K * (2^(2L) + R - 1)` on packet entry values.
+    pub entry_values_bound: usize,
+    /// Bound on weight, mode-row, and packet-entry ring elements.
+    pub ring_elements_bound: usize,
+    /// Actual ring-element count in the supplied certificate.
+    pub actual_ring_elements: usize,
+    /// Coarse byte ceiling for the schema-versioned JSON representation.
+    pub json_bytes_bound: usize,
+    /// Coarse bit ceiling for a canonical length-prefixed binary representation.
+    pub canonical_binary_bits_bound: usize,
+}
+
+fn checked_product(values: &[usize], label: &str) -> std::result::Result<usize, String> {
+    values.iter().try_fold(1usize, |product, &value| {
+        product
+            .checked_mul(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn checked_sum(values: &[usize], label: &str) -> std::result::Result<usize, String> {
+    values.iter().try_fold(0usize, |sum, &value| {
+        sum.checked_add(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn index_width(maximum: usize) -> usize {
+    usize::BITS as usize - maximum.leading_zeros() as usize
+}
+
+/// Derive explicit JSON and canonical-binary description ceilings for a
+/// certificate already accepted by [`verify`].
+///
+/// For each packet, group arities sum to at most `2L`, so convexity gives
+/// `sum_g 2^arity_g <= 2^(2L) + R - 1`. The remaining terms count packet
+/// weights, mode rows/columns, tuples, repeated entry-table headers, JSON
+/// containers, and fixed-width ring coordinates.
+pub fn description_envelope(
+    certificate: &Certificate,
+) -> std::result::Result<DescriptionEnvelope, String> {
+    if certificate.degree == 0 || certificate.precision == 0 || certificate.radix == 0 {
+        return Err("certificate context".into());
+    }
+    let edges = certificate.edge_count;
+    let packets = certificate.packets.len();
+    let packet_length = certificate.packets.iter().map(Vec::len).max().unwrap_or(0);
+    let modes = certificate.modes.len();
+    let tuples = certificate.tuples.len();
+    let radix = certificate.radix;
+    let degree = certificate.degree;
+    let precision = certificate.precision;
+    let twice_length = packet_length
+        .checked_mul(2)
+        .ok_or_else(|| "packet arity overflow".to_string())?;
+    let assignment_bound = 1usize
+        .checked_shl(u32::try_from(twice_length).map_err(|_| "packet arity overflow".to_string())?)
+        .ok_or_else(|| "packet assignment bound overflow".to_string())?;
+    let group_value_bound = assignment_bound
+        .checked_add(radix - 1)
+        .ok_or_else(|| "packet group-value bound overflow".to_string())?;
+    let entry_tables_bound = checked_product(&[tuples, radix, packets], "entry table bound")?;
+    let entry_values_bound =
+        checked_product(&[tuples, packets, group_value_bound], "entry value bound")?;
+    let weight_elements_bound = checked_product(
+        &[packets, packet_length, packet_length],
+        "weight element bound",
+    )?;
+    let mode_elements_bound = checked_product(&[modes, packet_length], "mode element bound")?;
+    let ring_elements_bound = checked_sum(
+        &[
+            weight_elements_bound,
+            mode_elements_bound,
+            entry_values_bound,
+        ],
+        "ring element bound",
+    )?;
+    let actual_weight_elements = certificate.weights.iter().flatten().flatten().count();
+    let actual_mode_elements = certificate.modes.iter().try_fold(0usize, |sum, mode| {
+        sum.checked_add(mode.rows.len())
+            .ok_or_else(|| "actual mode elements overflow".to_string())
+    })?;
+    let actual_entry_values = certificate.entries.iter().try_fold(0usize, |sum, table| {
+        sum.checked_add(table.values.len())
+            .ok_or_else(|| "actual entry values overflow".to_string())
+    })?;
+    let actual_ring_elements = checked_sum(
+        &[
+            actual_weight_elements,
+            actual_mode_elements,
+            actual_entry_values,
+        ],
+        "actual ring elements",
+    )?;
+    if certificate.entries.len() > entry_tables_bound
+        || actual_weight_elements > weight_elements_bound
+        || actual_mode_elements > mode_elements_bound
+        || actual_entry_values > entry_values_bound
+        || actual_ring_elements > ring_elements_bound
+    {
+        return Err("certificate exceeds description envelope".into());
+    }
+    let mode_columns_bound = checked_product(&[modes, packet_length], "mode column bound")?;
+    let index_atoms = checked_sum(
+        &[
+            5,
+            checked_product(&[packets, packet_length], "packet slot atoms")?,
+            edges
+                .checked_mul(2)
+                .ok_or_else(|| "incidence atoms overflow".to_string())?,
+            modes
+                .checked_mul(4)
+                .ok_or_else(|| "mode header atoms overflow".to_string())?,
+            mode_columns_bound
+                .checked_mul(2)
+                .ok_or_else(|| "mode placement atoms overflow".to_string())?,
+            checked_product(&[tuples, modes], "tuple atoms")?,
+            checked_product(
+                &[
+                    entry_tables_bound,
+                    modes
+                        .checked_add(2)
+                        .ok_or_else(|| "entry header width overflow".to_string())?,
+                ],
+                "entry header atoms",
+            )?,
+        ],
+        "index atoms",
+    )?;
+    let limbs = precision
+        .checked_add(31)
+        .ok_or_else(|| "coefficient limb bound overflow".to_string())?
+        / 32;
+    let coefficient_arrays = checked_sum(
+        &[
+            checked_product(&[ring_elements_bound, degree], "ring coefficient arrays")?,
+            mode_columns_bound,
+        ],
+        "coefficient arrays",
+    )?;
+    let limb_atoms = checked_product(&[coefficient_arrays, limbs], "coefficient limb atoms")?;
+    let atoms = index_atoms
+        .checked_add(limb_atoms)
+        .ok_or_else(|| "JSON atom bound overflow".to_string())?;
+    let containers = checked_sum(
+        &[
+            8,
+            packets
+                .checked_mul(2)
+                .ok_or_else(|| "packet container bound overflow".to_string())?,
+            checked_product(&[packets, packet_length], "weight row containers")?,
+            checked_product(
+                &[
+                    ring_elements_bound,
+                    degree
+                        .checked_add(1)
+                        .ok_or_else(|| "ring element container width overflow".to_string())?,
+                ],
+                "ring element containers",
+            )?,
+            modes
+                .checked_mul(3)
+                .ok_or_else(|| "mode containers overflow".to_string())?,
+            mode_columns_bound
+                .checked_mul(3)
+                .ok_or_else(|| "mode pair containers overflow".to_string())?,
+            tuples,
+            entry_tables_bound
+                .checked_mul(3)
+                .ok_or_else(|| "entry containers overflow".to_string())?,
+        ],
+        "JSON containers",
+    )?;
+    let fields = checked_sum(
+        &[
+            12,
+            modes
+                .checked_mul(6)
+                .ok_or_else(|| "mode field bound overflow".to_string())?,
+            entry_tables_bound
+                .checked_mul(4)
+                .ok_or_else(|| "entry field bound overflow".to_string())?,
+        ],
+        "JSON fields",
+    )?;
+    let json_units = checked_sum(&[atoms, containers, fields, 1], "JSON units")?;
+    let json_bytes_bound = checked_product(&[json_units, 64], "JSON byte description bound")?;
+    let maximum_index = [
+        edges,
+        packets,
+        packet_length,
+        radix,
+        modes,
+        tuples,
+        entry_tables_bound,
+        assignment_bound,
+    ]
+    .into_iter()
+    .max()
+    .unwrap_or(1);
+    let width = index_width(maximum_index.max(1));
+    let value_bits = checked_product(
+        &[coefficient_arrays, precision],
+        "canonical coefficient bits",
+    )?;
+    let index_bits = checked_product(&[index_atoms, width], "canonical index bits")?;
+    let framing_bits = checked_product(
+        &[
+            containers
+                .checked_add(fields)
+                .and_then(|value| value.checked_add(1))
+                .ok_or_else(|| "canonical framing units overflow".to_string())?,
+            64,
+        ],
+        "canonical framing bits",
+    )?;
+    let canonical_binary_bits_bound = checked_sum(
+        &[value_bits, index_bits, framing_bits],
+        "canonical binary description bound",
+    )?;
+    Ok(DescriptionEnvelope {
+        packet_length,
+        modes,
+        tuples,
+        entry_tables_bound,
+        entry_values_bound,
+        ring_elements_bound,
+        actual_ring_elements,
+        json_bytes_bound,
+        canonical_binary_bits_bound,
+    })
+}
+
 fn preflight(certificate: &Certificate, meter: &mut Meter) -> std::result::Result<(), String> {
     if certificate.schema != SCHEMA
         || certificate.degree == 0
@@ -381,18 +625,26 @@ pub(crate) fn verify_with_ring(
             return Err("mode header".into());
         }
         let slots = &certificate.packets[mode.packet];
+        let mut row_slots = BTreeSet::new();
         for &(slot, ref value) in &mode.rows {
             let Some(Some(edge)) = slots.get(slot) else {
                 return Err("mode row slot".into());
             };
+            if !row_slots.insert(slot) {
+                return Err("mode row duplicate".into());
+            }
             if value.is_zero() || certificate.left_groups[*edge] != mode.target {
                 return Err("mode row placement".into());
             }
         }
+        let mut column_slots = BTreeSet::new();
         for &(slot, ref value) in &mode.columns {
             let Some(Some(edge)) = slots.get(slot) else {
                 return Err("mode column slot".into());
             };
+            if !column_slots.insert(slot) {
+                return Err("mode column duplicate".into());
+            }
             if value.is_zero()
                 || value >= ring.modulus()
                 || certificate.right_groups[*edge] != mode.source
