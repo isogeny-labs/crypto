@@ -54,6 +54,7 @@ jobs:
           rustup run 1.100.0 rustc -vV | tee "$RECEIPT_DIR/rustc.txt"
           rustup run 1.100.0 cargo -V | tee "$RECEIPT_DIR/cargo.txt"
           sha256sum "$MANIFEST" \
+            research/cheap_ecdlp_cold_gate_20261123/Cargo.lock \
             research/cheap_ecdlp_cold_gate_20261123/src/bin/rr5_receipt_check.rs \
             research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json \
             research/prime31_ic_20261115/native/Cargo.toml \
@@ -62,13 +63,14 @@ jobs:
             src/cryptanalysis/f4_fp_tower.rs \
             src/cryptanalysis/sig_fp_tower.rs \
             > "$RECEIPT_DIR/source.sha256"
-      - name: Resolve and freeze exact dependency lock for this execution
+      - name: Require and archive committed dependency lock
         shell: bash
         run: |
           set -euo pipefail
-          # This standalone package has no committed lock yet; archive the
-          # resolved lock and never silently report cross-run reproducibility.
-          cargo +1.100.0 generate-lockfile --manifest-path "$MANIFEST"
+          # Never re-resolve in the qualification job. Missing or inconsistent
+          # lock fails closed; dependency updates require a separately reviewed lock.
+          git ls-files --error-unmatch research/cheap_ecdlp_cold_gate_20261123/Cargo.lock
+          test -s research/cheap_ecdlp_cold_gate_20261123/Cargo.lock
           cp research/cheap_ecdlp_cold_gate_20261123/Cargo.lock "$RECEIPT_DIR/Cargo.lock"
           sha256sum "$RECEIPT_DIR/Cargo.lock" > "$RECEIPT_DIR/lock.sha256"
       - name: Compile exact checker tests and retain executable identity
@@ -113,6 +115,7 @@ jobs:
             cmp -s research/cheap_ecdlp_cold_gate_20261123/Cargo.lock "$RECEIPT_DIR/Cargo.lock"
           fi
           git status --porcelain --untracked-files=no > "$RECEIPT_DIR/final-git-status.txt"
+          test ! -s "$RECEIPT_DIR/final-git-status.txt"
           find "$RECEIPT_DIR" -type f ! -name file-digests.txt -print0 \
             | sort -z | xargs -0 -r sha256sum > "$RECEIPT_DIR/file-digests.txt"
       - name: Retain full result including failures and caps

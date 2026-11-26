@@ -842,6 +842,10 @@ fn main() -> ExitCode {
                     rec["rels_by_lp"] = json!(o.rels_by_lp);
                     rec["core_rows"] = json!(o.core_rows);
                     rec["core_cols"] = json!(o.core_cols);
+                    rec["mean_weight_before"] = json!(o.mean_weight_before);
+                    rec["mean_weight_after"] = json!(o.mean_weight_after);
+                    rec["core_nnz_before_sge"] = json!(o.core_nnz_before_sge);
+                    rec["core_nnz_after_sge"] = json!(o.core_nnz_after_sge);
                     rec["attempts"] = json!(o.attempts);
                     if let Some(b) = bounded {
                         rec["bd_target"] = json!(b.target);

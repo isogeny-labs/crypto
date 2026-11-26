@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+"""Checks for comparison of saved panel receipts."""
+import hashlib, importlib.util, json, pathlib, tempfile, unittest
+
+HERE=pathlib.Path(__file__).resolve().parent
+spec=importlib.util.spec_from_file_location('compare_panels',HERE/'compare_panels.py')
+compare=importlib.util.module_from_spec(spec); spec.loader.exec_module(compare)
+
+
+def save(path,obj): path.write_text(json.dumps(obj,sort_keys=True)+'\n')
+def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def fixture(directory, *, filtered=False, target=17, incomplete=False, mode_targets=None):
+    directory.mkdir()
+    plan={'common_args':['--p','101','--curve-a','1','--curve-b','32','--px','4','--py','10','--qx','82','--qy','27'] + (['--modulus','2','--residue','0'] if filtered else []), 'seeds':[7], 'timeout_seconds':10}
+    save(directory/'plan.json',plan)
+    rows=[]
+    for mode in compare.MODES:
+        name=f'seed-7-{mode}'
+        actual_target=(mode_targets or {}).get(mode,target)
+        for suffix in ('stdout','stderr'):
+            (directory/f'{name}.{suffix}').write_bytes(b'')
+        result=directory/f'{name}.result.json'
+        save(result,{'schema':'e2e-relation-measurement/v1','config':compare.expected_config(plan,7,mode),'status':'complete','target':{'a':1,'b':2,'point':[actual_target,1]},'useful_relations':1,'relation_counts':{'nonzero_b':1},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
+        missing=incomplete and mode=='walk'
+        row={'seed':7,'mode':mode,'status':'timeout' if missing else 'exited', 'exit_code':-9 if missing else 0, 'result_status':None if missing else 'complete', 'target':None if missing else {'a':1,'b':2,'point':[actual_target,1]},'whole_process_wall_ns':20,'relation_counts':None if missing else {'nonzero_b':1},'useful_relations':None if missing else 1,'result_sha256':digest(result),'checkpoint_sha256':None,'stdout_sha256':digest(directory/f'{name}.stdout'),'stderr_sha256':digest(directory/f'{name}.stderr')}
+        if missing:
+            row['independent_audit']={'status':'not_attempted','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+        else:
+            audit=directory/f'{name}.audit.json'
+            save(audit,{'status':'verified','seed_replay':{'status':'verified'},'record_sha256':digest(result),'audit_source_sha256':'audit'})
+            for suffix in ('audit.stdout','audit.stderr'): (directory/f'{name}.{suffix}').write_bytes(b'')
+            row['independent_audit']={'status':'verified','wall_ns':5,'result_sha256':digest(audit),'stdout_sha256':digest(directory/f'{name}.audit.stdout'),'stderr_sha256':digest(directory/f'{name}.audit.stderr'),'exit_code':0}
+        row['protocol_observation']={'status':'not_requested','product_criterion':None,'chain_criterion':None,'overlong_lines':0}
+        rows.append(row); save(directory/f'{name}.receipt.json',row)
+    summary={'plan_sha256':digest(directory/'plan.json'),'measure_source_unchanged':True,'accounting_source_unchanged':True,'audit_source_unchanged':True,'audit_sha256_at_start':'audit','audit_sha256_at_end':'audit','measure_sha256_at_start':'m','measure_sha256_at_end':'m','measure_sha256':'m','accounting_sha256_at_start':'a','accounting_sha256_at_end':'a','panel_sha256':'p','platform':'host','resource_metadata_at_start':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'resource_metadata_at_end':{'machine':'local','cpu_model':'cpu','logical_cpus':1,'parent_limits':{'RLIMIT_CPU':[-1,-1]},'rss_native_unit':'bytes','thread_environment':{}},'runs':rows}
+    save(directory/'summary.json',summary)
+
+
+class ComparisonTest(unittest.TestCase):
+    def test_matched_and_tampered(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,filtered=True)
+            result=compare.compare(a,b)
+            self.assertTrue(result['matching_checks_pass']); self.assertEqual(len(result['pairs']),3)
+            self.assertEqual(result['resource_metadata_status'],'metadata_match_only')
+            self.assertIsNone(result['per_mode']['walk']['left']['peak_rss_native_max']['observed_value'])
+            self.assertEqual(result['per_mode']['walk']['left']['whole_process_wall_ns'],20)
+            self.assertEqual(result['per_mode']['walk']['left']['observed_child_and_audit_wall_ns'],25)
+            self.assertEqual(result['per_mode']['walk']['left']['independently_verified_runs'],1)
+            self.assertEqual(result['per_mode']['walk']['left']['candidates']['unknown_attempts'],1)
+            self.assertEqual(result['right_filter']['--modulus'],'2')
+            (b/'seed-7-walk.result.json').write_text('{}')
+            with self.assertRaisesRegex(ValueError,'artifact hash mismatch'): compare.compare(a,b)
+    def test_mismatch_and_incomplete(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,target=18,incomplete=True)
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertIn('some targets unavailable',result['mismatch_or_unknown'])
+            self.assertEqual(result['per_mode']['walk']['right']['nonzero_b_unknown_runs'],1)
+            self.assertEqual(result['per_mode']['walk']['right']['whole_process_wall_ns'],20)
+            self.assertIn('some attempts incomplete or invalid',result['mismatch_or_unknown'])
+            self.assertTrue(any('target differs' in reason for reason in result['mismatch_or_unknown']))
+    def test_checkpoint_counts_checked_before_aggregation(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,incomplete=True)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=next(row for row in summary['runs'] if row['mode']=='walk')
+            checkpoint=b/'seed-7-walk.checkpoint.json'
+            save(checkpoint,{'schema':'e2e-relation-measurement/v1','config':compare.expected_config(json.loads((b/'plan.json').read_text()),7,'walk'),'counts':{'candidates':9},'source_sha256_at_start':'m','accounting_sha256_at_start':'a'})
+            row['observation_source']='checkpoint'; row['checkpoint_sha256']=digest(checkpoint); row['candidate_counts']={'candidates':9}
+            save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertEqual(result['per_mode']['walk']['right']['candidates']['observed_sum'],9)
+            row['candidate_counts']={'candidates':99}; save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'checkpoint does not match receipt'): compare.compare(a,b)
+            row['candidate_counts']={'candidates':9}
+            snapshot=json.loads(checkpoint.read_text()); snapshot['config']['x_min']=7; save(checkpoint,snapshot)
+            row['checkpoint_sha256']=digest(checkpoint); save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'checkpoint does not match receipt'): compare.compare(a,b)
+
+    def test_modes_must_share_target_within_each_panel(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'
+            fixture(a,mode_targets={'walk':19}); fixture(b,mode_targets={'walk':19})
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertTrue(any('modes use different targets' in reason for reason in result['mismatch_or_unknown']))
+
+    def test_receipt_cannot_relabel_result(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['target']={'a':9,'b':9,'point':[9,9]}
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'result does not match receipt'): compare.compare(a,b)
+
+    def test_result_configuration_must_match_frozen_plan(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            result_path=b/'seed-7-independent.result.json'; result=json.loads(result_path.read_text())
+            result['config']['block_size']=999; save(result_path,result)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['result_sha256']=digest(result_path)
+            audit_path=b/'seed-7-independent.audit.json'; audit=json.loads(audit_path.read_text()); audit['record_sha256']=digest(result_path); save(audit_path,audit); row['independent_audit']['result_sha256']=digest(audit_path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'result does not match receipt or sources'): compare.compare(a,b)
+
+    def test_timeout_cannot_claim_a_relation(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b,incomplete=True)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=next(row for row in summary['runs'] if row['mode']=='walk'); row['relation_counts']={'nonzero_b':1}
+            save(b/'seed-7-walk.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'unfinished attempt claims a result'): compare.compare(a,b)
+
+    def test_resource_observation_cannot_be_relabelled(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['observed_total']={'cpu_ns':1,'peak_rss_native':1}
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'result does not match receipt'): compare.compare(a,b)
+
+    def test_resource_metadata_disagreement_and_absence(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            summary['resource_metadata_at_end']['machine']='other'; save(summary_path,summary)
+            self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'different')
+            del summary['resource_metadata_at_end']; save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertEqual(result['resource_metadata_status'],'unavailable')
+            self.assertFalse(result['matching_checks_pass'])
+            summary['resource_metadata_at_end']=summary['resource_metadata_at_start'].copy(); summary['resource_metadata_at_end']['cpu_model']=None; save(summary_path,summary)
+            self.assertEqual(compare.compare(a,b)['resource_metadata_status'],'incomplete')
+
+    def test_inconclusive_rng_audit_is_bound_and_not_verified(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text()); row=summary['runs'][0]
+            path=b/'seed-7-independent.audit.json'; report=json.loads(path.read_text()); report['status']='inconclusive_rng'; save(path,report)
+            row['independent_audit']['status']='inconclusive_rng'; row['independent_audit']['exit_code']=2; row['independent_audit']['result_sha256']=digest(path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertIn('some independent audits not verified',result['mismatch_or_unknown'])
+            report['status']='verified'; save(path,report); row['independent_audit']['result_sha256']=digest(path)
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'inconclusive audit does not match'): compare.compare(a,b)
+
+    def test_unsupported_audit_is_not_counted_as_verified(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]
+            row['independent_audit']={'status':'unsupported','wall_ns':None,'result_sha256':None,'stdout_sha256':None,'stderr_sha256':None,'exit_code':None}
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            result=compare.compare(a,b)
+            self.assertFalse(result['matching_checks_pass'])
+            self.assertIn('some independent audits not verified',result['mismatch_or_unknown'])
+            self.assertEqual(result['per_mode']['independent']['right']['audit_wall_unknown_runs'],1)
+            self.assertEqual(result['per_mode']['independent']['right']['independently_verified_runs'],0)
+
+    def test_protocol_observation_must_match_raw_stdout(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+            row=summary['runs'][0]; row['protocol_observation']['product_criterion']=99
+            save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+            with self.assertRaisesRegex(ValueError,'protocol observation mismatch'): compare.compare(a,b)
+
+    def test_audit_receipt_must_have_nonnegative_cost_and_logs(self):
+        for change in ('negative_wall','missing_log'):
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as d:
+                a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+                summary_path=b/'summary.json'; summary=json.loads(summary_path.read_text())
+                row=summary['runs'][0]
+                if change=='negative_wall': row['independent_audit']['wall_ns']=-1
+                else: row['independent_audit']['stdout_sha256']=None
+                save(b/'seed-7-independent.receipt.json',row); save(summary_path,summary)
+                with self.assertRaisesRegex(ValueError,'incomplete audit process receipt'): compare.compare(a,b)
+
+    def test_changed_audit_artifact_is_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            a,b=pathlib.Path(d)/'a',pathlib.Path(d)/'b'; fixture(a); fixture(b)
+            (b/'seed-7-walk.audit.json').write_text('{}')
+            with self.assertRaisesRegex(ValueError,'audit artifact hash mismatch'): compare.compare(a,b)
+
+    def test_ambiguous_arguments_rejected(self):
+        with self.assertRaises(ValueError): compare.flags(['--p','101','--p','103'])
+        with self.assertRaises(ValueError): compare.flags(['--seed','2'])
+
+if __name__=='__main__': unittest.main()

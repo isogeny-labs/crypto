@@ -59,9 +59,7 @@ use num_bigint::BigUint;
 pub struct VeluIsogeny {
     /// The source curve.
     pub domain: SmallCurve,
-    /// The codomain curve `E'`.  Computed by Vélu's `a'`, `b'`
-    /// formulas above.  `name` is reused from the domain (we do
-    /// not invent a new label here).
+    /// The codomain curve after any change of coordinates.
     pub codomain: SmallCurve,
     /// The degree `ℓ`.
     pub degree: u64,
@@ -73,9 +71,22 @@ pub struct VeluIsogeny {
     /// built once at construction so [`evaluate`] skips per-call
     /// `g_x`/`g_y` work (measured win on multi-point maps).
     kernel_vu: Vec<(u64, u64, u64)>,
+    // Post-compose the normalized map with (x, y) ↦ (scale²x, scale³y).
+    scale: u64,
 }
 
 impl VeluIsogeny {
+    fn rescale(mut self, scale: u128) -> Self {
+        let p = self.domain.p as u128;
+        let square = mod_mul(scale, scale, p);
+        let fourth = mod_mul(square, square, p);
+        let sixth = mod_mul(fourth, square, p);
+        self.codomain.a = mod_mul(self.codomain.a as u128, fourth, p) as u64;
+        self.codomain.b = mod_mul(self.codomain.b as u128, sixth, p) as u64;
+        self.scale = mod_mul(self.scale as u128, scale, p) as u64;
+        self
+    }
+
     /// Evaluate the isogeny at an affine point `(x, y)`.  Returns
     /// `None` when `(x, y)` is in the kernel (image is the point
     /// at infinity).
@@ -147,6 +158,12 @@ impl VeluIsogeny {
             );
             acc_y = mod_sub(acc_y, mod_mul(ym, bracket, p), p);
         }
+        if self.scale != 1 {
+            let scale = self.scale as u128;
+            let square = mod_mul(scale, scale, p);
+            acc_x = mod_mul(acc_x, square, p);
+            acc_y = mod_mul(acc_y, mod_mul(square, scale, p), p);
+        }
         Some((acc_x as u64, acc_y as u64))
     }
 }
@@ -211,6 +228,8 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
     let mut seen_x = std::collections::HashSet::<u64>::new();
     let mut half = Vec::new();
     for &(x, y) in kernel {
+        let x = x % domain.p;
+        let y = y % domain.p;
         if seen_x.insert(x) {
             half.push((x, y));
         }
@@ -220,8 +239,8 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
     let mut sum_uvx = 0u128;
     let mut kernel_vu = Vec::with_capacity(half.len());
     for &(xq, yq) in &half {
-        let xq = xq as u128 % p;
-        let yq = yq as u128 % p;
+        let xq = xq as u128;
+        let yq = yq as u128;
 
         let gx_q = mod_add(3 * mod_mul(xq, xq, p) % p, a, p);
         let gy_q = mod_sub(0, 2 * yq % p, p);
@@ -243,15 +262,10 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
         a: new_a,
         b: new_b,
     };
-    // For a cyclic kernel of odd order ℓ: |G| = 2·|half| + 1.
-    // For a cyclic kernel of even order ℓ that includes the
-    // 2-torsion point T = (x_T, 0): |G| = 2·|half| (T appears in
-    // `half` as its own inverse).
-    let degree = if half.iter().any(|&(_, y)| y == 0) {
-        2 * (half.len() as u64)
-    } else {
-        2 * (half.len() as u64) + 1
-    };
+    let degree = 1 + half
+        .iter()
+        .map(|&(_, y)| if y == 0 { 1 } else { 2 })
+        .sum::<u64>();
 
     VeluIsogeny {
         domain: *domain,
@@ -259,6 +273,7 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
         degree,
         kernel_half: half,
         kernel_vu,
+        scale: 1,
     }
 }
 
@@ -399,123 +414,103 @@ pub fn velu_isogeny_odd(domain: &SmallCurve, ell: u64) -> Vec<VeluIsogeny> {
 }
 
 // ── Dual isogeny ──────────────────────────────────────────────────────────────
-//
-// For φ: E → E' of degree ℓ, the dual `φ̂: E' → E` is again degree ℓ
-// and satisfies `φ̂ ∘ φ = [ℓ]_E`.  The kernel of `φ̂` is `φ(E[ℓ])`,
-// which over `F_p` is the image of any `ℓ`-torsion subgroup of `E'`
-// not equal to `ker(φ̂)` itself.
-//
-// We provide a `dual_isogeny_naive` that simply searches the
-// codomain's `ℓ`-torsion subgroups and picks the one that completes
-// the round-trip on a probe point.
 
-/// Find the dual `ℓ`-isogeny of a `VeluIsogeny` by exhaustive search
-/// over the codomain's `ℓ`-isogeny family.  `O(deg)`-many candidates
-/// (one per cyclic subgroup); each is tested by checking that the
-/// composition is `[ℓ]` on a single probe point.
+/// Find the dual of a degree-two or odd-prime isogeny. The returned map
+/// lands on the original curve and composes with `phi` to multiplication by
+/// its degree. The bounded odd-degree search requires a pointwise rational
+/// dual kernel and enough rational points to certify the result.
 pub fn dual_isogeny_naive(phi: &VeluIsogeny) -> Option<VeluIsogeny> {
     let ell = phi.degree;
-    let cands = if ell == 2 {
-        // 2-isogeny: search the codomain's 2-torsion.
-        let mut v = Vec::new();
-        for x in 0..phi.codomain.p {
-            if phi.codomain.rhs(x) == 0 {
-                if let Some(iso) = velu_isogeny_2(&phi.codomain, x) {
-                    v.push(iso);
-                }
-            }
-        }
-        v
-    } else {
-        velu_isogeny_odd(&phi.codomain, ell)
-    };
+    let p = phi.domain.p as u128;
+    let phi_scale = phi.scale as u128;
+    let scale = mod_inv(mod_mul(ell as u128 % p, phi_scale, p), p)?;
 
-    // Probe: pick a point on the domain that's not in ker(φ).
-    let p = phi.domain.p;
-    for x in 2..p {
-        let rhs = phi.domain.rhs(x);
-        if rhs == 0 {
-            continue;
-        }
-        let y = match crate::isogeny::cm::legendre_u64(rhs, p) {
-            1 => match crate::isogeny::cm::tonelli_shanks_u64(rhs, p) {
-                Some(y) if y != 0 => y,
-                _ => continue,
-            },
-            _ => continue,
+    if ell == 2 {
+        // Both non-kernel geometric 2-torsion points have image abscissa
+        // -2t under the normalized quotient with kernel (t, 0).
+        let &[(t, 0)] = phi.kernel_half.as_slice() else {
+            return None;
         };
-        let _ = y; // explicit binding for clarity below
+        let twice_t = mod_add(t as u128, t as u128, p);
+        let dual_x = mod_sub(0, mod_mul(twice_t, mod_mul(phi_scale, phi_scale, p), p), p);
+        let dual = velu_isogeny_2(&phi.codomain, dual_x as u64)?.rescale(scale);
+        return same_equation(&dual.codomain, &phi.domain).then_some(dual);
+    }
+    if ell < 3 || ell.is_multiple_of(2) {
+        return None;
+    }
 
-        if let Some(image) = phi.evaluate(x, y) {
-            // For each candidate ψ, compute ψ(image) and check it equals [ell] · (x, y).
-            let curve = phi.domain.to_curve_params();
-            let a_fe = curve.a_fe();
-            let p_point = crate::ecc::point::Point::Affine {
-                x: curve.fe(BigUint::from(x)),
-                y: curve.fe(BigUint::from(y)),
-            };
-            let ell_p = p_point.scalar_mul(&BigUint::from(ell), &a_fe);
-            for psi in &cands {
-                if let Some((px, py)) = psi.evaluate(image.0, image.1) {
-                    if let crate::ecc::point::Point::Affine { x: ex, y: ey } = &ell_p {
-                        let exv = ex.value.iter_u64_digits().next().unwrap_or(0);
-                        let eyv = ey.value.iter_u64_digits().next().unwrap_or(0);
-                        if exv == px && eyv == py {
-                            return Some(psi.clone());
-                        }
-                    }
-                }
-            }
-            // No probe → too small; bail.
-            break;
+    let mut candidates: Vec<_> = velu_isogeny_odd(&phi.codomain, ell)
+        .into_iter()
+        .filter(|candidate| candidate.degree == ell)
+        .map(|candidate| candidate.rescale(scale))
+        .filter(|candidate| same_equation(&candidate.codomain, &phi.domain))
+        .collect();
+    let curve = phi.domain.to_curve_params();
+    let a_fe = curve.a_fe();
+    let degree = BigUint::from(ell);
+    // A nonzero difference of the two degree-ell² maps has degree at
+    // most 4*ell², by the parallelogram law for isogeny degrees.
+    let difference_degree_bound = 4u128.saturating_mul(ell as u128 * ell as u128);
+    let mut agreeing_points = 1u128; // The point at infinity.
+    for x in 0..phi.domain.p {
+        if candidates.is_empty() {
+            return None;
+        }
+        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), phi.domain.p) else {
+            continue;
+        };
+        let point = crate::ecc::point::Point::Affine {
+            x: curve.fe(BigUint::from(x)),
+            y: curve.fe(BigUint::from(y)),
+        };
+        let expected = match point.scalar_mul(&degree, &a_fe) {
+            crate::ecc::point::Point::Infinity => None,
+            crate::ecc::point::Point::Affine { x, y } => Some((
+                x.value.iter_u64_digits().next().unwrap_or(0),
+                y.value.iter_u64_digits().next().unwrap_or(0),
+            )),
+        };
+        let image = phi.evaluate(x, y);
+        candidates
+            .retain(|candidate| image.and_then(|(x, y)| candidate.evaluate(x, y)) == expected);
+        // Equality on P implies equality on -P.
+        agreeing_points += if y == 0 { 1 } else { 2 };
+        if agreeing_points > difference_degree_bound {
+            return candidates.pop();
         }
     }
     None
 }
 
+fn same_equation(left: &SmallCurve, right: &SmallCurve) -> bool {
+    let p = left.p;
+    p == right.p && left.a % p == right.a % p && left.b % p == right.b % p
+}
+
 // ── Composition of isogenies ─────────────────────────────────────────────────
 
-/// Compose two Vélu isogenies `φ: E → E'` and `ψ: E' → E''`.  The
-/// returned record's `kernel_half` field is the *pull-back* of
-/// `ψ`'s kernel under `φ` (computed by evaluating `φ` on a curve
-/// enumeration), so the resulting record correctly represents the
-/// composite as a single isogeny.  Note: the **degree** of the
-/// composite is `phi.degree · psi.degree`.
+/// Compose two Vélu isogenies when the full composite kernel is
+/// pointwise rational. An affine rational-kernel table cannot represent
+/// a composite whose kernel requires extension-field points.
 pub fn compose_isogenies(phi: &VeluIsogeny, psi: &VeluIsogeny) -> Option<VeluIsogeny> {
-    if phi.codomain.a != psi.domain.a
-        || phi.codomain.b != psi.domain.b
-        || phi.codomain.p != psi.domain.p
-    {
+    if !same_equation(&phi.codomain, &psi.domain) {
         return None;
     }
-    // Enumerate ker(ψ ∘ φ) by walking E(F_p) and keeping points
-    // whose image under φ lies in ker(ψ).  Tonelli-Shanks per x
-    // gives O(p · log² p) instead of O(p²).
-    let mut kernel = Vec::new();
+    let degree = phi.degree.checked_mul(psi.degree)?;
     let p = phi.domain.p;
+    let mut kernel = Vec::new();
     for x in 0..p {
-        let rhs = phi.domain.rhs(x);
-        let y = if rhs == 0 {
-            0u64
-        } else {
-            match crate::isogeny::cm::legendre_u64(rhs, p) {
-                1 => match crate::isogeny::cm::tonelli_shanks_u64(rhs, p) {
-                    Some(y) => y,
-                    None => continue,
-                },
-                _ => continue,
-            }
+        let Some(y) = crate::isogeny::cm::tonelli_shanks_u64(phi.domain.rhs(x), p) else {
+            continue;
         };
-        if let Some(image) = phi.evaluate(x, y) {
-            if psi.kernel_half.iter().any(|&(kx, _)| kx == image.0) {
-                kernel.push((x, y));
-            }
+        if phi.evaluate(x, y).and_then(|(u, v)| psi.evaluate(u, v)).is_none() {
+            kernel.push((x, y));
         }
     }
-    let mut iso = velu_codomain_from_kernel(&phi.domain, &kernel);
-    iso.codomain = psi.codomain;
-    iso.degree = phi.degree * psi.degree;
-    Some(iso)
+    let scale = mod_mul(phi.scale as u128, psi.scale as u128, p as u128);
+    let iso = velu_codomain_from_kernel(&phi.domain, &kernel).rescale(scale);
+    (iso.degree == degree && same_equation(&iso.codomain, &psi.codomain)).then_some(iso)
 }
 
 // ── Unit tests ───────────────────────────────────────────────────────────────
@@ -523,7 +518,108 @@ pub fn compose_isogenies(phi: &VeluIsogeny, psi: &VeluIsogeny) -> Option<VeluIso
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::isogeny::cm::tonelli_shanks_u64;
     use crate::isogeny::toy_curve_a;
+
+    fn curve_211() -> SmallCurve {
+        SmallCurve {
+            name: "velu-211",
+            p: 211,
+            a: 1,
+            b: 3,
+        }
+    }
+
+    #[test]
+    fn explicit_kernel_counts_all_self_inverse_points() {
+        let curve = SmallCurve {
+            a: 210,
+            b: 0,
+            ..curve_211()
+        };
+        let iso = velu_isogeny_from_kernel(&curve, &[(0, 0), (1, 0), (210, 0)]);
+        assert_eq!(iso.degree, 4);
+        assert_eq!(iso.kernel_half.len(), 3);
+    }
+
+    #[test]
+    fn explicit_kernel_deduplicates_field_representatives() {
+        let curve = curve_211();
+        let canonical = velu_isogeny_2(&curve, 168).unwrap();
+        let equivalent = velu_isogeny_from_kernel(&curve, &[(379, 211), (168, 0)]);
+        assert_eq!(equivalent.kernel_half, canonical.kernel_half);
+        assert_eq!(equivalent.degree, canonical.degree);
+        assert!(same_equation(&equivalent.codomain, &canonical.codomain));
+    }
+
+    #[test]
+    fn dual_isogenies_return_to_original_model() {
+        let curve = curve_211();
+        let a_fe = curve.to_curve_params().a_fe();
+        for phi in [
+            velu_isogeny_2(&curve, 168).unwrap(),
+            velu_isogeny_from_kernel(&curve, &[(77, 3)]),
+        ] {
+            let degree = BigUint::from(phi.degree);
+            let dual = dual_isogeny_naive(&phi).expect("fixture has a rational dual kernel");
+            assert!(same_equation(&dual.codomain, &curve));
+            let double_dual = dual_isogeny_naive(&dual).expect("the scaled dual also has a dual");
+            assert!(same_equation(&double_dual.codomain, &phi.codomain));
+            for x in 0..curve.p {
+                let Some(y) = tonelli_shanks_u64(curve.rhs(x), curve.p) else {
+                    continue;
+                };
+                let expected = xy(&pt(x, y, curve.p).scalar_mul(&degree, &a_fe));
+                assert_eq!(
+                    phi.evaluate(x, y).and_then(|(u, v)| dual.evaluate(u, v)),
+                    expected
+                );
+                assert_eq!(double_dual.evaluate(x, y), phi.evaluate(x, y));
+            }
+        }
+    }
+
+    #[test]
+    fn composite_includes_first_kernel_and_checks_rationality() {
+        let curve = curve_211();
+        let phi = velu_isogeny_2(&curve, 168).unwrap();
+        let dual = dual_isogeny_naive(&phi).unwrap();
+        let other = velu_isogeny_2(&phi.codomain, 1).unwrap();
+        assert!(compose_isogenies(&phi, &dual).is_none());
+
+        let composite = compose_isogenies(&phi, &other).expect("fully rational kernel");
+        assert_eq!(composite.degree, 4);
+        assert_eq!(composite.evaluate(168, 0), None);
+        for x in 0..curve.p {
+            if let Some(y) = tonelli_shanks_u64(curve.rhs(x), curve.p) {
+                let sequential = phi.evaluate(x, y).and_then(|(u, v)| other.evaluate(u, v));
+                assert_eq!(composite.evaluate(x, y), sequential);
+            }
+        }
+    }
+
+    #[test]
+    fn dual_and_composition_accept_equivalent_coefficient_representatives() {
+        let curve = SmallCurve {
+            a: 212,
+            b: 425,
+            ..curve_211()
+        };
+        let phi = velu_isogeny_2(&curve, 168).unwrap();
+        let dual = dual_isogeny_naive(&phi).expect("dual returns to the same field equation");
+        assert_eq!((dual.codomain.a, dual.codomain.b), (1, 3));
+        let intermediate = SmallCurve {
+            b: phi.codomain.b + curve.p,
+            ..phi.codomain
+        };
+        let psi = velu_isogeny_2(&intermediate, 1).unwrap();
+        let composite = compose_isogenies(&phi, &psi).expect("matching intermediate equations");
+        assert_eq!(composite.degree, 4);
+        assert_eq!(
+            (composite.codomain.a, composite.codomain.b),
+            (psi.codomain.a, psi.codomain.b)
+        );
+    }
 
     #[test]
     fn two_isogeny_round_trip() {
