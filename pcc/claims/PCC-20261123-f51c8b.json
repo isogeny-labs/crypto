@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T19:41:13Z",
+ "id": "PCC-20261123-f51c8b",
+ "kind": "statement",
+ "producer": {
+  "commit": "f7bfd41405dc4d22f034f5197fb881c260c1e2cb",
+  "model": "",
+  "session": "codex-ecc2k-halftrace-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/checks/artifact-autofix-source-freeze.txt",
+    "sha256": "24cec2fd1401bf9f327f19037f9d22dc12f938d5a1e704b6288ff31b920a0a19"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Artifact-autofix run45247559161 for the published half-trace source/protocol head failed its original HeadObject upload/replay step with HTTP403 Forbidden. No remote artifact custody or object absence is established; full raw data remain preserved locally and in the source publication. The failed request is not treated as404 and no direct-Put or identity workaround was attempted."
+}

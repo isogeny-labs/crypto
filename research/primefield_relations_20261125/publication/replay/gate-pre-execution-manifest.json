@@ -1,0 +1,18 @@
+{
+  "schema": "isogeny.shared-terminal-pre-execution/v1",
+  "attempt": "attempt-002",
+  "created_utc": "2026-11-25T22:59:43Z",
+  "source_manifest_sha256": "e0c3b71cc7b256c7e1252979ecce8f4d6aa48c5c7ab691a1ec502ddd496afb23",
+  "qualifier": "frozen/QUALIFIER.md",
+  "binaries": "binaries.sha256",
+  "commands": [
+    "timeout -k 2s 45s build/shared_terminal_tests --test-threads=1",
+    "timeout -k 2s 45s build/shared_terminal_gate"
+  ],
+  "input_policy": "fixed historical public Q, historical source seed, indices and signs; expected scalar used only after reconstructed relation",
+  "relation_search_calls": 0,
+  "mutations": "enumerated in the frozen qualifier",
+  "stop_on_first_failed_call": true,
+  "all_prior_failures_retained": true,
+  "performance_claim": false
+}

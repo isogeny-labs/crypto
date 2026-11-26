@@ -248,7 +248,9 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/ic_boundary.rs",
-            "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+            // Whole-file refresh reviewed in PR5099 and rechecked for the
+            // additive sectors; see prime31_rr5_coprime_sectors_20261123/SOURCE_REVIEW.md.
+            "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
             &[
                 Range {
                     start: "/// The field operations behind the group operations: modular\n",
@@ -299,7 +301,7 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/prime_fast.rs",
-            "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+            "0aaac6eaa73a9766cfe46e19f0cb26e125c7b4e2d1f5d8dc848865ab000dde6d",
             &[
                 Range {
                     start: "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n",
@@ -335,7 +337,9 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/semaev_prime_poly.rs",
-            "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a",
+            // The selected Fp bytes are unchanged; the whole-file change was
+            // reviewed separately. Keep the exact-source guard mandatory.
+            "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
             &[Range {
                 start: "/// `F_p` arithmetic for `p < 2^62`.\n",
                 end: "/// The curve `y² = x³ + ax + b` over `F_p`, coefficients reduced.\n",
@@ -453,6 +457,10 @@ fn main() {
         (
             "research/prime31_four_summand_20261122/native/selector_circuit.rs",
             "quadratic quartic-modular membership circuit and independent dense-selector controls",
+        ),
+        (
+            "research/prime31_four_summand_20261122/native/selector_sectors.rs",
+            "additive five coprime-selector quadratic systems and M31 construction controls; no solver calls",
         ),
         (
             "research/prime31_four_summand_20261122/native/b677_gate.rs",

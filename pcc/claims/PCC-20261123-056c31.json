@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:14:37Z",
+ "id": "PCC-20261123-056c31",
+ "kind": "statement",
+ "producer": {
+  "commit": "ad5f91c4b439eb758b63d2c7d0088d7e8f2d9915",
+  "model": "",
+  "session": "codex-ecc2k-cold50-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/checks/focused-tests-01.txt",
+    "sha256": "54ca05fc36b0da59967d6e4729643acd393a3cb073260edb8f7a9698494b75c5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The current-source focused release suite passes47 tests. New checks compare direct parsing against the original BigUint grammar over word/inline/heap boundaries, validate every byte at each eight-digit SIMD position, and check all53248 two/three-limb basis products with nonzero XOR accumulators and short-output safety. Existing field, trace-zero context, compact workspace and projector checks also pass. Producer-written checks, unsigned; no performance result yet."
+}

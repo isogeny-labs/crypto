@@ -1,0 +1,15 @@
+{
+  "action": "check on which side of 1 the pooled interval lies at every band point; if it lies wholly on the other side at any point, confirm the rule's verdict but report the pair as not ranked under section 5a, with the crossover weight",
+  "created": "2026-11-24T08:18:18Z",
+  "evidence": [
+    "research/quartic_diem_la_20261123/validation/validator-report.md",
+    "research/quartic_diem_la_20261123/validation/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a frozen decision rule admits a tolerance at one band point (e.g. upper95 <= 1.01 at w = 0) and the producer's script labels the verdict 'ranked across the band'",
+  "why": "quartic_diem_la_20261123: IMPROVEMENT by the frozen rule, but pooled w=0 ratio 1.0028 [1.0010, 1.0048] lies above 1 while w=0.1 and w=1 lie below; analysis.json said 'ranked across the band'"
+}

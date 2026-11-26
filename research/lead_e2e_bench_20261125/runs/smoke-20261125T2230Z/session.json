@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h9b25152b2df9",
+  "label": "lead e2e smoke: root-finding and double-large-prime IC on one binary target",
+  "spec_id": "ECS1h5ee3d903e487",
+  "spec_sha256": "5ee3d903e48708e0b4ee62db12313c518770e6cb4f6789c36b9f27e594138b47",
+  "env_class_id": "ECBENV2h7ec59eb3ea09",
+  "host_sha256": "9230ffd994f66437ce43c342176201d9184c3edf224b9cb9700283b23b141a08",
+  "plan_sha256": "8a0da15d8190eb0038dd3d85b0393238f02f7918179d83b591edcfcd2ac7431e",
+  "binary_sha256": "f717da8ad079f5896db084ffbe4f6d23bdde7cd7435783d1af6e438121650318",
+  "git_commit": "5097d0d45c46c72041ddacca012fe694252ded6d",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/Volumes/SSD990-2/crypto/target/release/ecbench"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "0d9d02362b268f2f9f490611dc3f5aa723abe4f182415b05e229378ac08c03d9",
+  "child_env": {
+    "HOME": "/Users/adamburan",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/Users/adamburan/.elan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.local/share/solana/install/active_release/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/go/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Volumes/SSD990-2/.codex/tmp/arg0-macos/codex-arg0FBdsjO:/Users/adamburan/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/adamburan/bin:/Users/adamburan/.local/bin:/Users/adamburan/.bun/bin:/Users/adamburan/.opencode/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/adamburan/.atuin/bin:/Users/adamburan/.pyenv/shims:/Users/adamburan/.pyenv/bin:/Users/adamburan/.elan/bin:/Users/adamburan/.local/share/solana/install/active_release/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/adamburan/.local/ecc-challenges/bin:/Users/adamburan/.cargo/bin:/Users/adamburan/.docker/bin:/Users/adamburan/go/bin:/Users/adamburan/istio-1.24.0/bin:/Users/adamburan/.lmstudio/bin:/Users/adamburan/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/adamburan/.docker/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795645816523,
+  "finished_unix_ms": 1795645816686,
+  "status": "complete",
+  "executions_planned": 4,
+  "records_written": 4,
+  "records_sha256": "6edd714cd9aa1c27827cf44658304b594eb9399dfb4e540b0e760e69de4790e4",
+  "status_counts": {
+    "verified": 4
+  }
+}

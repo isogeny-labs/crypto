@@ -42,6 +42,9 @@ fn main() {
     // A synthetic known-answer target. Its scalar is never passed to collection.
     let secret = 0x20261016u64 % (curve.n - 1) + 1;
     let q = curve.mul(Some(g), secret).unwrap();
+    let support = fb
+        .support_profile(&curve, &[Some(g), Some(q)])
+        .expect("valid signed factor-base support");
     println!(
         "{}",
         json!({"kind":"manifest", "schema":"prime61.factor-base-baseline/v1",
@@ -50,7 +53,11 @@ fn main() {
             "icv1":id.icv1,"slug":id.slug},
         "target":curve.canonical(q),"target_kind":"synthetic-known-answer",
         "target_scalar_for_replay_only":secret,"runs":runs,"max_targets_per_run":trials,
-        "inverse_pairs":fb.len(),"factor_base":fb.pts.iter().map(|&p|curve.canonical(p)).collect::<Vec<_>>(),
+        "inverse_pairs":support.inverse_pairs,
+        "stored_representatives":fb.len(),"represented_points":support.points,
+        "factor_base_representation":"one-representative-per-negation-orbit",
+        "support_profile":support,
+        "factor_base":fb.pts.iter().map(|&p|curve.canonical(p)).collect::<Vec<_>>(),
         "summands":2,"candidate_search_performed":false,
         "isogeny_transport_performed":false,"wall_time_claim":null,
         "total_operation_cost":null,"speedup":null})
