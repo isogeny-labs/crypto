@@ -287,6 +287,14 @@ schedules: 132 certificates, 791,236 total bytes, and a 20,767-byte maximum.
 Measured checker time is about 0.60 seconds; production and JSON bring the
 complete warm debug gate to 1.12--1.26 seconds. `[pcc:unverified]`
 
+The verifier is now a public module separate from recursive contraction and a
+native `factorization-certificate-check` executable. It imports exact ring
+arithmetic but no contraction, deformation, packing, child, or packet-tensor
+code. The command caps JSON input at 64 MiB and applies explicit work, vector,
+width, and mode-depth limits. This is an executable separation boundary, not a
+theorem-assistant or independently reimplemented arithmetic kernel.
+`[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

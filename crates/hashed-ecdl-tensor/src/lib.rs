@@ -24,6 +24,7 @@ pub mod contraction;
 pub mod curve;
 pub mod encoding;
 pub mod factoring;
+pub mod factorization_certificate;
 pub mod finite;
 pub mod floor_sum;
 pub mod joint;

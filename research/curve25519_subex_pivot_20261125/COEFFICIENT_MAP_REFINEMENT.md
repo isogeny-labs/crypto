@@ -141,13 +141,12 @@ items, is the remaining independent boundary for this lemma.
 
 ## Native certificate checker
 
-The test-only `factorization_certificate` module now implements all six checks
-on a plain in-memory certificate. Production code supplies packet slots,
-incidence groups, kernel-weight tables, generated modes, retained tuples, and
-black-box packet-entry tables. The checker independently verifies coverage,
-group placement, crossing series, Cartesian tuple completeness, and every
-packet coefficient before accepting the certificate. It never calls
-production `child` while checking. `[pcc:unverified]`
+The public `factorization_certificate` verifier module now implements all six
+checks on plain certificate data. A separate production-side test module
+supplies packet slots, incidence groups, kernel-weight tables, generated modes,
+retained tuples, and black-box packet-entry tables. The verifier imports exact
+ring arithmetic but not contraction, deformation, packing, child construction,
+or packet tensors. `[pcc:unverified]`
 
 Four mutations are load-bearing: duplicate packet coverage, target-group
 reassignment, removal of a retained tuple, and alteration of one packet-table
@@ -178,7 +177,14 @@ target, plus about 0.51 seconds of production and 0.13 seconds of JSON work.
 The complete warm debug gate varied from 1.12 to 1.26 seconds.
 `[pcc:unverified]`
 
-This is not yet an external or theorem-assistant kernel. Producer and checker
-still compile in the same test-only Rust module, there is no standalone checker
-executable, and the positive controls remain bounded through four edges.
+The native `factorization-certificate-check` command now reads that JSON from a
+file or standard input, caps input at 64 MiB, applies explicit work/vector/width
+limits plus a 1,024-mode recursion-depth cap, and reports charged work. The
+checked fixture is 2,163 bytes including its terminating newline and verifies
+in 224 charged steps; a schema mutation exits with rejection status 2.
 `[pcc:unverified]`
+
+This is a standalone executable boundary, but not a theorem-assistant or
+separately implemented arithmetic kernel. Producer, verifier, and exact ring
+arithmetic remain in the same Rust crate, and positive controls remain bounded
+through four edges. `[pcc:unverified]`
