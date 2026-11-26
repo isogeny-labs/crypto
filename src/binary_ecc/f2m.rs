@@ -307,7 +307,7 @@ impl F2mElement {
             if i < nw {
                 words[i] = prefix;
             }
-            if m % 64 != 0 {
+            if !m.is_multiple_of(64) {
                 words[nw - 1] &= (1u64 << (m % 64)) - 1;
             }
             let mut w = [0; INLINE_WORDS];
@@ -982,7 +982,7 @@ fn half_trace_basis_by_elimination(
     trace_mask: &[u64],
 ) -> Option<Vec<F2mElement>> {
     let n = irreducible.degree as usize;
-    if !(3..=192).contains(&n) || n % 2 == 0 || trace_mask.len() != n.div_ceil(64) {
+    if !(3..=192).contains(&n) || n.is_multiple_of(2) || trace_mask.len() != n.div_ceil(64) {
         return None;
     }
     let mut rows = vec![[0u64; 6]; n];
@@ -1024,7 +1024,7 @@ fn half_trace_basis_by_elimination(
         for (r, row) in rows.iter().enumerate() {
             words[r / 64] |= ((row[3 + col / 64] >> (col % 64)) & 1) << (r % 64);
         }
-        if n.div_ceil(2) % 2 == 0 {
+        if n.div_ceil(2).is_multiple_of(2) {
             words[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
         }
         basis.push(F2mElement::from_words(&words, irreducible.degree));
@@ -1874,6 +1874,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Fused product/reduction for canonical 131-bit operands and
 /// X^131+X^13+X²+X+1. The caller must select by the complete modulus.
 /// Unsupported instruction sets retain the existing word-field fallback.
+#[cfg(all(test, target_arch = "x86_64"))]
 #[inline]
 pub(crate) fn mul_mod131(a: &[u64; 3], b: &[u64; 3]) -> Option<[u64; 3]> {
     debug_assert_eq!((a[2] | b[2]) & !7, 0);
@@ -1957,6 +1958,7 @@ pub(crate) unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
 
 /// Canonical131-bit squaring needs only two64-bit carryless squares. The
 /// three-bit high limb is spread directly; other ISAs keep the scalar path.
+#[cfg(test)]
 #[inline]
 pub(crate) fn square_mod131(a: &[u64; 3]) -> Option<[u64; 3]> {
     debug_assert_eq!(a[2] & !7, 0);
