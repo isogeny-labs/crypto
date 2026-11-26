@@ -10,7 +10,7 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 
 /// Current packing-provenance wire schema.
-pub const SCHEMA: u32 = 2;
+pub const SCHEMA: u32 = 3;
 
 /// Endpoint vertex indices for one edge in source order.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -46,6 +46,10 @@ pub struct Certificate {
     pub row_labels: Vec<usize>,
     /// Source labels for every right vertex, including isolates.
     pub column_labels: Vec<usize>,
+    /// Creation precision of every source left tensor.
+    pub row_creation_precisions: Vec<usize>,
+    /// Creation precision of every source right tensor.
+    pub column_creation_precisions: Vec<usize>,
     /// Unordered radix-digit pair pattern attached to every emitted packet.
     pub packet_pairs: Vec<Vec<(usize, usize)>>,
 }
@@ -208,6 +212,8 @@ pub fn verify(
         || provenance.coordinate >= provenance.packet_exponent
         || factorization.radix != provenance.radix
         || provenance.edges.len() != factorization.edge_count
+        || provenance.row_creation_precisions.len() != provenance.row_labels.len()
+        || provenance.column_creation_precisions.len() != provenance.column_labels.len()
         || (provenance.source_degree_cap.is_some() && !provenance.conditional_labels)
     {
         return Err("packing provenance context".into());

@@ -4,7 +4,8 @@ use super::*;
 use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
 use crate::child_provenance_certificate::{
     verify as verify_child_provenance, Certificate as ChildProvenanceCertificate,
-    ChildEdge as ProvenanceChildEdge, SCHEMA as CHILD_PROVENANCE_SCHEMA,
+    ChildEdge as ProvenanceChildEdge, OldTensorSource, ParentSide,
+    SCHEMA as CHILD_PROVENANCE_SCHEMA,
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
@@ -291,6 +292,16 @@ fn packing_provenance(
             .collect(),
         row_labels: packing.row_labels.clone(),
         column_labels: packing.column_labels.clone(),
+        row_creation_precisions: graph
+            .left
+            .iter()
+            .map(|vertex| vertex.tensor.creation_precision)
+            .collect(),
+        column_creation_precisions: graph
+            .right
+            .iter()
+            .map(|vertex| vertex.tensor.creation_precision)
+            .collect(),
         packet_pairs: packing
             .packets
             .iter()
@@ -299,15 +310,56 @@ fn packing_provenance(
     }
 }
 
-fn child_provenance(child: &Bipartite, group: usize) -> ChildProvenanceCertificate {
+fn child_provenance(
+    graph: &Bipartite,
+    packing: &Packing,
+    coordinate: usize,
+    parameters: &Parameters,
+    child: &Bipartite,
+    beta: &[usize],
+    group: usize,
+) -> ChildProvenanceCertificate {
+    let mut old_tensor_sources = Vec::new();
+    let mut expected_old_tensors = Vec::new();
+    for (side, vertices, labels) in [
+        (ParentSide::Row, &graph.left, &packing.row_labels),
+        (ParentSide::Column, &graph.right, &packing.column_labels),
+    ] {
+        for (vertex, (tensor_vertex, &label)) in vertices.iter().zip(labels).enumerate() {
+            if packing::digit(label, coordinate, parameters.radix) == group {
+                old_tensor_sources.push(OldTensorSource { side, vertex });
+                expected_old_tensors.push(&tensor_vertex.tensor);
+            }
+        }
+    }
+    assert_eq!(expected_old_tensors.len(), child.left.len());
+    for (expected, actual) in expected_old_tensors.iter().zip(&child.left) {
+        assert!(Arc::ptr_eq(expected, &actual.tensor));
+    }
+    assert!(child
+        .right
+        .iter()
+        .all(|vertex| matches!(vertex.tensor.kind, TensorKind::Packet(_))));
     ChildProvenanceCertificate {
         schema: CHILD_PROVENANCE_SCHEMA,
         group,
+        beta: beta.to_vec(),
         old_vertex_degrees: child.left.iter().map(|vertex| vertex.edges.len()).collect(),
+        old_tensor_sources,
+        old_creation_precisions: child
+            .left
+            .iter()
+            .map(|vertex| vertex.tensor.creation_precision)
+            .collect(),
         packet_vertex_degrees: child
             .right
             .iter()
             .map(|vertex| vertex.edges.len())
+            .collect(),
+        packet_creation_precisions: child
+            .right
+            .iter()
+            .map(|vertex| vertex.tensor.creation_precision)
             .collect(),
         edges: child
             .edges
@@ -646,11 +698,6 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
 
-    let conditional_packets: Vec<_> = conditional_packing
-        .packets
-        .iter()
-        .map(|packet| packet.slots.clone())
-        .collect();
     let zero_beta = vec![0usize; conditional_modes.len()];
     let mut first_child_provenance = None;
     for group in 0..conditional_parameters.radix {
@@ -666,34 +713,90 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
             &mut meter,
         )
         .unwrap();
-        let produced_child = child_provenance(&child, group);
+        let produced_child = child_provenance(
+            &conditional_graph,
+            &conditional_packing,
+            0,
+            &conditional_parameters,
+            &child,
+            &zero_beta,
+            group,
+        );
         let serialized_child = serde_json::to_vec(&produced_child).unwrap();
         let parsed_child: ChildProvenanceCertificate =
             serde_json::from_slice(&serialized_child).unwrap();
         assert_eq!(serde_json::to_vec(&parsed_child).unwrap(), serialized_child);
         let summary = verify_child_provenance(
             &conditional_provenance,
-            &conditional_packets,
+            &conditional_certificate,
             &parsed_child,
             &mut meter,
         )
         .unwrap();
         assert_eq!(summary.edges, child.edges.len());
+        assert_eq!(
+            summary.packet_entry_tables,
+            conditional_certificate.packets.len()
+        );
+        assert!(summary.packet_entry_values >= summary.packet_entry_tables);
         if !parsed_child.edges.is_empty() && first_child_provenance.is_none() {
             first_child_provenance = Some(parsed_child);
         }
     }
-    let mut bad_child = first_child_provenance.unwrap();
+    let first_child = first_child_provenance.unwrap();
+    let mut bad_child = first_child.clone();
     bad_child.edges[0].right_port += 1;
     assert_eq!(
         verify_child_provenance(
             &conditional_provenance,
-            &conditional_packets,
+            &conditional_certificate,
             &bad_child,
             &mut meter
         )
         .unwrap_err(),
         "child provenance replay"
+    );
+    let mut bad_packet_precision = first_child.clone();
+    bad_packet_precision.packet_creation_precisions[0] += 1;
+    assert_eq!(
+        verify_child_provenance(
+            &conditional_provenance,
+            &conditional_certificate,
+            &bad_packet_precision,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance replay"
+    );
+    let mut bad_parent_precision = conditional_provenance.clone();
+    let source = &first_child.old_tensor_sources[0];
+    match source.side {
+        ParentSide::Row => bad_parent_precision.row_creation_precisions[source.vertex] += 1,
+        ParentSide::Column => {
+            bad_parent_precision.column_creation_precisions[source.vertex] += 1;
+        }
+    }
+    assert_eq!(
+        verify_child_provenance(
+            &bad_parent_precision,
+            &conditional_certificate,
+            &first_child,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance replay"
+    );
+    let mut bad_beta = first_child;
+    bad_beta.beta.push(0);
+    assert_eq!(
+        verify_child_provenance(
+            &conditional_provenance,
+            &conditional_certificate,
+            &bad_beta,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance context"
     );
 
     let mut bad_conditional_labels = conditional_provenance;

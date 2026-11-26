@@ -90,7 +90,7 @@ all 262,144 packet vertices, including 254,016 isolates. This substantially
 tests items 2–5, but deliberately bypasses `Setup` admission and therefore
 does not close the live-object refinement. `[pcc:unverified]`
 
-The schema-1 packing-provenance verifier adds a separately implemented finite
+The schema-3 packing-provenance verifier adds a separately implemented finite
 refinement for item 2. From serialized endpoint indices, vertex labels, and
 packet orientation patterns it reconstructs every label class, padding/copy
 index, packet slot, and active endpoint group, then requires exact agreement
@@ -102,14 +102,16 @@ inequality, packet capacity, and every-coordinate group balance. The uniform
 arbitrary-size argument and the asymptotic R1 object remain open.
 `[pcc:unverified]`
 
-The schema-1 child-topology verifier continues that finite refinement through
-one group child. From parent endpoint ports and packets it reconstructs selected
-old vertices and isolates, preserved degrees/ports, all packet vertices and
-isolates, packet ownership, and the complete child edge order. Both groups of
-the admitted three-edge control pass after serialization; a packet-port
-mutation fails. This strengthens R1 items 2–3 at the topology layer, while
-tensor identity, creation precision, coefficients, and uniform arbitrary-size
-refinement remain open. `[pcc:unverified]`
+The schema-2 child verifier continues that finite refinement through one group
+child. From schema-3 parent provenance and the accepted factorization object it
+reconstructs selected old vertices and isolates, stable parent tensor sources,
+preserved degrees/ports and creation precision, all packet vertices and
+isolates, packet creation precision, ownership, and complete edge order. It
+binds every packet vertex to the independently checked entry table for its
+`(beta, group, packet)` key. Both groups of the admitted three-edge control
+pass after serialization; port, parent/packet precision, and tuple mutations
+fail. This strengthens R1 items 2–3 through the finite tensor-table interface;
+uniform arbitrary-size refinement remains open. `[pcc:unverified]`
 
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to

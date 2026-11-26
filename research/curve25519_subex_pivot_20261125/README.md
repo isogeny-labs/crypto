@@ -363,14 +363,16 @@ uniform arbitrary-size theorem, asymptotic graph realization, or the external
 contraction theorem. `[pcc:unverified]`
 
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
-group-child topology. From schema-2 parent endpoint ports and packet slots, a
-standalone verifier reconstructs retained old vertices including isolates,
-preserved old ports, one vertex per packet including isolated packets, row then
-column incidence order, packet ownership, packet ports, and every child edge.
-Both groups of the admitted three-edge control round-trip and replay exactly;
-a packet-port mutation fails closed. Tensor identity, creation precision, mode
-coefficients, and the uniform arbitrary-size refinement remain separate.
-`[pcc:unverified]`
+group child. From schema-3 parent provenance and the accepted factorization
+object, its schema-2 verifier reconstructs retained old vertices including
+isolates, stable parent tensor references, preserved old ports and creation
+precision, one vertex per packet including isolated packets, packet creation
+precision, row-then-column incidence order, and every child edge. It also binds
+each packet vertex to the exact `(beta, group, packet)` coefficient table
+already checked by the factorization verifier. Both groups of the admitted
+three-edge control round-trip and replay exactly; port, precision, and tuple
+mutations fail closed. The uniform arbitrary-size refinement and external
+contraction theorem remain separate. `[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical
