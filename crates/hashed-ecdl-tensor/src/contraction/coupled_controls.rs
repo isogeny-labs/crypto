@@ -4,6 +4,7 @@ use super::*;
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::network::FnPredicate;
 use crate::Limits;
+use std::collections::BTreeSet;
 use std::sync::Arc;
 
 fn evaluate_generated_modes(
@@ -121,6 +122,194 @@ fn direct_deformed_contraction(
     Ok(total)
 }
 
+fn direct_packet_basis_map(
+    graph: &Bipartite,
+    packing: &Packing,
+    kernel: &deformation::Cauchy,
+    meter: &mut Meter,
+) -> Result<Vec<Element>> {
+    let incidences = graph
+        .edges
+        .len()
+        .checked_mul(2)
+        .ok_or_else(|| overflow("direct basis incidences"))?;
+    let assignments = 1usize
+        .checked_shl(u32::try_from(incidences).map_err(|_| overflow("direct basis shift"))?)
+        .ok_or_else(|| overflow("direct basis assignments"))?;
+    let mut out = Vec::with_capacity(assignments);
+    for mask in 0..assignments {
+        let left_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << edge) != 0)
+            .collect();
+        let right_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << (graph.edges.len() + edge)) != 0)
+            .collect();
+        let mut product = kernel.ring.one();
+        for packet in &packing.packets {
+            for (row, &row_edge) in packet
+                .slots
+                .iter()
+                .enumerate()
+                .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+            {
+                let mut row_sum = kernel.ring.zero();
+                for (column, &column_edge) in packet
+                    .slots
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+                {
+                    if right_bits[column_edge] {
+                        let weight = kernel.weight(row, column, meter)?;
+                        row_sum = kernel.ring.add(&row_sum, &weight, meter)?;
+                    }
+                }
+                let factor = if left_bits[row_edge] {
+                    row_sum
+                } else {
+                    kernel.ring.sub(&kernel.ring.one(), &row_sum, meter)?
+                };
+                product = kernel.ring.mul(&product, &factor, meter)?;
+            }
+        }
+        out.push(product);
+    }
+    Ok(out)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn child_basis_map(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+    kernel: &deformation::Cauchy,
+    modes: &[deformation::Mode],
+    beta: &[usize],
+    group: usize,
+    meter: &mut Meter,
+) -> Result<Vec<(usize, Element)>> {
+    let child = deformation::child(
+        graph, packing, coordinate, parameters, kernel, modes, beta, group, meter,
+    )?;
+    let mut selected = Vec::new();
+    for (side, vertices, labels) in [
+        (false, &graph.left, &packing.row_labels),
+        (true, &graph.right, &packing.column_labels),
+    ] {
+        for vertex in 0..vertices.len() {
+            if packing::digit(labels[vertex], coordinate, parameters.radix) == group {
+                selected.push((side, vertex));
+            }
+        }
+    }
+    assert_eq!(selected.len(), child.left.len());
+    let mut bit_positions = Vec::with_capacity(child.edges.len());
+    let mut unique_positions = BTreeSet::new();
+    for edge in &child.edges {
+        let (side, vertex) = selected[edge.left.0];
+        let old_edge = if side {
+            graph.right[vertex].edges[edge.left.1]
+        } else {
+            graph.left[vertex].edges[edge.left.1]
+        };
+        let position = old_edge + usize::from(side) * graph.edges.len();
+        assert!(unique_positions.insert(position));
+        bit_positions.push(position);
+    }
+    let assignments = 1usize
+        .checked_shl(u32::try_from(child.edges.len()).map_err(|_| overflow("child basis shift"))?)
+        .ok_or_else(|| overflow("child basis assignments"))?;
+    let mut out = Vec::with_capacity(assignments);
+    for mask in 0..assignments {
+        let mut global_mask = 0usize;
+        for (edge, &position) in bit_positions.iter().enumerate() {
+            if mask & (1usize << edge) != 0 {
+                global_mask |= 1usize << position;
+            }
+        }
+        let mut product = kernel.ring.one();
+        for vertex in &child.right {
+            let bits: Vec<_> = vertex
+                .edges
+                .iter()
+                .map(|&edge| mask & (1usize << edge) != 0)
+                .collect();
+            let value = vertex.tensor.entry(&bits, &kernel.ring, meter)?;
+            product = kernel.ring.mul(&product, &value, meter)?;
+        }
+        out.push((global_mask, product));
+    }
+    out.sort_by_key(|(mask, _)| *mask);
+    assert!(out.windows(2).all(|pair| pair[0].0 != pair[1].0));
+    Ok(out)
+}
+
+fn extracted_basis_map(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+    kernel: &deformation::Cauchy,
+    modes: &[deformation::Mode],
+    meter: &mut Meter,
+) -> Result<Vec<Element>> {
+    let groups = packing.packets.len() * parameters.radix;
+    let mut bounds = vec![0usize; groups];
+    for (packet_id, packet) in packing.packets.iter().enumerate() {
+        for &edge in packet.slots.iter().flatten() {
+            let target = packing::digit(
+                packing.row_labels[graph.edges[edge].left.0],
+                coordinate,
+                parameters.radix,
+            );
+            bounds[packet_id * parameters.radix + target] += 1;
+        }
+    }
+    let assignments = 1usize
+        .checked_shl(u32::try_from(2 * graph.edges.len()).map_err(|_| overflow("basis map shift"))?)
+        .ok_or_else(|| overflow("basis map assignments"))?;
+    let mut total = vec![kernel.ring.zero(); assignments];
+    let mut usage = vec![0usize; groups];
+    let mut beta = vec![0usize; modes.len()];
+    let mut weight = 0usize;
+    loop {
+        let mut product_map = vec![(0usize, kernel.ring.one())];
+        for group in 0..parameters.radix {
+            let child_map = child_basis_map(
+                graph, packing, parameters, coordinate, kernel, modes, &beta, group, meter,
+            )?;
+            let mut next = Vec::with_capacity(product_map.len() * child_map.len());
+            for (left_mask, left_value) in &product_map {
+                for (right_mask, right_value) in &child_map {
+                    assert_eq!(left_mask & right_mask, 0);
+                    next.push((
+                        left_mask | right_mask,
+                        kernel.ring.mul(left_value, right_value, meter)?,
+                    ));
+                }
+            }
+            product_map = next;
+        }
+        assert_eq!(product_map.len(), assignments);
+        for (mask, value) in product_map {
+            total[mask] = kernel.ring.add(&total[mask], &value, meter)?;
+        }
+        if !next_tuple(
+            &mut beta,
+            modes,
+            &mut usage,
+            &bounds,
+            &mut weight,
+            kernel.ring.precision(),
+            parameters.radix,
+            meter,
+        )? {
+            return Ok(total);
+        }
+    }
+}
+
 fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     Arc::new(Tensor {
         creation_precision: 3,
@@ -130,6 +319,19 @@ fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
                 .enumerate()
                 .fold(0, |n, (i, bit)| n | (usize::from(*bit) << i));
             Ok(table & (1 << index) != 0)
+        }))),
+    })
+}
+
+fn delta_predicate(arity: usize, selected: usize) -> Arc<Tensor> {
+    Arc::new(Tensor {
+        creation_precision: 3,
+        kind: TensorKind::Boolean(Arc::new(FnPredicate::new(arity, move |bits, _| {
+            let index = bits
+                .iter()
+                .enumerate()
+                .fold(0, |value, (port, bit)| value | (usize::from(*bit) << port));
+            Ok(index == selected)
         }))),
     })
 }
@@ -195,7 +397,7 @@ fn partition_basis_graph(left_groups: &[usize], right_groups: &[usize], basis: u
                         value | (((basis >> (offset + edge)) & 1) << port)
                     });
                 TensorVertex {
-                    tensor: predicate(edges.len(), 1u8 << assignment),
+                    tensor: delta_predicate(edges.len(), assignment),
                     edges,
                 }
             })
@@ -518,6 +720,139 @@ fn direct_factorization_matches_every_three_edge_partition_basis() {
         }
     }
     assert_eq!(cases, 6_400);
+}
+
+#[test]
+fn direct_factorization_matches_four_edge_partition_orbits() {
+    const PARTITIONS: [[usize; 4]; 15] = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 1],
+        [0, 0, 1, 0],
+        [0, 0, 1, 1],
+        [0, 0, 1, 2],
+        [0, 1, 0, 0],
+        [0, 1, 0, 1],
+        [0, 1, 0, 2],
+        [0, 1, 1, 0],
+        [0, 1, 1, 1],
+        [0, 1, 1, 2],
+        [0, 1, 2, 0],
+        [0, 1, 2, 1],
+        [0, 1, 2, 2],
+        [0, 1, 2, 3],
+    ];
+    const PERMUTATIONS: [[usize; 4]; 24] = [
+        [0, 1, 2, 3],
+        [0, 1, 3, 2],
+        [0, 2, 1, 3],
+        [0, 2, 3, 1],
+        [0, 3, 1, 2],
+        [0, 3, 2, 1],
+        [1, 0, 2, 3],
+        [1, 0, 3, 2],
+        [1, 2, 0, 3],
+        [1, 2, 3, 0],
+        [1, 3, 0, 2],
+        [1, 3, 2, 0],
+        [2, 0, 1, 3],
+        [2, 0, 3, 1],
+        [2, 1, 0, 3],
+        [2, 1, 3, 0],
+        [2, 3, 0, 1],
+        [2, 3, 1, 0],
+        [3, 0, 1, 2],
+        [3, 0, 2, 1],
+        [3, 1, 0, 2],
+        [3, 1, 2, 0],
+        [3, 2, 0, 1],
+        [3, 2, 1, 0],
+    ];
+
+    fn normalize(values: [usize; 4]) -> [usize; 4] {
+        let mut names = [usize::MAX; 4];
+        let mut next = 0usize;
+        values.map(|value| {
+            if names[value] == usize::MAX {
+                names[value] = next;
+                next += 1;
+            }
+            names[value]
+        })
+    }
+
+    fn canonical(left: [usize; 4], right: [usize; 4]) -> ([usize; 4], [usize; 4]) {
+        PERMUTATIONS
+            .iter()
+            .map(|permutation| {
+                (
+                    normalize(permutation.map(|edge| left[edge])),
+                    normalize(permutation.map(|edge| right[edge])),
+                )
+            })
+            .min()
+            .unwrap()
+    }
+
+    let representatives: BTreeSet<_> = PARTITIONS
+        .iter()
+        .flat_map(|&left| PARTITIONS.iter().map(move |&right| canonical(left, right)))
+        .collect();
+    assert_eq!(representatives.len(), 33);
+
+    let mut meter = Meter::new(Limits {
+        steps: 100_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let z = ring.point(&3u8.into()).unwrap();
+    let t = 1i64;
+    let coordinate = deformation::valuation(t);
+    let kernel = deformation::Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+    let mut cases = 0usize;
+    for (left_groups, right_groups) in representatives {
+        for schedule in 0..4 {
+            let prototype = partition_basis_graph(&left_groups, &right_groups, 0);
+            let rows = refinement_labels(prototype.left.len(), schedule, 0);
+            let columns = refinement_labels(prototype.right.len(), schedule, 1);
+            let packing =
+                packing::pack_labels(&prototype, &parameters, rows, columns, false, &mut meter)
+                    .unwrap();
+            let modes = deformation::modes(
+                &prototype,
+                &packing,
+                coordinate,
+                &parameters,
+                &kernel,
+                &mut meter,
+            )
+            .unwrap();
+            let expected =
+                direct_packet_basis_map(&prototype, &packing, &kernel, &mut meter).unwrap();
+            let actual = extracted_basis_map(
+                &prototype,
+                &packing,
+                &parameters,
+                coordinate,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
+            assert_eq!(
+                actual, expected,
+                "left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
+            );
+            cases += expected.len();
+        }
+    }
+    assert_eq!(cases, 33_792);
 }
 
 #[test]

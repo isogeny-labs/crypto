@@ -244,6 +244,16 @@ factorization map for arbitrary tensor entries on each tested structural
 shape. This strengthens the independent finite refinement without claiming
 all packet counts, edge counts, or labelings. `[pcc:unverified]`
 
+At four edges, the control quotients all 225 partition pairs to 33 graph-shape
+orbits under simultaneous edge relabeling, then checks all 256 delta-basis
+coefficients under four label schedules: 33,792 comparisons. A test-only
+symbolic child map batches the coefficients by old-incidence mask while still
+calling production mode construction, tuple enumeration, child construction,
+and packet entries. It agrees with a separately computed direct packet-kernel
+map. The measured Rust 1.78 debug runtime fell from 536.50 seconds for repeated
+delta contractions to 3.96 seconds for the same coefficient set.
+`[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

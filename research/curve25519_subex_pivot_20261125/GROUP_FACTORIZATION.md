@@ -182,6 +182,17 @@ Thus the 64 basis configurations determine the factorization map for arbitrary
 old tensor entries on every tested partition/label shape, rather than merely
 sampling 64 truth tables. `[pcc:unverified]`
 
+A third control covers four labeled edges. The 225 left/right partition pairs
+collapse to 33 graph-shape orbits under simultaneous edge relabeling. For each
+orbit and four label schedules, an independent direct packet-kernel map is
+compared with a symbolic map built from production modes, tuple enumeration,
+children, and packet entries. Each map contains all 256 old-incidence delta
+basis coefficients, giving 33,792 exact coefficient comparisons. The symbolic
+map enumerates each child assignment once and records its old-incidence mask,
+rather than rerunning a complete contraction for every delta tensor. This
+reduced the measured Rust 1.78 debug runtime from 536.50 seconds to 3.96
+seconds while preserving the exact coefficient set. `[pcc:unverified]`
+
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust
 child back to this polynomial. C1 items 1–3 close only after that independent
