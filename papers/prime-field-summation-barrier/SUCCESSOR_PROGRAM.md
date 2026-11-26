@@ -48,6 +48,8 @@ The status of the program is:
 | Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set or the attainable targets forces a quantified false-verification blowup |
 | Proposition 23 | exact target-dependent construction and audit | the map \(P\mapsto x(T-P)\) leaves only a sign ambiguity, but its scan/preprocessing balance remains strictly above one-half |
 | Theorem 24 | unconditional in the degree-explicit selector model | target-adaptive algebraic leaf correspondences satisfy a preprocessing/query direct sum and hence a square-root relation barrier |
+| Proposition 25 | unconditional compact-degree counterexample | multiplication-by-\(k\) has degree \(k^2\) but an \(O(\log k)\) group-law DAG, so expanded degree cannot be charged as compact-circuit work |
+| Theorem 26 | unconditional in the explicit global-map catalogue model | compact single-valued rational branches satisfy a degree-free square-root direct sum |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2075,6 +2077,125 @@ without paying their expanded degree sum.  The theorem does not assert
 compact case requires a simulation theorem or a different search measure;
 the unrestricted ARQP conjecture therefore remains open. [pcc:unverified]
 
+### Proposition 25 (expanded degree is not compact-DAG work)
+
+For every integer \(k\ge1\), the multiplication morphism
+
+\[
+[k]:E\to E
+\]
+
+has algebraic degree \(k^2\).  Nevertheless, binary double-and-add evaluates
+\([k]T\) with \(O(\log k)\) elliptic group operations and a shared rational
+DAG of size \(O(\log k)\).  If \(G\) has prime order \(n\) and
+\(k\not\equiv0\pmod n\), then \([k]\) permutes \(G\), so for every
+\(\mathcal F\subseteq G\),
+
+\[
+\left|\{T\in G:[k]T\in\mathcal F\}\right|=|\mathcal F|.
+\]
+
+Thus neither expanded map degree nor the degree sum in Theorem 24 is a valid
+lower bound for unrestricted compact-DAG size. [pcc:unverified]
+
+#### Proof
+
+The standard degree formula for multiplication on an elliptic curve is
+\(\deg[k]=k^2\), including inseparable degree in positive characteristic. [pcc:unverified]
+The binary expansion of \(k\) uses at most
+\(\lfloor\log_2 k\rfloor\) doublings and that many conditional additions.
+On the cyclic group \(G\), multiplication by a nonzero residue modulo \(n\)
+is a permutation, which proves the displayed identity. \(\square\)
+
+### Theorem 26 (degree-free compact global-map direct sum)
+
+Let \(G\subseteq E(\mathbb F_p)\) have prime order \(n\), and let
+\(\mathcal F\subseteq G\) have size \(N\).  A catalogue contains \(r\)
+branches.  Branch \(j\) consists of \(m\) fixed global rational maps
+
+\[
+f_{j,i}:E\dashrightarrow E\qquad(1\le i\le m),
+\]
+
+represented by arbitrary compact shared DAGs.  On its success set
+\(U_j\subseteq G\), all outputs lie in \(\mathcal F\) and
+
+\[
+\sum_{i=1}^m f_{j,i}(T)=T.
+\]
+
+The query algorithm may choose branches adaptively after seeing the target,
+and DAG computations may be shared within and across branches.  The explicit
+catalogue model charges only \(P\ge r\), with no charge proportional to map
+degree.  For \(B\) independent uniform targets and \(Z\) returned
+branch--target relations,
+
+\[
+\mathbb E Z\le\frac{BNr}{n}.
+\]
+
+Hence producing \(R=cN\) expected rows requires
+
+\[
+Br\ge cn,\qquad
+P+B+T_{\rm verify}\ge2\sqrt{cn}.
+\]
+
+This gives an unconditional \(p^{1/2-o(1)}\) barrier for compact,
+single-valued global rational selector branches when \(n=\Theta(p)\).
+[pcc:unverified]
+
+#### Proof
+
+Because \(E\) is a smooth projective curve and the target \(E\) is proper,
+each rational map \(f_{j,i}:E\dashrightarrow E\) extends to a morphism.
+For any morphism \(f:E\to E\), put \(C=f(O)\).  The rigidity lemma for
+abelian varieties shows that
+
+\[
+\phi(T)=f(T)-C
+\]
+
+is a group endomorphism of \(E\).  The subgroup
+\(\ker(\phi)\cap G\) is either \(G\) or \(\{O\}\), since \(G\) has prime
+order.  In the first case \(f|_G\) is constant; in the second it is injective.
+This conclusion is independent of the degree and representation of \(f\).
+
+Fix a branch \(j\).  If some \(f_{j,i}|_G\) is injective, then
+
+\[
+|U_j|
+\le\left|\{T\in G:f_{j,i}(T)\in\mathcal F\}\right|
+\le N.
+\]
+
+If every leaf map is constant on \(G\), their sum is constant, so the relation
+equation holds for at most one target and again \(|U_j|\le N\).  Therefore
+\(\sum_j|U_j|\le Nr\).
+
+For a uniform target, branch \(j\) succeeds with probability \(|U_j|/n\).
+Adaptive selection can only suppress successful branch--target pairs, so
+linearity of expectation gives
+
+\[
+\mathbb E Z\le\frac{B}{n}\sum_j|U_j|\le\frac{BNr}{n}.
+\]
+
+The relation requirement gives \(Br\ge cn\); using \(P\ge r\) and AM--GM
+proves the cost bound. [pcc:unverified] \(\square\)
+
+Theorem 26 includes arbitrarily high-degree multiplication maps, isogeny
+chains, compact straight-line coordinate formulas that globally map
+\(E\) to itself, and shared group-law DAGs.  Unlike Theorem 24, it does not
+charge expanded degree.
+
+It does not cover multivalued correspondences represented succinctly without
+degree expansion, coordinate circuits that land on \(E\) only on a finite
+branch domain rather than defining a global rational map, or branching
+programs that implicitly encode exponentially many distinct rational output
+tuples while paying for only a compact control DAG.  Those are now the exact
+remaining compact-circuit cases. [pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2105,8 +2226,10 @@ filtering do not create sparse expanded certificates.
 These results rule out a globally low-rank representation that amortizes all
 targets at once. They do **not** rule out:
 
-- a target-adaptive coordinate circuit built after seeing \(R\) and using more
-  than black-box sum evaluation;
+- a target-adaptive coordinate circuit whose output formulas land on \(E\)
+  only over a finite branch domain rather than defining global maps;
+- a succinct multivalued correspondence whose expanded projection degree is
+  not materialized;
 - randomized algorithms that tolerate false positives and verify candidates;
 - implicit meet-in-the-middle or collision walks;
 - an algebraic solver whose internal representation is not a separated exact
@@ -2276,14 +2399,15 @@ overhead, while product trees, fast gcd/resultant algorithms, and Proposition
 Theorem 18 supplies the exact multi-target preprocessing/query direct-sum
 bound for static-provenance product trees with arbitrary adaptive query
 branching.  Theorem 24 supplies the corresponding square-root direct sum for
-degree-explicit piecewise-rational selectors with adaptive branch choice.  The
-remaining Gate 2 extension is to compact, implicitly generated split-\(S_3\)
-subtrees and shared DAGs whose expanded path-degree mass is not charged.  A
-width or monomial lower bound counts only if a simulation theorem shows that
-it also charges those compact polynomial and rational representations.
-Theorems 21--22 and Proposition 23 further show that this extension must cover
-joint or target-dependent witness search, rather than only exact labels,
-false-positive verification, or target-shifted scans.
+degree-explicit algebraic selectors with adaptive branch choice.  Theorem 26
+removes the degree charge for compact single-valued global maps in an explicit
+branch catalogue.  The remaining Gate 2 extension is to succinct multivalued
+correspondences, finite-domain coordinate formulas, and control DAGs that
+implicitly generate exponentially many output branches.  A width or monomial
+lower bound counts only if a simulation theorem charges those compact
+representations.  Theorems 21--22 and Proposition 23 further show that this
+extension must cover joint or target-dependent witness search, rather than
+only exact labels, false-positive verification, or target-shifted scans.
 `[pcc:unverified]`
 
 ### Gate 3: square-root closure
@@ -2301,8 +2425,9 @@ representation, turn that witness into an algorithm and audit its exponent.
 ## 10. Near-term paper-quality deliverable
 
 Theorem 18 supplies the first item below for the static-provenance subclass,
-and Theorem 24 extends it to degree-explicit rational selector catalogues.  The
-next publishable extension should be one of:
+Theorem 24 extends it to degree-explicit algebraic selector catalogues, and
+Theorem 26 handles compact single-valued global maps without a degree charge.
+The next publishable extension should be one of:
 
 1. an extension of the exact direct-sum theorem from explicit provenance to a
    closed class of compact split-\(S_3\) candidate generators;
@@ -2315,6 +2440,7 @@ next publishable extension should be one of:
 Theorem 1 makes “global low tensor rank” an unpromising escape, while
 Propositions 11 and 12 show that expanded support is not a general circuit
 measure.  Theorems 21--22 close exact and one-sided target-independent
-separate labels, while Proposition 23 audits the simplest target-dependent
-coordinate filter.  Research should now concentrate on joint target-adaptive
-search, direct sums, data-structure trade-offs, and multi-target sharing.
+separate labels, Proposition 23 audits the simplest target-dependent
+coordinate filter, and Theorem 26 closes compact global single-valued maps.
+Research should now concentrate on succinct correspondences, implicit branch
+generation, joint target-adaptive search, and multi-target sharing.

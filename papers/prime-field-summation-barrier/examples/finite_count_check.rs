@@ -458,4 +458,64 @@ fn finite_selector_catalogues_obey_fibre_mass_bound() {
     }
 }
 
+#[test]
+fn compact_global_map_branches_are_constant_or_injective() {
+    for group_order in [11_usize, 17] {
+        for factor_size in 3..=6 {
+            let factor: BTreeSet<_> = (0..factor_size).collect();
+            let mut total_successes = 0_usize;
+            let mut branch_count = 0_usize;
+
+            for coefficient in [0_usize, 1, 2, 5] {
+                let coefficients = [
+                    coefficient % group_order,
+                    (group_order + 1 - coefficient % group_order) % group_order,
+                    0,
+                ];
+                let constants = [2_usize, group_order - 2, 0];
+                let maps: Vec<Vec<usize>> = coefficients
+                    .iter()
+                    .zip(constants)
+                    .map(|(&scalar, constant)| {
+                        (0..group_order)
+                            .map(|target| (scalar * target + constant) % group_order)
+                            .collect()
+                    })
+                    .collect();
+
+                for map in &maps {
+                    let image_size = map.iter().copied().collect::<BTreeSet<_>>().len();
+                    assert!(image_size == 1 || image_size == group_order);
+                }
+
+                let success_count = (0..group_order)
+                    .filter(|&target| {
+                        maps.iter().all(|map| factor.contains(&map[target]))
+                            && maps.iter().map(|map| map[target]).sum::<usize>() % group_order
+                                == target
+                    })
+                    .count();
+                assert!(success_count <= factor_size);
+                total_successes += success_count;
+                branch_count += 1;
+            }
+
+            // A branch with only constant leaf maps can satisfy the target
+            // equation at one group element at most.
+            let constant_outputs = [0_usize, 1, 2];
+            let constant_successes = (0..group_order)
+                .filter(|target| {
+                    constant_outputs.iter().all(|value| factor.contains(value))
+                        && constant_outputs.iter().sum::<usize>() % group_order == *target
+                })
+                .count();
+            assert!(constant_successes <= 1);
+            total_successes += constant_successes;
+            branch_count += 1;
+
+            assert!(total_successes <= factor_size * branch_count);
+        }
+    }
+}
+
 fn main() {}

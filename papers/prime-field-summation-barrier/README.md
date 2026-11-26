@@ -92,6 +92,18 @@ non-materializing leaf output are allowed.  Compact shared DAGs that encode
 many paths without paying their expanded degree mass remain outside the
 theorem. `[pcc:unverified]`
 
+Proposition 25 explains why Theorem 24's expanded-degree charge cannot simply
+be imposed on compact DAGs: multiplication-by-`k` has degree `k^2` but an
+`O(log k)` double-and-add circuit.  Theorem 26 then removes the degree charge
+for single-valued global maps entirely.  Every rational map `E -> E` is a
+translation of an endomorphism; on a prime-order subgroup its restriction is
+constant or injective.  Consequently each compact selector branch succeeds
+on at most `N` targets, so an explicit `r`-branch catalogue obeys
+`E[Z] <= BNr/n` and again requires `Omega(sqrt(n))` total work.  Arbitrary
+map degree, compact group-law DAGs, and shared straight-line computation are
+allowed.  Succinct multivalued correspondences and implicitly exponential
+branching remain open. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -133,7 +145,7 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-ten tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+eleven tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
@@ -141,6 +153,7 @@ and exact separate-label predicates for small groups. It also checks all three
 one-sided false-positive lower bounds of Theorem 22 on bounded cyclic-group
 fixtures and the target-shift exponent arithmetic of Proposition 23.
 It also replays the finite fibre-count kernel of Theorem 24.
+The final check replays Theorem 26's constant-or-injective compact-map kernel.
 `[pcc:unverified]`
 
 ## Owed before review-ready status
