@@ -19,6 +19,7 @@ proof obligations from computational-model assumptions.
 | no compressed exact bucket filter or compositional quotient | successor Theorem 21 | exact-predicate injectivity, prime subgroup order, congruence fibres, properness of `E`, isogeny kernel length | hand proof plus finite exhaustive label replay, unreviewed `[pcc:unverified]` | independent algebraic-group review |
 | one-sided separate-label false-positive trade-off | successor Theorem 22 | summand- and target-label fibre collision counts, cancellation, and Cauchy--Schwarz | exact hand proof plus bounded finite replay, unreviewed `[pcc:unverified]` | independent combinatorial review and finite replay |
 | target-shifted coordinate filter | successor Proposition 23 | elliptic \(x\)-coordinate sign ambiguity, explicit hash/scan costs, and relation-batch exponent balance | exact construction and arithmetic replay, unreviewed `[pcc:unverified]` | independent algorithm/cost review |
+| degree-explicit algebraic-selector direct sum | successor Theorem 24 | degrees of target and leaf morphism fibres, union over factor-base points, uniform-target expectation, and AM--GM | exact hand proof plus bounded combinatorial replay, unreviewed `[pcc:unverified]` | independent algebraic-geometry and model review |
 | unrestricted compact-circuit barrier | successor programme | new preprocessing/query direct-sum theorem | **open; not claimed** | formulate a narrow model with a falsifiable lower-bound target |
 
 ## Explicit non-implications

@@ -80,6 +80,18 @@ complete relation exponent \((m-1)/(2m-3)>1/2\), namely `2/3`, `3/5`, and
 `4/7` for `m = 3, 4, 5`.  This does not rule out a shared multi-target or
 non-scanning construction. `[pcc:unverified]`
 
+Theorem 24 proves the desired square-root direct sum for a new explicit class:
+degree-explicit algebraic selector correspondences.  A nonconstant
+degree-\(d\) leaf morphism can land in an \(N\)-point factor base at no more
+than \(dN\) witness points.  Summing this fibre bound over a fixed catalogue
+of charged projection-degree mass \(\Delta\) gives
+\(\mathbb E Z\le BN\Delta/n\).  Producing \(\Theta(N)\) rows therefore forces
+\(B\Delta=\Omega(n)\) and total cost \(\Omega(\sqrt n)\).
+Target-adaptive branch selection, multivalued root recovery, and direct
+non-materializing leaf output are allowed.  Compact shared DAGs that encode
+many paths without paying their expanded degree mass remain outside the
+theorem. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -121,13 +133,14 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-nine tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+ten tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
 and exact separate-label predicates for small groups. It also checks all three
 one-sided false-positive lower bounds of Theorem 22 on bounded cyclic-group
 fixtures and the target-shift exponent arithmetic of Proposition 23.
+It also replays the finite fibre-count kernel of Theorem 24.
 `[pcc:unverified]`
 
 ## Owed before review-ready status

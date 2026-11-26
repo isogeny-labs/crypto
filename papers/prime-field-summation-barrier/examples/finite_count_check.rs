@@ -402,4 +402,60 @@ fn target_shift_scan_exponents_remain_above_one_half() {
     }
 }
 
+fn maximum_fibre_size(map: &[usize], range_size: usize) -> usize {
+    let mut fibres = vec![0_usize; range_size];
+    for &value in map {
+        fibres[value] += 1;
+    }
+    fibres.into_iter().max().unwrap_or(0)
+}
+
+#[test]
+fn finite_selector_catalogues_obey_fibre_mass_bound() {
+    for group_order in [11_usize, 17] {
+        for factor_size in 2..=5 {
+            let factor: BTreeSet<_> = (0..factor_size).collect();
+            let mut total_successes = 0_usize;
+            let mut total_degree_mass = 0_usize;
+
+            // Each coefficient tuple sums to one, so the branch outputs sum
+            // to the target. Constants are included as coefficient zero.
+            for coefficients in [
+                [1, 0, 0],
+                [2, group_order - 1, 0],
+                [3, 4, group_order - 6],
+            ] {
+                let maps: Vec<Vec<usize>> = coefficients
+                    .iter()
+                    .map(|&coefficient| {
+                        (0..group_order)
+                            .map(|target| coefficient * target % group_order)
+                            .collect()
+                    })
+                    .collect();
+
+                let success_count = (0..group_order)
+                    .filter(|&target| {
+                        maps.iter().all(|map| factor.contains(&map[target]))
+                            && maps.iter().map(|map| map[target]).sum::<usize>() % group_order
+                                == target
+                    })
+                    .count();
+                let degree_mass = 1
+                    + maps
+                        .iter()
+                        .filter(|map| !map.iter().all(|value| *value == map[0]))
+                        .map(|map| maximum_fibre_size(map, group_order))
+                        .sum::<usize>();
+
+                assert!(success_count <= factor_size * degree_mass);
+                total_successes += success_count;
+                total_degree_mass += degree_mass;
+            }
+
+            assert!(total_successes <= factor_size * total_degree_mass);
+        }
+    }
+}
+
 fn main() {}

@@ -47,6 +47,7 @@ The status of the program is:
 | Theorem 21 | unconditional bucket/quotient obstruction | arbitrary exact separate-label predicates, exact compositional buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
 | Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set or the attainable targets forces a quantified false-verification blowup |
 | Proposition 23 | exact target-dependent construction and audit | the map \(P\mapsto x(T-P)\) leaves only a sign ambiguity, but its scan/preprocessing balance remains strictly above one-half |
+| Theorem 24 | unconditional in the degree-explicit selector model | target-adaptive algebraic leaf correspondences satisfy a preprocessing/query direct sum and hence a square-root relation barrier |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1958,6 +1959,122 @@ side.  Proposition 23 does not lower-bound more elaborate target-dependent
 maps or shared multi-target algorithms; it identifies the scan that a genuine
 non-materializing improvement must avoid. [pcc:unverified]
 
+### Theorem 24 (degree-explicit algebraic-selector direct sum)
+
+Let \(G\subseteq E(\mathbb F_p)\) have order \(n\), and let
+\(\mathcal F\subseteq G\) be a factor base of size \(N\).  A
+**degree-explicit algebraic selector catalogue** consists of finitely many
+branches \(j\).  Branch \(j\) is a smooth projective curve \(X_j\), a
+nonconstant target morphism, and \(m\) leaf morphisms,
+
+\[
+\pi_j:X_j\to E,\qquad
+f_{j,i}:X_j\to E\qquad(1\le i\le m).
+\]
+
+This includes the normalization of a finite algebraic correspondence; an
+ordinary rational selector is the special case \(X_j=E\) and
+\(\pi_j=\operatorname{id}\).  Let \(W_j\subseteq X_j(\overline{\mathbb F}_p)\)
+be the verified witness points for which \(\pi_j(x)\in G\),
+\(f_{j,i}(x)\in\mathcal F\), and [pcc:unverified]
+
+\[
+\sum_{i=1}^m f_{j,i}(x)=\pi_j(x).
+\]
+
+On target \(T\), the query algorithm may choose branches adaptively, recover
+any \(x\in W_j\) with \(\pi_j(x)=T\), verify its leaf tuple, and suppress any
+successful output.  Repeated copies of the same witness point are counted
+once.  Put [pcc:unverified]
+
+\[
+\delta_j
+=\deg(\pi_j)
++\sum_{\substack{1\le i\le m\\ f_{j,i}\ {\rm nonconstant}}}
+\deg(f_{j,i}),
+\qquad
+\Delta=\sum_j\delta_j.
+\]
+
+The degree-explicit model charges preprocessing \(P\ge\Delta\); in
+particular, a branch catalogue, correspondence, or path expansion cannot
+store projection degree \(d\) for less than \(d\) charged units.  Supplying
+and reading a target costs at least one query unit, even when batch work is
+shared.  For \(B\) independent uniform targets, if \(Z\) is the number of
+distinct verified witness points returned, then [pcc:unverified]
+
+\[
+\mathbb E Z\le \frac{BN\Delta}{n}.
+\]
+
+Consequently, producing \(R=cN\) expected relation rows, for any fixed
+\(c>0\), requires
+
+\[
+B\Delta\ge cn,\qquad
+P+B+T_{\rm verify}\ge 2\sqrt{cn}.
+\]
+
+For \(n=\Theta(p)\), this is an unconditional
+\(p^{1/2-o(1)}\) relation-stage barrier in the stated model, independent of
+\(m\) and of the factor-base exponent. [pcc:unverified]
+
+#### Proof
+
+If a nonconstant morphism from a smooth projective curve to \(E\) has degree
+\(d\), every geometric point fibre has at most \(d\) distinct points.
+Therefore, for any nonconstant \(f_{j,i}\),
+
+\[
+\left|\{x\in W_j:f_{j,i}(x)\in\mathcal F\}\right|
+\le dN.
+\]
+
+If branch \(j\) has at least one nonconstant leaf map, choosing any such map
+gives \(|W_j|\le N\delta_j\).  If all leaf maps are constant, their sum is
+one fixed point \(T_j\).  The relation equation then puts \(W_j\) inside the
+fibre \(\pi_j^{-1}(T_j)\), so
+\(|W_j|\le\deg(\pi_j)\le N\delta_j\).  Hence
+
+\[
+\sum_j|W_j|\le N\Delta.
+\]
+
+For a uniform target, the expected number of branch-\(j\) witness points above
+it is \(|W_j|/n\).  Linearity of expectation over all targets and branches
+applies even when branch selection and root recovery are adaptive, because
+they can only suppress members of the fixed witness sets.  Thus
+
+\[
+\mathbb E Z
+\le \frac{B}{n}\sum_j|W_j|
+\le \frac{BN\Delta}{n}.
+\]
+
+The requirement \(\mathbb E Z\ge cN\) gives \(B\Delta\ge cn\).
+Since \(P\ge\Delta\), the arithmetic--geometric mean inequality gives
+
+\[
+P+B+T_{\rm verify}\ge\Delta+B\ge2\sqrt{B\Delta}
+\ge2\sqrt{cn}.
+\]
+
+\(\square\)
+
+The theorem permits target-adaptive branch choice, multivalued algebraic root
+recovery, non-materializing direct leaf output, false-positive verification,
+and reuse of the catalogue across the complete target batch.  It rules out
+bounded-degree rational reconstruction, explicit collections of
+target-dependent algebraic parameterizations, and degree-expanded split-tree
+correspondences as sub-rho mechanisms.
+
+Its boundary is exact and important: a compact shared DAG may encode
+exponentially many algebraic execution paths or a high-degree correspondence
+without paying their expanded degree sum.  The theorem does not assert
+\(P\ge\Delta\) for such representations.  Extending the direct sum to that
+compact case requires a simulation theorem or a different search measure;
+the unrestricted ARQP conjecture therefore remains open. [pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2158,12 +2275,15 @@ overhead, while product trees, fast gcd/resultant algorithms, and Proposition
 
 Theorem 18 supplies the exact multi-target preprocessing/query direct-sum
 bound for static-provenance product trees with arbitrary adaptive query
-branching.  The remaining Gate 2 extension is to implicitly generated
-split-\(S_3\) subtrees.  A width or monomial lower bound counts only if a
-simulation theorem shows that it also charges compact polynomial and rational
-representations.  Theorems 21--22 and Proposition 23 further show that this
-extension must cover joint or target-dependent witness search, rather than
-only exact labels, false-positive verification, or target-shifted scans.
+branching.  Theorem 24 supplies the corresponding square-root direct sum for
+degree-explicit piecewise-rational selectors with adaptive branch choice.  The
+remaining Gate 2 extension is to compact, implicitly generated split-\(S_3\)
+subtrees and shared DAGs whose expanded path-degree mass is not charged.  A
+width or monomial lower bound counts only if a simulation theorem shows that
+it also charges those compact polynomial and rational representations.
+Theorems 21--22 and Proposition 23 further show that this extension must cover
+joint or target-dependent witness search, rather than only exact labels,
+false-positive verification, or target-shifted scans.
 `[pcc:unverified]`
 
 ### Gate 3: square-root closure
@@ -2180,8 +2300,9 @@ representation, turn that witness into an algorithm and audit its exponent.
 
 ## 10. Near-term paper-quality deliverable
 
-Theorem 18 supplies the first item below for the static-provenance subclass.
-The next publishable extension should be one of:
+Theorem 18 supplies the first item below for the static-provenance subclass,
+and Theorem 24 extends it to degree-explicit rational selector catalogues.  The
+next publishable extension should be one of:
 
 1. an extension of the exact direct-sum theorem from explicit provenance to a
    closed class of compact split-\(S_3\) candidate generators;
