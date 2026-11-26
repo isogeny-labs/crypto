@@ -27,9 +27,6 @@ fn forced(
     layers: usize,
     meter: &mut Meter,
 ) -> Result<Element> {
-    if layers == 0 || graph.edges.is_empty() {
-        return brute_tensor(graph, ring, &mut Statistics::default(), meter);
-    }
     let parameters = Parameters {
         radix: 2,
         u: 1,
@@ -37,21 +34,56 @@ fn forced(
         length: 4,
         array: 16,
     };
-    let packing = packing::pack_labels(graph, &parameters, rows, columns, false, meter)?;
+    forced_at(
+        graph,
+        ring,
+        rows,
+        columns,
+        layers,
+        0,
+        &parameters,
+        &mut Vec::new(),
+        meter,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn forced_at(
+    graph: &Bipartite,
+    ring: &Ring,
+    rows: Vec<usize>,
+    columns: Vec<usize>,
+    layers: usize,
+    depth: usize,
+    parameters: &Parameters,
+    visits: &mut Vec<usize>,
+    meter: &mut Meter,
+) -> Result<Element> {
+    if visits.len() <= depth {
+        visits.resize(depth + 1, 0);
+    }
+    visits[depth] += 1;
+    if layers == 0 || graph.edges.is_empty() {
+        return brute_tensor(graph, ring, &mut Statistics::default(), meter);
+    }
+    let packing = packing::pack_labels(graph, parameters, rows, columns, false, meter)?;
     active(
         graph,
         ring,
-        &parameters,
+        parameters,
         &packing,
         false,
         usize::MAX,
         &mut |child, child_ring, work| {
-            forced(
+            forced_at(
                 child,
                 child_ring,
                 vec![0; child.left.len()],
-                vec![3; child.right.len()],
+                vec![parameters.length - 1; child.right.len()],
                 layers - 1,
+                depth + 1,
+                parameters,
+                visits,
                 work,
             )
         },
@@ -160,6 +192,53 @@ fn coupled_nested_contraction_preserves_old_packet_creation_precision() {
         forced(&graph, &ring, vec![0], vec![3], 2, &mut meter).unwrap(),
         expected
     );
+}
+
+#[test]
+fn three_nested_contractions_reach_the_third_child_and_match_direct_count() {
+    let mut meter = Meter::new(Limits {
+        steps: 20_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 3, &mut meter).unwrap();
+    let graph = Bipartite {
+        left: vec![TensorVertex {
+            tensor: predicate(1, 2),
+            edges: vec![0],
+        }],
+        right: vec![TensorVertex {
+            tensor: predicate(1, 3),
+            edges: vec![0],
+        }],
+        edges: vec![Edge {
+            left: (0, 0),
+            right: (0, 0),
+        }],
+    };
+    graph.validate().unwrap();
+    let expected = brute_tensor(&graph, &ring, &mut Statistics::default(), &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 1,
+        length: 2,
+        array: 4,
+    };
+    let mut visits = Vec::new();
+    let actual = forced_at(
+        &graph,
+        &ring,
+        vec![0],
+        vec![1],
+        3,
+        0,
+        &parameters,
+        &mut visits,
+        &mut meter,
+    )
+    .unwrap();
+    assert_eq!(actual, expected);
+    assert!(visits.get(3).copied().unwrap_or(0) > 0, "visits={visits:?}");
 }
 
 #[test]

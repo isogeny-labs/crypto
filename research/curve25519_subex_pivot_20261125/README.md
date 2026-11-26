@@ -102,13 +102,18 @@ cargo test --locked --release \
   --manifest-path crates/hashed-ecdl-tensor/Cargo.toml \
   --lib contraction::recursive::coupled_controls -- --nocapture
 
-3 passed; 0 failed
+4 passed; 0 failed
 ```
 
 Those controls cover parallel/correlated ports, quadratic incoming modes,
 outgoing form powers, two taper levels and a nested child whose older packet
-keeps its creation precision.  They are bounded exact controls, not a proof of
-the asymptotic induction.
+keeps its creation precision.  The fourth control forces three nested active
+contractions, records a nonempty child visit at depth three, and matches the
+independent direct count.  It uses the production deformation, child,
+interpolation and recovery routines with the smaller diagnostic taper
+`u=1,a=1,L=2`; the `a=2,L=4` preflight exceeded 60 seconds and is not retained
+as a routine gate.  These are bounded exact controls, not a proof of the
+asymptotic induction. [pcc:unverified]
 
 The finite counting and pair-split formulas are independently executable in
 `crates/hashed-ecdl-tensor/src/bin/curve25519-subex-gate.rs`.  It uses exact
@@ -452,7 +457,7 @@ composition, not an online-only or free-oracle calculation.
 The achievement remains conditional in two important senses.  The combined
 Rust/source cost argument is a producer audit rather than an independent
 refinement proof, and the Bochum reduction assumes the external tensor
-contraction theorem.  The native typed encoders and 163-test suite exercise
+contraction theorem.  The native typed encoders and 170-test suite exercise
 the required information-flow and polynomial-description claims, but do not
 kernel-check the whole asymptotic chain. [pcc:unverified]
 
