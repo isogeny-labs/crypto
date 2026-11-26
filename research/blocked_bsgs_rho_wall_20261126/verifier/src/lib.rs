@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::fs::{self, File};
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Read};
 use std::path::Path;
 
 use serde_json::{json, Value};
@@ -20,6 +20,14 @@ pub const PROTOCOL_ADDENDUM_2_SHA256: &str =
     "d581de654830d1730eac4a3019e323752f5dc98cbb4d7276e9943c954191a1c1";
 pub const NATIVE_CARGO_LOCK_SHA256: &str =
     "cd56d62407c6ef09b5fbd0cdf187b2fd684c609a1b2df42b301a8eb67c699b17";
+pub const PROTOCOL_BODY_SHA256: &str =
+    "a6c0cf1afac40deda80081b5c9eeedf94b0d8884b1f679c8a2f412d995f888bc";
+
+const MAX_SEED_ARTIFACT_BYTES: u64 = 1 << 20;
+const MAX_PROTOCOL_JSON_BYTES: u64 = 2 << 20;
+const MAX_RAW_FILE_BYTES: u64 = 128 << 20;
+const MAX_RAW_LINE_BYTES: usize = 1 << 20;
+const GIT_STATUS_SCOPE: &str = "all tracked/untracked paths except authorized raw timing outputs under research/blocked_bsgs_rho_wall_20261126/raw/";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Fixture {
@@ -344,25 +352,134 @@ pub fn verify_fixtures() -> Result<Value, String> {
     }))
 }
 
-fn read_jsonl(path: &Path) -> Result<Vec<Value>, String> {
+fn read_file_bounded(path: &Path, max_bytes: u64, label: &str) -> Result<Vec<u8>, String> {
     let file = File::open(path).map_err(|e| format!("open {}: {e}", path.display()))?;
-    BufReader::new(file)
-        .lines()
-        .enumerate()
-        .map(|(index, line)| {
-            let line = line.map_err(|e| format!("read {}:{}: {e}", path.display(), index + 1))?;
-            if line.trim().is_empty() {
-                return Err(format!("blank line at {}:{}", path.display(), index + 1));
-            }
-            serde_json::from_str(&line)
-                .map_err(|e| format!("parse {}:{}: {e}", path.display(), index + 1))
-        })
-        .collect()
+    let mut bytes = Vec::new();
+    file.take(max_bytes + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("read {}: {e}", path.display()))?;
+    if bytes.len() as u64 > max_bytes {
+        return Err(format!(
+            "{label} {} exceeds {max_bytes} byte limit",
+            path.display()
+        ));
+    }
+    Ok(bytes)
+}
+
+fn read_bounded_line<R: BufRead>(
+    reader: &mut R,
+    path: &Path,
+    line_number: usize,
+) -> Result<Option<Vec<u8>>, String> {
+    let mut line = Vec::new();
+    loop {
+        let available = reader
+            .fill_buf()
+            .map_err(|e| format!("read {}:{line_number}: {e}", path.display()))?;
+        if available.is_empty() {
+            return Ok((!line.is_empty()).then_some(line));
+        }
+        let take = available
+            .iter()
+            .position(|byte| *byte == b'\n')
+            .map_or(available.len(), |index| index + 1);
+        if line.len().saturating_add(take) > MAX_RAW_LINE_BYTES {
+            return Err(format!(
+                "raw JSONL line {}:{line_number} exceeds {MAX_RAW_LINE_BYTES} byte limit",
+                path.display()
+            ));
+        }
+        let terminated = available[take - 1] == b'\n';
+        line.extend_from_slice(&available[..take]);
+        reader.consume(take);
+        if terminated {
+            return Ok(Some(line));
+        }
+    }
 }
 
 fn sha256_path(path: &Path) -> Result<String, String> {
     let bytes = fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
     Ok(hex::encode(Sha256::digest(bytes)))
+}
+
+fn sha256_path_bounded(path: &Path, max_bytes: u64, label: &str) -> Result<String, String> {
+    Ok(hex::encode(Sha256::digest(read_file_bounded(
+        path, max_bytes, label,
+    )?)))
+}
+
+fn canonical_json(value: &Value, bytes: &mut Vec<u8>) -> Result<(), String> {
+    match value {
+        Value::Object(map) => {
+            bytes.push(b'{');
+            let mut keys = map.keys().collect::<Vec<_>>();
+            keys.sort_unstable();
+            for (index, key) in keys.into_iter().enumerate() {
+                if index != 0 {
+                    bytes.push(b',');
+                }
+                bytes.extend(serde_json::to_vec(key).map_err(|error| error.to_string())?);
+                bytes.push(b':');
+                canonical_json(&map[key], bytes)?;
+            }
+            bytes.push(b'}');
+        }
+        Value::Array(items) => {
+            bytes.push(b'[');
+            for (index, item) in items.iter().enumerate() {
+                if index != 0 {
+                    bytes.push(b',');
+                }
+                canonical_json(item, bytes)?;
+            }
+            bytes.push(b']');
+        }
+        _ => bytes.extend(serde_json::to_vec(value).map_err(|error| error.to_string())?),
+    }
+    Ok(())
+}
+
+fn protocol_body_hash(protocol: &Value) -> Result<String, String> {
+    let mut body = protocol.clone();
+    body.as_object_mut()
+        .ok_or_else(|| "protocol is not a JSON object".to_string())?
+        .remove("freeze");
+    let mut canonical = Vec::new();
+    canonical_json(&body, &mut canonical)?;
+    Ok(hex::encode(Sha256::digest(canonical)))
+}
+
+fn validate_protocol_freeze(protocol: &Value, expected_body_hash: &str) -> Result<String, String> {
+    let body_hash = protocol_body_hash(protocol)?;
+    let freeze = &protocol["freeze"];
+    let valid_lower_hex = |value: &str, length: usize| {
+        value.len() == length
+            && value
+                .bytes()
+                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    };
+    if !valid_lower_hex(expected_body_hash, 64)
+        || freeze["status"].as_str() != Some("frozen")
+        || freeze["protocol_sha256"].as_str() != Some(body_hash.as_str())
+        || body_hash != expected_body_hash
+        || freeze["commit"]
+            .as_str()
+            .filter(|value| valid_lower_hex(value, 40))
+            .is_none()
+        || freeze["filed_before_affected_data"].as_bool() != Some(true)
+    {
+        return Err("protocol freeze/body custody mismatch".into());
+    }
+    Ok(body_hash)
+}
+
+fn verify_protocol_custody(path: &Path) -> Result<String, String> {
+    let bytes = read_file_bounded(path, MAX_PROTOCOL_JSON_BYTES, "protocol JSON")?;
+    let protocol: Value = serde_json::from_slice(&bytes)
+        .map_err(|error| format!("parse {}: {error}", path.display()))?;
+    validate_protocol_freeze(&protocol, PROTOCOL_BODY_SHA256)
 }
 
 fn required_u64(value: &Value, field: &str) -> Result<u64, String> {
@@ -450,7 +567,7 @@ fn bootstrap_digest(curve: Fixture, stream: &str, observations: u64, reps: u64) 
 }
 
 pub fn verify_seed_mapping(path: &Path) -> Result<Value, String> {
-    let bytes = fs::read(path).map_err(|e| format!("read {}: {e}", path.display()))?;
+    let bytes = read_file_bounded(path, MAX_SEED_ARTIFACT_BYTES, "derived seed artifact")?;
     let artifact: Value =
         serde_json::from_slice(&bytes).map_err(|e| format!("parse {}: {e}", path.display()))?;
     let mut canonical = serde_json::to_vec(&artifact).map_err(|e| e.to_string())?;
@@ -724,11 +841,50 @@ impl EventKey {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum EventKind {
+    Intent,
+    Result,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct OrderedEvent {
+    kind: EventKind,
+    key: EventKey,
+}
+
 #[derive(Default)]
 struct EventSet {
     manifest: Option<Value>,
     intents: BTreeMap<EventKey, Value>,
     results: BTreeMap<EventKey, Value>,
+    order: Vec<OrderedEvent>,
+}
+
+fn check_git_custody(source: &Value, command: &str) -> Result<(), String> {
+    let valid_oid = |value: &str| {
+        value.len() == 40
+            && value
+                .bytes()
+                .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    };
+    let study_head = source["study_git_head"]
+        .as_str()
+        .filter(|value| valid_oid(value))
+        .ok_or_else(|| format!("invalid study Git revision for {command}"))?;
+    let runtime_head = source["runtime_git_head"]
+        .as_str()
+        .filter(|value| valid_oid(value))
+        .ok_or_else(|| format!("invalid runtime Git revision for {command}"))?;
+    if study_head != runtime_head
+        || source["build_git_dirty"].as_bool() != Some(false)
+        || source["build_git_status"].as_str() != Some("")
+        || source["runtime_git_status"].as_str() != Some("")
+        || source["runtime_git_status_scope"].as_str() != Some(GIT_STATUS_SCOPE)
+    {
+        return Err(format!("invalid Git custody envelope for {command}"));
+    }
+    Ok(())
 }
 
 fn check_manifest(row: &Value, command: &str, panels: &[&str]) -> Result<(), String> {
@@ -753,6 +909,7 @@ fn check_manifest(row: &Value, command: &str, panels: &[&str]) -> Result<(), Str
         return Err(format!("manifest panel mismatch for {command}"));
     }
     let source = &row["source"];
+    check_git_custody(source, command)?;
     if source["repository_base"].as_str() != Some("a2c2c400")
         || source["bsgs_path"].as_str() != Some("src/cryptanalysis/bsgs_fast.rs")
         || source["bsgs_sha256"].as_str() != Some(BSGS_SHA256)
@@ -855,10 +1012,35 @@ fn check_manifest(row: &Value, command: &str, panels: &[&str]) -> Result<(), Str
 }
 
 fn parse_event_file(path: &Path, command: &str, panels: &[&str]) -> Result<EventSet, String> {
-    let rows = read_jsonl(path)?;
+    let expected_order = expected_event_order(command)?;
+    let max_rows = expected_order.len() + 1;
+    let file = File::open(path).map_err(|e| format!("open {}: {e}", path.display()))?;
+    let mut reader = BufReader::new(file);
+    let mut total_bytes = 0u64;
     let mut manifest_count = 0usize;
     let mut events = EventSet::default();
-    for (index, row) in rows.into_iter().enumerate() {
+    let mut index = 0usize;
+    while let Some(line) = read_bounded_line(&mut reader, path, index + 1)? {
+        total_bytes = total_bytes
+            .checked_add(line.len() as u64)
+            .ok_or_else(|| format!("raw JSONL byte count overflow for {}", path.display()))?;
+        if total_bytes > MAX_RAW_FILE_BYTES {
+            return Err(format!(
+                "raw JSONL {} exceeds {MAX_RAW_FILE_BYTES} byte limit",
+                path.display()
+            ));
+        }
+        if index >= max_rows {
+            return Err(format!(
+                "raw JSONL {} exceeds frozen {max_rows} row limit",
+                path.display()
+            ));
+        }
+        if line.iter().all(u8::is_ascii_whitespace) {
+            return Err(format!("blank line at {}:{}", path.display(), index + 1));
+        }
+        let row: Value = serde_json::from_slice(&line)
+            .map_err(|e| format!("parse {}:{}: {e}", path.display(), index + 1))?;
         match row["schema"].as_str() {
             Some("blocked-bsgs-rho-wall/run-manifest/v1") => {
                 if index != 0 {
@@ -887,6 +1069,10 @@ fn parse_event_file(path: &Path, command: &str, panels: &[&str]) -> Result<Event
                 }
                 match row["event"].as_str() {
                     Some("intent") => {
+                        events.order.push(OrderedEvent {
+                            kind: EventKind::Intent,
+                            key: key.clone(),
+                        });
                         if events.intents.insert(key, row).is_some() {
                             return Err(format!(
                                 "{}:{}: duplicate intent",
@@ -896,6 +1082,10 @@ fn parse_event_file(path: &Path, command: &str, panels: &[&str]) -> Result<Event
                         }
                     }
                     Some("result") => {
+                        events.order.push(OrderedEvent {
+                            kind: EventKind::Result,
+                            key: key.clone(),
+                        });
                         if events.results.insert(key, row).is_some() {
                             return Err(format!(
                                 "{}:{}: duplicate result",
@@ -915,6 +1105,7 @@ fn parse_event_file(path: &Path, command: &str, panels: &[&str]) -> Result<Event
                 ))
             }
         }
+        index += 1;
     }
     if manifest_count != 1 {
         return Err(format!(
@@ -922,6 +1113,7 @@ fn parse_event_file(path: &Path, command: &str, panels: &[&str]) -> Result<Event
             path.display()
         ));
     }
+    validate_event_order(command, &events.order)?;
     Ok(events)
 }
 
@@ -978,6 +1170,80 @@ fn expected_amortized_keys() -> (BTreeSet<EventKey>, BTreeSet<EventKey>) {
         }
     }
     (intents, results)
+}
+
+fn expected_event_order(command: &str) -> Result<Vec<OrderedEvent>, String> {
+    let mut events = Vec::new();
+    let mut push = |kind, key| events.push(OrderedEvent { kind, key });
+    match command {
+        "run-cold" => {
+            for curve in FIXTURES {
+                for replicate in 0..512 {
+                    for arm in expected_schedule("cold-paired", replicate) {
+                        let event_key = key(curve, "cold-paired", replicate, 0, arm, 0);
+                        push(EventKind::Intent, event_key.clone());
+                        push(EventKind::Result, event_key);
+                    }
+                }
+            }
+        }
+        "run-aa" => {
+            for curve in FIXTURES {
+                for replicate in 0..64 {
+                    for (panel, arm) in [("bsgs-aa", "bsgs"), ("rho-aa", "rho")] {
+                        for label in expected_schedule(panel, replicate) {
+                            let copy = u64::from(label == "A-copy");
+                            let event_key = key(curve, panel, replicate, 0, arm, copy);
+                            push(EventKind::Intent, event_key.clone());
+                            push(EventKind::Result, event_key);
+                        }
+                    }
+                }
+            }
+        }
+        "run-amortized" => {
+            for curve in FIXTURES {
+                for replicate in 0..16 {
+                    for arm in expected_schedule("amortized-B64", replicate) {
+                        let batch_key = key(curve, "amortized-B64", replicate, 64, arm, 0);
+                        push(EventKind::Intent, batch_key.clone());
+                        for item in 0..64 {
+                            push(
+                                EventKind::Result,
+                                key(curve, "amortized-B64", replicate, item, arm, 0),
+                            );
+                        }
+                        push(EventKind::Result, batch_key);
+                    }
+                }
+            }
+        }
+        _ => return Err(format!("unknown run command {command:?}")),
+    }
+    Ok(events)
+}
+
+fn validate_event_order(command: &str, observed: &[OrderedEvent]) -> Result<(), String> {
+    let expected = expected_event_order(command)?;
+    if observed.len() > expected.len() {
+        return Err(format!(
+            "{command} has {} events, exceeding frozen maximum {}",
+            observed.len(),
+            expected.len()
+        ));
+    }
+    if let Some((index, (got, want))) = observed
+        .iter()
+        .zip(expected.iter())
+        .enumerate()
+        .find(|(_, (got, want))| got != want)
+    {
+        return Err(format!(
+            "{command} event order mismatch at event {}: got {got:?}, expected {want:?}",
+            index + 1
+        ));
+    }
+    Ok(())
 }
 
 fn affine_coords(point: Point) -> Result<(u64, u64), String> {
@@ -1143,6 +1409,9 @@ fn validate_phase_sum(
     scope: &str,
 ) -> Result<(), String> {
     let total = required_u64(measurement, "total_ns")?;
+    if total == 0 {
+        return Err(format!("zero total_ns for {event_key:?}"));
+    }
     if measurement["phase_sum_ns"].as_u64() != Some(total) {
         return Err(format!("declared phase sum mismatch for {event_key:?}"));
     }
@@ -1668,21 +1937,43 @@ fn ok_total(events: &EventSet, event_key: &EventKey) -> Option<u64> {
     row["payload"]["measurement"]["total_ns"].as_u64()
 }
 
-fn ratio_of_sums(pairs: &[(u64, u64)], indices: impl Iterator<Item = usize>) -> f64 {
+fn ratio_of_sums(
+    pairs: &[(u64, u64)],
+    indices: impl Iterator<Item = usize>,
+) -> Result<f64, String> {
     let mut numerator = 0f64;
     let mut denominator = 0f64;
     for index in indices {
         denominator += pairs[index].0 as f64;
         numerator += pairs[index].1 as f64;
     }
-    numerator / denominator
+    if denominator <= 0.0 || !denominator.is_finite() || !numerator.is_finite() {
+        return Err("invalid ratio-of-sums numerator or denominator".into());
+    }
+    let ratio = numerator / denominator;
+    if !ratio.is_finite() {
+        return Err("non-finite ratio of sums".into());
+    }
+    Ok(ratio)
 }
 
-fn paired_summary(curve: Fixture, stream: &str, pairs: &[(u64, u64)]) -> Value {
-    let ratio = ratio_of_sums(pairs, 0..pairs.len());
+fn paired_summary(curve: Fixture, stream: &str, pairs: &[(u64, u64)]) -> Result<Value, String> {
+    if pairs.is_empty() {
+        return Err("cannot summarize an empty timing panel".into());
+    }
+    if pairs
+        .iter()
+        .any(|&(first, second)| first == 0 || second == 0)
+    {
+        return Err("timing panel contains a zero total".into());
+    }
+    let ratio = ratio_of_sums(pairs, 0..pairs.len())?;
     let first_mean = pairs.iter().map(|pair| pair.0 as f64).sum::<f64>() / pairs.len() as f64;
     let second_mean = pairs.iter().map(|pair| pair.1 as f64).sum::<f64>() / pairs.len() as f64;
     let mean_difference = second_mean - first_mean;
+    if !first_mean.is_finite() || !second_mean.is_finite() || !mean_difference.is_finite() {
+        return Err("non-finite timing summary".into());
+    }
     let mut samples = Vec::with_capacity(10_000);
     for bootstrap_replicate in 0..10_000u64 {
         let indices = (0..pairs.len()).map(|draw| {
@@ -1695,10 +1986,10 @@ fn paired_summary(curve: Fixture, stream: &str, pairs: &[(u64, u64)]) -> Value {
             ) as usize
                 % pairs.len()
         });
-        samples.push(ratio_of_sums(pairs, indices));
+        samples.push(ratio_of_sums(pairs, indices)?);
     }
     samples.sort_by(f64::total_cmp);
-    json!({
+    Ok(json!({
         "observations": pairs.len(),
         "ratio_of_sums": ratio,
         "mean_first_ns": first_mean,
@@ -1707,7 +1998,7 @@ fn paired_summary(curve: Fixture, stream: &str, pairs: &[(u64, u64)]) -> Value {
         "ci95_type1": [samples[249], samples[9749]],
         "bootstrap_replicates": 10_000,
         "quantile_indices_zero_based": [249, 9749]
-    })
+    }))
 }
 
 fn collect_cold(events: &EventSet, curve: Fixture) -> Option<Vec<(u64, u64)>> {
@@ -1751,12 +2042,35 @@ fn collect_amortized(events: &EventSet, curve: Fixture) -> Option<Vec<(u64, u64)
     Some(pairs)
 }
 
-fn interval_contains_one(summary: &Value) -> bool {
-    let interval = summary["ci95_type1"].as_array().expect("summary interval");
-    interval[0].as_f64().unwrap() <= 1.0 && interval[1].as_f64().unwrap() >= 1.0
+fn summary_interval(summary: &Value) -> Result<(f64, f64), String> {
+    let interval = summary["ci95_type1"]
+        .as_array()
+        .filter(|values| values.len() == 2)
+        .ok_or_else(|| "invalid summary interval".to_string())?;
+    let lower = interval[0]
+        .as_f64()
+        .filter(|value| value.is_finite())
+        .ok_or_else(|| "invalid lower interval endpoint".to_string())?;
+    let upper = interval[1]
+        .as_f64()
+        .filter(|value| value.is_finite())
+        .ok_or_else(|| "invalid upper interval endpoint".to_string())?;
+    Ok((lower, upper))
 }
 
-fn analyze(cold: &EventSet, aa: &EventSet, amortized: &EventSet) -> Value {
+fn interval_contains_one(summary: &Value) -> Result<bool, String> {
+    let (lower, upper) = summary_interval(summary)?;
+    Ok(lower <= 1.0 && upper >= 1.0)
+}
+
+fn finite_summary_value(summary: &Value, field: &str) -> Result<f64, String> {
+    summary[field]
+        .as_f64()
+        .filter(|value| value.is_finite())
+        .ok_or_else(|| format!("invalid timing summary field {field}"))
+}
+
+fn analyze(cold: &EventSet, aa: &EventSet, amortized: &EventSet) -> Result<Value, String> {
     let mut curves = Vec::new();
     for curve in FIXTURES {
         let cold_pairs = collect_cold(cold, curve);
@@ -1765,43 +2079,49 @@ fn analyze(cold: &EventSet, aa: &EventSet, amortized: &EventSet) -> Value {
         let amortized_pairs = collect_amortized(amortized, curve);
         let cold_summary = cold_pairs
             .as_ref()
-            .map(|pairs| paired_summary(curve, "bootstrap-primary", pairs));
+            .map(|pairs| paired_summary(curve, "bootstrap-primary", pairs))
+            .transpose()?;
         let bsgs_aa = bsgs_aa_pairs
             .as_ref()
-            .map(|pairs| paired_summary(curve, "bootstrap-bsgs-aa", pairs));
+            .map(|pairs| paired_summary(curve, "bootstrap-bsgs-aa", pairs))
+            .transpose()?;
         let rho_aa = rho_aa_pairs
             .as_ref()
-            .map(|pairs| paired_summary(curve, "bootstrap-rho-aa", pairs));
+            .map(|pairs| paired_summary(curve, "bootstrap-rho-aa", pairs))
+            .transpose()?;
         let amortized_summary = amortized_pairs
             .as_ref()
-            .map(|pairs| paired_summary(curve, "bootstrap-amortized", pairs));
+            .map(|pairs| paired_summary(curve, "bootstrap-amortized", pairs))
+            .transpose()?;
         let decision = match (&cold_summary, &bsgs_aa, &rho_aa) {
-            (Some(primary), Some(bsgs), Some(rho))
-                if interval_contains_one(bsgs) && interval_contains_one(rho) =>
-            {
-                let interval = primary["ci95_type1"].as_array().unwrap();
-                let lower = interval[0].as_f64().unwrap();
-                let upper = interval[1].as_f64().unwrap();
-                if lower > 1.10 {
-                    "supported-at-least-10-percent"
-                } else if lower > 1.0 {
-                    "supported-positive"
-                } else if upper < 1.0 {
-                    "bsgs-loss"
+            (Some(primary), Some(bsgs), Some(rho)) => {
+                if !interval_contains_one(bsgs)? || !interval_contains_one(rho)? {
+                    "unresolved-aa-gate"
                 } else {
-                    "unresolved-primary-interval"
+                    let (lower, upper) = summary_interval(primary)?;
+                    if lower > 1.10 {
+                        "supported-at-least-10-percent"
+                    } else if lower > 1.0 {
+                        "supported-positive"
+                    } else if upper < 1.0 {
+                        "bsgs-loss"
+                    } else {
+                        "unresolved-primary-interval"
+                    }
                 }
             }
-            (Some(_), Some(_), Some(_)) => "unresolved-aa-gate",
             _ => "unresolved-censored-or-incomplete",
         };
-        let normalized = cold_summary.as_ref().map(|summary| {
-            let sqrt_n = (curve.n as f64).sqrt();
-            json!({
-                "bsgs_mean_ns_per_sqrt_n": summary["mean_first_ns"].as_f64().unwrap() / sqrt_n,
-                "rho_mean_ns_per_sqrt_n": summary["mean_second_ns"].as_f64().unwrap() / sqrt_n
+        let normalized = cold_summary
+            .as_ref()
+            .map(|summary| {
+                let sqrt_n = (curve.n as f64).sqrt();
+                Ok::<Value, String>(json!({
+                    "bsgs_mean_ns_per_sqrt_n": finite_summary_value(summary, "mean_first_ns")? / sqrt_n,
+                    "rho_mean_ns_per_sqrt_n": finite_summary_value(summary, "mean_second_ns")? / sqrt_n
+                }))
             })
-        });
+            .transpose()?;
         curves.push(json!({
             "curve_slug": curve.slug,
             "primary_cold": cold_summary,
@@ -1812,12 +2132,12 @@ fn analyze(cold: &EventSet, aa: &EventSet, amortized: &EventSet) -> Value {
             "decision": decision
         }));
     }
-    json!({
+    Ok(json!({
         "schema": "blocked-bsgs-rho-wall/independent-analysis/v1",
         "estimand": "sum(rho_total_ns)/sum(bsgs_total_ns)",
         "aa_orientation": "copy1/copy0",
         "curves": curves
-    })
+    }))
 }
 
 fn parse_optional(path: &Path, command: &str, panels: &[&str]) -> Result<(EventSet, bool), String> {
@@ -1895,9 +2215,13 @@ fn verify_manifest_coherence(study_dir: &Path, event_sets: &[&EventSet]) -> Resu
             ));
         }
     }
-    let protocol_json_sha256 = sha256_path(&study_dir.join("protocol.json"))?;
+    let protocol_path = study_dir.join("protocol.json");
+    let protocol_body_sha256 = verify_protocol_custody(&protocol_path)?;
+    let protocol_json_sha256 =
+        sha256_path_bounded(&protocol_path, MAX_PROTOCOL_JSON_BYTES, "protocol JSON")?;
     let seed_path = study_dir.join("derived-seeds.json");
-    let seed_sha256 = sha256_path(&seed_path)?;
+    let seed_sha256 =
+        sha256_path_bounded(&seed_path, MAX_SEED_ARTIFACT_BYTES, "derived seed artifact")?;
     let seed_bytes = fs::metadata(&seed_path)
         .map_err(|e| format!("stat {}: {e}", seed_path.display()))?
         .len();
@@ -1919,6 +2243,7 @@ fn verify_manifest_coherence(study_dir: &Path, event_sets: &[&EventSet]) -> Resu
         "present_manifests": manifests.len(),
         "binary_sha256": manifests.first().map(|manifest| manifest["binary_sha256"].clone()),
         "protocol_json_sha256": protocol_json_sha256,
+        "protocol_body_sha256": protocol_body_sha256,
         "derived_seed_mapping_sha256": seed_sha256,
         "derived_seed_mapping_bytes": seed_bytes,
         "cross_run_identity_match": true
@@ -1963,7 +2288,7 @@ pub fn verify_all(study_dir: &Path) -> Result<Value, String> {
             "amortized_B64": amortized_completeness
         },
         "manifest_coherence": manifest_coherence,
-        "analysis": analyze(&cold, &aa, &amortized)
+        "analysis": analyze(&cold, &aa, &amortized)?
     }))
 }
 
@@ -2183,11 +2508,115 @@ mod tests {
 
     #[test]
     fn ratio_of_sums_and_bootstrap_orientation_are_fixed() {
-        let summary = paired_summary(FIXTURES[0], "bootstrap-primary", &[(10, 20), (20, 40)]);
+        let summary =
+            paired_summary(FIXTURES[0], "bootstrap-primary", &[(10, 20), (20, 40)]).unwrap();
         assert_eq!(summary["ratio_of_sums"].as_f64(), Some(2.0));
         assert_eq!(summary["mean_second_minus_first_ns"].as_f64(), Some(15.0));
         assert_eq!(summary["ci95_type1"][0].as_f64(), Some(2.0));
         assert_eq!(summary["ci95_type1"][1].as_f64(), Some(2.0));
+    }
+
+    #[test]
+    fn timing_analysis_rejects_zero_and_invalid_intervals() {
+        assert!(paired_summary(FIXTURES[0], "bootstrap-primary", &[]).is_err());
+        assert!(paired_summary(FIXTURES[0], "bootstrap-primary", &[(0, 1)]).is_err());
+        assert!(paired_summary(FIXTURES[0], "bootstrap-primary", &[(1, 0)]).is_err());
+        assert!(interval_contains_one(&json!({"ci95_type1": [null, 1.0]})).is_err());
+    }
+
+    #[test]
+    fn event_order_requires_write_ahead_intents_and_frozen_schedule() {
+        let expected = expected_event_order("run-cold").unwrap();
+        validate_event_order("run-cold", &expected[..1]).unwrap();
+
+        let result_before_intent = vec![expected[1].clone()];
+        assert!(validate_event_order("run-cold", &result_before_intent).is_err());
+
+        let all_bsgs_first = vec![
+            expected[0].clone(),
+            expected[1].clone(),
+            expected[6].clone(),
+            expected[7].clone(),
+        ];
+        assert!(validate_event_order("run-cold", &all_bsgs_first).is_err());
+
+        let amortized = expected_event_order("run-amortized").unwrap();
+        validate_event_order("run-amortized", &amortized[..32]).unwrap();
+    }
+
+    #[test]
+    fn git_custody_requires_clean_matching_lowercase_revisions() {
+        let revision = "a".repeat(40);
+        let source = json!({
+            "study_git_head": revision,
+            "build_git_dirty": false,
+            "build_git_status": "",
+            "runtime_git_head": revision,
+            "runtime_git_status": "",
+            "runtime_git_status_scope": GIT_STATUS_SCOPE
+        });
+        check_git_custody(&source, "test").unwrap();
+
+        for (field, mutation) in [
+            ("build_git_dirty", json!(true)),
+            ("build_git_status", json!(" M changed")),
+            ("runtime_git_status", json!("?? extra")),
+            ("runtime_git_status_scope", json!("partial")),
+            ("runtime_git_head", json!("b".repeat(40))),
+            ("study_git_head", json!("A".repeat(40))),
+        ] {
+            let mut bad = source.clone();
+            bad[field] = mutation;
+            assert!(check_git_custody(&bad, "test").is_err(), "{field}");
+        }
+    }
+
+    #[test]
+    fn protocol_freeze_binds_canonical_body_and_predata_commit() {
+        let mut protocol = json!({"z": [2, 1], "a": {"y": true}});
+        let body_hash = protocol_body_hash(&protocol).unwrap();
+        protocol["freeze"] = json!({
+            "status": "frozen",
+            "protocol_sha256": body_hash,
+            "commit": "a".repeat(40),
+            "filed_before_affected_data": true
+        });
+        validate_protocol_freeze(&protocol, &body_hash).unwrap();
+
+        let mut bad_hash = protocol.clone();
+        bad_hash["a"]["y"] = json!(false);
+        assert!(validate_protocol_freeze(&bad_hash, &body_hash).is_err());
+
+        let mut bad_commit = protocol.clone();
+        bad_commit["freeze"]["commit"] = json!("A".repeat(40));
+        assert!(validate_protocol_freeze(&bad_commit, &body_hash).is_err());
+
+        let mut post_data = protocol.clone();
+        post_data["freeze"]["filed_before_affected_data"] = json!(false);
+        assert!(validate_protocol_freeze(&post_data, &body_hash).is_err());
+    }
+
+    #[test]
+    fn checked_in_protocol_matches_embedded_body_digest() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../protocol.json");
+        assert_eq!(
+            verify_protocol_custody(&path).unwrap(),
+            PROTOCOL_BODY_SHA256
+        );
+    }
+
+    #[test]
+    fn bounded_readers_reject_oversized_inputs() {
+        let mut line = std::io::Cursor::new(vec![b'x'; MAX_RAW_LINE_BYTES + 1]);
+        assert!(read_bounded_line(&mut line, Path::new("oversized.jsonl"), 1).is_err());
+
+        let path = std::env::temp_dir().join(format!(
+            "blocked-bsgs-verifier-bound-{}",
+            std::process::id()
+        ));
+        fs::write(&path, [0u8, 1]).unwrap();
+        assert!(read_file_bounded(&path, 1, "test artifact").is_err());
+        fs::remove_file(path).unwrap();
     }
 
     #[test]

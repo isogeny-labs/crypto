@@ -1,7 +1,8 @@
 use blocked_bsgs_rho_wall::{
     bsgs_fast, build_compact_seed_manifest, canonical_compact_seed_bytes, derive_u64,
     ecc::curve::CurveParams, prime_fast, rho_seed, target_scalar, validate_git_revision,
-    verify_compact_seed_artifact_bytes, verify_fixtures, verify_source_hashes, FIXTURES,
+    verify_compact_seed_artifact_bytes, verify_fixtures, verify_machine_protocol_value,
+    verify_source_hashes, FIXTURES,
 };
 use num_bigint::BigUint;
 use sha2::{Digest, Sha256};
@@ -14,6 +15,26 @@ fn hex_word(words: &str, index: usize) -> u64 {
 #[test]
 fn source_hashes_match_frozen_protocol() {
     verify_source_hashes().unwrap();
+}
+
+#[test]
+fn machine_protocol_hash_and_freeze_fail_closed() {
+    let path = format!("{}/../protocol.json", env!("CARGO_MANIFEST_DIR"));
+    let bytes = std::fs::read(path).unwrap();
+    let protocol: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    verify_machine_protocol_value(&protocol).unwrap();
+
+    let mut stale = protocol.clone();
+    stale["question"] = serde_json::json!("mutated after freeze");
+    assert!(verify_machine_protocol_value(&stale).is_err());
+
+    let mut bad_commit = protocol.clone();
+    bad_commit["freeze"]["commit"] = serde_json::json!("ABCDEF");
+    assert!(verify_machine_protocol_value(&bad_commit).is_err());
+
+    let mut retrospective = protocol;
+    retrospective["freeze"]["filed_before_affected_data"] = serde_json::json!(false);
+    assert!(verify_machine_protocol_value(&retrospective).is_err());
 }
 
 #[test]

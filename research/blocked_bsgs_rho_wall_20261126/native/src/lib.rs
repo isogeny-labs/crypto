@@ -106,6 +106,8 @@ const PROTOCOL_ADDENDUM_1_SHA256: &str =
     "45cf548ae2c1fa71e55f713e933f74b743052bb403fd1846767026eef4082801";
 const PROTOCOL_ADDENDUM_2_SHA256: &str =
     "d581de654830d1730eac4a3019e323752f5dc98cbb4d7276e9943c954191a1c1";
+const PROTOCOL_JSON_BODY_SHA256: &str =
+    "a6c0cf1afac40deda80081b5c9eeedf94b0d8884b1f679c8a2f412d995f888bc";
 const CARGO_LOCK_SHA256: &str = "cd56d62407c6ef09b5fbd0cdf187b2fd684c609a1b2df42b301a8eb67c699b17";
 const COMPACT_SEED_LIMIT_BYTES: usize = 1 << 20;
 
@@ -255,6 +257,88 @@ fn sha256_file(path: &Path) -> Result<String, String> {
         hasher.update(&buf[..n]);
     }
     Ok(hex::encode(hasher.finalize()))
+}
+
+fn canonical_json(value: &Value) -> Result<Vec<u8>, String> {
+    fn emit(value: &Value, output: &mut Vec<u8>) -> Result<(), String> {
+        match value {
+            Value::Object(map) => {
+                output.push(b'{');
+                let mut keys: Vec<_> = map.keys().collect();
+                keys.sort_unstable();
+                for (index, key) in keys.into_iter().enumerate() {
+                    if index != 0 {
+                        output.push(b',');
+                    }
+                    output.extend(serde_json::to_vec(key).map_err(|error| error.to_string())?);
+                    output.push(b':');
+                    emit(&map[key], output)?;
+                }
+                output.push(b'}');
+            }
+            Value::Array(items) => {
+                output.push(b'[');
+                for (index, item) in items.iter().enumerate() {
+                    if index != 0 {
+                        output.push(b',');
+                    }
+                    emit(item, output)?;
+                }
+                output.push(b']');
+            }
+            _ => output.extend(
+                serde_json::to_vec(value).map_err(|error| format!("canonical JSON: {error}"))?,
+            ),
+        }
+        Ok(())
+    }
+
+    let mut output = Vec::new();
+    emit(value, &mut output)?;
+    Ok(output)
+}
+
+fn protocol_body_sha256(protocol: &Value) -> Result<String, String> {
+    let mut body = protocol.clone();
+    body.as_object_mut()
+        .ok_or_else(|| "protocol.json is not an object".to_owned())?
+        .remove("freeze");
+    Ok(hex::encode(Sha256::digest(canonical_json(&body)?)))
+}
+
+pub fn verify_machine_protocol_value(protocol: &Value) -> Result<(), String> {
+    if protocol["schema"] != "experiment.protocol/v1" {
+        return Err("protocol.json schema mismatch".into());
+    }
+    let freeze = &protocol["freeze"];
+    if freeze["status"] != "frozen" || freeze["filed_before_affected_data"] != true {
+        return Err("protocol.json is not a prospectively filed freeze".into());
+    }
+    let commit = freeze["commit"]
+        .as_str()
+        .ok_or_else(|| "protocol.json freeze commit is missing".to_owned())?;
+    if commit.len() != 40
+        || !commit
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err("protocol.json freeze commit is not a lowercase Git OID".into());
+    }
+    let computed = protocol_body_sha256(protocol)?;
+    let declared = freeze["protocol_sha256"]
+        .as_str()
+        .ok_or_else(|| "protocol.json canonical body hash is missing".to_owned())?;
+    if declared != computed {
+        return Err(format!(
+            "protocol.json canonical body hash mismatch: {declared} != {computed}"
+        ));
+    }
+    if computed != PROTOCOL_JSON_BODY_SHA256 {
+        return Err(format!(
+            "protocol.json body is not the compiled freeze: {computed} != {PROTOCOL_JSON_BODY_SHA256}"
+        ));
+    }
+    Ok(())
 }
 
 pub fn verify_source_hashes() -> Result<(), String> {
@@ -1363,12 +1447,7 @@ fn verify_committed_seed_artifact() -> Result<SeedArtifactCustody, String> {
         .map_err(|error| format!("open {}: {error}", protocol_path.display()))?;
     let protocol: Value = serde_json::from_reader(protocol_file)
         .map_err(|error| format!("parse {}: {error}", protocol_path.display()))?;
-    if protocol["schema"] != "experiment.protocol/v1" {
-        return Err("protocol.json schema mismatch".into());
-    }
-    if protocol["freeze"]["status"] != "frozen" {
-        return Err("protocol.json is not frozen".into());
-    }
+    verify_machine_protocol_value(&protocol)?;
     let anchors = &protocol["extensions"]["protocol_anchors"];
     for (field, expected) in [
         ("human_protocol_sha256", PROTOCOL_MD_SHA256),
