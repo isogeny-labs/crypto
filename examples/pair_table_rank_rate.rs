@@ -150,6 +150,9 @@ fn main() {
     let k_frac: usize = args.next().and_then(|v| v.parse().ok()).unwrap_or(8);
     let salt: u64 = args.next().and_then(|v| v.parse().ok()).unwrap_or(1);
     let threads: usize = args.next().and_then(|v| v.parse().ok()).unwrap_or(1);
+    // Admission rule: "fb2" (default) keeps only relations with >= 2 factor-base terms,
+    // the crypto #5097 consumer rule; ADMIT=all also admits higher large-prime arity.
+    let admit_all = std::env::var("ADMIT").as_deref() == Ok("all");
     let f = Mersenne31;
     let p = f.p();
     let cold = Instant::now();
@@ -288,7 +291,7 @@ fn main() {
                 }
                 assert_eq!(s, Some(r), "relation must replay");
                 replay_ms += tr.elapsed().as_secs_f64() * 1e3;
-                if rel.terms.iter().filter(|t| is_fb[t.0 as usize]).count() < 2 {
+                if !admit_all && rel.terms.iter().filter(|t| is_fb[t.0 as usize]).count() < 2 {
                     continue;
                 }
                 let mut row = vec![0u64; WIDTH];
@@ -314,7 +317,7 @@ fn main() {
     let total = rank.lp_rank + rank.fb_rank;
     println!("{}", serde_json::to_string(&json!({
         "stream_digest": format!("{:016x}", digest.finish()),
-        "arm": arm, "k": k_frac, "salt": salt, "threads": threads, "queries": queries, "relations": seen.len(), "useful": useful,
+        "arm": arm, "admit": if admit_all { "all" } else { "fb2" }, "k": k_frac, "salt": salt, "threads": threads, "queries": queries, "relations": seen.len(), "useful": useful,
         "rank": total, "recovered": recovered, "build_ms": build_ms, "probe_ms": probe_ms, "elim_ms": elim_ms,
         "cold_ms": cold_ms, "replay_ms": replay_ms, "rank_per_s": total as f64 / (cold_ms / 1e3), "probes": st.probes, "hits": st.hits,
         "ns_per_probe": probe_ms * 1e6 / (st.probes.max(1)) as f64,
