@@ -72,6 +72,14 @@ expected verification cost.  The result still does not cover joint encodings,
 target-dependent labels, or non-enumerating witness recovery.
 `[pcc:unverified]`
 
+Proposition 23 then audits a concrete target-dependent escape.  Hashing one
+partial-sum side by \(x(Q)\) and scanning the other with the label \(x(T-P)\)
+has only the elliptic sign ambiguity as a false positive.  Its search cost,
+not verification, is decisive: the most favourable separate-query split has
+complete relation exponent \((m-1)/(2m-3)>1/2\), namely `2/3`, `3/5`, and
+`4/7` for `m = 3, 4, 5`.  This does not rule out a shared multi-target or
+non-scanning construction. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -113,13 +121,13 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-eight tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+nine tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
 and exact separate-label predicates for small groups. It also checks all three
 one-sided false-positive lower bounds of Theorem 22 on bounded cyclic-group
-fixtures.
+fixtures and the target-shift exponent arithmetic of Proposition 23.
 `[pcc:unverified]`
 
 ## Owed before review-ready status

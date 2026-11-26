@@ -384,4 +384,22 @@ fn one_sided_separate_labels_force_false_candidates() {
     }
 }
 
+#[test]
+fn target_shift_scan_exponents_remain_above_one_half() {
+    let expected = [(3_i128, 2_i128, 3_i128), (4, 3, 5), (5, 4, 7)];
+    for (arity, expected_numerator, expected_denominator) in expected {
+        let numerator = arity - 1;
+        let denominator = 2 * arity - 3;
+        assert_eq!(
+            numerator * expected_denominator,
+            expected_numerator * denominator
+        );
+        assert!(2 * numerator > denominator);
+
+        // Explicit batching of all m-tuples is slightly better, though it too
+        // remains above one-half: m/(2m-1) < (m-1)/(2m-3).
+        assert!(arity * denominator < numerator * (2 * arity - 1));
+    }
+}
+
 fn main() {}

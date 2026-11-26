@@ -46,6 +46,7 @@ The status of the program is:
 | Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
 | Theorem 21 | unconditional bucket/quotient obstruction | arbitrary exact separate-label predicates, exact compositional buckets, affine algebraic-group linearizations, and low-degree isogeny quotients cannot compress the prime-order subgroup |
 | Theorem 22 | unconditional one-sided label trade-off | compressing either partial-sum label set or the attainable targets forces a quantified false-verification blowup |
+| Proposition 23 | exact target-dependent construction and audit | the map \(P\mapsto x(T-P)\) leaves only a sign ambiguity, but its scan/preprocessing balance remains strictly above one-half |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1874,10 +1875,88 @@ The theorem is unconditional for one-sided predicates that factor through
 separate, target-independent labels and enumerate all accepted pairs.  It
 quantifies the false-positive escape hatch left by Theorem 21: compressing a
 partial-sum side or the attainable target set below its cardinality
-necessarily creates a second-moment verification cost.  It does not cover joint encodings, target-specific label
-maps, signed algebraic summaries whose intermediate terms cancel, or
-algorithms that recover witnesses without enumerating accepted pairs.  Those
-remain within the general preprocessing/query problem. [pcc:unverified]
+necessarily creates a second-moment verification cost.  It does not cover
+joint encodings, target-specific label maps, signed algebraic summaries whose
+intermediate terms cancel, or algorithms that recover witnesses without
+enumerating accepted pairs.  Those remain within the general
+preprocessing/query problem. [pcc:unverified]
+
+### Proposition 23 (target-shifted coordinate filtering does not beat rho)
+
+Let
+
+\[
+A=(P_u)_{u\in F^a},\qquad B=(Q_v)_{v\in F^b},\qquad a+b=m,
+\]
+
+be ordered partial-sum arrays whose records retain their tuple witnesses.
+Give the point at infinity a distinguished tag and define the
+target-dependent labels on record values by
+
+\[
+\lambda_{A,T}(P)=x(T-P),\qquad \lambda_B(Q)=x(Q),
+\]
+
+using that tag when the argument is the point at infinity.  Hash the records
+of \(B\) by \(\lambda_B\).  On target \(T\), scan the records \(P\in A\),
+look up \(\lambda_{A,T}(P)\), and verify every returned record pair.
+
+Every true record pair \(P+Q=T\) is returned.  For a fixed \(P\), the lookup
+contains records with at most the two curve-point values \(T-P\) and
+\(-(T-P)\); hence the only false group value is the opposite sign.  Duplicate
+tuple witnesses are retained and charged as output.  With expected-constant
+hash lookup, this explicit implementation gives
+
+\[
+P=\widetilde\Theta(N^b),\qquad Q=\widetilde\Theta(N^a).
+\]
+
+The most favourable separate-query split stores \(b=m-1\) leaves and scans
+one leaf.  Collecting \(\Theta(N)\) relation rows still requires at least
+\(pN^{-(m-1)}\) uniform targets by the exact tuple-count bound.  Thus this
+implementation has relation-stage balance
+
+\[
+\widetilde\Omega\!\left(
+N^{m-1}+\frac{p}{N^{m-2}}
+\right).
+\]
+
+Writing \(N=p^{\alpha+o(1)}\), the terms balance at
+\(\alpha=1/(2m-3)\le1/m\), with exponent
+
+\[
+E_m^{\rm shift}=\frac{m-1}{2m-3}
+=\frac12+\frac1{4m-6}>\frac12.
+\]
+
+For \(m=3,4,5\), the exponents are respectively
+\(2/3,3/5,4/7\).  They are also slightly worse than the explicit batched
+candidate exponents \(3/5,4/7,5/9\).
+
+#### Proof
+
+If \(P+Q=T\), then \(Q=T-P\), so the two labels agree.  Conversely, equal
+non-infinity \(x\)-coordinates on a short Weierstrass curve imply
+\(Q=T-P\) or \(Q=-(T-P)\); direct group-law verification removes the latter.
+The infinity tag handles the exceptional affine case.  Forming the hash table
+and performing one lookup per scanned partial tuple give the stated costs.
+
+For a general split, the query total over the necessary target batch is
+\(pN^{a-(m-1)}=p/N^{b-1}\).  Whenever the internal balance is feasible, its
+exponent is \(b/(2b-1)\), which decreases with \(b\); otherwise the
+factor-base boundary is no better.  Hence \(b=m-1\) is optimal among these
+separate-query scans.  Balancing \(N^{m-1}\) with \(p/N^{m-2}\) gives the
+displayed value of \(\alpha\) and \(E_m^{\rm shift}\).  The conventional
+\(N^2\) linear-algebra term does not increase that exponent for \(m\ge3\).
+\(\square\)
+
+This construction shows exactly why target-independent label bounds cannot be
+extended by merely allowing a low-degree target shift: such a shift removes
+the false-positive bottleneck.  The remaining cost is search over one partial
+side.  Proposition 23 does not lower-bound more elaborate target-dependent
+maps or shared multi-target algorithms; it identifies the scan that a genuine
+non-materializing improvement must avoid. [pcc:unverified]
 
 ### Exact remaining computational gap
 
@@ -2024,7 +2103,9 @@ materialization.
 The barrier conjecture should be attacked, not protected. Look for:
 
 1. **Target-linearization:** a change of variables making the target enter only
-   through a low-dimensional linear sketch.
+   through a low-dimensional linear sketch.  Proposition 23 gives the exact
+   low-degree shift \(x(T-P)\), but not a way to avoid scanning the other
+   partial side.
 2. **Low partition rank:** an exact or one-sided-error decomposition of the
    split-tree relation tensor below the collision frontier.
 3. **Reusable partial elimination:** a curve-specific data structure of size
@@ -2080,7 +2161,10 @@ bound for static-provenance product trees with arbitrary adaptive query
 branching.  The remaining Gate 2 extension is to implicitly generated
 split-\(S_3\) subtrees.  A width or monomial lower bound counts only if a
 simulation theorem shows that it also charges compact polynomial and rational
-representations. `[pcc:unverified]`
+representations.  Theorems 21--22 and Proposition 23 further show that this
+extension must cover joint or target-dependent witness search, rather than
+only exact labels, false-positive verification, or target-shifted scans.
+`[pcc:unverified]`
 
 ### Gate 3: square-root closure
 
@@ -2109,5 +2193,7 @@ The next publishable extension should be one of:
 
 Theorem 1 makes “global low tensor rank” an unpromising escape, while
 Propositions 11 and 12 show that expanded support is not a general circuit
-measure. Research should now concentrate on target-adaptive search, direct
-sums, data-structure trade-offs, and one-sided-error filters.
+measure.  Theorems 21--22 close exact and one-sided target-independent
+separate labels, while Proposition 23 audits the simplest target-dependent
+coordinate filter.  Research should now concentrate on joint target-adaptive
+search, direct sums, data-structure trade-offs, and multi-target sharing.
