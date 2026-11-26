@@ -282,6 +282,11 @@ left/right set-partition pairs and four label schedules. Their total wire size
 is 317,734 bytes, the largest certificate is 10,136 bytes, and the warm Rust
 1.78 debug verification sweep takes 0.34 seconds. `[pcc:unverified]`
 
+For four edges, the same boundary covers 33 graph-shape orbits and four label
+schedules: 132 certificates, 791,236 total bytes, and a 20,767-byte maximum.
+Measured checker time is about 0.60 seconds; production and JSON bring the
+complete warm debug gate to 1.12--1.26 seconds. `[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

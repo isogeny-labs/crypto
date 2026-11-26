@@ -169,7 +169,16 @@ occupy 317,734 bytes in total (3,177.34 bytes on average); the maximum is 10,136
 bytes for partition pair `[0,1,1]/[0,1,1]` under schedule 3. The complete warm
 Rust 1.78 debug sweep verifies in 0.34 seconds. `[pcc:unverified]`
 
+The serialized boundary also covers the 33 simultaneous-edge-relabeling orbits
+of four-edge partition pairs under four label schedules. The 132 certificates
+occupy 791,236 bytes in total (5,994.21 bytes on average); the maximum is
+20,767 bytes for `[0,0,1,1]/[0,0,1,1]` under schedule 3. Phase timing measured
+about 0.60 seconds in the independent checker, below the one-second verifier
+target, plus about 0.51 seconds of production and 0.13 seconds of JSON work.
+The complete warm debug gate varied from 1.12 to 1.26 seconds.
+`[pcc:unverified]`
+
 This is not yet an external or theorem-assistant kernel. Producer and checker
 still compile in the same test-only Rust module, there is no standalone checker
-executable, and the positive controls remain bounded through three edges.
+executable, and the positive controls remain bounded through four edges.
 `[pcc:unverified]`

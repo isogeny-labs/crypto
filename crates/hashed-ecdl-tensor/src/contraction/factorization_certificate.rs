@@ -18,10 +18,15 @@ impl CertifiedElement {
         Self(value.coordinates().to_vec())
     }
 
-    fn decode(&self, ring: &Ring) -> std::result::Result<Element, String> {
+    fn validate(&self, ring: &Ring) -> std::result::Result<(), String> {
         if self.0.len() != ring.degree() || self.0.iter().any(|value| value >= ring.modulus()) {
             return Err("noncanonical certificate element".into());
         }
+        Ok(())
+    }
+
+    fn decode(&self, ring: &Ring) -> std::result::Result<Element, String> {
+        self.validate(ring)?;
         Ok(Element(self.0.clone()))
     }
 
@@ -77,6 +82,13 @@ fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     })
 }
 
+fn true_predicate(arity: usize) -> Arc<Tensor> {
+    Arc::new(Tensor {
+        creation_precision: 3,
+        kind: TensorKind::Boolean(Arc::new(FnPredicate::new(arity, |_, _| Ok(true)))),
+    })
+}
+
 fn fixture() -> Bipartite {
     Bipartite {
         left: vec![TensorVertex {
@@ -112,7 +124,7 @@ fn partition_graph(left_groups: &[usize], right_groups: &[usize]) -> Bipartite {
         let tensors = ports
             .into_iter()
             .map(|edges| TensorVertex {
-                tensor: predicate(edges.len(), u8::MAX),
+                tensor: true_predicate(edges.len()),
                 edges,
             })
             .collect();
@@ -144,6 +156,80 @@ fn refinement_labels(vertices: usize, schedule: usize, side: usize) -> Vec<usize
             _ => unreachable!(),
         })
         .collect()
+}
+
+fn set_partitions(edges: usize) -> Vec<Vec<usize>> {
+    fn visit(position: usize, maximum: usize, current: &mut [usize], out: &mut Vec<Vec<usize>>) {
+        if position == current.len() {
+            out.push(current.to_vec());
+            return;
+        }
+        for group in 0..=maximum + 1 {
+            current[position] = group;
+            visit(position + 1, maximum.max(group), current, out);
+        }
+    }
+
+    assert!(edges > 0);
+    let mut out = Vec::new();
+    let mut current = vec![0usize; edges];
+    visit(1, 0, &mut current, &mut out);
+    out
+}
+
+fn edge_permutations(edges: usize) -> Vec<Vec<usize>> {
+    fn visit(position: usize, current: &mut [usize], out: &mut Vec<Vec<usize>>) {
+        if position == current.len() {
+            out.push(current.to_vec());
+            return;
+        }
+        for next in position..current.len() {
+            current.swap(position, next);
+            visit(position + 1, current, out);
+            current.swap(position, next);
+        }
+    }
+
+    let mut out = Vec::new();
+    let mut current: Vec<_> = (0..edges).collect();
+    visit(0, &mut current, &mut out);
+    out
+}
+
+fn normalize_partition(values: impl Iterator<Item = usize>, edges: usize) -> Vec<usize> {
+    let mut names = vec![usize::MAX; edges];
+    let mut next = 0usize;
+    values
+        .map(|value| {
+            if names[value] == usize::MAX {
+                names[value] = next;
+                next += 1;
+            }
+            names[value]
+        })
+        .collect()
+}
+
+fn partition_pair_orbits(edges: usize) -> BTreeSet<(Vec<usize>, Vec<usize>)> {
+    let partitions = set_partitions(edges);
+    let permutations = edge_permutations(edges);
+    let mut out = BTreeSet::new();
+    for left in &partitions {
+        for right in &partitions {
+            let canonical = permutations
+                .iter()
+                .map(|permutation| {
+                    (
+                        normalize_partition(permutation.iter().map(|&edge| left[edge]), edges),
+                        normalize_partition(permutation.iter().map(|&edge| right[edge]), edges),
+                    )
+                })
+                .min()
+                .unwrap();
+            out.insert(canonical);
+        }
+    }
+    out
 }
 
 fn producer_bounds(certificate: &Certificate) -> Vec<usize> {
@@ -493,7 +579,7 @@ fn check(
         )
         .chain(certificate.entries.iter().flat_map(|table| &table.values))
     {
-        value.decode(ring)?;
+        value.validate(ring)?;
     }
     if certificate.left_groups.len() != certificate.edge_count
         || certificate.right_groups.len() != certificate.edge_count
@@ -595,7 +681,7 @@ fn check(
                         .add(&expanded, &term, meter)
                         .map_err(|error| error.to_string())?;
                 }
-                if expanded != certificate.weights[packet][row][column].decode(ring)? {
+                if expanded.coordinates() != certificate.weights[packet][row][column].0.as_slice() {
                     return Err("crossing mode series".into());
                 }
             }
@@ -659,7 +745,7 @@ fn check(
                 meter,
             )
             .map_err(|error| error.to_string())?;
-            if expected != value.decode(ring)? {
+            if expected.coordinates() != value.0.as_slice() {
                 return Err(format!(
                     "packet coefficient table: beta={:?}, group={}, packet={}, mask={}, slots={:?}, left={:?}, right={:?}, expected={expected:?}, actual={value:?}",
                     table.beta,
@@ -853,4 +939,64 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
     assert_eq!(total_bytes, 317_734);
     assert_eq!(maximum_bytes, 10_136);
     assert_eq!(maximum_case, Some(([0, 1, 1], [0, 1, 1], 3)));
+}
+
+#[test]
+fn serialized_certificate_covers_four_edge_partition_orbits() {
+    let representatives = partition_pair_orbits(4);
+    assert_eq!(representatives.len(), 33);
+    let mut meter = Meter::new(Limits {
+        steps: 500_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let kernel = deformation::Cauchy::new(&parameters, 1, &ring.one(), &ring, &mut meter).unwrap();
+    let mut cases = 0usize;
+    let mut total_bytes = 0usize;
+    let mut maximum_bytes = 0usize;
+    let mut maximum_case = None;
+    for (left_groups, right_groups) in representatives {
+        for schedule in 0..4 {
+            let graph = partition_graph(&left_groups, &right_groups);
+            let rows = refinement_labels(graph.left.len(), schedule, 0);
+            let columns = refinement_labels(graph.right.len(), schedule, 1);
+            let packing =
+                packing::pack_labels(&graph, &parameters, rows, columns, false, &mut meter)
+                    .unwrap();
+            let modes =
+                deformation::modes(&graph, &packing, 0, &parameters, &kernel, &mut meter).unwrap();
+            let produced = produce(
+                &graph,
+                &packing,
+                &parameters,
+                0,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
+            let serialized = serde_json::to_vec(&produced).unwrap();
+            total_bytes += serialized.len();
+            if serialized.len() > maximum_bytes {
+                maximum_bytes = serialized.len();
+                maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
+            }
+            let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            check(&certificate, &ring, &mut meter).unwrap_or_else(|error| {
+                panic!("left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}")
+            });
+            cases += 1;
+        }
+    }
+    assert_eq!(cases, 132);
+    assert_eq!(total_bytes, 791_236);
+    assert_eq!(maximum_bytes, 20_767);
+    assert_eq!(maximum_case, Some((vec![0, 0, 1, 1], vec![0, 0, 1, 1], 3)));
 }
