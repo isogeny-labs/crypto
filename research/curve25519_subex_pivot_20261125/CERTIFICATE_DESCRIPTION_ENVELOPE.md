@@ -12,6 +12,7 @@ Let:
 - `M` be the old edge count;
 - `K` be the packet count;
 - `L` be the maximum packet length;
+- `tau` be the certified tile period `2^(i+1)`;
 - `R` be the label radix;
 - `Q` be the number of generated modes;
 - `T` be the number of retained exponent tuples;
@@ -42,6 +43,51 @@ there are at most `H` entry tables and at most `T K S` packet-entry ring
 elements. This is deliberately worst case: it charges the maximally
 concentrated arity to every packet and tuple.
 
+## Source bounds for modes and tuples
+
+The schema-2 verifier accepts only a power-of-two tile period `2 <= tau <= L`.
+Every retained mode has nonempty columns in one residue class modulo `tau`,
+and the verifier rejects two modes with the same `(packet, weight, residue)`.
+Since every mode weight lies in `1..p`, this gives, without trusting the
+producer's mode count,
+
+```text
+n = K tau,
+Q_b <= n                         for each weight b,
+Q <= n (p - 1).
+```
+
+The independent tuple check reconstructs exactly every nonnegative exponent
+vector of total weighted degree below `p`, subject also to packet/group
+capacities. Dropping those extra capacities can only increase the count. For
+at most `n` variables of each positive weight, the weighted generating
+function at `exp(-theta)` gives
+
+```text
+ln T <= theta p + 2n/theta.
+```
+
+Choosing `theta=sqrt(n/p)` and converting to base two is covered by the
+integer source bound
+
+```text
+log2 T <= 5 ceil(sqrt(n p)).
+```
+
+The verifier recomputes all three ceilings from `K`, `tau`, and `p`, checks
+the mode tile keys and exact tuple coverage, and rejects a certificate whose
+actual `Q` or `T` exceeds them. This is the same local source count used by
+`admission::dimensions`, now bound to serialized factorization evidence.
+When the separate active-call premises provide `L=2^a`, `tau=2^(i+1)`,
+`D=L/2^i`, and `K L<=3M`, they also give
+
+```text
+n D = 2 K L <= 6 M.
+```
+
+The packing-capacity and recursive-precision premises remain separate
+obligations; this certificate does not manufacture them. `[pcc:unverified]`
+
 ## Ring elements and scalar atoms
 
 Packet weights, mode rows, and entry values contribute at most
@@ -61,7 +107,7 @@ load-bearing rather than an assumption about producer output.
 The schema's non-coefficient scalar atoms are bounded by
 
 ```text
-I = 5 + K L + 2M + 4Q + 2QL + TQ + H(Q + 2).
+I = 6 + K L + 2M + 4Q + 2QL + TQ + H(Q + 2).
 ```
 
 The final term includes the deliberately repeated `beta` vector and the
@@ -80,7 +126,7 @@ The implementation bounds JSON containers and named fields by
 
 ```text
 C = 8 + 2K + KL + E(d + 1) + 3Q + 3QL + T + 3H,
-F = 12 + 6Q + 4H.
+F = 13 + 6Q + 4H.
 ```
 
 Every primitive number, delimiter, comma, key, and colon is covered by the
@@ -99,7 +145,7 @@ description envelope, not compression or a tight model of `serde_json`.
 For a canonical length-prefixed encoding, let
 
 ```text
-B = bitlength(max(M,K,L,R,Q,T,H,2^(2L))).
+B = bitlength(max(M,K,L,tau,R,Q,T,H,2^(2L))).
 ```
 
 The implemented bit ceiling is
@@ -108,10 +154,11 @@ The implemented bit ceiling is
 (E d + Q L) p + I B + 64(C + F + 1).
 ```
 
-This retains a 64-bit framing allowance per container and field. It therefore
-proves existence of a polynomial-overhead binary description once `Q` and
-`T` receive their separate source bounds; it does not itself bound either
-quantity. `[pcc:unverified]`
+This retains a 64-bit framing allowance per container and field. Together
+with the checked source bounds above, it proves existence of this finite
+description ceiling from the certificate dimensions. The separate recursion
+induction must still bound those dimensions over a complete call tree.
+`[pcc:unverified]`
 
 ## Native evidence and boundary
 
@@ -122,18 +169,18 @@ label schedules through five edges. At five edges the largest computed ceilings
 are:
 
 ```text
-JSON bytes              32,519,360
-canonical binary bits   19,154,209
-observed JSON bytes         43,450
+JSON bytes              32,519,488
+canonical binary bits   19,154,282
+observed JSON bytes         43,460
 ```
 
-For the checked two-edge fixture they are 1,227,264 JSON bytes and 725,921
-canonical bits, versus a 2,162-byte JSON payload. The gap records the
+For the checked two-edge fixture they are 1,227,392 JSON bytes and 725,994
+canonical bits, versus a 2,172-byte JSON payload. Its recomputed source fields
+are `tau=2`, `n=4`, `Q<=16`, and `log2 T<=25`. The gap records the
 `2^(2L)` worst-case concentration and uniform framing constants.
 `[pcc:unverified]`
 
 This closes a finite description-counting obligation, not the entire
-subexponential theorem. A full result still needs independently justified
-source bounds for `Q`, `T`, recursive histories, and the external
-contraction/reduction theorems. It does not imply a practical Curve25519
-attack. `[pcc:unverified]`
+subexponential theorem. A full result still needs the recursive-history and
+precision induction, plus the external contraction/reduction theorems. It
+does not imply a practical Curve25519 attack. `[pcc:unverified]`

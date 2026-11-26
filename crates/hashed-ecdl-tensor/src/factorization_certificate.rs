@@ -10,7 +10,7 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub(crate) const SCHEMA: u32 = 1;
+pub(crate) const SCHEMA: u32 = 2;
 const MAX_MODE_DEPTH: usize = 1_024;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -64,6 +64,7 @@ pub struct Certificate {
     pub(crate) degree: usize,
     pub(crate) radix: usize,
     pub(crate) precision: usize,
+    pub(crate) tiles: usize,
     pub(crate) edge_count: usize,
     pub(crate) packets: Vec<Vec<Option<usize>>>,
     pub(crate) left_groups: Vec<usize>,
@@ -79,10 +80,18 @@ pub struct Certificate {
 pub struct DescriptionEnvelope {
     /// Maximum packet length present in the certificate.
     pub packet_length: usize,
+    /// Validated tile period `2^(i+1)` used to construct modes.
+    pub tiles: usize,
     /// Number of generated modes.
     pub modes: usize,
     /// Number of retained exponent tuples.
     pub tuples: usize,
+    /// Source bound `K * tiles` on modes of each positive weight.
+    pub modes_per_weight_bound: usize,
+    /// Source bound `K * tiles * (p - 1)` on all retained modes.
+    pub attempted_modes_bound: usize,
+    /// Base-two exponent satisfying `T <= 2^tuple_log2_bound`.
+    pub tuple_log2_bound: usize,
     /// Bound `T * R * K` on packet entry tables.
     pub entry_tables_bound: usize,
     /// Bound `T * K * (2^(2L) + R - 1)` on packet entry values.
@@ -116,6 +125,68 @@ fn index_width(maximum: usize) -> usize {
     usize::BITS as usize - maximum.leading_zeros() as usize
 }
 
+fn ceil_sqrt(value: usize) -> usize {
+    if value <= 1 {
+        return value;
+    }
+    let mut low = 1usize;
+    let mut high = value;
+    while low < high {
+        let middle = low + (high - low) / 2;
+        let quotient = value / middle;
+        let remainder = value % middle;
+        if middle > quotient || (middle == quotient && remainder == 0) {
+            high = middle;
+        } else {
+            low = middle + 1;
+        }
+    }
+    low
+}
+
+fn ceil_log2_count(value: usize) -> usize {
+    if value <= 1 {
+        0
+    } else {
+        usize::BITS as usize - (value - 1).leading_zeros() as usize
+    }
+}
+
+fn source_count_bounds(
+    certificate: &Certificate,
+    packet_length: usize,
+) -> std::result::Result<(usize, usize, usize), String> {
+    if certificate.tiles < 2
+        || !certificate.tiles.is_power_of_two()
+        || certificate.tiles > packet_length
+    {
+        return Err("certificate tile period".into());
+    }
+    let modes_per_weight_bound = checked_product(
+        &[certificate.packets.len(), certificate.tiles],
+        "modes per weight bound",
+    )?;
+    let attempted_modes_bound = checked_product(
+        &[
+            modes_per_weight_bound,
+            certificate.precision.saturating_sub(1),
+        ],
+        "attempted modes bound",
+    )?;
+    let tuple_argument = checked_product(
+        &[modes_per_weight_bound, certificate.precision],
+        "tuple exponent argument",
+    )?;
+    let tuple_log2_bound = ceil_sqrt(tuple_argument)
+        .checked_mul(5)
+        .ok_or_else(|| "tuple exponent bound overflow".to_string())?;
+    Ok((
+        modes_per_weight_bound,
+        attempted_modes_bound,
+        tuple_log2_bound,
+    ))
+}
+
 /// Derive explicit JSON and canonical-binary description ceilings for a
 /// certificate already accepted by [`verify`].
 ///
@@ -137,6 +208,21 @@ pub fn description_envelope(
     let radix = certificate.radix;
     let degree = certificate.degree;
     let precision = certificate.precision;
+    let (modes_per_weight_bound, attempted_modes_bound, tuple_log2_bound) =
+        source_count_bounds(certificate, packet_length)?;
+    if modes > attempted_modes_bound || ceil_log2_count(tuples) > tuple_log2_bound {
+        return Err("certificate exceeds source count envelope".into());
+    }
+    let mut modes_by_weight = BTreeMap::new();
+    for mode in &certificate.modes {
+        *modes_by_weight.entry(mode.weight).or_insert(0usize) += 1;
+    }
+    if modes_by_weight
+        .values()
+        .any(|&count| count > modes_per_weight_bound)
+    {
+        return Err("certificate exceeds per-weight mode envelope".into());
+    }
     let twice_length = packet_length
         .checked_mul(2)
         .ok_or_else(|| "packet arity overflow".to_string())?;
@@ -190,7 +276,7 @@ pub fn description_envelope(
     let mode_columns_bound = checked_product(&[modes, packet_length], "mode column bound")?;
     let index_atoms = checked_sum(
         &[
-            5,
+            6,
             checked_product(&[packets, packet_length], "packet slot atoms")?,
             edges
                 .checked_mul(2)
@@ -260,7 +346,7 @@ pub fn description_envelope(
     )?;
     let fields = checked_sum(
         &[
-            12,
+            13,
             modes
                 .checked_mul(6)
                 .ok_or_else(|| "mode field bound overflow".to_string())?,
@@ -276,6 +362,7 @@ pub fn description_envelope(
         edges,
         packets,
         packet_length,
+        certificate.tiles,
         radix,
         modes,
         tuples,
@@ -307,8 +394,12 @@ pub fn description_envelope(
     )?;
     Ok(DescriptionEnvelope {
         packet_length,
+        tiles: certificate.tiles,
         modes,
         tuples,
+        modes_per_weight_bound,
+        attempted_modes_bound,
+        tuple_log2_bound,
         entry_tables_bound,
         entry_values_bound,
         ring_elements_bound,
@@ -323,6 +414,7 @@ fn preflight(certificate: &Certificate, meter: &mut Meter) -> std::result::Resul
         || certificate.degree == 0
         || certificate.precision == 0
         || certificate.radix == 0
+        || certificate.tiles == 0
     {
         return Err("certificate context".into());
     }
@@ -601,6 +693,12 @@ pub(crate) fn verify_with_ring(
     if certificate.weights.len() != certificate.packets.len() {
         return Err("packet weight count".into());
     }
+    let packet_length = certificate.packets.iter().map(Vec::len).max().unwrap_or(0);
+    let (modes_per_weight_bound, attempted_modes_bound, tuple_log2_bound) =
+        source_count_bounds(certificate, packet_length)?;
+    if certificate.modes.len() > attempted_modes_bound {
+        return Err("mode source count bound".into());
+    }
     let mut occurrences = vec![0usize; certificate.edge_count];
     for slots in &certificate.packets {
         for &edge in slots.iter().flatten() {
@@ -613,6 +711,8 @@ pub(crate) fn verify_with_ring(
     if occurrences.iter().any(|&count| count != 1) {
         return Err("packet coverage".into());
     }
+    let mut mode_keys = BTreeSet::new();
+    let mut modes_by_weight = BTreeMap::new();
     for mode in &certificate.modes {
         if mode.packet >= certificate.packets.len()
             || mode.source >= certificate.radix
@@ -652,6 +752,24 @@ pub(crate) fn verify_with_ring(
                 return Err("mode column placement".into());
             }
         }
+        let residue = mode.columns[0].0 % certificate.tiles;
+        if mode
+            .columns
+            .iter()
+            .any(|(slot, _)| slot % certificate.tiles != residue)
+        {
+            return Err("mode tile placement".into());
+        }
+        if !mode_keys.insert((mode.packet, mode.weight, residue)) {
+            return Err("mode tile duplicate".into());
+        }
+        *modes_by_weight.entry(mode.weight).or_insert(0usize) += 1;
+    }
+    if modes_by_weight
+        .values()
+        .any(|&count| count > modes_per_weight_bound)
+    {
+        return Err("mode per-weight source bound".into());
     }
     for (packet, slots) in certificate.packets.iter().enumerate() {
         if certificate.weights[packet].len() != slots.len()
@@ -714,6 +832,9 @@ pub(crate) fn verify_with_ring(
         || actual_tuples != independent_tuples(certificate, meter)?
     {
         return Err("weighted tuple coverage".into());
+    }
+    if ceil_log2_count(certificate.tuples.len()) > tuple_log2_bound {
+        return Err("weighted tuple source bound".into());
     }
     let expected_tables = certificate
         .tuples

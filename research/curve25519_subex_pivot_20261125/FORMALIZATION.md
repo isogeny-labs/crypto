@@ -272,32 +272,35 @@ A separate public native certificate verifier now implements those six checks
 over plain certificate data without invoking production child construction
 during verification. Duplicate packet coverage, duplicated mode slots,
 mode-target reassignment, tuple removal, and packet-table mutation are rejected.
-The positive certificate round-trips through a stable 2,162-byte JSON
-representation; schema mismatch and noncanonical ring-element mutations are
-also rejected, and an overflowing structural count fails closed.
+The schema-2 positive certificate round-trips through a stable 2,172-byte JSON
+representation; schema mismatch, noncanonical ring-element, invalid tile
+period, and overflowing structural-count mutations fail closed.
 `[pcc:unverified]`
 
 The serialized checker also covers all 100 combinations of the 25 three-edge
 left/right set-partition pairs and four label schedules. Their total wire size
-is 317,734 bytes, the largest certificate is 10,136 bytes, and the warm Rust
+is 318,734 bytes, the largest certificate is 10,146 bytes, and the warm Rust
 1.78 debug verification sweep takes 0.34 seconds. `[pcc:unverified]`
 
 For four edges, the same boundary covers 33 graph-shape orbits and four label
-schedules: 132 certificates, 791,236 total bytes, and a 20,767-byte maximum.
+schedules: 132 certificates, 792,556 total bytes, and a 20,777-byte maximum.
 Measured checker time is about 0.60 seconds; production and JSON bring the
 complete warm debug gate to 1.12--1.26 seconds. `[pcc:unverified]`
 
 For five edges, 91 relabeling orbits under four schedules give 364 serialized
-certificates, 3,648,802 total bytes, and a 43,450-byte maximum. The measured
+certificates, 3,652,442 total bytes, and a 43,460-byte maximum. The measured
 verifier phase is 2.06 seconds and the complete production/JSON/verification
 gate is 4.93 seconds, below the three-second and six-second targets.
 `[pcc:unverified]`
 
 `CERTIFICATE_DESCRIPTION_ENVELOPE.md` then bounds the complete certificate
-description from `M,K,L,R,Q,T,d,p`. The entry-value term follows from
+description from `M,K,L,tau,R,Q,T,d,p`. The entry-value term follows from
 `sum_g 2^a_g <= 2^(2L)+R-1`; explicit JSON and canonical-binary ceilings are
-checked on every serialized fixture through five edges. This isolates the
-remaining need for independent source bounds on `Q` and `T`.
+checked on every serialized fixture through five edges. The verifier also
+reconstructs the tile keys and exact weighted tuple set, enforcing
+`Q<=K tau(p-1)` and `log2 T<=5 ceil(sqrt(K tau p))`. This binds `Q` and `T` to
+the existing active-call source ledger while leaving recursive history and
+precision refinement open.
 `[pcc:unverified]`
 
 The verifier is now a public module separate from recursive contraction and a

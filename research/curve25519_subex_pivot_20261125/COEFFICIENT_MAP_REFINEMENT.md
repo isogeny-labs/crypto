@@ -148,7 +148,7 @@ retained tuples, and black-box packet-entry tables. The verifier imports exact
 ring arithmetic but not contraction, deformation, packing, child construction,
 or packet tensors. `[pcc:unverified]`
 
-Five algebraic mutations are load-bearing: duplicate packet coverage,
+Five algebraic mutation classes are load-bearing: duplicate packet coverage,
 duplicated mode slots, target-group reassignment, removal of a retained tuple,
 and alteration of one packet-table entry are each rejected. During
 implementation the checker detected and localized an indexing error in the new
@@ -157,45 +157,48 @@ identifiers instead of local packet port indices. The corrected producer and
 independent checker now agree. `[pcc:unverified]`
 
 The positive certificate is now serialized to JSON and parsed into fresh data
-before verification. Its exact wire size is 2,162 bytes under the pinned Rust
-dependencies. A schema-version mutation and a noncanonical ring coordinate are
-rejected before the six algebraic checks, an overflowing structural count fails
-closed, and reserialization is byte-for-byte stable. `[pcc:unverified]`
+before verification. Schema 2 adds the mode tile period, and its exact wire
+size is 2,172 bytes under the pinned Rust dependencies. Schema-version,
+noncanonical-coordinate, overflowing-count, and invalid-tile-period mutations
+fail closed, and reserialization is byte-for-byte stable. `[pcc:unverified]`
 
 A second positive control serializes and verifies all 25 left/right set-partition
 pairs of three labeled edges under four label schedules. The 100 certificates
-occupy 317,734 bytes in total (3,177.34 bytes on average); the maximum is 10,136
+occupy 318,734 bytes in total (3,187.34 bytes on average); the maximum is 10,146
 bytes for partition pair `[0,1,1]/[0,1,1]` under schedule 3. The complete warm
 Rust 1.78 debug sweep verifies in 0.34 seconds. `[pcc:unverified]`
 
 The serialized boundary also covers the 33 simultaneous-edge-relabeling orbits
 of four-edge partition pairs under four label schedules. The 132 certificates
-occupy 791,236 bytes in total (5,994.21 bytes on average); the maximum is
-20,767 bytes for `[0,0,1,1]/[0,0,1,1]` under schedule 3. Phase timing measured
+occupy 792,556 bytes in total (6,004.21 bytes on average); the maximum is
+20,777 bytes for `[0,0,1,1]/[0,0,1,1]` under schedule 3. Phase timing measured
 about 0.60 seconds in the independent checker, below the one-second verifier
 target, plus about 0.51 seconds of production and 0.13 seconds of JSON work.
 The complete warm debug gate varied from 1.12 to 1.26 seconds.
 `[pcc:unverified]`
 
 At five edges, the 2,704 partition pairs collapse to 91 relabeling orbits.
-Across four label schedules, the 364 serialized certificates occupy 3,648,802
-bytes in total (10,024.18 bytes on average); the maximum is 43,450 bytes for
+Across four label schedules, the 364 serialized certificates occupy 3,652,442
+bytes in total (10,034.18 bytes on average); the maximum is 43,460 bytes for
 `[0,0,0,1,1]/[0,0,0,1,1]` under schedule 3. The explicit phase measurement
 used 2.06 seconds in verification, 1.88 seconds in production, and 0.55 seconds
 in JSON work, for 4.93 seconds total. This passes the three-second verifier and
 six-second total admission targets. `[pcc:unverified]`
 
 `CERTIFICATE_DESCRIPTION_ENVELOPE.md` derives a reusable bound from
-`M,K,L,R,Q,T,d,p`. Its core entry-value term is
+`M,K,L,tau,R,Q,T,d,p`. Its core entry-value term is
 `T K (2^(2L) + R - 1)`; native controls check the resulting JSON and
 canonical-binary ceilings on every serialized fixture through five edges.
-The bound remains conditional on separate source bounds for `Q` and `T`.
+Schema 2 validates one tile residue key per packet and positive weight, giving
+`Q<=K tau (p-1)`, and checks exact retained tuples against
+`log2 T<=5 ceil(sqrt(K tau p))`. These are the same local bounds as the
+active-call dimension ledger, without trusting producer-supplied counts.
 `[pcc:unverified]`
 
 The native `factorization-certificate-check` command now reads that JSON from a
 file or standard input, caps input at 64 MiB, applies explicit work/vector/width
 limits plus a 1,024-mode recursion-depth cap, and reports charged work. The
-checked fixture is 2,163 bytes including its terminating newline and verifies
+checked fixture is 2,173 bytes including its terminating newline and verifies
 in 224 charged steps; a schema mutation exits with rejection status 2.
 `[pcc:unverified]`
 

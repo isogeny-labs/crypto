@@ -203,6 +203,22 @@ small weighted tuples.  This closes the local exponent algebra conditional on
 the packet-capacity and precision premises.  The following components bind
 those premises to recursive histories and price the remaining arithmetic.
 
+The standalone factorization certificate now carries the schema-2 tile period
+`tau` and independently validates the same local counts. Nonempty mode columns
+must occupy one residue modulo `tau`; duplicate `(packet,weight,residue)` keys
+are rejected. Exact independent tuple reconstruction then enforces
+
+```text
+Q <= K*tau*(p-1),
+log2(T) <= 5*ceil(sqrt(K*tau*p)).
+```
+
+The bounded positive controls cover 100 three-edge, 132 four-edge, and 364
+five-edge serialized certificates. This joins the finite factorization
+evidence to the active-call dimension ledger without trusting the producer's
+reported `Q` or `T`. It does not yet join the separate packing and precision
+premises to every node of an arbitrary recursive history. `[pcc:unverified]`
+
 ### Uniform source-history bridge
 
 The capacity and normalized-precision premises are now bound to the successful

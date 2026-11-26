@@ -252,6 +252,16 @@ fn produce(
         degree: kernel.ring.degree(),
         radix: parameters.radix,
         precision: kernel.ring.precision(),
+        tiles: 1usize
+            .checked_shl(
+                u32::try_from(
+                    coordinate
+                        .checked_add(1)
+                        .ok_or_else(|| overflow("certificate tile period"))?,
+                )
+                .map_err(|_| overflow("certificate tile period"))?,
+            )
+            .ok_or_else(|| overflow("certificate tile period"))?,
         edge_count: graph.edges.len(),
         packets,
         left_groups,
@@ -355,7 +365,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     )
     .unwrap();
     let serialized = serde_json::to_vec(&produced).unwrap();
-    assert_eq!(serialized.len(), 2_162);
+    assert_eq!(serialized.len(), 2_172);
     let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
     assert_eq!(serde_json::to_vec(&certificate).unwrap(), serialized);
     assert!(serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound);
@@ -371,6 +381,19 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(
         check(&bad_context, &ring, &mut meter).unwrap_err(),
         "certificate context"
+    );
+
+    let mut bad_tiles = certificate.clone();
+    bad_tiles.tiles = 1;
+    assert_eq!(
+        check(&bad_tiles, &ring, &mut meter).unwrap_err(),
+        "certificate tile period"
+    );
+    let mut bad_tiles = certificate.clone();
+    bad_tiles.tiles = 3;
+    assert_eq!(
+        check(&bad_tiles, &ring, &mut meter).unwrap_err(),
+        "certificate tile period"
     );
 
     let mut bad_element = certificate.clone();
@@ -421,6 +444,13 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(
         check(&duplicate_mode_slot, &ring, &mut meter).unwrap_err(),
         "mode row duplicate"
+    );
+
+    let mut duplicate_mode = certificate.clone();
+    duplicate_mode.modes.push(duplicate_mode.modes[0].clone());
+    assert_eq!(
+        check(&duplicate_mode, &ring, &mut meter).unwrap_err(),
+        "mode tile duplicate"
     );
 
     let mut bad_tuples = certificate.clone();
@@ -507,8 +537,8 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
         }
     }
     assert_eq!(cases, 100);
-    assert_eq!(total_bytes, 317_734);
-    assert_eq!(maximum_bytes, 10_136);
+    assert_eq!(total_bytes, 318_734);
+    assert_eq!(maximum_bytes, 10_146);
     assert_eq!(maximum_case, Some(([0, 1, 1], [0, 1, 1], 3)));
 }
 
@@ -570,8 +600,8 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
         }
     }
     assert_eq!(cases, 132);
-    assert_eq!(total_bytes, 791_236);
-    assert_eq!(maximum_bytes, 20_767);
+    assert_eq!(total_bytes, 792_556);
+    assert_eq!(maximum_bytes, 20_777);
     assert_eq!(maximum_case, Some((vec![0, 0, 1, 1], vec![0, 0, 1, 1], 3)));
 }
 
@@ -637,12 +667,12 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
         }
     }
     assert_eq!(cases, 364);
-    assert_eq!(total_bytes, 3_648_802);
-    assert_eq!(maximum_bytes, 43_450);
+    assert_eq!(total_bytes, 3_652_442);
+    assert_eq!(maximum_bytes, 43_460);
     assert_eq!(
         maximum_case,
         Some((vec![0, 0, 0, 1, 1], vec![0, 0, 0, 1, 1], 3))
     );
-    assert_eq!(maximum_json_bound, 32_519_360);
-    assert_eq!(maximum_binary_bits_bound, 19_154_209);
+    assert_eq!(maximum_json_bound, 32_519_488);
+    assert_eq!(maximum_binary_bits_bound, 19_154_282);
 }
