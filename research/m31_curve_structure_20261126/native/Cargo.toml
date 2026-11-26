@@ -1,0 +1,15 @@
+[package]
+name = "m31-structure-rho"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "m31-structure-rho"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+debug = false
