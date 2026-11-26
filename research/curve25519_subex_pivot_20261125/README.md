@@ -474,6 +474,8 @@ kernel-check the whole asymptotic chain. [pcc:unverified]
   <https://github.com/openai/math/blob/42907c9e999cc00d6abe7a50bfc1023250edd1b9/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/quantitative-contraction.tex>
 - Existing lead assessment:
   `docs/leads/2026-11-17/subexponential-ecdlp-goal/REPORT.md`
+- Independent-lemma and acceptance map:
+  [`FORMALIZATION.md`](FORMALIZATION.md)
 - Pair-image degree gate:
   `research/curve25519_pair_image_gate_20261125/README.md`
 
