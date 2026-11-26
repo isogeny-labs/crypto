@@ -268,6 +268,12 @@ behind those maps, proves the producer implication `D=E=H`, maps each object
 to Rust, and lists the six checks required from an independent kernel.
 `[pcc:unverified]`
 
+A separate test-only certificate checker now implements those six checks over
+plain certificate data without invoking production child construction during
+verification. Duplicate packet coverage, mode-target reassignment, tuple
+removal, and packet-table mutation are rejected. The checker remains in the
+same crate and is not an external proof kernel. `[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

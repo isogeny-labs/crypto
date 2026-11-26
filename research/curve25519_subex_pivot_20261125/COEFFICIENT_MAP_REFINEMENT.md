@@ -138,3 +138,25 @@ check, without invoking production child construction:
 Supplying that checker, or a theorem-assistant refinement of the same six
 items, is the remaining independent boundary for this lemma.
 `[pcc:unverified]`
+
+## Native certificate checker
+
+The test-only `factorization_certificate` module now implements all six checks
+on a plain in-memory certificate. Production code supplies packet slots,
+incidence groups, kernel-weight tables, generated modes, retained tuples, and
+black-box packet-entry tables. The checker independently verifies coverage,
+group placement, crossing series, Cartesian tuple completeness, and every
+packet coefficient before accepting the certificate. It never calls
+production `child` while checking. `[pcc:unverified]`
+
+Four mutations are load-bearing: duplicate packet coverage, target-group
+reassignment, removal of a retained tuple, and alteration of one packet-table
+entry are each rejected. During implementation the checker detected and
+localized an indexing error in the new certificate producer: packet truth
+tables initially used global child-edge identifiers instead of local packet
+port indices. The corrected producer and independent checker now agree.
+`[pcc:unverified]`
+
+This is not yet an external or theorem-assistant kernel. Producer and checker
+still compile in the same Rust crate, the certificate is not serialized, and
+the positive control is a bounded correlated-port fixture. `[pcc:unverified]`

@@ -23,6 +23,10 @@ mod coupled_controls;
 mod dimension_controls;
 
 #[cfg(test)]
+#[path = "factorization_certificate.rs"]
+mod factorization_certificate;
+
+#[cfg(test)]
 #[path = "port_mass_controls.rs"]
 mod port_mass_controls;
 
