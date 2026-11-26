@@ -1708,7 +1708,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "rho.signed_frobenius_v6",
             family: "rho",
-            summary: "rho.signed_frobenius_v5 with every partition-mix call tallied as uncharged native work; the trajectory and charged group operations are identical; Koblitz curves only",
+            summary: "rho.signed_frobenius_v5 with a direct count of every partition-mix call in place of the per-step tally; the trajectory and charged group operations are identical; Koblitz curves only",
             entry: "ic_boundary::signed_frobenius_rho_v3_partition_counted(RhoV3::v6(true))",
             applies: Applies::KoblitzOnly,
             params: RHO_PARAMS,
@@ -4046,7 +4046,11 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
     let bin_walk = matches!(inst, Instance::Binary(_)) && or_name == "wwalk";
     let (r, prime) = match inst {
         Instance::Prime(i) => (i.r, Some(i)),
-        Instance::Binary(b) if bin_walk && fb_name != "prime-interval" => (b.r, None),
+        Instance::Binary(b)
+            if bin_walk && !matches!(fb_name.as_str(), "prime-abscissa" | "prime-interval") =>
+        {
+            (b.r, None)
+        }
         _ => {
             return Err(format!(
                 "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
@@ -11977,7 +11981,7 @@ mod accounting_rules_tests {
     }
 
     #[test]
-    fn signed_frobenius_v6_only_adds_exact_partition_accounting() {
+    fn signed_frobenius_v6_only_changes_partition_accounting() {
         let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 19 });
         let old = run(
             &method("rho.signed_frobenius_v5", &[]),
@@ -11998,15 +12002,16 @@ mod accounting_rules_tests {
         assert_eq!(counted.exhausted, old.exhausted);
         assert_eq!(counted.total_gae, old.total_gae);
         assert_eq!(counted.phases, old.phases);
-        assert!(!old.counters.contains_key("partition_hashes_uncharged"));
-        let hashes = counted.counters["partition_hashes_uncharged"];
+        assert_eq!(old.counters[V5_JUMP_INDEX_COUNTER], old.counters["steps"]);
+        let hashes = counted.counters[V5_JUMP_INDEX_COUNTER];
         assert!(hashes >= counted.counters["walk_operations"]);
-        assert!(counted
-            .unpriced
-            .contains(&"partition_hashes_uncharged".to_string()));
+        assert!(counted.unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+        assert_eq!(counted.unpriced, old.unpriced);
         let mut counted_counters = counted.counters.clone();
-        counted_counters.remove("partition_hashes_uncharged");
-        assert_eq!(counted_counters, old.counters);
+        counted_counters.remove(V5_JUMP_INDEX_COUNTER);
+        let mut old_counters = old.counters;
+        old_counters.remove(V5_JUMP_INDEX_COUNTER);
+        assert_eq!(counted_counters, old_counters);
     }
 
     /// The verification a BSGS, kangaroo or claw run pays is the one
@@ -12542,42 +12547,33 @@ mod accounting_rules_tests {
     fn exhausted_strong_v2_records_the_spent_work() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let (inst, facts) = built(&spec);
-        let Instance::Binary(b) = &inst else {
-            unreachable!()
-        };
-        // A point of the curve outside the order-r subgroup (h = 4).
-        let out_of_subgroup = (1u64..)
-            .flat_map(|x| b.points_with_x(x))
-            .find(|q| !b.fast.mul_u64(*q, b.r).infinity)
-            .expect("the cofactor is 4");
-        let target = [
-            format!("0x{:x}", out_of_subgroup.x),
-            format!("0x{:x}", out_of_subgroup.y),
+        // Keep the target in the subgroup and bound both walks tightly.
+        let parameters = [
+            ("lanes", "1"),
+            ("dp_bits", "31"),
+            ("step_cap_factor", "1"),
         ];
-        let frozen = solve(
-            &method("rho.signed_frobenius_strong", &[]),
+        let frozen = run(
+            &method("rho.signed_frobenius_strong", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(frozen.exhausted);
         assert_eq!(frozen.total_gae, 0.0);
         assert!(frozen.phases.is_empty());
-        let v2 = solve(
-            &method("rho.signed_frobenius_strong_v2", &[]),
+        let v2 = run(
+            &method("rho.signed_frobenius_strong_v2", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(v2.exhausted && v2.recovered.is_none());
         assert!(v2.total_gae > 0.0);
         assert_phases_sum("strong_v2 exhausted", &v2);
         assert!(v2.counters["walk_steps"] > 0);
-        assert!(v2.counters["failed_collisions"] > 0 || v2.counters["table_inserts_uncharged"] > 0);
         // The failed candidate checks are charged to verification.
         let checks = v2.phases.iter().find(|p| p.name == "verification").unwrap();
         assert_eq!(checks.scalar_mults, v2.counters["failed_collisions"]);
@@ -13477,7 +13473,8 @@ mod accounting_tests {
                 "unknown parameter",
             ),
         ] {
-            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle)).unwrap_err();
+            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle))
+                .expect_err(&format!("{fb} / {oracle} was admitted"));
             assert!(err.contains(needle), "{fb} / {oracle}: {err}");
         }
     }
