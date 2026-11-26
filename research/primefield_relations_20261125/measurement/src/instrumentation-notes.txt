@@ -1,0 +1,66 @@
+COUNTED M31 HARNESS -- SOURCE REVIEW NOTES, BEFORE EXECUTION
+
+Owned source files: main.rs, counted_native.rs, archive_source.rs.
+No measured workload or unit test has been executed by the implementation agent.
+The root session owns source/protocol freezing, publication, test execution,
+measurement calls, raw manifests and admission.
+
+REUSE
+counted_native.rs copies the pinned shared-terminal native subset, SHA256
+e01d41e24bdd650a0440a52f8782ece3c69c188cfb7b292479a9c8cfdb3c3986.
+The original arithmetic expressions and branch decisions are unchanged.
+Added counters classify native add calls, EC scalar calls, sqrt attempts and
+successes, curve checks, Base seed trials and Base chain steps. The sqrt result
+is bound to a local before returning, solely to count successful roots.
+
+archive_source.rs derives from the archived source wrapper, SHA256
+3ed2eb9cf632caf21195c194a781f0563573216f75316ec9facfe7b12c9d1fd4.
+Its only behavioral implementation change is a deterministic DefaultHasher
+builder for the existing HashSet. The SplitMix64 stream, seed, source-loop
+order, duplicate predicate and arithmetic calls remain unchanged. Pin Rust
+1.100.0 in the protocol. Hash bucket probes and allocations are not counted.
+
+SCOPE
+This is a heterogeneous operation census, not a wall-time comparison or GAE
+model. Counter families overlap where documented (e.g. inversion calls and
+their actual modular products). Native direct integer addition/subtraction,
+small-constant products, primality integer work, memory allocation, hash/tree
+comparisons and output/bookkeeping are explicitly unpriced. Custom chain,
+polynomial, support-gcd and Fr inversion products are counted in full.
+
+Full ordered 4608 source x coordinates appear in JSON for input custody.
+The sorted full-pool roster is a clone, so source order is preserved.
+Root-to-label admission uses the complete 4608-record roster; the archived
+three-column roster is measured and reported separately.
+
+The support-certificate terminal membership checks use the same explicitly
+counted A predicate as the query arms. A computed charged total is common
+phase work plus ONE full-stream arm pass. It never adds the repeated controls
+or the separate all-positive corpus to the cold charged total.
+
+There are two A/A controls and five ordered pairs AB,BA,AB,BA,AB, separately
+for the full source stream and the all-positive support. These are fixed
+counter-determinism/algorithm comparisons, not independent yield trials.
+
+UNIT-TEST EXECUTION BOUNDARY
+Six tests are defined. The complete_counted_fixture test calls run(), so it
+performs one complete correctness census, in addition to any later executable
+measurement calls. The prospective protocol must explicitly count that
+correctness invocation rather than saying there are only two total full
+invocations when running the suite plus two executable calls.
+
+COMPILE-ONLY RECEIPT
+Both normal and --test Rust type checks with --emit=metadata succeeded, with
+no diagnostics, using Rust 1.100.0. Neither executable nor tests were run.
+Compiler:
+/workspace/scratch/998688543c6d/toolchain/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc
+Commands were --edition=2021 [--test] --emit=metadata -o <temporary>.rmeta
+research/primefield_relations_20261125/measurement/src/main.rs.
+Temporary output directory: /tmp/m31-counted-typecheck.m85rd9.
+The initial emission target /dev/null failed with EBUSY (exit 1) for both
+forms; retrying into separate regular temporary metadata files passed. This
+was an output-destination failure, not an executed correctness failure.
+
+The support-membership comparator accounting change was made after those
+initial type checks in response to independent source review. Root will
+compile the final frozen source before execution.
