@@ -1,0 +1,18 @@
+{
+  "applied": [
+    "L-1e09e78e395f"
+  ],
+  "created": "2026-11-26T02:46:54Z",
+  "evidence": [
+    "research/primefield_relations_20261125/measurement/results/attempt-001/replay-comparison.json",
+    "research/primefield_relations_20261125/measurement/results/attempt-001/source-publication-receipt.json",
+    "docs/session-logs/2026-11-25.md",
+    "https://github.com/isogeny-labs/crypto/pull/5217"
+  ],
+  "kind": "outcome",
+  "note": "Scoped measurement succeeded on published source 84d656e47987be9b932276c25c6b9ee6cd8d318e: six tests passed, and initial/replay JSON hashes both equal c15d06b52255e93bc0ebd304da97fe670d1d62649e322a0c43aba797221c629d. Preserve typed product/comparison/storage units and full-pool versus historical-roster admission; fewer lookup comparisons do not establish a runtime speedup. Source-generation helper counts are specific to the retained implementation, and no new relation extractor or yield measurement was produced. Test stdout SHA-256: ed98f05c97d3016dfd4f9e4d40b7a45d4f8596a86c8d0d750928435d3f18d342. PR #5217 evidence publication and CI remain pending; #5213 is merged. Dashboard exclusion is documented under AGENTS section 7d; benchmark-progress regeneration remains a separate publication obligation. Unsigned producer evidence; no new PCC IDs.",
+  "result": "success",
+  "schema": "crypto.lesson/v1",
+  "scope": "primefield-relations",
+  "task": "Measure and audit the fixed M31 shared-selector construction, full-pool label admission, and paired membership operation counts"
+}

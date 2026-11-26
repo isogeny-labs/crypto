@@ -79,7 +79,10 @@ fn every_representation_holds_at_a_planted_relation() {
         for m in 2..=4 {
             let mut rng = Rng(100 + m as u64 + a);
             let p = plant(&c, 4, m, &mut rng);
-            for rep in Rep::ALL.into_iter().chain([Rep::ChainTrace]) {
+            for rep in Rep::ALL
+                .into_iter()
+                .chain([Rep::QuadAc, Rep::QuadBc, Rep::ChainTrace])
+            {
                 let b = build(&c, rep, &p);
                 assert!(holds(&b), "{rep:?} m = {m} a = {a}");
             }
@@ -96,6 +99,8 @@ fn quadratic_arms_are_quadratic_and_chain_is_cubic() {
     let deg = |rep| crate::systems::system_stats(&build(&c, rep, &p)).max_degree;
     assert_eq!(deg(Rep::Chain), 3);
     assert_eq!(deg(Rep::QuadGeneric), 2);
+    assert_eq!(deg(Rep::QuadAc), 2);
+    assert_eq!(deg(Rep::QuadBc), 2);
     assert_eq!(deg(Rep::E2Aux), 2);
     assert_eq!(deg(Rep::Line), 2);
 }
