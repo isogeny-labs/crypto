@@ -1,0 +1,64 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "norm-one-torus-base-compare-public-precommit-20261126",
+  "frozen_before_execution_utc": "2026-11-26T07:21:25Z",
+  "precommit_intent": "This manifest must be committed and pushed to draft PR #5229 before its target stream is constructed or either factor-base arm is executed.",
+  "master_seed_hex": "11a133bce6940d31caa29609928b8b573cee51e1899360559588b5e38b655e89",
+  "stream_derivation": {
+    "domain": "isogeny-labs/norm-one-torus-base-compare/public-precommit/2026-11-26/v1",
+    "construction": "SHA-256(domain || 0x00 || master_seed || 0x00 || stream_name || 0x00 || u64be(index)); reduce the big-endian digest modulo the requested range"
+  },
+  "configuration": {
+    "curve": "icv1-fp31-tm3989-ae9db972",
+    "dickson_height": 6,
+    "dickson_lo": 0,
+    "dickson_c_top": 0,
+    "random_targets": 256,
+    "planted_targets_per_base": 8,
+    "arity": 5,
+    "rounds": 9,
+    "query_block_size": 1024
+  },
+  "comparison": {
+    "torus": "production dickson_factor_base(instance, 6, 0, 0)",
+    "ordinary": "production prime_factor_base(instance, 34)",
+    "cardinality_contract": "34 abscissae and 68 signed points in both arms",
+    "retained_side": "canonical elliptic-negation quotient of the complete unordered signed three-sum multiset",
+    "streamed_side": "complete unordered signed two-sum multiset regenerated in blocks per target and discarded after probing",
+    "common_random_targets": true,
+    "arm_specific_planted_targets": 8,
+    "warmups_per_arm": 1,
+    "round_order": "dickson-torus,ordinary-small-x on even rounds; reversed on odd rounds",
+    "aa_repeats_per_arm_per_round": 1,
+    "primary_evidence": "full-scan deterministic operation vectors on common random targets",
+    "secondary_evidence": "first-hit counts and local non-isolated producer wall diagnostics"
+  },
+  "tuning_disclosure": {
+    "development_benchmark_runs": 0,
+    "block_size_source": "fixed by the frozen protocol before execution",
+    "public_precommit_seed_used_during_implementation_or_tests": false,
+    "unit_test_seed_is_separate_and explicitly_not_a_measurement": true
+  },
+  "source": {
+    "commit": "aeec13214c09e3a661a1a023a6faad0991b6851e",
+    "sha256": {
+      "examples/norm_one_torus_base_compare.rs": "0f031f73932e431f059ecca7a6ba3c054782d98450cc3aeebba6154e42564e97",
+      "examples/norm_one_torus_base_compare_verify.rs": "24af7fc36fe81678671f940d34c5c8c0a3f836b8d46af1e0ad18dbf180173fa7",
+      "examples/support/norm_one_torus_base_compare.rs": "2d42b24741ea12f3b103dd5c88f028136c33a04f0fc2eb92ae7e1807e1d1ff9d",
+      "examples/support/norm_one_torus_compare_kernel.rs": "c94d6e0e6ab35ffdd361226ef8cc432492981c257f4724b1d0c4ae1acd5b72b8",
+      "research/norm_one_torus_base_compare_20261126/PROTOCOL.md": "4b32a57e73b47c6d058480cf9d25b3d58207bf90b37d2c2633c593bed3e7806c",
+      "src/cryptanalysis/ic_boundary.rs": "2ff113f98afb6aae1d2ccd247f5872dbed33396922f4c87f0151a6819354c56d",
+      "src/cryptanalysis/ic_framework/pkm_semaev.rs": "4c506981d6449f2688fe07222ae9b6b21e6d58d5a363e372e0425014167c9c4a",
+      "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+    }
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "target": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.57 x86_64",
+    "cpu": "Intel Xeon Platinum 8573C",
+    "visible_cpus": 5,
+    "isolation": "none; exact counts are primary and local wall time is only a producer diagnostic"
+  }
+}

@@ -299,15 +299,15 @@ fn umulmod(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
     umod(&c, m, p)
 }
 fn ugcd(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-    let (mut a, mut b) = (a.to_vec(), b.to_vec());
-    trim(&mut a);
-    trim(&mut b);
-    while !(b.len() == 1 && b[0] == 0) {
-        let r = umod(&a, &b, p);
-        a = b;
-        b = r;
+    // Shared gcd (monic; the caller only reads its length).  This file
+    // writes the zero polynomial as `[0]`.
+    let f = crypto_lib::gcd::poly::Fp64::new(p);
+    let g = crypto_lib::gcd::poly::gcd(&f, a, b);
+    if g.is_empty() {
+        vec![0]
+    } else {
+        g
     }
-    a
 }
 /// Number of distinct roots in `F_p` of `m` (degree of `gcd(x^p − x, m)`).
 fn roots_in_fp(m: &[u64], p: u64) -> usize {

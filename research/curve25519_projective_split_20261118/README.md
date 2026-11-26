@@ -1,8 +1,9 @@
 # Curve25519 projective split: current status
 
 The `m = 3` projective split implementation now passes its native correctness
-panels directly on current `main`. The frozen performance qualification grid
-has not run, no cost slope has been fitted, and this study makes no
+panels directly on current `main`. A historical repair-overlay run completed
+the frozen `t = 3,4` cells, while `t = 5,6` were censored before producing a
+mean; no four-point cost slope can therefore be fitted. This study makes no
 subexponential Curve25519 ECDLP claim. `[pcc:unverified]`
 
 ## Implemented arm
@@ -47,21 +48,27 @@ These observations are current-machine evidence but remain
 ## Historical overlay evidence
 
 [`raw/qualification-tests.json`](raw/qualification-tests.json) is the frozen
-2026-11-18 repair-overlay receipt. It is retained byte-for-byte as historical
-evidence and is not represented as a current-main run.
+repair-overlay receipt, repeated with the final counter instrumentation on
+2026-11-25. It records the exact task and compile-repair revisions and is not
+represented as a current-main run.
 
 ## Performance and exponent decision
 
 The frozen protocol requires matched `t = 3..6` cells, eight planted
 relations per measured cell, paired uncertainty, and an upper cost-ratio bound
-below 0.80 before opening a separately frozen `m = 4` stage. Those gates are
-not satisfied by the correctness panels or the one-planted descent smoke.
+below 0.80 before opening a separately frozen `m = 4` stage. On the historical
+overlay, the chain/projective multiply-add ratios were `1.001116` at `t = 3`
+and `1.000464` at `t = 4`; both arms timed out at `t = 5` and were
+memory-killed at `t = 6`. Every completed arm recovered 8/8 planted relations
+with zero invalid rows. The observed ratios miss the `0.80` gate and the
+censored cells leave the four-point slope undefined. `[pcc:unverified]`
 
 The newer solving-degree frontier analysis in
 [`../solving_degree_tower_frontier_20261124/README.md`](../solving_degree_tower_frontier_20261124/README.md)
 records reachable `m <= 4` measurements as non-decisive for the exponent bar.
-Accordingly, this continuation does not spend the frozen grid or open the
-`m = 4` stage. The decision-relevant remaining problem is a proved bound on
-the satisfiable-solve cost/degree growth (including the narrow two-free-block
-route), together with end-to-end relation collection and linear algebra.
+Accordingly, the current-main continuation does not rerun the expensive grid
+or open the `m = 4` stage. The decision-relevant remaining problem is a proved
+bound on the satisfiable-solve cost/degree growth (including the narrow
+two-free-block route), together with end-to-end relation collection and linear
+algebra.
 `[pcc:unverified]`

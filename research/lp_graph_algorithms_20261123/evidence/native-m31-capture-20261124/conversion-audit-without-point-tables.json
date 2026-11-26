@@ -1,0 +1,1204 @@
+{
+  "schema": "graph-ic.native-audit-excerpt/v1",
+  "original_artifact_path": "extracted/home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/derived/conversion-audit.json",
+  "original_sha256": "6058b62ec057b0977b888933949abd534371e6148cd0249f720321090d217649",
+  "transformation": "Copy all native audit fields except point_tables; no mathematical recomputation.",
+  "native_audit": {
+    "schema": "prime31-b677-capture-audit/v1",
+    "status": "verified-fixed-input-replay",
+    "source": {
+      "commit": "577d6c2c1c4a527604d965e6fb62c44df7902f36",
+      "git_blob": "7fd27b9888058399d8814cef373d373243e6a1e5",
+      "hash_validation": "The replay wrapper binds input, source and output bytes with SHA-256; this converter checks structure, fixture and group equations.",
+      "input_bytes_expected": 165511,
+      "input_bytes_read": 165511,
+      "input_kind": "retained generic exhaustive-pair search on a known-answer public target; not planted decompositions or blinded algebraic extraction",
+      "input_sha256_expected": "e2407b695d4df7a7c9d71eae00895a643aebe3afab50d1c338e58778884dabab",
+      "path": "research/prime31_graph_ecdlp_20261123/evidence/mitm-b677-control-01/ten-query.json",
+      "producer_path": "research/prime31_graph_ecdlp_20261123/native/mitm_four.rs",
+      "producer_sha256_expected": "6b97389197bcebc85ace5b47096dbc590475a1fd1021590715e66aa88f13fc12",
+      "repository": "isogeny-labs/crypto",
+      "scope": "single-target generic four-sum graph-control; pair enumeration fully charged",
+      "seed": "0x7033315f6d340101"
+    },
+    "instance": {
+      "curve": {
+        "a": 847514846,
+        "b": 2087444724,
+        "g": [
+          625037715,
+          2100627251
+        ],
+        "n": 2147446831,
+        "p": 2147483647
+      },
+      "public_target": [
+        976979610,
+        1228979761
+      ]
+    },
+    "counts": {
+      "queries": 10,
+      "source_rows": 645,
+      "replayed_rows": 645,
+      "kept_rows": 613,
+      "excluded_rows": 32,
+      "classes_by_base_terms": [
+        2,
+        30,
+        138,
+        276,
+        199
+      ],
+      "kept_by_lp_arity": [
+        199,
+        276,
+        138
+      ],
+      "excluded_by_lp_arity": [
+        0,
+        0,
+        0,
+        30,
+        2
+      ],
+      "source_points": 677,
+      "small_points": 509,
+      "large_points": 168
+    },
+    "query_joins": [
+      {
+        "label": 0,
+        "a": 732241239,
+        "b": 2105609680,
+        "query": [
+          1309556011,
+          132006747
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 0,
+        "last_source_row_id": 51,
+        "source_rows": 52,
+        "kept_rows": 50,
+        "excluded_rows": 2,
+        "classes_by_base_terms": [
+          0,
+          2,
+          13,
+          23,
+          14
+        ]
+      },
+      {
+        "label": 1,
+        "a": 1386609379,
+        "b": 1414993243,
+        "query": [
+          828373911,
+          960376015
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 52,
+        "last_source_row_id": 105,
+        "source_rows": 54,
+        "kept_rows": 51,
+        "excluded_rows": 3,
+        "classes_by_base_terms": [
+          1,
+          2,
+          10,
+          23,
+          18
+        ]
+      },
+      {
+        "label": 2,
+        "a": 1102690313,
+        "b": 599019718,
+        "query": [
+          548387151,
+          494482780
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 106,
+        "last_source_row_id": 176,
+        "source_rows": 71,
+        "kept_rows": 70,
+        "excluded_rows": 1,
+        "classes_by_base_terms": [
+          0,
+          1,
+          12,
+          34,
+          24
+        ]
+      },
+      {
+        "label": 3,
+        "a": 330099298,
+        "b": 749220022,
+        "query": [
+          75714828,
+          123267255
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 177,
+        "last_source_row_id": 240,
+        "source_rows": 64,
+        "kept_rows": 61,
+        "excluded_rows": 3,
+        "classes_by_base_terms": [
+          0,
+          3,
+          19,
+          24,
+          18
+        ]
+      },
+      {
+        "label": 4,
+        "a": 1833325445,
+        "b": 678901836,
+        "query": [
+          223163909,
+          1698152582
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 241,
+        "last_source_row_id": 312,
+        "source_rows": 72,
+        "kept_rows": 68,
+        "excluded_rows": 4,
+        "classes_by_base_terms": [
+          0,
+          4,
+          14,
+          35,
+          19
+        ]
+      },
+      {
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "query": [
+          2102574346,
+          252453871
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 313,
+        "last_source_row_id": 387,
+        "source_rows": 75,
+        "kept_rows": 68,
+        "excluded_rows": 7,
+        "classes_by_base_terms": [
+          0,
+          7,
+          13,
+          28,
+          27
+        ]
+      },
+      {
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "query": [
+          69786133,
+          1705725180
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 388,
+        "last_source_row_id": 455,
+        "source_rows": 68,
+        "kept_rows": 62,
+        "excluded_rows": 6,
+        "classes_by_base_terms": [
+          0,
+          6,
+          15,
+          28,
+          19
+        ]
+      },
+      {
+        "label": 7,
+        "a": 431690758,
+        "b": 1361284661,
+        "query": [
+          1137024304,
+          1198271019
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 456,
+        "last_source_row_id": 509,
+        "source_rows": 54,
+        "kept_rows": 54,
+        "excluded_rows": 0,
+        "classes_by_base_terms": [
+          0,
+          0,
+          13,
+          22,
+          19
+        ]
+      },
+      {
+        "label": 8,
+        "a": 601834213,
+        "b": 1843773425,
+        "query": [
+          206761805,
+          902696817
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 510,
+        "last_source_row_id": 578,
+        "source_rows": 69,
+        "kept_rows": 66,
+        "excluded_rows": 3,
+        "classes_by_base_terms": [
+          1,
+          2,
+          16,
+          31,
+          19
+        ]
+      },
+      {
+        "label": 9,
+        "a": 341498856,
+        "b": 123682560,
+        "query": [
+          1572321693,
+          1364328161
+        ],
+        "query_replayed": true,
+        "first_source_row_id": 579,
+        "last_source_row_id": 644,
+        "source_rows": 66,
+        "kept_rows": 63,
+        "excluded_rows": 3,
+        "classes_by_base_terms": [
+          0,
+          3,
+          13,
+          28,
+          22
+        ]
+      }
+    ],
+    "excluded_rows": [
+      {
+        "id": 25,
+        "label": 0,
+        "a": 732241239,
+        "b": 2105609680,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            83,
+            -1
+          ],
+          [
+            209,
+            1
+          ],
+          [
+            480,
+            1
+          ],
+          [
+            641,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 46,
+        "label": 0,
+        "a": 732241239,
+        "b": 2105609680,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            284,
+            1
+          ],
+          [
+            291,
+            1
+          ],
+          [
+            543,
+            -1
+          ],
+          [
+            605,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 52,
+        "label": 1,
+        "a": 1386609379,
+        "b": 1414993243,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 0,
+        "large_terms": 4,
+        "terms": [
+          [
+            1,
+            1
+          ],
+          [
+            60,
+            -1
+          ],
+          [
+            605,
+            1
+          ],
+          [
+            636,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 66,
+        "label": 1,
+        "a": 1386609379,
+        "b": 1414993243,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            32,
+            1
+          ],
+          [
+            198,
+            -1
+          ],
+          [
+            325,
+            -1
+          ],
+          [
+            455,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 69,
+        "label": 1,
+        "a": 1386609379,
+        "b": 1414993243,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            43,
+            -1
+          ],
+          [
+            218,
+            1
+          ],
+          [
+            223,
+            -1
+          ],
+          [
+            436,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 145,
+        "label": 2,
+        "a": 1102690313,
+        "b": 599019718,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            132,
+            -1
+          ],
+          [
+            400,
+            1
+          ],
+          [
+            423,
+            -1
+          ],
+          [
+            562,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 179,
+        "label": 3,
+        "a": 330099298,
+        "b": 749220022,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            1,
+            -1
+          ],
+          [
+            119,
+            -1
+          ],
+          [
+            423,
+            1
+          ],
+          [
+            482,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 209,
+        "label": 3,
+        "a": 330099298,
+        "b": 749220022,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            118,
+            -1
+          ],
+          [
+            195,
+            1
+          ],
+          [
+            300,
+            -1
+          ],
+          [
+            446,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 225,
+        "label": 3,
+        "a": 330099298,
+        "b": 749220022,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            218,
+            -1
+          ],
+          [
+            256,
+            1
+          ],
+          [
+            310,
+            1
+          ],
+          [
+            340,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 262,
+        "label": 4,
+        "a": 1833325445,
+        "b": 678901836,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            62,
+            -1
+          ],
+          [
+            178,
+            1
+          ],
+          [
+            285,
+            -1
+          ],
+          [
+            371,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 277,
+        "label": 4,
+        "a": 1833325445,
+        "b": 678901836,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            133,
+            1
+          ],
+          [
+            200,
+            1
+          ],
+          [
+            256,
+            1
+          ],
+          [
+            474,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 278,
+        "label": 4,
+        "a": 1833325445,
+        "b": 678901836,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            141,
+            1
+          ],
+          [
+            195,
+            1
+          ],
+          [
+            480,
+            -1
+          ],
+          [
+            490,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 289,
+        "label": 4,
+        "a": 1833325445,
+        "b": 678901836,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            179,
+            -1
+          ],
+          [
+            187,
+            1
+          ],
+          [
+            223,
+            1
+          ],
+          [
+            341,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 318,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            7,
+            1
+          ],
+          [
+            53,
+            1
+          ],
+          [
+            346,
+            -1
+          ],
+          [
+            630,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 325,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            26,
+            -1
+          ],
+          [
+            90,
+            -1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            155,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 349,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            81,
+            1
+          ],
+          [
+            247,
+            1
+          ],
+          [
+            279,
+            1
+          ],
+          [
+            334,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 357,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            118,
+            1
+          ],
+          [
+            151,
+            1
+          ],
+          [
+            467,
+            1
+          ],
+          [
+            518,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 372,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            201,
+            -1
+          ],
+          [
+            389,
+            -1
+          ],
+          [
+            443,
+            -1
+          ],
+          [
+            628,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 373,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            201,
+            1
+          ],
+          [
+            486,
+            -1
+          ],
+          [
+            538,
+            -1
+          ],
+          [
+            542,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 376,
+        "label": 5,
+        "a": 291968545,
+        "b": 1932316791,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            217,
+            -1
+          ],
+          [
+            302,
+            -1
+          ],
+          [
+            310,
+            -1
+          ],
+          [
+            489,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 394,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            26,
+            -1
+          ],
+          [
+            64,
+            1
+          ],
+          [
+            70,
+            1
+          ],
+          [
+            570,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 433,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            149,
+            1
+          ],
+          [
+            253,
+            1
+          ],
+          [
+            645,
+            1
+          ],
+          [
+            656,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 441,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            196,
+            -1
+          ],
+          [
+            373,
+            1
+          ],
+          [
+            381,
+            -1
+          ],
+          [
+            478,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 444,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            214,
+            -1
+          ],
+          [
+            235,
+            -1
+          ],
+          [
+            333,
+            1
+          ],
+          [
+            529,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 447,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            247,
+            -1
+          ],
+          [
+            377,
+            -1
+          ],
+          [
+            403,
+            -1
+          ],
+          [
+            653,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 449,
+        "label": 6,
+        "a": 2136646360,
+        "b": 827643829,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            274,
+            -1
+          ],
+          [
+            400,
+            1
+          ],
+          [
+            535,
+            -1
+          ],
+          [
+            675,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 524,
+        "label": 8,
+        "a": 601834213,
+        "b": 1843773425,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            26,
+            1
+          ],
+          [
+            158,
+            1
+          ],
+          [
+            234,
+            1
+          ],
+          [
+            486,
+            -1
+          ]
+        ]
+      },
+      {
+        "id": 525,
+        "label": 8,
+        "a": 601834213,
+        "b": 1843773425,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            32,
+            -1
+          ],
+          [
+            467,
+            1
+          ],
+          [
+            534,
+            1
+          ],
+          [
+            656,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 547,
+        "label": 8,
+        "a": 601834213,
+        "b": 1843773425,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 0,
+        "large_terms": 4,
+        "terms": [
+          [
+            144,
+            -1
+          ],
+          [
+            224,
+            -1
+          ],
+          [
+            325,
+            -1
+          ],
+          [
+            586,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 607,
+        "label": 9,
+        "a": 341498856,
+        "b": 123682560,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            62,
+            1
+          ],
+          [
+            87,
+            -1
+          ],
+          [
+            408,
+            -1
+          ],
+          [
+            520,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 623,
+        "label": 9,
+        "a": 341498856,
+        "b": 123682560,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            128,
+            1
+          ],
+          [
+            262,
+            1
+          ],
+          [
+            380,
+            -1
+          ],
+          [
+            403,
+            1
+          ]
+        ]
+      },
+      {
+        "id": 626,
+        "label": 9,
+        "a": 341498856,
+        "b": 123682560,
+        "reason": "large-prime-arity-exceeds-two",
+        "base_terms": 1,
+        "large_terms": 3,
+        "terms": [
+          [
+            155,
+            -1
+          ],
+          [
+            273,
+            -1
+          ],
+          [
+            414,
+            -1
+          ],
+          [
+            430,
+            1
+          ]
+        ]
+      }
+    ],
+    "arithmetic": {
+      "fixture_setup": {
+        "group_additions": 222,
+        "fp_multiplications": 136795,
+        "fp_inversions": 116,
+        "scalar_multiplications": 0,
+        "scalar_inversions": 0,
+        "polynomial_evaluations": 0,
+        "extraction_nodes": 0
+      },
+      "base_classification": {
+        "group_additions": 0,
+        "fp_multiplications": 68596,
+        "fp_inversions": 0,
+        "scalar_multiplications": 0,
+        "scalar_inversions": 0,
+        "polynomial_evaluations": 0,
+        "extraction_nodes": 0
+      },
+      "group_replay": {
+        "group_additions": 3501,
+        "fp_multiplications": 182150,
+        "fp_inversions": 2836,
+        "scalar_multiplications": 0,
+        "scalar_inversions": 0,
+        "polynomial_evaluations": 0,
+        "extraction_nodes": 0
+      },
+      "counters_are_complete_cold_cost": false
+    },
+    "custody_limits": [
+      "The source does not supply a complete per-probe rejected-attempt trace.",
+      "The original collector binary/toolchain attestation is not supplied by this input.",
+      "The producer arithmetic counter omits its separate fixture setup and bespoke graph arithmetic; it is not a full cold-cost receipt.",
+      "Fixture setup, separate Base classification and group replay counters here describe this consumer only; no timing or speedup inference is made.",
+      "Producer rank, recovered-scalar, recovery-result and timing fields are ignored. Native replay is not independently signed PCC validation."
+    ]
+  },
+  "point_table_source_identity": {
+    "arithmetic_path": "research/prime31_ic_20261115/native/lib.rs",
+    "arithmetic_sha256_expected": "52b30e41478b0306603db7d09bcb17377cae64efcfd78d4c34db7bf91325a867",
+    "derived_table_binding": "The external replay wrapper hashes this audit, its exact extracted point_tables and the capture output.",
+    "extra_csv_path": "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv",
+    "extra_csv_sha256_expected": "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46",
+    "fixture_path": "research/prime31_four_summand_20261122/native/b677_fixture.rs",
+    "fixture_sha256_expected": "3f491defbc7aa1643192db4d0c7144afcec1f84a41f03489355a866459329624"
+  }
+}

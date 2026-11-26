@@ -1,0 +1,16 @@
+{
+  "action": "Inspect the minimal leading-generator degrees before enumerating rows; reject a degree bound below the largest required degree and qualify that early guard before any expensive saved-case run.",
+  "created": "2026-11-24T00:33:40Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/template-h2-20261123/saved-reference-shape.json",
+    "research/extension_ic_graph_20261115/template-h2-20261123/koszul-summary.json",
+    "research/extension_ic_graph_20261115/template-h2-20261123/validation/degree7-tests.log"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "extension-ic-graph"
+  ],
+  "trigger": "Constructing a full-basis Macaulay template from a retained reference Groebner basis",
+  "why": "Degree-5/6 controls spent arithmetic on a full-basis guard that required the minimal degree-7 generator x5^7. The later Rust preflight catches this structural insufficiency before matrix construction; lower-degree failures remain explicit controls."
+}

@@ -1,0 +1,328 @@
+{
+  "branch": "feat/lucid-cray-tckh5e",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/hgcd_bench",
+        "--rounds",
+        "11",
+        "--seed",
+        "6868",
+        "--out",
+        "docs/notes/adx-hgcd-20261125/hgcd_raw.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T23:53:56+00:00",
+      "wall_s": 166.344
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/hgcd_bench",
+        "--rounds",
+        "11",
+        "--seed",
+        "6869",
+        "--out",
+        "docs/notes/adx-hgcd-20261125/hgcd_raw_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-26T00:19:10+00:00",
+      "wall_s": 274.917
+    }
+  ],
+  "commit": "7a6da71c6f75e049bab86ca276cd168ba9b57f5a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-25T23:51:53+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261125-hgcd-crossovers"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "local container, 4 vCPU shared VM, taskset -c 3, no PMU",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261125T2351Z-hgcd-crossovers",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "fp-xgcd_hgcd-vs-xgcd_euclid-n4096",
+      "note": "run 2 (8f0b91a242, fixed baseline); fp size 4096 (degree); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 129977.60 us vs xgcd_hgcd 104228.01 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.233,
+        1.363
+      ],
+      "unit": "ratio",
+      "value": 1.289
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "fp-gcd_hgcd-vs-gcd_euclid-n16384",
+      "note": "run 2 (8f0b91a242, fixed baseline); fp size 16384 (degree); paired median of 11 rounds, 95% bootstrap; gcd_euclid 826263.29 us vs gcd_hgcd 844296.56 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.937,
+        0.992
+      ],
+      "unit": "ratio",
+      "value": 0.981
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "fp-xgcd_hgcd-vs-xgcd_euclid-n16384",
+      "note": "run 2 (8f0b91a242, fixed baseline); fp size 16384 (degree); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 2346826.60 us vs xgcd_hgcd 1068889.87 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.08,
+        2.33
+      ],
+      "unit": "ratio",
+      "value": 2.226
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "gf2-xgcd_hgcd-vs-xgcd_euclid-n1024",
+      "note": "run 2 (8f0b91a242, fixed baseline); gf2 size 1024 (degree); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 107.23 us vs xgcd_hgcd 89.64 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.155,
+        1.213
+      ],
+      "unit": "ratio",
+      "value": 1.197
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "gf2-gcd_hgcd-vs-gcd_euclid-n8192",
+      "note": "run 2 (8f0b91a242, fixed baseline); gf2 size 8192 (degree); paired median of 11 rounds, 95% bootstrap; gcd_euclid 1172.58 us vs gcd_hgcd 997.84 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.121,
+        1.284
+      ],
+      "unit": "ratio",
+      "value": 1.16
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "gf2-xgcd_hgcd-vs-xgcd_euclid-n8192",
+      "note": "run 2 (8f0b91a242, fixed baseline); gf2 size 8192 (degree); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 2655.72 us vs xgcd_hgcd 1094.64 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.383,
+        2.66
+      ],
+      "unit": "ratio",
+      "value": 2.461
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "gf2-gcd_hgcd-vs-gcd_euclid-n131072",
+      "note": "run 2 (8f0b91a242, fixed baseline); gf2 size 131072 (degree); paired median of 11 rounds, 95% bootstrap; gcd_euclid 153157.18 us vs gcd_hgcd 33884.88 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.204,
+        4.864
+      ],
+      "unit": "ratio",
+      "value": 4.457
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "gf2-xgcd_hgcd-vs-xgcd_euclid-n131072",
+      "note": "run 2 (8f0b91a242, fixed baseline); gf2 size 131072 (degree); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 390328.28 us vs xgcd_hgcd 41401.33 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        9.272,
+        10.68
+      ],
+      "unit": "ratio",
+      "value": 9.428
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-gcd_lehmer-vs-gcd_numinteger-n256",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 256 (bits); paired median of 11 rounds, 95% bootstrap; gcd_numinteger 3.76 us vs gcd_lehmer 2.91 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.257,
+        1.351
+      ],
+      "unit": "ratio",
+      "value": 1.277
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-xgcd_lehmer-vs-xgcd_euclid-n1024",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 1024 (bits); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 121.97 us vs xgcd_lehmer 25.46 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.643,
+        5.388
+      ],
+      "unit": "ratio",
+      "value": 5.203
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-gcd_lehmer-vs-gcd_numinteger-n8192",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 8192 (bits); paired median of 11 rounds, 95% bootstrap; gcd_numinteger 531.33 us vs gcd_lehmer 203.80 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.584,
+        2.785
+      ],
+      "unit": "ratio",
+      "value": 2.626
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-xgcd_lehmer-vs-xgcd_euclid-n8192",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 8192 (bits); paired median of 11 rounds, 95% bootstrap; xgcd_euclid 2994.94 us vs xgcd_lehmer 546.87 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.399,
+        5.515
+      ],
+      "unit": "ratio",
+      "value": 5.457
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-xgcd_hgcd-vs-xgcd_lehmer-n16384",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 16384 (bits); paired median of 11 rounds, 95% bootstrap; xgcd_lehmer 1788.56 us vs xgcd_hgcd 1408.16 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.141,
+        1.32
+      ],
+      "unit": "ratio",
+      "value": 1.255
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-gcd_lehmer-vs-gcd_numinteger-n131072",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 131072 (bits); paired median of 11 rounds, 95% bootstrap; gcd_numinteger 115730.09 us vs gcd_lehmer 26531.49 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.034,
+        4.495
+      ],
+      "unit": "ratio",
+      "value": 4.372
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-gcd_hgcd-vs-gcd_lehmer-n131072",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 131072 (bits); paired median of 11 rounds, 95% bootstrap; gcd_lehmer 26531.49 us vs gcd_hgcd 24324.33 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.979,
+        1.1
+      ],
+      "unit": "ratio",
+      "value": 1.066
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 11,
+      "name": "int-xgcd_hgcd-vs-xgcd_lehmer-n131072",
+      "note": "run 2 (8f0b91a242, fixed baseline); int size 131072 (bits); paired median of 11 rounds, 95% bootstrap; xgcd_lehmer 73635.62 us vs xgcd_hgcd 32920.43 us",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.085,
+        2.311
+      ],
+      "unit": "ratio",
+      "value": 2.224
+    }
+  ],
+  "problem": "kernel:gcd_hgcd",
+  "raw": [
+    {
+      "bytes": 14589,
+      "path": "docs/notes/adx-hgcd-20261125/hgcd_raw.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/78/78a99949571421dc2fdc62574af9dc1efecd4e35f59fe47c70277c5fbf313697",
+      "sha256": "78a99949571421dc2fdc62574af9dc1efecd4e35f59fe47c70277c5fbf313697",
+      "uploaded": false
+    },
+    {
+      "bytes": 12853,
+      "path": "docs/notes/adx-hgcd-20261125/hgcd_raw_run2.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/88/88f57f1261ef140df660c9683ac0db28b773dbaa839924be00a623200119effd",
+      "sha256": "88f57f1261ef140df660c9683ac0db28b773dbaa839924be00a623200119effd",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hgcd-crossovers",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

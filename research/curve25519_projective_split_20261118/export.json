@@ -1,0 +1,163 @@
+{
+  "analysis": {
+    "blinded": false,
+    "outputs": [
+      "evidence/analysis.json",
+      "evidence/per-target.jsonl",
+      "evidence/plot.csv",
+      "evidence/figure.svg"
+    ],
+    "script": "native/src/main.rs"
+  },
+  "arms": [
+    {
+      "id": "chain",
+      "role": "baseline"
+    },
+    {
+      "id": "projective",
+      "role": "candidate"
+    }
+  ],
+  "backend": "local-cloud-executor",
+  "created": "2026-11-25",
+  "export_id": "CURVE25519-PROJECTIVE-SPLIT-20261125-R1",
+  "files": [
+    {
+      "path": "raw/t3-chain.json",
+      "role": "raw aggregate",
+      "sha256": "ec3201cfb13d493cb63995b980acce931e53e7e7703e7e9b77fdf12750cfeeca"
+    },
+    {
+      "path": "raw/t3-projective.json",
+      "role": "raw aggregate",
+      "sha256": "f8b4cfea73ad1b2d974b379196951d8fd1b1387c5417ef009dbb36566613fbcc"
+    },
+    {
+      "path": "raw/t4-chain.json",
+      "role": "raw aggregate",
+      "sha256": "4e4db55a8816f47878da4567045ab6e38df17b5783c0ce3f845abab12614485e"
+    },
+    {
+      "path": "raw/t4-projective.json",
+      "role": "raw aggregate",
+      "sha256": "9a43fc77f031d117e4760104a694ee25e311998eeea99da7190456d4f4f4c0d9"
+    },
+    {
+      "path": "raw/attempts.json",
+      "role": "run metadata",
+      "sha256": "0080f62aaa06b1e2b267a382b3d3cbf44cbeb4b29c3857e2dd86e39d25a06441"
+    },
+    {
+      "path": "raw/qualification-tests.json",
+      "role": "run metadata",
+      "sha256": "2b6ee9b44713c21fda741c841ed51b8cbd393b0000e59dec3c79aa4bb6a930a0"
+    },
+    {
+      "path": "raw/t5-chain.json",
+      "role": "censored raw aggregate (empty by construction)",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "raw/t5-projective.json",
+      "role": "censored raw aggregate (empty by construction)",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "raw/t6-chain.json",
+      "role": "censored raw aggregate (empty by construction)",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "raw/t6-projective.json",
+      "role": "censored raw aggregate (empty by construction)",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/host.json",
+      "role": "host metadata",
+      "sha256": "2b8d068d41b609c3fc6c1f3cdaf02395b08be5a3c9868fc99874ab64315d7a88"
+    },
+    {
+      "path": "native/Cargo.lock",
+      "role": "analysis dependency lock",
+      "sha256": "28b4d169ec34256a3f499d10951c9cb883c7147d52fd14e4180c688a56b9e7d9"
+    },
+    {
+      "path": "native/src/main.rs",
+      "role": "analysis source",
+      "sha256": "da0644cfdbe9cc73a0d91a4f8a1416b3f38d165d08fa63bb1a46140360a8f528"
+    },
+    {
+      "path": "evidence/analysis.json",
+      "role": "derived analysis",
+      "sha256": "bbcfb93daa39acf3f73ee7c8366e4ae0778807e62096ea592cd7a2231520b6e7"
+    },
+    {
+      "path": "evidence/per-target.jsonl",
+      "role": "derived per-target records",
+      "sha256": "1a17bc00389fd723896ad21c9953bddaa83c6397d3891ef70b00b2a369d8b39d"
+    },
+    {
+      "path": "evidence/plot.csv",
+      "role": "editable figure data",
+      "sha256": "71d0b7b41cf8b73cc6e338c49e9a4915a50ce9d4416170c387afcdc154b543b5"
+    },
+    {
+      "path": "evidence/figure.svg",
+      "role": "editable vector figure",
+      "sha256": "092315dde9976cdfd4b10459716309a6332233279ea6a2dba0cd27f3ad7b5023"
+    },
+    {
+      "path": "evidence/figure.png",
+      "role": "raster figure render",
+      "sha256": "da2a1a17dad24e5b2298e00cbbc9c360e2c49bbf93f0ff357891ff9066a7b817"
+    },
+    {
+      "path": "evidence/report.typ",
+      "role": "report source",
+      "sha256": "ae6ef0f83e65a8dac3585e844880980797e93c3329c5f8f9f8222c0930f3afbe"
+    },
+    {
+      "path": "evidence/report.pdf",
+      "role": "compiled report",
+      "sha256": "19ceef2454a26149b14c481d629864a6f30a18aa31d98ba003795b8d27113710"
+    }
+  ],
+  "flow": {
+    "attempted": 9,
+    "completed": 4,
+    "excluded": [
+      {
+        "attempt": 3,
+        "reason": "environment restart destroyed tee output sink; unchanged t4-chain retry completed"
+      }
+    ],
+    "interrupted": 1,
+    "not_completed": 4,
+    "planned": 8,
+    "resumed": 1
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "t=5 timed out before one target in both arms; t=6 was killed for memory before one target in both arms."
+    },
+    {
+      "kind": "claim boundary",
+      "text": "No m=4 stage and no total-work subexponential claim."
+    }
+  ],
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "cc21fe2ebba439a951e24fbd4770a8d6bdc1c6a7b7217df32da5962ad92689f9"
+  },
+  "reviews_dir": "reviews",
+  "schema": "experiment.export/v1",
+  "source": {
+    "binary_sha256": "249c9415a43d060012ad179ab6d814da7ee0530e8ad8ee50693bc272c80764fc",
+    "implementation_commit": "fcfa0556673cbbf45dec4a9d1906bd8f1e068fba",
+    "instrumentation_diff_sha256": "a9b7159f5c36bf1faf888a281568a03c58092059899cdb05058b6d645b118991",
+    "repo": "isogeny-labs/crypto"
+  }
+}

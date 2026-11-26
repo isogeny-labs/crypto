@@ -1,0 +1,666 @@
+//! Independent replay of finite packet-packing provenance.
+//!
+//! This module consumes a labeled bipartite edge skeleton and an already
+//! accepted factorization certificate. It does not import the source packing,
+//! deformation, contraction, or graph implementations.
+
+use crate::factorization_certificate::Certificate as FactorizationCertificate;
+use crate::{BigUint, Meter};
+use num_traits::Zero;
+use serde::{Deserialize, Serialize};
+
+/// Current packing-provenance wire schema.
+pub const SCHEMA: u32 = 3;
+
+/// Endpoint vertex indices for one edge in source order.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EdgeEndpoints {
+    /// Index of the left endpoint vertex.
+    pub left: usize,
+    /// Port index at the left endpoint vertex.
+    pub left_port: usize,
+    /// Index of the right endpoint vertex.
+    pub right: usize,
+    /// Port index at the right endpoint vertex.
+    pub right_port: usize,
+}
+
+/// Finite data needed to replay packet construction independently.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Certificate {
+    /// Wire schema version.
+    pub schema: u32,
+    /// Packet label radix.
+    pub radix: usize,
+    /// Packet-length exponent `a`, so `L=2^a`.
+    pub packet_exponent: u32,
+    /// Active valuation coordinate used for factorization groups.
+    pub coordinate: u32,
+    /// Whether labels are claimed to be the exact conditional-expectation output.
+    pub conditional_labels: bool,
+    /// Source degree cap when degree, variance, capacity, and balance are claimed.
+    pub source_degree_cap: Option<usize>,
+    /// Edge endpoints in the factorization certificate's edge order.
+    pub edges: Vec<EdgeEndpoints>,
+    /// Source labels for every left vertex, including isolates.
+    pub row_labels: Vec<usize>,
+    /// Source labels for every right vertex, including isolates.
+    pub column_labels: Vec<usize>,
+    /// Creation precision of every source left tensor.
+    pub row_creation_precisions: Vec<usize>,
+    /// Creation precision of every source right tensor.
+    pub column_creation_precisions: Vec<usize>,
+    /// Unordered radix-digit pair pattern attached to every emitted packet.
+    pub packet_pairs: Vec<Vec<(usize, usize)>>,
+}
+
+/// Checked dimensions of one accepted packing-provenance replay.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct VerificationSummary {
+    /// Number of replayed edges.
+    pub edges: usize,
+    /// Number of left vertices, including isolates.
+    pub left_vertices: usize,
+    /// Number of right vertices, including isolates.
+    pub right_vertices: usize,
+    /// Number of reconstructed nonempty packets.
+    pub packets: usize,
+    /// Slots in every packet.
+    pub packet_length: usize,
+    /// Number of ordered row/column label classes.
+    pub label_classes: usize,
+    /// Largest reconstructed row/column label class.
+    pub maximum_class: usize,
+    /// Number of unordered digit patterns replayed before empty suppression.
+    pub orientation_patterns: usize,
+    /// Nonnegative slack in `K L<=3M`, when that inequality holds.
+    pub packing_slack: Option<BigUint>,
+    /// Whether the replayed packet array satisfies source capacity.
+    pub source_capacity_admitted: bool,
+    /// Whether conditional-expectation label selection was independently replayed.
+    pub conditional_labels_verified: bool,
+    /// Whether degree, variance, capacity, and all-coordinate balance were checked.
+    pub source_bounds_verified: bool,
+    /// Whether the actual source guards imply the stronger class, padding,
+    /// packet-count, and per-side group-load closure bounds.
+    pub source_guard_closure_admitted: bool,
+}
+
+/// Coarse structural description ceiling for one packing-provenance object.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct DescriptionEnvelope {
+    /// Primitive numeric, Boolean, null, and tuple atoms.
+    pub scalar_atoms: usize,
+    /// JSON arrays and objects.
+    pub containers: usize,
+    /// Named JSON object fields.
+    pub named_fields: usize,
+    /// Maximum bit width of any serialized integer, with minimum one.
+    pub integer_width: usize,
+    /// Coarse JSON byte ceiling.
+    pub json_bytes_bound: usize,
+    /// Coarse canonical length-prefixed binary bit ceiling.
+    pub canonical_binary_bits_bound: usize,
+}
+
+fn checked_sum(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(0usize, |sum, &value| {
+        sum.checked_add(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn checked_product(values: &[usize], label: &str) -> Result<usize, String> {
+    values.iter().try_fold(1usize, |product, &value| {
+        product
+            .checked_mul(value)
+            .ok_or_else(|| format!("{label} overflow"))
+    })
+}
+
+fn bit_width(value: usize) -> usize {
+    (usize::BITS as usize - value.leading_zeros() as usize).max(1)
+}
+
+fn verify_source_guard_closure(
+    edges: usize,
+    label_classes: usize,
+    packet_length: usize,
+    degree_cap: Option<usize>,
+    maximum_class: usize,
+    radix: usize,
+    maximum_group_load: usize,
+) -> Result<bool, String> {
+    let Some(delta) = degree_cap else {
+        return Ok(false);
+    };
+    let edges = BigUint::from(edges);
+    let array = BigUint::from(label_classes);
+    let guard_admitted = edges >= BigUint::from(packet_length) * &array
+        && edges >= BigUint::from(2u8) * &array * &array * BigUint::from(delta);
+    if !guard_admitted {
+        return Ok(false);
+    }
+    if BigUint::from(maximum_class) * &array > BigUint::from(2u8) * &edges {
+        return Err("packing provenance source guard class cap".into());
+    }
+    if BigUint::from(maximum_group_load) * BigUint::from(radix) > BigUint::from(2u8) * &edges {
+        return Err("packing provenance source guard group cap".into());
+    }
+    Ok(true)
+}
+
+/// Derive a structural description ceiling without serializing the object.
+///
+/// The JSON bound charges 64 bytes per primitive, container, field, and one
+/// framing unit. Canonical binary charges the actual maximum integer width per
+/// primitive and 64 framing bits per container and field.
+pub fn description_envelope(certificate: &Certificate) -> Result<DescriptionEnvelope, String> {
+    let edges = certificate.edges.len();
+    let rows = certificate.row_labels.len();
+    let columns = certificate.column_labels.len();
+    let packets = certificate.packet_pairs.len();
+    let pair_count = certificate
+        .packet_pairs
+        .iter()
+        .try_fold(0usize, |sum, pairs| {
+            sum.checked_add(pairs.len())
+                .ok_or_else(|| "packing provenance pair count overflow".to_string())
+        })?;
+    let vertices = rows
+        .checked_add(columns)
+        .ok_or_else(|| "packing provenance vertex count overflow".to_string())?;
+    let scalar_atoms = checked_sum(
+        &[
+            6,
+            checked_product(&[4, edges], "packing provenance edge atoms")?,
+            checked_product(&[2, vertices], "packing provenance vertex atoms")?,
+            checked_product(&[2, pair_count], "packing provenance pair atoms")?,
+        ],
+        "packing provenance scalar atoms",
+    )?;
+    let containers = checked_sum(
+        &[7, edges, packets, pair_count],
+        "packing provenance containers",
+    )?;
+    let named_fields = checked_sum(
+        &[
+            12,
+            checked_product(&[4, edges], "packing provenance edge fields")?,
+        ],
+        "packing provenance fields",
+    )?;
+    let maximum = std::iter::once(certificate.schema as usize)
+        .chain(std::iter::once(certificate.radix))
+        .chain(std::iter::once(certificate.packet_exponent as usize))
+        .chain(std::iter::once(certificate.coordinate as usize))
+        .chain(certificate.source_degree_cap)
+        .chain(
+            certificate
+                .edges
+                .iter()
+                .flat_map(|edge| [edge.left, edge.left_port, edge.right, edge.right_port]),
+        )
+        .chain(certificate.row_labels.iter().copied())
+        .chain(certificate.column_labels.iter().copied())
+        .chain(certificate.row_creation_precisions.iter().copied())
+        .chain(certificate.column_creation_precisions.iter().copied())
+        .chain(
+            certificate
+                .packet_pairs
+                .iter()
+                .flatten()
+                .flat_map(|&(left, right)| [left, right]),
+        )
+        .max()
+        .unwrap_or(0);
+    let integer_width = bit_width(maximum);
+    let structural_units = checked_sum(
+        &[scalar_atoms, containers, named_fields, 1],
+        "packing provenance structural units",
+    )?;
+    let json_bytes_bound = checked_product(
+        &[64, structural_units],
+        "packing provenance JSON description",
+    )?;
+    let canonical_binary_bits_bound = checked_sum(
+        &[
+            checked_product(
+                &[scalar_atoms, integer_width],
+                "packing provenance binary atoms",
+            )?,
+            checked_product(
+                &[
+                    64,
+                    checked_sum(
+                        &[containers, named_fields, 1],
+                        "packing provenance binary framing units",
+                    )?,
+                ],
+                "packing provenance binary framing",
+            )?,
+        ],
+        "packing provenance binary description",
+    )?;
+    Ok(DescriptionEnvelope {
+        scalar_atoms,
+        containers,
+        named_fields,
+        integer_width,
+        json_bytes_bound,
+        canonical_binary_bits_bound,
+    })
+}
+
+fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
+    radix
+        .checked_pow(coordinate)
+        .map(|place| (label / place) % radix)
+}
+
+fn conditional_objective(
+    edges: &[EdgeEndpoints],
+    rows: &[Option<usize>],
+    columns: &[Option<usize>],
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<BigUint, String> {
+    let label = BigUint::from(labels);
+    let square = &label * &label;
+    let mut total = BigUint::zero();
+    for first in edges {
+        for second in edges {
+            meter
+                .charge(1, "packing provenance conditional edge pair")
+                .map_err(|error| error.to_string())?;
+            let mut unknown = 0usize;
+            let mut impossible = false;
+            for (left, right, assignment) in [
+                (first.left, second.left, rows),
+                (first.right, second.right, columns),
+            ] {
+                if left == right {
+                    continue;
+                }
+                match (assignment[left], assignment[right]) {
+                    (Some(x), Some(y)) if x != y => {
+                        impossible = true;
+                        break;
+                    }
+                    (Some(_), Some(_)) => {}
+                    _ => unknown += 1,
+                }
+            }
+            if !impossible {
+                total += match unknown {
+                    0 => square.clone(),
+                    1 => label.clone(),
+                    _ => BigUint::from(1u8),
+                };
+            }
+        }
+    }
+    Ok(total)
+}
+
+fn verify_conditional_labels(
+    provenance: &Certificate,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(), String> {
+    let mut rows = vec![None; provenance.row_labels.len()];
+    let mut columns = vec![None; provenance.column_labels.len()];
+    for right_side in [false, true] {
+        let count = if right_side {
+            columns.len()
+        } else {
+            rows.len()
+        };
+        for vertex in 0..count {
+            let isolated = provenance.edges.iter().all(|edge| {
+                if right_side {
+                    edge.right != vertex
+                } else {
+                    edge.left != vertex
+                }
+            });
+            if isolated {
+                if right_side {
+                    columns[vertex] = Some(0);
+                } else {
+                    rows[vertex] = Some(0);
+                }
+                continue;
+            }
+            let mut best: Option<(BigUint, usize)> = None;
+            for label in 0..labels {
+                meter
+                    .charge(1, "packing provenance conditional candidate")
+                    .map_err(|error| error.to_string())?;
+                if right_side {
+                    columns[vertex] = Some(label);
+                } else {
+                    rows[vertex] = Some(label);
+                }
+                let score =
+                    conditional_objective(&provenance.edges, &rows, &columns, labels, meter)?;
+                if best.as_ref().map_or(true, |(old, _)| score < *old) {
+                    best = Some((score, label));
+                }
+            }
+            let selected = best
+                .ok_or_else(|| "packing provenance conditional alphabet".to_string())?
+                .1;
+            if right_side {
+                columns[vertex] = Some(selected);
+            } else {
+                rows[vertex] = Some(selected);
+            }
+        }
+    }
+    let rows: Vec<_> = rows.into_iter().map(Option::unwrap).collect();
+    let columns: Vec<_> = columns.into_iter().map(Option::unwrap).collect();
+    if rows != provenance.row_labels || columns != provenance.column_labels {
+        return Err("packing provenance conditional labels".into());
+    }
+    Ok(())
+}
+
+/// Reconstruct packet ordering, slots, orientations, and active groups.
+///
+/// The factorization certificate must be verified separately. Acceptance here
+/// proves that its packet and group arrays are exactly reproduced by the
+/// serialized labeled edge skeleton under the source packet-construction
+/// schedule. It does not prove how the vertex labels were selected or that the
+/// external contraction theorem applies.
+pub fn verify(
+    factorization: &FactorizationCertificate,
+    provenance: &Certificate,
+    meter: &mut Meter,
+) -> Result<VerificationSummary, String> {
+    if provenance.schema != SCHEMA
+        || provenance.radix == 0
+        || provenance.coordinate >= provenance.packet_exponent
+        || factorization.radix != provenance.radix
+        || provenance.edges.len() != factorization.edge_count
+        || provenance.row_creation_precisions.len() != provenance.row_labels.len()
+        || provenance.column_creation_precisions.len() != provenance.column_labels.len()
+        || (provenance.source_degree_cap.is_some() && !provenance.conditional_labels)
+    {
+        return Err("packing provenance context".into());
+    }
+    let packet_length = 1usize
+        .checked_shl(provenance.packet_exponent)
+        .ok_or_else(|| "packing provenance packet width".to_string())?;
+    let labels = provenance
+        .radix
+        .checked_pow(provenance.packet_exponent)
+        .ok_or_else(|| "packing provenance label width".to_string())?;
+    let label_classes = labels
+        .checked_mul(labels)
+        .ok_or_else(|| "packing provenance class width".to_string())?;
+    if factorization
+        .packets
+        .iter()
+        .any(|packet| packet.len() != packet_length)
+        || provenance
+            .row_labels
+            .iter()
+            .chain(&provenance.column_labels)
+            .any(|&label| label >= labels)
+        || provenance.edges.iter().any(|edge| {
+            edge.left >= provenance.row_labels.len() || edge.right >= provenance.column_labels.len()
+        })
+    {
+        return Err("packing provenance shape".into());
+    }
+    if provenance.conditional_labels {
+        verify_conditional_labels(provenance, labels, meter)?;
+    }
+    meter
+        .vector(label_classes, "packing provenance classes")
+        .map_err(|error| error.to_string())?;
+    let mut classes = vec![Vec::new(); label_classes];
+    for (edge_index, edge) in provenance.edges.iter().enumerate() {
+        let class = provenance.row_labels[edge.left]
+            .checked_mul(labels)
+            .and_then(|value| value.checked_add(provenance.column_labels[edge.right]))
+            .ok_or_else(|| "packing provenance class index".to_string())?;
+        classes[class].push(edge_index);
+        let left_group = digit(
+            provenance.row_labels[edge.left],
+            provenance.coordinate,
+            provenance.radix,
+        )
+        .ok_or_else(|| "packing provenance group width".to_string())?;
+        let right_group = digit(
+            provenance.column_labels[edge.right],
+            provenance.coordinate,
+            provenance.radix,
+        )
+        .ok_or_else(|| "packing provenance group width".to_string())?;
+        if factorization.left_groups.get(edge_index) != Some(&left_group)
+            || factorization.right_groups.get(edge_index) != Some(&right_group)
+        {
+            return Err("packing provenance groups".into());
+        }
+    }
+    if let Some(delta) = provenance.source_degree_cap {
+        let mut row_degrees = vec![0usize; provenance.row_labels.len()];
+        let mut column_degrees = vec![0usize; provenance.column_labels.len()];
+        for edge in &provenance.edges {
+            row_degrees[edge.left] = row_degrees[edge.left]
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance row degree".to_string())?;
+            column_degrees[edge.right] = column_degrees[edge.right]
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance column degree".to_string())?;
+        }
+        if row_degrees
+            .iter()
+            .chain(&column_degrees)
+            .any(|&degree| degree > delta)
+        {
+            return Err("packing provenance source degree cap".into());
+        }
+        let sum_squares: BigUint = classes
+            .iter()
+            .map(|class| BigUint::from(class.len()) * BigUint::from(class.len()))
+            .sum();
+        let edges = BigUint::from(provenance.edges.len());
+        let array = BigUint::from(label_classes);
+        let lhs = &array * sum_squares;
+        let base = &edges * &edges;
+        let rhs = BigUint::from(2u8) * &edges * BigUint::from(delta) * &array;
+        if lhs < base || lhs - base > rhs {
+            return Err("packing provenance variance bound".into());
+        }
+    }
+
+    let maximum = classes.iter().map(Vec::len).max().unwrap_or(0);
+    let height = maximum
+        .div_ceil(packet_length)
+        .checked_mul(packet_length)
+        .ok_or_else(|| "packing provenance height".to_string())?;
+    let pairs: Vec<_> = (0..provenance.radix)
+        .flat_map(|low| (low..provenance.radix).map(move |high| (low, high)))
+        .collect();
+    let orientation_patterns = pairs
+        .len()
+        .checked_pow(provenance.packet_exponent)
+        .ok_or_else(|| "packing provenance pattern width".to_string())?;
+    meter
+        .vector(orientation_patterns, "packing provenance patterns")
+        .map_err(|error| error.to_string())?;
+
+    let mut expected_packets = Vec::new();
+    let mut expected_pairs = Vec::new();
+    for mut pattern in 0..orientation_patterns {
+        meter
+            .charge(1, "packing provenance pattern")
+            .map_err(|error| error.to_string())?;
+        let mut chosen = Vec::with_capacity(provenance.packet_exponent as usize);
+        for _ in 0..provenance.packet_exponent {
+            chosen.push(pairs[pattern % pairs.len()]);
+            pattern /= pairs.len();
+        }
+        let unequal = chosen.iter().filter(|&&(low, high)| low != high).count();
+        let copies = 1usize
+            .checked_shl(provenance.packet_exponent - unequal as u32)
+            .ok_or_else(|| "packing provenance copy width".to_string())?;
+        for start in (0..height).step_by(copies) {
+            meter
+                .vector(packet_length, "packing provenance packet slots")
+                .map_err(|error| error.to_string())?;
+            let mut slots = Vec::with_capacity(packet_length);
+            for slot in 0..packet_length {
+                meter
+                    .charge(1, "packing provenance slot")
+                    .map_err(|error| error.to_string())?;
+                let (mut row, mut column, mut place, mut copy, mut copy_bit) =
+                    (0usize, 0usize, 1usize, 0usize, 0usize);
+                for (coordinate, &(low, high)) in chosen.iter().enumerate() {
+                    let bit = (slot >> coordinate) & 1;
+                    let (row_digit, column_digit) = if low == high {
+                        copy |= bit << copy_bit;
+                        copy_bit += 1;
+                        (low, high)
+                    } else if bit == 0 {
+                        (low, high)
+                    } else {
+                        (high, low)
+                    };
+                    row = row
+                        .checked_add(
+                            row_digit
+                                .checked_mul(place)
+                                .ok_or_else(|| "packing provenance row label".to_string())?,
+                        )
+                        .ok_or_else(|| "packing provenance row label".to_string())?;
+                    column = column
+                        .checked_add(
+                            column_digit
+                                .checked_mul(place)
+                                .ok_or_else(|| "packing provenance column label".to_string())?,
+                        )
+                        .ok_or_else(|| "packing provenance column label".to_string())?;
+                    place = place
+                        .checked_mul(provenance.radix)
+                        .ok_or_else(|| "packing provenance label place".to_string())?;
+                }
+                let class = row
+                    .checked_mul(labels)
+                    .and_then(|value| value.checked_add(column))
+                    .ok_or_else(|| "packing provenance slot class".to_string())?;
+                slots.push(classes[class].get(start + copy).copied());
+            }
+            if slots.iter().any(Option::is_some) {
+                meter
+                    .vector(expected_packets.len() + 1, "packing provenance packets")
+                    .map_err(|error| error.to_string())?;
+                expected_packets.push(slots);
+                expected_pairs.push(chosen.clone());
+            }
+        }
+    }
+    if expected_packets != factorization.packets || expected_pairs != provenance.packet_pairs {
+        return Err("packing provenance replay".into());
+    }
+    let packing_lhs = BigUint::from(expected_packets.len()) * BigUint::from(packet_length);
+    let packing_rhs = BigUint::from(3u8) * BigUint::from(provenance.edges.len());
+    let source_capacity_admitted = packing_lhs <= packing_rhs;
+    if provenance.source_degree_cap.is_some() && !source_capacity_admitted {
+        return Err("packing provenance source capacity".into());
+    }
+    let mut maximum_group_load = 0usize;
+    if provenance.source_degree_cap.is_some() {
+        for coordinate in 0..provenance.packet_exponent {
+            let mut row_load = vec![0usize; provenance.radix];
+            let mut column_load = vec![0usize; provenance.radix];
+            for edge in &provenance.edges {
+                let row = digit(
+                    provenance.row_labels[edge.left],
+                    coordinate,
+                    provenance.radix,
+                )
+                .ok_or_else(|| "packing provenance balance width".to_string())?;
+                let column = digit(
+                    provenance.column_labels[edge.right],
+                    coordinate,
+                    provenance.radix,
+                )
+                .ok_or_else(|| "packing provenance balance width".to_string())?;
+                row_load[row] = row_load[row]
+                    .checked_add(1)
+                    .ok_or_else(|| "packing provenance row load".to_string())?;
+                column_load[column] = column_load[column]
+                    .checked_add(1)
+                    .ok_or_else(|| "packing provenance column load".to_string())?;
+            }
+            let maximum = BigUint::from(3u8) * BigUint::from(provenance.edges.len());
+            maximum_group_load = maximum_group_load.max(
+                row_load
+                    .iter()
+                    .chain(&column_load)
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            );
+            if row_load
+                .iter()
+                .chain(&column_load)
+                .any(|&load| BigUint::from(load) * BigUint::from(provenance.radix) > maximum)
+            {
+                return Err("packing provenance group balance".into());
+            }
+        }
+    }
+    // The checked variance identity is
+    //   sum_c (c-M/D)^2 <= 2 M delta.
+    // If M>=2D^2 delta, one class above 2M/D would already exceed that
+    // complete budget. M>=LD then absorbs the final per-class padding block.
+    let source_guard_closure_admitted = verify_source_guard_closure(
+        provenance.edges.len(),
+        label_classes,
+        packet_length,
+        provenance.source_degree_cap,
+        maximum,
+        provenance.radix,
+        maximum_group_load,
+    )?;
+    Ok(VerificationSummary {
+        edges: provenance.edges.len(),
+        left_vertices: provenance.row_labels.len(),
+        right_vertices: provenance.column_labels.len(),
+        packets: expected_packets.len(),
+        packet_length,
+        label_classes,
+        maximum_class: maximum,
+        orientation_patterns,
+        packing_slack: source_capacity_admitted.then(|| packing_rhs - packing_lhs),
+        source_capacity_admitted,
+        conditional_labels_verified: provenance.conditional_labels,
+        source_bounds_verified: provenance.source_degree_cap.is_some(),
+        source_guard_closure_admitted,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn source_guard_closure_boundary_and_failures_are_exact() {
+        assert!(verify_source_guard_closure(32, 4, 2, Some(1), 8, 2, 16).unwrap());
+        assert!(!verify_source_guard_closure(32, 4, 2, Some(2), 8, 2, 16).unwrap());
+        assert!(!verify_source_guard_closure(32, 4, 2, None, 8, 2, 16).unwrap());
+        assert_eq!(
+            verify_source_guard_closure(32, 4, 2, Some(1), 17, 2, 16).unwrap_err(),
+            "packing provenance source guard class cap"
+        );
+        assert_eq!(
+            verify_source_guard_closure(512, 16, 2, Some(1), 64, 4, 257).unwrap_err(),
+            "packing provenance source guard group cap"
+        );
+    }
+}

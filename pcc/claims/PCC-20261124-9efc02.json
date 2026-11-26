@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:16:14Z",
+ "id": "PCC-20261124-9efc02",
+ "kind": "measurement",
+ "producer": {
+  "commit": "69dda878b3e8b44153213251e9e94a2370669bab",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/anchored-forced-divisor-20261124/results/audit.json",
+    "sha256": "000874de3c370437bcb74ee81f1dc2050f74119fc2a29bcdd195d1527d532566"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/anchored-forced-divisor-20261124/results/fixture.json",
+    "sha256": "d09c03c2734e32b36c229f1fc52997c05e9dfc1b12ba7f8c57c330364d6c26e9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/anchored-forced-divisor-20261124/results/raw.tar.xz",
+    "sha256": "2fd414fb3b48add74116be4bba1c25d27beacc5704e4ce92685ed65ed13ee231"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Public read-only anchor audit completes once at published source69dda878b3:90877 retained sources, cofactor counts215 full,8013 one-LP,82649 two-LP. Deterministic first one-LP source0 passes original normalized norm,7 actual small points plus signed quadratic, and original Jacobian replay. Public fixture hash d09c03c2734e32b36c229f1fc52997c05e9dfc1b12ba7f8c57c330364d6c26e9. Native/launcher/posthash0, empty stderr. No new system solve or graph row; evidence unsigned, original raw remains pinned LOCAL and no target/kernel fields are exported."
+}

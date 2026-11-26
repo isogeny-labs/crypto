@@ -1,0 +1,90 @@
+{
+  "schema": "relation-diagnostic-canonical-merge/v1",
+  "feature_parent": "8fc9fdb88938d33dad693bb3f275d53525ee69e3",
+  "canonical_parent": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "base": "f1bcb59a0b32c6eadead5975b5f52f58d35bbfc3",
+  "canonical_ledger_prefix_byte_preserved": true,
+  "canonical_keyring_byte_preserved": true,
+  "original_feature_ledger_sha256": "ea70b5fdabc56095592f5f37f7a1646d363479b477120bf8f3dc86f91a3dd1c4",
+  "original_branch_registrations_preserved_in_immutable_parent": true,
+  "original_branch_registration_entries": [
+    {
+      "at": "2026-11-24T00:14:08Z",
+      "body": {
+        "claim_id": "PCC-20261124-895a89",
+        "claim_sha256": "ce5bcd6d3dbb18792087a1ff1f3a42fb68f343e509e8baee07edd554873c15ef",
+        "path": "pcc/claims/PCC-20261124-895a89.json"
+      },
+      "hash": "4d72296fe1985e22f9dfc1a66a4e3c9b6f21ba4cfd82ab404496d84709137367",
+      "prev": "0809ad35c0daf419da663d499bc4337fecb7a2668ff65d4115f1461039c0cfb8",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1834,
+      "type": "claim"
+    },
+    {
+      "at": "2026-11-24T00:14:08Z",
+      "body": {
+        "claim_id": "PCC-20261123-19dd11",
+        "claim_sha256": "400b387a6a78b8b455c72a181c65c9bc1859725d0d3aeef0c7c698543a082305",
+        "path": "pcc/claims/PCC-20261123-19dd11.json"
+      },
+      "hash": "254fd8b097e50fc3fc8afb289f43118bc91a15de9f17b9a1b609e3c2cba1739f",
+      "prev": "4d72296fe1985e22f9dfc1a66a4e3c9b6f21ba4cfd82ab404496d84709137367",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1835,
+      "type": "claim"
+    },
+    {
+      "at": "2026-11-24T00:14:08Z",
+      "body": {
+        "claim_id": "PCC-20261123-ba7d3a",
+        "claim_sha256": "f883d2d2ec42f87937ea88e9b626365e2ace178ef58e68c6d0896907fe2835fe",
+        "path": "pcc/claims/PCC-20261123-ba7d3a.json"
+      },
+      "hash": "5345a123a8ccba2db5b0ce27714bf5554478ba232b6ce6d81c3d54a5df46dd76",
+      "prev": "254fd8b097e50fc3fc8afb289f43118bc91a15de9f17b9a1b609e3c2cba1739f",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1836,
+      "type": "claim"
+    },
+    {
+      "at": "2026-11-24T03:56:41Z",
+      "body": {
+        "claim_id": "PCC-20261124-378198",
+        "claim_sha256": "9c7840a4e5b13ab4040cffb7df4c1a92fa4cec1de83ac10fb0310020317a08e7",
+        "path": "pcc/claims/PCC-20261124-378198.json"
+      },
+      "hash": "3b8c429679bb1b75d009d6088e92f06f6965bb6dc24daa4660b9586e2e39cc34",
+      "prev": "5345a123a8ccba2db5b0ce27714bf5554478ba232b6ce6d81c3d54a5df46dd76",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1837,
+      "type": "claim"
+    }
+  ],
+  "same_claim_payload_subjects_registered_with_maintained_api": [
+    "PCC-20261124-895a89",
+    "PCC-20261123-19dd11",
+    "PCC-20261123-ba7d3a",
+    "PCC-20261124-378198"
+  ],
+  "already_canonical_not_replayed": [],
+  "journal_checks": {
+    "docs/session-logs/2026-11-23.md": {
+      "all_branch_and_canonical_block_multiplicities_preserved": true,
+      "appended_feature_blocks": 3,
+      "merged_blocks": 1045,
+      "canonical_prefix_anchor": "## 2026-11-23T23:41Z \u2014 PR5093 ready; merge-method auto-merge enabled"
+    },
+    "docs/session-logs/2026-11-24.md": {
+      "all_branch_and_canonical_block_multiplicities_preserved": true,
+      "appended_feature_blocks": 9,
+      "merged_blocks": 38,
+      "canonical_prefix_anchor": null
+    }
+  },
+  "all_canonical_ACTIVE_lines_preserved": true,
+  "source419_unchanged": true,
+  "old_producer_source_equal_to_canonical_except_two_exports": true,
+  "gate_or_trust_changes_from_feature": false,
+  "stale_ref_correction": "origin/main was stale5cca because remote.origin.fetch maps only older lane. Plain fetch origin main updated FETCH_HEAD toceba but not origin/main. Explicit main refspec corrects it; apparent keyring and crate deletion differences were against staleNovember16ref."
+}

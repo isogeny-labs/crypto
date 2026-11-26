@@ -1130,33 +1130,15 @@ fn pl_trim(a: &mut Vec<u32>) {
     }
 }
 
-fn pl_rem(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut r = a.to_vec();
-    pl_trim(&mut r);
-    let db = b.len() - 1;
-    let iv = inv_p(b[db], p);
-    while r.len() > db {
-        let c = r[r.len() - 1] * iv % p;
-        let sh = r.len() - 1 - db;
-        for i in 0..=db {
-            r[sh + i] = (r[sh + i] + (p - c) * b[i]) % p;
-        }
-        pl_trim(&mut r);
-    }
-    r
-}
-
 fn pl_gcd(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut x = a.to_vec();
-    let mut y = b.to_vec();
-    pl_trim(&mut x);
-    pl_trim(&mut y);
-    while !y.is_empty() {
-        let r = pl_rem(&x, &y, p);
-        x = y;
-        y = r;
-    }
-    x
+    // Shared gcd (monic; the caller only reads its length).
+    let f = crypto_lib::gcd::poly::Fp64::new(p as u64);
+    let a: Vec<u64> = a.iter().map(|&c| (c % p) as u64).collect();
+    let b: Vec<u64> = b.iter().map(|&c| (c % p) as u64).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
+        .into_iter()
+        .map(|c| c as u32)
+        .collect()
 }
 
 fn hyper_squarefree(p: u32, c: &[u32; 11]) -> bool {
