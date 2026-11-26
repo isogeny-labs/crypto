@@ -1,8 +1,11 @@
 # Frozen protocol: paired blocked BSGS versus rho
 
-Protocol ID: `blocked-bsgs-rho-wall/v1`  
-Freeze date: 2026-11-26  
-Primary comparison: cold, one target, one CPU thread  
+Protocol ID: `blocked-bsgs-rho-wall/v1`
+
+Freeze date: 2026-11-26
+
+Primary comparison: cold, one target, one CPU thread
+
 Status at freeze: no harness timing has run
 
 ## 1. Question and allowed conclusion
