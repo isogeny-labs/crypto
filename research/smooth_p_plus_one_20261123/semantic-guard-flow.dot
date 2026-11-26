@@ -1,0 +1,18 @@
+digraph guard {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.22, ranksep=0.27];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#426886", fontname="DejaVu Sans", fontsize=11, margin="0.12,0.09"];
+  edge [color="#52616c", fontname="DejaVu Sans", fontsize=9];
+  input [label="Both fixed-form callers\nCanonical serialization: omit zero terms"];
+  raw [label="Solver output retained under existing capture rules\nSame absolute query deadline"];
+  positive [label="Positive RUR: names and degrees\nSquare-free eliminant Q; unit denominator D"];
+  residues [label="Every input equation and the fixed form\nCleared-denominator remainder modulo Q must be zero"];
+  accepted [label="Signed extraction and group replay", fillcolor="#e5f1e8"];
+  empty [label="[-1] marker\nExplicitly unchecked empty result", fillcolor="#fff3d9"];
+  failure [label="Semantic error, cap or deadline\nIncomplete; raw evidence retained\nNo added form retry", fillcolor="#f9e5e2"];
+  input -> raw -> positive -> residues -> accepted;
+  raw -> empty [label="empty"];
+  positive -> failure;
+  residues -> failure;
+  {rank=same; positive; empty;}
+  {rank=same; accepted; failure;}
+}

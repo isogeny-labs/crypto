@@ -1,0 +1,9 @@
+# Frozen source and executable identity are in pre_call.txt.
+# RAYON_NUM_THREADS=1; 2 GiB whole-process address space; 60s outer deadline
+# plus 5s kill grace. Each query keeps one original 3s deadline.
+# The positional solver path is unused: both arms call native F4/root traversal.
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' oriented-f127 /workspace/scratch/dickson-oriented-v1 127 4 unused oriented-dense oriented-tower
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' oriented-f8191-d4 /workspace/scratch/dickson-oriented-v1 8191 4 unused oriented-dense oriented-tower
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' oriented-f8191-d5 /workspace/scratch/dickson-oriented-v1 8191 5 unused oriented-dense oriented-tower
+# Complete JSONL is also retained locally by the capture hook.
+# No Cloudflare sender is active; the receiving HTTPS URL is missing.

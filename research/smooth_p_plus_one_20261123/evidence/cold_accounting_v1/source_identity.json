@@ -1,0 +1,48 @@
+{
+  "format": "dickson.development_identity/v1",
+  "created_utc": "2026-11-24T22:50:56.222802+00:00",
+  "source_commit": "a4cd5ee0b3cf3f83c71c78b96ceb904b69772158",
+  "base_main": "2af748ace3eff34b63c9f06950fd4fcd3dcc47b6",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "accounting": "local_development_only",
+  "files": {
+    "binary": {
+      "path": "/workspace/scratch/dickson-cold-accounting-v1",
+      "sha256": "f7fb325a7913246b80049cdaf066b635cbc1ff643c780f935872855741414b3b"
+    },
+    "msolve": {
+      "path": "/workspace/scratch/msolve/root/usr/bin/msolve",
+      "sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+    },
+    "protocol": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/COLD_ACCOUNTING.md",
+      "sha256": "62b2b636532b6fb1215a8bdf761a62d5fe7c296c1a52c4795a4d4b38f0f2a1fa"
+    },
+    "command": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/command.sh",
+      "sha256": "c5cf3dfd7b47c7552b469ca01dc15dcea4f18ef381ac6b873b84151927da9b97"
+    },
+    "accounting_source": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/smooth_p_plus_one_20261123/native/src/accounting.rs",
+      "sha256": "5aba0a19ccf09bcfee489d1ebdd41c09b500fc06de0841e89e1e7557f5a829f3"
+    },
+    "production_consumer": {
+      "path": "/workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/relation_adapter.rs",
+      "sha256": "1915ef03235d68900b696c12a9abca5de51abd68f55d40ee568c4476124a7350"
+    }
+  },
+  "planned_arms": [
+    "Direct",
+    "Refined",
+    "ProductionCofactorMsolve"
+  ],
+  "prime": 127,
+  "depth": 4,
+  "seed": 781815,
+  "max_draws": 30,
+  "process_limit_seconds": 120,
+  "outer_seconds": 400,
+  "kill_grace_seconds": 5,
+  "virtual_memory_kib": 2097152,
+  "workers": 1
+}

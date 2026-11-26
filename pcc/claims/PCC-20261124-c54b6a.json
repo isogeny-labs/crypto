@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T23:12:43Z",
+ "id": "PCC-20261124-c54b6a",
+ "kind": "statement",
+ "producer": {
+  "commit": "513acca244209fbf52bcd8b02e3d2215b11dfe04",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/base_lookup_v1/unit_tests_initial.txt",
+    "sha256": "af033dd6fc653e1fdcc3cbda8f7ac171515b982a551e807b28ea0007abf5a85b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/base_lookup_v1/unit_tests_initial.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-common-base-lookup",
+ "statement": "The common signed-base lookup implementation passes 27 feature tests locally. New checks cover both signs of every depth-four base point on both toy curves, all five historical F127 target-in-base refusals in the fixed 12-draw prefix, a missing-oracle miss retained as undetermined, and rejection of altered lookup policy/count accounting. Unflagged Direct still recovers with nine queries. These are unsigned development checks, not a new map or performance conclusion."
+}

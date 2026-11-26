@@ -1,0 +1,57 @@
+{
+  "schema": "dickson.development_flow/v1",
+  "planned_audits": 3,
+  "attempted_audits": 3,
+  "completed_audits": 3,
+  "audit_reconciliation_passed": true,
+  "planned_panels": 3,
+  "attempted_panels": 3,
+  "panels": [
+    {
+      "name": "f127_d4",
+      "exit": 1,
+      "stderr_bytes": 278
+    },
+    {
+      "name": "f8191_d4",
+      "exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "name": "f8191_d5",
+      "exit": 0,
+      "stderr_bytes": 0
+    }
+  ],
+  "planned_queries": 26,
+  "emitted_query_records": 24,
+  "exact_query_records": 17,
+  "undetermined_query_records": 6,
+  "mismatch_query_records": 1,
+  "unattempted_queries": [
+    {
+      "prime": 127,
+      "depth": 4,
+      "target": [
+        41,
+        32
+      ],
+      "mode": "LiftableCutoff",
+      "reason": "F127 panel stopped after comparator mismatch on preceding target"
+    },
+    {
+      "prime": 127,
+      "depth": 4,
+      "target": [
+        41,
+        32
+      ],
+      "mode": "ProductionCofactorMsolve",
+      "reason": "F127 panel stopped after comparator mismatch on preceding target"
+    }
+  ],
+  "retries": 0,
+  "canonical_export_validation": false,
+  "signed_verification": false,
+  "cost_comparison": false
+}

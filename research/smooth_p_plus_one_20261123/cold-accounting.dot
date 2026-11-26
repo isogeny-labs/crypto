@@ -1,0 +1,12 @@
+digraph accounting {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.25", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#446077", fontname="DejaVu Sans", fontsize=10];
+  edge [color="#446077", arrowsize=0.7];
+  a [label="Parent starts clock\nspawn fresh child"];
+  b [label="Child: setup + draws\nqueries (failures retained)\nproduction consumer + replay"];
+  c [label="Child interval closes\nsummary + teardown"];
+  d [label="Parent observes exit\nvalidates accounting receipt"];
+  a -> b -> c -> d;
+  note [shape=note,fillcolor="#fff5dd",label="Child: phases + unattributed = pre-summary wall\nParent includes summary, teardown and polling latency\nLocal development control; no admitted cost ratio"];
+  b -> note [style=dashed,arrowhead=none];
+}

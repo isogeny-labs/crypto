@@ -1,0 +1,19 @@
+digraph cofactor_output {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.28", ranksep="0.3"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f9", color="#53677e", fontname="DejaVu Sans", fontsize=10, margin="0.12,0.09"];
+  edge [color="#53677e", fontname="DejaVu Sans", fontsize=9];
+  source [label="Exact production cofactor equations\nFull distinct-x, target-disjoint RR5 chart"];
+  parameter [label="Append A = b + jc + j²d; j = 0..15\nmsolve -c 0; one shared 3-second deadline"];
+  guard [label="Finite RUR: degree = quotient dimension\nExtract, replay, compare full signed set"];
+  complete [label="Degree 16: 8 / 8 exact local controls\nEvery query accepted its first form", fillcolor="#e6f1e9"];
+  incomplete [label="Degree 32: 0 / 5 complete\nFive first-form timeouts retained", fillcolor="#fff1da"];
+  refined [label="Separate Refined regression\n9 / 9 exact on the narrower regular chart", fillcolor="#f0ebf7"];
+  limit [label="Unequal scopes; no fully charged cost conclusion\nCold recovery comparison remains open", fillcolor="#f5f5f5"];
+  source -> parameter -> guard;
+  guard -> complete;
+  parameter -> incomplete;
+  complete -> limit;
+  incomplete -> limit;
+  refined -> limit;
+  {rank=same; complete; incomplete; refined;}
+}

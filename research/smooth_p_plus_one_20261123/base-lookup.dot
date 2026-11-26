@@ -1,0 +1,17 @@
+digraph lookup {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf3f8",color="#375c79",fontname="DejaVu Sans",fontsize=10];
+ edge [color="#375c79",fontname="DejaVu Sans",fontsize=9,arrowsize=0.7];
+ mask [label="Fresh public residual\nR = aG + bQ"];
+ lookup [shape=diamond,label="Signed-base\nlookup"];
+ one [label="Hit: R = s P_i\none-term relation",fillcolor="#def1e9"];
+ four [label="Miss: original\nfour-leaf oracle"];
+ consumer [label="Same production consumer\nreplay, rank, linear algebra"];
+ mask -> lookup;
+ lookup -> one [label="hit"];
+ lookup -> four [label="miss"];
+ one -> consumer;
+ four -> consumer;
+ note [shape=note,label="Common to every arm; lookup and setup charged\nFour-leaf oracle scopes remain different",fillcolor="#fff3da"];
+ lookup -> note [style=dashed,arrowhead=none];
+}

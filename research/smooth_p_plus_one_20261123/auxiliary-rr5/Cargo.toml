@@ -1,0 +1,16 @@
+[package]
+name = "auxiliary-rr5-adapter"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+auxiliary-two-isogeny = { path = "../auxiliary-isogeny" }
+prime31-four-summand = { path = "../../prime31_four_summand_20261122/native" }
+prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native" }
+
+[profile.release.package.rr5-original-f4-closure]
+opt-level = 0
+codegen-units = 256
