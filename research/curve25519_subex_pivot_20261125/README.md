@@ -413,14 +413,24 @@ family or balanced conditional labels. `[pcc:unverified]`
 
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
-`M=32<LD=512` child fails exactly at packet padding, while the first
-guard-compatible `M=512=LD` group-zero/group-zero path accepts the next scale:
-maximum class 10, padded mass 1024 versus `3M=1536`, 74 packets, and maximum
-one-side group load 261. The positive run is an ignored 107-second
-reproducibility test; the routine suite retains the fast exact rejection
-control. This is one finite path, not radix-64 recursive closure. It sharpens
-the next target to proving `max_class<=2M/D` and each side's group load
-`<=3M/64` from packet-pattern orbit counts. `[pcc:unverified]`
+`M=32<LD=512` child fails exactly at packet padding, while all four two-group
+paths from the first guard-boundary root `M=512=LD` accept the next packing.
+Their edge counts are
+512/512/516/508, maximum class is always 10, padded mass is always 1024,
+packet counts are 74--78, maximum one-side loads are 260--262, and maximum
+degree is 32. The 508-edge path falls below the next `LD` guard and would use
+the production fallback. This is finite radix-two evidence, not radix-64
+recursive closure. It sharpens the next target to proving `max_class<=2M/D`
+and each side's group load `<=3M/64` from packet-pattern orbit counts.
+`[pcc:unverified]`
+
+`CONDITIONAL_LABEL_GRAM.md` derives the exact greedy score from sparse
+incidence Gram forms. A 3,280-case exhaustive control matches the original
+ordered-edge-pair objective exactly, while the independent provenance verifier
+retains its own quadratic replay. The former 107.32-second single path now
+takes 0.02 seconds and all four paths take 0.06 seconds in the warm debug
+harness. This optimization exposes the right auxiliary variables for an orbit
+proof; it does not itself prove the required caps. `[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical

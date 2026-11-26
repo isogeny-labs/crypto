@@ -42,28 +42,31 @@ M >= L D = 8 * 64 = 512.
 The fast default test fixes this rejection and its exact occupancy transcript.
 `[pcc:unverified]`
 
-## First guard-compatible witness
+## First guard-boundary orbit sweep
 
-With sixteen vertices per root side, `M=512=L D` at the `a=3` level. An
-exhaustive production run on the group-zero/group-zero path measured:
+With sixteen vertices per root side, the root has `M=512=L D` at the `a=3`
+level. The incidence-Gram implementation in `CONDITIONAL_LABEL_GRAM.md` makes
+all four two-group paths cheap enough for the default suite. They measure:
 
 ```text
 root packets                         256
-first child edges / maximum degree  512 / 32
-a=2 packets                          132
-second child edges / maximum degree 512 / 32
-a=3 maximum pair-label class         10
-a=3 padded class mass              1024 <= 3M = 1536
-a=3 packets                           74, so KL = 592 <= 1536
-a=3 maximum group load               261, so 2*261 <= 1536.
+path               00    01    10    11
+a=2 packets       132   132   134   134
+a=3 child edges   512   512   516   508
+maximum degree     32    32    32    32
+maximum class      10    10    10    10
+padded class mass 1024  1024  1024  1024
+a=3 packets        74    78    77    77
+maximum side load 261   261   260   262
 ```
 
-The exact conditional-expectation run took about 107 seconds in the Rust debug
-test profile, so it is retained as an ignored reproducibility control rather
-than added to the routine suite. This is positive evidence for one finite path,
-not evidence for every group, coordinate, depth, or radix 64. The
-first-minimum tie rule also means unproved group equivalence must not be
-assumed. `[pcc:unverified]`
+All four packings pass their production padding, packet-count, and group-load
+bounds. Paths 00, 01, and 10 also have at least `LD=512` edges; path 11 has 508
+and would take the production fallback before this scale. The former single
+path took 107.32 seconds under the edge-pair objective. The exact Gram reduction
+cuts that path to 0.02 seconds and the full four-path sweep to 0.06 seconds in
+the warm Rust debug harness. This remains finite radix-two evidence, not every
+coordinate, depth, or radix-64 closure. `[pcc:unverified]`
 
 ## New proof target
 
@@ -86,9 +89,9 @@ which is the padding bound; the packet-count bound then follows from the same
 full class array. The second inequality gives the required eightfold child
 shrink, and the third preserves the degree hypothesis.
 
-The most promising representation is an equitable partition whose auxiliary
-variables are `(packet pattern, block index, old-side orbit)`. The next step is
-to derive the conditional-expectation score from aggregate orbit counts and
-show that greedy first-minimum labeling preserves the two displayed caps. A
+The production labeler now exposes the exact aggregate score as degree-bucket
+mass plus sparse incidence Gram forms. The next step is to express those forms
+over the equitable partition `(packet pattern, block index, old-side orbit)`
+and show that greedy first-minimum labeling preserves the two displayed caps. A
 counterexample must satisfy the actual `M>=LD` and `M>=2D^2 delta` guards;
 under-scale padding failures do not refute closure. `[pcc:unverified]`

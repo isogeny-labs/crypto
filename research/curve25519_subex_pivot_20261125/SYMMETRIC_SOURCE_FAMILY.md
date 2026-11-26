@@ -102,9 +102,12 @@ balanced. Proving such closure, or finding a different invariant family using
 packet vertices as auxiliary variables, is the next decisive lead. No
 practical Curve25519 attack follows. `[pcc:unverified]`
 
-The finite production probe in `SYMMETRIC_CHILD_CLOSURE.md` supplies one new
-positive datum without closing this gap: the first radix-two path satisfying
-the next `M>=LD` guard accepts the next packing scale. Its smaller under-scale
-analogue fails exactly at padding. The proof target is now an orbit-wise class
-cap `max_class<=2M/D` plus the existing one-side group-load and degree caps,
-uniformly over all source-admitted children. `[pcc:unverified]`
+The finite production probe in `SYMMETRIC_CHILD_CLOSURE.md` supplies new
+positive data without closing this gap: all four two-group paths at the first
+radix-two `LD` boundary accept the next packing scale, while the smallest
+under-scale analogue fails exactly at padding. `CONDITIONAL_LABEL_GRAM.md`
+reduces the exact greedy objective to degree-bucket and sparse incidence-Gram
+scores, exposing packet orbits as the proof variables. The target is now an
+orbit-wise class cap `max_class<=2M/D` plus the existing one-side group-load
+and degree caps, uniformly over all source-admitted children.
+`[pcc:unverified]`

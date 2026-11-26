@@ -59,6 +59,7 @@ fn maximum_degree(graph: &Bipartite) -> usize {
         .unwrap_or(0)
 }
 
+#[derive(Debug, PartialEq, Eq)]
 struct PackingShape {
     maximum_class: usize,
     padded_class_mass: usize,
@@ -201,8 +202,7 @@ fn under_scale_auxiliary_child_exposes_packet_padding_boundary() {
 }
 
 #[test]
-#[ignore = "107-second exhaustive conditional-expectation threshold witness"]
-fn first_guard_compatible_auxiliary_child_accepts_next_scale() {
+fn first_guard_boundary_auxiliary_child_paths_accept_next_scale() {
     let mut meter = Meter::new(Limits {
         steps: 1_000_000_000,
         ..Limits::default()
@@ -238,40 +238,120 @@ fn first_guard_compatible_auxiliary_child_accepts_next_scale() {
     let root_packing =
         packing::pack(&root, &root_parameters, maximum_degree(&root), &mut meter).unwrap();
     assert_eq!(root_packing.packets.len(), 256);
-    let child = packet_child(&root, &root_packing, &root_parameters, 0, &ring, &mut meter);
-    let child_packing = packing::pack(
-        &child,
-        &child_parameters,
-        maximum_degree(&child),
-        &mut meter,
-    )
-    .unwrap();
-    assert_eq!(child.edges.len(), 512);
-    assert_eq!(maximum_degree(&child), 32);
-    assert_eq!(child_packing.packets.len(), 132);
-    let grandchild = packet_child(
-        &child,
-        &child_packing,
-        &child_parameters,
-        0,
-        &ring,
-        &mut meter,
+    let mut observed = Vec::new();
+    for group in 0..root_parameters.radix {
+        let child = packet_child(
+            &root,
+            &root_packing,
+            &root_parameters,
+            group,
+            &ring,
+            &mut meter,
+        );
+        let child_packing = packing::pack(
+            &child,
+            &child_parameters,
+            maximum_degree(&child),
+            &mut meter,
+        )
+        .unwrap();
+        assert_eq!(child.edges.len(), 512);
+        assert_eq!(maximum_degree(&child), 32);
+        for next_group in 0..child_parameters.radix {
+            let grandchild = packet_child(
+                &child,
+                &child_packing,
+                &child_parameters,
+                next_group,
+                &ring,
+                &mut meter,
+            );
+            let grandchild_packing = packing::pack(
+                &grandchild,
+                &grandchild_parameters,
+                maximum_degree(&grandchild),
+                &mut meter,
+            )
+            .unwrap();
+            observed.push((
+                group,
+                next_group,
+                child_packing.packets.len(),
+                grandchild.edges.len(),
+                maximum_degree(&grandchild),
+                packing_shape(&grandchild, &grandchild_packing, &grandchild_parameters),
+            ));
+        }
+    }
+    assert_eq!(
+        observed,
+        [
+            (
+                0,
+                0,
+                132,
+                512,
+                32,
+                PackingShape {
+                    maximum_class: 10,
+                    padded_class_mass: 1_024,
+                    packets: 74,
+                    maximum_group_load: 261,
+                },
+            ),
+            (
+                0,
+                1,
+                132,
+                512,
+                32,
+                PackingShape {
+                    maximum_class: 10,
+                    padded_class_mass: 1_024,
+                    packets: 78,
+                    maximum_group_load: 261,
+                },
+            ),
+            (
+                1,
+                0,
+                134,
+                516,
+                32,
+                PackingShape {
+                    maximum_class: 10,
+                    padded_class_mass: 1_024,
+                    packets: 77,
+                    maximum_group_load: 260,
+                },
+            ),
+            (
+                1,
+                1,
+                134,
+                508,
+                32,
+                PackingShape {
+                    maximum_class: 10,
+                    padded_class_mass: 1_024,
+                    packets: 77,
+                    maximum_group_load: 262,
+                },
+            ),
+        ]
     );
-    let grandchild_packing = packing::pack(
-        &grandchild,
-        &grandchild_parameters,
-        maximum_degree(&grandchild),
-        &mut meter,
-    )
-    .unwrap();
-    assert_eq!(grandchild.edges.len(), 512);
-    assert_eq!(maximum_degree(&grandchild), 32);
-    let shape = packing_shape(&grandchild, &grandchild_packing, &grandchild_parameters);
-    assert_eq!(shape.maximum_class, 10);
-    assert_eq!(shape.padded_class_mass, 1_024);
-    assert_eq!(shape.packets, 74);
-    assert_eq!(shape.maximum_group_load, 261);
-    assert!(shape.padded_class_mass <= 3 * grandchild.edges.len());
-    assert!(shape.packets * grandchild_parameters.length <= 3 * grandchild.edges.len());
-    assert!(shape.maximum_group_load * grandchild_parameters.radix <= 3 * grandchild.edges.len());
+    assert_eq!(
+        observed
+            .iter()
+            .filter(|(_, _, _, edges, _, _)| {
+                *edges >= grandchild_parameters.length * grandchild_parameters.array
+            })
+            .count(),
+        3
+    );
+    for (_, _, _, edges, _, shape) in observed {
+        assert!(shape.padded_class_mass <= 3 * edges);
+        assert!(shape.packets * grandchild_parameters.length <= 3 * edges);
+        assert!(shape.maximum_group_load * grandchild_parameters.radix <= 3 * edges);
+    }
 }

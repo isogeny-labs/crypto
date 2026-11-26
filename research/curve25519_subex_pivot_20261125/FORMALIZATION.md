@@ -150,12 +150,22 @@ closure of the old/packet child shape under the next packing call remains open.
 The native radix-two child probe separates an under-scale padding failure from
 the first schedule point satisfying `M>=LD`. At `a=3`, `L=8`, `D=64`, the
 `M=32` model is rejected because its padded class mass is 512, but the
-`M=512=LD` group-zero/group-zero path is accepted with maximum class 10,
-padded mass 1024, 74 packets, maximum one-side group load 261, and maximum
-degree 32. The exact 107-second positive run is retained as an ignored test.
-This does not discharge R1: all coordinates, groups, depths, and the radix-64
-orbit argument remain open. It identifies the sufficient local targets
-`max_class<=2M/D`, one-side group load `<=3M/64`, and degree `<=delta`.
+`M=512=LD` root yields four accepted two-group paths. Their next edge counts
+are 512/512/516/508, maximum class 10, padded mass 1024, 74--78 packets,
+one-side group loads 260--262, and maximum degree 32. The final 508-edge path
+is below the next `LD` guard and would fall back. This does not discharge R1:
+all coordinates, depths, and the radix-64 orbit argument remain open. It
+identifies the sufficient local targets `max_class<=2M/D`, one-side group load
+`<=3M/64`, and degree `<=delta`. `[pcc:unverified]`
+
+The production greedy labeler now computes exact degree-bucket and sparse
+incidence-Gram scores instead of rescanning all ordered edge pairs per
+candidate. The row weight is
+`deg(v)deg(w)+(q-1)sum_r m(v,r)m(w,r)`; the column weight is the dot product of
+row-label incidence profiles. An exhaustive 3,280-case reference comparison
+preserves every first-minimum choice. It cuts the former 107.32-second single
+path to 0.02 seconds and enables the 0.06-second four-path control. The separate
+packing-provenance verifier still replays the original objective.
 `[pcc:unverified]`
 
 The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
