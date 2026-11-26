@@ -120,6 +120,13 @@ quadratic left bound grows by less than two.  For evaluation,
 `u=32` base case and the same induction prove the second absorption.
 `[pcc:unverified]`
 
+The schema-versioned transcript in `SYMBOLIC_HISTORY_CERTIFICATE.md` gives a
+separate executable scalar boundary. Its verifier independently reconstructs
+all five threshold depths and composition constants from a 1,624-byte JSON
+fixture without importing the producer dimension audit or graph code. This
+strengthens R2's finite replay but does not discharge R1's graph-realization
+premise. `[pcc:unverified]`
+
 ## R3 — One active-call cost
 
 Assuming R1 and R2, prove that one active call with `M` edges and scale `u`

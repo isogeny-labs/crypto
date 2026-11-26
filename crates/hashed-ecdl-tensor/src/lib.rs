@@ -42,6 +42,7 @@ pub mod short_box;
 pub mod structured;
 pub mod structured_runner;
 mod subgroup;
+pub mod symbolic_history_certificate;
 pub mod target_walk;
 pub mod treewidth;
 pub mod unimodular;

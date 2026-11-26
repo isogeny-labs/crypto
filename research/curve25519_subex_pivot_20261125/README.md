@@ -310,7 +310,16 @@ excluded by shrinkage:
 The negative control `lambda=2^23` reaches `u=16` and `u=8`; both fail
 the inherited absorption check, so the certificate distinguishes the missing
 margin rather than accepting every schedule.  The focused native suite now
-passes 9/9 controls. [pcc:unverified]
+passes 14/14 controls. [pcc:unverified]
+
+`SYMBOLIC_HISTORY_CERTIFICATE.md` now separates this transcript from its
+producer. A standalone module reconstructs the five-depth schedule, both
+precision absorptions, geometric path comparisons, packet-entry absorption,
+and final constants from a stable 1,624-byte JSON fixture. It imports neither
+the producer dimension audit nor contraction/packing/factorization code.
+Schema, missing-depth, precision-transition, and final-constant mutations are
+rejected. This is an independent scalar replay, not graph realization or a
+proof of the external theorem. `[pcc:unverified]`
 
 This threshold is asymptotic: it means a root edge count on the order of
 `2^(2^26)`, far outside the live `usize` representation and irrelevant to

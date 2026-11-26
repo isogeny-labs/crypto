@@ -4,7 +4,7 @@
 //! the external theorem. They expose dimensional inputs to its resource ledger.
 //! In particular, record counts are not bit-operation or allocator-byte counts.
 
-use crate::{invalid, BigUint, Result};
+use crate::{integrity, invalid, BigUint, Result};
 use num_traits::{One, Zero};
 
 /// Structural dimensions of one active interpolation evaluation.
@@ -607,6 +607,67 @@ pub fn audit_recursion_composition(lambda: u64) -> Result<RecursionCompositionAu
         packet_entry_absorbed,
         depths,
         all_composition_checks_hold,
+    })
+}
+
+/// Serialize the producer-side strict-history and composition audits into the
+/// plain scalar format consumed by [`crate::symbolic_history_certificate`].
+///
+/// The resulting certificate contains no graph or callback. Its standalone
+/// verifier independently reconstructs the fixed source schedule and exact
+/// inequalities; graph realization and the external contraction theorem
+/// remain separate premises.
+pub fn symbolic_history_certificate(
+    lambda: u64,
+) -> Result<crate::symbolic_history_certificate::Certificate> {
+    use crate::symbolic_history_certificate::{Certificate, DepthCertificate, SCHEMA};
+
+    let history = audit_uniform_history(lambda)?;
+    let composition = audit_recursion_composition(lambda)?;
+    if history.depths.len() != composition.depths.len() {
+        return Err(integrity("symbolic history depth alignment"));
+    }
+    let depths = history
+        .depths
+        .iter()
+        .zip(&composition.depths)
+        .map(|(history_case, composition_case)| {
+            if history_case.depth != composition_case.depth {
+                return Err(integrity("symbolic history depth alignment"));
+            }
+            Ok(DepthCertificate {
+                depth: history_case.depth,
+                shrink_factor: history_case.shrink_factor.clone(),
+                u: history_case.u,
+                prior_a: history_case.prior_a,
+                current_a: history_case.current_a,
+                inherited_lhs: history_case.inherited_absorption_lhs.clone(),
+                inherited_rhs_exponent: history_case.inherited_absorption_rhs_exponent,
+                evaluation_lhs: history_case.evaluation_absorption_lhs.clone(),
+                evaluation_rhs_exponent: history_case.evaluation_absorption_rhs_exponent,
+                geometric_scale_comparison_holds: composition_case.geometric_scale_comparison_holds,
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    Ok(Certificate {
+        schema: SCHEMA,
+        lambda: history.lambda,
+        leaf_divisor: history.leaf_divisor,
+        root_u: history.root_u,
+        scale_floor: history.scale_floor,
+        inherited_precision_constant: history.inherited_precision_constant,
+        normalized_precision_constant: history.normalized_precision_constant,
+        depths,
+        local_child_exponent_constant: composition.local_child_exponent_constant,
+        path_sum_constant: composition.path_sum_constant,
+        active_tree_exponent_constant: composition.active_tree_exponent_constant,
+        leaf_exponent_constant: composition.leaf_exponent_constant,
+        leaf_scale_absorbed: composition.leaf_scale_absorbed,
+        packet_entry_exponent_constant: composition.packet_entry_exponent_constant,
+        packet_entry_polynomial_factor: composition.packet_entry_polynomial_factor,
+        packet_entry_absorbed: composition.packet_entry_absorbed,
+        total_root_u_exponent_constant: composition.total_root_u_exponent_constant,
+        total_root_log_exponent_constant: composition.total_root_log_exponent_constant,
     })
 }
 

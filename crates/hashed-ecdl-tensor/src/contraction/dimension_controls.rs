@@ -3,11 +3,12 @@
 use super::*;
 use crate::admission::dimensions::{
     audit_arithmetic_widths, audit_node_dimensions, audit_recursion_composition,
-    audit_uniform_history, path_precision_envelope, NodeDimensions,
+    audit_uniform_history, path_precision_envelope, symbolic_history_certificate, NodeDimensions,
     UNIFORM_HISTORY_LAMBDA_THRESHOLD, UNIFORM_HISTORY_SCALE_FLOOR,
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::network::FnPredicate;
+use crate::symbolic_history_certificate::{verify as verify_symbolic_history, Certificate};
 use crate::Limits;
 use std::sync::Arc;
 
@@ -497,6 +498,55 @@ fn recursion_composition_has_depth_independent_constants() {
     // Active-node, sample, and radix terms use the remaining 16 units.
     assert_eq!(80 + 4 + 5 + 6, 95);
     assert!(audit.local_child_exponent_constant >= 95);
+}
+
+#[test]
+fn symbolic_history_certificate_has_independent_exact_replay() {
+    let produced = symbolic_history_certificate(UNIFORM_HISTORY_LAMBDA_THRESHOLD).unwrap();
+    let serialized = serde_json::to_vec(&produced).unwrap();
+    assert_eq!(serialized.len(), 1_623);
+    assert_eq!(
+        serialized,
+        include_bytes!("../../examples/symbolic-history-certificate.json")
+            .strip_suffix(b"\n")
+            .unwrap()
+    );
+    let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+    assert_eq!(serde_json::to_vec(&certificate).unwrap(), serialized);
+    let summary = verify_symbolic_history(&certificate).unwrap();
+    assert_eq!(summary.lambda, UNIFORM_HISTORY_LAMBDA_THRESHOLD);
+    assert_eq!(summary.root_u, 512);
+    assert_eq!(summary.active_depths, 5);
+    assert_eq!(summary.total_root_u_exponent_constant, 290);
+    assert_eq!(summary.total_root_log_exponent_constant, 148_480);
+
+    let mut bad_schema = certificate.clone();
+    bad_schema.schema += 1;
+    assert_eq!(
+        verify_symbolic_history(&bad_schema).unwrap_err(),
+        "symbolic history context"
+    );
+
+    let mut missing_depth = certificate.clone();
+    missing_depth.depths.pop();
+    assert_eq!(
+        verify_symbolic_history(&missing_depth).unwrap_err(),
+        "symbolic history depth missing"
+    );
+
+    let mut bad_precision = certificate.clone();
+    bad_precision.depths[2].current_a += 1;
+    assert_eq!(
+        verify_symbolic_history(&bad_precision).unwrap_err(),
+        "symbolic history depth mismatch"
+    );
+
+    let mut bad_composition = certificate;
+    bad_composition.total_root_u_exponent_constant += 1;
+    assert_eq!(
+        verify_symbolic_history(&bad_composition).unwrap_err(),
+        "symbolic history composition mismatch"
+    );
 }
 
 #[test]

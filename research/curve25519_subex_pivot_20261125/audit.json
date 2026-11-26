@@ -46,7 +46,7 @@
     "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-active-call-audit.rs",
     "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
     "test_result": {
-      "passed": 13,
+      "passed": 14,
       "failed": 0
     },
     "derived_envelope": "with n=K*2^(i+1), K*L<=3M and D=L/2^i imply n*D<=6M; weighted tuple count is at most 2^(5*ceil(sqrt(n*p)))",
@@ -130,13 +130,26 @@
     "negative_control": "lambda=2^23 reaches u=16 and u=8 and fails inherited-precision absorption",
     "claim_boundary": "exact symbolic integer schedule plus producer derivation; no allocated graph, practical Curve25519 attack, signed verification or complete bit-cost theorem"
   },
+  "symbolic_history_certificate_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMBOLIC_HISTORY_CERTIFICATE.md",
+    "producer_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/symbolic_history_certificate.rs",
+    "command_source": "crates/hashed-ecdl-tensor/src/bin/symbolic-history-certificate-check.rs",
+    "fixture": "crates/hashed-ecdl-tensor/examples/symbolic-history-certificate.json",
+    "wire_format": "schema-1 JSON, 1623-byte payload and 1624-byte newline-terminated fixture",
+    "checks": "exact leaf divisor and root scale; complete eight-fold-shrink depth coverage; every u, prior/current packet exponent and shrink factor; inherited and evaluation precision absorptions; geometric scale comparison; leaf and packet-entry absorption; local, tree, root-u and root-log exponent constants",
+    "mutations": "schema mismatch, missing depth, altered precision transition, altered final composition constant",
+    "standalone_gate": "1624-byte fixture accepted with five active depths, root u 512, root-u exponent constant 290 and root-log exponent constant 148480; 1 MiB input cap",
+    "dependency_boundary": "verifier imports exact integers and serialization only, not admission::dimensions, contraction, packing, deformation, factorization or graph code",
+    "claim_boundary": "independent exact scalar replay of declared source premises; no symbolic graph realization, external theorem proof, complete certificate-description composition or practical Curve25519 attack"
+  },
   "arithmetic_and_tree_certificate": {
     "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
     "arithmetic_native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-arithmetic-audit.rs",
     "tree_native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
     "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
     "test_result": {
-      "passed": 13,
+      "passed": 14,
       "failed": 0
     },
     "width_formulas": {
@@ -387,5 +400,5 @@
     "complete_library_result": "183 passed; 0 failed",
     "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
   },
-  "next_gate": "design an implicit symbolic-history certificate because the usize backend provably cannot execute a strict source branch; bind every symbolic node's K,L,tau,p to checked packing, shrinkage and precision history, and prove the depth-first sum of tuple/child exponents and description bits is at most C*s/sqrt(log s) plus polynomial overhead; require a fresh refinement/cost audit and accept a counterexample to any premise as decisive"
+  "next_gate": "extend the independently replayed symbolic-history certificate with per-node K,L,tau,p commitments and a graph-realization/refinement premise, connect each row to schema-2 factorization source bounds, and prove the depth-first sum of tuple/child exponents plus certificate-description bits is at most C*s/sqrt(log s) with polynomial overhead; accept a counterexample to any premise as decisive"
 }
