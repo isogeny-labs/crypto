@@ -177,6 +177,14 @@ target, plus about 0.51 seconds of production and 0.13 seconds of JSON work.
 The complete warm debug gate varied from 1.12 to 1.26 seconds.
 `[pcc:unverified]`
 
+At five edges, the 2,704 partition pairs collapse to 91 relabeling orbits.
+Across four label schedules, the 364 serialized certificates occupy 3,648,802
+bytes in total (10,024.18 bytes on average); the maximum is 43,450 bytes for
+`[0,0,0,1,1]/[0,0,0,1,1]` under schedule 3. The explicit phase measurement
+used 2.06 seconds in verification, 1.88 seconds in production, and 0.55 seconds
+in JSON work, for 4.93 seconds total. This passes the three-second verifier and
+six-second total admission targets. `[pcc:unverified]`
+
 The native `factorization-certificate-check` command now reads that JSON from a
 file or standard input, caps input at 64 MiB, applies explicit work/vector/width
 limits plus a 1,024-mode recursion-depth cap, and reports charged work. The
@@ -187,4 +195,4 @@ in 224 charged steps; a schema mutation exits with rejection status 2.
 This is a standalone executable boundary, but not a theorem-assistant or
 separately implemented arithmetic kernel. Producer, verifier, and exact ring
 arithmetic remain in the same Rust crate, and positive controls remain bounded
-through four edges. `[pcc:unverified]`
+through five edges. `[pcc:unverified]`

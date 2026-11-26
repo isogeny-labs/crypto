@@ -287,6 +287,12 @@ schedules: 132 certificates, 791,236 total bytes, and a 20,767-byte maximum.
 Measured checker time is about 0.60 seconds; production and JSON bring the
 complete warm debug gate to 1.12--1.26 seconds. `[pcc:unverified]`
 
+For five edges, 91 relabeling orbits under four schedules give 364 serialized
+certificates, 3,648,802 total bytes, and a 43,450-byte maximum. The measured
+verifier phase is 2.06 seconds and the complete production/JSON/verification
+gate is 4.93 seconds, below the three-second and six-second targets.
+`[pcc:unverified]`
+
 The verifier is now a public module separate from recursive contraction and a
 native `factorization-certificate-check` executable. It imports exact ring
 arithmetic but no contraction, deformation, packing, child, or packet-tensor

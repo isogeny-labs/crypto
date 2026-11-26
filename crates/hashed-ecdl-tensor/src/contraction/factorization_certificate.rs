@@ -558,3 +558,66 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
     assert_eq!(maximum_bytes, 20_767);
     assert_eq!(maximum_case, Some((vec![0, 0, 1, 1], vec![0, 0, 1, 1], 3)));
 }
+
+#[test]
+fn serialized_certificate_covers_five_edge_partition_orbits() {
+    let representatives = partition_pair_orbits(5);
+    assert_eq!(representatives.len(), 91);
+    let mut meter = Meter::new(Limits {
+        steps: 2_000_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let kernel = deformation::Cauchy::new(&parameters, 1, &ring.one(), &ring, &mut meter).unwrap();
+    let mut cases = 0usize;
+    let mut total_bytes = 0usize;
+    let mut maximum_bytes = 0usize;
+    let mut maximum_case = None;
+    for (left_groups, right_groups) in representatives {
+        for schedule in 0..4 {
+            let graph = partition_graph(&left_groups, &right_groups);
+            let rows = refinement_labels(graph.left.len(), schedule, 0);
+            let columns = refinement_labels(graph.right.len(), schedule, 1);
+            let packing =
+                packing::pack_labels(&graph, &parameters, rows, columns, false, &mut meter)
+                    .unwrap();
+            let modes =
+                deformation::modes(&graph, &packing, 0, &parameters, &kernel, &mut meter).unwrap();
+            let produced = produce(
+                &graph,
+                &packing,
+                &parameters,
+                0,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
+            let serialized = serde_json::to_vec(&produced).unwrap();
+            total_bytes += serialized.len();
+            if serialized.len() > maximum_bytes {
+                maximum_bytes = serialized.len();
+                maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
+            }
+            let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
+            standalone_verify(&certificate, &mut meter).unwrap_or_else(|error| {
+                panic!("left={left_groups:?}, right={right_groups:?}, schedule={schedule}: {error}")
+            });
+            cases += 1;
+        }
+    }
+    assert_eq!(cases, 364);
+    assert_eq!(total_bytes, 3_648_802);
+    assert_eq!(maximum_bytes, 43_450);
+    assert_eq!(
+        maximum_case,
+        Some((vec![0, 0, 0, 1, 1], vec![0, 0, 0, 1, 1], 3))
+    );
+}
