@@ -1,5 +1,6 @@
 # Prime-field relation discovery: shared selectors and public tags
 
+**Implementation PR:** [#5213](https://github.com/isogeny-labs/crypto/pull/5213).
 **Tracking PR:** [#5206](https://github.com/isogeny-labs/crypto/pull/5206) merged
 only the task card. The implementation follow-up is on
 [`lane/m31-shared-selector-integration-20261125`](https://github.com/isogeny-labs/crypto/tree/lane/m31-shared-selector-integration-20261125).

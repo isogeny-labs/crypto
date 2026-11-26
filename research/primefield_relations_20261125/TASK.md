@@ -6,6 +6,7 @@ authorized by this task. Tracking PR #5206 merged only this task card; the
 implementation follows on the branch below.
 
 Lane: `m31-shared-selector-integration-20261125`.
+Implementation PR: [#5213](https://github.com/isogeny-labs/crypto/pull/5213).
 Source problem: ordinary M31 ECDLP over `p=2147483647`, subgroup order
 `r=2147446831`.
 
@@ -19,8 +20,9 @@ Source problem: ordinary M31 ECDLP over `p=2147483647`, subgroup order
   brief/PDF/diagram, and a source-linked continuation handoff.
 - [x] Run the affected native checks: six tests and exact retained-output
   comparisons. Root-library attempts remain incomplete and documented.
-- [ ] Publish the complete implementation, satisfy applicable repository
-  checks, and integrate the follow-up PR.
+- [x] Publish the complete implementation in PR #5213 and pass local
+  publication, inventory, prose, parity, ledger, and size checks. [pcc:unverified]
+- [ ] Integrate PR #5213 after applicable GitHub checks pass.
 
 The new-claim coordinate-input/cost screen is not satisfied by this archived
 fixture, so this change adds no PCC ledger IDs. Results retain unsigned
