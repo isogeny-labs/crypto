@@ -16,6 +16,25 @@ predates the gate is frozen in [`PRE_GATE.json`](PRE_GATE.json) and is
 `VALIDATION.json` validates it. `python3 scripts/validation_gate.py check`
 lists each row's standing.
 
+Diagnostic component record awaiting admission:
+[H6 forced-divisor fiber pilot, 2026-11-24](20261124-h6-fiber-pilot-01/README.md).
+Nine fibers per arm: recorded F4+linear products 23,196,730 full-reference,
+16,414,425 plain and 12,480,689 traced; no new admissible graph rows.
+AMD EPYC 9V74, local reserved CPU0, count study only. This unsigned partial
+counter record is excluded from the admitted table. [pcc:unverified]
+
+[H6 exact unit-elimination diagnostic, 2026-11-24](20261124-h6-unit-fiber-01/README.md):
+same nine fibers, six-variable plain/traced counts23,582,716/19,237,258,
+respectively1.4367x/1.5414x their frozen seven-variable solver counts.
+All outputs match, no new rows. AMD EPYC9V74, reservedCPU0, partial count
+only; unsigned and excluded from the admitted table. [pcc:unverified]
+
+[Anchored graph support-policy diagnostic, 2026-11-24](20261124-anchored-support-policy-01/README.md):
+258 matching calls, expanded policy1 extra deferred edge versus0 old,
+zero full relations; traced172,312,093 F4+linear products over129 fibers.
+AMD EPYC9V74/localCPU0, partial count only, unsigned/unadmitted.
+[pcc:unverified]
+
 **Gate audit, 2026-10-24 (base `5cb5538` plus rule-v6/v7 validation):**
 all rows remaining in this admitted table have a passing gate standing in the
 complete local source tree. Twenty-one post-freeze rows lacking independent
