@@ -67,7 +67,11 @@ pub mod opcount {
     }
     /// `(sqrtm, invm, mulm)`; mulm includes those inside powm/invm/sqrtm.
     pub fn snapshot() -> (u64, u64, u64) {
-        (SQRTM.with(|c| c.get()), INVM.with(|c| c.get()), MULM.with(|c| c.get()))
+        (
+            SQRTM.with(|c| c.get()),
+            INVM.with(|c| c.get()),
+            MULM.with(|c| c.get()),
+        )
     }
 }
 

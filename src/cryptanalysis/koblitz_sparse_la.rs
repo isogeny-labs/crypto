@@ -2898,10 +2898,7 @@ fn minimal_approximant_basis<W: ModWord>(
             } else {
                 f_slice.chunks(n).map(|ch| ch.to_vec()).collect()
             };
-            BasisColumn {
-                f,
-                delta: c.delta,
-            }
+            BasisColumn { f, delta: c.delta }
         })
         .collect()
 }
