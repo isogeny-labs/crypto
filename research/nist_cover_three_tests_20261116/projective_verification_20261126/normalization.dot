@@ -1,0 +1,12 @@
+digraph normalize {
+  graph [rankdir=LR, bgcolor="white", pad=0.1, nodesep=0.2, ranksep=0.3];
+  node [shape=box, fontname="Helvetica", fontsize=11, margin=0.09];
+  edge [fontname="Helvetica", fontsize=10];
+  input [label="Valid rational KM input\n22 rows x 85 evaluations"];
+  reconstruct [label="Reconstruct numerators\nin the 34-monomial basis"];
+  detect [label="Detect infinity copies\nm = 9 - max degree"];
+  finite [label="Multiply by (x-56)^m\nreturn finite class"];
+  relation [label="Hinf - H56 is principal\nactual KM + OpenSSL transport", color="#246842"];
+  input -> reconstruct -> detect -> finite;
+  relation -> finite [label="class preserved", color="#246842"];
+}
