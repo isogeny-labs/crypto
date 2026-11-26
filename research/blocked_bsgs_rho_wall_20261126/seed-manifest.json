@@ -38,6 +38,15 @@
     "aa": "alternate invocation labels by replicate parity",
     "thread_count": 1
   },
+  "bootstrap_selection": {
+    "panel_argument": "analysis",
+    "replicate_argument": "bootstrap replicate b in 0..9999",
+    "item_argument": "draw d in 0..N-1",
+    "selection": "derived_u64 mod N",
+    "quantiles": "type-1, sorted zero-based indices 249 and 9749",
+    "custody": "one SHA-256 digest of each complete ordered little-endian selection-index stream is committed before timing"
+  },
   "full_mapping_artifact": "derived-seeds.jsonl",
+  "full_mapping_scope": "target, rho-walk, schedule, and warm-up identities; bootstrap draw streams are retained by compact ordered-stream digests",
   "full_mapping_status": "must be emitted, duplicate-checked, committed, and hash-pinned before the first timed row"
 }

@@ -108,13 +108,24 @@ row, or incorrect scalar is retained with its status. Any censoring at a size
 blocks an unconditional positive timing result at that size; a capped time may be shown
 only as a bound.
 
+The raw log is event-sourced. Immediately before each charged arm, flush an
+`intent` row naming the curve, panel, replicate, item, arm, invocation label,
+target-seed identity, rho-seed identity where applicable, and schedule position.
+Flush one `result` row after the arm returns. An intent without exactly one
+matching result is a censored arm, including process death or an external
+timeout; it is never interpreted as an arm that did not run.
+
 ## 6. Randomness
 
 `seed-manifest.json` freezes the 256-bit master seed, exact replicate ranges,
 stream names, encoding, and SHA-256 derivation. Before timing, the native study
 tool must emit the complete derived mapping for all target, rho-walk, scheduling,
-and bootstrap streams. That mapping is committed and hash-pinned; duplicate
-derived seeds are a hard refusal.
+and warm-up streams. That mapping is committed and hash-pinned; duplicate
+derived seeds are a hard refusal. Bootstrap selections are too numerous for a
+line-per-draw manifest, so the native seed emitter writes, per curve and panel,
+the SHA-256 of the complete ordered little-endian selection-index stream. The
+analyzer and independent verifier must reproduce those digests before reading
+timings.
 
 Target scalars are `1 + (u64_le(digest[0..8]) mod (n - 1))`. Rho seeds use the
 same extraction without reduction. Different stream labels make target and walk
@@ -147,6 +158,14 @@ Also report the arithmetic mean paired difference and `T / sqrt(n)` for both
 arms. A native analyzer performs 10,000 percentile-bootstrap resamples of whole
 pairs using the frozen bootstrap stream and reports a two-sided 95% interval.
 Medians and geometric means are secondary diagnostics only.
+
+For bootstrap replicate `b = 0..9999` and draw `d = 0..N-1`, apply the seed
+manifest derivation with `panel = "analysis"`, `replicate = b`, `item = d`, and
+the stream label `bootstrap-primary`, `bootstrap-bsgs-aa`, `bootstrap-rho-aa`,
+or `bootstrap-amortized`; select whole observation `derived_u64 mod N`. Sort the
+10,000 resampled statistics and use the type-1 quantiles at zero-based indices
+249 and 9749. A/A uses ordered invocation-2/invocation-1 ratios. Amortized
+resampling selects whole 64-target batches.
 
 - A positive timing result is reported only if every scalar passes the evaluator
   check, no row is censored,
