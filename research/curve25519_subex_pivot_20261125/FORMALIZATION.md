@@ -254,6 +254,12 @@ map. The measured Rust 1.78 debug runtime fell from 536.50 seconds for repeated
 delta contractions to 3.96 seconds for the same coefficient set.
 `[pcc:unverified]`
 
+At five edges, the same symbolic kernel covers all 91 graph-shape orbits of
+the 2,704 left/right partition pairs, four label schedules, and all 1,024
+delta-basis coefficients: 372,736 comparisons in 51.71 seconds under Rust
+1.78 debug. This meets the 90-second scaling target but remains a bounded
+refinement rather than a quantified proof. `[pcc:unverified]`
+
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.

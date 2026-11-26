@@ -855,6 +855,146 @@ fn direct_factorization_matches_four_edge_partition_orbits() {
     assert_eq!(cases, 33_792);
 }
 
+fn dynamic_set_partitions(edges: usize) -> Vec<Vec<usize>> {
+    fn visit(position: usize, maximum: usize, current: &mut [usize], out: &mut Vec<Vec<usize>>) {
+        if position == current.len() {
+            out.push(current.to_vec());
+            return;
+        }
+        for group in 0..=maximum + 1 {
+            current[position] = group;
+            visit(position + 1, maximum.max(group), current, out);
+        }
+    }
+
+    assert!(edges > 0);
+    let mut out = Vec::new();
+    let mut current = vec![0usize; edges];
+    visit(1, 0, &mut current, &mut out);
+    out
+}
+
+fn dynamic_edge_permutations(edges: usize) -> Vec<Vec<usize>> {
+    fn visit(position: usize, current: &mut [usize], out: &mut Vec<Vec<usize>>) {
+        if position == current.len() {
+            out.push(current.to_vec());
+            return;
+        }
+        for next in position..current.len() {
+            current.swap(position, next);
+            visit(position + 1, current, out);
+            current.swap(position, next);
+        }
+    }
+
+    let mut out = Vec::new();
+    let mut current: Vec<_> = (0..edges).collect();
+    visit(0, &mut current, &mut out);
+    out
+}
+
+fn dynamic_normalize_partition(values: impl Iterator<Item = usize>, edges: usize) -> Vec<usize> {
+    let mut names = vec![usize::MAX; edges];
+    let mut next = 0usize;
+    values
+        .map(|value| {
+            if names[value] == usize::MAX {
+                names[value] = next;
+                next += 1;
+            }
+            names[value]
+        })
+        .collect()
+}
+
+fn dynamic_partition_pair_orbits(edges: usize) -> BTreeSet<(Vec<usize>, Vec<usize>)> {
+    let partitions = dynamic_set_partitions(edges);
+    let permutations = dynamic_edge_permutations(edges);
+    let mut out = BTreeSet::new();
+    for left in &partitions {
+        for right in &partitions {
+            let canonical = permutations
+                .iter()
+                .map(|permutation| {
+                    (
+                        dynamic_normalize_partition(
+                            permutation.iter().map(|&edge| left[edge]),
+                            edges,
+                        ),
+                        dynamic_normalize_partition(
+                            permutation.iter().map(|&edge| right[edge]),
+                            edges,
+                        ),
+                    )
+                })
+                .min()
+                .unwrap();
+            out.insert(canonical);
+        }
+    }
+    out
+}
+
+#[test]
+fn direct_factorization_matches_five_edge_partition_orbits() {
+    let representatives = dynamic_partition_pair_orbits(5);
+    assert_eq!(representatives.len(), 91);
+    let mut meter = Meter::new(Limits {
+        steps: 500_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let z = ring.point(&3u8.into()).unwrap();
+    let t = 1i64;
+    let coordinate = deformation::valuation(t);
+    let kernel = deformation::Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+    let mut cases = 0usize;
+    for (left_groups, right_groups) in representatives {
+        for schedule in 0..4 {
+            let prototype = partition_basis_graph(&left_groups, &right_groups, 0);
+            let rows = refinement_labels(prototype.left.len(), schedule, 0);
+            let columns = refinement_labels(prototype.right.len(), schedule, 1);
+            let packing =
+                packing::pack_labels(&prototype, &parameters, rows, columns, false, &mut meter)
+                    .unwrap();
+            let modes = deformation::modes(
+                &prototype,
+                &packing,
+                coordinate,
+                &parameters,
+                &kernel,
+                &mut meter,
+            )
+            .unwrap();
+            let expected =
+                direct_packet_basis_map(&prototype, &packing, &kernel, &mut meter).unwrap();
+            let actual = extracted_basis_map(
+                &prototype,
+                &packing,
+                &parameters,
+                coordinate,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
+            assert_eq!(
+                actual, expected,
+                "left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
+            );
+            cases += expected.len();
+        }
+    }
+    assert_eq!(cases, 372_736);
+}
+
 #[test]
 fn generated_mode_removal_or_reassignment_changes_the_group_product() {
     let mut meter = Meter::new(Limits {

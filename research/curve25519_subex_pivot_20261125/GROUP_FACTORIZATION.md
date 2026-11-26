@@ -193,6 +193,12 @@ rather than rerunning a complete contraction for every delta tensor. This
 reduced the measured Rust 1.78 debug runtime from 536.50 seconds to 3.96
 seconds while preserving the exact coefficient set. `[pcc:unverified]`
 
+The same symbolic kernel scales to five edges. All 2,704 left/right partition
+pairs collapse to 91 graph-shape orbits; four label schedules and all 1,024
+incidence-basis coefficients give 372,736 exact comparisons. The complete
+Rust 1.78 debug control passes in 51.71 seconds, below the 90-second scaling
+target. `[pcc:unverified]`
+
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust
 child back to this polynomial. C1 items 1–3 close only after that independent
