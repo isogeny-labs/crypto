@@ -1,0 +1,39 @@
+{
+  "schema": "isogeny-labs/pcc-ledger-reconciliation/v1",
+  "reason": "current-main append-only ledger conflict during PR 5229 integration",
+  "branch_parent": "fa00be9aac215c15e1f3d9246cc7fa14b2fa3e04",
+  "canonical_main": "577980f627b09ccefc23e5bb75ca231f6cde0f93",
+  "canonical_prefix_entries": 1863,
+  "canonical_prefix_sha256": "14e3f518874ac7f195c2f9cd7f3f0af5835942d86282beb75ba6103afc758eef",
+  "archived_branch_suffix": "pcc-ledger-fork.jsonl",
+  "archived_branch_suffix_sha256": "5e367c3ff78fa5b5fa28b728fb65d7366af72bd68ee77b75137dd670ebe6945c",
+  "archived_branch_suffix_last_hash": "480f8ecbd959c71787e10e9285c78b257e4e754b09adc97aff4da8b33b1e4356",
+  "claim_ids": [
+    "PCC-20261126-1f48aa",
+    "PCC-20261126-7a50b7"
+  ],
+  "procedure": "retain canonical main byte prefix; archive the original branch suffix; append a custody note and register the two unchanged claim bodies with tools/pcc/pcc.py append_entry",
+  "canonical_suffix": [
+    {
+      "seq": 1863,
+      "type": "note",
+      "hash": "e41c65ad6de8b1c318a204d9933fb3f2a862a56493cccaf4109efb413cf65b23"
+    },
+    {
+      "seq": 1864,
+      "type": "claim",
+      "claim_id": "PCC-20261126-1f48aa",
+      "hash": "02d3cb3af4f03a69545a26228d300a59cd8972600a43c959086d299effef74d3"
+    },
+    {
+      "seq": 1865,
+      "type": "claim",
+      "claim_id": "PCC-20261126-7a50b7",
+      "hash": "6f405460433812789e2eca1375fb57da8863afb8faa505c29aff9349d867a379"
+    }
+  ],
+  "final_ledger_entries": 1866,
+  "final_ledger_sha256": "cef96cafc474fa269b800f95011f4172aac743ab6b33b80ec160648b4d4fc06e",
+  "scientific_rerun": false,
+  "claim_bodies_changed": false
+}

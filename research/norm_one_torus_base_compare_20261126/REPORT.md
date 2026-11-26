@@ -17,6 +17,7 @@ This is a useful null result: torus parametrization by itself is not the big
 speedup. A material improvement now requires an exact pair-spectrum query that
 avoids enumerating all pairs, a batched cross-target scheme, or an algebraic
 PKM/Semaev solver whose cost is changed by the factor-base equations.
+[pcc:unverified]
 
 ## Matched construction
 
@@ -74,7 +75,7 @@ Factor-base construction also has different primitive mixes. The torus arm
 scanned 64 selectors and made 63 selector plus 64 curve square-root solves. The
 ordinary arm scanned 71 abscissae and made 71 Legendre-symbol plus 34 square-
 root solves. These are reported as a vector rather than collapsed into an
-unsupported common cost.
+unsupported common cost. [pcc:unverified]
 
 ## Wall-clock boundary
 
@@ -128,3 +129,4 @@ The next falsifiable target should attack the 2,346 pair candidates per target:
 query the exact pair spectrum without enumerating it, or amortize it over many
 targets. Until that algorithm exists, the p+1 geometry is useful for defining
 structured algebraic systems, not as a standalone generic-query speedup.
+[pcc:unverified]
