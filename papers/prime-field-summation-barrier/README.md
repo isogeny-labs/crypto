@@ -140,6 +140,15 @@ remaining barrier must use the joint `m`-leaf sum constraint or a genuine
 preprocessing/query recovery argument, rather than bounding one leaf's
 factor-base hit rate. `[pcc:unverified]`
 
+Proposition 31 gives the exact surviving joint invariant.  A valid selector
+`T -> (P_1,...,P_m)` is injective because summing its output recovers `T`.
+Thus `|U| <= N^m`, and at least one leaf image has size `|U|^(1/m)`.  The
+corresponding joint output entropy is `log |U|`.  This rules out combining
+fixed-size leaf images to cover a dense target set, but it is exactly the
+ordinary tuple-count bound and is attained by a set-theoretic selector.
+Consequently entropy supplies no runtime lower bound for compact joint
+selectors. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint

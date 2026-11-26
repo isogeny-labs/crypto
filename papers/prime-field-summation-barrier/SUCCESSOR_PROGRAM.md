@@ -54,6 +54,7 @@ The status of the program is:
 | Theorem 28 | unconditional in the symbolic straight-line recovery model | rational recovery from a succinct correspondence produces a global selector section and inherits Theorem 26's square-root direct sum |
 | Proposition 29 | exact finite-field root-recovery counterexample | compact exponentiation recovers roots on many finite-field targets even when the generic correspondence has no rational section |
 | Proposition 30 | exact finite-field hit-bound counterexample | a logarithmic-size power map sends every target into a fixed small set, so individual-leaf factor-base hits cannot support the final barrier |
+| Proposition 31 | exact joint-entropy boundary | a valid \(m\)-leaf selector is injective and obeys the tuple-count entropy bound, but this supplies no circuit lower bound |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2407,6 +2408,63 @@ barrier must exploit the **joint** \(m\)-leaf addition constraint, witness
 recovery, or preprocessing/query trade-off; a per-leaf hit estimate is
 insufficient. [pcc:unverified]
 
+### Proposition 31 (joint selector entropy is exactly tuple count)
+
+Let \(U\subseteq G\), let \(\mathcal F\subseteq G\) have size \(N\), and
+suppose finite-domain functions
+
+\[
+f_i:U\to\mathcal F\qquad(1\le i\le m)
+\]
+
+satisfy
+
+\[
+\sum_{i=1}^m f_i(T)=T\qquad(T\in U).
+\]
+
+Then the joint selector
+
+\[
+f=(f_1,\ldots,f_m):U\to\mathcal F^m
+\]
+
+is injective.  Consequently,
+
+\[
+|U|\le\prod_{i=1}^m|\operatorname{im}f_i|\le N^m,
+\qquad
+\max_i|\operatorname{im}f_i|\ge |U|^{1/m}.
+\]
+
+If \(T\) is uniform on \(U\), then
+
+\[
+H(f(T))=\log|U|,
+\qquad
+\sum_{i=1}^m H(f_i(T))\ge\log|U|.
+\]
+
+In particular, the constant-size images in Proposition 30 cannot jointly
+cover a density-one target set for fixed \(m\). [pcc:unverified]
+
+#### Proof
+
+If \(f(T)=f(T')\), summing the common output tuple gives both \(T\) and
+\(T'\), so \(T=T'\).  This proves injectivity and the cardinality bounds. [pcc:unverified]
+For uniform \(T\), injectivity makes \(f(T)\) uniform on an image of size
+\(|U|\), hence \(H(f(T))=\log|U|\).  Shannon entropy is subadditive across
+the coordinates, which gives the final inequality. \(\square\)
+
+This proposition is tight at the set-theoretic level.  Choosing one
+decomposition from each nonempty fibre of the \(m\)-sum map produces exactly
+such an injection on its support, as in Proposition 27.  Therefore joint
+entropy recovers the familiar tuple-count condition \(N^m\ge|U|\) but gives
+no lower bound on the circuit or data-structure cost of computing the
+selector.  At the factor-base boundary \(N\asymp n^{1/m}\), the information
+constraint is already saturated.  The missing theorem is computational, not
+entropic. [pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2660,6 +2718,8 @@ coordinate filter, Theorem 26 closes compact global single-valued maps, and
 Theorem 28 closes straight-line rational recovery from correspondences.
 Proposition 29 shows why finite-field root extraction is a distinct case.
 Proposition 30 further rules out per-leaf factor-base hit bounds for arbitrary
-finite-domain circuits.  Research should now concentrate on the joint
-all-leaf addition constraint, finite-domain branching, implicit branch
-generation, and multi-target witness recovery.
+finite-domain circuits.  Proposition 31 shows that joint entropy recovers only
+the already-tight tuple-count bound.  Research should now concentrate on the
+computational complexity of the joint all-leaf addition constraint,
+finite-domain branching, implicit branch generation, and multi-target witness
+recovery.

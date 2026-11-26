@@ -553,6 +553,9 @@ fn finite_domain_selectors_need_not_be_constant_or_injective() {
                 .len()
         })
         .collect();
+    let joint_image_size = selector.iter().copied().collect::<BTreeSet<_>>().len();
+    assert_eq!(joint_image_size, group_order);
+    assert!(image_sizes.iter().product::<usize>() >= group_order);
     assert!(image_sizes.iter().any(|size| *size > 1));
     assert!(image_sizes.iter().all(|size| *size < group_order));
 }
