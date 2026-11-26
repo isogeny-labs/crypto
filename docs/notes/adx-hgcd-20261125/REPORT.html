@@ -331,8 +331,9 @@ replaced bodies with calls into <code>crate::gcd</code> while keeping
 every signature and observable behaviour (monic vs raw results, zero and
 non-unit handling, panics, call-count hooks such as
 <code>jv_bitops::hook_inv</code>). Per their reports about 260
-definitions were routed; the lead then reverted four files (below).
-Everything compiles
+definitions were routed; the lead then reverted four files and, after
+CI, restored thirteen more (below), leaving roughly 220 routed
+definitions. Everything compiles
 (<code>cargo check --lib --bins --examples --tests</code>; the only
 error is a pre-existing example that includes a <code>research/</code>
 file outside the sparse checkout).</p>
@@ -367,6 +368,22 @@ affine addition, <code>fp_backend</code> Pornin/Kaliski/binary inverses,
 coefficients), and Fermat inverses whose modulus is not known
 prime.</li>
 </ul>
+<p><strong>Restored to <code>main</code> after CI</strong> (provenance):
+twelve library sources that research crates compile by
+<code>#[path]</code> include (where <code>crate::gcd</code> does not
+exist) — <code>binary_ecc/trace_zero.rs</code>,
+<code>binary_radical_root.rs</code>, <code>curve_id.rs</code>,
+<code>f4_fp.rs</code>, <code>isogeny_walk/poly.rs</code>,
+<code>plane_quartic_pic.rs</code>, <code>prime_fast.rs</code>,
+<code>residual_walk.rs</code>, <code>semaev_prime_poly.rs</code>,
+<code>smith_prop24.rs</code>, <code>three_leads.rs</code>,
+<code>ecc/field.rs</code> (found by scanning all 1940 path-including
+files after the <code>software</code> check failed on the
+<code>five_leads_e2e</code> crate) — and
+<code>koblitz_strong_rho.rs</code>, the standing rho reference, whose
+git blob is pinned by
+<code>docs/ic/validation/reference-currency.json</code> (the
+<code>recompute</code> check).</p>
 <p><strong>Reverted by the lead after review</strong> (speed or
 provenance): <code>prime_fast.rs</code> (division-free binary inverse in
 the FastCurve rho walks; its root-finding gcd now uses half-GCD above
