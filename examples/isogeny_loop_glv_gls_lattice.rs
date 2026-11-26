@@ -227,9 +227,8 @@ fn cheapest_loops(d: i64, nmax: u64) -> (Vec<Loop>, u64) {
 }
 
 fn modinv(a: &BigInt, m: &BigInt) -> BigInt {
-    let e = a.extended_gcd(m);
-    assert!(e.gcd.is_one(), "not invertible");
-    e.x.mod_floor(m)
+    // Shared inverse in [0, m); panics on a non-unit as before.
+    crypto_lib::gcd::int::modinv_bigint(a, m).expect("not invertible")
 }
 
 fn bits(x: &BigInt) -> u64 {

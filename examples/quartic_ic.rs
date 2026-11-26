@@ -1585,18 +1585,9 @@ fn mulmod(a: u64, b: u64, m: u64) -> u64 {
 }
 
 fn invmod(a: u64, m: u64) -> u64 {
-    let (mut r0, mut r1) = (m as i128, a as i128);
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let qt = r0 / r1;
-        let r2 = r0 - qt * r1;
-        r0 = r1;
-        r1 = r2;
-        let t2 = t0 - qt * t1;
-        t0 = t1;
-        t1 = t2;
-    }
-    t0.rem_euclid(m as i128) as u64
+    // Shared inverse.  The old Euclid did not check for a unit; a non-unit
+    // (only `a ≡ 0` for prime `m`) still returns 0, as it did for `a = 0`.
+    crypto_lib::gcd::int::inv_mod_u64(a, m).unwrap_or(0)
 }
 
 fn run_rho(inst: &mut Instance, neg: bool, seed: u64) -> ArmResult {

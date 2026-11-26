@@ -191,11 +191,7 @@ impl std::fmt::Display for Big {
 // Part A: branch types.
 
 fn gcd(a: u32, b: u32) -> u32 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a as u64, b as u64) as u32
 }
 
 fn full(k: u32) -> u64 {
@@ -721,16 +717,14 @@ mod fp {
         a.iter().all(|&c| c == 0)
     }
     pub fn gcd(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-        let (mut x, mut y) = (a.to_vec(), b.to_vec());
-        trim(&mut x);
-        trim(&mut y);
-        while !is_zero(&y) {
-            let r = rem(&x, &y, p);
-            x = y;
-            y = r;
+        // Monic gcd through the shared module; this module writes the zero
+        // polynomial as `[0]`.
+        let g = crypto_lib::gcd::poly::gcd(&crypto_lib::gcd::poly::Fp64::new(p), a, b);
+        if g.is_empty() {
+            vec![0]
+        } else {
+            g
         }
-        let li = inv(*x.last().unwrap(), p);
-        x.iter().map(|c| c * li % p).collect()
     }
     pub fn div(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
         let mut r = a.to_vec();

@@ -101,18 +101,7 @@ fn pow_mod(mut a: u64, mut e: u64, m: u64) -> u64 {
 }
 
 fn inv_mod(a: u64, m: u64) -> u64 {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut rr, mut nr) = (m as i128, (a % m) as i128);
-    while nr != 0 {
-        let q = rr / nr;
-        (t, nt) = (nt, t - q * nt);
-        (rr, nr) = (nr, rr - q * nr);
-    }
-    assert!(rr == 1, "not invertible");
-    if t < 0 {
-        t += m as i128;
-    }
-    t as u64
+    crypto_lib::gcd::int::inv_mod_u64(a, m).expect("not invertible")
 }
 
 // ---------------------------------------------------------------- curve ----

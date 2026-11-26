@@ -592,7 +592,9 @@ fn load_factor_base() -> Result<(FactorBaseReceipt, Vec<FactorPoint>), String> {
 
 fn mod_inverse(value: &BigUint, modulus: &BigUint) -> BigUint {
     debug_assert!(!value.is_zero());
-    value.modpow(&(modulus - 2u8), modulus)
+    // Was Fermat value^(modulus-2); every modulus here is prime (P-256 p or n,
+    // 101 in tests), so the shared inverse is equal, and 0 for value ≡ 0 as before.
+    crypto_lib::gcd::int::modinv_big(value, modulus).unwrap_or_else(BigUint::zero)
 }
 
 fn pow_counted(mut base: Fe, exponent: &BigUint, multiplications: &mut u64) -> Fe {
@@ -738,13 +740,8 @@ fn canonical_relation(mut coefficients: BTreeMap<u32, i32>) -> Option<SparseRela
     })
 }
 
-fn gcd_u32(mut left: u32, mut right: u32) -> u32 {
-    while right != 0 {
-        let remainder = left % right;
-        left = right;
-        right = remainder;
-    }
-    left
+fn gcd_u32(left: u32, right: u32) -> u32 {
+    crypto_lib::gcd::int::gcd_u64(u64::from(left), u64::from(right)) as u32
 }
 
 fn relation_digest(relation: &SparseRelation) -> String {

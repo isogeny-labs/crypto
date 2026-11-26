@@ -763,17 +763,9 @@ fn small_irreducible(n: u32) -> Vec<u32> {
         }
         r
     }
-    fn deg(a: u64) -> i32 {
-        63 - a.leading_zeros() as i32
-    }
-    fn gcd(mut a: u64, mut b: u64) -> u64 {
-        while b != 0 {
-            while a != 0 && deg(a) >= deg(b) {
-                a ^= b << (deg(a) - deg(b));
-            }
-            std::mem::swap(&mut a, &mut b);
-        }
-        a
+    fn gcd(a: u64, b: u64) -> u64 {
+        // GF(2)[x] gcd (shared implementation).
+        crypto_lib::gcd::gf2::gcd_word(a, b)
     }
     let irreducible = |f: u64| {
         let mut g = 2u64;

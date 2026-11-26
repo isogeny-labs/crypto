@@ -60,21 +60,14 @@ fn addmod(a: u64, b: u64, m: u64) -> u64 {
 fn submod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 + m as u128 - b as u128) % m as u128) as u64
 }
-/// `a^(m-2) mod m` (the modulus is prime); `None` for `a ≡ 0`.
+/// `a⁻¹ mod m` (the modulus is prime, so this is the old `a^(m-2)`);
+/// `None` for `a ≡ 0`.
 fn invmod(a: u64, m: u64) -> Option<u64> {
     let a = a % m;
     if a == 0 {
         return None;
     }
-    let (mut base, mut e, mut acc) = (a, m - 2, 1u64);
-    while e > 0 {
-        if e & 1 == 1 {
-            acc = mulmod(acc, base, m);
-        }
-        base = mulmod(base, base, m);
-        e >>= 1;
-    }
-    Some(acc)
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 /// Incremental maximum bipartite matching, rows against columns.
