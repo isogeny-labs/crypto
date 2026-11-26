@@ -160,46 +160,15 @@ fn ln_factorial(g: u64) -> f64 {
 
 // ── small modular polynomial arithmetic for the Frobenius check ────────
 
-fn mulmod(a: u128, b: u128, p: u128) -> u128 {
-    a * b % p
-}
-
-fn powmod(mut a: u128, mut e: u64, p: u128) -> u128 {
-    let mut r = 1;
-    while e > 0 {
-        if e & 1 == 1 {
-            r = mulmod(r, a, p);
-        }
-        a = mulmod(a, a, p);
-        e >>= 1;
-    }
-    r
-}
-
-fn pgcd_deg(mut a: Vec<u128>, mut b: Vec<u128>, p: u128) -> usize {
-    let trim = |v: &mut Vec<u128>| {
-        while v.last() == Some(&0) {
-            v.pop();
-        }
-    };
-    trim(&mut a);
-    trim(&mut b);
-    while !b.is_empty() {
-        let inv = powmod(*b.last().unwrap(), (p - 2) as u64, p);
-        while a.len() >= b.len() {
-            let c = mulmod(*a.last().unwrap(), inv, p);
-            let sh = a.len() - b.len();
-            for i in 0..b.len() {
-                a[sh + i] = (a[sh + i] + p - mulmod(c, b[i], p)) % p;
-            }
-            trim(&mut a);
-            if a.is_empty() {
-                break;
-            }
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a.len().saturating_sub(1)
+fn pgcd_deg(a: Vec<u128>, b: Vec<u128>, p: u128) -> usize {
+    // Degree of the gcd through the shared module (p is prime, < 2^63,
+    // coefficients reduced); 0 when both inputs are zero, as before.
+    let f = crypto_lib::gcd::poly::Fp64::new(p as u64);
+    let a: Vec<u64> = a.iter().map(|&c| c as u64).collect();
+    let b: Vec<u64> = b.iter().map(|&c| c as u64).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
+        .len()
+        .saturating_sub(1)
 }
 
 /// Degree of gcd(chi(x), x^{2n} - t x^n + q^n) in F_p[x], chi the

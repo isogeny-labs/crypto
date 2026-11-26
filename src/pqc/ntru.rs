@@ -177,9 +177,31 @@ impl NtruPoly {
 ///
 /// Returns `None` if `f` is not invertible.
 pub fn poly_inverse(f: &NtruPoly, m: i32) -> Option<NtruPoly> {
-    // Brute force is feasible for all our toy parameters:
-    // N = 5, m ∈ {3, 11}: at most 11^5 = 161,051 candidates.
-    poly_inverse_brute(f, m)
+    // The old contract was the brute-force search below: `None` past
+    // 2·10⁸ candidates, else the (unique) inverse.  For a prime `m` the
+    // shared extended Euclid in `crate::gcd::poly` returns that same unique
+    // inverse; any other `m` keeps the brute force.
+    let total = (m as usize as u64).checked_pow(N as u32)?;
+    if total > 200_000_000 {
+        return None;
+    }
+    let is_prime = m >= 2 && (2..m).take_while(|d| d * d <= m).all(|d| m % d != 0);
+    if !is_prime {
+        return poly_inverse_brute(f, m);
+    }
+    use crate::gcd::poly::{inv_mod, Fp64};
+    let field = Fp64::new(m as u64);
+    let a: Vec<u64> = f.0.iter().map(|&c| c.rem_euclid(m) as u64).collect();
+    // x^N − 1.
+    let mut modulus = vec![0u64; N + 1];
+    modulus[0] = m as u64 - 1;
+    modulus[N] = 1;
+    let inv = inv_mod(&field, &a, &modulus)?;
+    let mut out = NtruPoly::zero();
+    for (o, &c) in out.0.iter_mut().zip(&inv) {
+        *o = c as i32;
+    }
+    Some(out)
 }
 
 fn poly_inverse_brute(f: &NtruPoly, m: i32) -> Option<NtruPoly> {

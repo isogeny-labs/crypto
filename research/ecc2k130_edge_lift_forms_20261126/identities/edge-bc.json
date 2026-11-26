@@ -1,0 +1,264 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h943d3d2cc5f015d2",
+  "statement": {
+    "name": "ECC2K-130 S3 substituted bc-edge lift",
+    "source": "research/ecc2k130_edge_lift_forms_20261126/README.md section 1",
+    "variables": [
+      "x_a",
+      "x_b",
+      "x_c",
+      "beta"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_b"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_b"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_b"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "x_a"
+            },
+            {
+              "op": "var",
+              "args": "x_b"
+            },
+            {
+              "op": "var",
+              "args": "x_c"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "beta"
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_b"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_b"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_b"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_a"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x_b"
+                },
+                {
+                  "op": "var",
+                  "args": "x_c"
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "x_a"
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "beta"
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 17060199648085606589,
+  "value_digest": "399bd04bf316f54d60bd6de2675a9cedc7f40f4319a2e19d097118fe35030490",
+  "independence": "issued by examples/identity_certificate_ecc2k130_edge_lift.rs from an explicit expression tree; checked by cryptanalysis::identity_certificate::check replaying from the sealed id and seed",
+  "proof": null
+}

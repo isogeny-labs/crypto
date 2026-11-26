@@ -1,0 +1,35 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 936, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 929, in main
+    return {
+           ^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 736, in cmd_pull
+    items = selected(cfg.root, [Path(p) for p in args.paths])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 292, in selected
+    for name, e in read_manifest(d).items():
+                   ^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 206, in read_manifest
+    text = read_text_or_index(p)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 198, in read_text_or_index
+    data = staged_content(root, rel(root, p), missing_ok=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/tools/artifacts/artifacts.py", line 177, in staged_content
+    result = subprocess.run(["git", "-C", str(root), "cat-file", "--filters",
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 2115, in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

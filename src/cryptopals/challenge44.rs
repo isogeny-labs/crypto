@@ -13,14 +13,11 @@ use crate::cryptopals::challenge28::sha1;
 use crate::cryptopals::challenge43::{dsa_params, dsa_x_from_known_k};
 use crate::cryptopals::Report;
 use num_bigint::{BigInt, BigUint, ToBigInt};
-use num_integer::Integer;
 
 fn mod_inv(a: &BigUint, n: &BigUint) -> BigUint {
-    let a_i = a.to_bigint().unwrap();
-    let n_i = n.to_bigint().unwrap();
-    let g = a_i.extended_gcd(&n_i);
-    let r = ((g.x % &n_i) + &n_i) % &n_i;
-    r.to_biguint().unwrap()
+    // Non-unit `a` (never expected here): the old body returned a
+    // value without checking; keep returning one (0).
+    crate::gcd::int::modinv_big(a, n).unwrap_or_default()
 }
 
 pub fn k_from_repeated(m1: &[u8], m2: &[u8], s1: &BigUint, s2: &BigUint, q: &BigUint) -> BigUint {

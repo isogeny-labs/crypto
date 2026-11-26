@@ -26,10 +26,10 @@ use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFami
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
     curve25519_family_instance, find_prime_order_curve, fp_p31_subexp_mersenne_instance,
-    generic_floor_ops, koblitz_floor_instance,
-    koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
-    roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
-    CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
+    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
+    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
+    RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::genroot::GenRootOracle;
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
@@ -782,8 +782,16 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
-        let mut rootfind_floor = RootfindFloorOracle::new(m, inst);
-        let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(m, inst);
+        let mut rootfind_floor = if or_name == "rootfind-floor-batch-v1" {
+            RootfindFloorOracle::new_batch_v1(m, inst)
+        } else {
+            RootfindFloorOracle::new(m, inst)
+        };
+        let mut rootfind_kmitm = if or_name == "rootfind-kmitm-batch-v1" {
+            RootfindKMitmOracle::new_prime_batch_v1(m, inst)
+        } else {
+            RootfindKMitmOracle::new_prime(m, inst)
+        };
         let mut rootfind_gpu =
             crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
                 m, inst,
@@ -804,16 +812,17 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
-            "rootfind-floor" => &mut rootfind_floor,
-            "rootfind-kmitm" => &mut rootfind_kmitm,
+            "rootfind-floor" | "rootfind-floor-batch-v1" => &mut rootfind_floor,
+            "rootfind-kmitm" | "rootfind-kmitm-batch-v1" => &mut rootfind_kmitm,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             "genroot" => &mut genroot,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
-                     hashed-tensor, genroot, indexed-s3 or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-floor, \
+                     rootfind-floor-batch-v1, rootfind-kmitm, rootfind-kmitm-batch-v1, \
+                     rootfind-subtract-gpu, hashed-tensor, genroot, indexed-s3 or pkm-semaev"
                 ))
             }
         };

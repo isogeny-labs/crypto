@@ -39,7 +39,7 @@
 //! the failure case is what gives us the factor.
 
 use num_bigint::{BigUint, RandBigInt};
-use num_traits::{One, Zero};
+use num_traits::Zero;
 use rand::{rngs::SmallRng, SeedableRng};
 
 /// Result of running ECM on a single curve.
@@ -60,26 +60,10 @@ type Point = Option<(BigUint, BigUint)>;
 /// `Err(gcd)` if `gcd(a, n) ≠ 1` (the gcd is the partial factor we
 /// want).
 fn mod_inv_or_factor(a: &BigUint, n: &BigUint) -> Result<BigUint, BigUint> {
-    use num_bigint::{BigInt, Sign};
-    let a_i = BigInt::from_biguint(Sign::Plus, a.clone());
-    let n_i = BigInt::from_biguint(Sign::Plus, n.clone());
-    let (mut old_r, mut r) = (a_i.clone(), n_i.clone());
-    let (mut old_s, mut s) = (BigInt::one(), BigInt::zero());
-    while !r.is_zero() {
-        let q = &old_r / &r;
-        let new_r = old_r - &q * &r;
-        old_r = r;
-        r = new_r;
-        let new_s = old_s - &q * &s;
-        old_s = s;
-        s = new_s;
+    match crate::gcd::int::modinv_big(a, n) {
+        Some(inv) => Ok(inv),
+        None => Err(crate::gcd::int::gcd_big(a, n)),
     }
-    let g = old_r.magnitude().clone();
-    if g != BigUint::one() {
-        return Err(g);
-    }
-    let result = ((old_s % &n_i) + &n_i) % &n_i;
-    Ok(result.to_biguint().unwrap())
 }
 
 /// Add two points on `E_{a,b}` over `Z/nZ`.  Returns `Err(g)` if a

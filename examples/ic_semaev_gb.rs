@@ -138,20 +138,8 @@ fn eadd(p: u64, a: u64, l: (u64, u64), r: (u64, u64)) -> Option<(u64, u64)> {
 }
 
 fn modinv(a: u64, p: u64) -> u64 {
-    let mut t = 0i64;
-    let mut newt = 1i64;
-    let mut r = p as i64;
-    let mut newr = (a % p) as i64;
-    while newr != 0 {
-        let q = r / newr;
-        let tmp = t - q * newt;
-        t = newt;
-        newt = tmp;
-        let tmp2 = r - q * newr;
-        r = newr;
-        newr = tmp2;
-    }
-    ((t % p as i64 + p as i64) % p as i64) as u64
+    // Unchecked as before: 0 when a is not a unit (also for a = 0).
+    crypto_lib::gcd::int::inv_mod_u64(a, p).unwrap_or(0)
 }
 
 fn curve_points(p: u64, a: u64, b: u64) -> Vec<(u64, u64)> {

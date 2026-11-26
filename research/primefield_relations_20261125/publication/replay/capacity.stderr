@@ -1,0 +1,15 @@
+   Compiling m31-shared-selector-study v0.1.0 (/workspace/scratch/a53530b2f2cf/crypto-pr-main/research/primefield_relations_20261125)
+warning: associated function `from_u64` is never used
+  --> capacity-checker/src/exact_bounds.rs:11:8
+   |
+ 8 | impl Nat {
+   | -------- associated function in this implementation
+...
+11 |     fn from_u64(x: u64) -> Self {
+   |        ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `m31-shared-selector-study` (bin "exact-bounds") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.63s
+     Running `/workspace/scratch/a53530b2f2cf/primefield-pr-replay/target/release/exact-bounds --certificate /workspace/scratch/a53530b2f2cf/primefield-pr-replay/certificates.json`

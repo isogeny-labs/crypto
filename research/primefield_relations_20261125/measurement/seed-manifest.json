@@ -1,0 +1,43 @@
+{
+  "schema": "isogeny.experiment-seeds/v1",
+  "study_id": "m31-shared-selector-counts-20261125",
+  "manifest_version": 1,
+  "classification": "deterministic archival-fixture operation counts; no independent replicate panel",
+  "root_seed_hex": "4150535f50523331",
+  "seed_width_bits": 64,
+  "seed_encoding": "fixed-width hexadecimal unsigned integer",
+  "prng": "SplitMix64, exact pinned archived implementation at crypto commit 90a0314f5be63d5ca56465a884091f4be0f114fd",
+  "initialization": "state is the root seed; increment then xor-shift/multiply mixing exactly as archived",
+  "stream_derivation": "No derived or split streams: preserve the single historical sequential stream byte-for-byte, intentionally shared by all arms",
+  "streams": [
+    {
+      "id": "archive/source/public-coefficients",
+      "seed_hex": "4150535f50523331",
+      "shared_by": ["A", "B"],
+      "draw_order": "three sequential parts of 1536 accepted points; consecutive draws for a and b, reduced modulo r; preserve all rejection draws"
+    }
+  ],
+  "hash_table": {
+    "algorithm": "std::collections::hash_map::DefaultHasher via BuildHasherDefault, pinned by Rust 1.100.0",
+    "initialization": "DefaultHasher::new deterministic initialization; no RandomState entropy",
+    "purpose": "duplicate-x membership only; does not determine source traversal order",
+    "difference_from_archive": "replace ambient randomized hasher, preserve source PRNG, rejection semantics, arithmetic, and accepted-point order",
+    "hash_bucket_probes_priced": false
+  },
+  "instance_generation": "none; frozen canonical M31 curve and public target coordinates",
+  "target_secret_custody": "archived known-answer replay; expected scalar is evaluator data, not a blinded solver input",
+  "terminal_selection": "fixed depth-three archival fixture, unchanged from parent study",
+  "source_query_order": "part-major then original index, all 4608 accepted coordinates",
+  "positive_control_order": "ascending certified field roots",
+  "membership_control_prefix": ["A", "A"],
+  "membership_pair_orders": [["A", "B"], ["B", "A"], ["A", "B"], ["B", "A"], ["A", "B"]],
+  "order_randomization": "none",
+  "measured_full_invocations": 2,
+  "correctness_full_fixture_invocations": 1,
+  "total_full_workload_budget": 3,
+  "independent_instances": 1,
+  "replay_requirement": "exact JSON mathematical outputs and counter equality across both full invocations",
+  "other_random_streams": "none",
+  "wall_time_admission": "not requested for this host; execution duration is metadata only",
+  "no_post_outcome_reroll": true
+}

@@ -108,30 +108,43 @@ fn deg5(p: &P5) -> Option<usize> {
     (0..5).rev().find(|&i| p[i] != 0)
 }
 
-/// Remainder of `a` by `b` (`b ≠ 0`), with one inversion of `lead(b)`.
-fn rem5(mut a: P5, b: &P5, gf: &Gf2) -> P5 {
-    let db = deg5(b).expect("divisor is non-zero");
-    let inv = gf.inv(b[db]);
-    while let Some(da) = deg5(&a) {
-        if da < db {
-            break;
-        }
-        let f = gf.mul(a[da], inv);
-        for i in 0..=db {
-            a[da - db + i] ^= gf.mul(b[i], f);
-        }
-        a[da] = 0;
+/// The one-word binary field as a coefficient field of the shared
+/// polynomial GCD (addition is XOR).
+struct Gf2Coeff<'a>(&'a Gf2);
+
+impl crypto_lib::gcd::poly::PolyField for Gf2Coeff<'_> {
+    type E = u64;
+    fn zero(&self) -> u64 {
+        0
     }
-    a
+    fn one(&self) -> u64 {
+        1
+    }
+    fn add(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.0.inv(a)
+    }
+    fn neg(&self, a: u64) -> u64 {
+        a
+    }
 }
 
-fn gcd5(mut a: P5, mut b: P5, gf: &Gf2) -> P5 {
-    while deg5(&b).is_some() {
-        let r = rem5(a, &b, gf);
-        a = b;
-        b = r;
-    }
-    a
+/// gcd through the shared module. The result is monic (the old Euclid
+/// returned an unnormalised remainder); the only caller reads its degree
+/// and the root `g[0] / g[1]`, which do not depend on the scaling.
+fn gcd5(a: P5, b: P5, gf: &Gf2) -> P5 {
+    let g = crypto_lib::gcd::poly::gcd(&Gf2Coeff(gf), &a, &b);
+    let mut out: P5 = [0; 5];
+    out[..g.len()].copy_from_slice(&g);
+    out
 }
 
 /// Square a residue modulo a monic `f` of degree `d` (`1 ≤ d ≤ 4`).

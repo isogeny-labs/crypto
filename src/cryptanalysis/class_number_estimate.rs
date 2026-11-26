@@ -162,7 +162,8 @@ pub fn exact_class_number(d: i64) -> u64 {
 }
 
 fn gcd3(a: u64, b: u64, c: u64) -> u64 {
-    a.gcd(&b).gcd(&c)
+    use crate::gcd::int::gcd_u64;
+    gcd_u64(gcd_u64(a, b), c)
 }
 
 /// Complementary error function, accurate to about 1e-14 relative for
