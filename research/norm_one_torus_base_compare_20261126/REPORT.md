@@ -1,9 +1,9 @@
 # Does a p+1 torus factor base accelerate streamed five-term decomposition?
 
-Date: 2026-11-26  
-Curve: production Prime31 instance over `p = 2^31 - 1`  
-Implementation: Rust  
-Standing: producer and replay evidence, `[pcc:unverified]`
+- Date: 2026-11-26
+- Curve: production Prime31 instance over `p = 2^31 - 1`
+- Implementation: Rust
+- Standing: producer and replay evidence, `[pcc:unverified]`
 
 ## Answer
 
