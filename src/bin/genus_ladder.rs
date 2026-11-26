@@ -950,7 +950,8 @@ fn main() -> ExitCode {
                     ),
                     _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
                 };
-                let fb = if name == "2lp-sfb" || name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb" {
+                let fb = if name == "2lp-sfb" || name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb"
+                {
                     ql::QFactorBase::Sampled
                 } else {
                     ql::QFactorBase::Enumerated
