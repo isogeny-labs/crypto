@@ -208,7 +208,11 @@ two simultaneous incoming modes of total degree three, local affine terms,
 and two outgoing forms including a square. The remaining link is the global
 claim that `modes` assigns every scalar series term to exactly one target and
 source group and that multiplying the resulting child contractions preserves
-all old vertex correlations. `[pcc:unverified]`
+all old vertex correlations. A correlated two-port mutation gate now checks
+that the production evaluator agrees with the extracted modes-to-child group
+product and that either removing a generated mode or flipping its target group
+changes the result. This makes both pieces load-bearing in a finite fixture;
+it is not the quantified factorization theorem. `[pcc:unverified]`
 
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper

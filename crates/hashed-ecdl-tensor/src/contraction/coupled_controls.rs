@@ -6,6 +6,56 @@ use crate::network::FnPredicate;
 use crate::Limits;
 use std::sync::Arc;
 
+fn evaluate_generated_modes(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+    kernel: &deformation::Cauchy,
+    modes: &[deformation::Mode],
+    meter: &mut Meter,
+) -> Result<Element> {
+    let groups = packing.packets.len() * parameters.radix;
+    let mut bounds = vec![0usize; groups];
+    for (packet_id, packet) in packing.packets.iter().enumerate() {
+        for &edge in packet.slots.iter().flatten() {
+            let group = packing::digit(
+                packing.row_labels[graph.edges[edge].left.0],
+                coordinate,
+                parameters.radix,
+            );
+            bounds[packet_id * parameters.radix + group] += 1;
+        }
+    }
+    let mut usage = vec![0usize; groups];
+    let mut beta = vec![0usize; modes.len()];
+    let mut weight = 0usize;
+    let mut total = kernel.ring.zero();
+    loop {
+        let mut product = kernel.ring.one();
+        for group in 0..parameters.radix {
+            let child = deformation::child(
+                graph, packing, coordinate, parameters, kernel, modes, &beta, group, meter,
+            )?;
+            let value = brute_tensor(&child, &kernel.ring, &mut Statistics::default(), meter)?;
+            product = kernel.ring.mul(&product, &value, meter)?;
+        }
+        total = kernel.ring.add(&total, &product, meter)?;
+        if !next_tuple(
+            &mut beta,
+            modes,
+            &mut usage,
+            &bounds,
+            &mut weight,
+            kernel.ring.precision(),
+            parameters.radix,
+            meter,
+        )? {
+            return Ok(total);
+        }
+    }
+}
+
 fn predicate(arity: usize, table: u8) -> Arc<Tensor> {
     Arc::new(Tensor {
         creation_precision: 3,
@@ -163,6 +213,135 @@ fn coupled_packets_match_direct_counts_with_parallel_ports_and_quadratic_modes()
         let actual = forced(&graph, &ring, vec![0, 2], vec![3, 1], 1, &mut meter).unwrap();
         assert_eq!(actual, expected, "column predicates {right_tables:?}");
     }
+}
+
+#[test]
+fn generated_mode_removal_or_reassignment_changes_the_group_product() {
+    let mut meter = Meter::new(Limits {
+        steps: 5_000_000_000,
+        ..Limits::default()
+    });
+    let ring = Ring::new(4, 5, &mut meter).unwrap();
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: 2,
+        length: 4,
+        array: 16,
+    };
+    let graph = Bipartite {
+        left: vec![TensorVertex {
+            tensor: predicate(2, 6),
+            edges: vec![0, 1],
+        }],
+        right: vec![TensorVertex {
+            tensor: predicate(2, 6),
+            edges: vec![0, 1],
+        }],
+        edges: vec![
+            Edge {
+                left: (0, 0),
+                right: (0, 0),
+            },
+            Edge {
+                left: (0, 1),
+                right: (0, 1),
+            },
+        ],
+    };
+    let packing =
+        packing::pack_labels(&graph, &parameters, vec![0], vec![3], false, &mut meter).unwrap();
+    let t = 1i64;
+    let z = ring.one();
+    let coordinate = deformation::valuation(t);
+    let kernel = deformation::Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+    let modes = deformation::modes(
+        &graph,
+        &packing,
+        coordinate,
+        &parameters,
+        &kernel,
+        &mut meter,
+    )
+    .unwrap();
+    assert!(!modes.is_empty());
+    let expected = evaluate_generated_modes(
+        &graph,
+        &packing,
+        &parameters,
+        coordinate,
+        &kernel,
+        &modes,
+        &mut meter,
+    )
+    .unwrap();
+    let production = evaluate_at(
+        &graph,
+        &packing,
+        &parameters,
+        t,
+        &z,
+        &ring,
+        false,
+        usize::MAX,
+        &mut |child, child_ring, work| {
+            brute_tensor(child, child_ring, &mut Statistics::default(), work)
+        },
+        &mut meter,
+    )
+    .unwrap();
+    assert_eq!(production, expected);
+
+    let mut removal_detected = false;
+    let mut reassignment_detected = false;
+    for index in 0..modes.len() {
+        let mut removed = deformation::modes(
+            &graph,
+            &packing,
+            coordinate,
+            &parameters,
+            &kernel,
+            &mut meter,
+        )
+        .unwrap();
+        removed.remove(index);
+        removal_detected |= evaluate_generated_modes(
+            &graph,
+            &packing,
+            &parameters,
+            coordinate,
+            &kernel,
+            &removed,
+            &mut meter,
+        )
+        .map_or(true, |value| value != expected);
+
+        let mut reassigned = deformation::modes(
+            &graph,
+            &packing,
+            coordinate,
+            &parameters,
+            &kernel,
+            &mut meter,
+        )
+        .unwrap();
+        reassigned[index].target ^= 1;
+        reassignment_detected |= evaluate_generated_modes(
+            &graph,
+            &packing,
+            &parameters,
+            coordinate,
+            &kernel,
+            &reassigned,
+            &mut meter,
+        )
+        .map_or(true, |value| value != expected);
+        if removal_detected && reassignment_detected {
+            break;
+        }
+    }
+    assert!(removal_detected);
+    assert!(reassignment_detected);
 }
 
 #[test]
