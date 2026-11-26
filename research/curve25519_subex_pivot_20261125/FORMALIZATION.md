@@ -112,8 +112,11 @@ binds every packet vertex to the independently checked entry table for its
 pass after serialization; port, parent/packet precision, and tuple mutations
 fail. Every producer path also replays every retained `(beta, group)` child for
 the correlated fixture, the 596-case corpus, and the executed diagnostic. This
-strengthens R1 items 2–3 through a generic finite tensor-table interface;
-uniform arbitrary-size refinement remains open. `[pcc:unverified]`
+family gate requires the exact Cartesian key set, rejects omissions and
+duplicates, checks `2M` child incidences per tuple, and binds the exact packet
+table count. This strengthens R1 items 2–3 through a generic finite
+tensor-table interface; uniform arbitrary-size refinement remains open.
+`[pcc:unverified]`
 
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once
 the packing premises hold. Each side contributes at most `3M/64` endpoints to

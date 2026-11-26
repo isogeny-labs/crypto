@@ -12,7 +12,7 @@ use crate::packing_provenance_certificate::{
 };
 use crate::Meter;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// Current child-provenance wire schema.
 pub const SCHEMA: u32 = 2;
@@ -87,6 +87,27 @@ pub struct VerificationSummary {
     /// Number of packet coefficient tables bound to this child.
     pub packet_entry_tables: usize,
     /// Number of independently checked packet-entry values bound to this child.
+    pub packet_entry_values: usize,
+}
+
+/// Aggregate dimensions of a complete tuple/group child family.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct FamilyVerificationSummary {
+    /// Number of retained mode tuples.
+    pub tuples: usize,
+    /// Number of radix groups per tuple.
+    pub groups: usize,
+    /// Exact number of verified children.
+    pub children: usize,
+    /// Total child incidences across the family.
+    pub child_edges: usize,
+    /// Largest edge count of any one child.
+    pub maximum_child_edges: usize,
+    /// Largest vertex degree of any one child.
+    pub maximum_degree: usize,
+    /// Total packet coefficient tables bound across all children.
+    pub packet_entry_tables: usize,
+    /// Total packet-entry values bound across all children.
     pub packet_entry_values: usize,
 }
 
@@ -269,6 +290,87 @@ pub fn verify(
         edges: expected_edges.len(),
         maximum_degree,
         packet_entry_tables: packet_vertex_degrees.len(),
+        packet_entry_values,
+    })
+}
+
+/// Verify exact Cartesian coverage of every retained tuple and radix group.
+///
+/// Besides invoking [`verify`] on each child, this rejects duplicate or missing
+/// `(beta, group)` keys and checks that each tuple has exactly two child
+/// incidences per parent edge, one for each endpoint.
+pub fn verify_family(
+    packing: &PackingCertificate,
+    factorization: &FactorizationCertificate,
+    children: &[Certificate],
+    meter: &mut Meter,
+) -> Result<FamilyVerificationSummary, String> {
+    let expected_children = factorization
+        .tuples
+        .len()
+        .checked_mul(factorization.radix)
+        .ok_or_else(|| "child provenance family coverage overflow".to_string())?;
+    if children.len() != expected_children {
+        return Err("child provenance family coverage".into());
+    }
+    meter
+        .vector(children.len(), "child provenance family")
+        .map_err(|error| error.to_string())?;
+    let expected_keys: BTreeSet<_> = factorization
+        .tuples
+        .iter()
+        .flat_map(|beta| (0..factorization.radix).map(move |group| (beta.clone(), group)))
+        .collect();
+    let mut actual_keys = BTreeSet::new();
+    let mut edges_by_tuple = BTreeMap::new();
+    let mut child_edges = 0usize;
+    let mut maximum_child_edges = 0usize;
+    let mut maximum_degree = 0usize;
+    let mut packet_entry_tables = 0usize;
+    let mut packet_entry_values = 0usize;
+    for child in children {
+        if !actual_keys.insert((child.beta.clone(), child.group)) {
+            return Err("child provenance family duplicate".into());
+        }
+        let summary = verify(packing, factorization, child, meter)?;
+        let tuple_edges = edges_by_tuple.entry(child.beta.clone()).or_insert(0usize);
+        *tuple_edges = tuple_edges
+            .checked_add(summary.edges)
+            .ok_or_else(|| "child provenance family tuple edges overflow".to_string())?;
+        child_edges = child_edges
+            .checked_add(summary.edges)
+            .ok_or_else(|| "child provenance family edges overflow".to_string())?;
+        maximum_child_edges = maximum_child_edges.max(summary.edges);
+        maximum_degree = maximum_degree.max(summary.maximum_degree);
+        packet_entry_tables = packet_entry_tables
+            .checked_add(summary.packet_entry_tables)
+            .ok_or_else(|| "child provenance family tables overflow".to_string())?;
+        packet_entry_values = packet_entry_values
+            .checked_add(summary.packet_entry_values)
+            .ok_or_else(|| "child provenance family values overflow".to_string())?;
+    }
+    let twice_edges = factorization
+        .edge_count
+        .checked_mul(2)
+        .ok_or_else(|| "child provenance family edge target overflow".to_string())?;
+    let expected_tables = expected_children
+        .checked_mul(factorization.packets.len())
+        .ok_or_else(|| "child provenance family table target overflow".to_string())?;
+    if actual_keys != expected_keys
+        || edges_by_tuple.len() != factorization.tuples.len()
+        || edges_by_tuple.values().any(|&edges| edges != twice_edges)
+        || packet_entry_tables != expected_tables
+    {
+        return Err("child provenance family coverage".into());
+    }
+    Ok(FamilyVerificationSummary {
+        tuples: factorization.tuples.len(),
+        groups: factorization.radix,
+        children: children.len(),
+        child_edges,
+        maximum_child_edges,
+        maximum_degree,
+        packet_entry_tables,
         packet_entry_values,
     })
 }

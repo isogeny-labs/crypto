@@ -3,9 +3,9 @@
 use super::*;
 use crate::admission::dimensions::{audit_node_dimensions, NodeDimensions};
 use crate::child_provenance_certificate::{
-    verify as verify_child_provenance, Certificate as ChildProvenanceCertificate,
-    ChildEdge as ProvenanceChildEdge, OldTensorSource, ParentSide,
-    SCHEMA as CHILD_PROVENANCE_SCHEMA,
+    verify as verify_child_provenance, verify_family as verify_child_family,
+    Certificate as ChildProvenanceCertificate, ChildEdge as ProvenanceChildEdge, OldTensorSource,
+    ParentSide, SCHEMA as CHILD_PROVENANCE_SCHEMA,
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
@@ -539,6 +539,7 @@ fn produce(
                 return Err(integrity("child provenance coverage"));
             }
             meter.vector(child_certificates.len(), "child provenance certificates")?;
+            let mut parsed_children = Vec::with_capacity(child_certificates.len());
             for child in child_certificates {
                 let serialized_child = serde_json::to_vec(&child)
                     .map_err(|_| invalid("child provenance serialization"))?;
@@ -551,9 +552,10 @@ fn produce(
                 {
                     return Err(integrity("child provenance round trip"));
                 }
-                verify_child_provenance(&parsed_provenance, &certificate, &parsed_child, meter)
-                    .map_err(|_| integrity("child provenance replay"))?;
+                parsed_children.push(parsed_child);
             }
+            verify_child_family(&parsed_provenance, &certificate, &parsed_children, meter)
+                .map_err(|_| integrity("child provenance family replay"))?;
             return Ok(certificate);
         }
     }
@@ -728,49 +730,96 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
 
     let zero_beta = vec![0usize; conditional_modes.len()];
     let mut first_child_provenance = None;
-    for group in 0..conditional_parameters.radix {
-        let child = deformation::child(
-            &conditional_graph,
-            &conditional_packing,
-            0,
-            &conditional_parameters,
-            &conditional_kernel,
-            &conditional_modes,
-            &zero_beta,
-            group,
-            &mut meter,
-        )
-        .unwrap();
-        let produced_child = child_provenance(
-            &conditional_graph,
-            &conditional_packing,
-            0,
-            &conditional_parameters,
-            &child,
-            &zero_beta,
-            group,
-        );
-        let serialized_child = serde_json::to_vec(&produced_child).unwrap();
-        let parsed_child: ChildProvenanceCertificate =
-            serde_json::from_slice(&serialized_child).unwrap();
-        assert_eq!(serde_json::to_vec(&parsed_child).unwrap(), serialized_child);
-        let summary = verify_child_provenance(
-            &conditional_provenance,
-            &conditional_certificate,
-            &parsed_child,
-            &mut meter,
-        )
-        .unwrap();
-        assert_eq!(summary.edges, child.edges.len());
-        assert_eq!(
-            summary.packet_entry_tables,
-            conditional_certificate.packets.len()
-        );
-        assert!(summary.packet_entry_values >= summary.packet_entry_tables);
-        if !parsed_child.edges.is_empty() && first_child_provenance.is_none() {
-            first_child_provenance = Some(parsed_child);
+    let mut conditional_children = Vec::new();
+    for beta in &conditional_certificate.tuples {
+        for group in 0..conditional_parameters.radix {
+            let child = deformation::child(
+                &conditional_graph,
+                &conditional_packing,
+                0,
+                &conditional_parameters,
+                &conditional_kernel,
+                &conditional_modes,
+                beta,
+                group,
+                &mut meter,
+            )
+            .unwrap();
+            let produced_child = child_provenance(
+                &conditional_graph,
+                &conditional_packing,
+                0,
+                &conditional_parameters,
+                &child,
+                beta,
+                group,
+            );
+            let serialized_child = serde_json::to_vec(&produced_child).unwrap();
+            let parsed_child: ChildProvenanceCertificate =
+                serde_json::from_slice(&serialized_child).unwrap();
+            assert_eq!(serde_json::to_vec(&parsed_child).unwrap(), serialized_child);
+            let summary = verify_child_provenance(
+                &conditional_provenance,
+                &conditional_certificate,
+                &parsed_child,
+                &mut meter,
+            )
+            .unwrap();
+            assert_eq!(summary.edges, child.edges.len());
+            assert_eq!(
+                summary.packet_entry_tables,
+                conditional_certificate.packets.len()
+            );
+            assert!(summary.packet_entry_values >= summary.packet_entry_tables);
+            if beta == &zero_beta
+                && !parsed_child.edges.is_empty()
+                && first_child_provenance.is_none()
+            {
+                first_child_provenance = Some(parsed_child.clone());
+            }
+            conditional_children.push(parsed_child);
         }
     }
+    let family_summary = verify_child_family(
+        &conditional_provenance,
+        &conditional_certificate,
+        &conditional_children,
+        &mut meter,
+    )
+    .unwrap();
+    assert_eq!(
+        family_summary.children,
+        conditional_certificate.tuples.len() * conditional_parameters.radix
+    );
+    assert_eq!(
+        family_summary.child_edges,
+        conditional_certificate.tuples.len() * 2 * conditional_graph.edges.len()
+    );
+    let mut missing_child = conditional_children.clone();
+    missing_child.pop();
+    assert_eq!(
+        verify_child_family(
+            &conditional_provenance,
+            &conditional_certificate,
+            &missing_child,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance family coverage"
+    );
+    let mut duplicate_child = conditional_children;
+    let repeated_child = duplicate_child[0].clone();
+    *duplicate_child.last_mut().unwrap() = repeated_child;
+    assert_eq!(
+        verify_child_family(
+            &conditional_provenance,
+            &conditional_certificate,
+            &duplicate_child,
+            &mut meter
+        )
+        .unwrap_err(),
+        "child provenance family duplicate"
+    );
     let first_child = first_child_provenance.unwrap();
     let mut bad_child = first_child.clone();
     bad_child.edges[0].right_port += 1;

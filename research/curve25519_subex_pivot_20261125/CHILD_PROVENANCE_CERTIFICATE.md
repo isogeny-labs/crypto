@@ -39,9 +39,12 @@ Mutating a packet port, parent precision, packet precision, or the mode tuple
 fails closed. In addition, every factorization producer path serializes and
 replays every `(beta, group)` child after completing its entry tables. This
 covers the correlated fixture, all 596 three- through five-edge certificates,
-and the executed diagnostic. Existing port-mass controls separately cover
-25,490 group-child calls across parallel ports, isolates, several radices, and
-packet geometries using direct source-object comparisons. `[pcc:unverified]`
+and the executed diagnostic. A standalone family verifier requires exact
+Cartesian tuple/group keys, rejects duplicates and omissions, checks exactly
+`2M` child incidences per tuple, and binds exactly one packet table per packet
+in every child. Existing port-mass controls separately cover 25,490 group-child
+calls across parallel ports, isolates, several radices, and packet geometries
+using direct source-object comparisons. `[pcc:unverified]`
 
 ## Remaining boundary
 
