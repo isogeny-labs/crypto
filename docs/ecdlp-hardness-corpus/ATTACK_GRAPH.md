@@ -5,7 +5,7 @@ Support edges are `conditions`, `enables` and `model_bridge` (B rests on A).
 Impact counts the claims that rest on a node
 transitively plus the repository files whose estimates cite it as `depends`.
 
-Corpus 2026-11-18: 659 claims, 435 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
+Corpus 2026-11-18: 660 claims, 435 on the frontier, 3 resting on a refuted claim, 0 unlinked citations.
 
 ## Resting on a refuted claim
 
