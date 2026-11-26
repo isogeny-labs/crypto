@@ -193,22 +193,34 @@
     "discarded_preflight": "the larger diagnostic taper a=2,length=4 at every level exceeded 60 seconds; a heterogeneous u=2 root plus two compact levels remained live past 90 seconds; both were interrupted and no result from either is claimed",
     "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines; not an asymptotic induction proof"
   },
-  "two_taper_hermite_control": {
+  "multi_taper_hermite_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
-    "test": "contraction::recursive::tests::two_taper_hermite_recovers_extension_polynomials_across_precisions",
-    "parameters": {
-      "extension_degree": 4,
-      "edges": 2,
-      "u": 2,
-      "a": 2,
-      "length": 4,
-      "root_precisions": [3, 5, 7],
+    "test": "contraction::recursive::tests::multi_taper_hermite_recovers_extension_polynomials_across_precisions",
+    "cases": [
+      {
+        "extension_degree": 4,
+        "edges": 2,
+        "u": 2,
+        "a": 2,
+        "length": 4,
+        "root_precisions": [3, 5, 7]
+      },
+      {
+        "extension_degree": 6,
+        "edges": 3,
+        "u": 3,
+        "a": 3,
+        "length": 8,
+        "root_precisions": [5]
+      }
+    ],
+    "common_parameters": {
       "coefficient_patterns": ["scalar", "mixed extension coordinates"]
     },
     "observed_gate": "every tapered recovery was 2-adically integral and returned the exact polynomial constant",
-    "focused_result": "1 passed in 0.15 seconds",
+    "focused_result": "1 passed in 5.63 seconds",
     "complete_library_result": "171 passed; 0 failed",
-    "claim_boundary": "bounded polynomial identity controls for both taper valuations; not a quantified Hermite recovery theorem or Rust refinement proof"
+    "claim_boundary": "bounded polynomial identity controls for two and three taper valuations; not a quantified Hermite recovery theorem or Rust refinement proof"
   },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }
