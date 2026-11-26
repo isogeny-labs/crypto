@@ -185,20 +185,7 @@ fn mod_inv(a: i128, p: i128) -> Option<i128> {
     if a_pos == 0 {
         return None;
     }
-    let (mut old_r, mut r) = (a_pos, p);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        let (nr, ns) = (old_r - q * r, old_s - q * s);
-        old_r = r;
-        r = nr;
-        old_s = s;
-        s = ns;
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(((old_s % p) + p) % p)
+    crate::gcd::int::inv_mod_i128(a_pos, p)
 }
 
 #[cfg(test)]

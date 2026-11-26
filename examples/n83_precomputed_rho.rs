@@ -377,14 +377,7 @@ fn lookup(table: &[(u64, u64)], key: u64) -> Option<u64> {
 }
 
 fn inverse_mod(v: u64, m: u64) -> Option<u64> {
-    let (mut t, mut new_t) = (0i128, 1i128);
-    let (mut r, mut new_r) = (m as i128, v as i128);
-    while new_r != 0 {
-        let q = r / new_r;
-        (t, new_t) = (new_t, t - q * new_t);
-        (r, new_r) = (new_r, r - q * new_r);
-    }
-    (r == 1).then(|| t.rem_euclid(m as i128) as u64)
+    crypto_lib::gcd::int::inv_mod_u64(v, m)
 }
 
 fn mul_mod(a: u64, b: u64, m: u64) -> u64 {

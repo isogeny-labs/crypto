@@ -3,8 +3,7 @@
 //! API-level counts and do not price allocations or internal word arithmetic.
 use super::exact_scalar::ExactScalar;
 use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
-use num_bigint::{BigInt, BigUint};
-use num_integer::Integer;
+use num_bigint::BigUint;
 use rand::distributions::uniform::{SampleBorrow, SampleUniform, UniformSampler};
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
@@ -211,12 +210,10 @@ impl RhoScalar for ExactScalar {
         if m <= Self::one() {
             return None;
         }
-        let modulus = BigInt::from(m.to_biguint());
-        let egcd = BigInt::from(value.to_biguint()).extended_gcd(&modulus);
-        if egcd.gcd != BigInt::from(1u8) {
-            return None;
-        }
-        Some(exact(egcd.x.mod_floor(&modulus).to_biguint()?))
+        Some(exact(crate::gcd::int::modinv_big(
+            &value.to_biguint(),
+            &m.to_biguint(),
+        )?))
     }
 }
 

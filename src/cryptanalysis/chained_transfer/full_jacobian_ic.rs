@@ -793,15 +793,10 @@ impl FPoly {
 #[inline]
 pub fn inv_extgcd(p: u64, a: u64) -> u64 {
     debug_assert!(a != 0 && a < p);
-    let (mut r0, mut r1) = (p as i64, a as i64);
-    let (mut t0, mut t1) = (0i64, 1i64);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    debug_assert_eq!(r0, 1);
-    t0.rem_euclid(p as i64) as u64
+    let inv = crate::gcd::int::inv_mod_u64(a, p);
+    debug_assert!(inv.is_some(), "inv_extgcd: {a} is not a unit mod {p}");
+    // Release builds returned a value without checking; keep returning one.
+    inv.unwrap_or(0)
 }
 
 /// The polynomial routines of `hyper64`, counting into `t`.
