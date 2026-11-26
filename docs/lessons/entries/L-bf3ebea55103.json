@@ -1,0 +1,15 @@
+{
+  "action": "bind the binary to the commit from cargo's own build records: find deps/<bin>-<hash> whose sha256 equals the binary, read invoked.timestamp of that fingerprint and of the crypto_lib fingerprint it linked, and require every file in rustc's dep-info (deps/<crate>-<hash>.d) to be tracked, unmodified since before its compile was invoked, and equal to the commit; report it as mtime evidence, weaker than a rebuild",
+  "created": "2026-11-26T04:28:25Z",
+  "evidence": [
+    "research/quartic_diem_nofb_20261126/validation/checks_extra.json",
+    "research/quartic_diem_nofb_20261126/validation/checks_extra.py"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a dispatch forbids rebuilding the study binary but the producer's cargo target directory (target/release/.fingerprint and deps/) is still on the host",
+  "why": "nofb validation: binary born 02:55:09, build started 02:38:31, commit 31a1e2f53ef made 02:48:48 (after the build began); all 1169 lib + 1 bin dep-info sources had mtime <= 02:17:25 and equal 31a1e2f53ef, so the build read exactly the committed tree; source.sha256 hashed only 3 of those 1170 files"
+}
