@@ -30,6 +30,13 @@ The source workspace included Python diagnostics.  They are not imported as
 repository evidence.  Any retained finite check must be replaced by a bounded
 native Rust implementation with exact fixtures and replay instructions.
 
+The successor programme now includes an exact direct-sum theorem for
+static-provenance product trees with fully target-adaptive query branching.
+It obtains the same `m/(2m-1)` exponent without treating the tuple-sum map as
+random.  Its explicit limitation is that every recoverable witness is a
+pre-target materialized leaf; compact coordinate circuits that generate new
+target-dependent subtrees remain outside the theorem. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint

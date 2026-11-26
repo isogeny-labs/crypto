@@ -13,6 +13,7 @@ proof obligations from computational-model assumptions.
 | candidate/batching exponent `m/(2m-1)` | APS barrier theorem and sanity checks | explicit candidate/output model plus relation count | hand optimization plus exact displayed-fraction check; unreviewed | independent algebra review |
 | quotient-materialization lower bound | APS barrier theorem | definition requires basis/matrix-domain materialization | definitional/model-relative | verify every listed mechanism actually falls in the class |
 | split-tree dimension and exceptional-component audit | split-tree and Macaulay sections | generic dimension count, saturation, rationality filtering | hand audit, unreviewed | check degeneracies against PR #4829 implementation notes |
+| static-provenance eliminant direct sum | successor Theorem 18 | explicit pre-target leaf provenance, uniform targets, charged leaf records | exact counting proof, unreviewed `[pcc:unverified]` | independent proof review and finite native replay |
 | unrestricted compact-circuit barrier | successor programme | new preprocessing/query direct-sum theorem | **open; not claimed** | formulate a narrow model with a falsifiable lower-bound target |
 
 ## Explicit non-implications

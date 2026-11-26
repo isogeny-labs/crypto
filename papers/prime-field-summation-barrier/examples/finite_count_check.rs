@@ -62,6 +62,38 @@ fn check_instance(modulus: usize, base_size: usize, arity: usize) {
     assert!(sums.len() as u128 <= tuples);
     assert!(sums.len() <= modulus);
 
+    // Counting with multiplicity is the finite kernel of the static-provenance
+    // direct-sum theorem: summing fibre sizes over every target recovers the
+    // number of stored candidate leaves exactly.
+    let mut fibre_sizes = vec![0_u128; modulus];
+    fn count_fibres(
+        base: &[usize],
+        modulus: usize,
+        arity: usize,
+        start: usize,
+        depth: usize,
+        sum: usize,
+        fibres: &mut [u128],
+    ) {
+        if depth == arity {
+            fibres[sum % modulus] += 1;
+            return;
+        }
+        for index in start..base.len() {
+            count_fibres(
+                base,
+                modulus,
+                arity,
+                index,
+                depth + 1,
+                (sum + base[index]) % modulus,
+                fibres,
+            );
+        }
+    }
+    count_fibres(&base, modulus, arity, 0, 0, 0, &mut fibre_sizes);
+    assert_eq!(fibre_sizes.iter().sum::<u128>(), tuples);
+
     // Exhausting every target makes the uniform-target identity exact:
     // the number of targets with a decomposition is precisely |im sigma_m|.
     let accepted_targets = (0..modulus).filter(|target| sums.contains(target)).count();

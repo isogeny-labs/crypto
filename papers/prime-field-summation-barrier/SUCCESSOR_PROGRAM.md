@@ -41,6 +41,7 @@ The status of the program is:
 | Theorem 14 | unconditional for the stated representation class | multiplicity-preserving expanded resultants and explicitly supplied multipoint queries |
 | Propositions 15--16 | exact reductions and scope boundaries | succinct eliminant trees and group-algebra convolution |
 | Theorem 17 | unconditional density-one statement for fixed \(m\) | sparse-regime \(m\)-sum expansion and the resulting exact separated-sketch barrier |
+| Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1364,6 +1365,98 @@ It still does not cover shared nonlinear arithmetic circuits or succinct
 eliminant trees.  For \(m=3,4,5\), the resulting exponents are respectively
 \(3/5\), \(4/7\), and \(5/9\).
 
+### Theorem 18 (static-provenance eliminant direct sum)
+
+Let \(G\) be any finite group of order \(n\), let
+\(\sigma:\Omega\to G\) be any fixed candidate-sum map, and consider the
+following static-provenance product-tree model.
+
+1. Before targets are known, preprocessing chooses a set
+   \(W\subseteq\Omega\) of \(D\) distinct candidate leaves and materializes
+   enough provenance to recover each \(\omega\in W\).  It may build arbitrary
+   exact product trees, factored polynomials, rational circuits, or shared DAG
+   summaries over those leaves.  Creating the explicit provenance records is
+   charged at least \(D\) operations or words, so \(P\ge D\).
+2. The query algorithm receives \(B\) uniform targets.  It may evaluate any
+   stored node, take target-dependent branches, share every evaluation across
+   all targets, and return any number of verified leaf--target pairs. `[pcc:unverified]`
+3. Every returned witness must be one of the preprocessed leaves.  Constructing
+   a new target-dependent candidate or a new implicit subtree is outside this
+   static-provenance model.
+
+If \(Z\) is the number of distinct reported pairs
+\((\omega,T_j)\) with \(\sigma(\omega)=T_j\), then
+
+\[
+\mathbb E Z\le \frac{BD}{n}.
+\]
+
+Consequently, producing \(R\) expected verified relations has charged work `[pcc:unverified]`
+
+\[
+C\;\ge\;P+B+T_{\rm verify}\;\ge\;D+B
+\;\ge\;2\sqrt{Rn}.
+\]
+
+For a factor base of size \(N=p^{\alpha+o(1)}\), arity \(m\), and
+\(R=\Theta(N)\) required rows, the domain cap \(D\le N^m\) yields
+
+\[
+C\ge p^{\,m/(2m-1)-o(1)}.
+\]
+
+In particular the exponents are \(3/5,4/7,5/9\) for \(m=3,4,5\), and are
+strictly above \(1/2\) for every fixed \(m\).
+
+#### Proof
+
+For every stored leaf \(\omega\in W\) and target index \(j\), let
+
+\[
+I_{\omega,j}=\mathbf 1[T_j=\sigma(\omega)].
+\]
+
+Each target is uniform, so \(\mathbb E I_{\omega,j}=1/n\), independently of
+collisions among leaf values and without any randomness assumption on
+\(\sigma\).  Every reported pair is one of the pairs counted by these
+indicators.  Therefore adaptive evaluation and branching can only suppress
+matches, and linearity of expectation gives
+
+\[
+\mathbb E Z
+\le\sum_{\omega\in W}\sum_{j=1}^B
+\mathbb E I_{\omega,j}
+=\frac{BD}{n}.
+\]
+
+Thus \(\mathbb E Z\ge R\) implies \(BD\ge Rn\).  Since \(P\ge D\), the
+arithmetic--geometric mean inequality gives
+\(C\ge D+B\ge2\sqrt{Rn}\).
+
+For completeness, retain the domain cap rather than assuming that the square
+root balance is feasible.  The least possible value of
+
+\[
+D+\frac{Rn}{D},\qquad 1\le D\le N^m,
+\]
+
+is attained at \(D=\min\{\sqrt{Rn},N^m\}\).  With
+\(R=N=p^{\alpha+o(1)}\), the transition occurs at
+\(m\alpha=(1+\alpha)/2\), namely \(\alpha=1/(2m-1)\).  Below the transition,
+the target term is \(p^{1-(m-1)\alpha+o(1)}\); above it, the square-root term
+is \(p^{(1+\alpha)/2+o(1)}\).  Both branches are minimized at the transition,
+where their exponent is \(m/(2m-1)\). \(\square\)
+
+The theorem is insensitive to the internal polynomial representation and
+allows fully target-adaptive descent through a stored eliminant tree.  It
+therefore closes the product-tree-plus-adaptive-branching subclass promised by
+Gate 2.  Its exact boundary is provenance: it does not charge a compact
+coordinate circuit merely because the circuit semantically represents
+\(D\) leaves.  Extending the result requires a simulation or information
+theorem showing that an implicitly generated split-\(S_3\) subtree carries
+comparable charged information, or an explicit compact generator that
+refutes that extension. `[pcc:unverified]`
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -1560,14 +1653,19 @@ overhead, while product trees, fast gcd/resultant algorithms, and Proposition
 
 ### Gate 2: first adaptive lower bound
 
-Prove a multi-target preprocessing/query direct-sum bound in a closed ARQP [pcc:unverified]
-subclass.  A width or monomial lower bound counts only if a simulation theorem
-shows that it also charges compact polynomial and rational representations.
+Theorem 18 supplies the exact multi-target preprocessing/query direct-sum
+bound for static-provenance product trees with arbitrary adaptive query
+branching.  The remaining Gate 2 extension is to implicitly generated
+split-\(S_3\) subtrees.  A width or monomial lower bound counts only if a
+simulation theorem shows that it also charges compact polynomial and rational
+representations. `[pcc:unverified]`
 
 ### Gate 3: square-root closure
 
-Combine the adaptive bound with exact relation-output requirements to obtain
-\(p^{1/2-o(1)}\) total cost.
+For the static-provenance subclass, Theorem 18 combines the adaptive bound
+with exact relation-output requirements and gives
+\(p^{m/(2m-1)-o(1)}\), hence \(p^{1/2-o(1)}\), total cost.  Gate 3 remains open
+for implicit candidate generators and the full ARQP. `[pcc:unverified]`
 
 ### Gate 4: algorithmic inversion
 
@@ -1576,10 +1674,11 @@ representation, turn that witness into an algorithm and audit its exponent.
 
 ## 10. Near-term paper-quality deliverable
 
-The next publishable result should be one of:
+Theorem 18 supplies the first item below for the static-provenance subclass.
+The next publishable extension should be one of:
 
-1. an exact direct-sum theorem for \(B\) queries in a
-   product-tree-plus-adaptive-branching ARQP subclass;
+1. an extension of the exact direct-sum theorem from explicit provenance to a
+   closed class of compact split-\(S_3\) candidate generators;
 2. a polynomial-calculus monomial lower bound of \(p^{1/2-o(1)}\) for
    insoluble random targets, explicitly scoped to materializing proof systems;
    or
