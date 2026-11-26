@@ -202,8 +202,7 @@ impl Field {
     fn bi(&self, a: u64) -> u64 {
         assert_ne!(a, 0);
         self.count(|c| c.i += 1);
-        // p prime (`validate`): the value a^(p−2) gave, 0 for a ≡ 0.
-        crate::gcd::int::inv_mod_u64(a, self.p).unwrap_or(0)
+        modpow(a, self.p - 2, self.p)
     }
     fn nr(&self) -> u64 {
         (self.p - self.modulus % self.p) % self.p
@@ -556,8 +555,19 @@ fn binary_mul(mut a: u64, mut b: u64, modulus: u64, n: usize) -> u64 {
     }
     r
 }
-fn binary_gcd(a: u64, b: u64) -> u64 {
-    crate::gcd::gf2::gcd_word(a, b)
+fn binary_rem(mut a: u64, b: u64) -> u64 {
+    while a != 0 && a.leading_zeros() <= b.leading_zeros() {
+        a ^= b << (b.leading_zeros() - a.leading_zeros());
+    }
+    a
+}
+fn binary_gcd(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        let r = binary_rem(a, b);
+        a = b;
+        b = r;
+    }
+    a
 }
 fn binary_irreducible(modulus: u64, n: usize) -> bool {
     let mut x = 2;
@@ -1513,9 +1523,7 @@ impl Ring {
         let mut c = self.counts.get();
         c.inv += 1;
         self.counts.set(c);
-        // r is a prime > 2 (asserted in `new`): the value a^(r−2) gave,
-        // 0 for a ≡ 0.
-        crate::gcd::int::inv_mod_u64(a, self.r).unwrap_or(0)
+        modpow(a, self.r - 2, self.r)
     }
     fn signed(&self, sign: i8, a: u64) -> u64 {
         if sign == 1 {

@@ -109,51 +109,32 @@ pub fn monic(f: &Field, a: &Poly) -> Poly {
     }
 }
 
-/// `GF(p)` as a [`crate::gcd::poly::PolyField`].
-struct Coeffs<'a>(&'a Field);
-
-impl crate::gcd::poly::PolyField for Coeffs<'_> {
-    type E = Fe;
-    fn zero(&self) -> Fe {
-        self.0.zero()
-    }
-    fn one(&self) -> Fe {
-        self.0.one()
-    }
-    fn add(&self, a: Fe, b: Fe) -> Fe {
-        self.0.add(&a, &b)
-    }
-    fn sub(&self, a: Fe, b: Fe) -> Fe {
-        self.0.sub(&a, &b)
-    }
-    fn mul(&self, a: Fe, b: Fe) -> Fe {
-        self.0.mul(&a, &b)
-    }
-    fn inv(&self, a: Fe) -> Fe {
-        self.0.inv(&a).expect("inverse of a nonzero element")
-    }
-    fn is_zero(&self, a: Fe) -> bool {
-        self.0.is_zero(&a)
-    }
-    fn neg(&self, a: Fe) -> Fe {
-        self.0.neg(&a)
-    }
-}
-
-/// The monic gcd, by `crate::gcd::poly::gcd`.
+/// The monic gcd.
 pub fn gcd(f: &Field, a: &Poly, b: &Poly) -> Poly {
-    crate::gcd::poly::gcd(&Coeffs(f), a, b)
+    let (mut a, mut b) = (a.clone(), b.clone());
+    while !b.is_empty() {
+        let r = rem(f, &a, &b);
+        a = b;
+        b = r;
+    }
+    monic(f, &a)
 }
 
-/// `a^{-1} mod m`, or `None` when `gcd(a, m) ≠ 1`, by
-/// `crate::gcd::poly::inv_mod`.  As before, panics on `m = 0` and gives
-/// the zero polynomial for a constant `m`.
+/// `a^{-1} mod m`, or `None` when `gcd(a, m) ≠ 1`.
 pub fn invmod(f: &Field, a: &Poly, m: &Poly) -> Option<Poly> {
-    match degree(m) {
-        None => panic!("division by the zero polynomial"),
-        Some(0) => Some(Vec::new()),
-        Some(_) => crate::gcd::poly::inv_mod(&Coeffs(f), a, m),
+    let (mut r0, mut r1) = (m.clone(), rem(f, a, m));
+    let (mut s0, mut s1): (Poly, Poly) = (Vec::new(), vec![f.one()]);
+    while !r1.is_empty() {
+        let (q, r) = divrem(f, &r0, &r1);
+        let s = sub(f, &s0, &mul(f, &q, &s1));
+        r0 = std::mem::replace(&mut r1, r);
+        s0 = std::mem::replace(&mut s1, s);
     }
+    if degree(&r0) != Some(0) {
+        return None;
+    }
+    let c = f.inv(&r0[0])?;
+    Some(rem(f, &scale(f, &s0, &c), m))
 }
 
 pub fn powmod(f: &Field, base: &Poly, e: &BigUint, m: &Poly) -> Poly {

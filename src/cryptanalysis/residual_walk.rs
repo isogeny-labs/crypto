@@ -207,20 +207,32 @@ pub fn pow_mod(mut base: u64, mut e: u64, p: u64) -> u64 {
 /// Modular inverse by the extended Euclidean algorithm.  `a` must be
 /// non-zero mod `p` and `p` prime.
 ///
-/// Units go through the shared [`crate::gcd::int::inv_mod_u64`].  A
-/// non-unit (a debug assertion) still returns what the classical Euclid
-/// on `(a mod p, p)` leaves, `a`'s Bézout coefficient reduced into
-/// `[0, p)`, via [`crate::gcd::int::xgcd_i128`]: the same sequence as the
-/// earlier hand-written loop, so the value is unchanged for every input,
-/// units or not.
+/// The Bézout coefficients `s_i` of the remainder sequence alternate in
+/// sign from `s_2` on and grow in magnitude, `|s_{i+1}| = |s_{i−1}| +
+/// q_i·|s_i|`, up to `|s_{k+1}| = p / gcd ≤ p` when the remainder
+/// vanishes.  So the loop carries the magnitudes in `u64` and the sign as
+/// the parity of the step count, and every quotient is one hardware
+/// 64-bit divide instead of the `i128` software division (`__divti3`)
+/// this was first written with.  It walks the same sequence, so it
+/// returns the same value for every input, units or not.
 pub fn inv_mod(a: u64, p: u64) -> u64 {
     super::jv_bitops::hook_inv(p);
-    if let Some(inv) = crate::gcd::int::inv_mod_u64(a, p) {
-        return inv;
+    let (mut old_r, mut r) = (a % p, p);
+    // |s_{i−1}| and |s_i|, with s_i = (−1)^i·|s_i| (s_1 = 0).
+    let (mut old_s, mut s) = (1u64, 0u64);
+    let mut odd = false;
+    while r != 0 {
+        let q = old_r / r;
+        (old_r, r) = (r, old_r - q * r);
+        (old_s, s) = (s, old_s + q * s);
+        odd = !odd;
     }
-    let (g, x, _) = crate::gcd::int::xgcd_i128((a % p) as i128, p as i128);
-    debug_assert_eq!(g, 1, "inv_mod of a non-unit");
-    x.rem_euclid(p as i128) as u64
+    debug_assert_eq!(old_r, 1, "inv_mod of a non-unit");
+    if odd && old_s != 0 {
+        p - old_s
+    } else {
+        old_s
+    }
 }
 
 /// Square root mod an odd prime (Tonelli–Shanks).  Returns `None` for
@@ -2882,8 +2894,11 @@ mod tests {
         old_s.rem_euclid(p as i128) as u64
     }
 
-    fn gcd(a: u64, b: u64) -> u64 {
-        crate::gcd::int::gcd_u64(a, b)
+    fn gcd(mut a: u64, mut b: u64) -> u64 {
+        while b != 0 {
+            (a, b) = (b, a % b);
+        }
+        a
     }
 
     #[test]

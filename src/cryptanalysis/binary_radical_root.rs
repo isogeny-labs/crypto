@@ -233,7 +233,14 @@ impl AsSolver for RadicalQuartic {
 
 /// `x⁻¹ mod m` for `gcd(x, m) = 1`.
 fn inv_mod(x: u128, m: u128) -> Option<u128> {
-    crate::gcd::int::inv_mod_u128(x, m)
+    let (mut r0, mut r1) = (m as i128, (x % m) as i128);
+    let (mut t0, mut t1) = (0i128, 1i128);
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 - q * t1);
+    }
+    (r0 == 1).then(|| t0.rem_euclid(m as i128) as u128)
 }
 
 /// Why a quartic went to the gcd instead of the closed form.

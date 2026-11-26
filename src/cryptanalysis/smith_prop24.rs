@@ -99,8 +99,7 @@ pub fn pow_mod(b: u64, mut e: u128, p: u64) -> u64 {
 
 pub fn inv_mod(a: u64, p: u64) -> u64 {
     assert!(!a.is_multiple_of(p), "inverse of zero");
-    // p prime: the value a^(p−2) gave.
-    crate::gcd::int::inv_mod_u64(a, p).expect("inverse modulo a prime")
+    pow_mod(a, (p - 2) as u128, p)
 }
 
 /// Quadratic character of `a` mod `p`: 0, 1 or -1.
@@ -278,9 +277,16 @@ fn pmonic(a: &[u64], p: u64) -> Poly {
     }
 }
 
-/// Monic `gcd(a, b)`, by `crate::gcd::poly::gcd`.
 fn pgcd(a: &[u64], b: &[u64], p: u64) -> Poly {
-    crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(p), a, b)
+    let (mut a, mut b) = (a.to_vec(), b.to_vec());
+    trim(&mut a);
+    trim(&mut b);
+    while !b.is_empty() {
+        let r = prem(&a, &b, p);
+        a = b;
+        b = r;
+    }
+    pmonic(&a, p)
 }
 
 fn pmulmod(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Poly {
@@ -641,18 +647,24 @@ impl Ext {
         (0..self.d).fold(0, |s, j| ad(s, md(a[j], self.tr[j], self.p), self.p))
     }
 
-    /// Inverse by the extended Euclidean algorithm in `F_p[z]`
-    /// (`crate::gcd::poly::inv_mod`).
+    /// Inverse by the extended Euclidean algorithm in `F_p[z]`.
     pub fn inv(&self, a: &El) -> El {
+        let p = self.p;
+        let m: Poly = self.m[..=self.d].to_vec();
+        let mut r0 = m.clone();
         let mut r1: Poly = a[..self.d].to_vec();
         trim(&mut r1);
         assert!(!r1.is_empty(), "inverse of zero");
-        let s = crate::gcd::poly::inv_mod(
-            &crate::gcd::poly::Fp64::new(self.p),
-            &r1,
-            &self.m[..=self.d],
-        )
-        .expect("inverse in a field");
+        let (mut s0, mut s1): (Poly, Poly) = (Vec::new(), vec![1]);
+        while deg(&r1) > 0 {
+            let (q, r) = pdivrem(&r0, &r1, p);
+            let s2 = psub(&s0, &pmul(&q, &s1, p), p);
+            r0 = r1;
+            r1 = r;
+            s0 = s1;
+            s1 = s2;
+        }
+        let s = prem(&pscale(&s1, inv_mod(r1[0], p), p), &m, p);
         let mut out = [0; 8];
         out[..s.len()].copy_from_slice(&s);
         out
@@ -720,40 +732,16 @@ fn kp_monic(k: &Ext, a: &[El]) -> Vec<El> {
     a
 }
 
-/// `K` as a [`crate::gcd::poly::PolyField`].
-struct KCoeffs<'a>(&'a Ext);
-
-impl crate::gcd::poly::PolyField for KCoeffs<'_> {
-    type E = El;
-    fn zero(&self) -> El {
-        self.0.zero()
-    }
-    fn one(&self) -> El {
-        self.0.one()
-    }
-    fn add(&self, a: El, b: El) -> El {
-        self.0.add(&a, &b)
-    }
-    fn sub(&self, a: El, b: El) -> El {
-        self.0.sub(&a, &b)
-    }
-    fn mul(&self, a: El, b: El) -> El {
-        self.0.mul(&a, &b)
-    }
-    fn inv(&self, a: El) -> El {
-        self.0.inv(&a)
-    }
-    fn is_zero(&self, a: El) -> bool {
-        self.0.is_zero(&a)
-    }
-    fn neg(&self, a: El) -> El {
-        self.0.neg(&a)
-    }
-}
-
-/// Monic `gcd(a, b)`, by `crate::gcd::poly::gcd`.
 fn kp_gcd(k: &Ext, a: &[El], b: &[El]) -> Vec<El> {
-    crate::gcd::poly::gcd(&KCoeffs(k), a, b)
+    let (mut a, mut b) = (a.to_vec(), b.to_vec());
+    kp_trim(k, &mut a);
+    kp_trim(k, &mut b);
+    while !b.is_empty() {
+        let r = kp_divrem(k, &a, &b).1;
+        a = b;
+        b = r;
+    }
+    kp_monic(k, &a)
 }
 
 /// One root in `K` of a monic polynomial over `K` with distinct roots, all in `K`.

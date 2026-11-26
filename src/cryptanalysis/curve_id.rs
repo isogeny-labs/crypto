@@ -85,16 +85,39 @@ fn poly_mod(mut a: BigUint, f: &BigUint) -> BigUint {
     a
 }
 
+fn clmul(a: &BigUint, b: &BigUint) -> BigUint {
+    let mut r = BigUint::zero();
+    for i in 0..b.bits() {
+        if b.bit(i) {
+            r ^= a << i;
+        }
+    }
+    r
+}
+
 /// Inverse of a non-zero `a` modulo the irreducible `f` over `GF(2)`.
 fn poly_inverse(a: &BigUint, f: &BigUint) -> Option<BigUint> {
-    // Shared bit-packed GF(2)[x] inverse (BigUint bit i = coeff of x^i);
-    // `None` unless gcd(a, f) = 1, as before.
-    let inv = crate::gcd::gf2::inv_mod(&a.to_u64_digits(), &f.to_u64_digits())?;
-    Some(BigUint::from_bytes_le(
-        &inv.iter()
-            .flat_map(|w| w.to_le_bytes())
-            .collect::<Vec<u8>>(),
-    ))
+    let (mut r0, mut r1) = (f.clone(), poly_mod(a.clone(), f));
+    let (mut s0, mut s1) = (BigUint::zero(), BigUint::one());
+    if r1.is_zero() {
+        return None;
+    }
+    while !r1.is_one() {
+        let mut q = BigUint::zero();
+        let mut r = r0.clone();
+        while !r.is_zero() && deg(&r) >= deg(&r1) {
+            let shift = deg(&r) - deg(&r1);
+            q.set_bit(shift, true);
+            r ^= &r1 << shift;
+        }
+        if r.is_zero() {
+            return None; // f was not irreducible
+        }
+        let s = &s0 ^ clmul(&q, &s1);
+        r0 = std::mem::replace(&mut r1, r);
+        s0 = std::mem::replace(&mut s1, s);
+    }
+    Some(poly_mod(s1, f))
 }
 
 /// `|q + 1 − #E| ≤ 2√q`: false for a subgroup order passed as the group's.

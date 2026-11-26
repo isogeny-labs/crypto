@@ -454,16 +454,15 @@ pub fn poly_powmod(f: Fp, base: &[u64], mut e: u64, m: &[u64]) -> Vec<u64> {
     r
 }
 
-/// `gcd(a, b)`, MONIC (by the shared `crate::gcd::poly::gcd`; the old
-/// Euclid returned an unnormalised associate, and every caller is invariant
-/// under the unit), with the zero polynomial as `[0]`.
 pub fn poly_gcd(f: Fp, a: &[u64], b: &[u64]) -> Vec<u64> {
-    let g = crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(f.p), a, b);
-    if g.is_empty() {
-        vec![0]
-    } else {
-        g
+    let mut x = trim(a.to_vec());
+    let mut y = trim(b.to_vec());
+    while !(y.len() == 1 && y[0] == 0) {
+        let r = poly_rem(f, &x, &y);
+        x = y;
+        y = r;
     }
+    x
 }
 
 fn is_one_up_to_unit(a: &[u64]) -> bool {

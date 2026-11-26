@@ -3240,40 +3240,7 @@ fn poly_make_monic_mont(f: &Fp64, p: &mut Vec<u64>) {
     p[last] = f.one;
 }
 
-/// [`Fp64`] (Montgomery form) as a coefficient field for the shared
-/// half-GCD (`crate::gcd::poly`): zero is 0, one is `f.one`.
-struct MontCoeffs<'a>(&'a Fp64);
-
-impl crate::gcd::poly::PolyField for MontCoeffs<'_> {
-    type E = u64;
-    fn zero(&self) -> u64 {
-        0
-    }
-    fn one(&self) -> u64 {
-        self.0.one
-    }
-    fn add(&self, a: u64, b: u64) -> u64 {
-        self.0.add(a, b)
-    }
-    fn sub(&self, a: u64, b: u64) -> u64 {
-        self.0.sub(a, b)
-    }
-    fn mul(&self, a: u64, b: u64) -> u64 {
-        self.0.mul(a, b)
-    }
-    fn inv(&self, a: u64) -> u64 {
-        self.0.inv(a)
-    }
-}
-
-/// Monic `gcd(a, b)` in Montgomery form.  From the half-GCD crossover
-/// (`crate::gcd::poly::HGCD_THRESHOLD`) on, the shared subquadratic
-/// half-GCD; below it the in-place monic Euclid loop.  Both return the
-/// same monic gcd.
 fn poly_gcd_mont(f: &Fp64, a_in: &[u64], b_in: &[u64], rem_u128: &mut Vec<u128>) -> Vec<u64> {
-    if a_in.len().min(b_in.len()) > crate::gcd::poly::HGCD_THRESHOLD {
-        return crate::gcd::poly::gcd(&MontCoeffs(f), a_in, b_in);
-    }
     let mut a = a_in.to_vec();
     let mut b = b_in.to_vec();
     poly_make_monic_mont(f, &mut a);
