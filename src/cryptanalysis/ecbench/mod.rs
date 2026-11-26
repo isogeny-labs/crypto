@@ -53,6 +53,7 @@ pub mod aps;
 pub mod audit;
 pub mod band;
 pub mod best2_model;
+pub mod blocked_bsgs_rho_study;
 pub mod bounds;
 pub mod calibration;
 pub mod callgrind;

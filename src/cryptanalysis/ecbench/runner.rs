@@ -25,7 +25,7 @@
 //! it.  An interruption (`signals`) or an error leaves the session marked
 //! `interrupted`, every evicted thread restored, and no child running.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -35,7 +35,9 @@ use std::time::{Duration, Instant};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
+use crate::cryptanalysis::ecbench::canonical::{
+    digest, reject_duplicate_keys, sha256_hex, short_id,
+};
 use crate::cryptanalysis::ecbench::fbm::{self, INSTRUMENT_IC_PIPELINE};
 use crate::cryptanalysis::ecbench::host::{capture, HostCapsule};
 use crate::cryptanalysis::ecbench::isolation::{
@@ -43,17 +45,17 @@ use crate::cryptanalysis::ecbench::isolation::{
     ticks_per_second, topology, BenchLock, CpuPlan, CpuRequest, Eviction, EvictionSummary,
     Preflight, Thresholds,
 };
-use crate::cryptanalysis::ecbench::methods::MethodSpec;
+use crate::cryptanalysis::ecbench::methods::{BatchItemReport, MethodSpec, SolveReport};
 use crate::cryptanalysis::ecbench::record::{
-    floor_s, from_str_legacy_floats, grade, Boundaries, ChildInput, ChildOutput, Cost, GradeInput,
-    IsolationRecord, Outcome, Record, Timing, CHILD_INPUT_SCHEMA, GRADING_VERSION, RECORD_SCHEMA,
-    UNIT,
+    floor_s, from_str_legacy_floats, grade, BatchOutcomeItem, Boundaries, ChildInput, ChildOutput,
+    Cost, GradeInput, IsolationRecord, Outcome, PublicStudyExecution, Record, Timing,
+    CHILD_INPUT_SCHEMA, GRADING_VERSION, RECORD_SCHEMA, UNIT,
 };
 use crate::cryptanalysis::ecbench::signals;
 #[cfg(test)]
 use crate::cryptanalysis::ecbench::spec::plan;
 use crate::cryptanalysis::ecbench::spec::{Execution, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
+use crate::cryptanalysis::ecbench::workload::{TargetKind, Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
 
@@ -523,6 +525,10 @@ pub struct Session {
     /// Why and where the session stopped, when it did not run to the end.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stop: Option<SessionStop>,
+    /// Write-ahead custody for fixed-study executions. Absent keeps every
+    /// legacy session byte-for-byte unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub study_intents: Option<StudyIntentSummary>,
 }
 
 /// Why a session ended early.
@@ -553,6 +559,321 @@ pub struct PlanDoc {
     pub arms: Vec<crate::cryptanalysis::ecbench::spec::Arm>,
     pub workloads: Vec<Workload>,
     pub executions: Vec<Execution>,
+}
+
+const STUDY_INTENT_SCHEMA: &str = "ecbench.study-intent/v1";
+const STUDY_INTENT_MAX_LINE_BYTES: usize = 1024 * 1024;
+
+/// One durable write-ahead declaration for an execution carrying fixed-study
+/// metadata. The hash chain is over canonical JSON with `intent_sha256`
+/// removed, so an independent reader does not depend on map insertion order.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StudyIntent {
+    pub schema: String,
+    pub session_id: String,
+    pub seq: u64,
+    pub execution_sha256: String,
+    pub arm: String,
+    pub method_sha256: String,
+    pub workload_sha256: String,
+    pub algorithm_seed: String,
+    pub study: crate::cryptanalysis::ecbench::spec::StudyExecution,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub previous_intent_sha256: Option<String>,
+    pub intent_sha256: String,
+}
+
+impl StudyIntent {
+    fn unsigned_value(&self) -> Result<Value, String> {
+        let mut value = serde_json::to_value(self).map_err(|error| error.to_string())?;
+        value
+            .as_object_mut()
+            .ok_or("study intent is not an object")?
+            .remove("intent_sha256");
+        Ok(value)
+    }
+
+    fn recompute_hash(&self) -> Result<String, String> {
+        digest(&self.unsigned_value()?)
+    }
+
+    fn validate(&self, previous: Option<&str>) -> Result<(), String> {
+        if self.schema != STUDY_INTENT_SCHEMA {
+            return Err("unsupported study intent schema".into());
+        }
+        if self.session_id.is_empty()
+            || self.execution_sha256.len() != 64
+            || self.method_sha256.len() != 64
+            || self.workload_sha256.len() != 64
+            || self.intent_sha256.len() != 64
+        {
+            return Err("malformed study intent identity".into());
+        }
+        if self.previous_intent_sha256.as_deref() != previous {
+            return Err("study intent chain predecessor mismatch".into());
+        }
+        if self.recompute_hash()? != self.intent_sha256 {
+            return Err("study intent hash mismatch".into());
+        }
+        Ok(())
+    }
+}
+
+/// Discoverability and final digest of `intents.jsonl`. A hard-killed runner
+/// can leave the counters stale; the append-only file and its chain remain the
+/// authoritative crash-prefix evidence.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StudyIntentSummary {
+    pub schema: String,
+    pub path: String,
+    pub planned: u64,
+    pub written: u64,
+    pub records_matched: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub censored_seq: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sha256: Option<String>,
+}
+
+struct StudyIntentWriter {
+    file: std::fs::File,
+    path: PathBuf,
+    planned: u64,
+    written: u64,
+    records_matched: u64,
+    previous: Option<String>,
+    pending: Option<StudyIntent>,
+}
+
+impl StudyIntentWriter {
+    fn create(out: &Path, planned: u64) -> Result<Self, String> {
+        let path = out.join("intents.jsonl");
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&path)
+            .map_err(|error| error.to_string())?;
+        std::fs::File::open(out)
+            .and_then(|directory| directory.sync_all())
+            .map_err(|error| error.to_string())?;
+        Ok(Self {
+            file,
+            path,
+            planned,
+            written: 0,
+            records_matched: 0,
+            previous: None,
+            pending: None,
+        })
+    }
+
+    fn summary(&self, sha256: Option<String>) -> StudyIntentSummary {
+        StudyIntentSummary {
+            schema: STUDY_INTENT_SCHEMA.into(),
+            path: "intents.jsonl".into(),
+            planned: self.planned,
+            written: self.written,
+            records_matched: self.records_matched,
+            censored_seq: self.pending.as_ref().map(|intent| intent.seq),
+            sha256,
+        }
+    }
+
+    fn append(
+        &mut self,
+        session_id: &str,
+        execution: &Execution,
+        arm: &crate::cryptanalysis::ecbench::spec::Arm,
+        workload: &Workload,
+    ) -> Result<(), String> {
+        let study = execution
+            .study
+            .clone()
+            .ok_or("study intent requested for ordinary execution")?;
+        if self.pending.is_some() {
+            return Err("new study intent before prior record".into());
+        }
+        let execution_value = serde_json::to_value(execution).map_err(|e| e.to_string())?;
+        let method_value = serde_json::to_value(&arm.method).map_err(|e| e.to_string())?;
+        let workload_value = serde_json::to_value(workload).map_err(|e| e.to_string())?;
+        let mut intent = StudyIntent {
+            schema: STUDY_INTENT_SCHEMA.into(),
+            session_id: session_id.into(),
+            seq: execution.seq,
+            execution_sha256: digest(&execution_value)?,
+            arm: arm.name.clone(),
+            method_sha256: digest(&method_value)?,
+            workload_sha256: digest(&workload_value)?,
+            algorithm_seed: execution.algorithm_seed.to_string(),
+            study,
+            previous_intent_sha256: self.previous.clone(),
+            intent_sha256: String::new(),
+        };
+        intent.intent_sha256 = intent.recompute_hash()?;
+        intent.validate(self.previous.as_deref())?;
+        let mut line = serde_json::to_vec(&intent).map_err(|error| error.to_string())?;
+        if line.len() > STUDY_INTENT_MAX_LINE_BYTES {
+            return Err("study intent exceeds line byte bound".into());
+        }
+        line.push(b'\n');
+        self.file
+            .write_all(&line)
+            .and_then(|()| self.file.sync_all())
+            .map_err(|error| error.to_string())?;
+        self.previous = Some(intent.intent_sha256.clone());
+        self.pending = Some(intent);
+        self.written += 1;
+        Ok(())
+    }
+
+    fn verify_record(&self, line: &str) -> Result<(), String> {
+        let intent = self
+            .pending
+            .as_ref()
+            .ok_or("study record has no prior unmatched intent")?;
+        validate_record_intent(intent, line)
+    }
+
+    fn record_durable(&mut self, seq: u64) -> Result<(), String> {
+        let intent = self
+            .pending
+            .take()
+            .ok_or("durable study record has no pending intent")?;
+        if intent.seq != seq {
+            return Err("durable study record sequence mismatch".into());
+        }
+        self.records_matched += 1;
+        Ok(())
+    }
+
+    fn finish(&mut self) -> Result<StudyIntentSummary, String> {
+        self.file.sync_all().map_err(|error| error.to_string())?;
+        let body = std::fs::read(&self.path).map_err(|error| error.to_string())?;
+        Ok(self.summary(Some(sha256_hex(&body))))
+    }
+}
+
+fn validate_record_intent(intent: &StudyIntent, line: &str) -> Result<(), String> {
+    reject_duplicate_keys(line)?;
+    let record: Value = serde_json::from_str(line).map_err(|error| error.to_string())?;
+    if record["session_id"].as_str() != Some(&intent.session_id)
+        || record["seq"].as_u64() != Some(intent.seq)
+        || record["arm"].as_str() != Some(&intent.arm)
+        || record["algorithm_seed"].as_str() != Some(&intent.algorithm_seed)
+        || record["study"]
+            != serde_json::to_value(&intent.study).map_err(|error| error.to_string())?
+        || digest(&record["method"])? != intent.method_sha256
+        || digest(&record["workload"])? != intent.workload_sha256
+    {
+        return Err("study record does not match its write-ahead intent".into());
+    }
+    Ok(())
+}
+
+/// Recheck an append-only study intent stream against sealed record lines.
+/// Exactly one final unmatched intent is a valid crash prefix and is returned
+/// as `censored_seq`; all other missing, duplicate, reordered or tampered
+/// associations are rejected.
+pub fn audit_study_intents(
+    intents_jsonl: &str,
+    records_jsonl: &str,
+) -> Result<StudyIntentSummary, String> {
+    let mut intents = Vec::new();
+    let mut previous: Option<String> = None;
+    let mut sequences = BTreeSet::new();
+    for (index, line) in intents_jsonl.lines().enumerate() {
+        if line.is_empty() || line.len() > STUDY_INTENT_MAX_LINE_BYTES {
+            return Err(format!("invalid study intent line {}", index + 1));
+        }
+        reject_duplicate_keys(line)?;
+        let intent: StudyIntent = serde_json::from_str(line).map_err(|error| error.to_string())?;
+        intent.validate(previous.as_deref())?;
+        if !sequences.insert(intent.seq) {
+            return Err("duplicate study intent sequence".into());
+        }
+        previous = Some(intent.intent_sha256.clone());
+        intents.push(intent);
+    }
+
+    let mut study_records = Vec::new();
+    let mut record_sequences = BTreeSet::new();
+    for line in records_jsonl.lines() {
+        if line.is_empty() {
+            return Err("blank record line".into());
+        }
+        reject_duplicate_keys(line)?;
+        let record: Value = serde_json::from_str(line).map_err(|error| error.to_string())?;
+        if !record["study"].is_null() {
+            let seq = record["seq"]
+                .as_u64()
+                .ok_or("study record lacks sequence")?;
+            if !record_sequences.insert(seq) {
+                return Err("duplicate study result sequence".into());
+            }
+            study_records.push((line, seq));
+        }
+    }
+    if study_records.len() > intents.len() || intents.len() > study_records.len() + 1 {
+        return Err("study intent/result stream is not a valid execution prefix".into());
+    }
+    for ((line, seq), intent) in study_records.iter().zip(&intents) {
+        if *seq != intent.seq {
+            return Err("study results are reordered relative to intents".into());
+        }
+        validate_record_intent(intent, line)?;
+    }
+    let censored_seq = (intents.len() == study_records.len() + 1)
+        .then(|| intents.last().expect("nonempty unmatched prefix").seq);
+    Ok(StudyIntentSummary {
+        schema: STUDY_INTENT_SCHEMA.into(),
+        path: "intents.jsonl".into(),
+        planned: intents.len() as u64,
+        written: intents.len() as u64,
+        records_matched: study_records.len() as u64,
+        censored_seq,
+        sha256: Some(sha256_hex(intents_jsonl.as_bytes())),
+    })
+}
+
+/// Bind the validated stream to the exact expanded plan, including executions
+/// that have an intent but no result because the runner stopped mid-child.
+pub fn audit_study_intents_for_plan(
+    intents_jsonl: &str,
+    records_jsonl: &str,
+    plan: &Plan,
+) -> Result<StudyIntentSummary, String> {
+    let mut summary = audit_study_intents(intents_jsonl, records_jsonl)?;
+    let expected: Vec<_> = plan
+        .executions
+        .iter()
+        .filter(|execution| execution.study.is_some())
+        .collect();
+    let parsed: Vec<StudyIntent> = intents_jsonl
+        .lines()
+        .map(|line| serde_json::from_str(line).map_err(|error| error.to_string()))
+        .collect::<Result<_, _>>()?;
+    if parsed.len() > expected.len() {
+        return Err("study intent stream exceeds the fixed plan".into());
+    }
+    for (intent, execution) in parsed.iter().zip(&expected) {
+        let arm = &plan.arms[execution.arm];
+        let workload = &plan.workloads[execution.workload];
+        let execution_value = serde_json::to_value(execution).map_err(|e| e.to_string())?;
+        let method_value = serde_json::to_value(&arm.method).map_err(|e| e.to_string())?;
+        let workload_value = serde_json::to_value(workload).map_err(|e| e.to_string())?;
+        if intent.seq != execution.seq
+            || intent.execution_sha256 != digest(&execution_value)?
+            || intent.arm != arm.name
+            || intent.method_sha256 != digest(&method_value)?
+            || intent.workload_sha256 != digest(&workload_value)?
+            || intent.algorithm_seed != execution.algorithm_seed.to_string()
+            || Some(&intent.study) != execution.study.as_ref()
+        {
+            return Err("study intent differs from the expanded plan".into());
+        }
+    }
+    summary.planned = expected.len() as u64;
+    Ok(summary)
 }
 
 fn now_ms() -> u128 {
@@ -1215,6 +1536,15 @@ fn execute_session(
         )?;
     }
 
+    let study_execution_count = p
+        .executions
+        .iter()
+        .filter(|execution| execution.study.is_some())
+        .count() as u64;
+    let mut study_intents = (study_execution_count != 0)
+        .then(|| StudyIntentWriter::create(out, study_execution_count))
+        .transpose()?;
+
     let mut session = Session {
         schema: SESSION_SCHEMA.into(),
         session_id: session_id.clone(),
@@ -1247,6 +1577,7 @@ fn execute_session(
         status_counts: BTreeMap::new(),
         last_seq: None,
         stop: None,
+        study_intents: study_intents.as_ref().map(|writer| writer.summary(None)),
     };
     write_json(&out.join("session.json"), &session)?;
 
@@ -1341,6 +1672,12 @@ fn execute_session(
                 let arm = &p.arms[ex.arm];
                 let w = &p.workloads[ex.workload];
                 let inst = p.instance(ex.workload);
+                let public_study = ex
+                    .study
+                    .as_ref()
+                    .map(PublicStudyExecution::from_parent)
+                    .transpose()?;
+                let fixed_study = public_study.is_some();
                 let input = ChildInput {
                     schema: CHILD_INPUT_SCHEMA.into(),
                     diagnostics: None,
@@ -1358,10 +1695,17 @@ fn execute_session(
                             )
                         })
                         .transpose()?,
+                    study: public_study,
                     curve: w.curve_spec.for_child(inst),
-                    target_seed: w.target_seed,
-                    target_index: w.target_index,
-                    target_kind: w.kind(),
+                    // Send only the public point projection; target derivation
+                    // provenance remains parent-side and is not a solver input.
+                    target_seed: if fixed_study { 0 } else { w.target_seed },
+                    target_index: if fixed_study { 0 } else { w.target_index },
+                    target_kind: if fixed_study {
+                        TargetKind::Public
+                    } else {
+                        w.kind()
+                    },
                     expected_workload_id: w.workload_id.clone(),
                     method: MethodSpec {
                         id: arm.method.id.clone(),
@@ -1386,6 +1730,14 @@ fn execute_session(
                     }
                 }
                 let before = snapshot();
+                if ex.study.is_some() {
+                    study_intents
+                        .as_mut()
+                        .ok_or("study execution has no intent writer")?
+                        .append(&session_id, ex, arm, w)?;
+                    session.study_intents =
+                        study_intents.as_ref().map(|writer| writer.summary(None));
+                }
                 // A child that cannot be started (spawn, pinning) is a record
                 // of its own, not a silent end of the session.
                 let observe_child = resources.is_some();
@@ -1436,6 +1788,7 @@ fn execute_session(
                     inst,
                     capsule,
                     &reaped,
+                    ex.study.clone(),
                     before,
                     after,
                     &GradeContext {
@@ -1463,6 +1816,12 @@ fn execute_session(
                 }
                 // Sealed over the exact bytes written (see `Record::seal`).
                 let line = rec.seal() + "\n";
+                if ex.study.is_some() {
+                    study_intents
+                        .as_ref()
+                        .ok_or("study execution has no intent writer")?
+                        .verify_record(&line)?;
+                }
                 records
                     .write_all(line.as_bytes())
                     .map_err(|e| e.to_string())?;
@@ -1477,6 +1836,14 @@ fn execute_session(
                         Some(sha256_hex(line.as_bytes())),
                         resource_clock.ok_or("diagnostic clock absent")?,
                     );
+                }
+                if ex.study.is_some() {
+                    study_intents
+                        .as_mut()
+                        .ok_or("study execution has no intent writer")?
+                        .record_durable(ex.seq)?;
+                    session.study_intents =
+                        study_intents.as_ref().map(|writer| writer.summary(None));
                 }
                 if input.diagnostic_lifecycle.is_some() {
                     let mut attachment = match child_reaped
@@ -1671,6 +2038,9 @@ fn execute_session(
     if let Ok(body) = std::fs::read(out.join("records.jsonl")) {
         session.records_sha256 = Some(sha256_hex(&body));
     }
+    if let Some(writer) = &mut study_intents {
+        session.study_intents = Some(writer.finish()?);
+    }
     write_json(&out.join("session.json"), &session)?;
     result.map(|()| session)
 }
@@ -1686,6 +2056,74 @@ pub struct GradeContext<'a> {
     pub hz: f64,
 }
 
+struct BatchEvaluation {
+    items: Vec<BatchOutcomeItem>,
+    any_wrong: bool,
+    any_missing: bool,
+    verification_ns: u64,
+}
+
+/// Convert child batch claims into parent-verified public-target outcomes.
+/// No planted scalar exists for the fixed study: `matches_planted` stays null.
+fn evaluate_batch_output(
+    inst: &crate::cryptanalysis::ecbench::workload::Instance,
+    study: &crate::cryptanalysis::ecbench::spec::StudyExecution,
+    report: &SolveReport,
+    batch: &[BatchItemReport],
+) -> Result<BatchEvaluation, String> {
+    let public = PublicStudyExecution::from_parent(study)?;
+    if public.panel != "amortized-B64" || public.items.len() != 64 || batch.len() != 64 {
+        return Err("batch64 output length/panel mismatch".into());
+    }
+    if report.recovered.is_some() {
+        return Err("batch64 aggregate report carries a single recovered scalar".into());
+    }
+    let started = Instant::now();
+    let mut items = Vec::with_capacity(64);
+    let mut any_wrong = false;
+    let mut any_missing = false;
+    let mut any_exhausted = false;
+    for (index, (claimed, expected)) in batch.iter().zip(&public.items).enumerate() {
+        if claimed.item != index as u64
+            || expected.item != index as u64
+            || claimed.target != expected.target
+            || claimed.rho_seed != expected.rho_derived_u64_hex
+        {
+            return Err("batch64 output identity/order mismatch".into());
+        }
+        let matches_target = claimed
+            .recovered
+            .map(|scalar| inst.mul_generator_exact(scalar).as_ref() == Some(&expected.target));
+        let expected_exhausted = claimed.recovered.is_none() || matches_target == Some(false);
+        if claimed.exhausted != expected_exhausted
+            || claimed.evaluator_correct != matches_target.unwrap_or(false)
+        {
+            return Err("batch64 output exhaustion/evaluator flags are inconsistent".into());
+        }
+        any_missing |= claimed.recovered.is_none();
+        any_wrong |= matches_target == Some(false);
+        any_exhausted |= claimed.exhausted;
+        items.push(BatchOutcomeItem {
+            item: claimed.item,
+            recovered: claimed.recovered.map(|scalar| scalar.to_string()),
+            matches_target,
+            matches_planted: None,
+            exhausted: claimed.exhausted,
+        });
+    }
+    if report.exhausted != any_exhausted {
+        return Err("batch64 aggregate exhaustion flag mismatch".into());
+    }
+    let verification_ns = u64::try_from(started.elapsed().as_nanos())
+        .map_err(|_| "batch64 parent verification interval overflow")?;
+    Ok(BatchEvaluation {
+        items,
+        any_wrong,
+        any_missing,
+        verification_ns,
+    })
+}
+
 /// Build the record for one execution from what the runner observed.
 #[allow(clippy::too_many_arguments)]
 fn assemble(
@@ -1697,6 +2135,7 @@ fn assemble(
     inst: &crate::cryptanalysis::ecbench::workload::Instance,
     capsule: &HostCapsule,
     reaped: &Reaped,
+    study: Option<crate::cryptanalysis::ecbench::spec::StudyExecution>,
     before: crate::cryptanalysis::ecbench::isolation::Conditions,
     after: crate::cryptanalysis::ecbench::isolation::Conditions,
     ctx: &GradeContext,
@@ -1706,13 +2145,44 @@ fn assemble(
     // execution must not also carry an accepted scalar or final cost. Preserve
     // the parsed late protocol message inside the sealed diagnostic instead.
     // Do not change historical records or weaken the auditor's status check.
-    let report = super::diagnostics::accepted_after_stop(
+    let exited_cleanly = reaped.exit.as_deref() == Some("exit 0");
+    // Read the accepted projection once so a late timeout/interruption cannot
+    // expose either the aggregate report or its ordered batch. A nonzero exit
+    // likewise makes stdout diagnostic-only, even if it was valid JSON.
+    let accepted = super::diagnostics::accepted_after_stop(
         reaped.output.as_ref(),
         reaped.timed_out,
         reaped.interrupted,
     )
-    .and_then(|o| o.report.clone());
-    let child_error = if let Some(message) = &reaped.spawn_error {
+    .filter(|_| exited_cleanly);
+    let mut report = accepted.and_then(|output| output.report.clone());
+    let child_batch = accepted.and_then(|output| output.batch.clone());
+    let batch_expected = matches!(
+        arm.method.id.as_str(),
+        "bsgs.prime_paired_batch64_v1" | "rho.prime_fast_batch64_v1"
+    );
+    let batch_evaluation = if batch_expected {
+        match (study.as_ref(), report.as_ref(), child_batch.as_deref()) {
+            (Some(study), Some(report), Some(batch)) => {
+                evaluate_batch_output(inst, study, report, batch).map(Some)
+            }
+            _ => Err("batch64 accepted output is missing study, report, or ordered items".into()),
+        }
+    } else if child_batch.is_some() {
+        Err("ordinary method returned batch64 output".into())
+    } else {
+        Ok(None)
+    };
+    let (batch_evaluation, batch_shape_error) = match batch_evaluation {
+        Ok(evaluation) => (evaluation, None),
+        Err(error) if accepted.is_some() => (None, Some(error)),
+        // A stopped/nonzero child has no accepted result to shape-check.
+        Err(_) => (None, None),
+    };
+    if batch_shape_error.is_some() {
+        report = None;
+    }
+    let mut child_error = if let Some(message) = &reaped.spawn_error {
         Some(format!("spawn_error: {message}"))
     } else if reaped.timed_out {
         Some(match &reaped.output {
@@ -1722,6 +2192,18 @@ fn assemble(
             ),
             None => "watchdog expired".to_string(),
         })
+    } else if !exited_cleanly {
+        Some(match &reaped.output {
+            Some(output) => format!(
+                "child {}: unaccepted parsed output: {}",
+                reaped.exit.as_deref().unwrap_or("did not exit cleanly"),
+                serde_json::to_string(output).expect("child protocol serializes")
+            ),
+            None => format!(
+                "child {}",
+                reaped.exit.as_deref().unwrap_or("did not exit cleanly")
+            ),
+        })
     } else {
         reaped
             .output
@@ -1729,7 +2211,12 @@ fn assemble(
             .and_then(|o| o.error.clone())
             .or_else(|| reaped.parse_error.clone())
     };
-    let exited_cleanly = reaped.exit.as_deref() == Some("exit 0");
+    if let Some(error) = batch_shape_error {
+        child_error = Some(match child_error {
+            Some(previous) => format!("{previous}; malformed batch64 output: {error}"),
+            None => format!("malformed batch64 output: {error}"),
+        });
+    }
     let recovered = report.as_ref().and_then(|r| r.recovered);
     // Verification in the runner's own process: [k]G against the target.
     // This audit clock is separate from child timing and its isolation grade.
@@ -1742,17 +2229,29 @@ fn assemble(
     });
     let matches_target = audit_verification.map(|(matches, _)| matches);
     // A public target has no planted answer: [k]G = Q decides alone.
-    let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
+    let matches_planted = if study.is_some() {
+        None
+    } else {
+        w.planted.and_then(|p| recovered.map(|k| k == p))
+    };
     let status = if reaped.spawn_error.is_some() {
         "spawn_error"
     } else if reaped.interrupted {
         "interrupted"
     } else if reaped.timed_out {
         "timeout"
-    } else if !exited_cleanly && report.is_none() {
+    } else if !exited_cleanly {
         "crashed"
     } else if child_error.is_some() || report.is_none() {
         "error"
+    } else if let Some(batch) = &batch_evaluation {
+        if batch.any_wrong {
+            "wrong_answer"
+        } else if batch.any_missing {
+            "exhausted"
+        } else {
+            "verified"
+        }
     } else if matches_target == Some(true) && matches_planted != Some(false) {
         "verified"
     } else if recovered.is_some() {
@@ -1764,12 +2263,13 @@ fn assemble(
     let floor = floor_s(w.curve.automorphisms_available);
     // A run whose factor-base logs came from a store is amortized: its
     // total moves to `*_store` and the cold fields stay null.
-    let amortized = report
-        .as_ref()
-        .is_some_and(|r| crate::cryptanalysis::koblitz_log_store::detail_is_amortized(&r.detail));
+    let amortized = !batch_expected
+        && report.as_ref().is_some_and(|r| {
+            crate::cryptanalysis::koblitz_log_store::detail_is_amortized(&r.detail)
+        });
     let s = report
         .as_ref()
-        .filter(|_| !amortized)
+        .filter(|_| !amortized && !batch_expected)
         .map(|r| r.total_gae / sqrt_r);
     let placement = reaped
         .output
@@ -1805,11 +2305,15 @@ fn assemble(
         method: arm.method.clone(),
         workload: w.clone(),
         algorithm_seed: ex.algorithm_seed.to_string(),
+        study,
         outcome: Outcome {
             status: status.into(),
             recovered: recovered.map(|k| k.to_string()),
             matches_target,
             matches_planted,
+            batch: batch_evaluation
+                .as_ref()
+                .map(|evaluation| evaluation.items.clone()),
             error: child_error,
             exit: reaped.exit.clone(),
             stderr_sha256: (!reaped.stderr.is_empty()).then(|| sha256_hex(&reaped.stderr)),
@@ -1837,6 +2341,15 @@ fn assemble(
                 .filter(|_| amortized)
                 .map(|r| r.total_gae / sqrt_r),
             cost_basis: amortized.then(|| "amortized".to_string()),
+            batch_size: (batch_expected && report.is_some()).then_some(64),
+            total_gae_per_target: report
+                .as_ref()
+                .filter(|_| batch_expected)
+                .map(|r| r.total_gae / 64.0),
+            s_per_target: report
+                .as_ref()
+                .filter(|_| batch_expected)
+                .map(|r| r.total_gae / 64.0 / sqrt_r),
         },
         boundaries: Boundaries {
             automorphisms_available: w.curve.automorphisms_available,
@@ -1891,7 +2404,10 @@ fn assemble(
         binary_sha256: capsule.build.binary_sha256.clone(),
         work: None,
     };
-    record.time.parent_audit_verification_ns = audit_verification.map(|(_, ns)| ns);
+    record.time.parent_audit_verification_ns = batch_evaluation
+        .as_ref()
+        .map(|evaluation| evaluation.verification_ns)
+        .or_else(|| audit_verification.map(|(_, ns)| ns));
     record.time.online_clock_diagnostics =
         report
             .as_ref()
@@ -1903,7 +2419,7 @@ fn assemble(
     // An amortized run carries none: its phases leave out the collection
     // and linear algebra an earlier run paid, so no gate total of it may
     // stand beside the cold ones (`ecbench amortize` skips it).
-    if report.is_some() && !amortized {
+    if report.is_some() && !amortized && !batch_expected {
         record.work = crate::cryptanalysis::ecbench::work::price_record(&record).ok();
     }
     record
@@ -1945,8 +2461,31 @@ fn read_record_lines_with(
     dir: &Path,
     parse: impl Fn(&str) -> Result<Record, String>,
 ) -> Result<Vec<(String, Record)>, String> {
-    let text = std::fs::read_to_string(dir.join("records.jsonl"))
-        .map_err(|e| format!("{}: {e}", dir.join("records.jsonl").display()))?;
+    const MAX_RECORDS_JSONL_BYTES: u64 = 256 * 1024 * 1024;
+    let path = dir.join("records.jsonl");
+    let metadata = std::fs::metadata(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    if metadata.len() > MAX_RECORDS_JSONL_BYTES {
+        return Err(format!(
+            "{} exceeds {} byte record cap",
+            path.display(),
+            MAX_RECORDS_JSONL_BYTES
+        ));
+    }
+    let file = std::fs::File::open(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let capacity = usize::try_from(metadata.len())
+        .map_err(|_| format!("{} length exceeds address space", path.display()))?;
+    let mut bytes = Vec::with_capacity(capacity);
+    file.take(MAX_RECORDS_JSONL_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("{}: {e}", path.display()))?;
+    if bytes.len() as u64 > MAX_RECORDS_JSONL_BYTES {
+        return Err(format!(
+            "{} exceeds {} byte record cap",
+            path.display(),
+            MAX_RECORDS_JSONL_BYTES
+        ));
+    }
+    let text = String::from_utf8(bytes).map_err(|e| format!("{}: {e}", path.display()))?;
     text.lines()
         .filter(|l| !l.trim().is_empty())
         .enumerate()
@@ -2012,6 +2551,234 @@ pub fn read_session(dir: &Path) -> Result<Session, String> {
 }
 
 #[cfg(test)]
+mod study_intent_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::spec::{StudyExecution, StudyItemIdentity};
+
+    fn study() -> StudyExecution {
+        StudyExecution {
+            study: "blocked-bsgs-rho-wall/v1".into(),
+            curve_slug: "icv1-fixture".into(),
+            panel: "cold-paired".into(),
+            replicate: 0,
+            arm: "bsgs-cold".into(),
+            copy: "main".into(),
+            schedule_position: 0,
+            items: vec![StudyItemIdentity {
+                item: 0,
+                target_derived_u64_hex: "0123456789abcdef".into(),
+                target: ["0x2".into(), "0x3".into()],
+                rho_derived_u64_hex: Some("fedcba9876543210".into()),
+            }],
+        }
+    }
+
+    fn intent(seq: u64, previous: Option<String>) -> StudyIntent {
+        let method = json!({"id":"fixture","method_id":"fixture-1","params":{}});
+        let workload = json!({"workload_id":"Wfixture","target":["0x2","0x3"]});
+        let mut intent = StudyIntent {
+            schema: STUDY_INTENT_SCHEMA.into(),
+            session_id: "session".into(),
+            seq,
+            execution_sha256: "a".repeat(64),
+            arm: "bsgs-cold".into(),
+            method_sha256: digest(&method).unwrap(),
+            workload_sha256: digest(&workload).unwrap(),
+            algorithm_seed: "7".into(),
+            study: study(),
+            previous_intent_sha256: previous,
+            intent_sha256: String::new(),
+        };
+        intent.intent_sha256 = intent.recompute_hash().unwrap();
+        intent
+    }
+
+    fn line(value: &impl Serialize) -> String {
+        format!("{}\n", serde_json::to_string(value).unwrap())
+    }
+
+    fn record(intent: &StudyIntent) -> Value {
+        json!({
+            "session_id":intent.session_id,
+            "seq":intent.seq,
+            "arm":intent.arm,
+            "algorithm_seed":intent.algorithm_seed,
+            "study":intent.study,
+            "method":{"id":"fixture","method_id":"fixture-1","params":{}},
+            "workload":{"workload_id":"Wfixture","target":["0x2","0x3"]}
+        })
+    }
+
+    #[test]
+    fn study_intent_audit_rejects_result_before_intent_and_duplicates() {
+        let first = intent(0, None);
+        let record_line = line(&record(&first));
+        assert!(audit_study_intents("", &record_line).is_err());
+
+        let second_same_seq = intent(0, Some(first.intent_sha256.clone()));
+        assert!(audit_study_intents(&(line(&first) + &line(&second_same_seq)), "").is_err());
+        assert!(audit_study_intents(&line(&first), &(record_line.clone() + &record_line)).is_err());
+    }
+
+    #[test]
+    fn study_intent_audit_accepts_one_unmatched_crash_prefix() {
+        let first = intent(0, None);
+        let public = PublicStudyExecution::from_parent(&first.study).unwrap();
+        let public_text = serde_json::to_string(&public).unwrap();
+        assert!(!public_text.contains("target_derived_u64_hex"));
+        assert!(!public_text.contains("0123456789abcdef"));
+        assert!(public_text.contains("fedcba9876543210"));
+        let child = ChildInput {
+            diagnostics: None,
+            diagnostic_lifecycle: None,
+            study: Some(public),
+            schema: CHILD_INPUT_SCHEMA.into(),
+            curve: crate::cryptanalysis::ecbench::workload::CurveSpec::PrimeExplicit {
+                p: 113,
+                a: 19,
+                b: 2,
+                group_order: 112,
+                r: 7,
+                gx: 52,
+                gy: 110,
+            },
+            target_seed: 0,
+            target_index: 0,
+            target_kind: TargetKind::Public,
+            expected_workload_id: "public-fixture".into(),
+            method: MethodSpec {
+                id: "rho.prime_fast_v1".into(),
+                params: BTreeMap::new(),
+            },
+            expected_method_id: "method-fixture".into(),
+            algorithm_seed: u64::from_str_radix("fedcba9876543210", 16).unwrap(),
+        };
+        let child_text = serde_json::to_string(&child).unwrap();
+        assert!(!child_text.contains("target_derived_u64_hex"));
+        assert!(!child_text.contains("0123456789abcdef"));
+        assert!(child_text.contains("fedcba9876543210"));
+        assert_eq!((child.target_seed, child.target_index), (0, 0));
+        assert_eq!(child.target_kind, TargetKind::Public);
+        let audit = audit_study_intents(&line(&first), "").unwrap();
+        assert_eq!(audit.censored_seq, Some(0));
+        assert_eq!((audit.written, audit.records_matched), (1, 0));
+
+        let complete = audit_study_intents(&line(&first), &line(&record(&first))).unwrap();
+        assert_eq!(complete.censored_seq, None);
+        assert_eq!((complete.written, complete.records_matched), (1, 1));
+    }
+
+    #[test]
+    fn study_intent_audit_rejects_record_mismatch_and_chain_tampering() {
+        let first = intent(0, None);
+        let mut wrong = record(&first);
+        wrong["arm"] = json!("rho-cold");
+        assert!(audit_study_intents(&line(&first), &line(&wrong)).is_err());
+
+        let mut tampered = first.clone();
+        tampered.previous_intent_sha256 = Some("f".repeat(64));
+        assert!(audit_study_intents(&line(&tampered), "").is_err());
+        let mut changed = first;
+        changed.study.panel = "rho-aa".into();
+        assert!(audit_study_intents(&line(&changed), "").is_err());
+    }
+}
+
+#[cfg(test)]
+mod batch_outcome_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
+    use crate::cryptanalysis::ecbench::spec::{StudyExecution, StudyItemIdentity};
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn fixture() -> (
+        crate::cryptanalysis::ecbench::workload::Instance,
+        StudyExecution,
+        SolveReport,
+        Vec<BatchItemReport>,
+    ) {
+        let spec = CurveSpec::PrimeExplicit {
+            p: 16_777_199,
+            a: 16_777_196,
+            b: 31,
+            group_order: 16_782_299,
+            r: 16_782_299,
+            gx: 2,
+            gy: 5_412_647,
+        };
+        let inst = spec.build().unwrap();
+        let slug = inst.facts(&spec).slug;
+        let mut study_items = Vec::new();
+        let mut reports = Vec::new();
+        for index in 0..64u64 {
+            let target = inst.mul_generator_hex(u128::from(index + 1)).unwrap();
+            let rho_seed = format!("{:016x}", 0x1000u64 + index);
+            study_items.push(StudyItemIdentity {
+                item: index,
+                target_derived_u64_hex: format!("{:016x}", 0x2000u64 + index),
+                target: target.clone(),
+                rho_derived_u64_hex: Some(rho_seed.clone()),
+            });
+            reports.push(BatchItemReport {
+                item: index,
+                target,
+                rho_seed: Some(rho_seed),
+                recovered: Some(ExactScalar::from(index + 1)),
+                exhausted: false,
+                evaluator_correct: true,
+                solver_wall_ns: 0,
+                verification_wall_ns: 0,
+                drop_wall_ns: 0,
+                counters: BTreeMap::new(),
+            });
+        }
+        let study = StudyExecution {
+            study: "blocked-bsgs-rho-wall/v1".into(),
+            curve_slug: slug,
+            panel: "amortized-B64".into(),
+            replicate: 0,
+            arm: "bsgs-amortized-b64".into(),
+            copy: "main".into(),
+            schedule_position: 0,
+            items: study_items,
+        };
+        let report = SolveReport {
+            exhausted: false,
+            ..SolveReport::default()
+        };
+        (inst, study, report, reports)
+    }
+
+    #[test]
+    fn batch_parent_verification_detects_wrong_scalar_and_malformed_shape() {
+        let (inst, study, report, batch) = fixture();
+        let honest = evaluate_batch_output(&inst, &study, &report, &batch).unwrap();
+        assert!(!honest.any_wrong && !honest.any_missing);
+        assert_eq!(honest.items.len(), 64);
+        assert!(honest
+            .items
+            .iter()
+            .all(|item| item.matches_target == Some(true) && item.matches_planted.is_none()));
+
+        let mut wrong = batch.clone();
+        wrong[0].recovered = Some(ExactScalar::from(2u64));
+        wrong[0].evaluator_correct = false;
+        wrong[0].exhausted = true;
+        let mut wrong_report = report.clone();
+        wrong_report.exhausted = true;
+        let evaluated = evaluate_batch_output(&inst, &study, &wrong_report, &wrong).unwrap();
+        assert!(evaluated.any_wrong);
+
+        let mut reordered = batch.clone();
+        reordered.swap(0, 1);
+        assert!(evaluate_batch_output(&inst, &study, &report, &reordered).is_err());
+        let mut short = batch;
+        short.pop();
+        assert!(evaluate_batch_output(&inst, &study, &report, &short).is_err());
+    }
+}
+
+#[cfg(test)]
 mod exact_record_reader_tests {
     use super::{from_str_exact_floats, Record};
     use serde::Deserialize;
@@ -2062,6 +2829,7 @@ mod watchdog_record_tests {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
             diagnostic_lifecycle: None,
+            study: None,
             curve: w.curve_spec.clone(),
             target_seed: w.target_seed,
             target_index: w.target_index,
@@ -2109,6 +2877,7 @@ mod watchdog_record_tests {
                 p.instance(ex.workload),
                 &capsule,
                 r,
+                None,
                 conditions(&[]),
                 conditions(&[]),
                 &ctx,
@@ -2198,6 +2967,18 @@ mod robustness_tests {
     }
 
     #[test]
+    fn imported_record_reader_rejects_oversized_sparse_artifact() {
+        let dir = tmp("oversized-records");
+        let path = dir.join("records.jsonl");
+        let file = std::fs::File::create(&path).unwrap();
+        file.set_len(256 * 1024 * 1024 + 1).unwrap();
+        let error = read_record_lines(&dir).unwrap_err();
+        assert!(error.contains("exceeds") && error.contains("record cap"));
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(dir).unwrap();
+    }
+
+    #[test]
     fn only_a_sigkill_that_the_watchdog_or_the_interruption_sent_is_a_stop() {
         // (watchdog fired, interruption, killed by SIGKILL) -> (timed out, interrupted)
         assert_eq!(classify_stop(true, false, true), (true, false));
@@ -2223,8 +3004,9 @@ mod robustness_tests {
     fn input() -> ChildInput {
         ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
-                diagnostics: None,
-                diagnostic_lifecycle: None,
+            diagnostics: None,
+            diagnostic_lifecycle: None,
+            study: None,
             curve: serde_json::from_str(
                 r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
             )
@@ -2462,6 +3244,7 @@ mod robustness_tests {
             p.instance(ex.workload),
             &capsule,
             &reaped,
+            None,
             conditions(&[]),
             conditions(&[]),
             &ctx,
@@ -2481,6 +3264,7 @@ mod robustness_tests {
             p.instance(ex.workload),
             &capsule,
             &crashed,
+            None,
             conditions(&[]),
             conditions(&[]),
             &ctx,
@@ -2500,6 +3284,7 @@ mod diagnostic_acceptance_tests {
             workload_id: None,
             method_id: None,
             report: None,
+            batch: Some(Vec::new()),
             method_call_wall_ns: Some(17),
             diagnostic_lifecycle: None,
             diagnostic_call_wall_ns: None,
@@ -2550,6 +3335,7 @@ mod diagnostic_acceptance_tests {
             workload_id: Some(w.workload_id.clone()),
             method_id: Some(arm.method.method_id.clone()),
             report: Some(late),
+            batch: Some(Vec::new()),
             method_call_wall_ns: Some(17),
             diagnostic_lifecycle: None,
             diagnostic_call_wall_ns: None,
@@ -2594,6 +3380,7 @@ mod diagnostic_acceptance_tests {
                     p.instance(ex.workload),
                     &capsule,
                     &reaped,
+                    None,
                     conditions(&[]),
                     conditions(&[]),
                     &ctx,
@@ -2602,6 +3389,7 @@ mod diagnostic_acceptance_tests {
                 assert!(record.outcome.recovered.is_none());
                 assert!(record.outcome.matches_target.is_none());
                 assert!(record.outcome.matches_planted.is_none());
+                assert!(record.outcome.batch.is_none());
                 assert!(record.cost.total_gae.is_none());
                 assert!(record.cost.s.is_none());
                 assert!(!record.cost.deterministic);
@@ -3046,6 +3834,7 @@ mod log_store_record_tests {
                 schema: CHILD_INPUT_SCHEMA.into(),
                 diagnostics: None,
                 diagnostic_lifecycle: None,
+                study: None,
                 curve: w.curve_spec.clone(),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
@@ -3082,6 +3871,7 @@ mod log_store_record_tests {
                 p.instance(ex.workload),
                 &capsule,
                 &reaped,
+                None,
                 conditions(&[]),
                 conditions(&[]),
                 &ctx,

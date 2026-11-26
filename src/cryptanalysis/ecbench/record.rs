@@ -6,7 +6,7 @@
 //! use, and the isolation level its own observations earned with the
 //! reason for every level it did not.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -21,8 +21,8 @@ use crate::cryptanalysis::ecbench::isolation::{
 };
 
 use crate::cryptanalysis::ecbench::methods::{
-    resolve, FactorBaseFacts, MethodSpec, OnlineWindow, PhaseRecord, ResolvedMethod, SolveReport,
-    SolverStats,
+    resolve, BatchItemReport, FactorBaseFacts, MethodSpec, OnlineWindow, PhaseRecord,
+    ResolvedMethod, SolveReport, SolverStats,
 };
 use crate::cryptanalysis::ecbench::spec::Level;
 use crate::cryptanalysis::ecbench::workload::{
@@ -130,6 +130,12 @@ pub fn f4_accounting_note(
 
 pub const CHILD_INPUT_SCHEMA: &str = "ecbench.child_input/v1";
 pub const CHILD_OUTPUT_SCHEMA: &str = "ecbench.child_output/v1";
+const BSGS_BATCH64_METHOD: &str = "bsgs.prime_paired_batch64_v1";
+const RHO_BATCH64_METHOD: &str = "rho.prime_fast_batch64_v1";
+
+fn is_batch64_method(id: &str) -> bool {
+    matches!(id, BSGS_BATCH64_METHOD | RHO_BATCH64_METHOD)
+}
 
 /// The unit every cost is in: group-addition equivalents (additions plus
 /// doublings, plus native work at the repository's pinned ratios where
@@ -139,6 +145,135 @@ pub const UNIT: &str = "ecbench.gae";
 // ── The child protocol ─────────────────────────────────────────────
 
 /// What the runner sends a measured child on stdin.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PublicStudyItem {
+    pub item: u64,
+    pub target: [String; 2],
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rho_derived_u64_hex: Option<String>,
+}
+
+/// The child-visible projection of a fixed-study execution. Parent-only target
+/// derivation provenance stays out of the measured protocol; public coordinates
+/// are the complete target input.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PublicStudyExecution {
+    pub study: String,
+    pub curve_slug: String,
+    pub panel: String,
+    pub replicate: u64,
+    pub arm: String,
+    pub copy: String,
+    pub schedule_position: u8,
+    pub items: Vec<PublicStudyItem>,
+}
+
+impl PublicStudyExecution {
+    pub fn from_parent(study: &super::spec::StudyExecution) -> Result<Self, String> {
+        let public = Self {
+            study: study.study.clone(),
+            curve_slug: study.curve_slug.clone(),
+            panel: study.panel.clone(),
+            replicate: study.replicate,
+            arm: study.arm.clone(),
+            copy: study.copy.clone(),
+            schedule_position: study.schedule_position,
+            items: study
+                .items
+                .iter()
+                .map(|item| PublicStudyItem {
+                    item: item.item,
+                    target: item.target.clone(),
+                    rho_derived_u64_hex: item.rho_derived_u64_hex.clone(),
+                })
+                .collect(),
+        };
+        public.validate()?;
+        Ok(public)
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        if self.study != "blocked-bsgs-rho-wall/v1" || self.curve_slug.is_empty() {
+            return Err("invalid fixed-study child identity".into());
+        }
+        let (replicates, expected_items, left, right, left_copy, right_copy, needs_rho) =
+            match self.panel.as_str() {
+                "warmup" => (4, 1, "bsgs-cold", "rho-cold", "main", "main", true),
+                "cold-paired" => (512, 1, "bsgs-cold", "rho-cold", "main", "main", true),
+                "bsgs-aa" => (64, 1, "bsgs-cold", "bsgs-aa-copy", "1", "2", false),
+                "rho-aa" => (64, 1, "rho-cold", "rho-aa-copy", "1", "2", true),
+                "amortized-B64" => (
+                    16,
+                    64,
+                    "bsgs-amortized-b64",
+                    "rho-amortized-b64",
+                    "main",
+                    "main",
+                    true,
+                ),
+                _ => return Err("unknown fixed-study panel".into()),
+            };
+        if self.replicate >= replicates || self.schedule_position > 1 {
+            return Err("fixed-study replicate or schedule position is out of range".into());
+        }
+        let left_position = u8::from(self.replicate % 2 == 1);
+        let (expected_arm, expected_copy) = if self.schedule_position == left_position {
+            (left, left_copy)
+        } else {
+            (right, right_copy)
+        };
+        if self.arm != expected_arm || self.copy != expected_copy {
+            return Err("fixed-study arm/copy does not match its frozen schedule".into());
+        }
+        if self.items.len() != expected_items {
+            return Err("fixed-study child item count mismatch".into());
+        }
+        let mut rho_seeds = BTreeSet::new();
+        for (index, item) in self.items.iter().enumerate() {
+            if item.item != index as u64 {
+                return Err("fixed-study child items are not contiguous".into());
+            }
+            for coordinate in &item.target {
+                let Some(digits) = coordinate.strip_prefix("0x") else {
+                    return Err("fixed-study public coordinate lacks 0x prefix".into());
+                };
+                if digits.is_empty()
+                    || digits.len() > 16
+                    || !digits
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+                {
+                    return Err("fixed-study public coordinate is not bounded lowercase hex".into());
+                }
+                let value = u64::from_str_radix(digits, 16)
+                    .map_err(|_| "fixed-study public coordinate exceeds u64")?;
+                if format!("0x{value:x}") != *coordinate {
+                    return Err("fixed-study public coordinate is not canonical".into());
+                }
+            }
+            match (&item.rho_derived_u64_hex, needs_rho) {
+                (Some(seed), true) => {
+                    if seed.len() != 16
+                        || !seed
+                            .bytes()
+                            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+                    {
+                        return Err("fixed-study rho seed is not fixed-width lowercase hex".into());
+                    }
+                    if !rho_seeds.insert(seed) {
+                        return Err("fixed-study rho seeds are not distinct".into());
+                    }
+                }
+                (None, false) => {}
+                _ => return Err("fixed-study rho seed presence does not match its panel".into()),
+            }
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ChildInput {
     /// Reserved explicit diagnostic context; producer execution remains disabled.
@@ -147,6 +282,10 @@ pub struct ChildInput {
     /// Explicit v2 transport, admitted only after identity and custody checks.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub diagnostic_lifecycle: Option<DiagnosticChild>,
+    /// Fixed-study public targets and rho seeds. Target derivation provenance
+    /// remains parent-side; these public targets have no planted scalar.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub study: Option<PublicStudyExecution>,
     pub schema: String,
     pub curve: CurveSpec,
     pub target_seed: u64,
@@ -404,6 +543,10 @@ pub struct ChildOutput {
     pub workload_id: Option<String>,
     pub method_id: Option<String>,
     pub report: Option<SolveReport>,
+    /// Ordered per-target results for an admitted 64-target fixed-study arm.
+    /// Absent for ordinary methods and stopped/censored output.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch: Option<Vec<BatchItemReport>>,
     /// Common cold method-call interval: dispatch through report construction,
     /// including per-call setup and in-child checks. Excludes workload creation,
     /// child serialization and the runner's independent audit verification.
@@ -431,9 +574,10 @@ pub struct ChildOutput {
     pub allocator: Option<AllocatorFacts>,
 }
 
-/// The measured child's whole job: rebuild the workload, check its
-/// identity, solve, report.  It never sees the planted scalar's use: the
-/// runner verifies the answer in its own process.
+/// The measured child's whole job: rebuild the workload, check its identity,
+/// solve, report. Fixed-study jobs carry explicit public coordinates without
+/// target-derivation provenance or a planted scalar; the parent independently
+/// verifies every reported answer.
 pub fn child_main(input: &str) -> ChildOutput {
     let mut placement = SelfPlacement {
         affinity: own_affinity(),
@@ -448,6 +592,7 @@ pub fn child_main(input: &str) -> ChildOutput {
         workload_id: None,
         method_id: None,
         report: None,
+        batch: None,
         method_call_wall_ns: None,
         diagnostic_lifecycle: None,
         diagnostic_call_wall_ns: None,
@@ -458,6 +603,12 @@ pub fn child_main(input: &str) -> ChildOutput {
         solve_obs: None,
         allocator: None,
     };
+    // Bound all input before serde allocates strings/vectors. Batch64 fits well
+    // below this protocol cap; diagnostics no longer get a special exemption.
+    if input.len() > MAX_DIAGNOSTIC_CHILD_BYTES {
+        out.error = Some("child input exceeds byte bound".into());
+        return out;
+    }
     let job: ChildInput = match serde_json::from_str(input) {
         Ok(j) => j,
         Err(e) => {
@@ -465,17 +616,42 @@ pub fn child_main(input: &str) -> ChildOutput {
             return out;
         }
     };
-    if job.diagnostics.is_some() || job.diagnostic_lifecycle.is_some() {
-        if input.len() > MAX_DIAGNOSTIC_CHILD_BYTES {
-            out.error = Some("diagnostic child input exceeds byte bound".into());
-            return out;
-        }
+    if job.diagnostics.is_some() || job.diagnostic_lifecycle.is_some() || job.study.is_some() {
         if let Err(error) = super::canonical::reject_duplicate_keys(input) {
             out.error = Some(error);
             return out;
         }
         if job.diagnostics.is_some() && job.diagnostic_lifecycle.is_some() {
             out.error = Some("mixed v1/v2 diagnostic contexts".into());
+            return out;
+        }
+    }
+    if let Some(study) = &job.study {
+        if let Err(error) = study.validate() {
+            out.error = Some(error);
+            return out;
+        }
+        if job.target_seed != 0 || job.target_index != 0 || job.target_kind != TargetKind::Public {
+            out.error = Some("fixed-study child received a target seed or planted target".into());
+            return out;
+        }
+        let expected_algorithm_seed = match study
+            .items
+            .first()
+            .and_then(|item| item.rho_derived_u64_hex.as_deref())
+        {
+            Some(seed) => match u64::from_str_radix(seed, 16) {
+                Ok(seed) => seed,
+                Err(_) => {
+                    out.error = Some("fixed-study first rho seed exceeds u64".into());
+                    return out;
+                }
+            },
+            None => 0,
+        };
+        if job.algorithm_seed != expected_algorithm_seed {
+            out.error =
+                Some("fixed-study algorithm seed does not match first rho seed custody".into());
             return out;
         }
     }
@@ -506,6 +682,7 @@ pub fn child_main(input: &str) -> ChildOutput {
     let result = (|| -> Result<
         (
             SolveReport,
+            Option<Vec<BatchItemReport>>,
             Option<SchedStat>,
             HwCounts,
             SolveObs,
@@ -516,12 +693,26 @@ pub fn child_main(input: &str) -> ChildOutput {
         if job.schema != CHILD_INPUT_SCHEMA {
             return Err(format!("child input schema `{}`", job.schema));
         }
-        let (w, inst) = Workload::build(
-            &job.curve,
-            job.target_seed,
-            job.target_index,
-            job.target_kind,
-        )?;
+        let (w, inst) = if let Some(study) = &job.study {
+            let inst = job.curve.build()?;
+            let first = study.items.first().ok_or("fixed-study child has no target")?;
+            let workload = Workload::from_explicit_public_target(
+                &job.curve,
+                &inst,
+                first.target.clone(),
+            )?;
+            if workload.curve.slug != study.curve_slug {
+                return Err("fixed-study child curve identity mismatch".into());
+            }
+            (workload, inst)
+        } else {
+            Workload::build(
+                &job.curve,
+                job.target_seed,
+                job.target_index,
+                job.target_kind,
+            )?
+        };
         if w.workload_id != job.expected_workload_id {
             return Err(format!(
                 "rebuilt workload {} is not the planned {}",
@@ -538,6 +729,66 @@ pub fn child_main(input: &str) -> ChildOutput {
                 m.method_id, job.expected_method_id
             ));
         }
+        let batch_method = is_batch64_method(&m.id);
+        match (&job.study, batch_method) {
+            (None, true) => return Err("batch64 method requires fixed-study custody".into()),
+            (Some(study), true) => {
+                let expected_arm = match m.id.as_str() {
+                    BSGS_BATCH64_METHOD => "bsgs-amortized-b64",
+                    RHO_BATCH64_METHOD => "rho-amortized-b64",
+                    _ => unreachable!("batch method predicate"),
+                };
+                if study.panel != "amortized-B64"
+                    || study.arm != expected_arm
+                    || study.items.len() != 64
+                {
+                    return Err("batch64 method/study identity mismatch".into());
+                }
+            }
+            (Some(study), false) => {
+                if study.panel == "amortized-B64" || study.items.len() != 1 {
+                    return Err("ordinary method received batch study items".into());
+                }
+                let expected_method = match study.arm.as_str() {
+                    "bsgs-cold" | "bsgs-aa-copy" => "bsgs.prime_paired_v1",
+                    "rho-cold" | "rho-aa-copy" => "rho.prime_fast_v1",
+                    _ => return Err("ordinary fixed-study arm is not admitted".into()),
+                };
+                if m.id != expected_method {
+                    return Err("ordinary method/fixed-study arm mismatch".into());
+                }
+            }
+            (None, false) => {}
+        }
+        // Validate every batch point on the curve and in the subgroup before
+        // the measured boundary. The batch API receives only public points and
+        // independently derived rho-walk seeds; algorithm_seed is not passed.
+        let batch_inputs = if batch_method {
+            let study = job.study.as_ref().expect("batch study checked above");
+            let mut items = Vec::with_capacity(64);
+            for item in &study.items {
+                let public = Workload::from_explicit_public_target(
+                    &job.curve,
+                    &inst,
+                    item.target.clone(),
+                )?;
+                if public.curve.slug != study.curve_slug {
+                    return Err("batch64 public target curve identity mismatch".into());
+                }
+                let rho_seed = item
+                    .rho_derived_u64_hex
+                    .as_deref()
+                    .map(|seed| {
+                        u64::from_str_radix(seed, 16)
+                            .map_err(|_| "batch64 rho seed exceeds u64".to_string())
+                    })
+                    .transpose()?;
+                items.push((item.target.clone(), rho_seed));
+            }
+            Some(items)
+        } else {
+            None
+        };
         // Harness tables a solve may consult by name are loaded outside
         // the measured interval.
         crate::cryptanalysis::curve_id::warm();
@@ -578,20 +829,28 @@ pub fn child_main(input: &str) -> ChildOutput {
                 _ => None,
             };
             let method_call_start = std::time::Instant::now();
-            let report = crate::cryptanalysis::ecbench::methods::solve_measured(
-                &m,
-                &inst,
-                &w.curve,
-                &w.target,
-                job.algorithm_seed,
-                planted_oracle
-                    .as_ref()
-                    .map(|o| o as &dyn crate::cryptanalysis::ecbench::oracle::StaticDhOracle),
-            );
+            let solved = if let Some(items) = &batch_inputs {
+                crate::cryptanalysis::ecbench::methods::solve_batch64_measured(
+                    &m, &inst, &w.curve, items,
+                )
+                .map(|(report, batch)| (report, Some(batch)))
+            } else {
+                crate::cryptanalysis::ecbench::methods::solve_measured(
+                    &m,
+                    &inst,
+                    &w.curve,
+                    &w.target,
+                    job.algorithm_seed,
+                    planted_oracle
+                        .as_ref()
+                        .map(|o| o as &dyn crate::cryptanalysis::ecbench::oracle::StaticDhOracle),
+                )
+                .map(|report| (report, None))
+            };
             if profile_solve {
                 ic_measurement::callgrind_dump(b"ecbench_solve\0");
             }
-            let mut report = report?;
+            let (mut report, batch) = solved?;
             let hw = counters.stop();
             let after = schedstat();
             let probe_after = SolveProbe::read();
@@ -626,6 +885,7 @@ pub fn child_main(input: &str) -> ChildOutput {
             out.method_id = Some(m.method_id);
             Ok((
                 report,
+                batch,
                 delta,
                 hw,
                 probe_after.since(&probe_before),
@@ -655,8 +915,9 @@ pub fn child_main(input: &str) -> ChildOutput {
     placement.anon_pages_by_node = anon_pages_by_node();
     out.placement = placement;
     match result {
-        Ok((r, s, hw, obs, alloc)) => {
+        Ok((r, batch, s, hw, obs, alloc)) => {
             out.report = Some(r);
+            out.batch = batch;
             out.schedstat_solve = s;
             out.hw_solve = Some(hw);
             out.solve_obs = Some(obs);
@@ -678,12 +939,29 @@ pub struct Outcome {
     /// `[recovered]G = Q`, checked by the runner in its own process.
     pub matches_target: Option<bool>,
     pub matches_planted: Option<bool>,
+    /// Independently checked ordered batch results. Absent on ordinary runs and
+    /// on stopped/censored batch executions.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch: Option<Vec<BatchOutcomeItem>>,
     pub error: Option<String>,
     /// Exit code or signal of the measured process.
     pub exit: Option<String>,
     /// SHA-256 of the child's stderr, kept as `exec/<seq>.stderr` when
     /// nonempty.
     pub stderr_sha256: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BatchOutcomeItem {
+    pub item: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recovered: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub matches_target: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub matches_planted: Option<bool>,
+    pub exhausted: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -713,6 +991,14 @@ pub struct Cost {
     /// `"amortized"` on such a run; absent otherwise (cold).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cost_basis: Option<String>,
+    /// Whole-batch accounting is kept out of the ordinary one-target `S` and
+    /// generic-floor columns. Absent on legacy and single-target records.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub batch_size: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_gae_per_target: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub s_per_target: Option<f64>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -769,6 +1055,10 @@ pub struct Record {
     pub method: ResolvedMethod,
     pub workload: Workload,
     pub algorithm_seed: String,
+    /// Parent-side frozen study identity. This is added only to fixed-study
+    /// records and is covered by the record seal.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub study: Option<super::spec::StudyExecution>,
     pub outcome: Outcome,
     pub cost: Cost,
     pub boundaries: Boundaries,
@@ -1221,6 +1511,85 @@ mod grade_tests {
 }
 
 #[cfg(test)]
+mod fixed_study_seed_custody_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::spec::{StudyExecution, StudyItemIdentity};
+
+    fn input(panel: &str, arm: &str, copy: &str, rho: Option<&str>, seed: u64) -> ChildInput {
+        ChildInput {
+            diagnostics: None,
+            diagnostic_lifecycle: None,
+            study: Some(
+                PublicStudyExecution::from_parent(&StudyExecution {
+                    study: "blocked-bsgs-rho-wall/v1".into(),
+                    curve_slug: "fixture-curve".into(),
+                    panel: panel.into(),
+                    replicate: 0,
+                    arm: arm.into(),
+                    copy: copy.into(),
+                    schedule_position: 0,
+                    items: vec![StudyItemIdentity {
+                        item: 0,
+                        target_derived_u64_hex: "0123456789abcdef".into(),
+                        target: ["0x2".into(), "0x3".into()],
+                        rho_derived_u64_hex: rho.map(str::to_owned),
+                    }],
+                })
+                .unwrap(),
+            ),
+            schema: CHILD_INPUT_SCHEMA.into(),
+            curve: CurveSpec::PrimeExplicit {
+                p: 113,
+                a: 19,
+                b: 2,
+                group_order: 112,
+                r: 7,
+                gx: 52,
+                gy: 110,
+            },
+            target_seed: 0,
+            target_index: 0,
+            target_kind: TargetKind::Public,
+            expected_workload_id: "not-reached".into(),
+            method: MethodSpec {
+                id: "bsgs.prime_paired_v1".into(),
+                params: BTreeMap::new(),
+            },
+            expected_method_id: "not-reached".into(),
+            algorithm_seed: seed,
+        }
+    }
+
+    #[test]
+    fn rho_panel_rejects_top_level_seed_not_bound_to_first_item() {
+        let job = input(
+            "cold-paired",
+            "bsgs-cold",
+            "main",
+            Some("0000000000000007"),
+            8,
+        );
+        let out = child_main(&serde_json::to_string(&job).unwrap());
+        assert_eq!(
+            out.error.as_deref(),
+            Some("fixed-study algorithm seed does not match first rho seed custody")
+        );
+        assert!(out.report.is_none() && out.batch.is_none());
+    }
+
+    #[test]
+    fn no_rho_panel_requires_zero_top_level_seed() {
+        let job = input("bsgs-aa", "bsgs-cold", "1", None, 1);
+        let out = child_main(&serde_json::to_string(&job).unwrap());
+        assert_eq!(
+            out.error.as_deref(),
+            Some("fixed-study algorithm seed does not match first rho seed custody")
+        );
+        assert!(out.report.is_none() && out.batch.is_none());
+    }
+}
+
+#[cfg(test)]
 mod allocator_tests {
     use super::*;
 
@@ -1291,6 +1660,7 @@ mod allocator_tests {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
             diagnostic_lifecycle: None,
+            study: None,
             curve: w.curve_spec.for_child(&inst),
             target_seed: 7,
             target_index: 0,

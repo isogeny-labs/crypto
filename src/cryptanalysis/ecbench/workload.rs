@@ -2218,6 +2218,10 @@ pub const PUBLIC_TARGET_LAW_WIDE: &str = "hash_to_subgroup_v2";
 /// abscissa, its bit 255 chooses the ordinate.  Used for no other class.
 pub const PUBLIC_TARGET_LAW_BIG: &str = "hash_to_subgroup_big_v3";
 
+/// A caller-supplied public point whose coordinates, rather than a seed that
+/// could disclose its planted logarithm, are the complete target input.
+pub const EXPLICIT_PUBLIC_TARGET_LAW: &str = "explicit_public_point_v1";
+
 /// Whether a workload's target was built from a known scalar.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -2377,6 +2381,74 @@ impl Workload {
         Ok((w, inst))
     }
 
+    /// Build a fixed public-target workload without transporting a target seed
+    /// or planted scalar to the measured child. This deliberately supports only
+    /// the one-word prime-field class used by fixed public benchmark panels.
+    /// The point is parsed canonically and independently checked on the curve
+    /// and in the declared prime-order subgroup.
+    pub fn from_explicit_public_target(
+        spec: &CurveSpec,
+        inst: &Instance,
+        target: [String; 2],
+    ) -> Result<Workload, String> {
+        let Instance::Prime(prime) = inst else {
+            return Err("explicit public target requires a one-word prime curve".into());
+        };
+        fn coordinate(text: &str) -> Result<u64, String> {
+            let digits = text
+                .strip_prefix("0x")
+                .ok_or("explicit public coordinate needs a 0x prefix")?;
+            if digits.is_empty()
+                || digits.len() > 16
+                || !digits
+                    .bytes()
+                    .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+            {
+                return Err("explicit public coordinate is not lowercase hexadecimal".into());
+            }
+            let value = u64::from_str_radix(digits, 16)
+                .map_err(|_| "explicit public coordinate exceeds u64")?;
+            if format!("0x{value:x}") != text {
+                return Err("explicit public coordinate is not canonical".into());
+            }
+            Ok(value)
+        }
+        let x = coordinate(&target[0])?;
+        let y = coordinate(&target[1])?;
+        if x >= prime.curve.p || y >= prime.curve.p {
+            return Err("explicit public coordinate is outside the base field".into());
+        }
+        let point = PrimePoint::affine(x, y);
+        let mut operations = GroupOps::default();
+        if point.infinity
+            || !prime.curve.is_on_curve(point)
+            || !prime.curve.mul(&mut operations, point, prime.r).infinity
+        {
+            return Err("explicit public point is not in the declared subgroup".into());
+        }
+        let curve = inst.facts(spec);
+        if curve.r.checked_u64() != Some(prime.r) {
+            return Err("explicit public target subgroup identity mismatch".into());
+        }
+        let (workload_id, workload_sha256) = bare_id(
+            "W",
+            &Self::identity_view(&curve, EXPLICIT_PUBLIC_TARGET_LAW, 0, 0, &target),
+        )?;
+        Ok(Workload {
+            workload_id,
+            workload_sha256,
+            curve_spec: spec.clone(),
+            curve,
+            target_law: EXPLICIT_PUBLIC_TARGET_LAW.into(),
+            target_seed: 0,
+            target_index: 0,
+            target,
+            planted: None,
+            target_counter: None,
+            representation: prime.representation.clone(),
+        })
+    }
+
     /// Workload `index` under `target_seed` on `inst`, already built from
     /// `spec`.
     pub fn on(
@@ -2519,6 +2591,7 @@ impl Workload {
         if self.target_law == PUBLIC_TARGET_LAW
             || self.target_law == PUBLIC_TARGET_LAW_WIDE
             || self.target_law == PUBLIC_TARGET_LAW_BIG
+            || self.target_law == EXPLICIT_PUBLIC_TARGET_LAW
             || self.target_law == "ecbench.public-fixture/v1"
             || self.target_law == super::curve25519_workload::PUBLIC_LAW
         {
@@ -2976,6 +3049,39 @@ mod tests {
             assert!((1..w.curve.r.checked_u128().unwrap())
                 .any(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target)));
         }
+    }
+
+    #[test]
+    fn explicit_public_targets_are_seedless_canonical_and_subgroup_checked() {
+        let spec = CurveSpec::PrimeExplicit {
+            p: 16_777_199,
+            a: 16_777_196,
+            b: 31,
+            group_order: 16_782_299,
+            r: 16_782_299,
+            gx: 2,
+            gy: 5_412_647,
+        };
+        let inst = spec.build().unwrap();
+        let target = ["0x2".to_string(), format!("0x{:x}", 5_412_647u64)];
+        let workload = Workload::from_explicit_public_target(&spec, &inst, target.clone()).unwrap();
+        assert_eq!(workload.target, target);
+        assert_eq!(workload.target_law, EXPLICIT_PUBLIC_TARGET_LAW);
+        assert_eq!((workload.target_seed, workload.target_index), (0, 0));
+        assert!(workload.planted.is_none());
+        assert_eq!(workload.kind(), TargetKind::Public);
+        assert_eq!(workload.recompute_id().unwrap(), workload.workload_id);
+        assert_eq!(
+            Workload::from_explicit_public_target(&spec, &inst, workload.target.clone()).unwrap(),
+            workload
+        );
+
+        let mut noncanonical = workload.target.clone();
+        noncanonical[0] = "0x02".into();
+        assert!(Workload::from_explicit_public_target(&spec, &inst, noncanonical).is_err());
+        let mut off_curve = workload.target.clone();
+        off_curve[1] = format!("0x{:x}", 5_412_648u64);
+        assert!(Workload::from_explicit_public_target(&spec, &inst, off_curve).is_err());
     }
 
     #[test]

@@ -45,6 +45,7 @@
 //! own SHA-256 is the replay certificate a claim cites.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::io::Read;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
@@ -60,11 +61,14 @@ use crate::cryptanalysis::ecbench::methods::{
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
     f6_tree_version, floor_s, from_str_legacy_floats, grade_for_version, json_roundtrip,
-    ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA, F6_TREE_VERSION,
+    BatchOutcomeItem, ChildInput, Grade, GradeInput, PublicStudyExecution, Record,
+    CHILD_INPUT_SCHEMA, F6_TREE_VERSION,
 };
-use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
+use crate::cryptanalysis::ecbench::runner::{
+    audit_study_intents_for_plan, read_session, PlanDoc, Session,
+};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
-use crate::cryptanalysis::ecbench::workload::{CurveFacts, Workload};
+use crate::cryptanalysis::ecbench::workload::{CurveFacts, TargetKind, Workload};
 
 /// Replay every measured deterministic run.
 pub const REPLAY_ALL: usize = usize::MAX;
@@ -560,14 +564,27 @@ pub fn replay_input_json(
 ) -> Result<String, String> {
     let ex = &p.executions[r.seq as usize];
     let w = &p.workloads[ex.workload];
+    let study = ex
+        .study
+        .as_ref()
+        .map(PublicStudyExecution::from_parent)
+        .transpose()?;
+    let fixed_study = study.is_some();
     let input = ChildInput {
         schema: CHILD_INPUT_SCHEMA.into(),
         diagnostics: None,
         diagnostic_lifecycle: None,
+        study,
         curve: w.curve_spec.for_child(p.instance(ex.workload)),
-        target_seed: w.target_seed,
-        target_index: w.target_index,
-        target_kind: w.kind(),
+        // Target derivation provenance remains parent-side. The public point is
+        // the replay child's complete target input.
+        target_seed: if fixed_study { 0 } else { w.target_seed },
+        target_index: if fixed_study { 0 } else { w.target_index },
+        target_kind: if fixed_study {
+            TargetKind::Public
+        } else {
+            w.kind()
+        },
         expected_workload_id: w.workload_id.clone(),
         method: MethodSpec {
             id: r.method.id.clone(),
@@ -629,11 +646,12 @@ fn replay_with_accounting_inner(
     session: &crate::cryptanalysis::ecbench::runner::Session,
 ) -> (bool, String) {
     let out = child_main(input_json);
+    let replay_batch = out.batch;
     if r.outcome.status == "error" {
         // The recorded error must be the one the replay hits (the runner
         // may append the session's own interruption to it).
-        return match (out.report, out.error) {
-            (None, Some(e)) => {
+        return match (out.report, replay_batch, out.error) {
+            (None, None, Some(e)) => {
                 let recorded = r.outcome.error.as_deref().unwrap_or("");
                 if recorded == e || recorded.starts_with(&format!("{e}; session ")) {
                     (true, "identical (same error)".into())
@@ -641,8 +659,10 @@ fn replay_with_accounting_inner(
                     (false, format!("differs in error: replay says `{e}`"))
                 }
             }
-            (Some(_), _) => (false, "differs in outcome: the replay solved it".into()),
-            (None, None) => (false, "replay failed without an error".into()),
+            (Some(_), _, _) | (_, Some(_), _) => {
+                (false, "differs in outcome: the replay solved it".into())
+            }
+            (None, None, None) => (false, "replay failed without an error".into()),
         };
     }
     let rep = match out.report {
@@ -654,7 +674,7 @@ fn replay_with_accounting_inner(
         }
         Some(rep) => rep,
     };
-    let (ok, detail) = compare_replay(&rep, r, host, session);
+    let (ok, detail) = compare_replay(&rep, replay_batch.as_deref(), r, host, session);
     if ok {
         return (ok, detail);
     }
@@ -662,7 +682,7 @@ fn replay_with_accounting_inner(
         .then(|| legacy::pre_endomorphism_a1(&rep, r))
         .flatten()
     {
-        let (ok, d) = compare_replay(&view, r, host, session);
+        let (ok, d) = compare_replay(&view, replay_batch.as_deref(), r, host, session);
         if ok {
             return (
                 true,
@@ -682,7 +702,7 @@ fn replay_with_accounting_inner(
             child_main(input_json)
         };
         if let Some(rep) = again.report {
-            let (ok, d) = compare_replay(&rep, r, host, session);
+            let (ok, d) = compare_replay(&rep, again.batch.as_deref(), r, host, session);
             if ok {
                 return (
                     true,
@@ -709,6 +729,7 @@ fn counted_field_ops_match(
 /// What a replay must reproduce of `r`: `(reproduced, detail)`.
 fn compare_replay(
     rep: &SolveReport,
+    replay_batch: Option<&[crate::cryptanalysis::ecbench::methods::BatchItemReport]>,
     r: &Record,
     host: &HostCapsule,
     session: &crate::cryptanalysis::ecbench::runner::Session,
@@ -738,11 +759,35 @@ fn compare_replay(
     }
     let rep = &rep;
     let mut diffs = Vec::new();
-    if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
-        diffs.push("recovered");
-    }
-    if (r.outcome.status == "exhausted") != (rep.recovered.is_none() && rep.exhausted) {
-        diffs.push("exhaustion");
+    if let Some(recorded_batch) = &r.outcome.batch {
+        let same = replay_batch.is_some_and(|batch| {
+            batch.len() == 64
+                && recorded_batch.len() == 64
+                && batch.iter().zip(recorded_batch).enumerate().all(
+                    |(index, (replayed, recorded))| {
+                        replayed.item == index as u64
+                            && recorded.item == index as u64
+                            && replayed.recovered.map(|k| k.to_string()) == recorded.recovered
+                            && replayed.exhausted == recorded.exhausted
+                    },
+                )
+        });
+        if !same {
+            diffs.push("batch outcome");
+        }
+        if rep.recovered.is_some() || r.outcome.recovered.is_some() {
+            diffs.push("batch aggregate recovered");
+        }
+    } else {
+        if replay_batch.is_some() {
+            diffs.push("unexpected batch outcome");
+        }
+        if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
+            diffs.push("recovered");
+        }
+        if (r.outcome.status == "exhausted") != (rep.recovered.is_none() && rep.exhausted) {
+            diffs.push("exhaustion");
+        }
     }
     // Integer counts compare exactly; a float compares after
     // the same serialise-parse round trip the record's took.
@@ -761,6 +806,24 @@ fn compare_replay(
     };
     let exact: Vec<f64> = rep.phases.iter().map(|p| p.gae).collect();
     let (mut total_ok, mut phases_ok) = same_gae(&exact, rep.total_gae);
+    if r.outcome.batch.is_some() {
+        let per_target = rep.total_gae / 64.0;
+        let s_per_target = per_target / r.workload.curve.r.to_f64().sqrt();
+        if r.cost.batch_size != Some(64)
+            || r.cost.total_gae_per_target.map(f64::to_bits)
+                != Some(json_roundtrip(per_target).to_bits())
+            || r.cost.s_per_target.map(f64::to_bits) != Some(json_roundtrip(s_per_target).to_bits())
+            || r.cost.s.is_some()
+            || r.boundaries.ratio_to_floor.is_some()
+        {
+            diffs.push("batch cost normalization");
+        }
+    } else if r.cost.batch_size.is_some()
+        || r.cost.total_gae_per_target.is_some()
+        || r.cost.s_per_target.is_some()
+    {
+        diffs.push("unexpected batch cost normalization");
+    }
     let mut legacy = false;
     // The pre-fix solver rounding is for the sealed records it was written
     // into, never for a record that merely claims it.
@@ -994,8 +1057,32 @@ impl AuditReport {
     }
 }
 
+const MAX_AUDIT_JSONL_BYTES: u64 = 256 * 1024 * 1024;
+
+fn read_bounded(path: &Path, cap: u64) -> Result<Vec<u8>, String> {
+    let metadata =
+        std::fs::metadata(path).map_err(|error| format!("{}: {error}", path.display()))?;
+    if metadata.len() > cap {
+        return Err(format!("{} exceeds {cap} byte audit cap", path.display()));
+    }
+    let file = std::fs::File::open(path).map_err(|error| format!("{}: {error}", path.display()))?;
+    let mut bytes = Vec::with_capacity(usize::try_from(metadata.len()).unwrap_or(0));
+    file.take(cap + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|error| format!("{}: {error}", path.display()))?;
+    if bytes.len() as u64 > cap {
+        return Err(format!("{} exceeds {cap} byte audit cap", path.display()));
+    }
+    Ok(bytes)
+}
+
+fn read_bounded_text(path: &Path, cap: u64) -> Result<String, String> {
+    String::from_utf8(read_bounded(path, cap)?)
+        .map_err(|error| format!("{}: {error}", path.display()))
+}
+
 fn file_sha(dir: &Path, name: &str, files: &mut BTreeMap<String, String>) -> Option<String> {
-    let bytes = std::fs::read(dir.join(name)).ok()?;
+    let bytes = read_bounded(&dir.join(name), MAX_AUDIT_JSONL_BYTES).ok()?;
     let h = sha256_hex(&bytes);
     files.insert(name.to_string(), h.clone());
     Some(h)
@@ -1162,7 +1249,7 @@ struct RecordFile {
 
 fn read_record_file(dir: &Path) -> Result<RecordFile, String> {
     let path = dir.join("records.jsonl");
-    let bytes = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let bytes = read_bounded(&path, MAX_AUDIT_JSONL_BYTES)?;
     let mut out = RecordFile {
         lines: Vec::new(),
         problem: None,
@@ -1257,6 +1344,54 @@ fn automorphisms_bound(r: &Record, curve: &CurveFacts) -> u32 {
     } else {
         own
     }
+}
+
+fn verify_batch_outcome(
+    inst: &crate::cryptanalysis::ecbench::workload::Instance,
+    study: &crate::cryptanalysis::ecbench::spec::StudyExecution,
+    batch: &[BatchOutcomeItem],
+) -> Result<&'static str, String> {
+    let public = PublicStudyExecution::from_parent(study)?;
+    if public.panel != "amortized-B64" || public.items.len() != 64 || batch.len() != 64 {
+        return Err("batch64 outcome length/panel mismatch".into());
+    }
+    let mut any_wrong = false;
+    let mut any_missing = false;
+    for (index, (recorded, expected)) in batch.iter().zip(&public.items).enumerate() {
+        if recorded.item != index as u64 || expected.item != index as u64 {
+            return Err("batch64 outcome order mismatch".into());
+        }
+        let recovered = recorded
+            .recovered
+            .as_deref()
+            .map(|text| {
+                let scalar: super::exact_scalar::ExactScalar = text.parse()?;
+                if scalar.to_string() != text {
+                    return Err("batch64 recovered scalar is not canonical");
+                }
+                Ok(scalar)
+            })
+            .transpose()
+            .map_err(|error: &str| error.to_string())?;
+        let matches_target = recovered
+            .map(|scalar| inst.mul_generator_exact(scalar).as_ref() == Some(&expected.target));
+        let expected_exhausted = recovered.is_none() || matches_target == Some(false);
+        if recorded.matches_target != matches_target
+            || recorded.matches_planted.is_some()
+            || recorded.exhausted != expected_exhausted
+        {
+            return Err("batch64 verification/exhaustion fields do not reproduce".into());
+        }
+        any_missing |= recovered.is_none();
+        any_wrong |= matches_target == Some(false);
+    }
+    Ok(if any_wrong {
+        "wrong_answer"
+    } else if any_missing {
+        "exhausted"
+    } else {
+        "verified"
+    })
 }
 
 /// The order of a prime curve's automorphism group over `F_p`, read from its
@@ -1386,7 +1521,13 @@ fn consistency_problems(
     if failed
         && (r.cost.total_gae.is_some()
             || r.cost.s.is_some()
-            || r.boundaries.ratio_to_floor.is_some())
+            || r.cost.total_gae_store.is_some()
+            || r.cost.s_store.is_some()
+            || r.cost.batch_size.is_some()
+            || r.cost.total_gae_per_target.is_some()
+            || r.cost.s_per_target.is_some()
+            || r.boundaries.ratio_to_floor.is_some()
+            || r.outcome.batch.is_some())
     {
         out.push(format!(
             "{tag}: status `{}` carries a cost; only a finished solve has one",
@@ -1419,6 +1560,12 @@ fn consistency_problems(
         out.push(format!(
             "{tag}: status `{}` has no total, so no solve finished",
             r.outcome.status
+        ));
+    }
+    if !failed && r.outcome.exit.as_deref() != Some("exit 0") {
+        out.push(format!(
+            "{tag}: finished status `{}` requires child exit 0, not {:?}",
+            r.outcome.status, r.outcome.exit
         ));
     }
     match r.outcome.status.as_str() {
@@ -1625,6 +1772,41 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     let file = read_record_file(dir)?;
     let lines = file.lines;
     let records: Vec<Record> = lines.iter().map(|(_, r)| r.clone()).collect();
+    let study_planned = p
+        .executions
+        .iter()
+        .filter(|execution| execution.study.is_some())
+        .count();
+    if study_planned != 0 {
+        let intents_path = dir.join("intents.jsonl");
+        let intents = read_bounded_text(&intents_path, MAX_AUDIT_JSONL_BYTES)?;
+        let record_text: String = lines.iter().map(|(line, _)| format!("{line}\n")).collect();
+        match audit_study_intents_for_plan(&intents, &record_text, &p) {
+            Ok(summary) => {
+                let session_summary = session.study_intents.as_ref();
+                led.check(
+                    "study_intents",
+                    summary.planned == study_planned as u64
+                        && session_summary.is_some_and(|recorded| {
+                            recorded.schema == summary.schema
+                                && recorded.path == summary.path
+                                && recorded.planned == summary.planned
+                                && recorded.written <= summary.written
+                                && recorded.records_matched <= summary.records_matched
+                                && (recorded.sha256.is_none() || recorded.sha256 == summary.sha256)
+                        }),
+                    || "study intent custody differs from the plan/session".into(),
+                );
+            }
+            Err(error) => led.check("study_intents", false, || error),
+        }
+    } else {
+        led.check(
+            "study_intents_absent",
+            session.study_intents.is_none() && !dir.join("intents.jsonl").exists(),
+            || "ordinary session unexpectedly carries fixed-study intents".into(),
+        );
+    }
     let torn_tolerated = allow_interrupted && interrupted;
     if let Some(bytes) = file.torn_tail {
         if torn_tolerated {
@@ -1710,6 +1892,17 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         if workload_identity(&r.workload) != workload_identity(w) {
             record_problems.push(format!("{tag}: workload differs from the plan"));
         }
+        if r.study != ex.study {
+            record_problems.push(format!("{tag}: study identity differs from the plan"));
+        }
+        let batch_method = matches!(
+            r.method.id.as_str(),
+            "bsgs.prime_paired_batch64_v1" | "rho.prime_fast_batch64_v1"
+        );
+        let finished_status = matches!(
+            r.outcome.status.as_str(),
+            "verified" | "wrong_answer" | "exhausted"
+        );
         // Every derived figure must follow from the record's own counts:
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
@@ -1717,14 +1910,49 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // The floor's `A` follows the rule the record names (none: the first
         // rule), so a record written before `j = 0` and `j = 1728` curves got
         // their own count still recomputes to the floor it was written with.
-        let derived_ok = Some(r.boundaries.automorphisms_available)
-            == expected_automorphisms(r.boundaries.floor_rule.as_deref(), &w.curve)
-            && close(r.boundaries.floor_s, floor)
-            && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
+        let ordinary_cost_ok = if batch_method && finished_status {
+            matches!(
+                (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor),
+                (Some(_), None, None)
+            )
+        } else if batch_method {
+            matches!(
+                (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor),
+                (None, None, None)
+            )
+        } else {
+            match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),
                 (None, None, None) => true,
                 _ => false,
             }
+        };
+        let batch_cost_ok = if batch_method && finished_status {
+            match (
+                r.cost.total_gae,
+                r.cost.batch_size,
+                r.cost.total_gae_per_target,
+                r.cost.s_per_target,
+            ) {
+                (Some(total), Some(64), Some(per_target), Some(s_per_target)) => {
+                    close(per_target, total / 64.0) && close(s_per_target, per_target / sqrt_r)
+                }
+                _ => false,
+            }
+        } else if batch_method {
+            r.cost.batch_size.is_none()
+                && r.cost.total_gae_per_target.is_none()
+                && r.cost.s_per_target.is_none()
+        } else {
+            r.cost.batch_size.is_none()
+                && r.cost.total_gae_per_target.is_none()
+                && r.cost.s_per_target.is_none()
+        };
+        let derived_ok = Some(r.boundaries.automorphisms_available)
+            == expected_automorphisms(r.boundaries.floor_rule.as_deref(), &w.curve)
+            && close(r.boundaries.floor_s, floor)
+            && ordinary_cost_ok
+            && batch_cost_ok
             && match (r.cost.total_gae_store, r.cost.s_store) {
                 (Some(t), Some(sv)) => close(sv, t / sqrt_r),
                 (None, None) => true,
@@ -1750,19 +1978,60 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         ));
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
-        let rec: Option<super::exact_scalar::ExactScalar> =
-            r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
-        let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
-        if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
-            record_problems.push(format!("{tag}: verification does not reproduce"));
-        }
-        let should_verify = target_ok == Some(true) && planted_ok != Some(false);
-        if (r.outcome.status == "verified") != should_verify {
-            record_problems.push(format!(
-                "{tag}: status `{}` contradicts the check",
-                r.outcome.status
-            ));
+        if batch_method {
+            if r.outcome.recovered.is_some()
+                || r.outcome.matches_target.is_some()
+                || r.outcome.matches_planted.is_some()
+            {
+                record_problems.push(format!(
+                    "{tag}: batch64 outcome carries single-target verification fields"
+                ));
+            }
+            let finished = matches!(
+                r.outcome.status.as_str(),
+                "verified" | "wrong_answer" | "exhausted"
+            );
+            match (finished, r.study.as_ref(), r.outcome.batch.as_deref()) {
+                (true, Some(study), Some(batch)) => {
+                    match verify_batch_outcome(inst, study, batch) {
+                        Ok(expected_status) if r.outcome.status == expected_status => {}
+                        Ok(expected_status) => record_problems.push(format!(
+                            "{tag}: batch64 status `{}` should be `{expected_status}`",
+                            r.outcome.status
+                        )),
+                        Err(error) => record_problems.push(format!("{tag}: {error}")),
+                    }
+                }
+                (true, _, _) => record_problems.push(format!(
+                    "{tag}: batch64 finished record lacks study or ordered outcome"
+                )),
+                (false, _, Some(_)) => record_problems.push(format!(
+                    "{tag}: stopped/failed batch64 record carries accepted outcomes"
+                )),
+                (false, _, None) => {}
+            }
+        } else {
+            if r.outcome.batch.is_some() {
+                record_problems.push(format!("{tag}: ordinary record carries batch64 outcome"));
+            }
+            let rec: Option<super::exact_scalar::ExactScalar> =
+                r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
+            let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
+            let planted_ok = if ex.study.is_some() {
+                None
+            } else {
+                w.planted.and_then(|p| rec.map(|k| k == p))
+            };
+            if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
+                record_problems.push(format!("{tag}: verification does not reproduce"));
+            }
+            let should_verify = target_ok == Some(true) && planted_ok != Some(false);
+            if (r.outcome.status == "verified") != should_verify {
+                record_problems.push(format!(
+                    "{tag}: status `{}` contradicts the check",
+                    r.outcome.status
+                ));
+            }
         }
         if r.outcome.status == "verified" {
             verified += 1;
@@ -2494,6 +2763,215 @@ pub(crate) mod tests {
         }
     }
 
+    fn batch_study_fixture() -> (
+        crate::cryptanalysis::ecbench::workload::Instance,
+        crate::cryptanalysis::ecbench::spec::StudyExecution,
+        Vec<BatchOutcomeItem>,
+    ) {
+        use crate::cryptanalysis::ecbench::blocked_bsgs_rho_study::{curves, derive_u64, STUDY_ID};
+        use crate::cryptanalysis::ecbench::spec::{StudyExecution, StudyItemIdentity};
+        use crate::cryptanalysis::ecbench::workload::{TargetKind, Workload};
+
+        let curve = curves().remove(0);
+        let instance = curve.build().unwrap();
+        let curve_slug = instance.facts(&curve).slug;
+        let mut items = Vec::with_capacity(64);
+        for item in 0..64 {
+            let target_seed = derive_u64(20261126, &curve_slug, "amortized-B64", 0, item, "target");
+            let rho_seed = derive_u64(20261126, &curve_slug, "amortized-B64", 0, item, "rho-walk");
+            let public =
+                Workload::on(&curve, &instance, target_seed, item, TargetKind::Public).unwrap();
+            items.push(StudyItemIdentity {
+                item,
+                target_derived_u64_hex: format!("{target_seed:016x}"),
+                target: public.target,
+                rho_derived_u64_hex: Some(format!("{rho_seed:016x}")),
+            });
+        }
+        let study = StudyExecution {
+            study: STUDY_ID.into(),
+            curve_slug,
+            panel: "amortized-B64".into(),
+            replicate: 0,
+            arm: "bsgs-amortized-b64".into(),
+            copy: "main".into(),
+            schedule_position: 0,
+            items,
+        };
+        let batch = (0..64)
+            .map(|item| BatchOutcomeItem {
+                item,
+                recovered: None,
+                matches_target: None,
+                matches_planted: None,
+                exhausted: true,
+            })
+            .collect();
+        (instance, study, batch)
+    }
+
+    #[test]
+    fn batch_outcome_verification_rejects_missing_reordered_and_forged_items() {
+        let (instance, study, batch) = batch_study_fixture();
+        assert_eq!(
+            verify_batch_outcome(&instance, &study, &batch).unwrap(),
+            "exhausted"
+        );
+
+        let mut missing = batch.clone();
+        missing.pop();
+        assert!(verify_batch_outcome(&instance, &study, &missing)
+            .unwrap_err()
+            .contains("length/panel"));
+
+        let mut duplicate = batch.clone();
+        duplicate[1].item = 0;
+        assert!(verify_batch_outcome(&instance, &study, &duplicate)
+            .unwrap_err()
+            .contains("order"));
+
+        let mut permuted = batch.clone();
+        permuted.swap(0, 1);
+        assert!(verify_batch_outcome(&instance, &study, &permuted)
+            .unwrap_err()
+            .contains("order"));
+
+        let target = &study.items[0].target;
+        let wrong = (1u64..)
+            .find(|scalar| instance.mul_generator_exact((*scalar).into()).as_ref() != Some(target))
+            .unwrap();
+        let mut forged_scalar_and_flags = batch.clone();
+        forged_scalar_and_flags[0].recovered = Some(wrong.to_string());
+        forged_scalar_and_flags[0].matches_target = Some(true);
+        forged_scalar_and_flags[0].exhausted = false;
+        assert!(
+            verify_batch_outcome(&instance, &study, &forged_scalar_and_flags)
+                .unwrap_err()
+                .contains("verification/exhaustion")
+        );
+
+        let mut planted_flag = batch;
+        planted_flag[0].matches_planted = Some(true);
+        assert!(verify_batch_outcome(&instance, &study, &planted_flag)
+            .unwrap_err()
+            .contains("verification/exhaustion"));
+    }
+
+    fn batch_replay_fixture(
+        tag: &str,
+    ) -> (
+        std::path::PathBuf,
+        SolveReport,
+        Vec<crate::cryptanalysis::ecbench::methods::BatchItemReport>,
+        Record,
+        HostCapsule,
+        crate::cryptanalysis::ecbench::runner::Session,
+    ) {
+        use crate::cryptanalysis::ecbench::methods::BatchItemReport;
+
+        let dir = fresh(tag);
+        let mut record = read_record_file(&dir).unwrap().lines[RHO_SEQ].1.clone();
+        let host: HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        let session = read_session(&dir).unwrap();
+        let report = SolveReport {
+            recovered: None,
+            exhausted: true,
+            phases: record.phases.clone(),
+            total_gae: record.cost.total_gae.unwrap(),
+            automorphisms_used: record.boundaries.automorphisms_used.unwrap(),
+            counters: record.counters.clone(),
+            unpriced: record.cost.unpriced.clone(),
+            deterministic: record.cost.deterministic,
+            nondeterminism: record.cost.nondeterminism.clone(),
+            solve_wall_ns: record.time.solve_wall_ns.unwrap_or(0),
+            factor_base: record.factor_base.clone(),
+            detail: record.detail.clone(),
+            online: record.online.clone(),
+            solver: record.solver.clone(),
+            field_ops: record.field_ops,
+            ..Default::default()
+        };
+        let batch: Vec<_> = (0..64)
+            .map(|item| BatchItemReport {
+                item,
+                target: ["0x1".into(), "0x1".into()],
+                rho_seed: Some(format!("{item:016x}")),
+                recovered: None,
+                exhausted: true,
+                evaluator_correct: false,
+                solver_wall_ns: 0,
+                verification_wall_ns: 0,
+                drop_wall_ns: 0,
+                counters: BTreeMap::new(),
+            })
+            .collect();
+        record.outcome.recovered = None;
+        record.outcome.matches_target = None;
+        record.outcome.matches_planted = None;
+        record.outcome.batch = Some(
+            batch
+                .iter()
+                .map(|item| BatchOutcomeItem {
+                    item: item.item,
+                    recovered: None,
+                    matches_target: None,
+                    matches_planted: None,
+                    exhausted: true,
+                })
+                .collect(),
+        );
+        record.cost.s = None;
+        record.boundaries.ratio_to_floor = None;
+        record.cost.batch_size = Some(64);
+        record.cost.total_gae_per_target = Some(report.total_gae / 64.0);
+        record.cost.s_per_target = Some(
+            record.cost.total_gae_per_target.unwrap() / record.workload.curve.r.to_f64().sqrt(),
+        );
+        (dir, report, batch, record, host, session)
+    }
+
+    #[test]
+    fn batch_replay_binds_ordered_items_flags_and_normalized_cost() {
+        let (dir, report, batch, record, host, session) = batch_replay_fixture("batch-replay");
+        let (ok, detail) = compare_replay(&report, Some(&batch), &record, &host, &session);
+        assert!(ok, "{detail}");
+
+        let mut altered = batch.clone();
+        altered.pop();
+        let (_, detail) = compare_replay(&report, Some(&altered), &record, &host, &session);
+        assert!(detail.contains("batch outcome"), "{detail}");
+
+        let mut altered = batch.clone();
+        altered[1].item = 0;
+        let (_, detail) = compare_replay(&report, Some(&altered), &record, &host, &session);
+        assert!(detail.contains("batch outcome"), "{detail}");
+
+        let mut altered = batch.clone();
+        altered.swap(0, 1);
+        let (_, detail) = compare_replay(&report, Some(&altered), &record, &host, &session);
+        assert!(detail.contains("batch outcome"), "{detail}");
+
+        let mut altered = batch.clone();
+        altered[0].recovered = Some(1u64.into());
+        let (_, detail) = compare_replay(&report, Some(&altered), &record, &host, &session);
+        assert!(detail.contains("batch outcome"), "{detail}");
+
+        let mut altered = batch.clone();
+        altered[0].exhausted = false;
+        let (_, detail) = compare_replay(&report, Some(&altered), &record, &host, &session);
+        assert!(detail.contains("batch outcome"), "{detail}");
+
+        let mut altered_record = record;
+        altered_record.cost.total_gae_per_target = altered_record
+            .cost
+            .total_gae_per_target
+            .map(|value| value + 1.0);
+        let (_, detail) = compare_replay(&report, Some(&batch), &altered_record, &host, &session);
+        assert!(detail.contains("batch cost normalization"), "{detail}");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
     fn problems_with(rep: &AuditReport, needle: &str) -> bool {
         rep.problems.iter().any(|p| p.contains(needle))
     }
@@ -2821,6 +3299,32 @@ pub(crate) mod tests {
             1
         );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn every_finished_status_requires_a_clean_child_exit() {
+        let dir = fresh("finished-exit");
+        let text = std::fs::read_to_string(dir.join("spec.json")).unwrap();
+        let p = plan(Spec::from_json(&text).unwrap()).unwrap();
+        let host: HostCapsule =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("host.json")).unwrap()).unwrap();
+        let started = read_session(&dir).unwrap().started_unix_ms;
+        let base = read_record_file(&dir).unwrap().lines[RHO_SEQ].1.clone();
+        let arm = &p.arms[p.executions[RHO_SEQ].arm];
+
+        for status in ["verified", "wrong_answer", "exhausted"] {
+            let mut record = base.clone();
+            record.outcome.status = status.into();
+            record.outcome.exit = Some("exit 7".into());
+            let problems =
+                consistency_problems(&record, arm, &host, 180, started, &record.workload.curve);
+            assert!(
+                problems.iter().any(|problem| problem
+                    .contains(&format!("finished status `{status}` requires child exit 0"))),
+                "{status}: {problems:?}"
+            );
+        }
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[test]

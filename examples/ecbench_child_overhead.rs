@@ -27,8 +27,11 @@ use std::process::{Command, Stdio};
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::ecbench::methods::MethodSpec;
-use crypto_lib::cryptanalysis::ecbench::record::{ChildInput, CHILD_INPUT_SCHEMA};
+use crypto_lib::cryptanalysis::ecbench::record::{
+    ChildInput, PublicStudyExecution, CHILD_INPUT_SCHEMA,
+};
 use crypto_lib::cryptanalysis::ecbench::spec::{plan_for_new_run, Spec};
+use crypto_lib::cryptanalysis::ecbench::workload::TargetKind;
 use serde_json::{json, Value};
 
 fn arg(args: &[String], name: &str) -> Option<String> {
@@ -64,14 +67,26 @@ fn inputs(args: &[String]) {
     {
         let w = &p.workloads[ex.workload];
         let arm = &p.arms[ex.arm];
+        let study = ex
+            .study
+            .as_ref()
+            .map(PublicStudyExecution::from_parent)
+            .transpose()
+            .unwrap();
+        let fixed_study = study.is_some();
         let input = ChildInput {
             schema: CHILD_INPUT_SCHEMA.into(),
             diagnostics: None,
             diagnostic_lifecycle: None,
+            study,
             curve: w.curve_spec.for_child(p.instance(ex.workload)),
-            target_seed: w.target_seed,
-            target_index: w.target_index,
-            target_kind: w.kind(),
+            target_seed: if fixed_study { 0 } else { w.target_seed },
+            target_index: if fixed_study { 0 } else { w.target_index },
+            target_kind: if fixed_study {
+                TargetKind::Public
+            } else {
+                w.kind()
+            },
             expected_workload_id: w.workload_id.clone(),
             method: MethodSpec {
                 id: arm.method.id.clone(),

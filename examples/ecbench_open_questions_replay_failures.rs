@@ -3,10 +3,12 @@
 use crypto_lib::cryptanalysis::ecbench::{
     canonical::sha256_hex,
     methods::{MethodSpec, PhaseRecord, SolveReport},
-    record::{json_roundtrip, ChildInput, ChildOutput, Record, CHILD_INPUT_SCHEMA},
+    record::{
+        json_roundtrip, ChildInput, ChildOutput, PublicStudyExecution, Record, CHILD_INPUT_SCHEMA,
+    },
     runner::read_records,
     spec::{plan, Spec},
-    workload::CurveSpec,
+    workload::{CurveSpec, TargetKind},
 };
 use serde_json::{json, Value};
 use std::{
@@ -110,17 +112,28 @@ fn main() -> Result<(), String> {
         {
             let ex = &p.executions[r.seq as usize];
             let w = &p.workloads[ex.workload];
+            let study = ex
+                .study
+                .as_ref()
+                .map(PublicStudyExecution::from_parent)
+                .transpose()?;
+            let fixed_study = study.is_some();
             let input = ChildInput {
                 // A plain replay: no diagnostic context or lifecycle transport
                 // (both are skipped when absent, so the input bytes are unchanged).
                 diagnostics: None,
                 diagnostic_lifecycle: None,
+                study,
                 schema: CHILD_INPUT_SCHEMA.into(),
                 curve: CurveSpec::explicit(p.instance(ex.workload))
                     .unwrap_or_else(|| w.curve_spec.clone()),
-                target_seed: w.target_seed,
-                target_index: w.target_index,
-                target_kind: w.kind(),
+                target_seed: if fixed_study { 0 } else { w.target_seed },
+                target_index: if fixed_study { 0 } else { w.target_index },
+                target_kind: if fixed_study {
+                    TargetKind::Public
+                } else {
+                    w.kind()
+                },
                 expected_workload_id: w.workload_id.clone(),
                 method: MethodSpec {
                     id: r.method.id.clone(),
@@ -128,8 +141,6 @@ fn main() -> Result<(), String> {
                 },
                 expected_method_id: r.method.method_id.clone(),
                 algorithm_seed: ex.algorithm_seed,
-                diagnostics: None,
-                diagnostic_lifecycle: None,
             };
             let input_bytes = serde_json::to_vec(&input).map_err(|e| e.to_string())?;
             let stem = format!("{}-{}", r.session_id, r.seq);

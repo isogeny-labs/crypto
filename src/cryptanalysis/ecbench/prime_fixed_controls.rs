@@ -22,13 +22,17 @@ use crate::cryptanalysis::prime_fast::{self, RhoConfig, RhoOpCounts};
 use crate::ecc::curve::CurveParams;
 
 use super::exact_scalar::ExactScalar;
-use super::methods::{unpriced_of, PhaseRecord, SolveReport};
+use super::methods::{unpriced_of, BatchItemReport, PhaseRecord, SolveReport};
 use super::workload::CurveFacts;
 
 /// Frozen paired blocked-BSGS control.
 pub const BSGS_ID: &str = "bsgs.prime_paired_v1";
 /// Frozen tuned single-thread native-rho control.
 pub const RHO_ID: &str = "rho.prime_fast_v1";
+/// Frozen paired BSGS with one table shared by exactly 64 ordered targets.
+pub const BSGS_BATCH64_ID: &str = "bsgs.prime_paired_batch64_v1";
+/// Frozen sequence of exactly 64 independent one-thread rho solves.
+pub const RHO_BATCH64_ID: &str = "rho.prime_fast_batch64_v1";
 
 #[derive(Clone, Copy)]
 struct Fixture {
@@ -90,7 +94,11 @@ const FIXTURES: [Fixture; 5] = [
 ];
 
 pub(super) fn is_method(id: &str) -> bool {
-    matches!(id, BSGS_ID | RHO_ID)
+    matches!(id, BSGS_ID | RHO_ID | BSGS_BATCH64_ID | RHO_BATCH64_ID)
+}
+
+pub(super) fn is_batch_method(id: &str) -> bool {
+    matches!(id, BSGS_BATCH64_ID | RHO_BATCH64_ID)
 }
 
 fn fixture(slug: &str) -> Option<Fixture> {
@@ -349,10 +357,9 @@ struct RhoSnapshot {
     ops: RhoOpCounts,
 }
 
-fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveReport, String> {
-    if tx >= inst.curve.p || ty >= inst.curve.p {
-        return Err("prime-fast rho target coordinates are not canonical".into());
-    }
+fn prepare_rho_curve(
+    inst: &PrimeInstance,
+) -> Result<(prime_fast::FastCurve, prime_fast::Pt), String> {
     let curve = prime_fast::FastCurve::new(
         "ecbench-fixed-prime-control",
         inst.curve.p,
@@ -361,21 +368,50 @@ fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveR
         inst.r,
     );
     let generator = curve.point(inst.generator.0, inst.generator.1);
-    let target = curve.point(tx, ty);
-    if !curve.is_on_curve(generator) || !curve.is_on_curve(target) {
-        return Err("prime-fast rho generator or target is not on the frozen curve".into());
+    if !curve.is_on_curve(generator) {
+        return Err("prime-fast rho generator is not on the frozen curve".into());
     }
+    Ok((curve, generator))
+}
+
+fn prepare_rho_config(inst: &PrimeInstance, seed: u64) -> RhoConfig {
     let mut config = RhoConfig::tuned(inst.r);
     config.threads = 1;
     config.seed = seed;
     config.max_steps = 64u64.saturating_mul(ceil_sqrt(inst.r));
+    config
+}
 
+fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveReport, String> {
+    if tx >= inst.curve.p || ty >= inst.curve.p {
+        return Err("prime-fast rho target coordinates are not canonical".into());
+    }
+    let (curve, generator) = prepare_rho_curve(inst)?;
+    let target = curve.point(tx, ty);
+    if !curve.is_on_curve(target) {
+        return Err("prime-fast rho target is not on the frozen curve".into());
+    }
+    let config = prepare_rho_config(inst, seed);
+    solve_rho_prepared(inst, &curve, generator, target, &config, RHO_ID, true)
+}
+
+fn solve_rho_prepared(
+    inst: &PrimeInstance,
+    curve: &prime_fast::FastCurve,
+    generator: prime_fast::Pt,
+    target: prime_fast::Pt,
+    config: &RhoConfig,
+    boundary_id: &str,
+    mark_online: bool,
+) -> Result<SolveReport, String> {
     // Curve/point conversion and deterministic config construction are
     // fixture preparation.  The cold clock starts at rho_parallel itself.
     let total_start = Instant::now();
-    measurement::begin_online(Phase::RhoSolve);
+    if mark_online {
+        measurement::begin_online(Phase::RhoSolve);
+    }
     let solver_start = Instant::now();
-    let result = prime_fast::rho_parallel(&curve, generator, target, &config);
+    let result = prime_fast::rho_parallel(curve, generator, target, config);
     let solver_ns = elapsed_ns(solver_start);
     let verification_start = Instant::now();
     let evaluator_correct = result
@@ -383,7 +419,9 @@ fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveR
         .map(|r| curve.mul(Some(generator), r.log) == Some(target))
         .unwrap_or(false);
     let verification_ns = elapsed_ns(verification_start);
-    measurement::end_online();
+    if mark_online {
+        measurement::end_online();
+    }
     let snapshot = result.as_ref().map(|r| RhoSnapshot {
         log: r.log,
         total_steps: r.total_steps,
@@ -399,7 +437,11 @@ fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveR
     drop(result);
     let drop_ns = elapsed_ns(drop_start);
     let total_ns = elapsed_ns(total_start);
-    let residual_ns = residual_ns(total_ns, &[solver_ns, verification_ns, drop_ns], RHO_ID)?;
+    let residual_ns = residual_ns(
+        total_ns,
+        &[solver_ns, verification_ns, drop_ns],
+        boundary_id,
+    )?;
 
     let mul_gae = 1.5 * (inst.r as f64).log2();
     let (solver_adds, solver_doubles, collision_checks) = snapshot.map_or((0, 0, 0), |r| {
@@ -541,6 +583,452 @@ fn solve_rho(inst: &PrimeInstance, tx: u64, ty: u64, seed: u64) -> Result<SolveR
     })
 }
 
+fn parse_public_coordinate(value: &str) -> Result<u64, String> {
+    let digits = value
+        .strip_prefix("0x")
+        .ok_or_else(|| "fixed-batch coordinate lacks 0x prefix".to_owned())?;
+    if digits.is_empty()
+        || digits.len() > 16
+        || !digits
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err("fixed-batch coordinate is not bounded lowercase hexadecimal".into());
+    }
+    u64::from_str_radix(digits, 16)
+        .map_err(|_| "fixed-batch coordinate does not fit u64".to_owned())
+}
+
+fn parse_public_target(inst: &PrimeInstance, target: &[String; 2]) -> Result<(u64, u64), String> {
+    let tx = parse_public_coordinate(&target[0])?;
+    let ty = parse_public_coordinate(&target[1])?;
+    if tx >= inst.curve.p || ty >= inst.curve.p {
+        return Err("fixed-batch target coordinates are not canonical".into());
+    }
+    Ok((tx, ty))
+}
+
+fn counter_delta(after: u64, before: u64, name: &str) -> Result<u64, String> {
+    after
+        .checked_sub(before)
+        .ok_or_else(|| format!("fixed-batch {name} counter decreased"))
+}
+
+fn solve_bsgs_batch64(
+    inst: &PrimeInstance,
+    items: &[([String; 2], Option<u64>)],
+) -> Result<(SolveReport, Vec<BatchItemReport>), String> {
+    let curve = bsgs_curve(inst)?;
+    let mut targets = Vec::with_capacity(items.len());
+    for (target, _) in items {
+        let (tx, ty) = parse_public_target(inst, target)?;
+        let point = BsgsPoint {
+            x: curve.f.to_mont(tx),
+            y: curve.f.to_mont(ty),
+            infinity: false,
+        };
+        if !curve.on_curve(point) {
+            return Err("fixed-batch BSGS target is not on the frozen curve".into());
+        }
+        targets.push(point);
+    }
+
+    let plan = BsgsFastPlan::new(inst.r, 0, true, 1, 8).with_kernel(StepKernel::Paired, 32);
+    let table_bytes = plan.table_bytes();
+    let total_start = Instant::now();
+    let build_start = Instant::now();
+    let mut solver = BsgsFast::build(curve, plan);
+    let build_ns = elapsed_ns(build_start);
+
+    measurement::begin_online(Phase::RhoSolve);
+    let mut item_reports = Vec::with_capacity(items.len());
+    let mut recovered_count = 0u64;
+    let mut evaluator_failures = 0u64;
+    for (index, ((target_text, rho_seed), target)) in items.iter().zip(targets.iter()).enumerate() {
+        let before = solver.stats();
+        let search_start = Instant::now();
+        let recovered = solver.solve(target);
+        let search_ns = elapsed_ns(search_start);
+        let verification_start = Instant::now();
+        let evaluator_correct = recovered
+            .map(|log| curve.scalar_mul(curve.g, log) == *target)
+            .unwrap_or(false);
+        let verification_ns = elapsed_ns(verification_start);
+        let after = solver.stats();
+        recovered_count = recovered_count.saturating_add(u64::from(recovered.is_some()));
+        evaluator_failures =
+            evaluator_failures.saturating_add(u64::from(recovered.is_some() && !evaluator_correct));
+        let mut counters = BTreeMap::new();
+        counters.insert(
+            "giant_steps".into(),
+            counter_delta(after.giant_steps, before.giant_steps, "giant_steps")?,
+        );
+        counters.insert(
+            "candidates".into(),
+            counter_delta(after.candidates, before.candidates, "candidates")?,
+        );
+        counters.insert(
+            "false_candidates".into(),
+            counter_delta(
+                after.false_candidates,
+                before.false_candidates,
+                "false_candidates",
+            )?,
+        );
+        item_reports.push(BatchItemReport {
+            item: index as u64,
+            target: target_text.clone(),
+            rho_seed: rho_seed.map(|seed| format!("{seed:016x}")),
+            recovered: recovered.map(ExactScalar::from),
+            exhausted: recovered.is_none() || !evaluator_correct,
+            evaluator_correct,
+            solver_wall_ns: search_ns,
+            verification_wall_ns: verification_ns,
+            drop_wall_ns: 0,
+            counters,
+        });
+    }
+    measurement::end_online();
+
+    let stats = solver.stats();
+    let drop_start = Instant::now();
+    drop(solver);
+    let drop_ns = elapsed_ns(drop_start);
+    let total_ns = elapsed_ns(total_start);
+    let search_ns = item_reports.iter().try_fold(0u64, |total, item| {
+        total
+            .checked_add(item.solver_wall_ns)
+            .ok_or_else(|| "fixed-batch BSGS search-wall sum overflowed".to_owned())
+    })?;
+    let verification_ns = item_reports.iter().try_fold(0u64, |total, item| {
+        total
+            .checked_add(item.verification_wall_ns)
+            .ok_or_else(|| "fixed-batch BSGS verification-wall sum overflowed".to_owned())
+    })?;
+    let residual_ns = residual_ns(
+        total_ns,
+        &[build_ns, search_ns, verification_ns, drop_ns],
+        BSGS_BATCH64_ID,
+    )?;
+    let replay_gae = 1.5 * (inst.r as f64).log2();
+    let phases = vec![
+        PhaseRecord {
+            name: "table_build".into(),
+            adds: stats.baby_steps,
+            gae: stats.baby_steps as f64,
+            wall_ns: Some(build_ns),
+            ..Default::default()
+        },
+        PhaseRecord {
+            name: "batch_search".into(),
+            adds: stats.giant_steps,
+            gae: stats.giant_steps as f64,
+            wall_ns: Some(search_ns),
+            ..Default::default()
+        },
+        PhaseRecord {
+            name: "evaluator_verification".into(),
+            scalar_mults: recovered_count,
+            gae: recovered_count as f64 * replay_gae,
+            wall_ns: Some(verification_ns),
+            ..Default::default()
+        },
+        timed_phase("teardown", drop_ns),
+        timed_phase("timer_residual", residual_ns),
+    ];
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
+    let mut counters = BTreeMap::new();
+    for (name, value) in [
+        ("batch_size", 64),
+        ("table_builds", 1),
+        (
+            "successful_items",
+            item_reports.iter().filter(|item| !item.exhausted).count() as u64,
+        ),
+        ("evaluator_failures", evaluator_failures),
+        ("baby_steps", stats.baby_steps),
+        ("giant_steps", stats.giant_steps),
+        ("candidates", stats.candidates),
+        ("false_candidates", stats.false_candidates),
+        ("table_entries", stats.table_entries),
+        ("table_bytes", table_bytes),
+        ("candidate_matches_uncharged", stats.candidates),
+        ("batch_public_target_conversions_uncharged", 64),
+    ] {
+        counters.insert(name.into(), value);
+    }
+    let unpriced = unpriced_of(&counters);
+    let exhausted = item_reports.iter().any(|item| item.exhausted);
+    let detail_items = item_reports.clone();
+    Ok((
+        SolveReport {
+            recovered: None,
+            exhausted,
+            phases,
+            total_gae,
+            automorphisms_used: 2,
+            counters,
+            unpriced,
+            deterministic: true,
+            nondeterminism: vec![],
+            solve_wall_ns: total_ns,
+            factor_base: None,
+            detail: json!({
+                "implementation": "cryptanalysis::bsgs_fast::BsgsFast shared-table batch",
+                "batch_size": 64,
+                "table_builds": 1,
+                "plan": {
+                    "constructor": "BsgsFastPlan::new(r,0,true,1,8)",
+                    "kernel": "paired",
+                    "pair_k": 32,
+                },
+                "batch_items": detail_items,
+                "cold_boundary": "one table allocation/build through all 64 ordered searches, evaluator replays, and table deallocation",
+            }),
+            online: None,
+            online_error: None,
+            solver: None,
+            field_ops: None,
+        },
+        item_reports,
+    ))
+}
+
+fn checked_counter_add(
+    counters: &mut BTreeMap<String, u64>,
+    name: &str,
+    value: u64,
+) -> Result<(), String> {
+    let entry = counters.entry(name.to_owned()).or_default();
+    *entry = entry
+        .checked_add(value)
+        .ok_or_else(|| format!("fixed-batch counter `{name}` overflowed"))?;
+    Ok(())
+}
+
+fn merge_phase(
+    phases: &mut BTreeMap<String, PhaseRecord>,
+    source: &PhaseRecord,
+) -> Result<(), String> {
+    let destination = phases
+        .entry(source.name.clone())
+        .or_insert_with(|| PhaseRecord {
+            name: source.name.clone(),
+            wall_ns: Some(0),
+            ..Default::default()
+        });
+    destination.adds = destination
+        .adds
+        .checked_add(source.adds)
+        .ok_or_else(|| "fixed-batch phase additions overflowed".to_owned())?;
+    destination.doubles = destination
+        .doubles
+        .checked_add(source.doubles)
+        .ok_or_else(|| "fixed-batch phase doublings overflowed".to_owned())?;
+    destination.scalar_mults = destination
+        .scalar_mults
+        .checked_add(source.scalar_mults)
+        .ok_or_else(|| "fixed-batch phase scalar multiplications overflowed".to_owned())?;
+    destination.gae += source.gae;
+    if !destination.gae.is_finite() {
+        return Err("fixed-batch phase GAE is non-finite".into());
+    }
+    destination.wall_ns = match (destination.wall_ns, source.wall_ns) {
+        (Some(left), Some(right)) => Some(
+            left.checked_add(right)
+                .ok_or_else(|| "fixed-batch phase wall time overflowed".to_owned())?,
+        ),
+        _ => None,
+    };
+    for (name, value) in &source.native {
+        checked_counter_add(&mut destination.native, name, *value)?;
+    }
+    for (name, value) in &source.work_native {
+        checked_counter_add(&mut destination.work_native, name, *value)?;
+    }
+    Ok(())
+}
+
+fn solve_rho_batch64(
+    inst: &PrimeInstance,
+    items: &[([String; 2], Option<u64>)],
+) -> Result<(SolveReport, Vec<BatchItemReport>), String> {
+    // Match the BSGS batch boundary: canonical parsing, curve/generator/point
+    // conversion, and deterministic per-item config construction are fixture
+    // preparation and finish before the enclosing batch timer starts.
+    let (curve, generator) = prepare_rho_curve(inst)?;
+    let mut prepared = Vec::with_capacity(items.len());
+    for (target, seed) in items {
+        let (tx, ty) = parse_public_target(inst, target)?;
+        let point = curve.point(tx, ty);
+        if !curve.is_on_curve(point) {
+            return Err("fixed-batch rho target is not on the frozen curve".into());
+        }
+        let Some(seed) = *seed else {
+            return Err("fixed-batch rho requires one independent seed per item".into());
+        };
+        prepared.push((point, prepare_rho_config(inst, seed)));
+    }
+
+    let total_start = Instant::now();
+    let mut item_reports = Vec::with_capacity(items.len());
+    let mut reports = Vec::with_capacity(items.len());
+    measurement::begin_online(Phase::RhoSolve);
+    let batch_result = (|| -> Result<(), String> {
+        for (index, ((target, seed), (point, config))) in
+            items.iter().zip(prepared.iter()).enumerate()
+        {
+            let seed = seed.ok_or("fixed-batch rho seed disappeared after validation")?;
+            let report = solve_rho_prepared(
+                inst,
+                &curve,
+                generator,
+                *point,
+                config,
+                RHO_BATCH64_ID,
+                false,
+            )?;
+            let evaluator_correct = report.detail["evaluator_correct"]
+                .as_bool()
+                .unwrap_or(false);
+            let phase_wall = |name: &str| {
+                report
+                    .phases
+                    .iter()
+                    .find(|phase| phase.name == name)
+                    .and_then(|phase| phase.wall_ns)
+                    .unwrap_or(0)
+            };
+            item_reports.push(BatchItemReport {
+                item: index as u64,
+                target: target.clone(),
+                rho_seed: Some(format!("{seed:016x}")),
+                recovered: report.recovered,
+                exhausted: report.exhausted || !evaluator_correct,
+                evaluator_correct,
+                solver_wall_ns: phase_wall("rho_solver"),
+                verification_wall_ns: phase_wall("evaluator_verification"),
+                drop_wall_ns: phase_wall("teardown"),
+                counters: report.counters.clone(),
+            });
+            reports.push(report);
+        }
+        Ok(())
+    })();
+    measurement::end_online();
+    batch_result?;
+    let total_ns = elapsed_ns(total_start);
+    let child_total_ns = reports.iter().try_fold(0u64, |total, report| {
+        total
+            .checked_add(report.solve_wall_ns)
+            .ok_or_else(|| "fixed-batch rho child-wall sum overflowed".to_owned())
+    })?;
+    let dispatch_residual_ns = total_ns
+        .checked_sub(child_total_ns)
+        .ok_or_else(|| "fixed-batch rho child clocks exceeded batch clock".to_owned())?;
+
+    let mut phase_map = BTreeMap::new();
+    for report in &reports {
+        for phase in &report.phases {
+            merge_phase(&mut phase_map, phase)?;
+        }
+    }
+    phase_map.insert(
+        "batch_dispatch_residual".into(),
+        timed_phase("batch_dispatch_residual", dispatch_residual_ns),
+    );
+    let phases: Vec<_> = phase_map.into_values().collect();
+    let total_gae = reports.iter().try_fold(0.0, |total, report| {
+        let next = total + report.total_gae;
+        if next.is_finite() {
+            Ok(next)
+        } else {
+            Err("fixed-batch rho GAE is non-finite".to_owned())
+        }
+    })?;
+    let mut counters = BTreeMap::new();
+    counters.insert("batch_size".into(), 64);
+    counters.insert("table_builds".into(), 64);
+    counters.insert(
+        "successful_items".into(),
+        item_reports.iter().filter(|item| !item.exhausted).count() as u64,
+    );
+    counters.insert(
+        "exhausted_items".into(),
+        item_reports.iter().filter(|item| item.exhausted).count() as u64,
+    );
+    for report in &reports {
+        for (name, value) in &report.counters {
+            // The independent seeds are identities sealed by the ordered study
+            // metadata, not additive work. Summing arbitrary u64 seeds is both
+            // meaningless and can overflow on an otherwise valid batch.
+            if name == "config_seed" {
+                continue;
+            }
+            checked_counter_add(&mut counters, &format!("item_sum_{name}"), *value)?;
+        }
+    }
+    let mut unpriced = Vec::new();
+    for report in &reports {
+        for name in &report.unpriced {
+            let aggregate = format!("item_sum_{name}");
+            if !unpriced.contains(&aggregate) {
+                unpriced.push(aggregate);
+            }
+        }
+    }
+    let exhausted = item_reports.iter().any(|item| item.exhausted);
+    let detail_items = item_reports.clone();
+    Ok((
+        SolveReport {
+            recovered: None,
+            exhausted,
+            phases,
+            total_gae,
+            automorphisms_used: 2,
+            counters,
+            unpriced,
+            deterministic: true,
+            nondeterminism: vec![],
+            solve_wall_ns: total_ns,
+            factor_base: None,
+            detail: json!({
+                "implementation": "64 sequential cryptanalysis::prime_fast::rho_parallel calls",
+                "batch_size": 64,
+                "table_builds": 64,
+                "batch_items": detail_items,
+                "excluded_preparation": "canonical parsing plus curve, generator, target-point, and deterministic RhoConfig construction completed before the batch timer, matching the BSGS fixture-preparation boundary",
+                "cold_boundary": "all 64 sequential target-dependent rho tables, walks, collision recovery, evaluator replays, and returned-state deallocation",
+            }),
+            online: None,
+            online_error: None,
+            solver: None,
+            field_ops: None,
+        },
+        item_reports,
+    ))
+}
+
+pub(super) fn solve_batch64(
+    id: &str,
+    inst: &PrimeInstance,
+    facts: &CurveFacts,
+    items: &[([String; 2], Option<u64>)],
+) -> Result<(SolveReport, Vec<BatchItemReport>), String> {
+    applicable(id, inst, facts)?;
+    if items.len() != 64 {
+        return Err(format!(
+            "`{id}` requires exactly 64 ordered public targets, got {}",
+            items.len()
+        ));
+    }
+    match id {
+        BSGS_BATCH64_ID => solve_bsgs_batch64(inst, items),
+        RHO_BATCH64_ID => solve_rho_batch64(inst, items),
+        _ => Err(format!("`{id}` is not a fixed 64-target batch method")),
+    }
+}
+
 pub(super) fn solve(
     id: &str,
     inst: &PrimeInstance,
@@ -553,6 +1041,9 @@ pub(super) fn solve(
     match id {
         BSGS_ID => solve_bsgs(inst, tx, ty),
         RHO_ID => solve_rho(inst, tx, ty, seed),
+        BSGS_BATCH64_ID | RHO_BATCH64_ID => Err(format!(
+            "`{id}` requires solve_batch64_measured and refuses the single-target API"
+        )),
         _ => Err(format!("`{id}` is not a frozen prime control")),
     }
 }
@@ -589,6 +1080,27 @@ mod tests {
                 )
             })
             .collect()
+    }
+
+    fn batch64_fixture() -> (
+        CurveSpec,
+        crate::cryptanalysis::ecbench::workload::Instance,
+        Vec<([String; 2], Option<u64>)>,
+        Vec<ExactScalar>,
+    ) {
+        let spec = fp24();
+        let inst = spec.build().unwrap();
+        let mut items = Vec::with_capacity(64);
+        let mut planted = Vec::with_capacity(64);
+        for item in 0..64 {
+            let workload = Workload::on(&spec, &inst, 20261126, item, TargetKind::Planted).unwrap();
+            items.push((
+                workload.target.clone(),
+                Some(0x51eed00000000000u64.wrapping_add(item)),
+            ));
+            planted.push(workload.planted.unwrap());
+        }
+        (spec, inst, items, planted)
     }
 
     #[test]
@@ -642,6 +1154,77 @@ mod tests {
             assert!(methods::applicable(&method, &inst, &facts)
                 .unwrap_err()
                 .contains("five fixed"));
+        }
+    }
+
+    #[test]
+    fn fixed_batch64_methods_recover_every_ordered_fp24_item() {
+        let (spec, inst, items, planted) = batch64_fixture();
+        let facts = inst.facts(&spec);
+        for id in [BSGS_BATCH64_ID, RHO_BATCH64_ID] {
+            let method = methods::resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            let (report, rows) =
+                methods::solve_batch64_measured(&method, &inst, &facts, &items).unwrap();
+            assert!(report.recovered.is_none(), "{id}");
+            assert!(!report.exhausted, "{id}");
+            assert_eq!(rows.len(), 64, "{id}");
+            assert_eq!(report.counters["batch_size"], 64, "{id}");
+            assert!(
+                report.online_error.is_none(),
+                "{id}: {:?}",
+                report.online_error
+            );
+            assert!(report.online.is_some(), "{id}");
+            assert_eq!(
+                report.counters["table_builds"],
+                if id == BSGS_BATCH64_ID { 1 } else { 64 },
+                "{id}"
+            );
+            if id == RHO_BATCH64_ID {
+                assert_eq!(
+                    report.detail["excluded_preparation"],
+                    "canonical parsing plus curve, generator, target-point, and deterministic RhoConfig construction completed before the batch timer, matching the BSGS fixture-preparation boundary"
+                );
+                assert_eq!(
+                    report.detail["cold_boundary"],
+                    "all 64 sequential target-dependent rho tables, walks, collision recovery, evaluator replays, and returned-state deallocation"
+                );
+            }
+            for (index, row) in rows.iter().enumerate() {
+                assert_eq!(row.item, index as u64, "{id}");
+                assert_eq!(row.recovered, Some(planted[index]), "{id}");
+                assert!(row.evaluator_correct, "{id}");
+                assert!(!row.exhausted, "{id}");
+            }
+        }
+    }
+
+    #[test]
+    fn fixed_batch64_api_rejects_cardinality_missing_seed_and_single_dispatch() {
+        let (spec, inst, mut items, _) = batch64_fixture();
+        let facts = inst.facts(&spec);
+        let bsgs = methods::resolve(&MethodSpec {
+            id: BSGS_BATCH64_ID.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        let rho = methods::resolve(&MethodSpec {
+            id: RHO_BATCH64_ID.into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+
+        assert!(methods::solve_batch64_measured(&bsgs, &inst, &facts, &items[..63]).is_err());
+        items[17].1 = None;
+        assert!(methods::solve_batch64_measured(&rho, &inst, &facts, &items).is_err());
+        let target = &items[0].0;
+        for method in [&bsgs, &rho] {
+            let error = methods::solve(method, &inst, &facts, target, 7).unwrap_err();
+            assert!(error.contains("refuses the single-target API"));
         }
     }
 }
