@@ -3,8 +3,11 @@
 # usage: sweep_t_engines_m3.sh BIN OUT.jsonl
 set -u
 BIN=$1; OUT=$2; SEED=20261400
-run() { # label t fb oracle max_trials
+run() { # label t fb oracle max_trials; skipped when (label, t) is already in OUT (resume)
   local t0 t1 res ec
+  if [ -f "$OUT" ] && jq -e --arg l "$1" --argjson t "$2" 'select(.label==$l and .t==$t)' "$OUT" >/dev/null 2>&1; then
+    [ -n "$(jq -c --arg l "$1" --argjson t "$2" 'select(.label==$l and .t==$t)' "$OUT")" ] && return 0
+  fi
   t0=$(date +%s.%N)
   res=$(RAYON_NUM_THREADS=1 timeout 900 "$BIN" bench --bits 16 --family generic --seed $SEED --repeats 1 --targets walk \
         --factor-base "$3" --oracle "$4" --max-trials "$5" --rho-runs 0 --json --solver-budget-seconds 900 2>/dev/null); ec=$?
