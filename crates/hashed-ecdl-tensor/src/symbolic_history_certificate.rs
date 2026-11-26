@@ -8,7 +8,7 @@ use crate::BigUint;
 use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const SCHEMA: u32 = 4;
+pub(crate) const SCHEMA: u32 = 5;
 const EPSILON_DENOMINATOR: u64 = 128 * 1024;
 const MINIMUM_LAMBDA: u64 = 1 << 26;
 
@@ -54,6 +54,13 @@ pub struct Certificate {
     pub(crate) tuple_square_root_ceiling: u64,
     pub(crate) tuple_exponent_constant: u64,
     pub(crate) description_overhead_constant: u64,
+    pub(crate) packing_radix: u64,
+    pub(crate) group_port_balance_constant: u64,
+    pub(crate) endpoint_sides: u64,
+    pub(crate) strict_edge_shrink_factor: u64,
+    pub(crate) child_edge_bound_numerator: u64,
+    pub(crate) strict_edge_bound_numerator: u64,
+    pub(crate) packet_degree_factor: u64,
     pub(crate) depths: Vec<DepthCertificate>,
     pub(crate) local_child_exponent_constant: u64,
     pub(crate) path_sum_constant: u64,
@@ -80,6 +87,8 @@ pub struct VerificationSummary {
     pub normalized_coordinate_witnesses: usize,
     /// Local exponent unit reserved for factorization-certificate descriptions.
     pub description_overhead_constant: u64,
+    /// Whether source packing bounds imply strict edge and packet-degree shrink.
+    pub strict_packing_shrink_certified: bool,
     /// Constant in `log2(T) <= C*M/sqrt(u)` from the source mode bounds.
     pub tuple_exponent_constant: u64,
     /// Root-`u` exponent constant for the complete recursion composition.
@@ -191,6 +200,21 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         "tuple exponent",
     )?;
     let description_overhead_constant = 1u64;
+    let packing_radix = 64u64;
+    let group_port_balance_constant = 3u64;
+    let endpoint_sides = 2u64;
+    let strict_edge_shrink_factor = 8u64;
+    let child_edge_bound_numerator = checked_mul(
+        group_port_balance_constant,
+        endpoint_sides,
+        "packing child edge bound",
+    )?;
+    let strict_edge_bound_numerator = checked_mul(
+        child_edge_bound_numerator,
+        strict_edge_shrink_factor,
+        "packing strict edge bound",
+    )?;
+    let packet_degree_factor = 2u64;
     if leaf_divisor <= 1
         || root_u == 0
         || certificate.leaf_divisor != leaf_divisor
@@ -204,6 +228,14 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         || certificate.tuple_square_root_ceiling != tuple_square_root_ceiling
         || certificate.tuple_exponent_constant != tuple_exponent_constant
         || certificate.description_overhead_constant != description_overhead_constant
+        || certificate.packing_radix != packing_radix
+        || certificate.group_port_balance_constant != group_port_balance_constant
+        || certificate.endpoint_sides != endpoint_sides
+        || certificate.strict_edge_shrink_factor != strict_edge_shrink_factor
+        || certificate.child_edge_bound_numerator != child_edge_bound_numerator
+        || certificate.strict_edge_bound_numerator != strict_edge_bound_numerator
+        || certificate.packet_degree_factor != packet_degree_factor
+        || strict_edge_bound_numerator > packing_radix
         || (tuple_square_root_ceiling - 1).pow(2) >= mode_precision_product_constant
         || tuple_square_root_ceiling.pow(2) < mode_precision_product_constant
     {
@@ -411,6 +443,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         active_depths: index,
         normalized_coordinate_witnesses: 2 * index,
         description_overhead_constant,
+        strict_packing_shrink_certified: true,
         tuple_exponent_constant,
         total_root_u_exponent_constant,
         total_root_log_exponent_constant,

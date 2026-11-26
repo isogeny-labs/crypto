@@ -315,7 +315,7 @@ passes 14/14 controls. [pcc:unverified]
 `SYMBOLIC_HISTORY_CERTIFICATE.md` now separates this transcript from its
 producer. A standalone module reconstructs the five-depth schedule, both
 precision absorptions, geometric path comparisons, packet-entry absorption,
-and final constants from a stable 7,355-byte JSON fixture. Schema 4 additionally
+and final constants from a stable 7,544-byte JSON fixture. Schema 5 additionally
 checks the chain from `K L<=3M`, `tau D=2L`, and `p u<=34 M D` to
 `n p<=204 M^2/u` and tuple exponent constant `80`. Every depth now binds the
 normalized family `M=uL`, `K=3u`, and `p_i=34L(L/2^i)` at both coordinate
@@ -328,6 +328,14 @@ precision-transition, normalized-dimension, source-constant, and final-constant
 mutations are rejected. This is an independent normalized scalar replay, not
 graph realization or a proof of the external theorem.
 `[pcc:unverified]`
+
+Schema 5 also makes the strict child edge/degree implication explicit. Source
+group balance contributes at most `3M/64` endpoints from each side, hence a
+child has at most `6M/64` edges and `8*6=48<=64` proves eight-fold shrinkage.
+Old vertex degrees are preserved and packet vertices have degree at most `2L`,
+which the source guard bounds by `delta`. The verifier reconstructs all seven
+constants and reports strict packing shrink as certified, conditional on the
+packing/object premises. `[pcc:unverified]`
 
 On the finite side, the standalone factorization module now provides the same
 scalar interface for an accepted schema-2 object. Given `(a,u,i)`, it

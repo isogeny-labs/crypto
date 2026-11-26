@@ -22,7 +22,7 @@ plain fields it independently reconstructs:
 6. leaf-scale and packet-entry absorption; and
 7. the reported constants `96`, `3`, `288`, `290`, and `148480`.
 
-Schema 4 also commits to the local source-bound chain
+Schema 5 also commits to the local source-bound chain
 
 ```text
 K L <= 3M,
@@ -53,7 +53,7 @@ whole coordinate range. They show that the scalar obligations are mutually
 compatible and bind concrete `M,K,L,tau,p` values; they still do not prove that
 a graph or packing realizes the witness. `[pcc:unverified]`
 
-Schema 4 also charges the schema-2 factorization-certificate description
+Schema 5 also charges the schema-2 factorization-certificate description
 envelope. After the tuple count `T` has been charged, every remaining scalar,
 coefficient-width, container, and framing factor in the JSON and canonical
 binary bounds is covered by the deliberately coarse exponent
@@ -78,6 +78,22 @@ interpolation samples, and radix. The global constants therefore remain
 unchanged. This is an arithmetic replay of the description formulas, still
 conditional on the source and active-node premises. `[pcc:unverified]`
 
+Schema 5 additionally binds the source packing bounds to strict recursion. For
+radix `R=64`, group-port balance gives at most `3M/64` retained endpoints from
+each of the two bipartite sides. Therefore every group child has at most
+
+```text
+(2*3/64) M = 6M/64
+```
+
+edges, and the strict check follows from `8*6=48<=64`. Old vertices retain
+their degree, while every new packet vertex has at most `2L` ports; the source
+degree guard supplies `2L<=delta`. The verifier reconstructs the constants
+`64,3,2,8,6,48,2` instead of trusting them. The finite packing-provenance and
+port-mass controls independently check the corresponding endpoint accounting.
+This proves the scalar implication, conditional on the source packing and
+object-refinement premises. `[pcc:unverified]`
+
 Missing, extra, reordered, or altered depth rows fail closed. Schema,
 precision-transition, and final-composition mutations are explicit negative
 controls. `[pcc:unverified]`
@@ -99,7 +115,7 @@ verifier checks both endpoint identities
 `1+a = u+(a-u+1) = a+1`, which proves `tau D=2L` uniformly for every
 coordinate between them.
 
-The newline-terminated schema-4 JSON fixture is 7,355 bytes. The native command
+The newline-terminated schema-5 JSON fixture is 7,544 bytes. The native command
 
 ```text
 cargo run --locked \
@@ -110,9 +126,9 @@ cargo run --locked \
 
 reports five active depths, ten normalized endpoint witnesses, description
 overhead constant `1`, root `u=512`, total root-`u` exponent constant `290`,
-root-log constant `148480`, and tuple exponent constant `80`. The companion
-native emitter deterministically regenerates the fixture. Verifier input is
-capped at 1 MiB.
+strict packing shrink `true`, root-log constant `148480`, and tuple exponent
+constant `80`. The companion native emitter deterministically regenerates the
+fixture. Verifier input is capped at 1 MiB.
 `[pcc:unverified]`
 
 ## Remaining refinement boundary
