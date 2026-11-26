@@ -78,6 +78,8 @@ def boot_prime(vals, rng):
 def summarize(per_curve, rng):
     """per_curve: {p: [curve-level values]} -> per-prime gm + boot95, pooled equal weight per prime"""
     per_prime, boots = {}, []
+    if not per_curve:
+        return {"per_prime": {}, "pooled": None}
     for p in sorted(per_curve):
         b = boot_prime(per_curve[p], rng)
         boots.append(np.log(b))
@@ -129,6 +131,30 @@ def main():
                             and runs[(SGE,) + k]["attempts"] != runs[(NOFB,) + k]["attempts"]],
     }
 
+    # pair identities (PROTOCOL section 2): without a rescue the arms see the
+    # same attempts and relation phase; nofb does the baseline's work minus the
+    # skipped fallbacks (equal with no fallback, strictly less with one)
+    ident = []
+    for k in keys:
+        if k in unpaired:
+            continue
+        a, b = runs[(SGE,) + k], runs[(NOFB,) + k]
+        if a["la_fallback_rescues"] != 0:
+            continue
+        same_rel = all(a[f] == b[f] for f in ("attempts", "relations", "decomp_trials",
+                                                  "rel_mul", "rel_add", "core_rows", "core_cols"))
+        la_a, la_b = (a["la_add"], a["la_mul"]), (b["la_add"], b["la_mul"])
+        if a["la_fallbacks"] == 0:
+            ok = same_rel and la_a == la_b and a["group_ops"] == b["group_ops"] \
+                and b["la_fallbacks_skipped"] == 0
+        else:
+            ok = same_rel and la_b[0] <= la_a[0] and la_b[1] <= la_a[1] \
+                and sum(la_b) < sum(la_a) and b["group_ops"] <= a["group_ops"] \
+                and b["la_fallbacks_skipped"] == a["la_fallbacks"]
+        if not ok:
+            ident.append(list(k))
+    out["pair_identity_violations"] = ident
+
     rng = np.random.default_rng(BOOT_SEED)
     panels = {"primary_seeds_3_4": PRIMARY_SEEDS, "all_seeds_1_4": {1, 2, 3, 4}}
     paired = {}
@@ -174,9 +200,13 @@ def main():
 
     # decision (section 6), on the primary held-out panel
     prim = paired["primary_seeds_3_4"]
-    up = {w: prim[f"gae_{w}"]["pooled"]["ci95"][1] for w in WS}
-    lo1 = prim["gae_1.0"]["pooled"]["ci95"][0]
-    integrity = not bad and not unpaired and same_log and not c0["mismatches"]
+    integrity = (not bad and not unpaired and same_log and not c0["mismatches"]
+                 and not ident)
+    if prim["gae_1.0"]["pooled"] is None:
+        integrity = False
+    else:
+        up = {w: prim[f"gae_{w}"]["pooled"]["ci95"][1] for w in WS}
+        lo1 = prim["gae_1.0"]["pooled"]["ci95"][0]
     if not integrity:
         dec = "VOID"
     elif up[1.0] < 1 and up[0.1] < 1 and up[0.0] <= 1:

@@ -1,6 +1,6 @@
 # Protocol: skip the full-core fallback in quartic Diem `2lp-sfb-sge`
 
-Status: **DRAFT, not frozen.** It is frozen by `frozen.sha256` (this file, `seeds.json`, `analyze.py` and `run_*.sh`), committed before any grid run. Every number this study produces is `[pcc:unverified]`.
+Status: **FROZEN 2026-11-26** by `frozen.sha256` (this file, `seeds.json`, `analyze.py` and `run_*.sh`), committed before any grid run. Binary `genus_ladder.nofb`, sha256 in `binary.sha256`, built from 31a1e2f53ef. Development data only, in `dev/`: curves 4093 and 8191, outside the grid. Every number this study produces is `[pcc:unverified]`.
 
 Parent: `research/quartic_diem_la_20261123` (merged in #5081; validated with errata).
 
@@ -50,7 +50,7 @@ Binary: `genus_ladder.nofb`, built from this branch. Its hash goes in `binary.sh
 - **Cost.** GAE_w = `group_ops` + w × (all native operations: `rel_mul + rel_add + la_mul + la_add + idx_lookups + idx_inserts`), for w ∈ {0, 0.1, 1} (AGENTS.md §5a).
 - **Paired ratio.** GAE_w(nofb) / GAE_w(sge) per (curve, seed). Curve level is the geometric mean over the panel's seeds. Per prime, the geometric mean over curves, with a cluster bootstrap over curves (4000 replicates, seed 20261126). Pooled gives equal weight per prime. Reported for the primary panel (seeds 3, 4) and for all seeds.
 - **IC / ideal negation rho.** Per arm and prime at each w, over all seeds. The verdict follows the parent: BELOW-RHO CANDIDATE only if all three upper bounds are below 1, ABOVE RHO if all lower bounds are above 1, otherwise UNRESOLVED.
-- **Integrity.** Every row is certified with `recovered == t_secret`; both arms recover the same log; every pair is complete; C0 holds, meaning the baseline rows for seeds 1 and 2 equal the parent's `2lp-sfb-sge` rows on the 24 fields listed in `analyze.py`. Any failure makes the study VOID.
+- **Integrity.** Every row is certified with `recovered == t_secret`; both arms recover the same log; every pair is complete; C0 holds, meaning the baseline rows for seeds 1 and 2 equal the parent's `2lp-sfb-sge` rows on the 24 fields listed in `analyze.py`; and every pair without a rescue satisfies the section-2 identities (same attempts and relation phase; equal linear algebra and group operations with no fallback; strictly less linear algebra, no more group operations and `la_fallbacks_skipped` equal to the baseline's `la_fallbacks` with one). The unit test met no fallback at its small q, so these identities are checked on the grid itself. Any failure makes the study VOID.
 - **Decision, on the primary panel.**
   - **IMPROVEMENT** if the pooled paired ratio has upper 95% < 1 at w = 1 and at w = 0.1, and ≤ 1 at w = 0. This is an order that holds across the band, not a tolerance.
   - **KILL** if the pooled w = 1 lower 95% is ≥ 0.98.
