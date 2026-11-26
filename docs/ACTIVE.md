@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Recover/replay the fixed P-192 original synthesis costs with source/artifact binding and all executed costs, distinguishing given torsion/model inputs from construction; retain prior evidence and existing execution limits/user waiver (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126; follows PR #5257).
+
 - [x] Implement callable direct P-192 f_* from valid rational 22x85 KM class input:12 end-to-end cases pass including infinity0..3, public F(G)/double, RR2, repeated supports and triple pole; standalone/replay-tree/class-only API checks pass; full189.715s diagnostic wrapper evidence/report retained (Codex, completed component 2026-11-26, branch lane/p192-km-pushforward-20261126, PR #5257 after #5256; unchanged limits/user waiver, historical original synthesis costs remain open). [pcc:unverified]
 
 - [x] Establish f_*phi*pi^*=[6] on the retained smooth P-192 models using separate actual-coordinate differential traces and a 6084<p difference-degree bound; bind the exact source-infinity reference, retain eight controls, failures and all149.116s wrapper costs (Codex, completed component 2026-11-26, branch lane/p192-composition-verification-20261126, PR #5256, follow-up to PR #5255; old software transpose, independent signing and original synthesis accounting remain open). [pcc:unverified]
