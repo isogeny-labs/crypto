@@ -59,12 +59,17 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   totals, distinct solver dispositions, sticky blockers, provenance/arm
   bindings, legacy-report shape preservation, callback/sink isolation and
   focused ownership/reconciliation controls.  The implementation deliberately
-  keeps both operation-coverage and memory-coverage promotion gates false;
-  admitted records currently seal with `memory_tracking_gap`, with the
-  independent operation-coverage flag also false.  Allocation/scratch,
-  remaining operation/branch coverage, the prospective RR9 runner, and the
-  outer collector are not complete.  This foundation therefore satisfies no
-  checklist item and authorizes no scientific row.
+  keeps operation-coverage, memory-coverage and work-ownership promotion gates
+  false.  It also provides a callback-free `VisitAccountingExecutorV1`
+  scaffold whose private one-thread pool returns only the first
+  equation-checked witness; its arm is explicitly labeled as a TLS shadow, not
+  as proved ownership.  Admitted records currently seal with
+  `memory_tracking_gap`, with the independent operation-coverage and
+  work-ownership flags also false.
+  Allocation/scratch, remaining operation/branch coverage, explicit token
+  ownership and promotion-ready executor integration, the prospective RR9
+  runner, and the outer collector are not complete.  This foundation
+  therefore satisfies no checklist item and authorizes no scientific row.
 - **Observed partial collector charge:** the development whole-solve code adds
   only `rec.f4_field_ops + rec.root_field_muls` for each RR9 call. Its Prime31
   scaling table derives a lower bound from the smaller observed UNSAT
@@ -174,10 +179,11 @@ still require prospective executions and independent replay.
   `VisitAccountingV1` slice in `src/cryptanalysis/f4_fp.rs`: route every
   admitted allocation/capacity/scratch and remaining operation/branch through
   checked call-owned accounting, stop on the first unowned operation, close
-  the remaining phase and hand-count controls, and keep both coverage gates
-  false until that review passes. Keep both copied-source bridges compiling
-  while completing the ledger, then integrate only through a prospectively
-  frozen successor RR9 runner schema.
+  the remaining phase and hand-count controls, add explicit token ownership
+  through the callback-free private executor, and keep all three promotion
+  gates false until that review passes. Keep both copied-source bridges
+  compiling while completing the ledger, then integrate only through a
+  prospectively frozen successor RR9 runner schema.
   Do not combine this slice with a B31 run or the whole-collector
   implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to

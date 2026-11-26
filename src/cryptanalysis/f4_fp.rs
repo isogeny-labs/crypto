@@ -3704,10 +3704,13 @@ fn rref32_deferred(
 /// so the reduced echelon form, and every counted operation, is the one the
 /// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
 /// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
-fn narrow_acc_interval(p: u64) -> Option<usize> {
+fn narrow_acc_enabled() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    let on = *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"));
-    if !on || mem_site(0) {
+    *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"))
+}
+
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    if !narrow_acc_enabled() || mem_site(0) {
         return None;
     }
     narrow_acc_interval_for(p)
@@ -8200,6 +8203,28 @@ pub struct VisitAccountingRequestV1 {
     pub binding: VisitAccountingBindingV1,
 }
 
+#[derive(Clone, Copy)]
+enum VisitAccountingEntryMode {
+    CallerPool,
+    PrivateFirstExecutor,
+}
+
+impl VisitAccountingEntryMode {
+    fn ownership_mode(self) -> &'static str {
+        match self {
+            Self::CallerPool => "caller_one_thread_rayon_tls_unproven",
+            Self::PrivateFirstExecutor => "private_one_thread_first_result_tls_shadow",
+        }
+    }
+
+    fn callback_stop_disposition(self) -> VisitDispositionV1 {
+        match self {
+            Self::CallerPool => VisitDispositionV1::CallbackStopped,
+            Self::PrivateFirstExecutor => VisitDispositionV1::WitnessFound,
+        }
+    }
+}
+
 /// The solver outcome.  This is deliberately independent of whether its work
 /// ledger is complete: a fully counted timeout is still not a complete solve,
 /// and a reconciliation failure does not rewrite a completed solver outcome.
@@ -8209,6 +8234,7 @@ pub enum VisitDispositionV1 {
     CompleteNonempty,
     CompleteEmpty,
     EmptyDomain,
+    WitnessFound,
     CallbackStopped,
     TimedOut,
     ResourceStopped,
@@ -8380,6 +8406,7 @@ pub struct VisitAccountingMemoryV1 {
 pub struct VisitAccountingArmV1 {
     pub ordering: &'static str,
     pub selection_strategy: &'static str,
+    pub ownership_mode: &'static str,
     pub rayon_threads: usize,
     pub inside_rayon_worker: bool,
     pub max_degree: u32,
@@ -8399,7 +8426,10 @@ pub struct VisitAccountingArmV1 {
     pub symbolic_parallel_enabled: bool,
     pub gebauer_moeller_enabled: bool,
     pub faugere_lachartre_enabled: bool,
+    pub faugere_lachartre_build_mode: &'static str,
+    pub faugere_lachartre_min_columns: usize,
     pub blocked_pair_reduction_enabled: bool,
+    pub narrow_accumulators_enabled: bool,
     pub linear_interreduce_enabled: bool,
     pub lazy_simd: &'static str,
 }
@@ -8410,6 +8440,7 @@ pub struct VisitAccountingReconciliationV1 {
     pub memory_balanced: bool,
     pub operation_tracking_complete: bool,
     pub memory_tracking_complete: bool,
+    pub work_ownership_complete: bool,
     pub checked_arithmetic: bool,
 }
 
@@ -8579,25 +8610,26 @@ struct VisitAccountingBuilder {
     peak_scratch_payload_bytes: u64,
     operation_tracking_complete: bool,
     memory_tracking_complete: bool,
+    work_ownership_complete: bool,
 }
 
 impl VisitAccountingBuilder {
+    #[cfg(test)]
     fn new(request: VisitAccountingRequestV1, opts: &F4Options, trace_sink: bool) -> Self {
-        Self::new_with_profile(request, opts, trace_sink, true)
+        Self::new_for_entry(
+            request,
+            opts,
+            trace_sink,
+            VisitAccountingEntryMode::CallerPool,
+            true,
+        )
     }
 
-    fn new_unresolved(
+    fn new_for_entry(
         request: VisitAccountingRequestV1,
         opts: &F4Options,
         trace_sink: bool,
-    ) -> Self {
-        Self::new_with_profile(request, opts, trace_sink, false)
-    }
-
-    fn new_with_profile(
-        request: VisitAccountingRequestV1,
-        opts: &F4Options,
-        trace_sink: bool,
+        entry_mode: VisitAccountingEntryMode,
         resolve_profile: bool,
     ) -> Self {
         let last_wall = Instant::now();
@@ -8615,7 +8647,10 @@ impl VisitAccountingBuilder {
             symbolic,
             gm,
             fl,
+            fl_build_mode,
+            fl_min_columns,
             fl_blocked,
+            narrow_accumulators,
             linear_interreduce,
             legacy_bitops,
             simd,
@@ -8630,6 +8665,9 @@ impl VisitAccountingBuilder {
                 false,
                 false,
                 false,
+                false,
+                "unresolved",
+                0,
                 false,
                 false,
                 false,
@@ -8650,7 +8688,14 @@ impl VisitAccountingBuilder {
                 symbolic_parallel(),
                 gebauer_moeller(),
                 fl_enabled(),
+                if fl_mode_tiles(0) {
+                    "column_tiles"
+                } else {
+                    "row_blocks"
+                },
+                fl_min_cols(),
                 fl_blocked_pairs(),
+                narrow_acc_enabled(),
                 linear_interreduce_enabled(),
                 super::jv_bitops::enabled(),
                 simd,
@@ -8677,6 +8722,7 @@ impl VisitAccountingBuilder {
                     Ordering::Grevlex => "grevlex",
                 },
                 selection_strategy: "normal_degree_by_degree",
+                ownership_mode: entry_mode.ownership_mode(),
                 rayon_threads: rayon::current_num_threads(),
                 inside_rayon_worker: rayon::current_thread_index().is_some(),
                 max_degree: opts.max_degree,
@@ -8701,7 +8747,10 @@ impl VisitAccountingBuilder {
                 symbolic_parallel_enabled: symbolic,
                 gebauer_moeller_enabled: gm,
                 faugere_lachartre_enabled: fl,
+                faugere_lachartre_build_mode: fl_build_mode,
+                faugere_lachartre_min_columns: fl_min_columns,
                 blocked_pair_reduction_enabled: fl_blocked,
+                narrow_accumulators_enabled: narrow_accumulators,
                 linear_interreduce_enabled: linear_interreduce,
                 lazy_simd: simd,
             },
@@ -8716,11 +8765,13 @@ impl VisitAccountingBuilder {
             live_payload_bytes: 0,
             peak_live_payload_bytes: 0,
             peak_scratch_payload_bytes: 0,
-            // Operation and allocation coverage are separate promotion gates.
-            // The current slice deliberately leaves both false until every
-            // admitted path is source-complete and independently reviewed.
+            // Operation, memory and work ownership are independent promotion
+            // gates.  The current slice deliberately leaves all three false
+            // until every admitted path is source-complete, explicitly
+            // token-owned and independently reviewed.
             operation_tracking_complete: false,
             memory_tracking_complete: false,
+            work_ownership_complete: false,
         }
     }
 
@@ -8944,6 +8995,17 @@ impl VisitAccountingBuilder {
                 "operation and branch coverage is not yet source-complete",
             );
         }
+        if !self.work_ownership_complete {
+            let ownership_mode = self.arm.ownership_mode;
+            self.block(
+                "work_ownership_gap",
+                None,
+                format!(
+                    "ownership mode {} does not prove exclusive solver work ownership",
+                    ownership_mode
+                ),
+            );
+        }
         let phases = VisitAccountingPhaseV1::ALL
             .iter()
             .copied()
@@ -8963,6 +9025,7 @@ impl VisitAccountingBuilder {
                 && memory_balanced
                 && self.operation_tracking_complete
                 && self.memory_tracking_complete
+                && self.work_ownership_complete
                 && self.checked_arithmetic,
             blocker: self.blocker,
             total: self.total,
@@ -8978,6 +9041,7 @@ impl VisitAccountingBuilder {
                 memory_balanced,
                 operation_tracking_complete: self.operation_tracking_complete,
                 memory_tracking_complete: self.memory_tracking_complete,
+                work_ownership_complete: self.work_ownership_complete,
                 checked_arithmetic: self.checked_arithmetic,
             },
             whole_collector_accounting_required: true,
@@ -9325,10 +9389,23 @@ fn visit_accounting_resolved_configuration_error() -> Option<String> {
         || !deferred_parallel()
         || stair_scan()
         || thread_ops_mode()
+        || !visit_accounting_cached_profile_is_default(
+            fl_mode_tiles(0),
+            fl_min_cols(),
+            narrow_acc_enabled(),
+        )
     {
         return Some("resolved F4 implementation profile is not the frozen default".into());
     }
     None
+}
+
+fn visit_accounting_cached_profile_is_default(
+    fl_tiles: bool,
+    fl_min_columns: usize,
+    narrow_accumulators: bool,
+) -> bool {
+    !fl_tiles && fl_min_columns == FL_MIN_COLS && narrow_accumulators
 }
 
 fn visit_account_charge_usize(counter: VisitAccountingCounter, value: usize) {
@@ -10240,11 +10317,15 @@ where
     }
 }
 
-fn visit_disposition(report: &VisitReport, empty_domain: bool) -> VisitDispositionV1 {
+fn visit_disposition(
+    report: &VisitReport,
+    empty_domain: bool,
+    callback_stop_disposition: VisitDispositionV1,
+) -> VisitDispositionV1 {
     if report.trace_stopped {
         VisitDispositionV1::TraceError
     } else if report.stopped_early {
-        VisitDispositionV1::CallbackStopped
+        callback_stop_disposition
     } else if report.timed_out {
         VisitDispositionV1::TimedOut
     } else if report.resource_limit.is_some() {
@@ -10268,6 +10349,7 @@ fn solve_visit_accounted_impl<F, S>(
     opts: &F4Options,
     domains: &[Option<Vec<u64>>],
     request: VisitAccountingRequestV1,
+    entry_mode: VisitAccountingEntryMode,
     visitor: F,
     sink: Option<S>,
 ) -> Result<VisitReport, VisitAccountedErrorV1>
@@ -10284,11 +10366,13 @@ where
         .then(|| visit_accounting_basic_configuration_error(opts, false))
         .flatten();
     let resolve_profile = !nested && binding_error.is_none() && basic_configuration_error.is_none();
-    let mut builder = if resolve_profile {
-        VisitAccountingBuilder::new(request, opts, trace_sink)
-    } else {
-        VisitAccountingBuilder::new_unresolved(request, opts, trace_sink)
-    };
+    let mut builder = VisitAccountingBuilder::new_for_entry(
+        request,
+        opts,
+        trace_sink,
+        entry_mode,
+        resolve_profile,
+    );
     if nested {
         builder.block(
             "nested_accounted_call",
@@ -10358,7 +10442,11 @@ where
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
     match solve_visit_impl(input, n_vars, p, opts, domains, visitor, sink, None) {
         Ok(mut report) => {
-            let disposition = visit_disposition(&report, empty_domain);
+            let disposition = visit_disposition(
+                &report,
+                empty_domain,
+                entry_mode.callback_stop_disposition(),
+            );
             report.accounting_v1 = Some(Box::new(session.finish(disposition)));
             Ok(report)
         }
@@ -10366,6 +10454,79 @@ where
             accounting: session.finish(VisitDispositionV1::InvalidInput),
             message,
         }),
+    }
+}
+
+/// One equation-checked witness and the accounted report that produced it.
+///
+/// `first_solution` is `None` when traversal completes without a witness or
+/// stops for another reason.  A present witness is also reflected by
+/// [`VisitDispositionV1::WitnessFound`] in `report.accounting_v1`.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct VisitFirstReportV1 {
+    pub report: VisitReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_solution: Option<Vec<u64>>,
+}
+
+/// Private, sequential entry point for the first equation-checked witness.
+///
+/// The executor owns a one-thread Rayon pool and exposes no caller callback or
+/// trace sink, preventing those extension points from submitting unrelated
+/// work to that pool.  Its current accounting implementation still uses the
+/// worker-local meter as a shadow; `work_ownership_complete` therefore remains
+/// false until the solver carries an explicit borrowed ownership token through
+/// every charged path.
+pub struct VisitAccountingExecutorV1 {
+    pool: rayon::ThreadPool,
+}
+
+impl VisitAccountingExecutorV1 {
+    /// Build a fresh executor with its own single worker.
+    pub fn try_new() -> Result<Self, rayon::ThreadPoolBuildError> {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .map(|pool| Self { pool })
+    }
+
+    /// Return the first equation-checked solution, if one is reached.
+    ///
+    /// Calls require `&mut self`, so one executor cannot admit overlapping
+    /// solves through this API.  The report remains call-scoped; construction,
+    /// replay, persistence, and whole-collector work need outer accounting.
+    #[allow(clippy::too_many_arguments)]
+    pub fn solve_first(
+        &mut self,
+        input: &[Poly],
+        n_vars: usize,
+        p: u64,
+        opts: &F4Options,
+        domains: &[Option<Vec<u64>>],
+        request: VisitAccountingRequestV1,
+    ) -> Result<VisitFirstReportV1, VisitAccountedErrorV1> {
+        let (report, first_solution) = self.pool.install(move || {
+            let mut first_solution = None;
+            let report = solve_visit_accounted_impl(
+                input,
+                n_vars,
+                p,
+                opts,
+                domains,
+                request,
+                VisitAccountingEntryMode::PrivateFirstExecutor,
+                |solution| {
+                    first_solution = Some(solution.to_vec());
+                    true
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+            )?;
+            Ok((report, first_solution))
+        })?;
+        Ok(VisitFirstReportV1 {
+            report,
+            first_solution,
+        })
     }
 }
 
@@ -10392,6 +10553,7 @@ pub fn solve_visit_accounted_v1(
         opts,
         domains,
         request,
+        VisitAccountingEntryMode::CallerPool,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
     )
@@ -10418,6 +10580,7 @@ pub fn solve_visit_traced_accounted_v1(
         opts,
         domains,
         request,
+        VisitAccountingEntryMode::CallerPool,
         visitor,
         Some(sink),
     )
@@ -11159,7 +11322,7 @@ mod visit_accounting_tests {
             .expect("accounted entry point returns its ledger")
     }
 
-    fn assert_reconciles(record: &VisitAccountingV1) {
+    fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
         let mut sum = VisitAccountingWorkV1::default();
         for phase in &record.phases {
             sum.checked_add_assign(&phase.work).unwrap();
@@ -11169,8 +11332,14 @@ mod visit_accounting_tests {
         assert!(record.reconciliation.checked_arithmetic);
         assert!(!record.reconciliation.operation_tracking_complete);
         assert!(!record.reconciliation.memory_tracking_complete);
+        assert!(!record.reconciliation.work_ownership_complete);
+        assert_eq!(record.arm.ownership_mode, ownership_mode);
         assert_eq!(record.scope, "solve_visit_call_only");
         assert!(record.whole_collector_accounting_required);
+    }
+
+    fn assert_reconciles(record: &VisitAccountingV1) {
+        assert_reconciles_in_mode(record, "caller_one_thread_rayon_tls_unproven");
     }
 
     #[test]
@@ -11189,6 +11358,47 @@ mod visit_accounting_tests {
             .unwrap()
             .get("accounting_v1")
             .is_none());
+    }
+
+    #[test]
+    fn cached_effective_profile_controls_are_bound_and_fail_closed() {
+        assert!(visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            true,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS + 1,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            false
+        ));
+
+        let report = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("cached-profile"),
+                |_| false,
+            )
+            .unwrap()
+        });
+        let arm = &accounting(&report).arm;
+        assert_eq!(arm.faugere_lachartre_build_mode, "row_blocks");
+        assert_eq!(arm.faugere_lachartre_min_columns, FL_MIN_COLS);
+        assert!(arm.narrow_accumulators_enabled);
     }
 
     #[test]
@@ -11224,6 +11434,47 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(record.blocker.as_ref().unwrap().code, "memory_tracking_gap");
         }
+    }
+
+    #[test]
+    fn private_first_executor_matches_legacy_and_is_sequentially_reusable() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut legacy_first = None;
+        let legacy = solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+            legacy_first = Some(solution.to_vec());
+            true
+        })
+        .unwrap();
+        assert!(legacy.stopped_early);
+
+        let mut executor = VisitAccountingExecutorV1::try_new().unwrap();
+        let first = executor
+            .solve_first(&input, 1, 7, &opts, &[None], request("private-first"))
+            .unwrap();
+        assert_eq!(first.first_solution, legacy_first);
+        assert_eq!(first.first_solution, Some(vec![1]));
+        assert!(first.report.stopped_early);
+        let record = accounting(&first.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::WitnessFound);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
+        assert!(!record.accounting_complete);
+
+        let empty = executor
+            .solve_first(
+                &[],
+                1,
+                7,
+                &opts,
+                &[Some(Vec::new())],
+                request("private-empty"),
+            )
+            .unwrap();
+        assert!(empty.first_solution.is_none());
+        assert!(!empty.report.stopped_early);
+        let record = accounting(&empty.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::EmptyDomain);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
     }
 
     #[test]
@@ -11394,6 +11645,7 @@ mod visit_accounting_tests {
         overflow.charge(VisitAccountingCounter::CallbackDeliveries, 1);
         overflow.operation_tracking_complete = true;
         overflow.memory_tracking_complete = true;
+        overflow.work_ownership_complete = true;
         let overflow = overflow.seal(VisitDispositionV1::CompleteEmpty);
         assert_eq!(overflow.blocker.as_ref().unwrap().code, "counter_overflow");
         assert!(!overflow.accounting_complete);
@@ -11403,6 +11655,7 @@ mod visit_accounting_tests {
         mismatch.phases[VisitAccountingPhaseV1::Validation.index()].traversal_nodes = 1;
         mismatch.operation_tracking_complete = true;
         mismatch.memory_tracking_complete = true;
+        mismatch.work_ownership_complete = true;
         let mismatch = mismatch.seal(VisitDispositionV1::CompleteEmpty);
         assert_eq!(
             mismatch.blocker.as_ref().unwrap().code,
@@ -11410,6 +11663,17 @@ mod visit_accounting_tests {
         );
         assert!(!mismatch.accounting_complete);
         assert!(!mismatch.reconciliation.phase_sum_equals_total);
+
+        let mut ownership = VisitAccountingBuilder::new(request("ownership"), &opts, false);
+        ownership.operation_tracking_complete = true;
+        ownership.memory_tracking_complete = true;
+        let ownership = ownership.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(
+            ownership.blocker.as_ref().unwrap().code,
+            "work_ownership_gap"
+        );
+        assert!(!ownership.accounting_complete);
+        assert!(!ownership.reconciliation.work_ownership_complete);
     }
 
     #[test]
