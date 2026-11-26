@@ -420,7 +420,10 @@ mod analyze {
             }
             f
         };
-        let (w, h, ml, mb, mt) = (980.0, 480.0, 60.0, 110.0, 40.0);
+        let legend_rows = arms.len().div_ceil(6) as f64;
+        let (w, ml, mt) = (980.0, 60.0, 40.0);
+        let mb = 70.0 + 20.0 * legend_rows;
+        let h = 370.0 + mb;
         let ymax = bars
             .iter()
             .filter(|b| b.2 != "biguint")
@@ -460,7 +463,7 @@ mod analyze {
         }
         for (ai, a) in arms.iter().enumerate() {
             let lx = ml + ((ai % 6) as f64) * 150.0;
-            let ly = h - 44.0 + ((ai / 6) as f64) * 20.0;
+            let ly = h - mb + 52.0 + ((ai / 6) as f64) * 20.0;
             write!(s, "<rect x='{lx}' y='{ly}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", COLORS[ai % COLORS.len()], lx + 16.0, ly + 10.0).unwrap();
         }
         s.push_str("</svg>\n");
