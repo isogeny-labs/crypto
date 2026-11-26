@@ -110,7 +110,9 @@ isolates, packet creation precision, ownership, and complete edge order. It
 binds every packet vertex to the independently checked entry table for its
 `(beta, group, packet)` key. Both groups of the admitted three-edge control
 pass after serialization; port, parent/packet precision, and tuple mutations
-fail. This strengthens R1 items 2–3 through the finite tensor-table interface;
+fail. Every producer path also replays every retained `(beta, group)` child for
+the correlated fixture, the 596-case corpus, and the executed diagnostic. This
+strengthens R1 items 2–3 through a generic finite tensor-table interface;
 uniform arbitrary-size refinement remains open. `[pcc:unverified]`
 
 The schema-5 symbolic transcript now closes R1 item 4 at the scalar level once

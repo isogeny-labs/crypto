@@ -36,9 +36,12 @@ The admitted three-edge conditional-packing control constructs both radix
 group children at the zero mode tuple. Each child's topology, source references,
 creation precisions, and packet-table keys agree with standalone replay.
 Mutating a packet port, parent precision, packet precision, or the mode tuple
-fails closed. Existing port-mass controls separately cover 25,490 group-child
-calls across parallel ports, isolates, several radices, and packet geometries
-using direct source-object comparisons. `[pcc:unverified]`
+fails closed. In addition, every factorization producer path serializes and
+replays every `(beta, group)` child after completing its entry tables. This
+covers the correlated fixture, all 596 three- through five-edge certificates,
+and the executed diagnostic. Existing port-mass controls separately cover
+25,490 group-child calls across parallel ports, isolates, several radices, and
+packet geometries using direct source-object comparisons. `[pcc:unverified]`
 
 ## Remaining boundary
 

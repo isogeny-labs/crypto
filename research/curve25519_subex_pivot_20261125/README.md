@@ -371,8 +371,11 @@ precision, row-then-column incidence order, and every child edge. It also binds
 each packet vertex to the exact `(beta, group, packet)` coefficient table
 already checked by the factorization verifier. Both groups of the admitted
 three-edge control round-trip and replay exactly; port, precision, and tuple
-mutations fail closed. The uniform arbitrary-size refinement and external
-contraction theorem remain separate. `[pcc:unverified]`
+mutations fail closed. Every producer path also replays every retained
+`(beta, group)` child, covering the correlated fixture, all 596 three- through
+five-edge certificates, and the executed diagnostic. The uniform
+arbitrary-size refinement and external contraction theorem remain separate.
+`[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical

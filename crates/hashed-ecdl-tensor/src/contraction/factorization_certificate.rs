@@ -466,12 +466,16 @@ fn produce(
     let mut beta = vec![0usize; modes.len()];
     let mut usage = vec![0usize; group_bounds.len()];
     let mut weight = 0usize;
+    let mut child_certificates = Vec::new();
     loop {
         certificate.tuples.push(beta.clone());
         for group in 0..parameters.radix {
             let child = deformation::child(
                 graph, packing, coordinate, parameters, kernel, modes, &beta, group, meter,
             )?;
+            child_certificates.push(child_provenance(
+                graph, packing, coordinate, parameters, &child, &beta, group,
+            ));
             for (packet, vertex) in child.right.iter().enumerate() {
                 let assignments = 1usize
                     .checked_shl(
@@ -526,6 +530,30 @@ fn produce(
             }
             verify_packing_provenance(&certificate, &parsed_provenance, meter)
                 .map_err(|_| integrity("packing provenance replay"))?;
+            let expected_children = certificate
+                .tuples
+                .len()
+                .checked_mul(parameters.radix)
+                .ok_or_else(|| overflow("child provenance coverage"))?;
+            if child_certificates.len() != expected_children {
+                return Err(integrity("child provenance coverage"));
+            }
+            meter.vector(child_certificates.len(), "child provenance certificates")?;
+            for child in child_certificates {
+                let serialized_child = serde_json::to_vec(&child)
+                    .map_err(|_| invalid("child provenance serialization"))?;
+                let parsed_child: ChildProvenanceCertificate =
+                    serde_json::from_slice(&serialized_child)
+                        .map_err(|_| invalid("child provenance parsing"))?;
+                if serde_json::to_vec(&parsed_child)
+                    .map_err(|_| invalid("child provenance serialization"))?
+                    != serialized_child
+                {
+                    return Err(integrity("child provenance round trip"));
+                }
+                verify_child_provenance(&parsed_provenance, &certificate, &parsed_child, meter)
+                    .map_err(|_| integrity("child provenance replay"))?;
+            }
             return Ok(certificate);
         }
     }
