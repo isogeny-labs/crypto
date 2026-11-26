@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Complete P-192 projective/exceptional map verification under the explicit user coordinate-screen/matched-rho waiver; retain existing execution limits, frozen evidence and no new PCC/speedup claims (Codex, started 2026-11-26, branch lane/p192-projective-verification-20261126).
+- [ ] Complete P-192 projective/exceptional map verification under the explicit user coordinate-screen/matched-rho waiver; retain existing execution limits, frozen evidence and no new PCC/speedup claims (Codex, started 2026-11-26, branch lane/p192-projective-verification-20261126, PR #5255).
 - [x] Demonstrate the drastic PKM supersingular auxiliary-curve setup with a runnable exact-order certificate, truncated Vélu tower, and measured ordinary-search comparison (Codex, completed local checks 2026-11-26, follow-up branch codex/pkm-drastic-setup-followup-20261126, PR #5237; PR #5236 contains tracking metadata only; exact `2^64` point, 16-step/65,536-element checked fibre, focused tests and strict scoped Clippy pass). [pcc:unverified]
 - [x] Publish the completed Cayley-product M31 signed chord extractor, deterministic correctness evidence, and static-label counting bound (Codex, 2026-11-25, branch codex/cayley-chord-m31-20261125, PR #5232; fresh standalone replay matches frozen outputs, root-library build limit documented). [pcc:unverified]
 - [x] Integrate the ordinary rational 2-isogeny floor/crater demonstration as native Rust with runnable output and tests (Codex, completed local checks 2026-11-26, branch codex/rational-2-isogeny-volcano-20261126, PR #5225; focused checks pass, repository-wide release and strict-Clippy baseline limitations recorded). [pcc:unverified]
