@@ -56,15 +56,17 @@ mod engine {
         Retain4PrefixCentered,
         Retain3PrefixCentered,
         Retain3PrefixAffineLeaf,
+        Retain3PrefixAffineXFirst,
     }
 
     impl Arm {
-        pub(super) const ALL: [Self; 5] = [
+        pub(super) const ALL: [Self; 6] = [
             Self::Retain4HashSum,
             Self::Retain4HashCentered,
             Self::Retain4PrefixCentered,
             Self::Retain3PrefixCentered,
             Self::Retain3PrefixAffineLeaf,
+            Self::Retain3PrefixAffineXFirst,
         ];
 
         fn name(self) -> &'static str {
@@ -74,12 +76,15 @@ mod engine {
                 Self::Retain4PrefixCentered => "retain4-prefix16-centered",
                 Self::Retain3PrefixCentered => "retain3-prefix16-centered",
                 Self::Retain3PrefixAffineLeaf => "retain3-prefix16-affine-leaf",
+                Self::Retain3PrefixAffineXFirst => "retain3-prefix16-affine-x-first",
             }
         }
 
         fn retained_arity(self) -> usize {
             match self {
-                Self::Retain3PrefixCentered | Self::Retain3PrefixAffineLeaf => 3,
+                Self::Retain3PrefixCentered
+                | Self::Retain3PrefixAffineLeaf
+                | Self::Retain3PrefixAffineXFirst => 3,
                 _ => 4,
             }
         }
@@ -90,6 +95,7 @@ mod engine {
                 Self::Retain4PrefixCentered
                     | Self::Retain3PrefixCentered
                     | Self::Retain3PrefixAffineLeaf
+                    | Self::Retain3PrefixAffineXFirst
             )
         }
 
@@ -235,6 +241,48 @@ mod engine {
                     None
                 }
             }
+        }
+
+        fn lookup_deferred(
+            &self,
+            point: DeferredAffine,
+            fixture: &Fixture,
+            ops: &mut OpCounts,
+            counts: &mut LookupCounts,
+            y_materializations: &mut u64,
+        ) -> Option<Vec<usize>> {
+            let DeferredAffine::Slope { x3, .. } = point else {
+                return self.lookup(
+                    point.materialize(fixture.instance.curve.p, ops),
+                    fixture,
+                    counts,
+                );
+            };
+            counts.probes += 1;
+            let Self::Prefix(table) = self else {
+                panic!("deferred affine lookup requires an exact prefix table");
+            };
+            let x = x3 as u32;
+            let bucket = prefix_bucket(x);
+            let start = table.offsets[bucket] as usize;
+            let end = table.offsets[bucket + 1] as usize;
+            for entry in &table.entries[start..end] {
+                counts.comparisons += 1;
+                if entry.x == x {
+                    *y_materializations += 1;
+                    let materialized = point.materialize(fixture.instance.curve.p, ops);
+                    return Some(oriented_witness(
+                        CompactValue {
+                            y: entry.y,
+                            witness: entry.witness,
+                        },
+                        materialized,
+                        table.retained_arity,
+                        fixture,
+                    ));
+                }
+            }
+            None
         }
     }
 
@@ -701,17 +749,44 @@ mod engine {
         numerator: u64,
     }
 
-    fn batch_affine_add(
+    #[derive(Clone, Copy, Debug)]
+    enum DeferredAffine {
+        Resolved(PrimePoint),
+        Slope {
+            x1: u64,
+            y1: u64,
+            x3: u64,
+            slope: u64,
+        },
+    }
+
+    impl DeferredAffine {
+        fn materialize(self, modulus: u64, ops: &mut OpCounts) -> PrimePoint {
+            match self {
+                Self::Resolved(point) => point,
+                Self::Slope { x1, y1, x3, slope } => PrimePoint::affine(
+                    x3,
+                    sub_mod(
+                        ops.mul(slope, sub_mod(x1, x3, modulus), modulus),
+                        y1,
+                        modulus,
+                    ),
+                ),
+            }
+        }
+    }
+
+    fn batch_affine_x(
         block: &[(PrimePoint, PrimePoint, u32)],
         fixture: &Fixture,
         ops: &mut OpCounts,
         branches: &mut AffineBranchCounts,
-    ) -> Vec<(PrimePoint, u32)> {
+    ) -> Vec<(DeferredAffine, u32)> {
         let modulus = fixture.instance.curve.p;
         let curve_a = fixture.instance.curve.a;
         let mut output: Vec<_> = block
             .iter()
-            .map(|&(_, _, witness)| (PrimePoint::INFINITY, witness))
+            .map(|&(_, _, witness)| (DeferredAffine::Resolved(PrimePoint::INFINITY), witness))
             .collect();
         let mut denominators = Vec::with_capacity(block.len());
         let mut work = Vec::with_capacity(block.len());
@@ -720,19 +795,19 @@ mod engine {
             ops.additions += 1;
             if left.infinity {
                 branches.identity += 1;
-                output[output_index].0 = right;
+                output[output_index].0 = DeferredAffine::Resolved(right);
                 continue;
             }
             if right.infinity {
                 branches.identity += 1;
-                output[output_index].0 = left;
+                output[output_index].0 = DeferredAffine::Resolved(left);
                 continue;
             }
 
             let (numerator, denominator) = if left.x == right.x {
                 if left.y != right.y || left.y == 0 {
                     branches.inverse += 1;
-                    output[output_index].0 = PrimePoint::INFINITY;
+                    output[output_index].0 = DeferredAffine::Resolved(PrimePoint::INFINITY);
                     continue;
                 }
                 branches.doubling += 1;
@@ -769,14 +844,26 @@ mod engine {
                 item.x2,
                 modulus,
             );
-            let y3 = sub_mod(
-                ops.mul(slope, sub_mod(item.x1, x3, modulus), modulus),
-                item.y1,
-                modulus,
-            );
-            output[item.output_index].0 = PrimePoint::affine(x3, y3);
+            output[item.output_index].0 = DeferredAffine::Slope {
+                x1: item.x1,
+                y1: item.y1,
+                x3,
+                slope,
+            };
         }
         output
+    }
+
+    fn batch_affine_add(
+        block: &[(PrimePoint, PrimePoint, u32)],
+        fixture: &Fixture,
+        ops: &mut OpCounts,
+        branches: &mut AffineBranchCounts,
+    ) -> Vec<(PrimePoint, u32)> {
+        batch_affine_x(block, fixture, ops, branches)
+            .into_iter()
+            .map(|(point, witness)| (point.materialize(fixture.instance.curve.p, ops), witness))
+            .collect()
     }
 
     fn probe_affine_block(
@@ -790,6 +877,29 @@ mod engine {
     ) {
         for (point, packed_stream) in batch_affine_add(block, fixture, ops, branches) {
             if let Some(retained) = table.lookup(point, fixture, lookup) {
+                if result.is_none() {
+                    let mut witness = unpack_witness(packed_stream, 4);
+                    witness.extend(retained);
+                    *result = Some(witness);
+                }
+            }
+        }
+    }
+
+    fn probe_affine_x_block(
+        block: &[(PrimePoint, PrimePoint, u32)],
+        table: &RetainedTable,
+        fixture: &Fixture,
+        ops: &mut OpCounts,
+        lookup: &mut LookupCounts,
+        branches: &mut AffineBranchCounts,
+        y_materializations: &mut u64,
+        result: &mut Option<Vec<usize>>,
+    ) {
+        for (point, packed_stream) in batch_affine_x(block, fixture, ops, branches) {
+            if let Some(retained) =
+                table.lookup_deferred(point, fixture, ops, lookup, y_materializations)
+            {
                 if result.is_none() {
                     let mut witness = unpack_witness(packed_stream, 4);
                     witness.extend(retained);
@@ -837,15 +947,17 @@ mod engine {
         fixture: &Fixture,
         table: &RetainedTable,
         block_size: usize,
+        defer_y: bool,
         ops: &mut OpCounts,
         lookup: &mut LookupCounts,
-    ) -> (Option<Vec<usize>>, u64, AffineBranchCounts) {
+    ) -> (Option<Vec<usize>>, u64, AffineBranchCounts, u64) {
         let prefix_states = centered_three_prefixes(fixture, ops);
         let prefixes = normalize_batch(&prefix_states, fixture.instance.curve.p, ops);
         let mut block = Vec::with_capacity(block_size);
         let mut result = None;
         let mut candidates = 0u64;
         let mut branches = AffineBranchCounts::default();
+        let mut y_materializations = 0u64;
 
         for (prefix, packed_prefix) in prefixes {
             let third = ((packed_prefix >> 14) & 0x7f) as usize;
@@ -857,36 +969,67 @@ mod engine {
                 ));
                 candidates += 1;
                 if block.len() == block_size {
-                    probe_affine_block(
-                        &block,
-                        table,
-                        fixture,
-                        ops,
-                        lookup,
-                        &mut branches,
-                        &mut result,
-                    );
+                    if defer_y {
+                        probe_affine_x_block(
+                            &block,
+                            table,
+                            fixture,
+                            ops,
+                            lookup,
+                            &mut branches,
+                            &mut y_materializations,
+                            &mut result,
+                        );
+                    } else {
+                        probe_affine_block(
+                            &block,
+                            table,
+                            fixture,
+                            ops,
+                            lookup,
+                            &mut branches,
+                            &mut result,
+                        );
+                    }
                     block.clear();
                 }
             }
         }
         if !block.is_empty() {
-            probe_affine_block(
-                &block,
-                table,
-                fixture,
-                ops,
-                lookup,
-                &mut branches,
-                &mut result,
-            );
+            if defer_y {
+                probe_affine_x_block(
+                    &block,
+                    table,
+                    fixture,
+                    ops,
+                    lookup,
+                    &mut branches,
+                    &mut y_materializations,
+                    &mut result,
+                );
+            } else {
+                probe_affine_block(
+                    &block,
+                    table,
+                    fixture,
+                    ops,
+                    lookup,
+                    &mut branches,
+                    &mut result,
+                );
+            }
         }
 
         assert_eq!(candidates, 971_635);
         assert_eq!(branches.total(), candidates);
         assert_eq!(ops.additions, 1_028_789);
         assert_eq!(ops.inversions, 476);
-        (result, candidates, branches)
+        if defer_y {
+            assert!(y_materializations <= 97_163);
+        } else {
+            assert_eq!(y_materializations, 0);
+        }
+        (result, candidates, branches, y_materializations)
     }
 
     pub(super) fn time_arm(fixture: &Fixture, arm: Arm, block_size: usize) -> TimedArm {
@@ -897,11 +1040,11 @@ mod engine {
         let started = Instant::now();
         let mut query_ops = OpCounts::default();
         let mut lookup = LookupCounts::default();
-        let (witness, candidates, affine_branches) = match arm {
+        let (witness, candidates, affine_branches, affine_y_materializations) = match arm {
             Arm::Retain4HashSum => {
                 let (witness, candidates) =
                     query_retain4_sum(fixture, &table, block_size, &mut query_ops, &mut lookup);
-                (witness, candidates, AffineBranchCounts::default())
+                (witness, candidates, AffineBranchCounts::default(), 0)
             }
             Arm::Retain4HashCentered | Arm::Retain4PrefixCentered => {
                 let (witness, candidates) = query_retain4_centered(
@@ -911,7 +1054,7 @@ mod engine {
                     &mut query_ops,
                     &mut lookup,
                 );
-                (witness, candidates, AffineBranchCounts::default())
+                (witness, candidates, AffineBranchCounts::default(), 0)
             }
             Arm::Retain3PrefixCentered => {
                 let (witness, candidates) = query_retain3_centered(
@@ -921,11 +1064,24 @@ mod engine {
                     &mut query_ops,
                     &mut lookup,
                 );
-                (witness, candidates, AffineBranchCounts::default())
+                (witness, candidates, AffineBranchCounts::default(), 0)
             }
-            Arm::Retain3PrefixAffineLeaf => {
-                query_retain3_affine_leaf(fixture, &table, block_size, &mut query_ops, &mut lookup)
-            }
+            Arm::Retain3PrefixAffineLeaf => query_retain3_affine_leaf(
+                fixture,
+                &table,
+                block_size,
+                false,
+                &mut query_ops,
+                &mut lookup,
+            ),
+            Arm::Retain3PrefixAffineXFirst => query_retain3_affine_leaf(
+                fixture,
+                &table,
+                block_size,
+                true,
+                &mut query_ops,
+                &mut lookup,
+            ),
         };
         let query = started.elapsed();
         assert_eq!(lookup.probes, candidates);
@@ -949,6 +1105,7 @@ mod engine {
                 affine_inverse: affine_branches.inverse,
                 affine_doubling: affine_branches.doubling,
                 affine_identity: affine_branches.identity,
+                affine_y_materializations,
                 witness,
             },
             setup,
@@ -960,7 +1117,7 @@ mod engine {
         let total = run.setup + run.query;
         let certificate = &run.certificate;
         println!(
-            "{round},{},{:.3},{:.3},{:.3},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
+            "{round},{},{:.3},{:.3},{:.3},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
             certificate.arm,
             run.setup.as_secs_f64() * 1_000.0,
             run.query.as_secs_f64() * 1_000.0,
@@ -987,6 +1144,7 @@ mod engine {
             certificate.affine_inverse,
             certificate.affine_doubling,
             certificate.affine_identity,
+            certificate.affine_y_materializations,
             usize::from(certificate.witness.is_some()),
         );
     }
@@ -1083,6 +1241,21 @@ mod engine {
             let mut ops = OpCounts::default();
             let mut branches = AffineBranchCounts::default();
             let output = batch_affine_add(&block, &fixture, &mut ops, &mut branches);
+            let mut deferred_ops = OpCounts::default();
+            let mut deferred_branches = AffineBranchCounts::default();
+            let deferred_output: Vec<_> =
+                batch_affine_x(&block, &fixture, &mut deferred_ops, &mut deferred_branches)
+                    .into_iter()
+                    .map(|(point, witness)| {
+                        (
+                            point.materialize(fixture.instance.curve.p, &mut deferred_ops),
+                            witness,
+                        )
+                    })
+                    .collect();
+            assert_eq!(deferred_output, output);
+            assert_eq!(deferred_ops, ops);
+            assert_eq!(deferred_branches, branches);
             for ((left, right, witness), (actual, actual_witness)) in block.into_iter().zip(output)
             {
                 assert_eq!(actual_witness, witness);
@@ -1103,6 +1276,78 @@ mod engine {
                     identity: 1,
                 }
             );
+        }
+
+        #[test]
+        fn exact_x_lookup_materializes_y_only_on_a_full_match() {
+            let instance = fp_p31_subexp_mersenne_instance();
+            let factor_base = dickson_factor_base(&instance, 6, 0, 0).unwrap();
+            let first = factor_base.points[0];
+            let match_right = factor_base
+                .points
+                .iter()
+                .copied()
+                .find(|point| point.x != first.x)
+                .unwrap();
+            let match_point = instance
+                .curve
+                .add(&mut GroupOps::default(), first, match_right);
+            let miss_right = factor_base
+                .points
+                .iter()
+                .copied()
+                .find(|&point| {
+                    let sum = instance.curve.add(&mut GroupOps::default(), first, point);
+                    !sum.infinity && sum.x != match_point.x
+                })
+                .unwrap();
+            let fixture = Fixture {
+                target: instance.curve.identity(),
+                instance,
+                base: factor_base.points,
+                neg_index: factor_base.neg_index,
+                abscissae: factor_base.abscissae,
+                planted_indices: Vec::new(),
+            };
+
+            let x = match_point.x as u32;
+            let bucket = prefix_bucket(x);
+            let mut offsets = vec![0u32; PREFIX_BUCKETS + 1];
+            offsets[bucket + 1..].fill(1);
+            let table = RetainedTable::Prefix(PrefixTable {
+                offsets,
+                entries: vec![CompactEntry {
+                    x,
+                    y: match_point.y as u32,
+                    witness: pack_witness(&[0]),
+                }],
+                infinity: None,
+                retained_arity: 1,
+            });
+            let block = [(first, match_right, 0), (first, miss_right, 1)];
+            let mut ops = OpCounts::default();
+            let mut branches = AffineBranchCounts::default();
+            let deferred = batch_affine_x(&block, &fixture, &mut ops, &mut branches);
+            let multiplications_before_lookup = ops.multiplications;
+            let mut lookup = LookupCounts::default();
+            let mut y_materializations = 0;
+            let found: Vec<_> = deferred
+                .into_iter()
+                .map(|(point, _)| {
+                    table.lookup_deferred(
+                        point,
+                        &fixture,
+                        &mut ops,
+                        &mut lookup,
+                        &mut y_materializations,
+                    )
+                })
+                .collect();
+
+            assert_eq!(found, vec![Some(vec![0]), None]);
+            assert_eq!(lookup.probes, 2);
+            assert_eq!(y_materializations, 1);
+            assert_eq!(ops.multiplications, multiplications_before_lookup + 1);
         }
     }
 }
@@ -1125,7 +1370,7 @@ fn main() {
     let configuration = &manifest.configuration;
 
     println!(
-        "round,implementation,setup_ms,query_ms,total_ms,retained_states,distinct_keys,candidates,table_probes,key_comparisons,setup_inversions,query_inversions,setup_multiplications,query_multiplications,setup_squarings,query_squarings,setup_additions,query_additions,setup_doublings,query_doublings,payload_bytes,index_bytes,container_capacity,affine_generic,affine_inverse,affine_doubling,affine_identity,success"
+        "round,implementation,setup_ms,query_ms,total_ms,retained_states,distinct_keys,candidates,table_probes,key_comparisons,setup_inversions,query_inversions,setup_multiplications,query_multiplications,setup_squarings,query_squarings,setup_additions,query_additions,setup_doublings,query_doublings,payload_bytes,index_bytes,container_capacity,affine_generic,affine_inverse,affine_doubling,affine_identity,affine_y_materializations,success"
     );
 
     let mut certificates: Vec<Option<common::ArmCertificate>> = vec![None; Arm::ALL.len()];

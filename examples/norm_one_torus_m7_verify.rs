@@ -169,7 +169,7 @@ fn main() {
     assert_eq!(certificates.factor_base_abscissae, fixture.abscissae);
     assert_eq!(point_from_record(certificates.target), fixture.target);
     assert_eq!(certificates.planted_indices, fixture.planted_indices);
-    assert!((4..=5).contains(&certificates.arms.len()));
+    assert!((4..=6).contains(&certificates.arms.len()));
     assert_eq!(
         certificates.result_digest,
         result_digest(&certificates.arms)
@@ -223,14 +223,22 @@ fn main() {
         }
         let affine_branches =
             arm.affine_generic + arm.affine_inverse + arm.affine_doubling + arm.affine_identity;
-        if arm.arm == "retain3-prefix16-affine-leaf" {
+        if matches!(
+            arm.arm.as_str(),
+            "retain3-prefix16-affine-leaf" | "retain3-prefix16-affine-x-first"
+        ) {
             assert_eq!(affine_branches, arm.candidates);
             assert_eq!(arm.query_ops.inversions, 476);
         } else {
             assert_eq!(affine_branches, 0);
         }
+        if arm.arm == "retain3-prefix16-affine-x-first" {
+            assert!(arm.affine_y_materializations <= 97_163);
+        } else {
+            assert_eq!(arm.affine_y_materializations, 0);
+        }
     }
-    if certificates.arms.len() == 5 {
+    if certificates.arms.len() >= 5 {
         let centered = certificates
             .arms
             .iter()
@@ -243,6 +251,31 @@ fn main() {
             .expect("affine-leaf arm");
         assert!(affine.query_ops.multiplications < centered.query_ops.multiplications);
         assert!(affine.query_ops.squarings < centered.query_ops.squarings);
+    }
+    if certificates.arms.len() == 6 {
+        let affine = certificates
+            .arms
+            .iter()
+            .find(|arm| arm.arm == "retain3-prefix16-affine-leaf")
+            .expect("affine-leaf arm");
+        let x_first = certificates
+            .arms
+            .iter()
+            .find(|arm| arm.arm == "retain3-prefix16-affine-x-first")
+            .expect("exact-x-first arm");
+        assert_eq!(x_first.retained_states, affine.retained_states);
+        assert_eq!(x_first.distinct_keys, affine.distinct_keys);
+        assert_eq!(x_first.candidates, affine.candidates);
+        assert_eq!(x_first.table_probes, affine.table_probes);
+        assert_eq!(x_first.key_comparisons, affine.key_comparisons);
+        assert_eq!(x_first.query_ops.additions, affine.query_ops.additions);
+        assert_eq!(x_first.query_ops.inversions, affine.query_ops.inversions);
+        assert_eq!(x_first.query_ops.squarings, affine.query_ops.squarings);
+        assert_eq!(
+            x_first.query_ops.multiplications,
+            affine.query_ops.multiplications - affine.candidates
+                + x_first.affine_y_materializations
+        );
     }
 
     let report = VerificationReport {

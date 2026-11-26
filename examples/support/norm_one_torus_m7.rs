@@ -55,6 +55,10 @@ pub struct OperationRecord {
     pub doublings: u64,
 }
 
+fn is_zero(value: &u64) -> bool {
+    *value == 0
+}
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ArmCertificate {
     pub arm: String,
@@ -77,6 +81,8 @@ pub struct ArmCertificate {
     pub affine_doubling: u64,
     #[serde(default)]
     pub affine_identity: u64,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub affine_y_materializations: u64,
     pub witness: Option<Vec<usize>>,
 }
 
@@ -265,7 +271,7 @@ pub fn certificate_bundle(
     manifest_bytes: &[u8],
     arms: Vec<ArmCertificate>,
 ) -> CertificateBundle {
-    assert!((4..=5).contains(&arms.len()));
+    assert!((4..=6).contains(&arms.len()));
     assert!(arms
         .iter()
         .all(|arm| verify_witness(fixture, arm.witness.as_deref())));
