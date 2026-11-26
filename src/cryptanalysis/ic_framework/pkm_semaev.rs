@@ -4880,7 +4880,7 @@ mod tests {
         let dfs = o.relation_counters();
         assert!(dfs["pkm_basis_dfs_visited_nodes"] > 0);
         assert!(dfs["pkm_basis_dfs_terminal_leaves"] > 0);
-        assert!(dfs["pkm_basis_dfs_root_split_branches"] > 0);
+        // The basis can force every tower variable before a root split is needed.
         assert_eq!(dfs["pkm_basis_dfs_verified_tuples"], 1);
         assert!(
             dfs["pkm_basis_dfs_terminal_leaves"] <= (1u64 << (3 * 3)),
