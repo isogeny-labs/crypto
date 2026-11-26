@@ -1,0 +1,42 @@
+   Compiling torus-reverse-multiplier v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-reverse-multiplier)
+warning: unused import: `encoded`
+ --> src/lib.rs:9:43
+  |
+9 | use torus_quotient_query::arithmetic::{c, encoded, trim, Engine, P};
+  |                                           ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+   --> src/controls.rs:115:33
+    |
+115 |         .map(|n| cayley(&cv.f, &BigUint::from(n)))
+    |                                 ^^^^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+    |
+    = help: `num_bigint::BigUint` implements trait `From<T>`:
+              From<bool>
+              From<u128>
+              From<u16>
+              From<u32>
+              From<u64>
+              From<u8>
+              From<usize>
+
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+   --> src/controls.rs:143:17
+    |
+143 |         let x = BigUint::from(x);
+    |                 ^^^^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+    |
+    = help: `num_bigint::BigUint` implements trait `From<T>`:
+              From<bool>
+              From<u128>
+              From<u16>
+              From<u32>
+              From<u64>
+              From<u8>
+              From<usize>
+
+For more information about this error, try `rustc --explain E0277`.
+warning: `torus-reverse-multiplier` (lib test) generated 1 warning
+error: could not compile `torus-reverse-multiplier` (lib test) due to 2 previous errors; 1 warning emitted

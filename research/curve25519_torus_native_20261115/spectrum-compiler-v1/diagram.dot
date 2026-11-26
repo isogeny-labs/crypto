@@ -1,0 +1,15 @@
+digraph Spectrum {
+  rankdir=LR;
+  graph [bgcolor="white",fontname="Helvetica",nodesep=0.3,ranksep=0.45];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,color="#29465b",fillcolor="#e8f1f5",margin="0.15,0.1"];
+  edge [color="#526978",arrowsize=0.65];
+  public [label="Public Spec, R, Q\nOriginal q and k"];
+  compact [label="Guarded sextic + quotient\nCharacteristic polynomial\nUnknown bounded labels"];
+  export [label="Exact SMT field equations\nBit-sum annotations"];
+  root [label="Unknown-input model\nNEXT: native solver + parser",fillcolor="#fff0cf",color="#a77922"];
+  replay [label="Full gate check\nOriginal index/group replay"];
+  public -> compact -> export -> root -> replay;
+  known [label="Supplied known sections\n12 fixed controls",fillcolor="#def0df",color="#46724b"];
+  known -> compact [style=dashed,label="extension only",fontsize=9];
+  known -> replay [style=dashed];
+}

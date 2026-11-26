@@ -1,0 +1,83 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T19:32:48Z",
+ "id": "PCC-20261123-cd1904",
+ "kind": "theorem",
+ "producer": {
+  "commit": "fd42626dc7280602d682630ff0c76b0d96715193",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "13af0b156b607e8c40eafbbf1e7487db9fd88d3d2da625e8598139f0556553c5",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_charpoly"
+  },
+  {
+   "decl_sha256": "d0fa033ba0b24fb606a4cb62c1fe74f1801a091b15877cc88396a6022bd2b88f",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_square_zero"
+  },
+  {
+   "decl_sha256": "a3331a0dc9e8fc04d42822b38a7b1b99756a3edb2638fd52d401b192455bb3a3",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/SpectrumAssembly.lean",
+   "theorem": "SpectrumAssembly.toy_nonzero"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/build.log",
+    "sha256": "6f5132472435fa51aeec69806d89e58e28e015e7e1077fbbc571eac74e80a305"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/audit.log",
+    "sha256": "2277b33ea2fac8554a27337604cbaaef44fad4fc8c8e8b8bcf6f82bbcfc4ea3e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean-gate/lake-build.log",
+    "sha256": "c3da1282842078756440506aebe6a719b5d2489874ce99d7ccc01a4a3335bc5e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lake-manifest.json",
+    "sha256": "47324a43f60bbc6f62f9f8cc5a741d8aa2bc2bc7b3484e1e0c8503ec5d1e9fad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lakefile.toml",
+    "sha256": "a2761c9d8d8dbde0bd2f1bbb27434c5485b27cb2b3937cd7ef05d6f0126ba447"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/lean/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/record-correction-v2/DECLARATION_BINDINGS.json",
+    "sha256": "f84ace118cdd5ef2c0eeea192caae1df7412a8a01d4342c655fa9d30bd23b313"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Correctly declaration-bound companion to the malformed published8d8628 record, which remains unchanged. Exact three finite ZMod101 matrix endpoints only; no full Curve25519 semantic/cost claim.",
+ "statement": "The concrete ZMod101 matrix N=[[0,1],[0,0]] has characteristic polynomial T^2, is square-zero and is nonzero."
+}

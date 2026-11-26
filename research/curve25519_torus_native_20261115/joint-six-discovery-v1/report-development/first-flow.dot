@@ -1,0 +1,14 @@
+digraph JointSix {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.25", ranksep="0.3"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10,
+        color="#40566c", fillcolor="#eff4f8", margin="0.12,0.09"];
+  edge [color="#40566c", arrowsize=0.65];
+  gs [label="All-point GS\nd < 6s; N >= 8"];
+  peel [label="Repeated graph factor\n(A,s) -> (A-H,s-1)"];
+  stop [label="No admissible polynomial\nBoundary: universal only", fillcolor="#fce9e4"];
+  gs -> peel -> stop;
+  norm [label="Exact physical-base\nproduct identity: OPEN", fillcolor="#fff3d5"];
+  jets [label="Five coefficients\n252 Hasse-jet equations"];
+  solver [label="Non-enumerating selection\nand full cost: OPEN", fillcolor="#fff3d5"];
+  norm -> jets -> solver;
+}

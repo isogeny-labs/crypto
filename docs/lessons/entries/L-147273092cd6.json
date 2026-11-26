@@ -1,0 +1,15 @@
+{
+  "action": "Match the original order of rational-branch uniqueness before zero/torsion filtering, and retain an ambiguous-boundary refusal for both constructor and external validator.",
+  "created": "2026-11-24T01:45:33Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/reverse-multiplier-native-v1/FIDELITY.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence",
+    "prime-field-research"
+  ],
+  "trigger": "Porting a factor-base map with uniqueness and torsion/nonzero filters to a constructor and separate lift validator",
+  "why": "Toy z+/-1 has two rational branches including ordinate0; filtering first would silently widen the original domain."
+}

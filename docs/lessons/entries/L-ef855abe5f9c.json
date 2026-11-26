@@ -1,0 +1,15 @@
+{
+  "action": "Keep stderr, exit status/signal and declared resource limits; classify the transport symptom separately from algorithmic failure. Never treat deadline/cap as absence or hardness.",
+  "created": "2026-11-23T20:53:53Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/model-solver-v1/RESULTS.json",
+    "research/curve25519_torus_native_20261115/model-solver-v1/NEXT.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "A native backend closes before a status/model and the transport reports BrokenPipe",
+  "why": "The one fixed p101 query reports native timeout in retained stderr, no model/status and a subsequent BrokenPipe symptom; v1 does not retain a signal number. All evidence is preserved without retry."
+}
