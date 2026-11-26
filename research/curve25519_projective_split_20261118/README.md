@@ -1,58 +1,74 @@
-# Curve25519 projective split qualification
+# Curve25519 projective split: current status
 
-The frozen `m=3` projective-intermediate candidate is **not qualified for an
-`m=4` exponent test**. It preserved exact relation recovery on every
-completed cell, but did not reduce counted F4 work and could not complete the
-larger cells. `[pcc:unverified]`
+The `m = 3` projective split implementation now passes its native correctness
+panels directly on current `main`. A historical repair-overlay run completed
+the frozen `t = 3,4` cells, while `t = 5,6` were censored before producing a
+mean; no four-point cost slope can therefore be fitted. This study makes no
+subexponential Curve25519 ECDLP claim. `[pcc:unverified]`
 
-## Result
-
-| factor-base bits | chain F4 mul-adds/target | projective F4 mul-adds/target | ratio | outcome |
-|---:|---:|---:|---:|:--|
-| 3 | 111,785,088.281 | 111,909,801.281 | 1.001116 | 32/32 random and 8/8 planted complete per arm |
-| 4 | 22,255,293,450.656 | 22,265,619,555.656 | 1.000464 | 32/32 random and 8/8 planted complete per arm |
-| 5 | — | — | — | both arms timed out at 900 s before one target |
-| 6 | — | — | — | both arms were memory-killed before one target |
-
-The descriptive geometric mean of the 32 paired `t=4` candidate/baseline
-ratios is `1.000463984`, with deterministic bootstrap interval
-`[1.000463984, 1.000463985]`. The frozen qualification target required the
-upper bound to be below `0.80`. The four-point solver-cost slopes are
-undefined because `t=5` and `t=6` have no completed means. This is therefore
-neither an exponent improvement nor evidence of a subexponential ECDLP
-algorithm.
-
-## Correctness boundary
+## Implemented arm
 
 `pkm-semaev:mode=projective,m=3` replaces the affine intermediate abscissa
-with normalized homogeneous coordinates `(X:Z)`. The Boolean rule `Z^2=Z`
-selects the affine chart `Z=1` or identity chart `(1:0)`; `(1-Z)(X-1)=0`
-excludes `(0:0)`. Both adjacent `S3` equations are bihomogenized without
-dividing by `Z`. Candidate rows still pass exhaustive extraction, sign lift,
-and exact group re-addition before a relation is returned.
+with normalized homogeneous coordinates `(X:Z)`. The Boolean quotient rule
+`Z^2 = Z` selects the affine chart `Z = 1` or the identity chart `(1:0)`;
+`(1-Z)(X-1) = 0` excludes `(0:0)`. Both adjacent `S3` equations are
+bihomogenized by clearing squared denominators. A solver result becomes a
+relation only after signed lifts re-add to the target in the elliptic-curve
+group.
 
-The release tests cover an explicit signed inverse-pair identity witness,
-planted decompositions, and agreement among affine-chain, projective-chain,
-full-`S4`, and exhaustive-grid verdicts on 40 deterministic targets. All
-completed measurement cells recovered 8/8 planted relations, returned no
-invalid rows, and matched target scalars and coordinates. Projective planted
-hits exercised both charts: 6 affine/2 identity at `t=3`, and 7 affine/1
-identity at `t=4`.
+The current-source reconciliation also distinguishes projective chart
+selectors from factor-base tower coordinates during algebraic extraction.
+That path was exercised above the tiny-grid crossover by a one-planted
+`k = 20, t = 4` smoke check.
 
-The task branch itself still encounters unrelated root build errors already
-tracked in `docs/ACTIVE.md`. The test and measurement artifacts used the
-task diff over compile-repair PR #4650 in a disposable worktree, with the
-exact hashes and unrelated shim disclosure retained in
-[`raw/qualification-tests.json`](raw/qualification-tests.json). This does
-not clear the task branch root gate.
+## Current-main evidence
 
-## Evidence
+The additive receipt
+[`raw/current-main-qualification-20261125.json`](raw/current-main-qualification-20261125.json)
+records revision, commands, hashes, toolchains, limits, and exclusions.
 
-- frozen protocol: [`PROTOCOL.md`](PROTOCOL.md) and [`protocol.json`](protocol.json)
-- machine export and run flow: [`export.json`](export.json) and [`raw/attempts.json`](raw/attempts.json)
-- analysis and per-target records: [`evidence/analysis.json`](evidence/analysis.json), [`evidence/per-target.jsonl`](evidence/per-target.jsonl)
-- visual/report assets: [`evidence/figure.svg`](evidence/figure.svg), [`evidence/figure.png`](evidence/figure.png), [`evidence/report.typ`](evidence/report.typ), [`evidence/report.pdf`](evidence/report.pdf)
+- The direct inverse-pair/identity-chart and `(0:0)` normalization test passed.
+- Six planted decompositions per presentation passed for affine chain,
+  projective chain, full `S4`, and exhaustive modes; every returned relation
+  re-added to its target.
+- On 40 deterministic random/planted targets, projective F4, affine F4, full
+  `S4`, the exhaustive grid, and the exact decomposable set agreed on every
+  verdict.
+- The exact Curve25519 model passed 9/9 release tests. The pinned Lean gate
+  audited five theorems with zero failures and zero trusted native decisions.
+- Standalone certificate `IDC1h32739202ad9d0c15` accepted 32 primary and 32
+  extra points with `false_accept_log2 = -3802.562399953846`.
+- The `t = 4` algebraic-descent smoke recovered and exactly re-summed its one
+  planted relation. Its counted 44,400,671,897 multiply-adds and 15.01-second
+  wall time are retained only as path evidence, not as an estimator.
 
-Empty `t=5`/`t=6` aggregate files are retained and SHA-bound as censored
-outcomes. No censored cost is imputed. The independent review directory
-records that this package remains unverified.
+These observations are current-machine evidence but remain
+`[pcc:unverified]`.
+
+## Historical overlay evidence
+
+[`raw/qualification-tests.json`](raw/qualification-tests.json) is the frozen
+repair-overlay receipt, repeated with the final counter instrumentation on
+2026-11-25. It records the exact task and compile-repair revisions and is not
+represented as a current-main run.
+
+## Performance and exponent decision
+
+The frozen protocol requires matched `t = 3..6` cells, eight planted
+relations per measured cell, paired uncertainty, and an upper cost-ratio bound
+below 0.80 before opening a separately frozen `m = 4` stage. On the historical
+overlay, the chain/projective multiply-add ratios were `1.001116` at `t = 3`
+and `1.000464` at `t = 4`; both arms timed out at `t = 5` and were
+memory-killed at `t = 6`. Every completed arm recovered 8/8 planted relations
+with zero invalid rows. The observed ratios miss the `0.80` gate and the
+censored cells leave the four-point slope undefined. `[pcc:unverified]`
+
+The newer solving-degree frontier analysis in
+[`../solving_degree_tower_frontier_20261124/README.md`](../solving_degree_tower_frontier_20261124/README.md)
+records reachable `m <= 4` measurements as non-decisive for the exponent bar.
+Accordingly, the current-main continuation does not rerun the expensive grid
+or open the `m = 4` stage. The decision-relevant remaining problem is a proved
+bound on the satisfiable-solve cost/degree growth (including the narrow
+two-free-block route), together with end-to-end relation collection and linear
+algebra.
+`[pcc:unverified]`

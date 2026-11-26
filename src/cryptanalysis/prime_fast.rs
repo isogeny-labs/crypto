@@ -1711,6 +1711,58 @@ impl FastFactorBase {
         self.pts.is_empty()
     }
 
+    /// Materialize the signed point support represented by these columns.
+    ///
+    /// The collector stores one point per x-coordinate but uses both signs.
+    /// A self-inverse point is emitted once. Invalid or repeated orbits are
+    /// rejected rather than silently changing the realized support size.
+    /// This is an audit API; it does not alter the collector's dense index.
+    pub fn signed_support(
+        &self,
+        curve: &FastCurve,
+    ) -> Result<Vec<Option<Pt>>, super::prime_factor_base_controls::Error> {
+        super::prime_factor_base_controls::expand_signed_support(curve, &self.pts)
+    }
+
+    /// Describe the actual signed support and membership of public anchors.
+    pub fn support_profile(
+        &self,
+        curve: &FastCurve,
+        anchors: &[Option<Pt>],
+    ) -> Result<
+        super::prime_factor_base_controls::SupportProfile,
+        super::prime_factor_base_controls::Error,
+    > {
+        use super::prime_factor_base_controls::{support_profile, IdentityPolicy, Representation};
+        support_profile(
+            curve,
+            &self.signed_support(curve)?,
+            anchors,
+            Representation::NegationClosedPoints,
+            IdentityPolicy::Exclude,
+        )
+    }
+
+    /// Count raw unordered triples from the represented signed point set.
+    ///
+    /// Identity sums and repeated target queries are retained. These are raw
+    /// decompositions, not deduplicated signed rows or independent rank; use
+    /// the existing collector and solver for those downstream quantities.
+    pub fn triple_counts(
+        &self,
+        curve: &FastCurve,
+        targets: &[Option<Pt>],
+    ) -> Result<
+        super::prime_factor_base_controls::TripleCounts,
+        super::prime_factor_base_controls::Error,
+    > {
+        super::prime_factor_base_controls::triple_counts(
+            curve,
+            &self.signed_support(curve)?,
+            targets,
+        )
+    }
+
     #[inline(always)]
     pub fn lookup(&self, x_canonical: u64) -> Option<usize> {
         if x_canonical > self.max_x {

@@ -1,0 +1,81 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261123-m31-rr5-coprime-sectors",
+  "title": "Compare complete five-sector and coupled M31 RR5 elimination",
+  "created": "2026-11-23",
+  "authors": ["Prime31 RR5 coprime-sector research lane"],
+  "status": "blocked",
+  "status_note": "Deferred experiment only. PR #5119 supplies a constructor API, not an integrated five-sector solver; no scientific run, compute admission, funding or launch authorization is established by this card.",
+  "blocked_on": [
+    "pr:5119 Review and integrate the construction-only sector API before implementing a complete solver comparison.",
+    "pr:5099 Held execution integration; preserve its publication and merge controls and original frozen scientific protocol.",
+    "note:Implement a full five-sector extractor and paired coupled reference with one shared total budget across all sectors, complete root/sign processing and useful-relation accounting.",
+    "note:Bind the exact canonical B677 fixture, positive control and public targets independently; qualify completeness on the unchanged original RR5 chart.",
+    "note:Freeze and review the successor protocol, exact merged source, immutable tested image, independent verifier, result schema and non-overwriting evidence plan.",
+    "note:Establish authenticated checkpoint transport, complete raw-results readback, approved finite remaining budget and live all-tenant capacity before any launch.",
+    "note:Full-root qualification remains incomplete: attempt 03 exited 124 at its 300-second limit before tests; its source check exited 0. No further build or test attempt is authorized by this card."
+  ],
+  "links": {
+    "lead": "research/prime31_rr5_coprime_sectors_20261123/README.md",
+    "notes": [
+      "research/prime31_rr5_coprime_sectors_20261123/CONSTRUCTION_PROTOCOL.md",
+      "research/prime31_rr5_coprime_sectors_20261123/ROOT_VALIDATION.json",
+      "research/prime31_four_summand_20261122/scaling-b677/PROTOCOL.md",
+      "research/prime31_four_summand_20261122/scaling-b677/payload-integration/README.md"
+    ],
+    "prs": [5119, 5099]
+  },
+  "question": "Does the complete union of all five coprime-selector sectors reduce charged M31 RR5 extraction work relative to the coupled formulation on the same canonical B677 public targets under matched total budgets?",
+  "decision_value": "A complete, independently checked reduction in total extraction work at equal useful-relation output would justify integrating the sector formulation into the maintained solver. A smaller individual system, an incomplete sector union, a timeout, or a comparison that renews the budget per sector would not justify that decision. Null and negative results determine whether to retain the coupled reference.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "isogeny-labs/crypto",
+    "commit": null,
+    "branch": "lane/prime31-rr5-coprime-sectors-20261123",
+    "build": []
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 2,
+    "disk_gb": 0,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "The numeric CPU/RAM/timeout fields retain the existing bounded route's ceiling references: two reserved CPUs, one scientific worker, 2147483648-byte address-space cap and 180-second scientific outer cap. They authorize nothing. Disk zero records no allocation. The full paired schedule and single shared total work/time/memory budget across the five sectors must be frozen before readiness; construction counts do not estimate solver runtime."
+  },
+  "run": {
+    "argv": ["/bin/false"],
+    "env": {"RAYON_NUM_THREADS": "1", "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1"},
+    "timeout_per_shard_s": 180
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "unassigned",
+    "verify": [],
+    "land": "research/prime31_rr5_coprime_sectors_20261123/comparison"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": ["XP-20261123-m31-rr5-coprime-sectors"],
+    "ttl_s": 3600,
+    "env": {
+      "name": "m31-rr5-coprime-sectors-blocked",
+      "recipe": "Unavailable: the integrated comparison has not been implemented or built. Require reviewed merged source and an immutable tested image before readiness; this card imports no environment."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 2048,
+      "timeout_s": 180,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261123-m31-rr5-coprime-sectors"
+    },
+    "notes": "No task, lease, objective, environment or funding is published. The false command is an intentional non-executing sentinel, not an extractor. Null protocol/checkpoint fields, empty build/verifier arrays and the unassigned result schema explicitly retain missing implementation and admission work.",
+    "funding": {
+      "units": 0,
+      "rationale": "Zero priority funding while implementation and admission are absent, below the funded seed cards. This is neither a cloud spending allocation nor an authorization to post a cairn task."
+    }
+  },
+  "owner_hint": "Prime31 RR5 native research lane"
+}

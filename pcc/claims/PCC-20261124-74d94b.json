@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:29:43Z",
+ "id": "PCC-20261124-74d94b",
+ "kind": "statement",
+ "producer": {
+  "commit": "1e30bb86f91560660cdb96141ebffc7246155616",
+  "model": "",
+  "session": "codex-ecc2k-cold50x-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/v2-grid-audit.json",
+    "sha256": "30735177e7b74c7e949ca3ad82b4a27daba154435380bdcd264a97f8ff5f8c5b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/v2-summary.json",
+    "sha256": "f29c59dab6910acc6a5ca972a5018abd00ab3b981cc6e0cdd0640248c15797b6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/checks/v2-source-final.json",
+    "sha256": "b29c0836a8aa186d006c3b6150e101399d7a943a9f30bd8cc4b231932b000207"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The full frozen dense-index panel completes120 rows with exact outputs and unchanged source inventory, but fails the50x target and no-regression guards. Uniform n131 whole-Ir is about1.02% higher and oracle about1.56% higher than the matched previous-best baseline. All raw rows and misses are retained; this candidate is rejected as an optimization."
+}
