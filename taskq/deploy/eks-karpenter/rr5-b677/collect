@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# AWS readback only: preserve failed Jobs too, without executing their payload.
+set -euo pipefail
+[[ $# == 5 ]] || { echo 'usage: collect IMAGE REQUEST CLIENT_DIR BUNDLE OUTPUT_DIR' >&2; exit 2; }
+image=$1 request=$2 client=$3 bundle=$4 output=$5
+[[ ! -e "$output" ]]
+mkdir -p "$output/client" "$output/launcher" "$output/payload"
+cp "$image" "$output/image.json"
+jq -S . "$request" > "$output/request.json"
+cp -R "$client/." "$output/client/"
+receipt="$output/client/result.json"
+jq -es 'length==1 and (.[0]|.schema=="isolab.eks.command-result/v1" and (.pods|length)==1)' "$receipt" >/dev/null
+job=$(jq -er .job_name "$receipt")
+pod=$(jq -er '.pods[0].uid' "$receipt")
+uri=$(jq -er .receipt_uri "$receipt")
+[[ "$job" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ && ${#job} -le 55 && "$pod" =~ ^[a-f0-9-]{36}$ ]]
+[[ "$job" == "$(jq -er .job.job_name "$output/request.json")" ]]
+prefix="s3://isolab-results-104186811093-us-east-2/runs/$job/"
+[[ "$uri" == "$prefix"launcher/*/ ]]
+suffix=${uri#"$prefix"launcher/}
+[[ "$suffix" =~ ^[a-zA-Z0-9._-]+/$ ]]
+set +e
+aws s3 cp "$uri" "$output/launcher/" --recursive --only-show-errors \
+  > "$output/launcher-download.stdout" 2> "$output/launcher-download.stderr"
+launcher_status=$?
+aws s3 cp "$prefix$pod/" "$output/payload/" --recursive --only-show-errors \
+  > "$output/payload-download.stdout" 2> "$output/payload-download.stderr"
+payload_status=$?
+set -e
+jq -n --argjson launcher "$launcher_status" --argjson payload "$payload_status" \
+  '{schema:"rr5.b677.collection/v1",launcher_download_exit:$launcher,payload_download_exit:$payload}' \
+  > "$output/collection.json"
+[[ "$launcher_status" == 0 && "$payload_status" == 0 ]]
+here=$(cd "$(dirname "$0")" && pwd)
+"$here/verify-artifacts" "$bundle" "$output" > "$output/transport.stdout" 2> "$output/transport.stderr"

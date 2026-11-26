@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Transport/identity checks only; this file never executes the downloaded code.
+set -euo pipefail
+[[ $# == 2 ]] || { echo 'usage: verify-artifacts BUNDLE EVIDENCE_DIR' >&2; exit 2; }
+bundle=$(realpath "$1") evidence=$(realpath "$2")
+payload="$evidence/payload"
+for file in "$evidence/image.json" "$evidence/request.json" "$evidence/client/result.json" \
+  "$evidence/launcher/pods.json" "$evidence/launcher/manifest.json" \
+  "$bundle/build-info.json" "$payload/job-exit.json"; do
+  jq -es 'length==1 and (.[0]|type)=="object"' "$file" >/dev/null
+done
+revision=$(jq -er .source_revision "$evidence/image.json")
+job=$(jq -er .job.job_name "$evidence/request.json")
+[[ "$revision" =~ ^[a-f0-9]{40}$ && "$job" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ && ${#job} -le 55 ]]
+# Reconstruct the complete fixed request, so extra command arguments or changed
+# limits cannot be accepted merely because they have a self-consistent hash.
+here=$(cd "$(dirname "$0")" && pwd)
+"$here/prepare-request" "$evidence/image.json" "$revision" "$job" \
+  "$(jq -er .job.instance_type "$evidence/request.json")" \
+  "$(jq -er .job.seconds "$evidence/request.json")" \
+  | jq -S . | cmp - "$evidence/request.json"
+request_hash=$(sha256sum "$evidence/request.json" | cut -d' ' -f1)
+jq -e --slurpfile request "$evidence/request.json" --arg digest "$request_hash" '
+  .schema=="isolab.eks.command-result/v1" and .request_sha256==$digest
+  and .job_name==$request[0].job.job_name
+  and (.job_uid|test("^[a-f0-9-]{36}$")) and (.pods|length)==1
+  and (.pods[0].uid|test("^[a-f0-9-]{36}$"))
+  and (.state=="succeeded" or .state=="failed")
+  and .results_prefix==("s3://isolab-results-104186811093-us-east-2/runs/"+.job_name+"/")
+' "$evidence/client/result.json" >/dev/null
+cmp "$evidence/client/result.json" "$evidence/launcher/result.json"
+cmp "$evidence/request.json" "$evidence/launcher/request.json"
+jq -e --arg digest "$(sha256sum "$evidence/launcher/manifest.json" | cut -d' ' -f1)" \
+  '.manifest_sha256==$digest' "$evidence/client/result.json" >/dev/null
+jq -e --slurpfile request "$evidence/request.json" '
+  .metadata.name==$request[0].job.job_name and .metadata.namespace=="isolab"
+  and .spec.backoffLimit==0 and .spec.activeDeadlineSeconds==$request[0].job.seconds
+  and .spec.template.spec.restartPolicy=="Never"
+  and (.spec.template.spec.containers|length)==1
+  and (.spec.template.spec.containers[0] |
+    .name=="task" and .image==$request[0].job.image and .command==$request[0].job.command
+    and (.args // [])==[]
+    and .resources.requests.cpu=="2" and .resources.limits.cpu=="2"
+    and .resources.requests.memory=="2Gi" and .resources.limits.memory=="2Gi")
+' "$evidence/launcher/manifest.json" >/dev/null
+jq -e --slurpfile receipt "$evidence/client/result.json" --slurpfile request "$evidence/request.json" '
+  (.items|length)==1 and (.items[0] |
+    .metadata.uid==$receipt[0].pods[0].uid
+    and any(.metadata.ownerReferences[]; .kind=="Job" and .uid==$receipt[0].job_uid)
+    and .spec.nodeName==$receipt[0].pods[0].node
+    and .spec.restartPolicy=="Never"
+    and (.spec.containers|length)==1 and .spec.containers[0].name=="task"
+    and .spec.containers[0].image==$request[0].job.image
+    and .spec.containers[0].command==$request[0].job.command
+    and (.spec.containers[0].args // [])==[]
+    and .spec.containers[0].resources.requests.cpu=="2"
+    and .spec.containers[0].resources.limits.cpu=="2"
+    and .spec.containers[0].resources.requests.memory=="2Gi"
+    and .spec.containers[0].resources.limits.memory=="2Gi"
+    and (.status.containerStatuses|length)==1
+    and .status.containerStatuses[0].name=="task"
+    and .status.containerStatuses[0].restartCount==0
+    and .status.containerStatuses[0].state.terminated.exitCode==$receipt[0].pods[0].exit_code
+    and (.status.containerStatuses[0].imageID|endswith($request[0].job.image)))
+' "$evidence/launcher/pods.json" >/dev/null
+jq -e --arg revision "$revision" \
+  --arg protocol "$(sha256sum "$bundle/PROTOCOL.md" | cut -d' ' -f1)" '
+  .schema=="rr5.b677.build/v1" and .source_revision==$revision
+  and .source_repository=="https://github.com/isogeny-labs/crypto" and .protocol_sha256==$protocol
+  and .target=="x86_64-unknown-linux-musl" and .architecture=="linux/amd64"
+  and (.payload_sha256|keys)==["rr5-b677-gate","rr5-b677-receipt-check","run","sequence","verify-call"]
+  and (.metadata_sha256|keys)==["source-manifest.json","source.sha256"]
+  and all(.payload_sha256[],.metadata_sha256[]; type=="string" and test("^[a-f0-9]{64}$"))
+  and .registered_extraction_executed==false
+' "$bundle/build-info.json" >/dev/null
+jq -e --slurpfile build "$bundle/build-info.json" \
+  --arg digest "$(sha256sum "$bundle/build-info.json" | cut -d' ' -f1)" '
+  .source_revision==$build[0].source_revision and .protocol_sha256==$build[0].protocol_sha256
+  and .build_info_sha256==$digest
+' "$evidence/image.json" >/dev/null
+for name in build-info.json PROTOCOL.md source-manifest.json source.sha256; do
+  [[ -f "$bundle/$name" && ! -L "$bundle/$name" ]]
+  cmp "$bundle/$name" "$payload/$name"
+done
+for field in payload_sha256 metadata_sha256; do
+  while IFS= read -r name; do
+    [[ "$name" =~ ^[a-zA-Z0-9_.-]+$ && -f "$bundle/$name" && ! -L "$bundle/$name" ]]
+    [[ $(sha256sum "$bundle/$name" | cut -d' ' -f1) == "$(jq -er --arg f "$field" --arg n "$name" '.[$f][$n]' "$bundle/build-info.json")" ]]
+  done < <(jq -r --arg f "$field" '.[$f]|keys[]' "$bundle/build-info.json")
+done
+# SHA256SUMS may only name regular files within this downloaded payload.
+[[ -s "$payload/SHA256SUMS" && -z $(find "$payload" -type l -print -quit) ]]
+names=$(mktemp)
+trap 'rm -f "$names"' EXIT
+pattern='^([a-f0-9]{64})  \./([a-zA-Z0-9][a-zA-Z0-9._/-]*)$'
+while IFS= read -r line; do
+  [[ "$line" =~ $pattern ]]
+  name=${BASH_REMATCH[2]}
+  [[ "/$name/" != *"/../"* && "/$name/" != *"/./"* && "/$name/" != *"//"* && "$name" != SHA256SUMS ]]
+  printf '%s\n' "$name" >> "$names"
+done < "$payload/SHA256SUMS"
+cmp <(LC_ALL=C sort "$names") <(LC_ALL=C sort -u "$names")
+cmp <(LC_ALL=C sort "$names") <(cd "$payload" && find . -type f ! -path ./SHA256SUMS -printf '%P\n' | LC_ALL=C sort)
+(cd "$payload" && sha256sum -c SHA256SUMS)
+jq -e --arg revision "$revision" --arg protocol "$(jq -er .protocol_sha256 "$evidence/image.json")" '
+  .schema=="rr5.b677.job-exit/v1" and .source_revision==$revision and .protocol_sha256==$protocol
+' "$payload/job-exit.json" >/dev/null

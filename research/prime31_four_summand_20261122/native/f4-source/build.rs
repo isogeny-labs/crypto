@@ -248,8 +248,8 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/ic_boundary.rs",
-            // Reviewed for the integrated build; see its rr5/README.md.
-            // The changed selected bytes add two cfg(test) map accessors.
+            // Reviewed in scaling-b677/payload-integration/SOURCE_REVIEW.md.
+            // Only two cfg(test) helpers changed inside the selected ranges.
             "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
             &[
                 Range {
@@ -337,7 +337,8 @@ fn main() {
             &root,
             &out,
             "src/cryptanalysis/semaev_prime_poly.rs",
-            // The selected Fp range is byte-identical; changes are outside it.
+            // The selected Fp implementation is byte-identical; changes are
+            // outside this range (SOURCE_REVIEW.md records both digests).
             "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
             &[Range {
                 start: "/// `F_p` arithmetic for `p < 2^62`.\n",
@@ -438,14 +439,6 @@ fn main() {
             "signed-RHS consumer",
         ),
         (
-            "research/prime31_four_summand_20261122/native/query_pipeline.rs",
-            "caller-driven streaming public-query integration",
-        ),
-        (
-            "research/prime31_four_summand_20261122/native/streaming_tests.rs",
-            "M31 streaming API and public-query development controls",
-        ),
-        (
             "research/prime31_four_summand_20261122/native/main.rs",
             "qualification entry point",
         ),
@@ -466,12 +459,16 @@ fn main() {
             "quadratic quartic-modular membership circuit and independent dense-selector controls",
         ),
         (
-            "research/prime31_four_summand_20261122/native/selector_sectors.rs",
-            "additive five coprime-selector quadratic systems and M31 construction controls; no solver calls",
-        ),
-        (
             "research/prime31_four_summand_20261122/native/b677_gate.rs",
             "fixed bounded extraction driver with independent signed replay and authentic-RHS adapter",
+        ),
+        (
+            "research/cheap_ecdlp_cold_gate_20261123/src/bin/rr5_receipt_check.rs",
+            "unchanged independently authored public-RHS receipt checker, separately compiled as a binary",
+        ),
+        (
+            "research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json",
+            "historical B8 receipt used only by the independent checker's unit tests",
         ),
         (
             "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv",
