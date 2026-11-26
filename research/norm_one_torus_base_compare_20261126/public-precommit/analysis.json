@@ -1,0 +1,54 @@
+{
+  "schema": "isogeny-labs/norm-one-torus-base-compare-analysis/v1",
+  "standing": "pcc:unverified",
+  "decision": "no_generic_streaming_query_advantage_at_matched_cardinality",
+  "arms": {
+    "dickson-torus": {
+      "signed_points": 68,
+      "right_states": 27370,
+      "right_keys": 26248,
+      "random_successes": 3,
+      "full_pair_candidates": 600576,
+      "full_table_probes": 600576,
+      "first_pair_candidates": 597634,
+      "first_table_probes": 595539
+    },
+    "ordinary-small-x": {
+      "signed_points": 68,
+      "right_states": 27370,
+      "right_keys": 26248,
+      "random_successes": 1,
+      "full_pair_candidates": 600576,
+      "full_table_probes": 600576,
+      "first_pair_candidates": 599254,
+      "first_table_probes": 599115
+    }
+  },
+  "setup_operation_vector": {
+    "inversions": 1,
+    "multiplications": 368098,
+    "squarings": 144160,
+    "additions": 29716,
+    "doublings": 68
+  },
+  "full_scan_operation_vector": {
+    "inversions": 768,
+    "multiplications": 11896064,
+    "squarings": 5413888,
+    "additions": 1201152,
+    "doublings": 17408
+  },
+  "first_hit_torus_reduction_against_ordinary": {
+    "pair_candidates": 1620,
+    "pair_candidates_fraction": 0.00270336,
+    "table_probes": 3576,
+    "table_probes_fraction": 0.00596880,
+    "interpretation": "finite-stream early-exit redistribution, not a mean-yield or asymptotic advantage"
+  },
+  "affine_replay": {
+    "target_decisions": 528,
+    "planted_witnesses": 16,
+    "status": "pass",
+    "proof_boundary": "transparent replay; not zero knowledge, signed attestation, or proof of producer-host execution"
+  }
+}
