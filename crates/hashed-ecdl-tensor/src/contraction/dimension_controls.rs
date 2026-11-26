@@ -348,7 +348,7 @@ fn uniform_history_threshold_covers_every_possible_active_depth() {
     assert!(audit.threshold_proof_applies);
     assert_eq!(audit.leaf_divisor, 8_192);
     assert_eq!(audit.root_u, 512);
-    assert_eq!(audit.scale_floor, 24);
+    assert_eq!(audit.scale_floor, 32);
     assert_eq!(audit.inherited_precision_constant, 81);
     assert_eq!(audit.normalized_precision_constant, 34);
     assert_eq!(audit.depths.len(), 5);
@@ -364,26 +364,35 @@ fn uniform_history_threshold_covers_every_possible_active_depth() {
     }));
     assert!(audit.all_absorption_checks_hold);
 
-    // The scale-floor proof is strict at the claimed threshold: if a possible
-    // active depth had u<=23, then lambda^5<C^6*24^6, contradicting these
-    // exact endpoint values for lambda>=2^26 and C=2^17.
-    let c = BigUint::one() << 17usize;
-    assert!(
-        BigUint::from(UNIFORM_HISTORY_LAMBDA_THRESHOLD).pow(5)
-            > c.pow(6) * BigUint::from(24u8).pow(6)
-    );
+    // If d<=4, the threshold itself gives u>=2^(26-17-4)=32.  If d>=5,
+    // activity gives lambda>2^(6d), hence u>=2^(5d-17)>=2^d>=32.
+    assert_eq!(UNIFORM_HISTORY_LAMBDA_THRESHOLD >> (17 + 4), 32);
+    // (5d-17)-d=4d-17 is already positive at d=5 and then increases.
+    assert!(4 * 5 - 17 > 0);
 
-    // From h^5<C^3*(u+1)^3 and u>=24, h<=512*(u+1).  These two base cases,
-    // followed by a factor-at-most-two induction, establish both absorptions.
+    // Thus 2^d<=u.  From lambda<2^(17+d)(u+1) and u+1<=2u we get
+    // h<512u.  The u=32 base cases below, followed by the fact that each
+    // right side doubles while the polynomial left side grows by less than
+    // two, establish both absorptions for every larger u.  For the evaluation
+    // check, (A+2u+1)/2^A decreases with every A>=0, so A=0 is worst.
     let u = BigUint::from(UNIFORM_HISTORY_SCALE_FLOOR);
-    assert!(BigUint::from(2u16).pow(9).pow(5) * (&u + BigUint::one()).pow(2) >= c.pow(3));
     assert!(
-        BigUint::from(81u8) * BigUint::from(512u16) * &u * (&u + BigUint::one())
-            <= (BigUint::one() << 25usize)
+        BigUint::from(81u8) * BigUint::from(512u16) * &u * &u
+            <= (BigUint::one() << (UNIFORM_HISTORY_SCALE_FLOOR + 1) as usize)
     );
     assert!(
         BigUint::from(8u8) * &u * (BigUint::from(2u8) * &u + BigUint::one())
-            <= (BigUint::one() << 25usize)
+            <= (BigUint::one() << (UNIFORM_HISTORY_SCALE_FLOOR + 1) as usize)
+    );
+    let next_u = &u + BigUint::one();
+    assert!(&next_u * &next_u < BigUint::from(2u8) * &u * &u);
+    assert!(
+        &next_u * (BigUint::from(2u8) * &u + BigUint::from(3u8))
+            < BigUint::from(2u8) * &u * (BigUint::from(2u8) * &u + BigUint::one())
+    );
+    assert!(
+        BigUint::from(2u8) * &u + BigUint::from(2u8)
+            <= BigUint::from(2u8) * (BigUint::from(2u8) * &u + BigUint::one())
     );
 }
 

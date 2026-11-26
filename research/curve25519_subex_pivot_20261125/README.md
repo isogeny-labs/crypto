@@ -226,22 +226,20 @@ cutoff `floor(s/h)`, where `h=floor(sqrt(lambda))` and
 8^d < h.
 ```
 
-For the source scale `u_d=floor(lambda/(2^17*2^d))`, this implies
-`u_d>=24` whenever `lambda>=2^26`.  The proof is elementary: if
-`u_d<=23`, then
+For the source scale `u_d=floor(lambda/(2^17*2^d))`, this implies the stronger
+bound `u_d>=32` whenever `lambda>=2^26`.  If `d<=4`, the threshold gives
+`u_d>=2^(26-17-4)=32`.  If `d>=5`, activity gives
+`lambda>2^(6d)` and hence
 
 ```text
-lambda^5 < (2^17)^6 * 24^6 < 2^130,
+u_d >= 2^(5d-17) >= 2^d >= 32.
 ```
 
-contradicting `lambda^5>=2^130`.  The same depth inequality gives
-
-```text
-h^5 < (2^17)^3*(u+1)^3,
-h <= 512*(u+1)                    for u>=24.
-```
-
-The base cases at `u=24`, followed by factor-at-most-two induction, yield
+Thus `2^d<=u`.  Since `lambda<2^(17+d)(u+1)` and `u+1<=2u`, it follows that
+`h<512u`.  The base cases at `u=32`, followed by factor-at-most-two induction,
+give the first inequality below.  For the second, the ratio
+`(A+2u+1)/2^A` decreases for every integer `A>=0`, so `A=0` is worst; its
+`u=32` base case and the same induction give
 
 ```text
 81*h*u <= 2^(u+1),

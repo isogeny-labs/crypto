@@ -301,7 +301,7 @@ pub struct PathPrecisionEnvelope {
 pub const UNIFORM_HISTORY_LAMBDA_THRESHOLD: u64 = 1 << 26;
 
 /// Scale floor obtained at every potentially active depth above the threshold.
-pub const UNIFORM_HISTORY_SCALE_FLOOR: u64 = 24;
+pub const UNIFORM_HISTORY_SCALE_FLOOR: u64 = 32;
 
 /// Exact absorption checks at one depth that is not excluded by shrinkage and
 /// the fixed root leaf cutoff.
@@ -446,7 +446,7 @@ fn at_most_power_of_two(value: &BigUint, exponent: u64) -> bool {
 /// `8^d*M_d<=s`.  Hence it can exist only when `8^d<h`; this routine audits
 /// exactly those depths.
 ///
-/// For every `lambda>=2^26`, elementary integer inequalities give `u_d>=24`.
+/// For every `lambda>=2^26`, elementary integer inequalities give `u_d>=32`.
 /// They then imply both conditions checked below for all possible depths:
 /// the finite-history constant 81 is absorbed into one local unit, and the
 /// evaluation loss is absorbed into another.  Combined with the native

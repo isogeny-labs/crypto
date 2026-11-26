@@ -82,15 +82,25 @@ For every `lambda >= 2^26`, establish simultaneously at every possible active
 depth:
 
 ```text
-u_d >= 24,
+u_d >= 32,
 81 floor(sqrt(lambda)) u_d <= 2^(u_d+1),
 8 u_d (a_d+1) <= 2^(a_(d-1)+u_d+1),
 p_next u_d <= 34 M_d (L_d/2^i).
 ```
 
 `audit_uniform_history` checks the complete finite depth schedule and the
-negative `lambda=2^23` control, but a formal proof must quantify over all
-`lambda >= 2^26`. `[pcc:unverified]`
+negative `lambda=2^23` control.  The following all-lambda derivation is the
+independent proof-obligation sketch, not a kernel check. `[pcc:unverified]`
+For `d<=4`, the threshold gives `u_d>=32`; for `d>=5`,
+activity gives `lambda>2^(6d)` and therefore
+`u_d>=2^(5d-17)>=2^d>=32`.  Consequently
+`lambda<2^(17+d)(u_d+1)<2^18*u_d^2`, so
+`floor(sqrt(lambda))<512u_d`.  The inherited absorption follows from its
+`u=32` base case because the exponential right side doubles while its
+quadratic left bound grows by less than two.  For evaluation,
+`(A+2u+1)/2^A` decreases for every integer `A>=0`, so `A=0` is worst; its
+`u=32` base case and the same induction prove the second absorption.
+`[pcc:unverified]`
 
 ## R3 — One active-call cost
 
