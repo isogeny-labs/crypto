@@ -241,22 +241,8 @@ fn ppowmod(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Vec<u64> {
     result
 }
 fn pgcd(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    trim(&mut a);
-    trim(&mut b);
-    while !b.is_empty() {
-        let r = pdivmod(&a, &b, p).1;
-        a = b;
-        b = r;
-    }
-    if let Some(&l) = a.last() {
-        let inv = invm(l, p);
-        for c in a.iter_mut() {
-            *c = mulm(*c, inv, p);
-        }
-    }
-    a
+    // Monic gcd (zero polynomial = empty) through the shared module.
+    crypto_lib::gcd::poly::gcd(&crypto_lib::gcd::poly::Fp64::new(p), a, b)
 }
 /// Split a squarefree product of distinct linear factors into its roots.
 fn split_linear(g: &[u64], p: u64, st: &mut u64, out: &mut Vec<u64>) {

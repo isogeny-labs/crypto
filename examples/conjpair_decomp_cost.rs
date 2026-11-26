@@ -38,7 +38,8 @@ fn pow_mod(mut b: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 fn inv_mod(a: u64, p: u64) -> u64 {
-    pow_mod(a, p - 2, p)
+    // Prime p >= 3: Fermat's a^(p-2) is the inverse of a unit and 0 for a = 0 mod p.
+    crypto_lib::gcd::int::inv_mod_u64(a, p).unwrap_or(0)
 }
 
 fn exponents4(d: u8) -> Vec<[u8; 4]> {

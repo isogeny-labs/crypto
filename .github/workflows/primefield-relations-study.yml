@@ -28,6 +28,15 @@ jobs:
         run: |
           RUSTC="$(rustup which rustc)" bash research/primefield_relations_20261125/check.sh \
             "$RUNNER_TEMP/m31-shared-selector-replay" attempt-002
+      - name: Check counted M31 measurement contracts
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/m31-shared-selector-replay"
+          CARGO_TARGET_DIR="$RUNNER_TEMP/m31-shared-selector-measurement-target" \
+            cargo test --manifest-path research/primefield_relations_20261125/measurement/Cargo.toml \
+              --offline --locked --release --bins -- --test-threads=1 \
+              > "$RUNNER_TEMP/m31-shared-selector-replay/measurement-tests.stdout" \
+              2> "$RUNNER_TEMP/m31-shared-selector-replay/measurement-tests.stderr"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

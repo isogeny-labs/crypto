@@ -90,25 +90,15 @@ fn submod(a: u64, b: u64, m: u64) -> u64 {
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
 }
-/// `a⁻¹ mod m`: `ic_boundary::invmod` (word-division Euclid) and, only
-/// when it finds no inverse, the `i128` Euclid it replaced.  Both are
-/// exact and the inverse is unique, so the value is unchanged.
+/// `a⁻¹ mod m` through the shared `crate::gcd` module.  The inverse is
+/// unique, so the value equals the old `ic_boundary::invmod` / `i128`
+/// Euclid pair's.
 fn invmod(a: u64, m: u64) -> Option<u64> {
-    crate::cryptanalysis::ic_boundary::invmod(a, m).or_else(|| invmod_i128(a, m))
+    crate::gcd::int::inv_mod_u64(a, m)
 }
+#[allow(dead_code)]
 fn invmod_i128(a: u64, m: u64) -> Option<u64> {
-    // Extended Euclid over i128; `m` is prime, so any non-zero `a` inverts.
-    let (mut r0, mut r1) = (m as i128, (a % m) as i128);
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    if r0 != 1 {
-        return None;
-    }
-    Some(((t0 % m as i128 + m as i128) % m as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 /// A sparse row: `(column, coefficient)` sorted by column, no zeros.

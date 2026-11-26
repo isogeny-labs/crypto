@@ -34,11 +34,17 @@ const ARMS: &[&str] = &[
     "sqr_wnaf5",
     "tuned",
     "tuned_wnaf",
+    "adx",
+    "adx_sqr",
+    "mulx",
+    "adx_wnaf",
 ];
 const BASELINE: &str = "pad9_cios";
 const AA: &str = "pad9_cios#aa";
 const KERNEL_OPS: &[&str] = &[
     "cios_mul",
+    "adx_mul",
+    "mulx_mul",
     "sos_mul",
     "karatsuba_mul",
     "cios_sqr",
@@ -154,7 +160,10 @@ fn main() {
                     "inv_fermat" | "inv_bingcd" => kernel_iters / 1000,
                     _ => kernel_iters,
                 };
-                let (ns, _) = field_kernel_probe(op, p, &ka, &kb, iters).unwrap();
+                // `adx_mul` exists only at 4 limbs (and `*_mulx` only with ADX).
+                let Some((ns, _)) = field_kernel_probe(op, p, &ka, &kb, iters) else {
+                    continue;
+                };
                 writeln!(
                     out,
                     "{{\"kind\":\"kernel\",\"field\":\"{name}\",\"limbs\":{limbs},\"op\":\"{op}\",\"rep\":{rep},\"iters\":{iters},\"ns_per_op\":{ns:.3}}}"
@@ -168,6 +177,7 @@ fn main() {
         arms.push(AA);
         arms.push("biguint");
         arms.push("prod_vartime");
+        arms.push("prod");
         for round in 0..rounds {
             let ks: Vec<BigUint> = (0..batch).map(|_| rng.gen_biguint(p.bits())).collect();
             let mut order = arms.clone();
@@ -182,7 +192,11 @@ fn main() {
                     batch
                 };
                 let t0 = std::time::Instant::now();
-                if real == "prod_vartime" {
+                if real == "prod" {
+                    for k in &ks[..n] {
+                        std::hint::black_box(std::hint::black_box(&base).scalar_mul(k, &a));
+                    }
+                } else if real == "prod_vartime" {
                     for k in &ks[..n] {
                         std::hint::black_box(std::hint::black_box(&base).scalar_mul_vartime(k, &a));
                     }
@@ -276,6 +290,7 @@ mod analyze {
 
         let mut arms: Vec<&str> = vec![AA];
         arms.extend(ARMS.iter().filter(|a| **a != BASELINE));
+        arms.push("prod");
         arms.push("prod_vartime");
         arms.push("biguint");
         let mut md = String::new();
@@ -328,8 +343,8 @@ mod analyze {
         for op in KERNEL_OPS {
             write!(md, " {op} |").unwrap();
         }
-        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | bingcd / fermat |\n|:--|--:|");
-        for _ in 0..KERNEL_OPS.len() + 4 {
+        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | mulx / cios_mul | bingcd / fermat |\n|:--|--:|");
+        for _ in 0..KERNEL_OPS.len() + 6 {
             md.push_str("--:|");
         }
         md.push('\n');
@@ -338,7 +353,11 @@ mod analyze {
             write!(md, "| {field} | {limbs} |").unwrap();
             let mut meds = BTreeMap::new();
             for op in KERNEL_OPS {
-                let mut v = ops[*op].clone();
+                let Some(v) = ops.get(*op) else {
+                    md.push_str(" – |");
+                    continue;
+                };
+                let mut v = v.clone();
                 let m = median(&mut v);
                 meds.insert(*op, m);
                 write!(md, " {m:.2} |").unwrap();
@@ -349,13 +368,19 @@ mod analyze {
                     "{{\"field\":\"{field}\",\"limbs\":{limbs},\"kernel_op\":\"{op}\",\"median_ns\":{m:.3}}}"
                 ));
             }
+            let ratio = |a: &str, b: &str| match (meds.get(a), meds.get(b)) {
+                (Some(x), Some(y)) => format!("{:.3}", x / y),
+                _ => "–".to_string(),
+            };
             writeln!(
                 md,
-                " {:.3} | {:.3} | {:.3} | {:.3} |",
-                meds["sqr"] / meds["cios_sqr"],
-                meds["karatsuba_mul"] / meds["cios_mul"],
-                meds["sos_mul"] / meds["cios_mul"],
-                meds["inv_bingcd"] / meds["inv_fermat"]
+                " {} | {} | {} | {} | {} | {} |",
+                ratio("sqr", "cios_sqr"),
+                ratio("karatsuba_mul", "cios_mul"),
+                ratio("sos_mul", "cios_mul"),
+                ratio("adx_mul", "cios_mul"),
+                ratio("mulx_mul", "cios_mul"),
+                ratio("inv_bingcd", "inv_fermat")
             )
             .unwrap();
         }
@@ -395,7 +420,10 @@ mod analyze {
             }
             f
         };
-        let (w, h, ml, mb, mt) = (980.0, 480.0, 60.0, 110.0, 40.0);
+        let legend_rows = arms.len().div_ceil(6) as f64;
+        let (w, ml, mt) = (980.0, 60.0, 40.0);
+        let mb = 70.0 + 20.0 * legend_rows;
+        let h = 370.0 + mb;
         let ymax = bars
             .iter()
             .filter(|b| b.2 != "biguint")
@@ -435,7 +463,7 @@ mod analyze {
         }
         for (ai, a) in arms.iter().enumerate() {
             let lx = ml + ((ai % 6) as f64) * 150.0;
-            let ly = h - 44.0 + ((ai / 6) as f64) * 20.0;
+            let ly = h - mb + 52.0 + ((ai / 6) as f64) * 20.0;
             write!(s, "<rect x='{lx}' y='{ly}' width='12' height='12' fill='{}'/><text x='{}' y='{}'>{a}</text>", COLORS[ai % COLORS.len()], lx + 16.0, ly + 10.0).unwrap();
         }
         s.push_str("</svg>\n");

@@ -1,0 +1,288 @@
+{
+  "branch": "feat/lucid-cray-tckh5e",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997749",
+        "--out",
+        "docs/notes/adx-hgcd-20261125/adx_raw.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-25T23:51:58+00:00",
+      "wall_s": 97.054
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099997750",
+        "--out",
+        "docs/notes/adx-hgcd-20261125/adx_raw_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-26T00:17:15+00:00",
+      "wall_s": 104.338
+    }
+  ],
+  "commit": "7a6da71c6f75e049bab86ca276cd168ba9b57f5a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-25T23:51:53+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261125-adx-mulx-kernel"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "local container, 4 vCPU shared VM, taskset -c 3, no PMU",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261125T2351Z-adx-mulx-kernel",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p127_mersenne-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 2 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.9979
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p127_mersenne-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 2 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.9882
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p192_nist-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 3 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.9959
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p192_nist-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 3 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0086
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p255_25519-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 4 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0133
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p255_25519-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 4 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0102
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p320_pmax-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 5 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0028
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p320_pmax-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 5 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 6 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0791
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 6 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0819
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p448_goldilocks-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 7 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.102
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p448_goldilocks-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 7 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0983
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p512_pmax-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 8 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.089
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p512_pmax-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 8 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0971
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p521_mersenne-scalar_mul-adx-prod-vs-tuned",
+      "note": "run 2 (8f0b91a242); 9 limbs; derived ratio of the paired medians prod/pad9_cios over tuned/pad9_cios (41 rounds each), Point::scalar_mul with ProdAdxKernel vs TunedKernel; taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0505
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p521_mersenne-scalar_mul_vartime-adx-prod-vs-tuned_wnaf",
+      "note": "run 2; 9 limbs; derived ratio prod_vartime/tuned_wnaf of paired medians vs pad9_cios",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0135
+    }
+  ],
+  "problem": "kernel:mont_vt_scalar_mul",
+  "raw": [
+    {
+      "bytes": 55193,
+      "path": "docs/notes/adx-hgcd-20261125/adx_raw.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d8/d85dced743ca86b7d3072ce8617605abf3fc23a57b58250a982dd752293c3be4",
+      "sha256": "d85dced743ca86b7d3072ce8617605abf3fc23a57b58250a982dd752293c3be4",
+      "uploaded": false
+    },
+    {
+      "bytes": 58424,
+      "path": "docs/notes/adx-hgcd-20261125/adx_raw_run2.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/10/10c5853a419bea66b439d1b0c20d15145f45e0aef59be841e07848f48698438e",
+      "sha256": "10c5853a419bea66b439d1b0c20d15145f45e0aef59be841e07848f48698438e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "adx-mulx-kernel",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}
