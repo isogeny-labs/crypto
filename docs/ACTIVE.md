@@ -17,6 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 - [ ] Integrate the ordinary rational 2-isogeny floor/crater demonstration as native Rust with runnable output and tests (Codex, started 2026-11-26, branch codex/rational-2-isogeny-volcano-20261126, draft PR #5225)
+- [x] Capture an unstopped natural two-summand relation stream and separately measure first balanced-circuit closure, first nonzero target projection, and first exact solver-visible dependency to estimate the stopping law rho(K) (Codex, completed 2026-11-26, branch codex/natural-cycle-stream-20261126, PR #5223; one uncensored K=168 observation, exact independent replay, and corpus integration; multi-K scaling remains open). [pcc:unverified]
 - [ ] Thread 1 — m=4 closure via an m=2 slope-t/4 theorem: NOT PURSUED on 2026-11-26 — the agent run was stopped by a safety check before producing output; left open for the owner (Claude, 2026-11-26)
 - [ ] Thread 2 — noncyclic Koblitz covers / gluing carriers: NOT PURSUED on 2026-11-26 — stopped by a safety check before producing output; left open for the owner (Claude, 2026-11-26)
 - [x] Package the M31 shared-selector capacity checker and archived public-tag replay with Rust targets, retained evidence, and portable CI; integration follow-up to tracking PR #5206 (Codex, completed local checks 2026-11-25, branch lane/m31-shared-selector-integration-20261125, PR #5213; unsigned producer evidence). [pcc:unverified]
