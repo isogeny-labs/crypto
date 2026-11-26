@@ -1,0 +1,16 @@
+migrate	Upload changed data and replay remote bytes	﻿2026-11-23T19:18:52.3338733Z ##[group]Run set -euo pipefail
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3339009Z [36;1mset -euo pipefail[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3339300Z [36;1mtest -n "$AWS_ACCESS_KEY_ID" && test -n "$AWS_SECRET_ACCESS_KEY"[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3339602Z [36;1mcd candidate[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3339830Z [36;1mbase=$(git merge-base "$BASE_SHA" HEAD)[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3340174Z [36;1mpython3 ../trusted/tools/artifacts/artifacts.py migrate "$base" HEAD[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3340495Z [36;1mgit diff --cached --check[0m
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3360142Z shell: /usr/bin/bash -e {0}
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3360387Z env:
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3360706Z   AWS_ACCESS_KEY_ID: ***
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3360996Z   AWS_SECRET_ACCESS_KEY: ***
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3361211Z   AWS_REGION: us-west-2
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3361468Z   BASE_SHA: da7777094392d3ccd37db78dcfc761c32e7e7813
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:52.3361716Z ##[endgroup]
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:57.1217195Z artifacts: head-object store/sha256/9a/9a34ad061aa02cfe3d1a5d0b53ba2661e44312b95383b520e49505afc0711d20: aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 answers 403 for an absent key without s3:ListBucket)
+migrate	Upload changed data and replay remote bytes	2026-11-23T19:18:57.1366338Z ##[error]Process completed with exit code 2.

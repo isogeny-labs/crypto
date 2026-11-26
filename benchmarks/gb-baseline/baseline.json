@@ -1,14 +1,14 @@
 {
   "host": {
-    "commit": "d5a52f0277c44454a0f74d9a1ea3dd923e7a3fda",
+    "commit": "ee44af42892026802dd55bfe96d383faea697926",
     "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
     "cpus": 4,
     "host": "runnervm0hi8g",
     "python": "3.12.16",
     "ref": "refs/heads/main",
-    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45721242782",
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45429763632",
     "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
-    "utc": "2026-11-25T23:47:01Z"
+    "utc": "2026-11-24T16:06:23Z"
   },
   "rows": [
     {
@@ -25,7 +25,7 @@
       "solving_degree_max": 4,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.002209916
+      "wall_s": 0.002258737
     },
     {
       "N": 6,
@@ -41,7 +41,7 @@
       "solving_degree_max": 5,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.020803277000000002
+      "wall_s": 0.02012996
     },
     {
       "N": 8,
@@ -50,14 +50,14 @@
       "cost": 214289944,
       "cost_unit": "multiply-adds (F_p elimination)",
       "curve": "M31",
-      "elapsed_s": 0.265,
+      "elapsed_s": 0.216,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 4,
       "solving_degree_max": 6,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.223536428
+      "wall_s": 0.21265372300000002
     },
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 5 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m5.jsonl",
@@ -117,11 +117,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 200358,
+        "build_ns": 190667,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 858,
+        "reduce_ns": 929,
         "reductions": 4,
         "splits": 0
       },
@@ -132,7 +132,7 @@
       "matrix_cols": 144,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.000614771
+      "wall_s": 0.000591143
     },
     {
       "answer_digest": "10055e840b7b42c7",
@@ -142,11 +142,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 173879194,
+        "build_ns": 163185190,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 2238722,
+        "reduce_ns": 2018941,
         "reductions": 568,
         "splits": 248
       },
@@ -157,7 +157,7 @@
       "matrix_cols": 443700,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.196565412
+      "wall_s": 0.184434053
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -182,7 +182,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.7879e-05
+      "wall_s": 2.5584e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -207,7 +207,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.5198e-05
+      "wall_s": 4.5029e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -232,7 +232,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.5616e-05
+      "wall_s": 2.0216e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -257,7 +257,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.4323e-05
+      "wall_s": 2.2327e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -275,14 +275,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.003,
+      "elapsed_s": 0.004,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 8,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.4773e-05
+      "wall_s": 2.1881e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -300,14 +300,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.003,
+      "elapsed_s": 0.004,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 9,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.3193e-05
+      "wall_s": 2.2272e-05
     }
   ],
   "schema": "gb-baseline.baseline/v1",

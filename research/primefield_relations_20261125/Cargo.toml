@@ -1,0 +1,16 @@
+[package]
+name = "m31-shared-selector-study"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Deterministic M31 selector capacity and public-label replay checks"
+
+[[bin]]
+name = "exact-bounds"
+path = "capacity-checker/src/exact_bounds.rs"
+
+[[bin]]
+name = "shared-terminal-gate"
+path = "shared-terminal-gate/src/main.rs"
+
+[workspace]

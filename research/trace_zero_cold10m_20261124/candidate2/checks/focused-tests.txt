@@ -1,0 +1,472 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto/research/trace_zero_cold10m_20261124/native/backend)
+warning: unused variable: `m`
+   --> backend/src/../../../../../src/binary_ecc/f2m.rs:682:13
+    |
+682 |         let m = self.m;
+    |             ^ help: if this is intentional, prefix it with an underscore: `_m`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `lo` is never read
+   --> backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:412:17
+    |
+390 |     macro_rules! consume {
+...
+412 |                 lo = _mm_xor_si128(lo, _mm_and_si128(m0, pivot));
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+432 |     consume!(15, hi, 7);
+    |     ------------------- in this macro invocation
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `hi` is never read
+   --> backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:413:17
+    |
+390 |     macro_rules! consume {
+...
+413 |                 hi = _mm_xor_si128(hi, _mm_and_si128(m1, pivot));
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+432 |     consume!(15, hi, 7);
+    |     ------------------- in this macro invocation
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: `full-trace-zero-backend` (lib) generated 3 warnings (run `cargo fix --lib -p full-trace-zero-backend` to apply 1 suggestion)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto/research/trace_zero_cold10m_20261124/native/leads)
+   Compiling trace-zero-experiments v0.1.0 (/workspace/crypto/research/trace_zero_cold10m_20261124/native/experiments)
+   Compiling trace-zero-halftrace v0.1.0 (/workspace/crypto/research/trace_zero_cold10m_20261124/native)
+warning: unused variable: `m`
+   --> src/../../../../src/binary_ecc/f2m.rs:682:13
+    |
+682 |         let m = self.m;
+    |             ^ help: if this is intentional, prefix it with an underscore: `_m`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `lo` is never read
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:412:17
+    |
+390 |     macro_rules! consume {
+...
+412 |                 lo = _mm_xor_si128(lo, _mm_and_si128(m0, pivot));
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+432 |     consume!(15, hi, 7);
+    |     ------------------- in this macro invocation
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `hi` is never read
+   --> src/../../../../src/cryptanalysis/trace_zero_linearized.rs:413:17
+    |
+390 |     macro_rules! consume {
+...
+413 |                 hi = _mm_xor_si128(hi, _mm_and_si128(m1, pivot));
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+432 |     consume!(15, hi, 7);
+    |     ------------------- in this macro invocation
+    |
+    = help: maybe it is overwritten before being read?
+
+warning: variants `InvalidPoint`, `NotTraceZero`, `InvalidCoordinates`, and `VariableCap` are never constructed
+  --> src/../../../../src/binary_ecc/trace_zero.rs:26:5
+   |
+23 | pub enum TraceZeroError {
+   |          -------------- variants in this enum
+...
+26 |     InvalidPoint,
+   |     ^^^^^^^^^^^^
+27 |     NotTraceZero,
+   |     ^^^^^^^^^^^^
+28 |     InvalidCoordinates,
+   |     ^^^^^^^^^^^^^^^^^^
+29 |     TermCap,
+30 |     VariableCap { required: u64, maximum: u32 },
+   |     ^^^^^^^^^^^
+   |
+   = note: `TraceZeroError` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: enum `TraceZeroCoordinates` is never used
+  --> src/../../../../src/binary_ecc/trace_zero.rs:34:10
+   |
+34 | pub enum TraceZeroCoordinates {
+   |          ^^^^^^^^^^^^^^^^^^^^
+
+warning: enum `TraceZeroAffineMode` is never used
+  --> src/../../../../src/binary_ecc/trace_zero.rs:44:10
+   |
+44 | pub enum TraceZeroAffineMode {
+   |          ^^^^^^^^^^^^^^^^^^^
+
+warning: enum `TraceZeroKummerMode` is never used
+  --> src/../../../../src/binary_ecc/trace_zero.rs:54:10
+   |
+54 | pub enum TraceZeroKummerMode {
+   |          ^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `one` and `degree` are never used
+   --> src/../../../../src/binary_ecc/trace_zero.rs:70:8
+    |
+ 64 | impl TraceZeroPolynomial {
+    | ------------------------ associated items in this implementation
+...
+ 70 |     fn one() -> Self {
+    |        ^^^
+...
+114 |     pub fn degree(&self) -> usize {
+    |            ^^^^^^
+
+warning: fields `trace_bits` and `order` are never read
+   --> src/../../../../src/binary_ecc/trace_zero.rs:133:5
+    |
+131 | pub struct TraceZeroVariety {
+    |            ---------------- fields in this struct
+132 |     curve: BinaryCurve,
+133 |     trace_bits: Vec<bool>,
+    |     ^^^^^^^^^^
+...
+138 |     order: BigUint,
+    |     ^^^^^
+    |
+    = note: `TraceZeroVariety` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: struct `TraceZeroFactorBase` is never constructed
+   --> src/../../../../src/binary_ecc/trace_zero.rs:142:12
+    |
+142 | pub struct TraceZeroFactorBase {
+    |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `TraceZeroSubspaceProfile` is never constructed
+   --> src/../../../../src/binary_ecc/trace_zero.rs:149:12
+    |
+149 | pub struct TraceZeroSubspaceProfile {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `binary_rank` is never used
+   --> src/../../../../src/binary_ecc/trace_zero.rs:158:4
+    |
+158 | fn binary_rank(rows: impl IntoIterator<Item = BigUint>, n: usize) -> usize {
+    |    ^^^^^^^^^^^
+
+warning: function `basis_coordinates` is never used
+   --> src/../../../../src/binary_ecc/trace_zero.rs:178:4
+    |
+178 | fn basis_coordinates(
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> src/../../../../src/binary_ecc/trace_zero.rs:326:12
+    |
+277 | impl TraceZeroVariety {
+    | --------------------- methods in this implementation
+...
+326 |     pub fn curve(&self) -> &BinaryCurve {
+    |            ^^^^^
+...
+383 |     pub fn kummer_contains_x(&self, x: &F2mElement) -> bool {
+    |            ^^^^^^^^^^^^^^^^^
+...
+403 |     pub fn lift_kummer_x(
+    |            ^^^^^^^^^^^^^
+...
+428 |     pub fn dimension(&self) -> u32 {
+    |            ^^^^^^^^^
+...
+431 |     pub fn rational_point_order(&self) -> &BigUint {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+437 |     pub fn intersect_factor_base(
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+524 |     pub fn point_trace(&self, p: &BinaryPoint) -> Result<BinaryPoint, TraceZeroError> {
+    |            ^^^^^^^^^^^
+...
+546 |     pub fn project(&self, p: &BinaryPoint) -> Result<BinaryPoint, TraceZeroError> {
+    |            ^^^^^^^
+...
+552 |     pub fn cofactor_image(&self, p: &BinaryPoint) -> Result<BinaryPoint, TraceZeroError> {
+    |            ^^^^^^^^^^^^^^
+...
+569 |     pub fn inverse_cofactor_image(&self, p: &BinaryPoint) -> Result<BinaryPoint, TraceZeroError> {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+591 |     pub fn coordinates(&self, p: &BinaryPoint) -> Result<TraceZeroCoordinates, TraceZeroError> {
+    |            ^^^^^^^^^^^
+...
+606 |     pub fn from_coordinates(
+    |            ^^^^^^^^^^^^^^^^
+...
+681 |     fn symbolic_q(
+    |        ^^^^^^^^^^
+...
+697 |     pub fn affine_system(
+    |            ^^^^^^^^^^^^^
+...
+777 |     fn subspace_x(
+    |        ^^^^^^^^^^
+...
+797 |     pub fn subspace_profile(
+    |            ^^^^^^^^^^^^^^^^
+...
+842 |     pub fn affine_system_over_subspace(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+852 |     pub fn affine_system_over_subspace_with_mode(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `TraceZeroAffineSystem` is never constructed
+   --> src/../../../../src/binary_ecc/trace_zero.rs:918:12
+    |
+918 | pub struct TraceZeroAffineSystem {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `kummer_system`, `kummer_system_over_subspace`, and `kummer_system_inner` are never used
+   --> src/../../../../src/binary_ecc/trace_zero.rs:929:12
+    |
+928 | impl TraceZeroVariety {
+    | --------------------- methods in this implementation
+929 |     pub fn kummer_system(
+    |            ^^^^^^^^^^^^^
+...
+936 |     pub fn kummer_system_over_subspace(
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+944 |     fn kummer_system_inner(
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `TraceZeroKummerSystem` is never constructed
+    --> src/../../../../src/binary_ecc/trace_zero.rs:1043:12
+     |
+1043 | pub struct TraceZeroKummerSystem {
+     |            ^^^^^^^^^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+    --> src/../../../../src/binary_ecc/trace_zero.rs:1053:12
+     |
+1052 | impl TraceZeroKummerSystem {
+     | -------------------------- methods in this implementation
+1053 |     pub fn maximum_degree(&self) -> usize {
+     |            ^^^^^^^^^^^^^^
+...
+1060 |     pub fn monomials(&self) -> usize {
+     |            ^^^^^^^^^
+...
+1063 |     pub fn auxiliary_variables(&self) -> usize {
+     |            ^^^^^^^^^^^^^^^^^^^
+...
+1066 |     pub fn accepts(&self, bits: &[bool]) -> bool {
+     |            ^^^^^^^
+...
+1073 |     pub fn assignment(&self, x: &F2mElement) -> Result<Vec<bool>, TraceZeroError> {
+     |            ^^^^^^^^^^
+...
+1100 |     fn value(&self, p: &[TraceZeroPolynomial], bits: &[bool]) -> F2mElement {
+     |        ^^^^^
+...
+1108 |     pub fn decode_x(&self, bits: &[bool]) -> Result<F2mElement, TraceZeroError> {
+     |            ^^^^^^^^
+...
+1121 |     pub fn lift(&self, bits: &[bool], negative: bool) -> Result<BinaryPoint, TraceZeroError> {
+     |            ^^^^
+...
+1124 |     pub fn append_to_solver(
+     |            ^^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+    --> src/../../../../src/binary_ecc/trace_zero.rs:1142:12
+     |
+1139 | impl TraceZeroAffineSystem {
+     | -------------------------- associated items in this implementation
+...
+1142 |     pub fn x_subspace_basis(&self) -> Option<&[F2mElement]> {
+     |            ^^^^^^^^^^^^^^^^
+...
+1145 |     pub fn maximum_degree(&self) -> usize {
+     |            ^^^^^^^^^^^^^^
+...
+1152 |     pub fn monomials(&self) -> usize {
+     |            ^^^^^^^^^
+...
+1155 |     pub fn accepts(&self, assignment: &[bool]) -> bool {
+     |            ^^^^^^^
+...
+1162 |     pub fn assignment(&self, p: &BinaryPoint) -> Result<Vec<bool>, TraceZeroError> {
+     |            ^^^^^^^^^^
+...
+1214 |     pub fn decode(&self, bits: &[bool]) -> Result<BinaryPoint, TraceZeroError> {
+     |            ^^^^^^
+...
+1236 |     fn auxiliary_keys(&self) -> BTreeSet<Vec<u32>> {
+     |        ^^^^^^^^^^^^^^
+...
+1239 |     fn equation_keys(equations: &[TraceZeroPolynomial]) -> BTreeSet<Vec<u32>> {
+     |        ^^^^^^^^^^^^^
+...
+1250 |     pub fn auxiliary_variables(&self) -> usize {
+     |            ^^^^^^^^^^^^^^^^^^^
+...
+1254 |     pub fn append_to_solver(
+     |            ^^^^^^^^^^^^^^^^
+...
+1262 |     fn append_equations(
+     |        ^^^^^^^^^^^^^^^^
+
+warning: associated functions `deg_193`, `deg_239`, `deg_283`, `deg_409`, and `deg_571` are never used
+   --> src/../../../../src/binary_ecc/f2m.rs:107:12
+    |
+ 49 | impl IrreduciblePoly {
+    | -------------------- associated functions in this implementation
+...
+107 |     pub fn deg_193() -> Self {
+    |            ^^^^^^^
+...
+114 |     pub fn deg_239() -> Self {
+    |            ^^^^^^^
+...
+121 |     pub fn deg_283() -> Self {
+    |            ^^^^^^^
+...
+128 |     pub fn deg_409() -> Self {
+    |            ^^^^^^^
+...
+135 |     pub fn deg_571() -> Self {
+    |            ^^^^^^^
+
+warning: associated items `z`, `to_biguint`, `degree`, and `sub` are never used
+   --> src/../../../../src/binary_ecc/f2m.rs:244:12
+    |
+226 | impl F2mElement {
+    | --------------- associated items in this implementation
+...
+244 |     pub fn z(m: u32) -> Self {
+    |            ^
+...
+364 |     pub fn to_biguint(&self) -> BigUint {
+    |            ^^^^^^^^^^
+...
+391 |     pub fn degree(&self) -> Option<u32> {
+    |            ^^^^^^
+...
+459 |     pub fn sub(&self, other: &Self) -> Self {
+    |            ^^^
+
+warning: struct `CompactLinearMaps` is never constructed
+    --> src/../../../../src/binary_ecc/f2m.rs:1150:19
+     |
+1150 | pub(crate) struct CompactLinearMaps {
+     |                   ^^^^^^^^^^^^^^^^^
+
+warning: associated items `new`, `trace_mask`, `half`, `half_words`, `half_fixed`, and `half_dynamic` are never used
+    --> src/../../../../src/binary_ecc/f2m.rs:1154:19
+     |
+1153 | impl CompactLinearMaps {
+     | ---------------------- associated items in this implementation
+1154 |     pub(crate) fn new(irreducible: &IrreduciblePoly) -> Self {
+     |                   ^^^
+...
+1160 |     pub(crate) fn trace_mask(&self) -> [u64; 3] {
+     |                   ^^^^^^^^^^
+...
+1166 |     pub(crate) fn half(&self, a: [u64; 3]) -> [u64; 3] {
+     |                   ^^^^
+...
+1175 |     fn half_words<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+     |        ^^^^^^^^^^
+...
+1183 |     fn half_fixed<const WORDS: usize, const BYTES: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+     |        ^^^^^^^^^^
+...
+1197 |     fn half_dynamic<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+     |        ^^^^^^^^^^^^
+
+warning: function `compact_mod131_hw_available` is never used
+    --> src/../../../../src/binary_ecc/f2m.rs:1882:15
+     |
+1882 | pub(crate) fn compact_mod131_hw_available() -> bool {
+     |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `trace-zero-halftrace` (lib test) generated 24 warnings (run `cargo fix --lib -p trace-zero-halftrace --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized + debuginfo] target(s) in 56.09s
+     Running unittests src/lib.rs (/workspace/scratch/cold10m-candidate2-target/release/build/trace-zero-halftrace/ff421dc5a9de54d2/out/trace_zero_halftrace-ff421dc5a9de54d2)
+
+running 71 tests
+test baseline::tests::adjoint_matches_reference_multiplication_on_every_bilinear_basis_triple ... ok
+test baseline::tests::adjoint_projector_preserves_every_coefficient_and_quotient_coordinate ... ok
+test baseline::tests::batched_residuals_match_scalar_group_law_including_all_exceptions ... ok
+test baseline::tests::direct_index_bounds_storage_and_falls_back_for_other_shapes ... ok
+test baseline::tests::direct_index_preserves_tree_keys_duplicates_and_first_indices ... ok
+test baseline::tests::direct_index_two_common_signs_stay_inline_and_extra_indices_spill_in_order ... ok
+test baseline::tests::packed_basis_preserves_reference_pivots_and_numeric_coordinate_order ... ok
+test baseline::tests::packed_elimination_matches_generic_solutions_kernels_and_inconsistency ... ok
+test baseline::tests::packed_row_maps_match_all_input_basis_vectors_and_independent_random_pairs ... ok
+test baseline::tests::projected_unique_inconsistent_and_deficient_results_match_complete_s3_spaces ... ok
+test baseline::tests::shared_x_admission_rejects_other_ordinates_and_wrong_coordinate_widths ... ok
+test baseline::tests::specialized_monic_roots_match_complete_field_enumeration_and_old_solver ... ok
+test context_unit::actual_context::lazy_symbolic_tests::deferred_symbolic_products_match_every_small_field_input_pair ... ok
+test context_unit::actual_context::lazy_symbolic_tests::numeric_queries_defer_symbolic_quadratic_and_clones_share_exact_materialization ... ok
+test field_unit_tests::tests::add_is_xor ... ok
+test field_unit_tests::tests::canonical_131_square_matches_independent_bit_doubling_and_reduction ... ok
+test field_unit_tests::tests::debug_output_is_unchanged ... ok
+test field_unit_tests::tests::direct_hex_matches_legacy_at_word_boundaries_and_preserves_syntax ... ok
+test field_unit_tests::tests::flt_inverse_deg16_sanity ... ok
+test field_unit_tests::tests::flt_inverse_of_zero_is_none ... ok
+test field_unit_tests::tests::flt_inverse_roundtrip ... ok
+test field_unit_tests::tests::frobenius_endomorphism ... ok
+test field_unit_tests::tests::fused_131_matches_bitwise_reduction_on_every_basis_product ... ok
+test field_unit_tests::tests::hex_eight_digit_pack_validates_every_byte_at_every_position ... ok
+test field_unit_tests::tests::hex_word_pack_validates_every_byte_and_keeps_full_word_order ... ok
+test field_unit_tests::tests::inline_and_heap_storage_agree_across_the_boundary ... ok
+test field_unit_tests::tests::inverse_roundtrip_all_fields ... ok
+test field_unit_tests::tests::mul_by_one_is_identity ... ok
+test field_unit_tests::tests::mul_commutes ... ok
+test field_unit_tests::tests::packed_half_trace_basis_and_every_byte_entry_match_scalar_chains ... ok
+test field_unit_tests::tests::packed_half_trace_dispatch_checks_all_terms_and_singular_input_falls_back ... ok
+test field_unit_tests::tests::qualified_trace_cache_shares_only_the_complete_same_polynomial ... ok
+test field_unit_tests::tests::reduce_words_matches_bitwise_reduction ... ok
+test field_unit_tests::tests::reduction_works_at_boundary ... ok
+test field_unit_tests::tests::schoolbook_and_karatsuba_agree ... ok
+test field_unit_tests::tests::soft_clmul_matches_shift_xor ... ok
+test field_unit_tests::tests::trace_and_half_trace_tables_match_definitions ... ok
+test field_unit_tests::tests::unrolled_clmul_matches_every_basis_pair_and_preserves_accumulation ... ok
+test field_unit_tests::tests::word_mul_matches_bitwise_reference ... ok
+test field_unit_tests::tests::word_square_matches_mul ... ok
+test projected_unit_tests::tests::adjoint_matches_reference_multiplication_on_every_bilinear_basis_triple ... ok
+test projected_unit_tests::tests::adjoint_projector_preserves_every_coefficient_and_quotient_coordinate ... ok
+test projected_unit_tests::tests::batched_residuals_match_scalar_group_law_including_all_exceptions ... ok
+test projected_unit_tests::tests::direct_index_bounds_storage_and_falls_back_for_other_shapes ... ok
+test projected_unit_tests::tests::direct_index_preserves_tree_keys_duplicates_and_first_indices ... ok
+test projected_unit_tests::tests::direct_index_two_common_signs_stay_inline_and_extra_indices_spill_in_order ... ok
+test projected_unit_tests::tests::four_bit_half_combinations_preserve_all_small_coefficient_vectors ... ok
+test projected_unit_tests::tests::omitted_coefficient_maps_remain_lazy_and_complete_deficient_fallback ... ok
+test projected_unit_tests::tests::packed_basis_preserves_reference_pivots_and_numeric_coordinate_order ... ok
+test projected_unit_tests::tests::packed_elimination_matches_generic_solutions_kernels_and_inconsistency ... ok
+test projected_unit_tests::tests::packed_prefix_preserves_generic_first_contradiction_and_unique_result ... ok
+test projected_unit_tests::tests::packed_row_maps_match_all_input_basis_vectors_and_independent_random_pairs ... ok
+test projected_unit_tests::tests::projected_unique_inconsistent_and_deficient_results_match_complete_s3_spaces ... ok
+test projected_unit_tests::tests::shared_x_admission_rejects_other_ordinates_and_wrong_coordinate_widths ... ok
+test projected_unit_tests::tests::specialized_monic_roots_match_complete_field_enumeration_and_old_solver ... ok
+test projected_unit_tests::tests::vector_prefix_matches_scalar_rank_and_stopping_row_on_arbitrary_matrices ... ok
+test tally_unit_tests::bounded_field_tally_guard_tests::active_tally_probe_preserves_existing_entries ... ok
+test tally_unit_tests::bounded_field_tally_guard_tests::nested_scopes_zero_counts_and_dropped_scope_preserve_parent ... ok
+test tally_unit_tests::bounded_field_tally_guard_tests::shared_and_mutable_empty_stack_borrows_refuse_without_mutation ... ok
+test tests::half_trace_product_elimination_is_exact_for_all_small_s3_candidates ... ok
+test wire_ascii::tests::direct_checked_points_match_the_original_typed_decoder ... ok
+test wire_ascii::tests::invalid_shapes_extended_hex_and_escaped_coordinates_refuse_fast_path ... ok
+test wire_tests::borrowed_ordinary_wire_matches_owned_decoder_and_original_checks ... ok
+test wire_tests::borrowed_wire_keeps_required_metadata_types_and_complete_json_validation ... ok
+test wire_tests::escaped_coordinates_and_metadata_retain_owned_fallback ... ok
+test word_unit::compact_admission_and_batch_residuals_match_all_small_curve_points_and_offcurve_inputs ... ok
+test word_unit::compact_arithmetic_matches_general_backend_small_exhaustive_and_wide_samples ... ok
+test word_unit::degree_alone_never_selects_a_specialized_modulus ... ok
+test word_unit::every_product_monomial_matches_reference_for_specialized_moduli ... ok
+test word_unit::generator_multiples_match_general_arithmetic_on_every_basis_vector ... ok
+test word_unit::repeated_denominator_runs_and_exceptional_points_preserve_every_residual ... ok
+
+test result: ok. 71 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
