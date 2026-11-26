@@ -72,6 +72,14 @@ and establish all of the following:
 The runtime guards and canonical serialization tests are evidence for R1 but
 do not constitute a refinement proof. `[pcc:unverified]`
 
+`IMPLEMENTATION_BOUNDARY.md` records that the positive production recursion is
+unreachable for a host-representable `usize` graph. The first symbolic active
+row has `lambda=131072,u=1`; at `lambda=2^26` all source guards pass but the
+theorem's `u>=lambda^(4/5)` invariant does not. The first passing power-of-two
+scan row is `lambda=2^480`, with 80 active depths. These facts make R1 a
+symbolic/refinement obligation rather than a runnable finite attack path.
+`[pcc:unverified]`
+
 The forced source-object control covers 2,080 `(radix,a,M,family,schedule,i)`
 contexts, 3,388 retained tuple states and 25,490 group-child calls. It checks
 every old vertex, isolate, endpoint/port identity, packet ownership, creation

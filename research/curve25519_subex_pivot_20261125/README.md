@@ -478,6 +478,8 @@ kernel-check the whole asymptotic chain. [pcc:unverified]
   [`HERMITE_IDENTITY.md`](HERMITE_IDENTITY.md)
 - Mode-to-group packet factorization identity:
   [`GROUP_FACTORIZATION.md`](GROUP_FACTORIZATION.md)
+- Symbolic versus live implementation boundary:
+  [`IMPLEMENTATION_BOUNDARY.md`](IMPLEMENTATION_BOUNDARY.md)
 - Pair-image degree gate:
   `research/curve25519_pair_image_gate_20261125/README.md`
 
