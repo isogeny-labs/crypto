@@ -73,7 +73,7 @@ fn cost_json(o: &Ops, n: u32) -> serde_json::Value {
 
 // ───────────────────────── pairs-and-solve (arms F, F0, G) ──────────────────
 
-pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, la_stream: &[&str]) -> Vec<serde_json::Value> {
+pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, la_stream: &[&str], ap: bool) -> Vec<serde_json::Value> {
     let gf = &c.gf;
     let t0 = std::time::Instant::now();
     let (cf_sh, cf_pt, cf_fac, cf_gcd, cf_lv) = (CF::new(gf), CF::new(gf), CF::new(gf), CF::new(gf), CF::new(gf));
@@ -84,7 +84,7 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
     let w_pt = t_pt.elapsed().as_nanos();
     let lv = subspace_poly(&cf_lv, &sub.basis);
     let mut rng = Sm64::keyed(stream);
-    let mut tg = Targets::new(c, &cf_sh, g, q, &mut rng);
+    let mut tg = if ap { Targets::new_ap(c, &cf_sh, g, q, &mut rng) } else { Targets::new(c, &cf_sh, g, q, &mut rng) };
     let mut la_rng = Sm64::keyed(la_stream);
     let mut rows: Vec<Row> = vec![];
     let (mut o_targets, mut o_resolve, mut o_la) = (Ops::default(), Ops::default(), Ops::default());
@@ -201,7 +201,7 @@ pub fn run_ps(c: &Curve, g: Pt, q: Pt, sub: &Sub, stream: &[&str], g_max: u64, l
 
 // ───────────────────────── meet in the middle (M3, M2) ──────────────────────
 
-pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_stream: &[&str]) -> serde_json::Value {
+pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_stream: &[&str], ap: bool) -> serde_json::Value {
     let gf = &c.gf;
     let t0 = std::time::Instant::now();
     let (cf_sh, cf_t, cf_p) = (CF::new(gf), CF::new(gf), CF::new(gf));
@@ -211,7 +211,7 @@ pub fn run_mitm(c: &Curve, g: Pt, q: Pt, sub: &Sub, m: u32, stream: &[&str], la_
     let uh = uhash(&cf_t, &pt);
     drop(pt);
     let mut rng = Sm64::keyed(stream);
-    let mut tg = Targets::new(c, &cf_sh, g, q, &mut rng);
+    let mut tg = if ap { Targets::new_ap(c, &cf_sh, g, q, &mut rng) } else { Targets::new(c, &cf_sh, g, q, &mut rng) };
     let mut la_rng = Sm64::keyed(la_stream);
     let mut rows: Vec<Row> = vec![];
     let (mut o_targets, mut o_resolve, mut o_la) = (Ops::default(), Ops::default(), Ops::default());
@@ -340,6 +340,7 @@ fn main() {
         Some("pilot") => pilot(&args[2], args[3..].iter().map(|s| s.parse().unwrap()).collect()),
         Some("run") => run(&args[2], &args[3], args.get(4).map(|s| s.parse().unwrap()).unwrap_or(1)),
         Some("analyze") => analysis::analyze(&args[2], &args[3], &args[4], &args[5]),
+        Some("dupcheck") => dupcheck(&args[2], &args[3]),
         Some("curves") => {
             for n in args[2..].iter().map(|s| s.parse::<u32>().unwrap()) {
                 for ci in 0..4 {
@@ -434,13 +435,13 @@ fn selftest(n: u32, np: u32) {
     }
     println!("{tot} targets: factored == gcd == m3 sets, consistent with crypto oracles; {hits} relations");
     let (q, d) = make_target("selftest-target", &inst, n, 0, 1);
-    let outs = run_ps(c, inst.g, q, &sub, &["selftest-ps", &n.to_string()], u64::MAX, &["selftest-la"]);
+    let outs = run_ps(c, inst.g, q, &sub, &["selftest-ps", &n.to_string()], u64::MAX, &["selftest-la"], false);
     for o in &outs {
         println!("{} d={} verified={} targets={} rels={} meq={:.3e}", o["arm"], o["d"], o["verified"], o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
     }
     assert_eq!(outs[0]["d"].as_u64(), Some(d));
     for m in [3, 2] {
-        let o = run_mitm(c, inst.g, q, &sub, m, &["selftest-ps", &n.to_string()], &["selftest-la"]);
+        let o = run_mitm(c, inst.g, q, &sub, m, &["selftest-ps", &n.to_string()], &["selftest-la"], false);
         println!("{} d={} verified={} targets={} rels={} meq={:.3e}", o["arm"], o["d"], o["verified"], o["targets"], o["relations"], o["cost"]["meq_s1_u1"].as_f64().unwrap());
         assert_eq!(o["d"].as_u64(), Some(d));
     }
@@ -480,6 +481,7 @@ fn run(protocol: &str, out: &str, threads: usize) {
     let curves = p["curves_per_rung"].as_u64().unwrap() as u32;
     let targets = p["targets_per_curve"].as_u64().unwrap() as u32;
     let rho_seeds = p["rho_seeds_per_target"].as_u64().unwrap() as u32;
+    let ap = p["target_walk"].as_str() == Some("ap");
     let arms: Vec<String> = p["ic_arms"].as_array().unwrap().iter().map(|s| s.as_str().unwrap().to_string()).collect();
     let file = Arc::new(Mutex::new(std::fs::OpenOptions::new().create(true).append(true).open(out).unwrap()));
     let mut jobs: Vec<(u32, u32, usize, u32, u32, u64)> = vec![];
@@ -503,6 +505,7 @@ fn run(protocol: &str, out: &str, threads: usize) {
     let arms = Arc::new(arms);
     for _ in 0..threads {
         let (jobs, file, arms) = (jobs.clone(), file.clone(), arms.clone());
+        let ap = ap;
         hs.push(std::thread::spawn(move || loop {
             let job = jobs.lock().unwrap().pop();
             let Some((n, np, w, ci, ti, gmax)) = job else { break };
@@ -512,7 +515,7 @@ fn run(protocol: &str, out: &str, threads: usize) {
             let basis = gen::subfield_basis(&c.gf, np);
             let sub = Sub::new(&basis);
             let (ns, cs, ts) = (n.to_string(), ci.to_string(), ti.to_string());
-            let stream = ["icstream", ns.as_str(), cs.as_str(), ts.as_str()];
+            let stream = [if ap { "icstream-a1" } else { "icstream" }, ns.as_str(), cs.as_str(), ts.as_str()];
             let case = json!({"n": n, "np": np, "ci": ci, "ti": ti, "curve": curve_json(n, np, ci, &inst)});
             let emit = |mut v: serde_json::Value| {
                 v["case"] = case.clone();
@@ -539,12 +542,12 @@ fn run(protocol: &str, out: &str, threads: usize) {
                         }
                     }
                     "PS" if arms.iter().any(|x| x == "F") => {
-                        for v in run_ps(c, inst.g, q, &sub, &stream, gmax, &["la", &ns, &cs, &ts, "PS"]) {
+                        for v in run_ps(c, inst.g, q, &sub, &stream, gmax, &["la", &ns, &cs, &ts, "PS"], ap) {
                             emit(v);
                         }
                     }
-                    "M3" if arms.iter().any(|x| x == "M3") => emit(run_mitm(c, inst.g, q, &sub, 3, &stream, &["la", &ns, &cs, &ts, "M3"])),
-                    "M2" if arms.iter().any(|x| x == "M2") => emit(run_mitm(c, inst.g, q, &sub, 2, &stream, &["la", &ns, &cs, &ts, "M2"])),
+                    "M3" if arms.iter().any(|x| x == "M3") => emit(run_mitm(c, inst.g, q, &sub, 3, &stream, &["la", &ns, &cs, &ts, "M3"], ap)),
+                    "M2" if arms.iter().any(|x| x == "M2") => emit(run_mitm(c, inst.g, q, &sub, 2, &stream, &["la", &ns, &cs, &ts, "M2"], ap)),
                     _ => {}
                 }
             }
@@ -553,5 +556,58 @@ fn run(protocol: &str, out: &str, threads: usize) {
     }
     for h in hs {
         h.join().unwrap();
+    }
+}
+
+/// For every IC record of the frozen run, regenerate the frozen relation-target
+/// stream up to the number of targets the arm consumed and count repeated
+/// targets (the r-adding target walk can enter a cycle).
+fn dupcheck(runs: &str, out: &str) {
+    let text = std::fs::read_to_string(runs).unwrap();
+    let mut f = std::fs::File::create(out).unwrap();
+    let mut seen_case: std::collections::HashSet<(u64, u64, u64)> = Default::default();
+    let mut maxt: std::collections::BTreeMap<(u64, u64, u64), Vec<(String, u64)>> = Default::default();
+    for line in text.lines() {
+        let v: serde_json::Value = serde_json::from_str(line).unwrap();
+        let arm = v["arm"].as_str().unwrap();
+        if arm == "RHO" || arm == "F0" || arm == "G" {
+            continue;
+        }
+        let c = &v["case"];
+        let key = (c["n"].as_u64().unwrap(), c["ci"].as_u64().unwrap(), c["ti"].as_u64().unwrap());
+        seen_case.insert(key);
+        maxt.entry(key).or_default().push((arm.to_string(), v["targets"].as_u64().unwrap()));
+    }
+    for ((n, ci, ti), arms) in maxt {
+        let (n, ci, ti) = (n as u32, ci as u32, ti as u32);
+        let inst = make_curve("curve", n, ci);
+        let c = &inst.curve;
+        let (q, _) = make_target("target", &inst, n, ci, ti);
+        let cf = CF::new(&c.gf);
+        let mut rng = Sm64::keyed(&["icstream", &n.to_string(), &ci.to_string(), &ti.to_string()]);
+        let mut tg = Targets::new(c, &cf, inst.g, q, &mut rng);
+        let tmax = arms.iter().map(|a| a.1).max().unwrap();
+        let mut seen: std::collections::HashMap<u64, u64> = Default::default();
+        let mut first_rep: Option<u64> = None;
+        let mut reps_at: Vec<(u64, u64)> = arms.iter().map(|a| (a.1, 0)).collect();
+        let mut reps = 0u64;
+        for k in 0..tmax {
+            let (r, _, _) = tg.next(c, &cf);
+            let x = r.x();
+            if seen.insert(x, k).is_some() {
+                reps += 1;
+                if first_rep.is_none() {
+                    first_rep = Some(k);
+                }
+            }
+            for e in reps_at.iter_mut() {
+                if k + 1 == e.0 {
+                    e.1 = reps;
+                }
+            }
+        }
+        for (i, (arm, t)) in arms.iter().enumerate() {
+            writeln!(f, "{}", json!({"n": n, "ci": ci, "ti": ti, "arm": arm, "targets": t, "repeated_targets": reps_at[i].1, "first_repeat_index": first_rep})).unwrap();
+        }
     }
 }

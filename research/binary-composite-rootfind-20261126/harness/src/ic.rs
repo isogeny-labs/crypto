@@ -569,6 +569,9 @@ pub fn solve_m2(cf: &CF, fb: &Fb, uh: &UHash, xr: u64, out: &mut Vec<[u64; 2]>) 
 
 /// `R_{k+1} = R_k + J_{h(x(R_k))}` on `W` lanes, batched; `R = [a]G + [b]Q`.
 pub struct Targets {
+    /// Amendment A1: arithmetic-progression lanes `R ← R + S` (never cycle
+    /// before ℓ steps) instead of the frozen r-adding walk.
+    ap: Option<(Pt, u64, u64)>,
     lanes: Vec<(Pt, u64, u64)>,
     jumps: Vec<(Pt, u64, u64)>,
     buf: std::collections::VecDeque<(Pt, u64, u64)>,
@@ -600,7 +603,20 @@ impl Targets {
             let (a, b) = (rng.bits(12) % ell, rng.bits(12) % ell);
             jumps.push((c.joint(cf, a, g, b, q), a, b));
         }
-        Targets { lanes, jumps, buf: Default::default(), scr: (vec![], vec![]), produced: 0 }
+        Targets { ap: None, lanes, jumps, buf: Default::default(), scr: (vec![], vec![]), produced: 0 }
+    }
+    /// Amendment A1 stream: 8 lanes with independent random starts
+    /// `[a_k]G + [b_k]Q` and one common random stride `S = [a_s]G + [b_s]Q`.
+    pub fn new_ap(c: &Curve, cf: &CF, g: Pt, q: Pt, rng: &mut Sm64) -> Self {
+        let ell = c.ell;
+        let (as_, bs) = (rng.below(ell), rng.below(ell));
+        let stride = c.joint(cf, as_, g, bs, q);
+        let mut lanes = vec![];
+        for _ in 0..TGT_LANES {
+            let (a, b) = (rng.below(ell), rng.below(ell));
+            lanes.push((c.joint(cf, a, g, b, q), a, b));
+        }
+        Targets { ap: Some((stride, as_, bs)), lanes, jumps: vec![], buf: Default::default(), scr: (vec![], vec![]), produced: 0 }
     }
     pub fn next(&mut self, c: &Curve, cf: &CF) -> (Pt, u64, u64) {
         if self.buf.is_empty() {
@@ -608,6 +624,17 @@ impl Targets {
                 self.buf.push_back(l);
             }
             let ps: Vec<Pt> = self.lanes.iter().map(|l| l.0).collect();
+            if let Some((st, sa, sb)) = self.ap {
+                let qs: Vec<Pt> = vec![st; ps.len()];
+                let mut out = vec![];
+                batch_add(c, cf, &ps, &qs, &mut out, &mut self.scr);
+                for k in 0..self.lanes.len() {
+                    let (_, a, b) = self.lanes[k];
+                    self.lanes[k] = (out[k], (a + sa) % c.ell, (b + sb) % c.ell);
+                }
+                self.produced += 1;
+                return self.buf.pop_front().unwrap();
+            }
             let js: Vec<usize> = ps
                 .iter()
                 .map(|p| match p {
