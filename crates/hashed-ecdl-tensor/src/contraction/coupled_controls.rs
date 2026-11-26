@@ -177,6 +177,97 @@ fn direct_packet_basis_map(
     Ok(out)
 }
 
+fn mode_expanded_basis_map(
+    graph: &Bipartite,
+    packing: &Packing,
+    parameters: &Parameters,
+    coordinate: usize,
+    kernel: &deformation::Cauchy,
+    modes: &[deformation::Mode],
+    meter: &mut Meter,
+) -> Result<Vec<Element>> {
+    let incidences = graph
+        .edges
+        .len()
+        .checked_mul(2)
+        .ok_or_else(|| overflow("mode basis incidences"))?;
+    let assignments = 1usize
+        .checked_shl(u32::try_from(incidences).map_err(|_| overflow("mode basis shift"))?)
+        .ok_or_else(|| overflow("mode basis assignments"))?;
+    let mut out = Vec::with_capacity(assignments);
+    for mask in 0..assignments {
+        let left_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << edge) != 0)
+            .collect();
+        let right_bits: Vec<_> = (0..graph.edges.len())
+            .map(|edge| mask & (1usize << (graph.edges.len() + edge)) != 0)
+            .collect();
+        let mut product = kernel.ring.one();
+        for (packet_id, packet) in packing.packets.iter().enumerate() {
+            for (row, &row_edge) in packet
+                .slots
+                .iter()
+                .enumerate()
+                .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+            {
+                let row_group = packing::digit(
+                    packing.row_labels[graph.edges[row_edge].left.0],
+                    coordinate,
+                    parameters.radix,
+                );
+                let mut row_sum = kernel.ring.zero();
+                for (column, &column_edge) in packet
+                    .slots
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(slot, edge)| edge.as_ref().map(|edge| (slot, edge)))
+                {
+                    let column_group = packing::digit(
+                        packing.column_labels[graph.edges[column_edge].right.0],
+                        coordinate,
+                        parameters.radix,
+                    );
+                    if column_group == row_group && right_bits[column_edge] {
+                        let weight = kernel.weight(row, column, meter)?;
+                        row_sum = kernel.ring.add(&row_sum, &weight, meter)?;
+                    }
+                }
+                for mode in modes
+                    .iter()
+                    .filter(|mode| mode.packet == packet_id && mode.target == row_group)
+                {
+                    let Some((_, row_coefficient)) =
+                        mode.rows.iter().find(|&&(slot, _)| slot == row)
+                    else {
+                        continue;
+                    };
+                    let mut form = BigUint::zero();
+                    for (column, coefficient) in &mode.columns {
+                        let column_edge = packet.slots[*column]
+                            .ok_or_else(|| integrity("mode column packet slot"))?;
+                        if right_bits[column_edge] {
+                            form = (form + coefficient) % kernel.ring.modulus();
+                        }
+                    }
+                    let term =
+                        kernel
+                            .ring
+                            .mul(row_coefficient, &kernel.ring.integer(&form), meter)?;
+                    row_sum = kernel.ring.add(&row_sum, &term, meter)?;
+                }
+                let factor = if left_bits[row_edge] {
+                    row_sum
+                } else {
+                    kernel.ring.sub(&kernel.ring.one(), &row_sum, meter)?
+                };
+                product = kernel.ring.mul(&product, &factor, meter)?;
+            }
+        }
+        out.push(product);
+    }
+    Ok(out)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn child_basis_map(
     graph: &Bipartite,
@@ -835,6 +926,16 @@ fn direct_factorization_matches_four_edge_partition_orbits() {
             .unwrap();
             let expected =
                 direct_packet_basis_map(&prototype, &packing, &kernel, &mut meter).unwrap();
+            let expanded = mode_expanded_basis_map(
+                &prototype,
+                &packing,
+                &parameters,
+                coordinate,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
             let actual = extracted_basis_map(
                 &prototype,
                 &packing,
@@ -848,6 +949,10 @@ fn direct_factorization_matches_four_edge_partition_orbits() {
             assert_eq!(
                 actual, expected,
                 "left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
+            );
+            assert_eq!(
+                expanded, expected,
+                "mode expansion: left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
             );
             cases += expected.len();
         }
@@ -975,6 +1080,16 @@ fn direct_factorization_matches_five_edge_partition_orbits() {
             .unwrap();
             let expected =
                 direct_packet_basis_map(&prototype, &packing, &kernel, &mut meter).unwrap();
+            let expanded = mode_expanded_basis_map(
+                &prototype,
+                &packing,
+                &parameters,
+                coordinate,
+                &kernel,
+                &modes,
+                &mut meter,
+            )
+            .unwrap();
             let actual = extracted_basis_map(
                 &prototype,
                 &packing,
@@ -988,6 +1103,10 @@ fn direct_factorization_matches_five_edge_partition_orbits() {
             assert_eq!(
                 actual, expected,
                 "left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
+            );
+            assert_eq!(
+                expanded, expected,
+                "mode expansion: left={left_groups:?}, right={right_groups:?}, schedule={schedule}",
             );
             cases += expected.len();
         }

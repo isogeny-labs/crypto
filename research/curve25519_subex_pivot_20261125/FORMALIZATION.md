@@ -256,9 +256,12 @@ delta contractions to 3.96 seconds for the same coefficient set.
 
 At five edges, the same symbolic kernel covers all 91 graph-shape orbits of
 the 2,704 left/right partition pairs, four label schedules, and all 1,024
-delta-basis coefficients: 372,736 comparisons in 51.71 seconds under Rust
-1.78 debug. This meets the 90-second scaling target but remains a bounded
-refinement rather than a quantified proof. `[pcc:unverified]`
+delta-basis coefficients: 372,736 comparisons. A third independent map now
+expands same-group kernel weights and generated mode row/source forms directly,
+without calling child construction, tuple enumeration, or packet entry. All
+three maps agree in 76.17 seconds under Rust 1.78 debug. This meets the
+90-second scaling target but remains a bounded refinement rather than a
+quantified proof. `[pcc:unverified]`
 
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent

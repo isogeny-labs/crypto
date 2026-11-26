@@ -334,9 +334,10 @@
     "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
     "test": "contraction::recursive::coupled_controls::direct_factorization_matches_five_edge_partition_orbits",
     "cases": "91 graph-shape orbits covering all 2,704 left/right set-partition pairs of five labeled edges; four label schedules; all 1,024 delta-basis coefficients; 372,736 comparisons",
-    "oracle": "direct packet-kernel coefficient map versus production-derived symbolic child coefficient map",
-    "observed_gate": "every coefficient agrees",
-    "runtime": "51.71 seconds under Rust 1.78 debug, below the 90-second scaling target",
+    "oracles": "direct packet-kernel map; independent same-group plus mode-row/source expansion map; production-derived symbolic child map",
+    "mode_expansion_boundary": "the middle map does not call child, next_tuple, or PacketTensor::entry",
+    "observed_gate": "all three maps agree for every coefficient",
+    "runtime": "51.71 seconds for the original two-map gate and 76.17 seconds for the triangular three-map gate under Rust 1.78 debug; both below the 90-second scaling target",
     "complete_library_result": "179 passed; 0 failed",
     "claim_boundary": "five-edge graph-shape orbits under four label schedules; larger edge counts and all possible labels remain unverified"
   },

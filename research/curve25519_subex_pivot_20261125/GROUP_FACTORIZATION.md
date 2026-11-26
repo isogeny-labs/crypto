@@ -196,8 +196,11 @@ seconds while preserving the exact coefficient set. `[pcc:unverified]`
 The same symbolic kernel scales to five edges. All 2,704 left/right partition
 pairs collapse to 91 graph-shape orbits; four label schedules and all 1,024
 incidence-basis coefficients give 372,736 exact comparisons. The complete
-Rust 1.78 debug control passes in 51.71 seconds, below the 90-second scaling
-target. `[pcc:unverified]`
+Rust 1.78 debug control initially passed in 51.71 seconds. A third map now
+reconstructs every row independently from same-group kernel weights plus mode
+row/source forms, without `child`, `next_tuple`, or packet entry. The direct
+kernel, mode-expanded, and production-child maps agree in 76.17 seconds,
+still below the 90-second scaling target. `[pcc:unverified]`
 
 These controls make the algebraic components load-bearing, but do not quantify
 over every admitted graph or establish a typed refinement from every live Rust
