@@ -1,0 +1,54 @@
+{
+  "schema": "isogeny.m31-counts-publication-checks/v1",
+  "created_utc": "2026-11-26T02:48:59.767Z",
+  "source_commit": "84d656e47987be9b932276c25c6b9ee6cd8d318e",
+  "pr": 5217,
+  "standing": "unsigned producer evidence; no new PCC claim",
+  "record": "benchmarks/records/20261126T0236Z-m31-shared-selector-counts-r1.json",
+  "local_checks": {
+    "new_closed_record_errors": [],
+    "progress_stale": [],
+    "lab_parity": {
+      "passed": true,
+      "locked_files": 21
+    },
+    "lesson_ledger": {
+      "passed": true,
+      "entries": 1112
+    },
+    "prose_lint": {
+      "passed": true,
+      "findings": 0
+    },
+    "workflow": {
+      "yaml_parses": true,
+      "triggers": [
+        "push main",
+        "workflow_dispatch"
+      ],
+      "counted_tests_added": true
+    }
+  },
+  "global_benchrec_gate": {
+    "passed": false,
+    "exit_code": 1,
+    "problems": 5770,
+    "records": 433,
+    "diagnostic_sha256": "24e035e721d5aa8a80e9c64353515b887e39f067e34b4bca071807e9651fd68d",
+    "scope": "Historical raw-custody paths absent from sparse checkout and pre-existing record problems; new record validates independently. No old record edited; no global pass claimed.",
+    "base_example": {
+      "record": "benchmarks/records/20261125T1820Z-mont-mul-kernels.json",
+      "ref": "origin/main",
+      "status": "open",
+      "closed_utc": null
+    }
+  },
+  "report": {
+    "path": "report/REPORT.pdf",
+    "pages": 2,
+    "sha256": "dad2803b41a5bd29b62e125e0fa99aa529e436a7944a86276cfcb4f1384bb8e9"
+  },
+  "replay_receipt": "results/attempt-001/replay-comparison.json",
+  "runtime_claim": false,
+  "remote_ci": "not yet observed for final evidence commit"
+}

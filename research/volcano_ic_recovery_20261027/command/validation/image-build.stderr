@@ -1,0 +1,74 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.28kB done
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${BUILD_IMAGE} results in empty or invalid base image name (line 6)
+#1 WARN: InvalidDefaultArgInFrom: Default value for ARG ${RUNTIME_IMAGE} results in empty or invalid base image name (line 19)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/gcc@sha256:5e927c284bf55a7dc796262e311a0703344f62f41f5621eb56843111b1d37e15
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [runtime 1/4] FROM docker.io/library/debian@sha256:734a72b3d6142a71993b4bc580ca01d8ca687f77a2c422d96a961d3376b179bc
+#5 DONE 0.0s
+
+#6 [build 1/6] FROM docker.io/library/gcc@sha256:5e927c284bf55a7dc796262e311a0703344f62f41f5621eb56843111b1d37e15
+#6 DONE 0.1s
+
+#7 [internal] load build context
+#7 transferring context: 985.82kB 0.0s done
+#7 DONE 0.1s
+
+#8 [build 2/6] COPY repo/ /opt/volcano/repo/
+#8 DONE 5.1s
+
+#9 [build 3/6] COPY SOURCE_REVISION /opt/volcano/SOURCE_REVISION
+#9 DONE 1.6s
+
+#10 [build 4/6] COPY launch.sh /opt/volcano/launch.sh
+#10 DONE 1.7s
+
+#11 [build 5/6] WORKDIR /opt/volcano/repo
+#11 DONE 1.4s
+
+#12 [build 6/6] RUN sha256sum -c research/volcano_ic_recovery_20261027/SOURCES.sha256  && mkdir -p /opt/volcano/bin  && g++ -std=c++20 -O2 -static -Wall -Wextra -Wpedantic -Werror research/volcano_ic_recovery_20261027/runner.cpp -o /opt/volcano/bin/runner  && g++ -std=c++20 -O2 -static -Wall -Wextra -Wpedantic -Werror research/volcano_ic_recovery_20261027/verify.cpp -o /opt/volcano/bin/verify  && cd /opt/volcano  && sha256sum bin/runner bin/verify > binaries.sha256  && chmod -R a+rX,go-w /opt/volcano  && chmod 555 /opt/volcano/launch.sh /opt/volcano/bin/runner /opt/volcano/bin/verify
+#12 1.734 research/volcano_ic_recovery_20261027/bounded.hpp: OK
+#12 1.734 research/volcano_ic_recovery_20261027/independent.hpp: OK
+#12 1.734 research/volcano_ic_recovery_20261027/runner.cpp: OK
+#12 1.734 research/volcano_ic_recovery_20261027/verify.cpp: OK
+#12 1.734 research/volcano_ic_recovery_20261027/tests.cpp: OK
+#12 1.734 research/volcano_ic_recovery_20261027/test.sh: OK
+#12 1.734 research/volcano_ic_recovery_20261027/run.sh: OK
+#12 1.734 research/volcano_ic_recovery_20261027/public_source_case.json: OK
+#12 1.734 research/volcano_ic_recovery_20261027/pilot_config.json: OK
+#12 1.734 research/volcano_ic_recovery_20261027/input_provenance.json: OK
+#12 1.734 research/volcano_ic_recovery_20261027/PROTOCOL.md: OK
+#12 1.737 research/photo_volcano_restart_20261017/source/json.hpp: OK
+#12 DONE 16.0s
+
+#13 [runtime 2/4] COPY --from=build /opt/volcano /opt/volcano
+#13 DONE 0.4s
+
+#14 [runtime 3/4] RUN mkdir -p /work/compute && chown 1000:1000 /work/compute
+#14 DONE 0.2s
+
+#15 [runtime 4/4] WORKDIR /work/compute
+#15 DONE 0.5s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.5s done
+#16 writing image sha256:5841e9fd55f005068f449f6cfed4f7c28adc4f84994bf0555c8de6323dd44fe8 done
+#16 naming to docker.io/library/volcano-ic-development:e0f26ec592 done
+#16 DONE 0.5s
+
+ [33m2 warnings found (use docker --debug to expand):
+[0m - InvalidDefaultArgInFrom: Default value for ARG ${BUILD_IMAGE} results in empty or invalid base image name (line 6)
+ - InvalidDefaultArgInFrom: Default value for ARG ${RUNTIME_IMAGE} results in empty or invalid base image name (line 19)

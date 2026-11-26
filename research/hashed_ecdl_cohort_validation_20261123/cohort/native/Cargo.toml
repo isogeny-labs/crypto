@@ -1,0 +1,19 @@
+[package]
+name = "cpu-scratch-panel"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+sha2 = "0.10"
+
+[[bin]]
+name = "cohort-panel"
+path = "panel.rs"
+
+[[bin]]
+name = "cohort-point-audit"
+path = "point-audit.rs"

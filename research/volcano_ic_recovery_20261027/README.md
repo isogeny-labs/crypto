@@ -64,6 +64,16 @@ points or a proved chance of success.
 
 ## Execution gates and next action
 
+The [November 24 command component](command/README.md) adds exact-input image
+packaging, a supervisor-only production wrapper and explicit 14Gi source
+admission. Its local image and small-fixture separate replay were checked;
+the original input/config/domain remain unchanged. See the
+[component PDF](command/REPORT.pdf) and [producer receipt](command/validation/component.json).
+The image is not registry-published and live CRIU/EBS continuation remains
+unqualified. The latest AWS identity check returns `InvalidClientTokenId`;
+the October checkpoint/access observations below are historical.
+[pcc:unverified]
+
 The source-only checkpoint gate passed on October 28 using the authorized AWS
 credentials. Its AES256-encrypted S3 archive was read back and its hash/content
 verified. It contains the source handoff and metadata, not private scalar/RNG
@@ -71,10 +81,11 @@ journals, credential values or a live-process checkpoint. This resolves the
 earlier missing-upload-access blocker; see [current launch status](LAUNCH_STATUS.md)
 and [access evidence](validation/access_20261028.json).
 
-The same identity was definitively denied `codebuild:StartBuild` on the lab
+On October 28 the same identity was definitively denied `codebuild:StartBuild` on the lab
 launcher and `eks:DescribeCluster`. A bounded read-only bridge preflight created
 no build or experiment. The existing commit-building GitHub workflow executes
-ecbench specs, not this standalone collector. A real launch still needs an
+ecbench specs. The newer native controller has an unqualified command mode;
+the prepared wrapper targets that mode. A real launch still needs an
 authorized custom-command route, tested-commit immutable image, qualified
 CRIU/EBS recovery, a current source checkpoint and retained Job/Pod receipts.
 The blocked [backlog card](../../backlog/XP-20261027-volcano-unknown-log-pilot/README.md)
