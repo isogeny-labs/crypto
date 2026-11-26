@@ -3429,7 +3429,6 @@ impl PkmSemaevOracle {
                 if let Some((s_idx, l_idx)) = c_orig.remove(chosen_var) {
                     c_fixed[s_idx][l_idx] = Some(rt);
                 }
-                c_fixed[s_idx][l_idx] = Some(rt);
                 stats.branch_copy_basis_terms += c_basis.iter().map(|g| g.len() as u64).sum::<u64>();
                 stats.branch_copy_state_slots +=
                     (c_orig.len() + c_fixed.iter().map(Vec::len).sum::<usize>() + free_done.len())
