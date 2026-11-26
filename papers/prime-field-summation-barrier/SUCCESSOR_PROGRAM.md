@@ -1,0 +1,1592 @@
+# Research program: the non-materializing escape hatch
+
+## 1. Objective
+
+For a general ordinary, non-anomalous elliptic curve \(E/\mathbb F_p\), settle
+the following canonical question.
+
+> Can compact Boolean or small-height encodings of a factor base be combined
+> with a target-adaptive, non-materializing solver to obtain a fully audited
+> \(p^{1/2-\varepsilon}\) ECDLP algorithm for some fixed \(\varepsilon>0\)?
+
+A negative result must name a computational class.  Exact separated-linear
+sketches, exact tensor-network cuts, random-sum-oracle algorithms, and
+expanded recursive-resultant solvers admit the lower bounds below.  Compact
+rational circuits show that bounded monomial support or naive partition width
+is not the right general measure.  The central open step is an
+algebraic preprocessing/query direct-sum theorem for \(m\ge3\).
+
+Success means either:
+
+1. a classical algorithm with total cost \(p^{1/2-\varepsilon}\), counting
+   curve-specific preprocessing, relation extraction, rationality filtering,
+   rank loss, and final linear algebra; or
+2. a theorem giving \(p^{1/2-o(1)}\) time or time--memory cost for the stated
+   non-materializing classes.
+
+Small-field timings and a first-fall-degree conjecture do not meet either
+criterion.
+
+### Current theorem ledger and explicit nonclaim
+
+The status of the program is:
+
+| Result | Status | Scope |
+|---|---|---|
+| Theorems 1--2 | unconditional | exact separated sketches, tensor cuts, and one-sided rectangle filters |
+| Theorem 3 | unconditional in its oracle model | target-adaptive evaluation of a random tuple-sum map |
+| Theorems 5--10 | unconditional algebraic/counting statements | expanded Boolean inverse certificates, including curve-dependent rational-lift filtering below \(p^{1/4}\) |
+| Propositions 11--12 | exact counterexamples to an overbroad inference | dense normal forms may have small rational circuits; two-leaf elimination is soft-linear |
+| Theorem 13 | unconditional under uniform-target relation collection | every two-summand solver, regardless of its internal representation |
+| Theorem 14 | unconditional for the stated representation class | multiplicity-preserving expanded resultants and explicitly supplied multipoint queries |
+| Propositions 15--16 | exact reductions and scope boundaries | succinct eliminant trees and group-algebra convolution |
+| Theorem 17 | unconditional density-one statement for fixed \(m\) | sparse-regime \(m\)-sum expansion and the resulting exact separated-sketch barrier |
+| ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
+
+In particular, this manuscript does **not** claim an unconditional
+\(p^{1/2-o(1)}\) lower bound for unrestricted arithmetic or rational circuits.
+Such a claim is not obtained from degree, Bézout numbers, dense normal forms,
+or the experiments.  The proved \(m\ge3\) barrier is the expanded-resultant [pcc:unverified]
+bound of Theorem 14; the broader ARQP statement remains the successor target.
+
+## 2. Canonical instance family
+
+Let \(G=\langle P\rangle\subseteq E(\mathbb F_p)\) have prime order
+\(n=\Theta(p)\). Fix \(N=2^k=p^{\alpha+o(1)}<p\) and encode
+
+\[
+F_k=\left\{\sum_{j=0}^{k-1}2^j b_j:b_j\in\{0,1\}\right\}
+=\{0,\ldots,N-1\}.
+\]
+
+Only values lifting to points of \(G\) are retained, with a public
+deterministic sign for each lift. Each factor-base coordinate has the faithful
+quadratic encoding
+
+\[
+b_j^2-b_j=0,\qquad x=\sum_j2^j b_j.
+\]
+
+For \(m\) leaves, use a balanced tree of \(S_3\) equations and saturate all
+exceptional addition denominators. The target \(R=aP+bQ\) is uniform in \(G\),
+and its known label is \((a,b)\), not its discrete logarithm.
+
+The relation-finding circuit receives:
+
+- fixed public inputs \((p,E,F_k,m)\);
+- target-dependent input \(x(R)\), or the full affine coordinates of \(R\);
+- \(mk\) Boolean leaf variables and \(O(m)\) internal addition variables.
+
+It must return a verified tuple of factor-base points, not merely decide that [pcc:unverified]
+an algebraic-closure solution exists.
+
+## 3. Exact incidence object
+
+Let \(\Omega\) be the set of admissible unordered \(m\)-tuples of factor-base
+points. Repetitions may be allowed. Define
+
+\[
+\sigma:\Omega\to G,\qquad \sigma(\omega)=\sum_{B\in\omega}B,
+\]
+
+and define the leaf-to-target incidence matrix over an arbitrary field \(K\):
+
+\[
+M_\sigma[\omega,R]=
+\begin{cases}
+1,&\sigma(\omega)=R,\\
+0,&\text{otherwise.}
+\end{cases}
+\]
+
+The corresponding order-\((m+1)\) tensor is
+
+\[
+\mathcal T(u_1,\ldots,u_m,R)
+=\mathbf 1[\phi(u_1)+\cdots+\phi(u_m)=R].
+\]
+
+The matrix is the flattening that groups every leaf leg against the target
+leg.
+
+## 4. First exact extension beyond quotient materialization
+
+### Theorem 1 (incidence-rank theorem)
+
+For every field \(K\),
+
+\[
+\operatorname{rank}_K(M_\sigma)=|\operatorname{im}\sigma|.
+\]
+
+#### Proof
+
+Every nonzero column is the indicator vector of one fibre
+\(\sigma^{-1}(R)\). Distinct columns have disjoint, nonempty supports, so they
+are linearly independent over every field. Columns outside the image are zero.
+\(\square\)
+
+### Corollary 1 (separated-sketch barrier)
+
+Suppose an exact preprocessing/query method represents the incidence predicate
+as
+
+\[
+M_\sigma[\omega,R]=\sum_{i=1}^{r}A_i(\omega)B_i(R).
+\]
+
+Then \(r\ge|\operatorname{im}\sigma|\). Thus, when the \(m\)-sum map covers
+\(p^{1-o(1)}\) targets, a global exact separated sketch has dimension
+\(p^{1-o(1)}\).
+
+### Corollary 2 (tensor-network cut barrier)
+
+In any exact tensor-network representation of \(\mathcal T\), the product of
+bond dimensions across a cut separating all leaf legs from the target leg is
+at least \(|\operatorname{im}\sigma|\).
+
+#### Proof
+
+Contracting either side of the cut gives a matrix factorization of the
+leaf--target flattening through a vector space whose dimension is the product
+of the cut bond dimensions. Apply Theorem 1. \(\square\)
+
+### Theorem 2 (one-sided rectangle/filter trade-off)
+
+Let \(s=|\operatorname{im}\sigma|\). Suppose a monotone filter is a union of
+\(r\) combinatorial rectangles \(A_j\times B_j\) in
+\(\Omega\times G\), and suppose it accepts every genuine incidence pair. It may
+also accept false pairs, which are subsequently verified. Let \(F\) be the [pcc:unverified]
+number of false pairs accepted after restricting to one representative leaf
+tuple for each attainable target. Then
+
+\[
+F\ge \frac{s^2}{r}-s,\qquad\text{equivalently}\qquad
+r(F+s)\ge s^2.
+\]
+
+In particular, charging one unit per stored rectangle and one unit per false
+verification gives
+
+\[
+r+F\ge s.
+\]
+
+The same conclusion is distributional. If a randomized monotone filter covers
+each genuine representative pair with probability at least \(1-\delta\), and
+\(\mathbf r,\mathbf F\) are its random rectangle count and false-pair count,
+then
+
+\[
+\mathbb E[\mathbf r+\mathbf F]\ge(1-\delta)s.
+\]
+
+#### Proof
+
+Choose one representative \(\omega_T\in\sigma^{-1}(T)\) for every attainable
+target. The induced \(s\times s\) incidence submatrix is the identity matrix.
+Assign every diagonal entry to one rectangle covering it, and let \(d_j\) be
+the number assigned to rectangle \(j\). If two distinct diagonal entries
+\((\omega_T,T)\) and \((\omega_U,U)\) are assigned to the same rectangle, that
+rectangle also accepts the two false cross-pairs
+\((\omega_T,U)\) and \((\omega_U,T)\). Because assigned groups are disjoint,
+these give at least
+
+\[
+\sum_j d_j(d_j-1)\ge \frac{(\sum_jd_j)^2}{r}-\sum_jd_j
+=\frac{s^2}{r}-s
+\]
+
+distinct false pairs. The last inequality follows by minimizing
+\(r+F\) subject to the displayed trade-off, or directly from
+\(r+s^2/r-s\ge s\).
+
+For a randomized realization that covers only \(c\) of the chosen diagonal
+pairs, the identical argument on those \(c\) pairs gives \(r+F\ge c\).
+Taking expectations and summing the per-pair coverage probabilities gives the
+distributional statement. \(\square\)
+
+This theorem covers exact monotone DNF/rectangle filters and one-sided filters
+whose false positives are explicitly verified, including randomized filters [pcc:unverified]
+with bounded false-negative probability. It does not cover cancellation
+between signed or field-valued terms or adaptive rectangles selected after the
+target is known. Those are the next boundaries.
+
+### Theorem 3 (adaptive random-sum oracle barrier)
+
+Let \(\Omega\) be any candidate domain, let \(|G|=n\), and choose
+\(f:\Omega\to G\) uniformly at random. An algorithm may:
+
+1. evaluate \(f\) on candidates before targets are known;
+2. receive \(B\) distinct uniform targets in \(G\);
+3. choose every subsequent candidate adaptively from the targets and its full
+   previous transcript; and
+4. reuse every evaluated value against every target.
+
+Let \(D\) be the total number of distinct candidate evaluations, possibly a
+stopping-time random variable. If \(Z\) is the number of reported
+candidate--target pairs \(f(\omega)=T_j\), then
+
+\[
+\mathbb E Z\le \frac{B\,\mathbb E D}{n}.
+\]
+
+Consequently, if expected materialized work is
+\(C=B+\mathbb E D\), producing \(N\) expected relations requires
+
+\[
+C\ge 2\sqrt{Nn}.
+\]
+
+If \(D\le|\Omega|\le p^{m\alpha+o(1)}\) and
+\(N=p^{\alpha+o(1)}\), optimizing \(\alpha\) again gives the fixed-\(m\)
+exponent \(m/(2m-1)>1/2\).
+
+#### Proof
+
+Conditioned on the entire preprocessing transcript, each precomputed candidate
+value belongs to the subsequently sampled target set with probability \(B/n\);
+linearity of expectation applies even when several candidates have the same
+output.
+Condition on the targets and the transcript immediately before a new,
+previously unevaluated candidate is queried. Because \(f\) is a random
+function, its value at that candidate is still uniform in \(G\), regardless of
+how the candidate was selected. Since the targets are distinct, the new value
+matches one of them with probability \(B/n\). Summing these conditional
+expectations up to any bounded stopping time, then passing to an integrable
+limit, gives
+
+\[
+\mathbb E Z=\frac{B}{n}\mathbb E D.
+\]
+
+If the algorithm suppresses some matches, this becomes an inequality.
+Finally,
+
+\[
+B\mathbb E D\le\frac{(B+\mathbb E D)^2}{4}=\frac{C^2}{4}.
+\]
+
+Requiring \(\mathbb E Z\ge N\) proves the square-root bound. The domain cap [pcc:unverified]
+gives the same two-branch optimization as the batched candidate theorem:
+balance occurs at
+\(\alpha=1/(2m-1)\). \(\square\)
+
+The theorem allows full target adaptivity, arbitrary control flow, and shared
+preprocessing, but only black-box evaluation of a random sum map. Therefore a
+sub-square-root coordinate attack must exploit a demonstrable algebraic
+property distinguishing the elliptic restricted-sum map from this oracle. A
+claim that merely chooses candidates adaptively, without identifying such a
+property, cannot change the exponent.
+
+### Theorem 4 (exact limit of target-specific rank)
+
+Let \(G\) be any finite abelian group of order \(n\), and let
+\(A,B\subseteq G\) be distinct partial-sum supports. For \(T\in G\), define the
+\(|A|\times|B|\) matrix
+
+\[
+H_T[a,b]=\mathbf 1[a+b=T].
+\]
+
+Over every coefficient field,
+
+\[
+\operatorname{rank}(H_T)
+=r_T:=|\{(a,b)\in A\times B:a+b=T\}|.
+\]
+
+Moreover,
+
+\[
+\sum_{T\in G}\operatorname{rank}(H_T)=|A||B|,
+\qquad
+\mathbb E_{T\leftarrow G}\operatorname{rank}(H_T)=\frac{|A||B|}{n}.
+\]
+
+For any target set \(U\subseteq G\), the block-diagonal direct sum satisfies
+
+\[
+\operatorname{rank}\left(\bigoplus_{T\in U}H_T\right)
+=\sum_{T\in U}r_T.
+\]
+
+#### Proof
+
+For fixed \(T\), each row of \(H_T\) contains at most one nonzero entry, at
+\(b=T-a\), and each column contains at most one, at \(a=T-b\). After deleting
+zero rows and columns, \(H_T\) is a permutation matrix of size \(r_T\), proving
+the first formula. Every pair \((a,b)\in A\times B\) contributes to exactly one
+target, namely \(T=a+b\), which proves the sum and expectation identities. [pcc:unverified]
+Ranks add across a block diagonal matrix. \(\square\)
+
+### Consequence: ordinary rank cannot close the sparse regime
+
+In the balanced constant-success regime, the distinct partial supports
+typically satisfy \(|A||B|=\Theta(n)\). Theorem 4 then gives only
+
+\[
+\mathbb E_T\operatorname{rank}(H_T)=\Theta(1).
+\]
+
+Thus an ordinary matrix-rank lower bound on one specialized target cannot
+prove \(p^{1/2-o(1)}\) query cost: the exact rank is often constant precisely [pcc:unverified]
+where relation probability becomes constant. Aggregating targets makes the
+rank grow only with the expected number of partial-sum matches, not with the
+cost of finding them.
+
+This is an exact limitation of proof Route A, not a heuristic about elliptic
+sums. Any successful lower bound must measure search, preprocessing/query
+trade-offs, cancellation complexity, proof complexity, or dynamic
+repartitioning---something strictly stronger than the rank of \(H_T\).
+
+### Theorem 5 (random Boolean inverse-certificate density)
+
+Let
+
+\[
+\mathcal B_r=
+\mathbb F_p[b_1,\ldots,b_r]/(b_1^2-b_1,\ldots,b_r^2-b_r).
+\]
+
+Evaluation identifies \(\mathcal B_r\) with all functions
+\(\{0,1\}^r\to\mathbb F_p\). Choose \(f\) uniformly from the unit group
+\(\mathcal B_r^\times\); equivalently, choose every value \(f(x)\)
+independently and uniformly from \(\mathbb F_p^\times\). Write the unique
+multilinear inverse as
+
+\[
+f^{-1}=\sum_{S\subseteq[r]}c_S\prod_{i\in S}b_i.
+\]
+
+Then:
+
+1. with probability at least \(1-2/(p-1)\), at least \(2^{r-1}\) of all
+   coefficients \(c_S\) are nonzero;
+2. with probability at least \(1-2/(p-1)\), at least \(2^{r-2}\) nonzero
+   coefficients have degree at least \(\lceil r/2\rceil\).
+
+Consequently, both statements hold simultaneously with probability at least
+\(1-4/(p-1)\).
+
+#### Proof
+
+Put \(g=f^{-1}\). Its values \(g(x)\) are again independent and uniform in
+\(\mathbb F_p^\times\). Möbius inversion on the Boolean cube gives
+
+\[
+c_S=\sum_{T\subseteq S}(-1)^{|S|-|T|}g(1_T),
+\]
+
+where \(1_T\) has support \(T\). For nonempty \(S\), condition on all summands
+except one. At most one value of the remaining uniform
+\(\mathbb F_p^\times\) variable can make \(c_S=0\), so
+
+\[
+\Pr[c_S=0]\le\frac1{p-1}.
+\]
+
+The constant coefficient is \(g(0)\ne0\). Hence the expected number of zero
+coefficients among all \(2^r\) monomials is at most \(2^r/(p-1)\).
+Markov's inequality shows that the probability of at least \(2^{r-1}\) zeros
+is at most \(2/(p-1)\), proving the first claim.
+
+Let \(\mathcal H=\{S:|S|\ge\lceil r/2\rceil\}\). Its size is at least
+\(2^{r-1}\). The same calculation and Markov's inequality show that, except
+with probability \(2/(p-1)\), fewer than half its coefficients vanish. Thus at
+least \(2^{r-2}\) high-degree coefficients are nonzero. A union bound proves [pcc:unverified]
+the simultaneous statement. \(\square\)
+
+### Corollary 3 (monomial-explicit refutation barrier)
+
+Suppose an insoluble Boolean equation \(f=0\) is refuted by
+
+\[
+a f+\sum_{i=1}^{r}h_i(b_i^2-b_i)=1.
+\]
+
+After reduction modulo the Boolean equations, \(\bar a=f^{-1}\) is unique.
+For random \(f\), any certificate that explicitly stores \(\bar a\) in the
+multilinear monomial basis therefore contains
+\(\Omega(2^r)\) monomials with overwhelming probability.
+
+For \(m\) factor-base leaves with \(N=2^k=p^{\alpha+o(1)}\), one has
+\(r=mk\) and
+
+\[
+2^r=N^m=p^{m\alpha+o(1)}.
+\]
+
+At the optimized exponent \(\alpha=1/(2m-1)\), this is
+\(p^{m/(2m-1)+o(1)}\), exactly the earlier fixed-\(m\) frontier; in the
+constant-success regime \(\alpha=1/m\), it is \(p^{1+o(1)}\).
+
+This corollary covers certificate-producing, monomial-explicit polynomial
+calculus, XL, and Macaulay-style elimination. It does not cover a compact
+arithmetic circuit for a dense multilinear polynomial. Applying it to the
+actual Semaev restriction requires proving that its reciprocal Möbius
+coefficients have comparable density; random-function behaviour is a benchmark,
+not an assumption about the elliptic system.
+
+### First restricted-\(S_3\) sanity check
+
+The accompanying Semaev inverse profiler was run on
+
+\[
+E/\mathbb F_{101}:y^2=x^3+7x+4,
+\qquad |E(\mathbb F_{101})|=97,
+\]
+
+using the eight rational factor-base coordinates
+
+\[
+[0,3,4,10,13,16,17,20].
+\]
+
+The two leaf indices use six Boolean variables in total. Among all 48 rational
+target \(x\)-coordinates, six made the restricted
+\(S_3(x_1,x_2,x_T)\) a unit on the 64-point Boolean cube. Their unique inverse
+certificates had:
+
+- total support between 62 and 64 of the 64 multilinear monomials;
+- full degree six;
+- between 41 and 42 nonzero monomials of degree at least three.
+
+All certificates passed pointwise round-trip verification. This is evidence
+that the smallest tested restricted Semaev instance resembles the dense random
+benchmark, but it is not asymptotic evidence and is not used in any theorem.
+The next experiments must vary \(p\), \(k\), the curve, the factor-base map,
+and the number of leaves.
+
+### Multi-curve adversarial scan
+
+The scan was extended to nine primes
+
+\[
+101,103,107,109,127,131,137,139,149,
+\]
+
+with two non-anomalous prime-order curves per prime and Boolean-indexed factor
+bases of size four and eight. This gave 36 curve/base-size cases and 1,200
+unit target polynomials.
+
+For base size four (four Boolean variables), 870 unit targets were found:
+
+- the weakest support was \(13/16=81.25\%\);
+- the mean, first averaged within a case and then across 18 cases, was
+  \(99.23\%\);
+- every case had at least nine high-degree terms.
+
+For base size eight (six Boolean variables), 330 unit targets were found:
+
+- the weakest support was \(60/64=93.75\%\);
+- the corresponding mean support fraction was \(99.20\%\);
+- every case had at least 38 high-degree terms.
+
+No compact certificate was found. The weakest case was
+\(E/\mathbb F_{137}:y^2=x^3+3x+9\), whose group has order 127, with base size
+four and target \(x=67\); its certificate used 13 of 16 monomials. These data
+support further investigation of reciprocal density, but they still cover
+only \(S_3\), two leaves, very small fields, and one deterministic choice of
+factor-base coordinates. They cannot justify an asymptotic randomness
+assumption.
+
+The base-size-16 scan used 43 primes from 251 through 503, one prime-order
+curve per prime. It found 1,969 unit targets. The weakest certificate used
+\(248/256=96.875\%\) of the monomials, while the mean of the 43 case means was
+\(99.73\%\). Again, this is diagnostic rather than asymptotic evidence.
+
+### Theorem 6 (fixed-size generic full support)
+
+Fix \(q=2^k\), formal factor-base coordinates
+\(z_0,\ldots,z_{q-1}\), curve coefficients \(A,B\), and target \(t\). Put
+
+\[
+F_{ij}=S_3(z_i,z_j,t)
+\]
+
+and work on the parameter open set where the curve discriminant and every
+\(F_{ij}\) are nonzero. Index \(i,j\) by \(2k\) Boolean bits. The pointwise
+inverse table \(F_{ij}^{-1}\) has a unique multilinear expansion
+
+\[
+\sum_{S\subseteq[2k]}C_S(A,B,t,z_0,\ldots,z_{q-1})\,b_S,
+\]
+
+whose coefficients are rational functions of the parameters.
+
+For \(q\in\{4,8,16\}\), the set on which every \(C_S\ne0\) is a nonempty
+Zariski-open subset over \(\mathbb Q\), and after reduction over
+\(\mathbb F_\ell\) for all but finitely many primes \(\ell\). Thus the
+restricted-\(S_3\) inverse has full multilinear support generically at these
+three factor-base sizes.
+
+#### Proof
+
+Each \(C_S\) is the Boolean Möbius sum of the \(1/F_{ij}\), hence a rational
+function with integer coefficients. It suffices to exhibit one specialization
+at which every denominator and every \(C_S\) is nonzero; then the product of
+their numerators is a nonzero integer polynomial. Its nonvanishing locus,
+intersected with the denominator and discriminant open sets, is nonempty and
+Zariski open. A polynomial nonzero modulo one prime is nonzero over
+\(\mathbb Q\), and its reduction remains nonzero outside the finite set of
+primes dividing all relevant coefficients.
+
+Exact witnesses, verified by the accompanying Möbius-transform code, are: [pcc:unverified]
+
+1. \(q=4\): \(p=101\), \(A=7\), \(B=4\),
+   \((z_i)=[0,3,4,10]\), \(t=0\), support \(16/16\);
+2. \(q=8\): the same curve,
+   \((z_i)=[0,3,4,10,13,16,17,20]\), \(t=21\), support \(64/64\);
+3. \(q=16\): \(p=251\), \(A=1\), \(B=4\),
+   \[
+   (z_i)=[0,7,8,9,11,14,15,16,18,19,20,25,26,28,29,31],
+   \]
+   \(t=85\), support \(256/256\).
+
+Every listed coordinate is the \(x\)-coordinate of a rational point on the
+listed curve, and the restricted polynomial is a unit on its Boolean cube.
+\(\square\)
+
+This theorem proves that no coefficient identity forces sparsity at these [pcc:unverified]
+sizes. It does not prove uniform support bounds for structured intervals as [pcc:unverified]
+\(k\to\infty\): the formal coordinates vary independently in the generic
+parameter space, whereas an interval or small-height factor base imposes
+strong arithmetic specialization. The asymptotic task is to make the
+exceptional hypersurfaces explicit enough to show that the structured
+specializations avoid them, or to exploit a specialization that does not.
+
+### Theorem 7 (generic full support for every Boolean lookup size)
+
+Let \(p>3\), \(q=2^k\), and let \(z_0,\ldots,z_{q-1}\) be algebraically
+independent factor-base coordinate parameters. In the universal nonsingular
+short-Weierstrass family, put
+
+\[
+F_{ij}=S_3(z_i,z_j,t).
+\]
+
+On the open set where all \(F_{ij}\ne0\), index the table
+\((F_{ij}^{-1})_{0\le i,j<q}\) by two \(k\)-bit blocks and take its Boolean
+Möbius transform. Every one of the \(2^{2k}=q^2\) multilinear coefficients is
+a nonzero rational function. Consequently the inverse has full multilinear
+support on a nonempty Zariski-open dense subset for every \(k\).
+
+#### Proof
+
+For a coefficient indexed by a bit set \(S\), Möbius inversion gives
+
+\[
+C_S=\sum_{T\subseteq S}
+(-1)^{|S|-|T|}\frac1{F_{i(T),j(T)}},
+\]
+
+where \(i(T)\) and \(j(T)\) are the integers encoded by the selected bits in
+the two blocks.
+
+Group equal denominators using the symmetry \(F_{ij}=F_{ji}\). An unordered
+off-diagonal pair \(\{i,j\}\) occurs at most twice. When both orientations
+occur, their signs are equal because swapping the two bit blocks preserves
+\(\operatorname{wt}(i)+\operatorname{wt}(j)\). Its grouped coefficient is
+therefore \(\pm2\), not zero because \(p>3\). A diagonal denominator has
+coefficient \(\pm1\).
+
+For \(S=\varnothing\), \(C_S=1/F_{00}\ne0\). For every nonempty \(S\), the
+subcube contains an off-diagonal pair: activate one selected bit in its block
+and leave the other block zero.
+
+The standard absolute irreducibility of \(S_3(X,Y,t)\) on the universal
+nonsingular curve implies that the polynomials \(F_{ij}\), for \(i\ne j\),
+are irreducible. Distinct unordered pairs give nonassociate polynomials,
+because their sets of independent \(z\)-variables differ. No such
+off-diagonal polynomial divides a diagonal \(F_{\ell\ell}\), which omits at
+least one of its two independent variables.
+
+Choose an off-diagonal denominator \(F_{ij}\) occurring in \(C_S\), multiply
+the alleged identity \(C_S=0\) by the product of all distinct denominators,
+and reduce modulo \(F_{ij}\). Every term vanishes except
+
+\[
+\pm1\cdot\prod_{e\ne\{i,j\}}F_e
+\quad\text{or}\quad
+\pm2\cdot\prod_{e\ne\{i,j\}}F_e.
+\]
+
+This is nonzero modulo \(F_{ij}\), since \(F_{ij}\) divides none of the other
+factors and the scalar is nonzero. Hence \(C_S\ne0\). The simultaneous
+nonvanishing locus of the finitely many coefficient numerators and
+denominators is therefore nonempty and Zariski open. \(\square\)
+
+### Theorem 8 (generic full support for every fixed residue factor base)
+
+Let \(p>3\), \(q=2^k<p\), and let
+\(c_0,\ldots,c_{q-1}\in\mathbb F_p\) be distinct fixed residues.  This includes
+the interval specialization \(c_i=i\), any fixed small-height list, and any
+fixed subset selected in advance.  In the universal short-Weierstrass family,
+put
+
+\[
+F_{ij}(A,B,t)=S_3(c_i,c_j,t).
+\]
+
+On the open set where the curve is nonsingular and all \(F_{ij}\ne0\), index
+\((F_{ij}^{-1})_{i,j}\) by two \(k\)-bit blocks.  Every coefficient in its
+Boolean Möbius transform is a nonzero rational function in \(A,B,t\).
+Consequently, for this fixed residue list the inverse table has full
+multilinear support on a nonempty Zariski-open subset of the three-parameter
+curve--target space.
+
+#### Proof
+
+For a fixed unordered pair write
+
+\[
+s=c_i+c_j,\qquad u=c_ic_j,\qquad d^2=(c_i-c_j)^2=s^2-4u.
+\]
+
+The explicit third summation polynomial gives
+
+\[
+\begin{aligned}
+F_{ij}
+={}&A^2+A(-2st-2u)\\
+ &+d^2t^2-2sut+u^2-4B(t+s).
+\end{aligned}
+\]
+
+Regard this as a polynomial in \(B\) over the UFD
+\(\mathbb F_p[A,t]\).  It has \(B\)-coefficient \(-4(t+s)\).  At the only root
+\(t=-s\) of this coefficient, its \(B\)-free part is
+
+\[
+(A+s^2-u)^2,
+\]
+
+a nonzero polynomial.  Thus its two coefficients are coprime; \(F_{ij}\) is
+primitive and linear in \(B\), hence irreducible in
+\(\mathbb F_p[A,B,t]\).
+
+The polynomials belonging to distinct unordered pairs are nonassociate.
+Indeed, the coefficient of \(A^2\) forces the associate scalar to be \(1\);
+the coefficient of \(B\) then forces equality of the sums \(s\), and the
+coefficient of \(A\) forces equality of the products \(u\).  The two residues
+are the roots of \(X^2-sX+u\), so the unordered pairs are equal.  Distinctness
+of the \(c_i\) makes the index pairs equal up to orientation.
+
+Now take any Boolean Möbius coefficient
+
+\[
+C_S=\sum_{T\subseteq S}
+(-1)^{|S|-|T|}\frac1{F_{i(T),j(T)}}.
+\]
+
+After grouping the two orientations, every diagonal denominator has scalar
+\(\pm1\), while every off-diagonal denominator has scalar \(\pm1\) or
+\(\pm2\).  If both orientations occur, their signs agree because exchanging
+the bit blocks preserves the total Hamming weight.  These scalars are nonzero
+as \(p>3\).
+
+Choose any grouped denominator occurring in \(C_S\), clear all distinct
+denominators, and reduce modulo that irreducible factor.  Pairwise
+nonassociation kills every other summand and leaves its nonzero scalar times
+the product of the other factors.  Hence \(C_S\ne0\).  This also covers
+\(S=\varnothing\), where \(C_S=1/F_{00}\).  Simultaneous nonvanishing of the
+finitely many coefficient numerators, denominators, and the discriminant
+defines the asserted nonempty Zariski-open set. \(\square\)
+
+### Theorem 9 (quantitative finite-field full support below \(p^{1/4}\))
+
+Under the hypotheses of Theorem 8, the proportion of triples
+\((A,B,t)\in\mathbb F_p^3\) for which the curve is singular, some \(F_{ij}\)
+vanishes, or some Boolean Möbius coefficient vanishes is at most
+
+\[
+\frac{2q^4}{p}.
+\]
+
+In particular, if \(q=o(p^{1/4})\), full support holds for a
+\(1-o(1)\) proportion of curve--target triples.
+
+#### Proof
+
+There are \(D=q(q+1)/2\) distinct unordered denominators.  Each \(F_{ij}\)
+has total degree at most \(2\) in \(A,B,t\).  Clear the distinct denominators
+occurring in a Möbius coefficient \(C_S\).  Its resulting numerator has total
+degree at most \(2(D-1)\), and it is a nonzero polynomial by Theorem 8.
+
+Let \(H\) be the product of the discriminant, the \(D\) distinct
+denominators, and one such nonzero common numerator for each of the \(q^2\)
+Möbius coefficients.  Since \(\mathbb F_p[A,B,t]\) is a domain, \(H\ne0\), and
+
+\[
+\begin{aligned}
+\deg H
+&\le 3+2D+2q^2(D-1)\\
+&=q^4+q^3-q^2+q+3
+<2q^4
+\end{aligned}
+\]
+
+for \(q\ge2\).  The Schwartz--Zippel bound gives fewer than
+\(2q^4p^2\) zeros in \(\mathbb F_p^3\), proving the first two statements.
+
+Write \(\varepsilon=2q^4/p\).  Averaging the exceptional-target proportion
+over \((A,B)\), then applying Markov's inequality at threshold
+\(\sqrt\varepsilon\), shows that all but at most \(\sqrt\varepsilon\) of the
+curve parameters have exceptional-target proportion at most
+\(\sqrt\varepsilon\).  This is \(O(q^2p^{-1/2})\); the discriminant factor has
+already charged singular curves as entirely exceptional. \(\square\)
+
+At the materializing balance \(\alpha=1/(2m-1)\), the exceptional proportion
+in Theorem 9 is
+
+\[
+O\!\left(p^{\,4/(2m-1)-1+o(1)}\right).
+\]
+
+For \(m=3,4,5\) these exponents are respectively
+\(-1/5\), \(-3/7\), and \(-5/9\).  Thus the finite-field genericity statement
+is already asymptotically effective at all three sanity-check scales.
+
+### Theorem 10 (uniformity under curve-dependent rational-lift filtering)
+
+Let \(p>3\), and fix a master list
+\(C=(c_0,\ldots,c_{L-1})\) of distinct residues in \(\mathbb F_p\).  For all
+but a proportion at most
+
+\[
+\frac{4L^4+3}{p}
+\]
+
+of coefficient pairs \((A,B)\in\mathbb F_p^2\), the curve is nonsingular and
+the following statement holds simultaneously for **every** subset of \(C\).
+
+Choose any \(q=2^k\) distinct elements \(d_0,\ldots,d_{q-1}\) of that subset
+and put
+
+\[
+G_{ij}(t)=S_3(d_i,d_j,t).
+\]
+
+Then all distinct unordered-pair polynomials \(G_{ij}\) are pairwise coprime
+in \(\mathbb F_p[t]\).  Consequently, outside a set of fewer than \(2q^4\)
+target values \(t\in\mathbb F_p\), the table \((G_{ij}(t)^{-1})\) is defined
+and its Boolean Möbius transform has all \(q^2\) coefficients nonzero.
+
+In particular, the statement applies to the curve-dependent subset
+
+\[
+C_E=\{c\in C:c^3+Ac+B\text{ is a square in }\mathbb F_p\},
+\]
+
+and hence to any power-of-two sublist of the rationally liftable interval
+coordinates.
+
+#### Proof
+
+For every unordered master pair \(e=\{i,j\}\), write
+
+\[
+F_e(A,B,t)=S_3(c_i,c_j,t).
+\]
+
+Theorem 8 proves that the \(F_e\) are irreducible and pairwise nonassociate in [pcc:unverified]
+\(\mathbb F_p[A,B,t]\).  They are primitive as polynomials in \(t\) over
+\(\mathbb F_p[A,B]\): for \(i\ne j\), the coefficient of \(t^2\) is the
+nonzero constant \((c_i-c_j)^2\); for \(i=j\), primitivity also follows from
+irreducibility.  Gauss's lemma therefore shows that two distinct \(F_e,F_f\)
+are coprime over \(\mathbb F_p(A,B)[t]\).  Their resultant
+
+\[
+R_{ef}(A,B)=\operatorname{Res}_t(F_e,F_f)
+\]
+
+is consequently a nonzero polynomial.
+
+Each \(F_e\) has \(t\)-degree at most \(2\), and every coefficient has total
+\((A,B)\)-degree at most \(2\).  The Sylvester determinant gives
+\(\deg R_{ef}\le8\).  There are
+\(D=L(L+1)/2\le L^2\) unordered master pairs.  Schwartz--Zippel and a union
+bound show that the number of coefficient pairs on which some distinct
+denominators acquire a common factor is at most
+
+\[
+8\binom D2p<4L^4p.
+\]
+
+The discriminant contributes at most another \(3p\) coefficient pairs.
+Dividing by \(p^2\) proves the asserted curve-exception bound.  Pairwise [pcc:unverified]
+coprimality passes to every subset, so no conditioning on the rational-lift
+pattern is needed.
+
+Fix a nonexceptional curve and one enumerated \(q\)-element subset.  In any
+Boolean Möbius coefficient, group the two orientations of each unordered
+pair.  As in Theorem 8, the resulting scalar is \(\pm1\) or \(\pm2\), hence
+nonzero.  Clear the distinct denominators and reduce modulo any irreducible
+factor of one chosen denominator.  Pairwise coprimality makes every other
+term vanish and leaves the chosen nonzero scalar times a product not divisible
+by that factor.  Thus every coefficient is a nonzero rational function of
+\(t\).
+
+With \(D_q=q(q+1)/2\), each cleared coefficient numerator has \(t\)-degree at
+most \(2(D_q-1)\).  The union of the roots of all \(q^2\) numerators and all
+denominators therefore has size at most
+
+\[
+2q^2(D_q-1)+2D_q
+=q^4+q^3-q^2+q
+<2q^4.
+\]
+
+Every other target has a defined inverse table with full Boolean support.
+\(\square\)
+
+If \(L=p^{\alpha+o(1)}\) with \(\alpha<1/4\), Theorem 10 gives a
+density-\(1-o(1)\) family of curves and, on each such curve, a
+density-\(1-o(1)\) family of targets.  Since a nonsingular elliptic curve has
+\(\Theta(p)\) rational target \(x\)-coordinates, intersecting with rational
+targets changes only the implied constant in the exceptional proportion.
+
+The required number of rational lifts also follows without a distributional
+heuristic.  For \(c\in C\), let
+
+\[
+I_c(A,B)=\mathbf 1[c^3+Ac+B\text{ is a square, including zero}].
+\]
+
+For distinct \(c,d\), the affine map
+
+\[
+(A,B)\longmapsto(c^3+Ac+B,\ d^3+Ad+B)
+\]
+
+is a bijection of \(\mathbb F_p^2\), since its linear part has determinant
+\(c-d\ne0\).  Hence the \(I_c\) are pairwise independent under uniform
+\((A,B)\), with mean \((p+1)/(2p)\) and variance at most \(1/4\).  Therefore
+
+\[
+\Pr\!\left[
+\left|\sum_{c\in C}I_c-\frac{p+1}{2p}L\right|\ge\delta L
+\right]
+\le\frac{1}{4\delta^2L}.
+\]
+
+For every fixed \(\eta>0\), taking \(L=(2+\eta)q+O(1)\) and a sufficiently
+small constant \(\delta=\delta(\eta)>0\) shows that at least \(q\) master
+coordinates lift for all but \(O_\eta(1/q)\) of coefficient pairs.  Combining
+this with Theorem 10 proves that, for \(q=p^{\alpha+o(1)}\) and [pcc:unverified]
+\(0<\alpha<1/4\), a density-\(1-o(1)\) family of curves has a rationally
+lifted \(q\)-element Boolean factor base whose restricted \(S_3\) inverse has
+full support for all but \(O(q^4)\) targets.
+
+### Proposition 11 (dense normal form does not imply a large rational circuit)
+
+For the interval encoding
+
+\[
+x(b_0,\ldots,b_{k-1})=\sum_{r=0}^{k-1}2^rb_r,\qquad q=2^k,
+\]
+
+put
+
+\[
+f_t(b,c)=S_3(x(b),x(c),t).
+\]
+
+On any target for which \(f_t\) is nonzero on the Boolean cube, the pointwise
+inverse \(f_t^{-1}\) is computed by an arithmetic circuit of size \(O(k)\)
+with one inversion gate.  Nevertheless, on the curves and targets covered by
+Theorems 9 and 10, its unique multilinear normal form has all \(q^2\)
+monomials.
+
+#### Proof
+
+Two linear circuits of size \(O(k)\) compute \(x(b)\) and \(x(c)\).  The fixed
+formula for \(S_3\) then uses \(O(1)\) additions and multiplications, and one
+inversion computes its reciprocal.  On the stated unit locus the inversion is
+defined at every Boolean assignment.  The normal-form support assertion is
+Theorem 9 or 10. \(\square\)
+
+Thus normal-form density is a valid lower bound only for representations that
+materialize that normal form, or for proof systems in which inversion must
+itself be expanded.  It gives no lower bound for general rational circuits.
+
+### Proposition 12 (near-linear two-leaf elimination)
+
+Let \(F=\{c_0,\ldots,c_{q-1}\}\subset\mathbb F_p\) be explicit and distinct,
+and precompute
+
+\[
+P_F(Y)=\prod_{c\in F}(Y-c)
+\]
+
+together with its subproduct tree.  For a target \(t\), define
+
+\[
+R_t(X)=\operatorname{Res}_Y(P_F(Y),S_3(X,Y,t))
+      =\prod_{c\in F}S_3(X,c,t).
+\]
+
+Then \(\deg R_t\le2q\), and
+
+\[
+\gcd(P_F(X),R_t(X))\ne1
+\]
+
+if and only if there exist \(x,y\in F\) with \(S_3(x,y,t)=0\).  Using fast
+polynomial multiplication, the product, gcd, and recovery of one such pair
+cost \(\widetilde O(q)\) field operations per target after
+\(\widetilde O(q)\) preprocessing.
+
+#### Proof
+
+The resultant identity is the root-product formula for the monic polynomial
+\(P_F\).  Each factor is quadratic in \(X\), so a balanced product tree
+constructs \(R_t\) in \(\widetilde O(q)\) operations.  Its gcd with \(P_F\)
+has precisely the first coordinates participating in a zero pair.  The
+stored subproduct tree identifies one root \(x\in F\); then
+\(\gcd(P_F(Y),S_3(x,Y,t))\) identifies a corresponding \(y\).  Fast gcd and
+remainder algorithms preserve the stated soft-linear bound. \(\square\)
+
+This is not a sub-square-root ECDLP algorithm.  Under the uniform-sum model,
+a two-leaf target succeeds with probability \(\Theta(q^2/p)\).  Collecting
+\(\Theta(q)\) relations therefore takes \(\Theta(p/q)\) target trials, and
+soft-linear work per trial gives \(\widetilde\Theta(p)\) relation-finding
+work before linear algebra.  The proposition instead demonstrates that
+dense quotient normal forms can conceal compact, exact, non-materializing
+elimination.
+
+### Theorem 13 (solver-independent two-summand square-root barrier)
+
+Let \(G\) be a finite abelian group of order \(n\), let \(F\subseteq G\) have
+size \(N\), and let \(T_1,\ldots,T_B\) be independent uniform targets.  An
+algorithm may use arbitrary preprocessing and, after seeing the targets,
+return any verified ordered pairs \((x,y)\in F^2\) with \(x+y=T_j\).  If with [pcc:unverified]
+constant probability it returns \(r=\Theta(N)\) relations sufficient to have
+rank \(\Theta(N)\) on the factor-base columns, then its charged target-input
+and relation-output work is
+
+\[
+\Omega\!\left(N+\frac{n}{N}\right)=\Omega(\sqrt n).
+\]
+
+This lower bound is independent of the internal solving representation and
+therefore includes product trees, resultants, arbitrary target batching, and
+unbounded curve-specific preprocessing.
+
+#### Proof
+
+Let
+
+\[
+Z=\sum_{j=1}^B
+|\{(x,y)\in F^2:x+y=T_j\}|
+\]
+
+be the total number of available ordered decompositions, whether or not the
+algorithm outputs them.  Every ordered pair contributes to a uniform target
+with probability \(1/n\), so exactly
+
+\[
+\mathbb E Z=\frac{BN^2}{n}.
+\]
+
+On an event of constant probability the algorithm outputs \(r=\Theta(N)\)
+distinct verified relations, hence \(Z\ge r\) there and [pcc:unverified]
+\(\mathbb E Z=\Omega(N)\).  Therefore \(B=\Omega(n/N)\).  Reading the \(B\)
+target inputs costs \(\Omega(B)\), while writing \(r=\Theta(N)\) sparse
+relations costs \(\Omega(N)\).  Their sum is
+\(\Omega(N+n/N)\), whose minimum is \(2\sqrt n\).  Ignoring preprocessing and
+all internal computation only weakens the bound. \(\square\)
+
+For \(m\) summands, the identical entropy calculation gives
+
+\[
+\mathbb E Z_m=\frac{BN^m}{n},\qquad
+B=\Omega\!\left(\frac{n}{N^{m-1}}\right),
+\]
+
+and hence only the input/output floor
+
+\[
+\Omega\!\left(N+\frac{n}{N^{m-1}}\right)
+=\Omega(n^{1/m}).
+\]
+
+Thus \(m=2\) is closed even against unrestricted solvers, whereas for every
+\(m\ge3\) the missing exponent lies entirely in the cost of finding or
+certifying decompositions inside a target fibre.  This is the exact point at
+which an ARQP direct-sum theorem must add information beyond relation
+probability and output entropy.
+
+### Theorem 14 (expanded recursive-resultant barrier)
+
+Fix \(m\ge2\) and a factor base of size \(N\).  An
+**\(r\)-leaf expanded-resultant solver**, \(1\le r\le m\), has the following
+properties:
+
+1. its target-independent phase materializes a multiplicity-preserving
+   univariate norm, resultant, coefficient array, or subproduct tree with one
+   leaf for every tuple in \(F^r\), at cost at least \(N^r\);
+2. for each target it explicitly supplies, probes, or materializes every tuple
+   of the remaining \(m-r\) leaves against that object, at cost at least
+   \(N^{m-r}\) (batched multipoint evaluation is allowed but is charged at
+   least once per explicitly supplied evaluation point); and
+3. it returns verified relations and needs \(\Theta(N)\) independent rows. [pcc:unverified]
+
+For uniform targets in a group of order \(n=\Theta(p)\), its total charged
+work satisfies
+
+\[
+\begin{aligned}
+T_r
+&=\Omega\!\left(
+N^r+\frac{p}{N^{m-1}}N^{m-r}
+\right)\\
+&=\Omega\!\left(N^r+\frac{p}{N^{r-1}}\right).
+\end{aligned}
+\]
+
+After optimizing \(N=p^{\alpha+o(1)}\), this is
+\(p^{r/(2r-1)-o(1)}\).  Optimizing also over \(r\le m\) gives
+
+\[
+T_{\rm expanded}
+\ge p^{\,m/(2m-1)-o(1)}
+>p^{1/2}.
+\]
+
+#### Proof
+
+The first two costs are part of the representation definition.  The exact
+decomposition expectation from Theorem 13 with \(m\) leaves shows that
+\(\Omega(p/N^{m-1})\) uniform targets are required to obtain
+\(\Theta(N)\) rows, even if every decomposition of a target is returned.
+Multiplying by the per-target remaining-leaf cost gives
+
+\[
+N^r+\frac{p}{N^{m-1}}N^{m-r}
+=N^r+\frac{p}{N^{r-1}}.
+\]
+
+Writing \(N=p^\alpha\), the two exponents are \(r\alpha\) and
+\(1-(r-1)\alpha\).  Their maximum is minimized at
+\(\alpha=1/(2r-1)\), with value \(r/(2r-1)\).  This value decreases with
+\(r\), so \(r=m\) is optimal among the allowed cut depths. \(\square\)
+
+For \(m=3\), the nontrivial cut depths \(r=2,3\) give respectively
+\(p^{2/3}\) and \(p^{3/5}\).  For \(m=4,5\), the best expanded depths give
+\(p^{4/7}\) and \(p^{5/9}\).  These are unconditional for the stated
+representation class: repeated resultant roots do not help because the
+class stores the multiplicity-preserving norm or its tuple-leaf subproduct
+tree.
+
+The theorem also names the remaining escape hatch exactly.  A better solver
+must keep an \(r\)-leaf eliminant in a representation with \(o(N^r)\) charged
+size **and** combine it with the remaining leaves without performing
+\(N^{m-r-o(1)}\) probes per target.  A nested unevaluated resultant gate is
+not by itself such an algorithm; its construction, evaluation, gcd, root
+recovery, and reuse costs must all be specified.
+
+### Proposition 15 (the succinct-eliminant circuit boundary)
+
+Let \(\Omega=F^m\).  For tuples whose sum is not the point at infinity, define
+the multiplicity-preserving target eliminant
+
+\[
+H_\Omega(Z)=\prod_{\omega\in\Omega}
+\bigl(Z-x(\sigma(\omega))\bigr).
+\]
+
+Partition \(\Omega\) by a binary tree, and for every node \(v\) put
+
+\[
+H_v(Z)=\prod_{\omega\in\Omega_v}
+\bigl(Z-x(\sigma(\omega))\bigr),
+\qquad H_v=H_{v_0}H_{v_1}.
+\]
+
+Suppose preprocessing stores a shared arithmetic-circuit DAG for this family,
+with enough node access to evaluate the two children of a visited node.  A
+target \(t\) satisfying \(H_\Omega(t)=0\) can then be resolved to a leaf tuple
+by descending through a zero child.  The query uses only the circuits on one
+root-to-leaf path, of depth \(m\log_2N\), plus final sign and rationality
+verification.
+
+Consequently, a lower bound for all implicit eliminant solvers must lower-bound
+the size or path-evaluation cost of this shared circuit family.  The expanded
+degree \(N^m\), the number of roots counted with multiplicity, and dense
+Boolean or coefficient support do not provide such a lower bound.
+
+#### Justification
+
+The product identity follows from the partition.  At an internal node,
+\(H_v(t)=0\) implies \(H_{v_0}(t)=0\) or \(H_{v_1}(t)=0\); evaluating both
+children identifies a branch, and iteration reaches a tuple whose sum has
+target \(x\)-coordinate.  Verification resolves the finite sign choices.
+Tuples summing to the point at infinity can be stored in a separate flag or
+excluded, since the queried target is affine.
+
+For the limitation, the degree-\(D\) polynomial \(Z^D-1\) has \(D\) roots
+over a suitable field extension but is computed by \(O(\log D)\)
+multiplications using repeated squaring.  Likewise, a dense multilinear
+normal form may have a logarithmic rational circuit by Proposition 11.
+Therefore none of degree, root count, or expanded support is monotone under
+straight-line circuit compression.  Over \(\mathbb F_p\), if an attainable
+target set is all of \(\mathbb F_p\), its squarefree membership polynomial is
+just \(Z^p-Z\), again computable in \(O(\log p)\).  Membership can therefore
+be trivial even when recovering a witnessing tuple remains difficult; this is
+why the proposition uses the whole factor tree rather than only its root.
+\(\square\)
+
+Writing the security parameter as \(\lambda=\log_2p\), the desired
+\(p^{1/2-o(1)}\) preprocessing lower bound is
+\(2^{(1/2-o(1))\lambda}\).  Proving this directly for unrestricted
+straight-line circuits computing the explicit \(H_v\) family would constitute
+an exponential arithmetic-circuit lower bound, not a routine Bézout or
+Macaulay estimate.  This does not show that the bound is false; it shows why
+the solver class must either retain a root-provenance/materialization
+restriction, use a black-box or data-structure query model, or be attacked
+algorithmically by searching for a succinct eliminant tree.
+
+### Proposition 16 (group-algebra and Fourier reformulation)
+
+Let \(K[G]\) be the group algebra of the finite abelian group \(G\), with basis
+elements \([Q]\) for \(Q\in G\), and put
+
+\[
+a_F=\sum_{Q\in F}[Q].
+\]
+
+Then
+
+\[
+a_F^m=\sum_{T\in G}c_m(T)[T],
+\qquad
+c_m(T)=|\{(Q_1,\ldots,Q_m)\in F^m:
+Q_1+\cdots+Q_m=T\}|.
+\]
+
+Thus batched relation finding is exactly the problem of recovering selected
+coefficients, together with witnesses, of a sparse \(m\)-fold convolution in
+\(K[G]\).
+
+If \(G=\langle P\rangle\) is cyclic of order \(n\), write
+\(\ell(Q)\in\mathbb Z/n\mathbb Z\) for the discrete-log coordinate of \(Q\).
+Over a coefficient field containing a primitive \(n\)-th root \(\zeta\), the
+Fourier formulas are
+
+\[
+\widehat a_F(k)=\sum_{Q\in F}\zeta^{k\ell(Q)},
+\qquad
+c_m(T)=\frac1n\sum_{k=0}^{n-1}
+\widehat a_F(k)^m\zeta^{-k\ell(T)}.
+\]
+
+Over \(\mathbb C\), Parseval also gives
+
+\[
+\sum_{T\in G}c_m(T)^2
+=\frac1n\sum_{k=0}^{n-1}|\widehat a_F(k)|^{2m}.
+\]
+
+#### Proof
+
+Multiplication in \(K[G]\) is defined by
+\([Q][R]=[Q+R]\); expanding \(a_F^m\) proves the coefficient identity. [pcc:unverified]
+The remaining formulas are the ordinary discrete Fourier transform on the
+cyclic group. \(\square\)
+
+This identifies a genuine compression route, but not a prime-field shortcut.
+Given all discrete-log labels, a full FFT computes every coefficient in
+\(\widetilde O(n)\) operations, already larger than the desired square-root
+bound.  Without those labels, an interval, multiplicative subgroup, or
+small-height description in the ambient \(x\)-field does not supply the
+Fourier phases \(\zeta^{\ell(Q)}\).  A useful sublinear method would therefore
+have to be a sparse/partial convolution algorithm directly in the black-box
+elliptic group, or exploit a new algebraic relation between \(x(Q)\) and
+\(\ell(Q)\).
+
+There is an exact black-box boundary.  If preprocessing and queries learn the
+tuple-sum map only by evaluating it on \(D\) distinct tuples, then for \(B\)
+uniform targets Theorem 3 gives
+
+\[
+\mathbb E[\text{reported matches}]\le\frac{BD}{n}.
+\]
+
+Producing \(\Theta(N)\) relations consequently forces
+
+\[
+B+D=\Omega(\sqrt{Nn}).
+\]
+
+Hence a succinct eliminant tree can beat the black-box bound only by computing [pcc:unverified]
+node summaries from the coordinate algebra without evaluating the
+corresponding leaf tuples.  Propositions 15 and 16 isolate the two sides of
+the open problem: arithmetic-circuit compression of the eliminants versus
+sparse convolution/inversion in the elliptic group.
+
+### Theorem 17 (density-one sparse-regime sumset expansion)
+
+Fix \(m\ge2\), let \(p>4m\), and let
+\(C=(c_0,\ldots,c_{L-1})\) be distinct residues, where
+
+\[
+L\longrightarrow\infty,\qquad L^m=o(p).
+\]
+
+For \(E_{A,B}:y^2=x^3+Ax+B\), retain the \(c_i\) that lift to rational points
+and choose either lift by any deterministic rule, producing a point set
+\(F_{A,B}\).  Then for a density-\(1-o(1)\) set of nonsingular coefficient
+pairs \((A,B)\),
+
+\[
+|F_{A,B}|=(1/2+o(1))L
+\]
+
+and the ordered \(m\)-sum map has support
+
+\[
+|\underbrace{F_{A,B}+\cdots+F_{A,B}}_{m\ {\rm times}}|
+=\Theta_m(|F_{A,B}|^m).
+\]
+
+The statement is uniform over intervals, multiplicative subgroups, and other
+fixed distinct-residue master lists; no randomness of the list itself is
+assumed.
+
+#### Collision-variety lemma
+
+Fix two ordered coordinate \(m\)-tuples from \(C\) whose coordinate multisets
+are different.  Across all \((A,B)\in\mathbb F_p^2\) and all choices of square
+roots above the coordinates involved, the number of rational instances in
+which the two point sums are equal is \(O_m(p)\).
+
+#### Proof of the lemma
+
+Work first over \(K=\overline{\mathbb F}_p(A,B)\).  For every distinct
+coordinate \(c\), the polynomial
+
+\[
+f_c=c^3+Ac+B
+\]
+
+is an irreducible linear polynomial in \(A,B\), and the \(f_c\) are pairwise
+nonassociate.  Their square classes are independent: a nonempty product has
+odd valuation at one of its distinct prime factors.  Consequently adjoining
+the square roots \(y_c^2=f_c\) gives a multiquadratic extension whose Galois
+group independently changes \(P_c=(c,y_c)\) to \(-P_c\).
+
+Equality of the two tuple sums would be an identity
+
+\[
+\sum_c a_cP_c=O,
+\]
+
+with some nonzero integer coefficient \(a_c\), \(|a_c|\le m\).  Applying the
+Galois automorphism that changes only \(P_c\) to \(-P_c\), then subtracting
+the two identities, would give \(2a_cP_c=O\).  This is impossible on the
+universal nonsingular curve when \(p>4m\): the relevant bounded-order division
+polynomial at \(x=c\) is a nonzero polynomial in \(A,B\).  Equivalently, the
+fixed-\(x\) generic point is not torsion of order at most \(2m\).
+
+Thus the collision locus is a proper subvariety of the finite
+multiquadratic cover of the \((A,B)\)-plane.  With \(m\) fixed, projective
+addition laws, the cover equations, and the relevant division polynomials
+have degree \(O_m(1)\).  The collision locus has dimension at most one and
+degree \(O_m(1)\), so it has \(O_m(p)\) rational points.  Addition-chart
+exceptional loci and singular curves have the same bound. \(\square\)
+
+#### Proof of the theorem
+
+The pairwise-independence calculation following Theorem 10 gives
+\(|F_{A,B}|=(1/2+o(1))L\) outside a density-\(o(1)\) set of coefficient pairs.
+
+For a fixed curve let \(r(T)\) count ordered \(m\)-tuples from \(F_{A,B}\)
+summing to \(T\), and write
+
+\[
+\mathcal E_m=\sum_T r(T)^2.
+\]
+
+This energy counts pairs of tuples with equal sums.  Pairs whose coordinate
+multisets agree contribute at most \(m!|F_{A,B}|^m\).  There are
+\(O(L^{2m})\) remaining ordered tuple pairs.  Summing the collision-variety
+lemma over them and averaging over the \(p^2\) coefficient pairs gives
+expected nontrivial energy
+
+\[
+O_m\!\left(\frac{L^{2m}}p\right)=o(L^m).
+\]
+
+Markov's inequality makes this \(o(L^m)\) for a density-\(1-o(1)\) family of
+curves.  Hence \(\mathcal E_m=O_m(|F_{A,B}|^m)\).  Cauchy--Schwarz now gives
+
+\[
+|\operatorname{supp}r|
+\ge\frac{(\sum_T r(T))^2}{\sum_T r(T)^2}
+=\frac{|F_{A,B}|^{2m}}{\mathcal E_m}
+=\Omega_m(|F_{A,B}|^m),
+\]
+
+and the reverse inequality is immediate. \(\square\)
+
+### Corollary 17.1 (end-to-end exact separated-sketch barrier)
+
+For the density-one curve family of Theorem 17, let
+\(N=|F_{A,B}|=p^{\alpha+o(1)}\) with \(N^m=o(p)\).  Any exact global
+separated representation
+
+\[
+\mathbf1[\sigma(\omega)=T]
+=\sum_{i=1}^r U_i(\omega)V_i(T)
+\]
+
+has \(r=\Omega_m(N^m)\) by Theorems 1 and 17.  If its \(r\) terms are
+materially stored or evaluated and uniform targets are used to collect
+\(\Theta(N)\) relations, then
+
+\[
+T_{\rm total}
+=\Omega_m\!\left(N^m+\frac{p}{N^{m-1}}\right)
+\ge p^{\,m/(2m-1)-o(1)}
+>p^{1/2}.
+\]
+
+Indeed, the exact expected number of ordered decompositions across \(B\)
+targets is \(BN^m/\Theta(p)\), so \(B=\Omega(p/N^{m-1})\), even if every
+available decomposition is returned.  Balancing this with the rank/storage
+cost \(N^m\) gives \(\alpha=1/(2m-1)\).  This is a genuine
+non-materializing-class barrier: it applies to exact separated sketches after
+proving, rather than assuming, the required sparse-regime sumset expansion.
+It still does not cover shared nonlinear arithmetic circuits or succinct
+eliminant trees.  For \(m=3,4,5\), the resulting exponents are respectively
+\(3/5\), \(4/7\), and \(5/9\).
+
+### Exact remaining computational gap
+
+Even full \(q^2\)-monomial support rules out only monomial-explicit
+two-leaf inversion.  It is not, by itself, an arithmetic-circuit lower bound:
+a dense multilinear polynomial can have a small factored circuit, and
+Propositions 11 and 12 give explicit examples in the present problem.
+
+The decisive target is now:
+
+> Define a preprocessing/query model that contains fast product trees,
+> resultants, gcds, branching, and split-tree elimination, and prove that [pcc:unverified]
+> producing enough verified relations costs \(p^{1/2-o(1)}\); or give a [pcc:unverified]
+> concrete data structure whose fully audited total exponent is below
+> \(1/2\).
+
+The appropriate measure must charge *search* or a preprocessing/query
+trade-off, not merely the size of a rational representation.  A direct-sum
+or cell-probe-style theorem for algebraic set-intersection queries is a more
+credible target than a \(q^2\) inverse-circuit lower bound, which Proposition
+11 disproves.  Proposition 15 also prevents replacing that conjecture by an
+unrestricted straight-line-circuit claim justified only from eliminant degree.
+Theorems 8--10 still delimit materializing proof systems and show that
+lookup-coordinate independence, finite-field genericity, and rational-lift
+filtering do not create sparse expanded certificates.
+
+### Scope
+
+These results rule out a globally low-rank representation that amortizes all
+targets at once. They do **not** rule out:
+
+- a target-adaptive coordinate circuit built after seeing \(R\) and using more
+  than black-box sum evaluation;
+- randomized algorithms that tolerate false positives and verify candidates;
+- implicit meet-in-the-middle or collision walks;
+- an algebraic solver whose internal representation is not a separated exact
+  factorization.
+
+The next theorem must address one of those cases without quietly reverting to
+candidate enumeration.
+
+## 5. Target theorem: an algebraic preprocessing/query direct sum
+
+Define an **algebraic relation-query program** (ARQP) for fixed \(m\) as
+follows.
+
+1. A curve-specific preprocessing phase receives \((p,E,F,m)\) and constructs
+   a data structure of size \(S\) using \(P\) charged field or word
+   operations.
+2. A query phase receives one target or a batch of targets.  It may use field
+   arithmetic, verified inversions, comparisons and branching, fast [pcc:unverified]
+   polynomial products, remainders, gcds, resultants, multipoint evaluation,
+   sparse or dense linear algebra, and split-tree substitutions.  A
+   degree-\(d\) polynomial operation is charged its actual algebraic-RAM cost,
+   at least the input/output representation length and at most the chosen fast
+   arithmetic bound \(M(d)\operatorname{polylog}d\).
+3. Intermediate objects may be factored polynomials, rational circuits,
+   straight-line programs, or shared DAGs.  The model does not charge their
+   expanded Boolean normal forms unless they are actually materialized.
+4. The program must return verified tuples of rational factor-base points. [pcc:unverified]
+   False positives, root recovery, memory probes, and extension-to-base-field
+   filtering are charged.  Curve-specific preprocessing may be reused, but
+   target-dependent work may not be relabelled as preprocessing.
+
+The ambitious target is:
+
+> **ARQP direct-sum conjecture.** For a density-\(1-o(1)\) family of general
+> ordinary curves, every ARQP that produces enough independent relations for
+> the factor-base linear system satisfies
+>
+> \[
+> P+\sum_{j=1}^{B}Q_j+T_{\rm verify}+T_{\rm LA}
+> \ge p^{1/2-o(1)}.
+> \]
+>
+> Equivalently, a violation must expose a concrete reusable data structure
+> and query algorithm, which can then be audited as a
+> \(p^{1/2-\varepsilon}\) ECDLP candidate.
+
+This is deliberately a search/direct-sum statement, not a representation-size
+claim.  Proposition 12 is contained in the model and shows that a single
+two-leaf query can cost only \(\widetilde O(q)\).  The theorem must instead
+show that preprocessing plus the number of target queries and recoveries
+cannot all be amortized below the collision frontier.  To make the conjecture
+provable, the next formalization should first restrict polynomial and rational
+objects to explicit coefficient arrays, subproduct trees, and bounded-fan-in
+shared circuits, with a simulation lemma for the listed primitives.
+
+## 6. Three proof routes
+
+### Route A: target-specialized flattening rank (resolved as insufficient)
+
+Find a leaf partition \(L\sqcup R\) such that, for a positive fraction of
+targets \(T\), the matrix
+
+\[
+H_T[u,v]=\mathbf 1[\sigma_L(u)+\sigma_R(v)=T]
+\]
+
+has large rank after quotienting duplicate partial sums. This matrix is a
+partial permutation matrix, hence its rank equals the number of matching
+distinct partial-sum pairs.
+
+Theorem 4 settles the basic calculation exactly. When the expected number of
+decompositions of one target is \(O(1)\), this target-specific rank is
+\(O(1)\) on average. A proof must use a stronger measure or track adaptive
+search branches; single-target matrix rank alone is insufficient. Route A
+should therefore be treated as a diagnostic, not the principal proof route.
+
+### Route B: a direct-sum theorem
+
+Prove that answering \(B\) independently uniform targets with a shared [pcc:unverified]
+preprocessing object costs, up to subpolynomial factors, at least the smaller
+of explicit candidate materialization and \(B\) target-specific searches.
+Combining this with the exact expected relation count
+\(B|\Omega|/n\) would recover the square-root frontier.
+
+This is the cleanest route, but it needs an explicit circuit or data-structure
+model; unrestricted arithmetic-circuit direct-sum theorems are out of reach.
+
+### Route C: polynomial-calculus monomial growth (materializing systems only)
+
+Work in the Boolean quotient
+
+\[
+A=\mathbb F_p[b_{ij}]/(b_{ij}^2-b_{ij}),\qquad \dim A=2^{mk}=N^m.
+\]
+
+Prove that deriving a target-specific leaf assignment, or deriving \(1\) for [pcc:unverified]
+an insoluble target, requires a graded component containing
+\(p^{1/2-o(1)}\) square-free monomials.
+
+Degree alone is insufficient: a degree-\(d\) component contains
+\(\sum_{i\le d}\binom{mk}{i}\) square-free monomials, and a useful theorem must
+locate \(d\) relative to \(mk\), not merely show \(d=\Omega(\log p)\).
+Proposition 11 proves that this route cannot lower-bound rational circuits [pcc:unverified]
+with inversion gates: their expanded Boolean normal form may be dense while
+their straight-line representation is logarithmic.  Route C remains relevant
+only after fixing a proof system that explicitly charges monomial
+materialization.
+
+## 7. Falsification program
+
+The barrier conjecture should be attacked, not protected. Look for:
+
+1. **Target-linearization:** a change of variables making the target enter only
+   through a low-dimensional linear sketch.
+2. **Low partition rank:** an exact or one-sided-error decomposition of the
+   split-tree relation tensor below the collision frontier.
+3. **Reusable partial elimination:** a curve-specific data structure of size
+   \(p^\beta\) with query/recovery time \(p^\gamma\), whose complete relation
+   and linear-algebra balance is below \(p^{1/2}\).
+4. **Hidden group compatibility:** a finite-set map not induced by a
+   bounded-degree \(\mathbb G_a\), \(\mathbb G_m\), or isogeny morphism, but
+   transporting enough convolution to elliptic addition.
+5. **One-sided randomized filters:** cheap filters with a proved [pcc:unverified]
+   false-positive rate whose verification does not restore square-root work.
+
+Every candidate must be evaluated by
+
+\[
+T_{\rm total}=T_{\rm FB}+T_{\rm pre}
++\frac{M}{\rho hP_{\rm rel}}T_{\rm query}+T_{\rm LA}.
+\]
+
+## 8. Experimental protocol
+
+Experiments are diagnostic only. For each sampled curve and parameter tuple
+\((p,N,m)\), record:
+
+- factor-base size after rational lifting;
+- ordered tuple count and support size of the \(m\)-sum distribution;
+- collision probability, maximum fibre, entropy, and total-variation distance
+  from uniform;
+- the exact leaf--target incidence rank, equal to the support size;
+- partial-sum supports and target-specific partial-permutation ranks for a
+  balanced cut;
+- Macaulay column counts and observed ranks by degree;
+- preprocessing and target-specific wall time separately.
+
+Do not fit an asymptotic exponent from fields below the regime where
+\(\log p\), \(k\), and \(m\) all vary.
+
+The accompanying experiments/sumset_profile.py computes this combinatorial
+profile on small prime fields without Sage.
+
+## 9. Decision gates
+
+### Gate 1: model closure
+
+Show that Boolean F4/F5 or XL elimination, tensor-network contraction, and
+bounded-width arithmetic branching programs embed in ARQP with polynomial
+overhead, while product trees, fast gcd/resultant algorithms, and Proposition
+12 embed with their soft-linear costs.
+
+### Gate 2: first adaptive lower bound
+
+Prove a multi-target preprocessing/query direct-sum bound in a closed ARQP [pcc:unverified]
+subclass.  A width or monomial lower bound counts only if a simulation theorem
+shows that it also charges compact polynomial and rational representations.
+
+### Gate 3: square-root closure
+
+Combine the adaptive bound with exact relation-output requirements to obtain
+\(p^{1/2-o(1)}\) total cost.
+
+### Gate 4: algorithmic inversion
+
+If a lower-bound step fails because of an explicit low-rank or reusable
+representation, turn that witness into an algorithm and audit its exponent.
+
+## 10. Near-term paper-quality deliverable
+
+The next publishable result should be one of:
+
+1. an exact direct-sum theorem for \(B\) queries in a
+   product-tree-plus-adaptive-branching ARQP subclass;
+2. a polynomial-calculus monomial lower bound of \(p^{1/2-o(1)}\) for
+   insoluble random targets, explicitly scoped to materializing proof systems;
+   or
+3. a concrete data structure with proved preprocessing/query exponents that [pcc:unverified]
+   violates the conjectured trade-off.
+
+Theorem 1 makes “global low tensor rank” an unpromising escape, while
+Propositions 11 and 12 show that expanded support is not a general circuit
+measure. Research should now concentrate on target-adaptive search, direct
+sums, data-structure trade-offs, and one-sided-error filters.
