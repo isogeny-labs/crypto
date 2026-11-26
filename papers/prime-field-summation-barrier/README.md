@@ -90,6 +90,11 @@ They verify finite instances of the exact uniform-target identity, the
 multiset-count upper bound, and the displayed fixed-arity exponent arithmetic.
 They do not verify an asymptotic lower bound or an algebraic solver model.
 
+Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
+digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
+three tests passed, zero failed.  The third test grid-checks Theorem 20's
+piecewise optimization against direct minimization. `[pcc:unverified]`
+
 ## Owed before review-ready status
 
 - [ ] Independent proof review of the entropy/length and batching arguments.
