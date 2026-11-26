@@ -182,6 +182,15 @@ maps every term to `recover`, and derives an all-parameter recovery loss below
 the existing `8h(L/2^i)` node allowance. Independent checking and the live
 Rust refinement link remain open. `[pcc:unverified]`
 
+For item 4, the sample points are binary-coordinate lifts of distinct elements
+of `GF(2^d)`. Every pairwise difference is therefore nonzero modulo two and
+is a unit at every coefficient precision. Lagrange interpolation over the
+extension of `Z/2^p Z` is exact whenever the guarded sample count is at most
+`2^d`. The native control covers precisions 1/3/17, degrees 1/3/4/8,
+extension-valued coefficients, all retained lengths through nine, and a
+duplicate-node failure. Linking the values returned by `evaluate_at` to the
+claimed deformation polynomial remains in C1 items 1–3. `[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,
