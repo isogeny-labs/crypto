@@ -37,6 +37,7 @@ from reportlab.platypus import Paragraph
 HERE = Path(__file__).resolve().parent
 MEASUREMENT = HERE.parent
 STUDY = MEASUREMENT.parent
+REPO = STUDY.parent.parent
 FONT_DIR = Path('/usr/share/fonts/truetype/dejavu')
 PAGE_W, PAGE_H = 612, 792
 LEFT, RIGHT, WIDTH = 46, 566, 520
@@ -100,9 +101,9 @@ def phase_svg(summary: dict) -> str:
                     'point-scalar calls are separate count columns, never one cost.', height)
     out += [svg_text(0, 22, 'Charged phase', 19, NAVY, True),
             svg_text(625, 22, 'Fp products', 18, NAVY, True, 'end'),
-            svg_text(770, 22, 'Fr products', 18, NAVY, True, 'end'),
-            svg_text(925, 22, 'Group-add calls', 17, NAVY, True, 'end'),
-            svg_text(1080, 22, 'Point-scalar calls', 16, NAVY, True, 'end'),
+            svg_text(770, 22, 'Fr products', 17, NAVY, True, 'end'),
+            svg_text(925, 22, 'Group-add calls', 15, NAVY, True, 'end'),
+            svg_text(1080, 22, 'Point-scalar calls', 14, NAVY, True, 'end'),
             svg_text(0, 46, 'Products include squares. Bars show only Fp products; numeric columns keep their own units.', 16, MUTED)]
     # A maximum and conversion to pixels are plotting geometry, not a result.
     scale_max = max([row['counts'][FP] for row in rows] + [1])
@@ -114,7 +115,7 @@ def phase_svg(summary: dict) -> str:
         out.append(svg_text(8, y, label, 16, INK, row['phase'] == 'archived_source_generation'))
         bar_width = 196 * counts[FP] / scale_max
         if counts[FP]:
-            out.append(f'<rect x="278" y="{y-15}" width="{max(bar_width, 1):.3f}" height="18" fill="{TEAL}"/>')
+            out.append(f'<rect x="278" y="{y-15}" width="{bar_width:.6f}" height="18" fill="{TEAL}"/>')
         for x, key in [(625, FP), (770, FR), (925, 'group_add_calls'), (1080, 'point_scalar_calls')]:
             out.append(svg_text(x-8, y, number(counts[key]), 17, NAVY, False, 'end'))
     out.append(f'<line x1="0" y1="{total_y-23}" x2="1080" y2="{total_y-23}" stroke="{LINE}" stroke-width="2"/>')
@@ -122,6 +123,7 @@ def phase_svg(summary: dict) -> str:
     common = summary['common_counted_path']
     for x, key in [(625, FP), (770, FR), (925, 'group_add_calls'), (1080, 'point_scalar_calls')]:
         out.append(svg_text(x-8, total_y, number(common[key]), 17, NAVY, True, 'end'))
+    out.append(svg_text(0, height-31, 'Other counter families remain in the raw ledger; zero displayed products do not make a phase free.', 15, MUTED))
     out.append(svg_text(0, height-12, 'Repeated membership controls and the all-positive diagnostic corpus are outside these phase totals.', 15, MUTED))
     out.append('</svg>')
     return '\n'.join(out) + '\n'
@@ -228,7 +230,7 @@ def chrome(c, page):
 
 
 def path_label(path: Path) -> str:
-    return path.resolve().relative_to(STUDY).as_posix()
+    return path.resolve().relative_to(REPO).as_posix()
 
 
 def require_hex(value: str, length: int, label: str) -> str:
@@ -252,6 +254,26 @@ def build(args):
     raw_sha = hashlib.sha256(raw_bytes).hexdigest()
     source_commit = require_hex(args.measurement_commit, 40, 'Measurement source commit')
     binary_sha = require_hex(args.executable_sha256, 64, 'Executable SHA-256')
+    replay_receipt_path = args.replay_receipt or args.input.with_name('replay-comparison.json')
+    publication_receipt_path = args.source_publication_receipt or args.input.with_name('source-publication-receipt.json')
+    replay_receipt = json.loads(replay_receipt_path.read_text())
+    publication_receipt = json.loads(publication_receipt_path.read_text())
+    # Bind supplied producer receipts to document provenance. These metadata
+    # checks do not rerun a test, compare scientific outputs, or confer PCC standing.
+    if (replay_receipt['schema'] != 'isogeny.m31-counts-replay-comparison/v1'
+            or replay_receipt['source_commit'] != source_commit
+            or replay_receipt['executable_sha256'] != binary_sha
+            or replay_receipt['initial']['sha256'] != raw_sha
+            or replay_receipt['replay']['sha256'] != raw_sha
+            or replay_receipt['initial']['exit_code'] != 0
+            or replay_receipt['replay']['exit_code'] != 0
+            or replay_receipt['byte_identical'] is not True
+            or replay_receipt['tests']['exit_code'] != 0):
+        raise ValueError('The producer replay receipt does not support this successful run report')
+    if (publication_receipt['commit'] != source_commit
+            or publication_receipt['published_before_outcomes'] is not True):
+        raise ValueError('Source-publication receipt does not match the measured source')
+    recorded_tests = replay_receipt['tests']
     for manifest in [args.pre_call_manifest, args.post_call_manifest]:
         if manifest is not None and not manifest.is_file():
             raise FileNotFoundError(manifest)
@@ -322,23 +344,26 @@ def build(args):
 
     heading(c, 407, '03', 'Setup stays charged in the complete construction path')
     charged = summary['charged_common_plus_one_full_stream_pass']
-    box(c, LEFT, 326, WIDTH, 62)
+    box(c, LEFT, 334, WIDTH, 54)
     text(c, LEFT+12, 371, 'COMMON PHASES + ONE SOURCE-QUERY PASS', 7.2, MUTED, True)
     text(c, LEFT+12, 349, 'A', 10, TEAL, True)
     text(c, LEFT+33, 349, number(charged['A'][FP])+' Fp products', 9.2, NAVY, True)
     text(c, LEFT+275, 349, 'B', 10, BLUE, True)
     text(c, LEFT+296, 349, number(charged['B'][FP])+' Fp products', 9.2, NAVY, True)
-    paragraph(c, LEFT, 313, WIDTH,
+    paragraph(c, LEFT, 324, WIDTH,
               'These totals are assembled by Rust from the measured common phases and one membership pass. '
               'The two A/A controls and five ordered A/B pairs are repeatability controls; they are '
               'not independent instances. The all-positive root corpus is a separate diagnostic.', 8.5, 11.8)
 
-    heading(c, 258, '04', 'Known-answer replay and evidence identities')
-    paragraph(c, LEFT, 240, WIDTH,
+    heading(c, 269, '04', 'Known-answer replay and evidence identities')
+    paragraph(c, LEFT, 251, WIDTH,
               f'Archived row: alpha = <b>{relation["alpha"]}</b>, beta = <b>{relation["beta"]}</b>; '
               f'replayed scalar <b>{relation["replayed_scalar"]}</b>. Native output records '
               f'<b>{number(data["new_relation_search_calls"])}</b> new relation-search calls. '
-              'Producer evidence remains <b>[pcc:unverified]</b>. No wall-time, rho comparison or '
+              'The producer receipt records <b>two successful invocations with byte-identical JSON</b>; '
+              f'native tests: <b>{number(recorded_tests["passed"])} passed, '
+              f'{number(recorded_tests["failed"])} failed</b>. Standing remains '
+              '<b>[pcc:unverified]</b>. No wall-time, rho comparison or '
               'new-relation discovery claim is made.', 8.3, 11.6)
     identity_rows = [
         ('Measured source commit', source_commit),
@@ -348,17 +373,18 @@ def build(args):
         ('Raw JSON SHA-256', raw_sha),
         ('Frozen source seed', provenance['archive_seed_hex']),
     ]
-    y = 176
+    y = 178
     for label, value in identity_rows:
         text(c, LEFT, y, label, 6.8, MUTED, True)
         text(c, LEFT+126, y, value, 6.6, INK, mono=True)
-        y -= 12
+        y -= 10.5
     evidence_paths = [path_label(args.input), path_label(args.pre_call_manifest)]
     if args.post_call_manifest is not None:
         evidence_paths.append(path_label(args.post_call_manifest))
-    paragraph(c, LEFT, 98, WIDTH,
-              '<b>Evidence paths</b> (relative to research/primefield_relations_20261125/):<br/>'
-              + '<br/>'.join(escape(p) for p in evidence_paths), 6.9, 9.5, MUTED)
+    evidence_paths.extend([path_label(replay_receipt_path), path_label(publication_receipt_path)])
+    paragraph(c, LEFT, 103, WIDTH,
+              '<b>Repository-relative evidence paths:</b><br/>'
+              + '<br/>'.join(escape(p) for p in evidence_paths), 6.6, 8.2, MUTED)
     c.save()
     print(HERE/'REPORT.pdf')
     print(phase_path)
@@ -372,6 +398,10 @@ def main():
     parser.add_argument('--executable-sha256', required=True)
     parser.add_argument('--pre-call-manifest', type=Path, required=True)
     parser.add_argument('--post-call-manifest', type=Path)
+    parser.add_argument('--replay-receipt', type=Path,
+                        help='Defaults to replay-comparison.json beside the native input')
+    parser.add_argument('--source-publication-receipt', type=Path,
+                        help='Defaults to source-publication-receipt.json beside the native input')
     args = parser.parse_args()
     build(args)
 
