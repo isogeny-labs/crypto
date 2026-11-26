@@ -239,6 +239,11 @@ semantic target. `[pcc:unverified]`
 `GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
 coefficient identity, maps its constants, incoming coefficients, exponent
 tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
+It now also gives the quantified producer proof from the direct deformation
+sum to the product of child contractions: whole-vertex port correlation,
+packet ownership, isolated vertices, target/source placement, finite Fubini,
+and weighted truncation are explicit. The remaining gap is independent or
+kernel-checked Rust refinement rather than an unstated composition step.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

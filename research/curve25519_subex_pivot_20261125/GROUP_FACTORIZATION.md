@@ -111,6 +111,53 @@ states the general cached-state and restricted-odometer proof; independent or
 kernel-checked refinement remains open.
 `[pcc:unverified]`
 
+## Quantified producer theorem
+
+Assume a validated bipartite graph, a packing in which every old edge occurs
+in exactly one packet slot, a working ring of precision `p`, and the scalar
+Cauchy mode-series identity. Treat every old tensor entry as an arbitrary ring
+function of its ordered ports; no Boolean, independence, or bounded-arity
+assumption is needed here. Then non-strict `evaluate_at` equals the direct
+deformed contraction `D(W)` modulo `2^p`. `[pcc:unverified]`
+
+The producer proof is the following finite rearrangement.
+
+1. Expand every packet factor `K_P` row by row. Same-group weights remain in
+   the local affine term. Every crossing weight is its finite mode series;
+   distributivity collects a global exponent vector `beta`.
+2. For fixed `beta`, the coefficient of each mode is selected from rows in its
+   unique target group, while its substituted linear form contains columns in
+   its unique source group. The packet-polynomial identity above therefore
+   assigns each factor to exactly one group.
+3. Every old vertex has one label digit, so all of its ordered ports and their
+   joint tensor entry remain in one group. This retains correlations among
+   parallel ports; it never factors a vertex entry into per-port values.
+4. Every left/right incidence belongs to exactly one old vertex and one packet
+   vertex in that group. Isolated old and packet vertices remain as scalar
+   factors. Consequently the assignment variables of different groups are
+   disjoint after `beta` is fixed.
+5. Finite distributivity (equivalently, Fubini for finite sums) turns the sum
+   over all incidence assignments into the product of group contractions.
+   Each factor is exactly the corresponding `child` graph: old tensors keep
+   their complete port order, and the new packet tensor contains the local,
+   incoming-target, and outgoing-source factors for that group.
+6. Summing these products over every admissible `beta` reconstructs `D(W)`.
+   The weighted iterator theorem visits each retained vector once. Every
+   omitted vector has total 2-adic weight at least `p`, so its complete term is
+   zero in the working ring.
+
+The argument is insensitive to whether an old tensor is Boolean, equality, or
+an immutable packet tensor: it only uses its entry as an opaque function of
+the retained ordered port vector. Creation-precision lifting is therefore a
+separate semantic premise, covered by its own native mutation controls.
+`[pcc:unverified]`
+
+This closes the producer-side algebraic composition of C1 items 1–3. What
+remains is an independent or kernel-checked refinement showing that every
+live Rust object and loop implements the stated finite rearrangement, plus the
+separate interpolation, Hermite, and creation-precision refinements.
+`[pcc:unverified]`
+
 ## Evidence and remaining gate
 
 The exhaustive packet oracle independently checks the coefficient-extraction
