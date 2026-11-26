@@ -1,4 +1,7 @@
 #!/bin/sh
 set -eu
 root=$(git rev-parse --show-toplevel)
-exec python3 "$root/tools/prepush_research_gate.py" "$@"
+# Git invokes pre-push hooks with the remote name and URL as positional
+# arguments. The research gate has its own CLI, so do not forward Git's
+# hook-protocol arguments to argparse.
+exec python3 "$root/tools/prepush_research_gate.py"

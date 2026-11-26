@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:42:00Z",
+ "id": "PCC-20261124-7dab65",
+ "kind": "statement",
+ "producer": {
+  "commit": "bd2b17ed598804ef695d75ff5ca163d1722e63bd",
+  "model": "",
+  "session": "codex-ecc2k-cold50x-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/checks/archive-custody.json",
+    "sha256": "b1b6a5dffd8c44d8a8a24c8969ea56442bfe4a91d11feb689e877c9de42476ea"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/checks/pdf-review.json",
+    "sha256": "77f20fa94321dc825357707b2eddb71cde4f842d9227bc5ff608e4d25f6ef178"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/checks/v2-export-check.txt",
+    "sha256": "9466380cd85b772e52c7d4717c1704ee3e7571a82dc57a6cc239bd9a97074de9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/checks/export-check.txt",
+    "sha256": "424ce52acc4163792d505d6e1c6fb502c2f4804ac4414128fd8baa1668f51df0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Both final controlled exports have zero strict findings; the two-page report has been visually inspected. Complete raw archive3500 members and executable archive19 members extract with every original hash/length equal. This is unsigned local custody, not remote storage or independent signed admission. Requested50x remains unmet."
+}

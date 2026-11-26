@@ -1,0 +1,34 @@
+Initial bounded m=3 development correctness probe; failed validation retained.
+No performance measurement, comparison panel, or scientific run was performed.
+
+Command:
+cargo test --offline --manifest-path summation_split/m31_native/Cargo.toml f4::tests::m31_one_preclosed_geometric_system_bounded_development_probe -- --nocapture
+
+Generator: systems::fixture_plane(3, 0).
+Arm: PreclosedSequential. Witness mode: Geometric.
+Exact chart presentation from System::quotient_presentation(). Field: M31.
+
+Producer limits: max_pairs=2000, max_rows=512, max_columns=512,
+max_nonzeros=25000, max_basis=64, max_degree=8, max_steps=32,
+max_reductions=20000.
+
+Observed producer result:
+status=Complete, nonfixed_basis=30, processed_pairs=561,
+scheduled_pairs=561, max_raw_product_degree=6,
+max_post_nf_matrix_degree=6, matrix_batches=10.
+
+Initial independent verifier accidentally reused max_steps=32, although that
+counter bounds ordinary Buchberger PAIR steps, not F4 matrix batches.
+Verification result: Incomplete(reason="ordinary verification steps").
+candidate_pairs_checked=561; original_generators_checked=11;
+oracle_pairs_processed=32; candidate_generators_checked=0;
+oracle_basis_len=0 (oracle did not complete).
+
+The unit test asserted Verified, failed, and cargo exited 101. This attempt
+does not establish the reverse ideal containment. No result was censored or
+interpreted as an empty solution set.
+
+Parent-directed correction: leave producer limits unchanged; use separately
+named verifier_limits with max_steps=2000 and ALL OTHER LIMITS UNCHANGED,
+including max_pairs=2000. This corrects distinct development-counter semantics.
+The corrected verification must establish both containments or remain failed.

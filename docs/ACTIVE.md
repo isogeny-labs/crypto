@@ -17,6 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 - [x] Submit the Rust prime-field polynomial and map profiler (Codex, completed 2026-11-25, branch codex/rust-prime-field-experiments, PR #5200)
+- [x] Unify two runnable cryptanalysis leads under one frozen, same-target ECbench end-to-end panel with retained records and replay (Codex, completed local integration 2026-11-25, branch codex/lead-e2e-unify-20261125, PR #5204; K1-17, 16/16 verified and replayed, L0)
 - [x] Correct `research/tensor_contraction_ecdlp_review_20261121/POLYNOMIAL_DECAY.md` §0.3, §2.2, §6: under Theorem A's (λ+B)^{C₀K²} overhead, e ≍ K^{-β} gives bounded-occurrence #3-SAT in 2^Õ(n^{2/(2+β)}) (β = 1: n^{2/3}), not 2^Õ(n^{1-β/2}) (√n); √n holds only with an overhead 2^{o(K²)} (Claude Code, completed 2026-11-25, branch claude/polynomial-decay-n23, PR #5197; workspace#160)
 - [ ] Add a Strassen path for the dense matrix products in the toy PQC schemes (MAYO, UOV, QR-UOV, McEliece) with a shared schoolbook loop and per-field cutoff (claude, 2026-11-24, branch claude/pqc-strassen-20261124, PR #5172; pqc tests pass; timings in bench.record 20261125T0508Z-pqc-strassen, unvalidated, loaded host)
 - [x] Large-prime graph leads: (A) prime-field automorphism-orbit and Gaudry-cubic relation streams through the evaluator (opt-in capture in both collectors); (B) parallel block Wiedemann (rayon; results identical to serial) with a thread/block-size schedule (Claude Code, started 2026-11-25, branch claude/lp-graph-leads-20261125)
@@ -357,7 +358,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
-- [ ] Test shared-coefficient membership nonenumeratively with blinded B=4/8 controls and a fully charged B=31 one-target solve, compared with cached BSGS and optimized Pollard rho across at least six growing sizes (Codex, started 2026-11-18, branch codex/shared-coefficient-membership-20261118-v2, PR #4692; follow-up to merged setup PR #4675)
+- [ ] Test shared-coefficient membership nonenumeratively with blinded B=4/8 controls and a fully charged B=31 one-target solve, compared with cached BSGS and optimized Pollard rho across at least six growing sizes (Codex, started 2026-11-18; continued 2026-11-25 on branch codex/rr9-full8-accounting-20261125, PR #5203; prior implementation PR #4692 merged without scientific rows)
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
 
 - [ ] Benchmark the Boolean Faugère–Lachartre F4 split and enforce canonical binary-field profiles across Gröbner/Semaev workloads (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4710)
@@ -430,7 +431,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 - [x] Record Vieta PR #4525 actual merge/check closeout and autonomy/lessons outcome (Codex, completed 2026-11-23, branch lane/vieta-publication-closeout-20261123, PR #4987; publication merged with failed checks; own record officially closed censored; scientific gaps remain separately tracked below)
 
-- [ ] Derive and measure an exponent-moving Curve25519 mechanism in native Rust (Codex, started 2026-11-17, resumed 2026-11-18, branch codex/curve25519-exponent-ideas-20261117, PR #4677; split/sign contracts complete; projective m=3 qualification protocol frozen before implementation; m=4 exponent stage gated on correctness)
+- [ ] Derive and measure an exponent-moving Curve25519 mechanism in native Rust (Codex, started 2026-11-17, resumed 2026-11-18 and 2026-11-25, branch codex/curve25519-exponent-followup-20261125, PR #5190; PR #4677 merged the split/sign contracts; current-main projective m=3 source panels now pass, with exact-model 9/9, Lean 5/5, certificate replay, and a t=4 descent smoke; the frozen paired grid and m=4 stage remain unspent because PR #5151 records reachable m<=4 measurements as non-decisive for the exponent bar; the satisfiable-solve growth theorem remains open) [pcc:unverified]
 - [x] Port the linearized two-summand root finder (lfd-summation-systems PR #28) into the Semaev decomposer and measure it vs the pair loop (claude, started 2026-11-17, branch claude/index-calculus-root-finding-e95kd6, PR #4578); follow-up: wrap as an ic_framework oracle and compare with rootfind-mitm in the harness unit
 
 - [x] Repair main-side CI breakage left by the 2026-11-16 merges: parity lock and IC reference currency (workflow store pulls deferred until the store is repaired) (claude, started 2026-11-17, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4576)
