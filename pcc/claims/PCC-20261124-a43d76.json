@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:32:54Z",
+ "id": "PCC-20261124-a43d76",
+ "kind": "statement",
+ "producer": {
+  "commit": "1e30bb86f91560660cdb96141ebffc7246155616",
+  "model": "",
+  "session": "codex-ecc2k-cold50x-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/checks/focused-tests.txt",
+    "sha256": "6a5a2eacbb59aa9255fbed3ace1de00ad2cdc401071a39504c5f39c5746ceca1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/equivalence.jsonl",
+    "sha256": "fbffbe82d046eb9ba4f277e909cf2e4a55d21c58849e95f3ad54875afe2d2343"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The revised bounded dense dictionary with inline two-index buckets passes52 focused release tests and all195 retained common-output equivalence rows. The actual8192-slot/1994-point boundary qualifies, and spill ordering is tested. Cost gain remains unmeasured."
+}

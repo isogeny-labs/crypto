@@ -1,0 +1,89 @@
+{
+  "schema": "cayley-chord.publication-checks/v1",
+  "standing": "PCC-unverified; no new claim IDs",
+  "base_commit": "3539ccc760e519cf9a96c6528deff4e440921422",
+  "scoped_format": {
+    "command": "rustfmt --edition 2021 --config skip_children=true --check main.rs extractor.rs reference.rs",
+    "exit_code": 0,
+    "note": "Source-bound upstream snapshots are intentionally not reformatted."
+  },
+  "artifact_hydration": {
+    "command": "python3 tools/artifacts/artifacts.py pull research/cayley_chord_m31_20261125/evidence --source git",
+    "exit_code": 0,
+    "files": 2,
+    "case_sha256": "aa02a987378a24ba7f04803e508be084371f6bb76d96249de0f5a4b276653e4c",
+    "source": "checked-in deterministic recovery payload; fresh task-local cache"
+  },
+  "root_library": [
+    {
+      "command": "cargo test --release --lib --offline",
+      "exit_code": 101,
+      "outcome": "Sparse checkout omitted certified-relations path dependency; materialized root source and path dependencies before the next attempt.",
+      "raw_stderr_sha256": "5a0663dc3112b048e6745da2c02b18b1a57427720ae10f94d7320246b091805b",
+      "published_stderr": "root-library-attempt1.redacted.stderr"
+    },
+    {
+      "command": "timeout 55 cargo test --release --lib --offline",
+      "exit_code": 124,
+      "build_jobs": 1,
+      "virtual_memory_kib": 1572864,
+      "outcome": "55-second cap reached during dependency compilation; no root library test result.",
+      "stderr": "root-library-attempt2.stderr"
+    }
+  ],
+  "conductor": {
+    "available": false,
+    "exit_code": 127,
+    "note": "No ownership reservation or external claim-check result asserted; no new PCC claims."
+  },
+  "lean": {
+    "available": false,
+    "build_performed": false,
+    "note": "See README proof map."
+  },
+  "standalone_replay": {
+    "command": "RUSTC=<Rust-1.100.0>/rustc ./replay.sh",
+    "exit_code": 0,
+    "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "output_cases_sha256": "aa02a987378a24ba7f04803e508be084371f6bb76d96249de0f5a4b276653e4c",
+    "output_summary_sha256": "a4f1782166fd21ae3ef9211fd4158601940d4884a2450495c81e8dd95eb23ae9",
+    "second_run_case_bytes_equal": true,
+    "second_run_summary_bytes_equal": true,
+    "matches_original_cases_and_summary": true,
+    "binary_sha256": "1e65ac99f5203a9fc5d5ee67b06d21bd82c7d7abc981829ed9592b0d7beb36d0",
+    "scientific_inputs_changed": false,
+    "stdout": "replay.stdout",
+    "stderr": "replay.stderr"
+  },
+  "repository_policy_checks": {
+    "research_gate": {
+      "command": "python3 tools/prepush_research_gate.py --base origin/main --repo-name crypto",
+      "exit_code": 0,
+      "new_pcc_claims": 0
+    },
+    "shared_code_parity": {
+      "command": "python3 tools/check_lab_parity.py --repo crypto",
+      "exit_code": 0,
+      "files": 21
+    },
+    "artifact_policy": {
+      "command": "python3 tools/artifacts/artifacts.py check origin/main HEAD",
+      "exit_code": 0
+    },
+    "size": {
+      "command": "bash scripts/check-large-files.sh origin/main HEAD",
+      "exit_code": 0
+    },
+    "prose": {
+      "scope": "edited study README, REVIEW, protocol publication copy, report README, and PR body",
+      "exit_code": 0
+    },
+    "whitespace": {
+      "editable_files": "pass",
+      "preserved_diagnostics": [
+        "source-bound upstream/arithmetic.rs has its original final blank line",
+        "path-redacted historical linker stderr retains original whitespace"
+      ]
+    }
+  }
+}

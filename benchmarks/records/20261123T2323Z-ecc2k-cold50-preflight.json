@@ -1,0 +1,79 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T23:30:34+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50_20261123/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:24:03+00:00",
+      "wall_s": 13.225
+    }
+  ],
+  "commit": "0bc9d5a2f21795612c10df1c22764811b92c9ea0",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T23:23:12+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T2323Z-ecc2k-cold50-preflight",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "pilot_calls",
+      "note": "Engineering pilot only; candidate1 misses50%; no primary rows attempted.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 16.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-cold50",
+  "raw": [
+    {
+      "bytes": 26553,
+      "path": "research/trace_zero_cold50_20261123/candidate1/preflight.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f1843b7f6f8e32ac957595cb68c90554e2b4e8fc97f50caafdc728cf4ff36c09",
+      "sha256": "f1843b7f6f8e32ac957595cb68c90554e2b4e8fc97f50caafdc728cf4ff36c09",
+      "uploaded": false
+    },
+    {
+      "bytes": 1778,
+      "path": "research/trace_zero_cold50_20261123/candidate1/calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2dc820ff58aae57cb96b617d78f66067eb92a7bba4ac6002f317a1a121dfabf5",
+      "sha256": "2dc820ff58aae57cb96b617d78f66067eb92a7bba4ac6002f317a1a121dfabf5",
+      "uploaded": false
+    },
+    {
+      "bytes": 176,
+      "path": "research/trace_zero_cold50_20261123/candidate1/preflight-gate.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c78d19035d1f226251d115584aa0fcf9e5be0aa07581b81eac57a567386d173",
+      "sha256": "7c78d19035d1f226251d115584aa0fcf9e5be0aa07581b81eac57a567386d173",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold50_20261123/candidate1/report.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50-preflight",
+  "status": "measured",
+  "summary": "16-call engineering pilot and three-binary calibration valid; candidate1 misses50% target (45.9443% lower in its uniform pilot). Zero primary rows; superseded by separately profiled candidate2, not an excluded primary subset.",
+  "validation": null
+}
