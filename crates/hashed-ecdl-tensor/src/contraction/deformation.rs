@@ -642,55 +642,80 @@ mod tests {
             steps: 500_000_000,
             ..Limits::default()
         });
-        let p = Parameters {
-            radix: 2,
-            u: 1,
-            a: 2,
-            length: 4,
-            array: 16,
-        };
-        let ring = Ring::new(4, 19, &mut meter).unwrap();
-        let zero = Cauchy::new(&p, 0, &ring.zero(), &ring, &mut meter).unwrap();
-        for x in 0..4 {
-            for y in 0..4 {
-                assert_eq!(
-                    zero.weight(x, y, &mut meter).unwrap(),
-                    if x == y { ring.one() } else { ring.zero() }
-                );
+        let cases = [
+            (
+                Parameters {
+                    radix: 2,
+                    u: 1,
+                    a: 2,
+                    length: 4,
+                    array: 16,
+                },
+                5usize,
+            ),
+            (
+                Parameters {
+                    radix: 2,
+                    u: 2,
+                    a: 4,
+                    length: 16,
+                    array: 256,
+                },
+                7usize,
+            ),
+        ];
+        for (parameters, precision) in cases {
+            let ring = Ring::new(4, precision, &mut meter).unwrap();
+            let zero = Cauchy::new(&parameters, 0, &ring.zero(), &ring, &mut meter).unwrap();
+            for x in 0..parameters.length {
+                for y in 0..parameters.length {
+                    assert_eq!(
+                        zero.weight(x, y, &mut meter).unwrap(),
+                        if x == y { ring.one() } else { ring.zero() }
+                    );
+                }
             }
-        }
-        for t in [-3i64, -2, -1, 1, 2, 3] {
-            let i = valuation(t);
-            for z in [ring.one(), ring.point(&BigUint::from(2u8)).unwrap()] {
-                let kernel = Cauchy::new(&p, t, &z, &ring, &mut meter).unwrap();
-                let tiles = 1usize << (i + 1);
-                for x in 0..4 {
-                    for y0 in 0..tiles {
-                        if ((x >> i) & 1) != ((y0 >> i) & 1) {
-                            continue;
-                        }
-                        for y in (y0..4).step_by(tiles) {
-                            let j = (y - y0) / tiles;
-                            let mut sum = ring.zero();
-                            for b in 0..ring.precision() - 1 {
-                                let coefficient =
-                                    kernel.mode_coefficient(x, y0, i, b, &mut meter).unwrap();
-                                assert!(coefficient
-                                    .coordinates()
-                                    .iter()
-                                    .all(|c| (c & ((BigUint::one() << (b + 1)) - BigUint::one()))
-                                        .is_zero()));
-                                let scalar = ring.integer(
-                                    &BigUint::from(j).modpow(&BigUint::from(b), ring.modulus()),
-                                );
-                                let term = ring.mul(&coefficient, &scalar, &mut meter).unwrap();
-                                sum = ring.add(&sum, &term, &mut meter).unwrap();
+            for t in grid(&parameters, &meter)
+                .unwrap()
+                .into_iter()
+                .filter(|&t| t != 0 && valuation(t) < parameters.u)
+            {
+                let i = valuation(t);
+                for z in [ring.one(), ring.point(&BigUint::from(2u8)).unwrap()] {
+                    let kernel = Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+                    let tiles = 1usize << (i + 1);
+                    for x in 0..parameters.length {
+                        for y0 in 0..tiles {
+                            if ((x >> i) & 1) != ((y0 >> i) & 1) {
+                                continue;
                             }
-                            assert_eq!(
-                                sum,
-                                kernel.weight(x, y, &mut meter).unwrap(),
-                                "t={t},x={x},y={y}"
-                            );
+                            for y in (y0..parameters.length).step_by(tiles) {
+                                let j = (y - y0) / tiles;
+                                let mut sum = ring.zero();
+                                for b in 0..ring.precision() - 1 {
+                                    let coefficient =
+                                        kernel.mode_coefficient(x, y0, i, b, &mut meter).unwrap();
+                                    assert!(coefficient.coordinates().iter().all(|c| {
+                                        (c & ((BigUint::one() << (b + 1)) - BigUint::one()))
+                                            .is_zero()
+                                    }));
+                                    let scalar = ring.integer(
+                                        &BigUint::from(j).modpow(&BigUint::from(b), ring.modulus()),
+                                    );
+                                    let term = ring.mul(&coefficient, &scalar, &mut meter).unwrap();
+                                    sum = ring.add(&sum, &term, &mut meter).unwrap();
+                                }
+                                assert!(kernel
+                                    .mode_coefficient(x, y0, i, ring.precision() - 1, &mut meter,)
+                                    .unwrap()
+                                    .is_zero());
+                                assert_eq!(
+                                    sum,
+                                    kernel.weight(x, y, &mut meter).unwrap(),
+                                    "u={},t={t},x={x},y={y}",
+                                    parameters.u
+                                );
+                            }
                         }
                     }
                 }

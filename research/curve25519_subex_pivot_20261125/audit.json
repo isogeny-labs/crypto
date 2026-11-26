@@ -36,7 +36,7 @@
     "outcome": "no_local_contradiction_found",
     "native_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::coupled_controls -- --nocapture",
     "native_result": {
-      "passed": 3,
+      "passed": 4,
       "failed": 0
     },
     "claim_boundary": "bounded native controls and focused source audit; not a proof of D.1 or a practical Curve25519 attack"
@@ -46,7 +46,7 @@
     "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-active-call-audit.rs",
     "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
     "test_result": {
-      "passed": 7,
+      "passed": 13,
       "failed": 0
     },
     "derived_envelope": "with n=K*2^(i+1), K*L<=3M and D=L/2^i imply n*D<=6M; weighted tuple count is at most 2^(5*ceil(sqrt(n*p)))",
@@ -240,6 +240,17 @@
     "observed_gate": "all pairwise binary-lift differences invert, every polynomial round-trips, and duplicate points fail closed",
     "complete_library_result": "173 passed; 0 failed",
     "claim_boundary": "ring-level interpolation identity only; evaluate_at-to-deformation refinement remains unverified"
+  },
+  "cauchy_mode_series_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+    "test": "contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match",
+    "cases": [
+      {"u": 1, "a": 2, "length": 4, "precision": 5},
+      {"u": 2, "a": 4, "length": 16, "precision": 7}
+    ],
+    "observed_gate": "the finite geometric mode series equals every active Cauchy weight; each coefficient has its claimed 2-adic divisibility and the first omitted coefficient is zero",
+    "complete_library_result": "173 passed; 0 failed",
+    "claim_boundary": "scalar kernel identity across two tapers; full modes-to-child packet factorization and Rust refinement remain unverified"
   },
   "next_gate": "independently refine or kernel-check the combined contraction/source-cost theorem; preserve the exact total-work reduction ledger while seeking a counterexample to any remaining premise"
 }

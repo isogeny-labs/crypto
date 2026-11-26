@@ -191,6 +191,15 @@ extension-valued coefficients, all retained lengths through nine, and a
 duplicate-node failure. Linking the values returned by `evaluate_at` to the
 claimed deformation polynomial remains in C1 items 1–3. `[pcc:unverified]`
 
+For item 1's scalar kernel step, `mode_coefficient` is the geometric expansion
+of `Cauchy::weight` along a tile `y=y0+2^(i+1)j`. Its weight-`b+1`
+coefficient is divisible by `2^(b+1)`, and the coefficient at `b=p-1` is zero
+modulo `2^p`, justifying the finite series. The native control now checks all
+active nodes for `u=1,a=2,L=4,p=5` and `u=2,a=4,L=16,p=7`, at scalar and
+nontrivial extension sample values. Factoring those scalar identities through
+`modes`, `child`, and all packet ports remains in items 2–3.
+`[pcc:unverified]`
+
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
 control.  An isolated recovery control additionally covers `u=2` and `u=3`,
