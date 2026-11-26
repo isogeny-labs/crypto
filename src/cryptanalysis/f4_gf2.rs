@@ -468,11 +468,11 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, e as usize, |s, _| {
-                if p.terms.iter().any(|t| (t.mask as u64 | s).count_ones() > e) {
+                if p.terms.iter().any(|t| (t.mask | s).count_ones() > e) {
                     return;
                 }
                 ws.clear();
-                ws.extend(p.terms.iter().map(|t| t.mask as u64 | s));
+                ws.extend(p.terms.iter().map(|t| t.mask | s));
                 ws.push(s);
                 ws.sort_unstable_by_key(|&w| (std::cmp::Reverse(w.count_ones()), w));
                 let mut k = 0;
@@ -508,7 +508,7 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, (e - d) as usize, |u, _| {
-                let mut row: Vec<u32> = p.terms.iter().map(|t| layout.rank(t.mask as u64 | u)).collect();
+                let mut row: Vec<u32> = p.terms.iter().map(|t| layout.rank(t.mask | u)).collect();
                 row.sort_unstable();
                 let mut kept = Vec::with_capacity(row.len());
                 let mut k = 0;
@@ -570,7 +570,7 @@ fn build(
     let term_vars = generating
         .iter()
         .flat_map(|(p, _)| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask as u64);
+        .fold(0u64, |acc, t| acc | t.mask);
     let occurring = if compact {
         term_vars
     } else {
@@ -640,7 +640,7 @@ fn build(
                     .is_some_and(|plan| plan.skips(&layout, degree, i, pdeg, u)),
             );
             for t in &p.terms {
-                let x = t.mask as u64 | u;
+                let x = t.mask | u;
                 let key = if use_rank {
                     let r = layout.rank(x) as usize;
                     if s.stamp[r] != generation {
@@ -836,7 +836,7 @@ fn exact_reference_rows_exceed(
                 return;
             }
             s.row_buf.clear();
-            s.row_buf.extend(p.terms.iter().map(|t| t.mask as u64 | u));
+            s.row_buf.extend(p.terms.iter().map(|t| t.mask | u));
             s.row_buf.sort_unstable();
             let mut i = 0;
             let mut nonempty = false;
@@ -1125,7 +1125,7 @@ pub fn f5_row_mask(polys: &[F2BoolPoly], n_vars: usize, degree: u32) -> Option<V
     let occurring = generating
         .iter()
         .flat_map(|(p, _)| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask as u64);
+        .fold(0u64, |acc, t| acc | t.mask);
     let layout = Layout::new(occurring, n_vars, degree);
     let plan = F5Plan::new(&generating, &layout, degree)?;
     let v = layout.bits.len();

@@ -2450,7 +2450,6 @@ fn ug_karatsuba(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
             out[i + h] = addm(out[i + h], mid, p);
         }
     }
-    let mut out = out;
     ug_trim(&mut out);
     out
 }

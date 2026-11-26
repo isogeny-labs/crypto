@@ -8746,7 +8746,7 @@ pub struct VisitAccountingV1 {
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct VisitAccountedErrorV1 {
     pub message: String,
-    pub accounting: VisitAccountingV1,
+    pub accounting: Box<VisitAccountingV1>,
 }
 
 impl std::fmt::Display for VisitAccountedErrorV1 {
@@ -9620,18 +9620,18 @@ impl<'a> VisitAccountingSession<'a> {
     fn begin(
         mut builder: VisitAccountingBuilder,
         context: &'a VisitAccountingContext,
-    ) -> Result<Self, VisitAccountingBuilder> {
+    ) -> Result<Self, Box<VisitAccountingBuilder>> {
         let token = VisitAccountingToken(context);
         builder.bind_token(token);
         if std::thread::current().id() != token.0.owner_thread {
             token.0.record_foreign_thread();
             visit_accounting_merge_context_fault(token, &mut builder);
-            return Err(builder);
+            return Err(Box::new(builder));
         }
         VISIT_ACCOUNTING_ACTIVE.with(|slot| {
             let mut slot = slot.borrow_mut();
             if slot.is_some() {
-                Err(builder)
+                Err(Box::new(builder))
             } else {
                 *slot = Some(builder);
                 VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
@@ -10976,21 +10976,21 @@ where
         );
         return Err(VisitAccountedErrorV1 {
             message: "nested accounted visitor calls are unsupported".into(),
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     }
     if let Some(error) = binding_error {
         builder.block("invalid_binding", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::InvalidInput),
+            accounting: Box::new(builder.seal(VisitDispositionV1::InvalidInput)),
         });
     }
     if let Some(error) = basic_configuration_error {
         builder.block("unsupported_configuration", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     }
     if builder.arm.implementation_environment != "f4_environment_absent" {
@@ -10998,21 +10998,21 @@ where
         builder.block("unsupported_configuration", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     }
     if let Some(error) = visit_accounting_basic_configuration_error(opts, false) {
         builder.block("unsupported_configuration", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     }
     if let Some(error) = visit_accounting_resolved_configuration_error() {
         builder.block("unsupported_configuration", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     }
     let Some(context) = VisitAccountingContext::new() else {
@@ -11020,7 +11020,7 @@ where
         builder.block("accounting_context_exhausted", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         });
     };
     let session = VisitAccountingSession::begin(builder, &context).map_err(|mut builder| {
@@ -11031,7 +11031,7 @@ where
         );
         VisitAccountedErrorV1 {
             message: "accounted visitor meter is already active".into(),
-            accounting: builder.seal(VisitDispositionV1::Unsupported),
+            accounting: Box::new(builder.seal(VisitDispositionV1::Unsupported)),
         }
     })?;
     let account = VisitAccount::On(session.token());
@@ -11052,8 +11052,10 @@ where
                 .stopped()
         });
     if initial_accounting_stopped || account.control().stopped() {
-        let mut report = VisitReport::default();
-        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        let report = VisitReport {
+            accounting_v1: Some(Box::new(session.finish(VisitDispositionV1::Incomplete))),
+            ..Default::default()
+        };
         return Ok(report);
     }
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
@@ -11070,7 +11072,7 @@ where
             Ok(report)
         }
         Err(message) => Err(VisitAccountedErrorV1 {
-            accounting: session.finish(VisitDispositionV1::InvalidInput),
+            accounting: Box::new(session.finish(VisitDispositionV1::InvalidInput)),
             message,
         }),
     }
