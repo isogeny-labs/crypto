@@ -12,57 +12,56 @@
 //! Every field multiplication (squarings included) and inversion is counted.
 //! Each recovered log is verified with an uncounted double-and-add (d*G == Q).
 //!
-//! Usage: m31-structure-rho <arm> <a> <b> <order> <gx> <gy> <qx> <qy> <seed_hex> <W> <dp_bits> [beta] [lambda]
-//! Output: one JSON line. No dependencies.
+//! Library: `solve(&Job) -> Solve` (one JSON line via `Solve::json`).
 
 use std::collections::HashMap;
 use std::time::Instant;
 
-const P: u64 = (1u64 << 31) - 1;
+pub const P: u64 = (1u64 << 31) - 1;
 const JUMPS: usize = 32;
 
 #[derive(Default, Clone, Copy)]
-struct Counts {
-    mul: u64, // field multiplications, squarings included (squarings also tallied in sqr)
-    sqr: u64,
-    inv: u64,       // inversions (each also costs ~61 counted multiplications inside `mul`)
-    canon_mul: u64, // multiplications spent on class canonicalisation (subset of mul)
+pub struct Counts {
+    pub mul: u64, // field multiplications, squarings included (squarings also tallied in sqr)
+    pub sqr: u64,
+    pub inv: u64,       // inversions (each also costs ~61 counted multiplications inside `mul`)
+    pub canon_mul: u64, // multiplications spent on class canonicalisation (subset of mul)
 }
 
-struct F {
-    c: Counts,
+pub struct F {
+    pub c: Counts,
 }
 impl F {
     #[inline(always)]
-    fn red(x: u64) -> u64 {
+    pub fn red(x: u64) -> u64 {
         let x = (x & P) + (x >> 31);
         let x = (x & P) + (x >> 31);
         if x >= P { x - P } else { x }
     }
     #[inline(always)]
-    fn mul(&mut self, a: u64, b: u64) -> u64 {
+    pub fn mul(&mut self, a: u64, b: u64) -> u64 {
         self.c.mul += 1;
         Self::red(a * b)
     }
     #[inline(always)]
-    fn sqr(&mut self, a: u64) -> u64 {
+    pub fn sqr(&mut self, a: u64) -> u64 {
         self.c.sqr += 1;
         self.mul(a, a)
     }
     #[inline(always)]
-    fn sub(a: u64, b: u64) -> u64 {
+    pub fn sub(a: u64, b: u64) -> u64 {
         if a >= b { a - b } else { a + P - b }
     }
     #[inline(always)]
-    fn add(a: u64, b: u64) -> u64 {
+    pub fn add(a: u64, b: u64) -> u64 {
         let s = a + b;
         if s >= P { s - P } else { s }
     }
     #[inline(always)]
-    fn neg(a: u64) -> u64 {
+    pub fn neg(a: u64) -> u64 {
         if a == 0 { 0 } else { P - a }
     }
-    fn inv(&mut self, x: u64) -> u64 {
+    pub fn inv(&mut self, x: u64) -> u64 {
         assert!(x != 0);
         self.c.inv += 1;
         let (mut o, mut b, mut e) = (1u64, x, P - 2);
@@ -77,10 +76,10 @@ impl F {
     }
 }
 
-type Pt = Option<(u64, u64)>;
+pub type Pt = Option<(u64, u64)>;
 
 /// Counted affine addition with its own inversion (setup and restarts only).
-fn add_counted(f: &mut F, a_coef: u64, p1: Pt, p2: Pt) -> Pt {
+pub fn add_counted(f: &mut F, a_coef: u64, p1: Pt, p2: Pt) -> Pt {
     let (a, b) = match (p1, p2) {
         (None, q) => return q,
         (q, None) => return q,
@@ -102,7 +101,7 @@ fn add_counted(f: &mut F, a_coef: u64, p1: Pt, p2: Pt) -> Pt {
     let y3 = F::sub(f.mul(l, F::sub(a.0, x3)), a.1);
     Some((x3, y3))
 }
-fn scalar_counted(f: &mut F, a_coef: u64, mut k: u64, mut pt: Pt) -> Pt {
+pub fn scalar_counted(f: &mut F, a_coef: u64, mut k: u64, mut pt: Pt) -> Pt {
     let mut r = None;
     while k > 0 {
         if k & 1 != 0 {
@@ -114,22 +113,22 @@ fn scalar_counted(f: &mut F, a_coef: u64, mut k: u64, mut pt: Pt) -> Pt {
     r
 }
 /// Uncounted reference arithmetic for verification only.
-fn scalar_ref(a_coef: u64, k: u64, pt: Pt) -> Pt {
+pub fn scalar_ref(a_coef: u64, k: u64, pt: Pt) -> Pt {
     let mut f = F { c: Counts::default() };
     scalar_counted(&mut f, a_coef, k, pt)
 }
 
-fn splitmix(s: &mut u64) -> u64 {
+pub fn splitmix(s: &mut u64) -> u64 {
     *s = s.wrapping_add(0x9e37_79b9_7f4a_7c15);
     let mut z = *s;
     z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
     z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
     z ^ (z >> 31)
 }
-fn mulmod(a: u64, b: u64, n: u64) -> u64 {
+pub fn mulmod(a: u64, b: u64, n: u64) -> u64 {
     ((a as u128 * b as u128) % n as u128) as u64
 }
-fn powmod(mut a: u64, mut e: u64, n: u64) -> u64 {
+pub fn powmod(mut a: u64, mut e: u64, n: u64) -> u64 {
     let mut o = 1;
     while e > 0 {
         if e & 1 != 0 {
@@ -145,8 +144,8 @@ fn jump_of(x: u64) -> usize {
     ((x.wrapping_mul(0x9e37_79b9_7f4a_7c15)) >> 59) as usize
 }
 
-#[derive(Clone, Copy, PartialEq)]
-enum Arm {
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum Arm {
     Plain,
     Neg,
     Aut6,
@@ -218,30 +217,47 @@ impl Ctx {
     }
 }
 
-fn arg(v: &[String], i: usize) -> u64 {
-    let s = &v[i];
-    if let Some(h) = s.strip_prefix("0x") {
-        u64::from_str_radix(h, 16).unwrap()
-    } else {
-        s.parse().unwrap()
-    }
-}
-
-fn main() {
-    let v: Vec<String> = std::env::args().collect();
-    let arm = match v[1].as_str() {
+pub fn parse_arm(s: &str) -> Arm {
+    match s {
         "plain" => Arm::Plain,
         "neg" => Arm::Neg,
         "aut6" => Arm::Aut6,
         _ => panic!("arm"),
-    };
-    let (acoef, bcoef, n) = (arg(&v, 2), arg(&v, 3), arg(&v, 4));
-    let g: Pt = Some((arg(&v, 5), arg(&v, 6)));
-    let q: Pt = Some((arg(&v, 7), arg(&v, 8)));
-    let seed = arg(&v, 9);
-    let w_n = arg(&v, 10) as usize;
-    let dp_bits = arg(&v, 11) as u32;
-    let (beta, lambda) = if v.len() > 13 { (arg(&v, 12), arg(&v, 13)) } else { (0, 0) };
+    }
+}
+
+/// One single-target solve request (public data only).
+#[derive(Clone)]
+pub struct Job {
+    pub arm: Arm,
+    pub a: u64,
+    pub b: u64,
+    pub n: u64,
+    pub g: (u64, u64),
+    pub q: (u64, u64),
+    pub seed: u64,
+    pub walks: usize,
+    pub dp_bits: u32,
+    pub beta: u64,
+    pub lambda: u64,
+}
+
+pub struct Solve {
+    pub recovered: u64,
+    pub verified: bool,
+    pub steps: u64,
+    pub json: String,
+}
+
+pub fn solve(job: &Job) -> Solve {
+    let arm = job.arm;
+    let (acoef, bcoef, n) = (job.a, job.b, job.n);
+    let g: Pt = Some(job.g);
+    let q: Pt = Some(job.q);
+    let seed = job.seed;
+    let w_n = job.walks;
+    let dp_bits = job.dp_bits;
+    let (beta, lambda) = (job.beta, job.lambda);
     let on_curve = |p: Pt| {
         let (x, y) = p.unwrap();
         let r = F::red;
@@ -438,7 +454,7 @@ fn main() {
     };
     let wc = f.c;
     let rc = restart_f.c;
-    println!(
+    let json = format!(
         "{{\"arm\":\"{}\",\"seed\":\"{:#018x}\",\"W\":{},\"dp_bits\":{},\"steps\":{},\"accepted_steps\":{},\"lookahead_rejects\":{},\
 \"restarts_cycle\":{},\"cycle_escapes\":{},\"cycle_len_hist\":{:?},\"ring_compares\":{},\"restarts_selfhit\":{},\"restarts_special\":{},\"distinguished_points\":{},\
 \"walk_mul\":{},\"walk_sqr\":{},\"walk_inv\":{},\"canon_mul\":{},\"restart_mul\":{},\"restart_inv\":{},\
@@ -447,5 +463,8 @@ fn main() {
         dps.len(), wc.mul, wc.sqr, wc.inv, wc.canon_mul, rc.mul, rc.inv, setup_counts.mul, setup_counts.inv,
         wc.mul + rc.mul + setup_counts.mul, recovered, verified, wall_ms
     );
-    assert!(verified, "recovered log must verify");
+    Solve { recovered, verified, steps, json }
 }
+
+pub mod structure;
+pub mod kdf;
