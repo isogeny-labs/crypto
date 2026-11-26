@@ -669,4 +669,3 @@ kernel-check the whole asymptotic chain. [pcc:unverified]
   [`IMPLEMENTATION_BOUNDARY.md`](IMPLEMENTATION_BOUNDARY.md)
 - Pair-image degree gate:
   `research/curve25519_pair_image_gate_20261125/README.md`
-

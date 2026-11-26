@@ -1368,7 +1368,6 @@ impl PkmSemaevOracle {
                 PkmMode::Projective => 3,
                 PkmMode::Sym => 4,
                 PkmMode::Chain => 5,
-                PkmMode::Projective => 3,
             };
             if !(2..=max_m).contains(&self.m) {
                 return Err(format!(

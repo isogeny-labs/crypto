@@ -224,7 +224,7 @@ impl Expr {
 
     fn constant(n: usize, c: u64, p: u64) -> Self {
         let mut out = Self::zero(n);
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             out.terms.insert(vec![0; n], c % p);
         }
         out
@@ -1149,7 +1149,7 @@ fn run_analyze(args: &[String]) -> Result<(), String> {
     let (d19_lo, d19_hi) = paired_interval(d19_ratios, SEED, 10_000);
     let degree_drop_pairs = d19_pairs
         .iter()
-        .filter(|(d, q)| q.solving_degree_max + 1 <= d.solving_degree_max)
+        .filter(|(d, q)| q.solving_degree_max < d.solving_degree_max)
         .count();
     let max_build_ratio = d19_pairs
         .iter()
