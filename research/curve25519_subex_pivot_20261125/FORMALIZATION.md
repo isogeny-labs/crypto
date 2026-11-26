@@ -169,8 +169,10 @@ contraction. `[pcc:unverified]` This decomposes into:
 
 The native suite covers direct one-level controls, two taper coordinates,
 creation-precision mutation tests, and a nonvacuous three-level one-taper
-control.  A combined two-taper/deep diagnostic remained live past 90 seconds,
-so these bounded tests do not close C1. `[pcc:unverified]`
+control.  An isolated recovery control additionally covers `u=2`, both taper
+valuations, precisions 3/5/7, and scalar plus nontrivial extension-coordinate
+polynomials.  A combined two-taper/deep diagnostic remained live past 90
+seconds, so these bounded tests do not close C1. `[pcc:unverified]`
 
 ## C2 — Complete source cost
 

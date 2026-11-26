@@ -570,6 +570,80 @@ mod tests {
     }
 
     #[test]
+    fn two_taper_hermite_recovers_extension_polynomials_across_precisions() {
+        let mut meter = Meter::new(Limits {
+            steps: 2_000_000_000,
+            ..Limits::default()
+        });
+        let parameters = Parameters {
+            radix: 2,
+            u: 2,
+            a: 2,
+            length: 4,
+            array: 16,
+        };
+        let edges = 2usize;
+        let samples = edges * (2 * parameters.length - 1) + 1;
+        for precision in [3usize, 5, 7] {
+            let ring = Ring::new(4, precision, &mut meter).unwrap();
+            let scalar: Vec<_> = (0..samples)
+                .map(|i| ring.integer(&BigUint::from(5 * i + 3)))
+                .collect();
+            let extension: Vec<_> = (0..samples)
+                .map(|i| {
+                    let point = ring.point(&BigUint::from((3 * i + 1) % 16)).unwrap();
+                    ring.add(&point, &ring.integer(&BigUint::from(7 * i + 2)), &mut meter)
+                        .unwrap()
+                })
+                .collect();
+            for coefficients in [scalar, extension] {
+                let mut jets = Vec::new();
+                for t in deformation::grid(&parameters, &mut meter).unwrap() {
+                    let qt = multiplicity(edges, &parameters, t).unwrap();
+                    if qt == 0 {
+                        continue;
+                    }
+                    let local = ring
+                        .at_precision(
+                            child_precision(edges, &parameters, t, precision).unwrap(),
+                            &meter,
+                        )
+                        .unwrap();
+                    let nodes: Vec<_> = (0..samples)
+                        .map(|j| local.point(&BigUint::from(j)).unwrap())
+                        .collect();
+                    let lifted: Vec<_> = coefficients
+                        .iter()
+                        .map(|coefficient| local.lift(coefficient).unwrap())
+                        .collect();
+                    let values: Vec<_> = nodes
+                        .iter()
+                        .map(|z| {
+                            let shifted = local.shift(z, parameters.a + 1).unwrap();
+                            let argument = local
+                                .add(&local.signed(&BigInt::from(t)), &shifted, &mut meter)
+                                .unwrap();
+                            polynomial_value(&lifted, &argument, &local, &mut meter).unwrap()
+                        })
+                        .collect();
+                    let mut jet = interpolate(&nodes, &values, &local, &mut meter).unwrap();
+                    jet.truncate(qt);
+                    jets.push(Jet {
+                        t,
+                        ring: local,
+                        coefficients: jet,
+                    });
+                }
+                assert_eq!(
+                    recover(&jets, edges, &parameters, &ring, &mut meter).unwrap(),
+                    coefficients[0],
+                    "precision={precision}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
         let mut meter = Meter::new(Limits::default());
         let modes: Vec<_> = [1usize, 2, 3]
