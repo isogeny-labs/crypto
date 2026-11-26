@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Establish the P-192 actual-map composition at an explicit general scope using separate exact differential checks and degree bounds; preserve previous evidence and existing execution limits/user waiver (Codex, started 2026-11-26, branch lane/p192-composition-verification-20261126; follow-up to PR #5255).
+
 - [x] Complete the declared P-192 curve-map boundary panel and rational KM infinity normalization: all four geometric infinity points, retained affine pole, actual projective principal relation and external valid class-input normalization; native evidence/report retained under the user coordinate-screen/matched-rho waiver and unchanged limits (Codex, completed component 2026-11-26, branch lane/p192-projective-verification-20261126, PR #5255; general individual-point transpose, signed verification and original synthesis accounting remain open). [pcc:unverified]
 - [x] Demonstrate the drastic PKM supersingular auxiliary-curve setup with a runnable exact-order certificate, truncated Vélu tower, and measured ordinary-search comparison (Codex, completed local checks 2026-11-26, follow-up branch codex/pkm-drastic-setup-followup-20261126, PR #5237; PR #5236 contains tracking metadata only; exact `2^64` point, 16-step/65,536-element checked fibre, focused tests and strict scoped Clippy pass). [pcc:unverified]
 - [x] Publish the completed Cayley-product M31 signed chord extractor, deterministic correctness evidence, and static-label counting bound (Codex, 2026-11-25, branch codex/cayley-chord-m31-20261125, PR #5232; fresh standalone replay matches frozen outputs, root-library build limit documented). [pcc:unverified]
