@@ -587,4 +587,19 @@ fn finite_field_root_selector_works_without_generic_section() {
     }
 }
 
+#[test]
+fn compact_power_maps_have_exact_small_images() {
+    for (prime, image_order) in [(13_u128, 3_u128), (17, 4), (31, 5), (43, 7)] {
+        assert_eq!((prime - 1) % image_order, 0);
+        let exponent = (prime - 1) / image_order;
+        let image: BTreeSet<_> = (0..prime)
+            .map(|target| modular_power(target, exponent, prime))
+            .collect();
+        assert_eq!(image.len() as u128, image_order + 1);
+        assert!(image
+            .iter()
+            .all(|&value| value == 0 || modular_power(value, image_order, prime) == 1));
+    }
+}
+
 fn main() {}

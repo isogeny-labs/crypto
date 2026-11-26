@@ -25,6 +25,7 @@ proof obligations from computational-model assumptions.
 | finite-domain selector boundary | successor Proposition 27 | coordinate algebra of a reduced finite rational-point scheme and explicit table lookup | exact algebraic identification plus bounded selector replay, unreviewed `[pcc:unverified]` | independent finite-scheme and model review |
 | symbolic correspondence recovery | successor Theorem 28 | closure of straight-line registers in the target function field, generic-fibre/section equivalence, and Theorem 26 | exact hand reduction, unreviewed `[pcc:unverified]` | independent function-field and recovery-model review |
 | finite-field root-recovery counterexample | successor Proposition 29 | valuation obstruction in `F_p(t)`, Euler's criterion, and binary exponentiation | exact hand proof plus bounded native replay, unreviewed `[pcc:unverified]` | independent finite-field review |
+| finite-field factor-hit counterexample | successor Proposition 30 | cyclicity of `F_p^*`, power-map image size, and fixed relabelling branches | exact hand proof plus bounded native replay, unreviewed `[pcc:unverified]` | independent finite-field and model review |
 | unrestricted compact-circuit barrier | successor programme | new preprocessing/query direct-sum theorem | **open; not claimed** | formulate a narrow model with a falsifiable lower-bound target |
 
 ## Explicit non-implications

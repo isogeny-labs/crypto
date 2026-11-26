@@ -131,6 +131,15 @@ to generic rational sections by degree or circuit size alone.  A final
 barrier must charge root extraction or bound how frequently its outputs land
 in the elliptic factor base. `[pcc:unverified]`
 
+Proposition 30 rules out even an individual-leaf hit bound for unrestricted
+finite-domain circuits.  For `d | p-1`, the logarithmic-size power map
+`t -> t^((p-1)/d)` sends every target into `{0} union mu_d`, a set of size
+`d+1`; fixed branches can relabel those values by chosen elliptic factor-base
+points.  This still does not produce a decomposition.  It proves that the
+remaining barrier must use the joint `m`-leaf sum constraint or a genuine
+preprocessing/query recovery argument, rather than bounding one leaf's
+factor-base hit rate. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -172,7 +181,7 @@ They do not verify an asymptotic lower bound or an algebraic solver model.
 
 Native replay on 2026-11-26 used the `rust:1.83-alpine` container image at
 digest `sha256:0ac946ed7597a9f053a1be2ce38c09aa88b3d7079a91ea491493615294b1f699`:
-thirteen tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
+fourteen tests passed, zero failed. The suite grid-checks Theorem 20's piecewise
 optimization against direct minimization and verifies the exact `m=3,4,5`
 fractions in the indexing-family audit plus the finite cyclic-group kernel of
 Theorem 21, including exhaustive arbitrary label algebras through order seven
@@ -184,6 +193,7 @@ The final check replays Theorem 26's constant-or-injective compact-map kernel.
 It also constructs the finite-domain selector counterexample of Proposition
 27 on a small cyclic group.
 The final fixture checks Proposition 29's finite-field square-root selector.
+It also checks Proposition 30's exact power-map image sizes.
 `[pcc:unverified]`
 
 ## Owed before review-ready status

@@ -53,6 +53,7 @@ The status of the program is:
 | Proposition 27 | exact finite-domain boundary | arbitrary subgroup-point selectors exist in the reduced evaluation algebra, so global-map rigidity cannot extend without a compression/query hypothesis |
 | Theorem 28 | unconditional in the symbolic straight-line recovery model | rational recovery from a succinct correspondence produces a global selector section and inherits Theorem 26's square-root direct sum |
 | Proposition 29 | exact finite-field root-recovery counterexample | compact exponentiation recovers roots on many finite-field targets even when the generic correspondence has no rational section |
+| Proposition 30 | exact finite-field hit-bound counterexample | a logarithmic-size power map sends every target into a fixed small set, so individual-leaf factor-base hits cannot support the final barrier |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -2356,6 +2357,56 @@ barrier must therefore charge finite-field root extraction or prove that its
 outputs still cannot hit the structured elliptic factor base often enough.
 [pcc:unverified]
 
+### Proposition 30 (compact finite-field maps can have tiny image)
+
+Let \(d\mid p-1\), and put
+
+\[
+h_d(t)=t^{(p-1)/d},\qquad
+A_d=\{0\}\cup\mu_d(\mathbb F_p).
+\]
+
+Then
+
+\[
+h_d(\mathbb F_p)=A_d,\qquad |A_d|=d+1.
+\]
+
+Binary powering computes \(h_d\) with \(O(\log p)\) multiplications.  Thus,
+even for fixed \(d\), a logarithmic-size finite-field circuit sends all \(p\)
+targets into a constant-size structured set.  With \(d+1\) fixed equality
+branches, the values in \(A_d\) may be relabelled by any chosen \(d+1\)
+elliptic factor-base points, producing a compact finite-domain leaf circuit
+whose output lies in that factor base for every target. [pcc:unverified]
+
+#### Proof
+
+The group \(\mathbb F_p^\times\) is cyclic of order \(p-1\).  The power
+homomorphism with exponent \((p-1)/d\) has image size
+
+\[
+\frac{p-1}{\gcd(p-1,(p-1)/d)}=d,
+\]
+
+and every image element is a \(d\)-th root of unity.  Hence its nonzero image
+is exactly \(\mu_d(\mathbb F_p)\); zero maps to zero.  Binary exponentiation
+has logarithmic circuit size.  The final relabelling uses a fixed branch for
+each of the \(d+1\) possible values. \(\square\)
+
+Proposition 30 does not produce an elliptic relation: after selecting one
+factor-base point, the remaining leaves must still lie in the factor base and
+sum with it to the target.  It does show that no bound of the form
+
+\[
+\bigl|\{T:f(T)\in\mathcal F\}\bigr|
+\le |\mathcal F|\,\operatorname{poly}(\operatorname{size}f)
+\]
+
+can hold for arbitrary finite-domain arithmetic circuits.  The final compact
+barrier must exploit the **joint** \(m\)-leaf addition constraint, witness
+recovery, or preprocessing/query trade-off; a per-leaf hit estimate is
+insufficient. [pcc:unverified]
+
 ### Exact remaining computational gap
 
 Even full \(q^2\)-monomial support rules out only monomial-explicit
@@ -2608,6 +2659,7 @@ separate labels, Proposition 23 audits the simplest target-dependent
 coordinate filter, Theorem 26 closes compact global single-valued maps, and
 Theorem 28 closes straight-line rational recovery from correspondences.
 Proposition 29 shows why finite-field root extraction is a distinct case.
-Research should now concentrate on factor-base hit bounds for such root
-selectors, finite-domain branching, implicit branch generation, and
-multi-target sharing.
+Proposition 30 further rules out per-leaf factor-base hit bounds for arbitrary
+finite-domain circuits.  Research should now concentrate on the joint
+all-leaf addition constraint, finite-domain branching, implicit branch
+generation, and multi-target witness recovery.
