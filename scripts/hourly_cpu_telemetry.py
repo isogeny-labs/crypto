@@ -9,6 +9,7 @@ import platform
 import shutil
 import statistics
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -32,13 +33,17 @@ def fingerprint(binary):
     with binary.open("rb") as f:
         for block in iter(lambda: f.read(1024 * 1024), b""):
             digest.update(block)
-    return hashlib.sha256(json.dumps({
+    components = {
         "binary_sha256": digest.hexdigest(),
         "compiler": subprocess.check_output(["rustc", "-Vv"], text=True, timeout=10),
         "flags": {k: os.getenv(k, "") for k in (
             "RUSTFLAGS", "CARGO_INCREMENTAL", "CARGO_PROFILE_RELEASE_DEBUG",
             "CARGO_BUILD_TARGET")},
-    }, sort_keys=True).encode()).hexdigest()
+    }
+    encoded = json.dumps(components, sort_keys=True)
+    # Diagnostic only: retain the identical cohort hash and CSV contract.
+    print("hourly_build_fingerprint_components=" + encoded, file=sys.stderr)
+    return hashlib.sha256(encoded.encode()).hexdigest()
 
 
 def cohort(row):
