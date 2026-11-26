@@ -255,7 +255,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 - [ ] Reproduce the genus 2–4 HEC index calculus comparison and examine the mathematical contribution (Codex, started 2026-11-18, branch research/hec-tenfold-replay, PR #4789)
 - [x] Publish the fresh P-192 plane-quartic transfer acceptance replay, machine receipt and exact remaining obligations (Codex, completed 2026-11-19, branch codex/p192-quartic-transfer-assessment-20261119, PR #4788)
 
-- [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, fast Phase-1 candidate extraction, and multi-prime scaling for extension-field graph IC (Cursor, in progress, started 2026-11-18, resumed 2026-11-26, branch cursor/graph-index-calculus-ecdlp-7226, prior tracking PR #4787)
+- [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, fast Phase-1 candidate extraction, and multi-prime scaling for extension-field graph IC (Cursor, in progress, started 2026-11-18, resumed 2026-11-26, branch cursor/graph-index-calculus-ecdlp-7226, PR #5247)
 
 - [x] Keep the n83_d18_shared_bits include_bytes! CSV in Git (store policy keep entry) so CI `check --all-targets` can compile it (Claude, started 2026-11-19, branch aburan28/zealous-lovelace-tc390j-keep-n83-csv, PR #4786)
 
