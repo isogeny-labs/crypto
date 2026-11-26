@@ -80,3 +80,36 @@ remaining useful probe is the same pair at `B = 61` and `127`; if those also
 sit at 1.2–1.4, the construction is closed for this goal on measured evidence,
 and the work belongs on the solver itself (cost per level below `B^{1/2}`)
 rather than on the map family.
+
+## Why this is not a cube-root algorithm, and cannot be made one here
+
+A cube-root (`L_p[1/3]`) index calculus for the ECDLP over prime fields is not
+known. The literature is explicit: Enge's `L(1/3+ε)` result is for low-degree
+*plane curves*, not elliptic curves over `F_p`, and the 2024 implementation
+study of index calculus on prime-field elliptic curves (ePrint 2024/1923)
+states that no subexponential method for this problem is known. The
+repository's own notes (`docs/ic/`,
+`RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`) agree.
+
+The measurements here say more than "not found yet":
+
+* **The dense route is exactly `p`.** With `|V| = p^{1/m}`, the membership
+  polynomial has degree `|V|` per summand, so the elimination degree is
+  `|V|^{m-1}` and `|V|` relations cost `|V| · |V|^{m-1} = p`. Measured, the
+  tower presentation does not beat that: total exponent 1.7–1.9 at `m = 2`.
+* **`L[1/3]` needs `exp(O((log p)^{1/3}))`.** At 256 bits that is about
+  `2^{20}` operations against rho's `2^{128}` — a different complexity class,
+  not a constant factor. Every route measured or bounded here is a power of
+  `p`.
+* **The structural reason.** `L(1/3)` algorithms (NFS, function-field IC) need
+  a ring or function field in which a smoothness notion exists — `F_{p^n}`
+  with small `n`, or a curve of genus `g` with `g` growing. `E(F_p)` is a
+  one-dimensional group over a prime field with no such structure: PKM
+  manufactures smoothness on an *auxiliary* curve, but the relation search
+  then runs in `E(F_p)`, where no smoothness concept exists.
+
+What would have to be invented: either a solver for the chain system with cost
+`exp(O(V^{1/3}))` in `V = log p / log B` tower variables — unknown for any
+polynomial system — or a smoothness structure on `E(F_p)` itself, which is the
+open problem the literature is stuck on. Neither is an engineering gap in this
+repository, and no amount of further running here produces one.
