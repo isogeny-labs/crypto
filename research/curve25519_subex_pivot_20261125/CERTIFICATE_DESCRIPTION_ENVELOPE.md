@@ -183,7 +183,8 @@ are `tau=2`, `n=4`, `Q<=16`, and `log2 T<=25`. The gap records the
 The standalone module now exposes `verify_source_dimensions`, which takes the
 source coordinates `(a,u,i)` and independently reconstructs
 `(M,K,L,tau,D,p)` from an already accepted serialized certificate. It requires
-uniform packet length and checks `K L<=3M`, `nD<=6M`, and `p u<=34MD`, then
+uniform packet length, checks `K L<=3M` and `nD<=6M`, reports whether
+`p u<=34MD` holds, and can require that normalized-precision premise. It then
 recomputes the same mode and tuple ceilings. The production controls compare
 that result field-for-field with the separate BigUint `NodeDimensions` audit.
 Among the 596 three- through five-edge partition-shape certificates, 285 meet
@@ -196,8 +197,11 @@ graph or the source packing routine produced the certificate.
 `[pcc:unverified]`
 
 The native verifier exposes this refinement as
-`factorization-certificate-check [CERTIFICATE.json] --source A U I`; omitted
-source arguments preserve the ordinary algebraic certificate check.
+`factorization-certificate-check [CERTIFICATE.json] --source A U I`; this mode
+requires normalized precision, while omitted source arguments preserve the
+ordinary algebraic certificate check. Non-strict diagnostic histories use the
+report-only mode so a known failed precision premise is not mislabeled as a
+factorization failure.
 
 This closes a finite description-counting obligation, not the entire
 subexponential theorem. A full result still needs the recursive-history and

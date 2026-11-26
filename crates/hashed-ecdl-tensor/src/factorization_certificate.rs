@@ -116,6 +116,8 @@ pub struct SourceDimensionWitness {
     pub u: u32,
     /// Active valuation coordinate `i<u`.
     pub coordinate: u32,
+    /// Whether failure of `p u<=34 M D` rejects this source shape.
+    pub require_normalized_precision: bool,
 }
 
 /// Independently reconstructed source dimensions for one accepted certificate.
@@ -135,8 +137,10 @@ pub struct SourceDimensionSummary {
     pub precision: BigUint,
     /// Nonnegative slack in `K L<=3M`.
     pub packing_slack: BigUint,
-    /// Nonnegative slack in `p u<=34 M D`.
-    pub precision_slack: BigUint,
+    /// Nonnegative slack in `p u<=34 M D`, when that inequality holds.
+    pub precision_slack: Option<BigUint>,
+    /// Whether the normalized precision inequality holds.
+    pub normalized_precision_admitted: bool,
     /// Recomputed `K tau` mode bound for each weight.
     pub modes_per_weight_bound: usize,
     /// Recomputed `K tau (p-1)` total mode bound.
@@ -453,8 +457,9 @@ pub fn description_envelope(
 /// The caller must first run [`verify`]. This independent refinement checks
 /// uniform packet length, the tile/coordinate identity, packet capacity, and
 /// the normalized precision inequality directly from serialized dimensions.
-/// It does not prove that a graph or the source packing routine produced the
-/// certificate.
+/// The witness chooses whether a failed normalized-precision inequality is a
+/// rejection or a reported diagnostic boundary. This function does not prove
+/// that a graph or the source packing routine produced the certificate.
 pub fn verify_source_dimensions(
     certificate: &Certificate,
     witness: &SourceDimensionWitness,
@@ -510,7 +515,8 @@ pub fn verify_source_dimensions(
     }
     let precision_lhs = &precision * BigUint::from(witness.u);
     let precision_rhs = BigUint::from(34u8) * &edges * &distance;
-    if precision_lhs > precision_rhs {
+    let normalized_precision_admitted = precision_lhs <= precision_rhs;
+    if witness.require_normalized_precision && !normalized_precision_admitted {
         return Err("source precision".into());
     }
     let envelope = description_envelope(certificate)?;
@@ -528,7 +534,9 @@ pub fn verify_source_dimensions(
         interaction_distance: distance,
         precision,
         packing_slack: packing_rhs - packing_lhs,
-        precision_slack: precision_rhs - precision_lhs,
+        precision_slack: normalized_precision_admitted
+            .then(|| precision_rhs.clone() - precision_lhs),
+        normalized_precision_admitted,
         modes_per_weight_bound: envelope.modes_per_weight_bound,
         attempted_modes_bound: envelope.attempted_modes_bound,
         tuple_log2_bound: envelope.tuple_log2_bound,

@@ -42,6 +42,7 @@ fn run() -> Result<(), String> {
                 coordinate: coordinate
                     .parse::<u32>()
                     .map_err(|error| format!("coordinate: {error}"))?,
+                require_normalized_precision: true,
             })
         };
     let (path, source) = match args.as_slice() {

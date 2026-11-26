@@ -17,6 +17,7 @@ fn assert_source_count_bridge(
     certificate: &Certificate,
     parameters: &Parameters,
     coordinate: usize,
+    require_normalized_precision: bool,
 ) -> bool {
     let dimensions = NodeDimensions {
         edges: certificate.edge_count.into(),
@@ -33,13 +34,20 @@ fn assert_source_count_bridge(
             a: u32::try_from(parameters.a).unwrap(),
             u: u32::try_from(parameters.u).unwrap(),
             coordinate: u32::try_from(coordinate).unwrap(),
+            require_normalized_precision,
         },
     );
     let packing_capacity = BigUint::from(certificate.packets.len())
         * BigUint::from(parameters.length)
         <= BigUint::from(3u8) * BigUint::from(certificate.edge_count);
     assert_eq!(audit.is_ok(), packing_capacity);
-    assert_eq!(source.is_ok(), packing_capacity);
+    let precision_admitted = audit
+        .as_ref()
+        .is_ok_and(|audit| audit.precision_md_over_u_coefficient <= BigUint::from(34u8));
+    assert_eq!(
+        source.is_ok(),
+        packing_capacity && (!require_normalized_precision || precision_admitted)
+    );
     let Ok(audit) = audit else {
         return false;
     };
@@ -52,6 +60,7 @@ fn assert_source_count_bridge(
     assert_eq!(source.tile_period, audit.tiles);
     assert_eq!(source.interaction_distance, audit.interaction_distance);
     assert_eq!(source.precision, dimensions.precision);
+    assert_eq!(source.normalized_precision_admitted, precision_admitted);
     assert_eq!(audit.packet_length, envelope.packet_length.into());
     assert_eq!(audit.tiles, envelope.tiles.into());
     assert_eq!(
@@ -411,7 +420,7 @@ pub(super) fn capture_executed_source_checked(
         .map_err(|_| invalid("executed source certificate parsing"))?;
     standalone_verify(&certificate, meter)
         .map_err(|_| integrity("executed source certificate verification"))?;
-    if !assert_source_count_bridge(&certificate, parameters, coordinate) {
+    if !assert_source_count_bridge(&certificate, parameters, coordinate, false) {
         return Err(invalid("executed source certificate dimensions"));
     }
     let envelope = description_envelope(&certificate)
@@ -464,7 +473,8 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(!assert_source_count_bridge(
         &certificate,
         &parameters,
-        coordinate
+        coordinate,
+        true,
     ));
     assert_eq!(serde_json::to_vec(&certificate).unwrap(), serialized);
     assert!(serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound);
@@ -623,8 +633,12 @@ fn serialized_certificate_covers_every_three_edge_partition_shape() {
                     maximum_case = Some((*left_groups, *right_groups, schedule));
                 }
                 let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
-                source_admitted +=
-                    usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
+                source_admitted += usize::from(assert_source_count_bridge(
+                    &certificate,
+                    &parameters,
+                    0,
+                    true,
+                ));
                 assert!(
                     serialized.len()
                         <= description_envelope(&certificate).unwrap().json_bytes_bound
@@ -694,8 +708,12 @@ fn serialized_certificate_covers_four_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
-            source_admitted +=
-                usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
+            source_admitted += usize::from(assert_source_count_bridge(
+                &certificate,
+                &parameters,
+                0,
+                true,
+            ));
             assert!(
                 serialized.len() <= description_envelope(&certificate).unwrap().json_bytes_bound
             );
@@ -763,8 +781,12 @@ fn serialized_certificate_covers_five_edge_partition_orbits() {
                 maximum_case = Some((left_groups.clone(), right_groups.clone(), schedule));
             }
             let certificate: Certificate = serde_json::from_slice(&serialized).unwrap();
-            source_admitted +=
-                usize::from(assert_source_count_bridge(&certificate, &parameters, 0));
+            source_admitted += usize::from(assert_source_count_bridge(
+                &certificate,
+                &parameters,
+                0,
+                true,
+            ));
             let envelope = description_envelope(&certificate).unwrap();
             assert!(serialized.len() <= envelope.json_bytes_bound);
             maximum_json_bound = maximum_json_bound.max(envelope.json_bytes_bound);
