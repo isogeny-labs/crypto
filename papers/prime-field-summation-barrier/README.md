@@ -37,6 +37,13 @@ random.  Its explicit limitation is that every recoverable witness is a
 pre-target materialized leaf; compact coordinate circuits that generate new
 target-dependent subtrees remain outside the theorem. `[pcc:unverified]`
 
+Proposition 19 identifies that remaining boundary with group `k`SUM-Indexing.
+It audits the strongest 2026 indexing upper-bound family in a deliberately
+attacker-favourable model and finds that the complete relation-collection
+exponent still stays strictly above one-half.  The proposition also explains
+why an unconditional extension is difficult: strong adaptive lower bounds for
+ordinary integer 3SUM-Indexing are themselves open. `[pcc:unverified]`
+
 ## Source and claim crosswalk
 
 - Semaev's original prime-field bounded-solution proposal: IACR ePrint
@@ -53,7 +60,8 @@ target-dependent subtrees remain outside the theorem. `[pcc:unverified]`
   `papers/rootfinding-decomposition/`.
 
 See [`PROOF_MAP.md`](PROOF_MAP.md) for the exact verification status of each
-claim family.
+claim family and [`LITERATURE.md`](LITERATURE.md) for the data-structure
+boundary.
 
 ## Building
 

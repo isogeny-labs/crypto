@@ -42,6 +42,7 @@ The status of the program is:
 | Propositions 15--16 | exact reductions and scope boundaries | succinct eliminant trees and group-algebra convolution |
 | Theorem 17 | unconditional density-one statement for fixed \(m\) | sparse-regime \(m\)-sum expansion and the resulting exact separated-sketch barrier |
 | Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
+| Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1456,6 +1457,112 @@ coordinate circuit merely because the circuit semantically represents
 theorem showing that an implicitly generated split-\(S_3\) subtree carries
 comparable charged information, or an explicit compact generator that
 refutes that extension. `[pcc:unverified]`
+
+### Proposition 19 (the group-\(k\)SUM-indexing boundary)
+
+Let \(m\ge3\), and split the factor-base leaves into blocks of sizes \(a\) and
+\(b=m-a\).
+Materialize the ordered partial-sum arrays, retaining one tuple witness per
+entry,
+
+\[
+A=(A_u)_{u\in F^a},\qquad B=(B_v)_{v\in F^b}.
+\]
+
+For a target \(T\), split-tree relation recovery is exactly the asymmetric
+group-3SUM-indexing query
+
+\[
+\text{find }(u,v)\text{ such that }A_u+B_v=T.
+\]
+
+Equivalently, without first materializing the two partial arrays, the original
+query is group-\((m+1)\)SUM-Indexing on the factor-base array: recover \(m\)
+input entries whose sum is the challenge.  Tuple recovery, rather than mere
+membership in the sumset, is part of the indexing problem.
+
+This reduction is exact for every finite abelian group and preserves
+preprocessing, online queries, and witness recovery up to the work required to
+form the partial sums.  Consequently the full ARQP target contains a
+structured group-indexing problem for which strong adaptive data-structure
+lower bounds are already a major open problem in the standard integer model.
+
+As an upper-bound stress test, take the 2026 Dinur--Golovnev
+\(k\)SUM-Indexing trade-off and optimistically assume that it transports to
+elliptic-group inputs with no extra cost.  To recover \(m\) leaves, set their
+indexing parameter \(k=m+1\).  For \(0\le\delta\le1\), their reported space
+and query exponents become
+
+\[
+S=\widetilde O(N^{m+1/2-\delta}),\qquad
+Q=\widetilde O(N^\delta).
+\]
+
+Even ignoring any preprocessing time beyond writing \(S\), this family does
+not cross the ECDLP square-root frontier.  In the sparse regime, collecting
+\(\Theta(N)\) rows needs
+
+\[
+B=\Omega\!\left(\frac{p}{N^{m-1}}\right)
+\]
+
+uniform targets, so with \(N=p^{\alpha+o(1)}\),
+
+\[
+T_{\rm total}\ge
+\max\left\{
+p^{(m+1/2-\delta)\alpha},
+p^{1-(m-1-\delta)\alpha}
+\right\}.
+\]
+
+The two exponents balance at
+
+\[
+\alpha=\frac1{2m-1/2-2\delta},
+\]
+
+where the common exponent is
+
+\[
+E_{m,\delta}
+=\frac{m+1/2-\delta}{2m-1/2-2\delta}
+=\frac12+rac{3/4}{2m-1/2-2\delta}
+>\frac12.
+\]
+
+Charging any preprocessing work beyond writing \(S\)---including the paper's
+stated \(\widetilde O(N^2)\) runtime in its symmetric 3SUM-Indexing case---plus
+elliptic-group adaptation, verification, or factor-base linear algebra can
+only increase this exponent.
+Thus current \(k\)SUM-indexing upper bounds do not constructively refute the
+ARQP barrier.  Conversely, the known unconditional adaptive lower bounds do
+not establish the desired trade-off once the query makes more than a tiny
+number of probes.  The next theorem would therefore require either new static
+data-structure lower-bound machinery specialized to elliptic partial sums, or
+an algebraic property absent from generic group-indexing instances.
+
+#### Proof
+
+The reduction follows by associativity:
+
+\[
+\sum_{i=1}^m P_i=T
+\quad\Longleftrightarrow\quad
+\left(\sum_{i=1}^a P_i\right)
++\left(\sum_{i=a+1}^m P_i\right)=T.
+\]
+
+The retained provenance converts a returned partial-sum pair back into the
+\(m\) leaves.  The exponent audit substitutes the cited space and query
+bounds into the exact uniform-target relation count and minimizes the maximum
+of one increasing and one decreasing affine function of \(\alpha\).  The
+displayed identity for \(E_{m,\delta}\) is direct algebra. \(\square\)
+
+The literature statements and the distinction between cell-probe space,
+preprocessing time, and algebraic-RAM work are recorded in
+[`LITERATURE.md`](LITERATURE.md).  No integer-indexing algorithm is claimed to
+apply to elliptic groups without that missing adaptation. `[pcc:unverified]`
 
 ### Exact remaining computational gap
 
