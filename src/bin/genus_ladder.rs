@@ -252,6 +252,7 @@ fn parse() -> Result<Cfg, String> {
                         "2lp-new",
                         "2lp-sfb",
                         "2lp-sfb-sge",
+                        "2lp-sfb-sge-nofb",
                     ]
                     .contains(&a.as_str())
                     {
@@ -404,7 +405,11 @@ fn main() -> ExitCode {
         // Only with the flags, so a run without them writes the frozen layout.
         config["quartic_arms"] = json!(cfg.quartic_arms);
         config["quartic_seeds"] = json!(cfg.quartic_seeds);
-        if cfg.quartic_arms.iter().any(|a| a == "2lp-sfb-sge") {
+        if cfg
+            .quartic_arms
+            .iter()
+            .any(|a| a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb")
+        {
             config["quartic_sge"] = json!({"w_max": cfg.quartic_sge.0,
                 "fill_max": cfg.quartic_sge.1, "excess": cfg.quartic_sge.2});
         }
@@ -910,8 +915,11 @@ fn main() -> ExitCode {
             let sfb_any = cfg
                 .quartic_arms
                 .iter()
-                .any(|a| a == "2lp-sfb" || a == "2lp-sfb-sge");
-            let sge_arm = cfg.quartic_arms.iter().any(|a| a == "2lp-sfb-sge");
+                .any(|a| a == "2lp-sfb" || a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb");
+            let sge_arm = cfg
+                .quartic_arms
+                .iter()
+                .any(|a| a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb");
             if sfb_any {
                 // the instance in full, so certificates can be re-checked independently
                 head["f"] = json!(inst.f.to_vec());
@@ -932,20 +940,29 @@ fn main() -> ExitCode {
                     "2lp-kick" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, true, "_kick"),
                     "2lp-sfb" => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_sfb"),
                     "2lp-sfb-sge" => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_sfb_sge"),
+                    "2lp-sfb-sge-nofb" => (
+                        A::DoubleLp,
+                        nb2,
+                        D::Algebraic,
+                        S::Linked,
+                        true,
+                        "_sfb_sge_nofb",
+                    ),
                     _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
                 };
-                let fb = if name == "2lp-sfb" || name == "2lp-sfb-sge" {
+                let fb = if name == "2lp-sfb" || name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb" {
                     ql::QFactorBase::Sampled
                 } else {
                     ql::QFactorBase::Enumerated
                 };
-                let la = if name == "2lp-sfb-sge" {
+                let la = if name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb" {
                     ql::QLinAlg::SgeCoord {
                         sge: gl::SgeParams {
                             w_max: cfg.quartic_sge.0,
                             fill_max: cfg.quartic_sge.1,
                         },
                         excess: cfg.quartic_sge.2,
+                        fallback: name == "2lp-sfb-sge",
                     }
                 } else {
                     ql::QLinAlg::Wiedemann
@@ -1033,6 +1050,8 @@ fn main() -> ExitCode {
                             rec[format!("la_{k}_add")] = json!(n.add);
                         }
                         rec["la_fallbacks"] = json!(o.la_fallbacks);
+                        rec["la_fallbacks_skipped"] = json!(o.la_fallbacks_skipped);
+                        rec["la_fallback_rescues"] = json!(o.la_fallback_rescues);
                         rec["core_nnz"] = json!(o.core_nnz);
                         rec["sq_dim"] = json!(o.sq_dim);
                         rec["sq_nnz"] = json!(o.sq_nnz);
