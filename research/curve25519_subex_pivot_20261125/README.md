@@ -115,6 +115,11 @@ interpolation and recovery routines with the smaller diagnostic taper
 as a routine gate.  These are bounded exact controls, not a proof of the
 asymptotic induction. [pcc:unverified]
 
+A heterogeneous attempt with a two-taper `u=2,a=2,L=4` root and two compact
+nested levels remained live past 90 seconds and was interrupted without a
+result.  Thus the fast two-taper one-level and three-level one-taper controls
+have not yet been composed in one retained finite test. [pcc:unverified]
+
 The finite counting and pair-split formulas are independently executable in
 `crates/hashed-ecdl-tensor/src/bin/curve25519-subex-gate.rs`.  It uses exact
 integers for both the existing order-131203 miniature and Curve25519's 253-bit
