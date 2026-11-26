@@ -1,0 +1,92 @@
+{
+  "schema": "m31-checked-projection-qualification/v1",
+  "field": 2147483647,
+  "source_parent_commit": "f80a6afef699299b9c3cee5bd4ddf54517280dfa",
+  "source_archive": "qualification-01/source-crate-01.tar.gz",
+  "source_archive_sha256": "06c951079b7490cfbb6d6d188f78f29cf5b4eabd541c691a76607890a13b0966",
+  "prospective_protocol": "../PROTOCOL.md",
+  "protocol_sha256": "f8f35f90cd0412922a704327d499281980b7030f84bc0f997091fca0db682a56",
+  "qualification_attempts": 1,
+  "build": {
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo_offline": true,
+    "cargo_locked": true,
+    "test_build_exit": 0,
+    "binary_build_exit": 0
+  },
+  "tests": {
+    "library_passed": 40,
+    "cli_passed": 5,
+    "failed": 0,
+    "ignored": 0,
+    "new_projection_library_test_functions": 13,
+    "new_cli_test_functions": 3,
+    "analytic_four_point_support_subsets": 16,
+    "coupled_test_extended_not_duplicated": true
+  },
+  "coupled_fixture": {
+    "summands": 3,
+    "case": 0,
+    "arm": "preclosed_sequential",
+    "witness_mode": "geometric",
+    "unique_semaev_instances_with_complete_native_projection": 1,
+    "producer_calls_this_qualification": 1,
+    "previous_recorded_producer_calls_same_unique_fixture": 5,
+    "producer_status": "complete",
+    "fixed_basis_polynomials": 4,
+    "nonfixed_basis_polynomials": 30,
+    "processed_pairs": 561,
+    "scheduled_pairs": 561,
+    "matrices": 10,
+    "observed_max_raw_product_degree": 6,
+    "observed_max_post_nf_matrix_column_degree": 6,
+    "ordinary_verifier": {
+      "status": "Verified algorithm enum; producer-local, unsigned",
+      "candidate_pairs_checked": 561,
+      "original_ideal_buchberger_pairs_processed": 528,
+      "original_generators_checked": 11,
+      "candidate_generators_checked": 30,
+      "oracle_basis_polynomials": 33
+    },
+    "projection": {
+      "status": "complete",
+      "points": [[0, 0]],
+      "matches_signed_point_oracle": true,
+      "queries_started": 6,
+      "queries_completed": 6,
+      "section_queries_completed": 2,
+      "indicator_queries_completed": 4,
+      "leading_term_iterations": 29,
+      "polynomial_subtractions": 28,
+      "maximum_division_degree": 2
+    }
+  },
+  "custody": {
+    "pre_call_manifest": "qualification-01/pre-call-manifest-01.json",
+    "post_call_manifest": "qualification-01/post-call-manifest-01.json",
+    "distinct_manifest_names": true,
+    "separately_copied_read_only_executables": true,
+    "pre_post_executable_hashes_equal": true,
+    "working_source_digests_match_pre_build": true
+  },
+  "scope": {
+    "native_solve_one_binary_compiled": true,
+    "native_solve_one_scientific_invocations": 0,
+    "additional_coupled_semaev_fixtures": 0,
+    "full_50_per_configuration_projected_campaign_completed": false,
+    "matched_runtime_or_rss_measurements": false,
+    "factor_base_changed": false,
+    "smaller_field_substituted": false,
+    "broader_root_library_gate": "not run in this fresh sparse checkout; historical timeouts retained",
+    "signed_pcc_standing": "unverified",
+    "remote_experiment_admission": "unavailable; no authenticated Conductor/runner/checkpoint custody route"
+  },
+  "raw_logs": [
+    "qualification-01/build-tests-01.jsonl",
+    "qualification-01/build-tests-01.stderr",
+    "qualification-01/build-bin-01.jsonl",
+    "qualification-01/build-bin-01.stderr",
+    "qualification-01/tests-lib-01.log",
+    "qualification-01/tests-cli-01.log"
+  ]
+}

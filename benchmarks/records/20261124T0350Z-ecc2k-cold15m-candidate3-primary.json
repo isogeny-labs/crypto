@@ -1,0 +1,124 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-24T03:58:37+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold15m_20261124/candidate3/checks/run-primary.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-24T03:50:52+00:00",
+      "wall_s": 52.241
+    }
+  ],
+  "commit": "781e12c34c5820f5ab58ad520c314640165cbc88",
+  "commit_dirty": true,
+  "created_utc": "2026-11-24T03:50:44+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261124-ecc2k-cold15m"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261124T0350Z-ecc2k-cold15m-candidate3-primary",
+  "metrics": [
+    {
+      "baseline": 20779444.0,
+      "better": "lower",
+      "n": 5,
+      "name": "complete_cold_query_ir",
+      "note": "Exact copied Rust result; complete cold/oracle boundary. No native-time or instruction-rate claim. Remote raw custody pending, uploaded=false.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        14688697.0,
+        14688697.0
+      ],
+      "unit": "ir",
+      "value": 14688697.0
+    },
+    {
+      "baseline": 13445154.0,
+      "better": "lower",
+      "n": 5,
+      "name": "complete_oracle_ir",
+      "note": "Exact copied Rust result; complete cold/oracle boundary. No native-time or instruction-rate claim. Remote raw custody pending, uploaded=false.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10024047.0,
+        10024047.0
+      ],
+      "unit": "ir",
+      "value": 10024047.0
+    }
+  ],
+  "problem": "ecc2k130-index-calculus-cold-query",
+  "raw": [
+    {
+      "bytes": 141375,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e2/e21f6172b8545946de8cec7cc3a3dd411c1189e0390addd1bc7f499875db1632",
+      "sha256": "e21f6172b8545946de8cec7cc3a3dd411c1189e0390addd1bc7f499875db1632",
+      "uploaded": false
+    },
+    {
+      "bytes": 29746,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d102e900130ca1e600d9a30369e63371cad535a8033e8a60b6cb664c2bbaadd3",
+      "sha256": "d102e900130ca1e600d9a30369e63371cad535a8033e8a60b6cb664c2bbaadd3",
+      "uploaded": false
+    },
+    {
+      "bytes": 4075,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/4678af1e1928f7cfd4effc9485a5d68c88555d4cb3f5b102cd4f0076fa01e369",
+      "sha256": "4678af1e1928f7cfd4effc9485a5d68c88555d4cb3f5b102cd4f0076fa01e369",
+      "uploaded": false
+    },
+    {
+      "bytes": 3524,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d5/d5df425b86e6fe59106d14025b89dc1996c6cd55ac56c0a2c6f09e7b8b23dc96",
+      "sha256": "d5df425b86e6fe59106d14025b89dc1996c6cd55ac56c0a2c6f09e7b8b23dc96",
+      "uploaded": false
+    },
+    {
+      "bytes": 1166452,
+      "path": "research/trace_zero_cold15m_20261124/RAW-ALL.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/27e2eec6117fd91bf3349a00ef7c748136429cb089d2eb854eec3716800f7d0c",
+      "sha256": "27e2eec6117fd91bf3349a00ef7c748136429cb089d2eb854eec3716800f7d0c",
+      "uploaded": false
+    },
+    {
+      "bytes": 17245068,
+      "path": "research/trace_zero_cold15m_20261124/FROZEN-EXECUTABLES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e6de0f5c7ca0b23d93740339307defd9f7ff1557862b7f47605099055797ad11",
+      "sha256": "e6de0f5c7ca0b23d93740339307defd9f7ff1557862b7f47605099055797ad11",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold15m_20261124/report.pdf",
+    "png": [
+      "research/trace_zero_cold15m_20261124/instructions.png"
+    ],
+    "svg": [
+      "research/trace_zero_cold15m_20261124/instructions.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold15m-candidate3-primary",
+  "status": "measured",
+  "summary": "Third candidate primary satisfies strict15M and all six controls; pilot is provisional only. Unsigned producer checks, remote custody and independent admission remain open.",
+  "validation": null
+}
