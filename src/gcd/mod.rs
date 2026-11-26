@@ -22,7 +22,8 @@
 //! Euclidean algorithm returns (see each function), so half-GCD and Euclid
 //! agree bit for bit.
 //!
-//! Crossovers ([`poly::HGCD_THRESHOLD`], [`gf2::HGCD_THRESHOLD_BITS`],
+//! Crossovers ([`poly::HGCD_THRESHOLD`], [`poly::GCD_HGCD_THRESHOLD`],
+//! [`gf2::HGCD_THRESHOLD_BITS`], [`gf2::GCD_HGCD_THRESHOLD_BITS`],
 //! [`int::HGCD_THRESHOLD_BITS`], [`int::GCD_HGCD_THRESHOLD_BITS`]) come
 //! from `src/bin/hgcd_bench.rs`; below them the entry points run the
 //! classical algorithm (Euclid, or Lehmer for integers), so they are never

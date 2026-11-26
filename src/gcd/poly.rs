@@ -10,11 +10,17 @@
 
 use super::hgcd::{self, PolyRing};
 
-/// Degree at and above which the half-GCD recursion runs (below it,
-/// classical Euclid).  Measured with `src/bin/hgcd_bench.rs` (F_p,
-/// p = 2^61 − 1, Karatsuba products): half-GCD loses below degree ~1000 and
-/// wins from ~2048 (gcd and xgcd ≈ 1.2–1.3× at 2048–4096).
-pub const HGCD_THRESHOLD: usize = 2048;
+/// Degree at and above which [`xgcd`] and [`inv_mod`] use half-GCD (below:
+/// classical extended Euclid).  Measured with `src/bin/hgcd_bench.rs` (F_p,
+/// p = 2^61 − 1, Karatsuba products, leaf 256): ≈1.0× at 2048, 1.2× at
+/// 3072, 1.3–2.3× at 8192–16384.
+pub const HGCD_THRESHOLD: usize = 3072;
+/// Degree from which plain [`gcd`] (no cofactors) uses half-GCD.  Classical
+/// gcd still won at every measured degree up to 8192 (half-GCD 0.6–0.8×),
+/// so this is set beyond the measured range.
+pub const GCD_HGCD_THRESHOLD: usize = 32768;
+/// Recursion leaf degree of the half-GCD (sweep: 32..1024, best ≈256).
+pub const HGCD_LEAF: usize = 256;
 /// Operand length at and above which multiplication uses Karatsuba.
 pub const KARATSUBA_THRESHOLD: usize = 24;
 
@@ -127,10 +133,11 @@ impl PolyField for Fp64 {
     }
 }
 
-/// `F[x]` as a [`PolyRing`] for the half-GCD driver; the second field is
-/// the half-GCD degree threshold ([`HGCD_THRESHOLD`] by default).
+/// `F[x]` as a [`PolyRing`] for the half-GCD driver: the field, then the
+/// xgcd/inverse threshold, the plain-gcd threshold and the recursion leaf
+/// degree ([`HGCD_THRESHOLD`], [`GCD_HGCD_THRESHOLD`], [`HGCD_LEAF`]).
 #[derive(Clone, Copy, Debug)]
-pub struct Polys<F>(pub F, pub usize);
+pub struct Polys<F>(pub F, pub usize, pub usize, pub usize);
 
 /// Drop trailing zero coefficients.
 pub fn trim<F: PolyField>(f: &F, a: &mut Vec<F::E>) {
@@ -318,6 +325,12 @@ impl<F: PolyField> PolyRing for Polys<F> {
     fn hgcd_threshold(&self) -> usize {
         self.1
     }
+    fn gcd_threshold(&self) -> usize {
+        self.2
+    }
+    fn hgcd_leaf(&self) -> usize {
+        self.3
+    }
 }
 
 fn normalized<F: PolyField>(f: &F, a: &[F::E]) -> Vec<F::E> {
@@ -330,7 +343,7 @@ fn normalized<F: PolyField>(f: &F, a: &[F::E]) -> Vec<F::E> {
 /// trailing zeros.
 pub fn gcd<F: PolyField>(f: &F, a: &[F::E], b: &[F::E]) -> Vec<F::E> {
     hgcd::gcd(
-        &Polys(f, HGCD_THRESHOLD),
+        &Polys(f, HGCD_THRESHOLD, GCD_HGCD_THRESHOLD, HGCD_LEAF),
         &normalized(f, a),
         &normalized(f, b),
     )
@@ -340,7 +353,7 @@ pub fn gcd<F: PolyField>(f: &F, a: &[F::E], b: &[F::E]) -> Vec<F::E> {
 /// minimal-degree cofactors ([`super::hgcd::xgcd`]).
 pub fn xgcd<F: PolyField>(f: &F, a: &[F::E], b: &[F::E]) -> (Vec<F::E>, Vec<F::E>, Vec<F::E>) {
     hgcd::xgcd(
-        &Polys(f, HGCD_THRESHOLD),
+        &Polys(f, HGCD_THRESHOLD, GCD_HGCD_THRESHOLD, HGCD_LEAF),
         &normalized(f, a),
         &normalized(f, b),
     )
@@ -350,7 +363,7 @@ pub fn xgcd<F: PolyField>(f: &F, a: &[F::E], b: &[F::E]) -> (Vec<F::E>, Vec<F::E
 /// `None` for `deg m < 1`.
 pub fn inv_mod<F: PolyField>(f: &F, a: &[F::E], m: &[F::E]) -> Option<Vec<F::E>> {
     hgcd::inv_mod(
-        &Polys(f, HGCD_THRESHOLD),
+        &Polys(f, HGCD_THRESHOLD, GCD_HGCD_THRESHOLD, HGCD_LEAF),
         &normalized(f, a),
         &normalized(f, m),
     )
@@ -359,7 +372,22 @@ pub fn inv_mod<F: PolyField>(f: &F, a: &[F::E], m: &[F::E]) -> Option<Vec<F::E>>
 /// [`gcd`] with an explicit half-GCD degree threshold (`0` forces the
 /// recursion at every size, `usize::MAX` forces Euclid); for benchmarks.
 pub fn gcd_with_threshold<F: PolyField>(f: &F, a: &[F::E], b: &[F::E], thr: usize) -> Vec<F::E> {
-    hgcd::gcd(&Polys(f, thr), &normalized(f, a), &normalized(f, b))
+    gcd_with_params(f, a, b, thr, HGCD_LEAF)
+}
+
+/// [`gcd`] with explicit threshold and recursion leaf degree; for tuning.
+pub fn gcd_with_params<F: PolyField>(
+    f: &F,
+    a: &[F::E],
+    b: &[F::E],
+    thr: usize,
+    leaf: usize,
+) -> Vec<F::E> {
+    hgcd::gcd(
+        &Polys(f, thr, thr, leaf),
+        &normalized(f, a),
+        &normalized(f, b),
+    )
 }
 
 /// [`xgcd`] with an explicit half-GCD degree threshold; for benchmarks.
@@ -369,7 +397,22 @@ pub fn xgcd_with_threshold<F: PolyField>(
     b: &[F::E],
     thr: usize,
 ) -> (Vec<F::E>, Vec<F::E>, Vec<F::E>) {
-    hgcd::xgcd(&Polys(f, thr), &normalized(f, a), &normalized(f, b))
+    xgcd_with_params(f, a, b, thr, HGCD_LEAF)
+}
+
+/// [`xgcd`] with explicit threshold and recursion leaf degree; for tuning.
+pub fn xgcd_with_params<F: PolyField>(
+    f: &F,
+    a: &[F::E],
+    b: &[F::E],
+    thr: usize,
+    leaf: usize,
+) -> (Vec<F::E>, Vec<F::E>, Vec<F::E>) {
+    hgcd::xgcd(
+        &Polys(f, thr, thr, leaf),
+        &normalized(f, a),
+        &normalized(f, b),
+    )
 }
 
 /// Classical Euclid only (the reference the half-GCD path is tested and

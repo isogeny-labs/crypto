@@ -177,6 +177,7 @@ fn main() {
         arms.push(AA);
         arms.push("biguint");
         arms.push("prod_vartime");
+        arms.push("prod");
         for round in 0..rounds {
             let ks: Vec<BigUint> = (0..batch).map(|_| rng.gen_biguint(p.bits())).collect();
             let mut order = arms.clone();
@@ -191,7 +192,11 @@ fn main() {
                     batch
                 };
                 let t0 = std::time::Instant::now();
-                if real == "prod_vartime" {
+                if real == "prod" {
+                    for k in &ks[..n] {
+                        std::hint::black_box(std::hint::black_box(&base).scalar_mul(k, &a));
+                    }
+                } else if real == "prod_vartime" {
                     for k in &ks[..n] {
                         std::hint::black_box(std::hint::black_box(&base).scalar_mul_vartime(k, &a));
                     }
@@ -285,6 +290,7 @@ mod analyze {
 
         let mut arms: Vec<&str> = vec![AA];
         arms.extend(ARMS.iter().filter(|a| **a != BASELINE));
+        arms.push("prod");
         arms.push("prod_vartime");
         arms.push("biguint");
         let mut md = String::new();

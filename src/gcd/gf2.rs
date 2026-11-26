@@ -7,10 +7,15 @@
 
 use super::hgcd::{self, PolyRing};
 
-/// Degree at and above which the half-GCD recursion runs.  Measured with
-/// `src/bin/hgcd_bench.rs`: break-even near 8192, ≈1.4× at 16384 and ≈2×
-/// at 32768.
-pub const HGCD_THRESHOLD_BITS: usize = 8192;
+/// Degree at and above which [`xgcd`] and [`inv_mod`] use half-GCD.
+/// Measured with `src/bin/hgcd_bench.rs` (leaf 256): ≈1.0× at 512, 1.2× at
+/// 1024, 1.5–1.8× at 1536–3072, 2.2–2.5× at 6144, 5× at 32768.
+pub const HGCD_THRESHOLD_BITS: usize = 1024;
+/// Degree from which plain [`gcd`] uses half-GCD: ≈0.96× at 3072, 1.1× at
+/// 6144, 1.6× at 16384, 2.2× at 32768.
+pub const GCD_HGCD_THRESHOLD_BITS: usize = 6144;
+/// Recursion leaf degree of the half-GCD (sweep: 128..4096, best ≈256).
+pub const HGCD_LEAF_BITS: usize = 256;
 /// Word length at and above which multiplication uses Karatsuba.
 pub const KARATSUBA_WORDS: usize = 12;
 
@@ -245,16 +250,21 @@ pub fn shr(a: &[u64], k: usize) -> Vec<u64> {
     out
 }
 
-/// `GF(2)[x]` as a [`PolyRing`] with a half-GCD degree threshold.
+/// `GF(2)[x]` as a [`PolyRing`]: xgcd/inverse and plain-gcd half-GCD
+/// thresholds and the recursion leaf degree.
 #[derive(Clone, Copy, Debug)]
 pub struct Gf2Polys {
     pub threshold: usize,
+    pub gcd_threshold: usize,
+    pub leaf: usize,
 }
 
 impl Default for Gf2Polys {
     fn default() -> Self {
         Gf2Polys {
             threshold: HGCD_THRESHOLD_BITS,
+            gcd_threshold: GCD_HGCD_THRESHOLD_BITS,
+            leaf: HGCD_LEAF_BITS,
         }
     }
 }
@@ -289,6 +299,12 @@ impl PolyRing for Gf2Polys {
     fn hgcd_threshold(&self) -> usize {
         self.threshold
     }
+    fn gcd_threshold(&self) -> usize {
+        self.gcd_threshold
+    }
+    fn hgcd_leaf(&self) -> usize {
+        self.leaf
+    }
 }
 
 fn norm(a: &[u64]) -> Vec<u64> {
@@ -314,7 +330,17 @@ pub fn inv_mod(a: &[u64], m: &[u64]) -> Option<Vec<u64>> {
 
 /// [`gcd`] with an explicit half-GCD degree threshold; for benchmarks.
 pub fn gcd_with_threshold(a: &[u64], b: &[u64], threshold: usize) -> Vec<u64> {
-    hgcd::gcd(&Gf2Polys { threshold }, &norm(a), &norm(b))
+    gcd_with_params(a, b, threshold, HGCD_LEAF_BITS)
+}
+
+/// [`gcd`] with explicit threshold and recursion leaf degree; for tuning.
+pub fn gcd_with_params(a: &[u64], b: &[u64], threshold: usize, leaf: usize) -> Vec<u64> {
+    let r = Gf2Polys {
+        threshold,
+        gcd_threshold: threshold,
+        leaf,
+    };
+    hgcd::gcd(&r, &norm(a), &norm(b))
 }
 
 /// [`xgcd`] with an explicit half-GCD degree threshold; for benchmarks.
@@ -323,7 +349,22 @@ pub fn xgcd_with_threshold(
     b: &[u64],
     threshold: usize,
 ) -> (Vec<u64>, Vec<u64>, Vec<u64>) {
-    hgcd::xgcd(&Gf2Polys { threshold }, &norm(a), &norm(b))
+    xgcd_with_params(a, b, threshold, HGCD_LEAF_BITS)
+}
+
+/// [`xgcd`] with explicit threshold and recursion leaf degree; for tuning.
+pub fn xgcd_with_params(
+    a: &[u64],
+    b: &[u64],
+    threshold: usize,
+    leaf: usize,
+) -> (Vec<u64>, Vec<u64>, Vec<u64>) {
+    let r = Gf2Polys {
+        threshold,
+        gcd_threshold: threshold,
+        leaf,
+    };
+    hgcd::xgcd(&r, &norm(a), &norm(b))
 }
 
 /// Classical Euclid only (test and benchmark reference).

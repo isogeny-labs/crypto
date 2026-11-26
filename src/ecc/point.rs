@@ -18,8 +18,8 @@
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use super::mont_vt::{
-    AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel, ProdKernel,
-    SqrKernel, TunedKernel,
+    AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel,
+    ProdAdxKernel, ProdKernel, SqrKernel, TunedKernel,
 };
 use num_bigint::BigUint;
 
@@ -33,6 +33,9 @@ fn mont_scalar_mul_vt<const N: usize>(
 ) -> Option<Point> {
     if std::env::var("IC_MONT_VT").as_deref() == Ok("0") {
         return None;
+    }
+    if super::mont_vt::has_adx() {
+        return mont_ladder_arm::<N, ProdAdxKernel>(x, y, k, a, MontLadder::Binary, false);
     }
     mont_ladder_arm::<N, ProdKernel>(x, y, k, a, MontLadder::Binary, false)
 }
@@ -739,9 +742,12 @@ impl Point {
             && modulus_is_prime_cached(&x.modulus)
         {
             let w = if limbs <= 3 { 4 } else { 5 };
-            if let Some(pt) =
+            let fast = if super::mont_vt::has_adx() {
+                mont_dispatch::<ProdAdxKernel>(x, y, k, a, MontLadder::Wnaf(w), true, false)
+            } else {
                 mont_dispatch::<ProdKernel>(x, y, k, a, MontLadder::Wnaf(w), true, false)
-            {
+            };
+            if let Some(pt) = fast {
                 return pt;
             }
         }

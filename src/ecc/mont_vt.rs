@@ -933,6 +933,43 @@ impl MulKernel for MulxKernel {
     }
 }
 
+/// Production kernel on CPUs with ADX+BMI2, from the 2026-11-25 ADX run
+/// (`docs/notes/adx-hgcd-20261125/`): the inline-asm dual-carry-chain
+/// product at `N = 4` with [`TunedKernel`] squares (+1.5% end to end), the
+/// `mulx` intrinsic CIOS for products and squares at `N ≥ 6` (+5–12%), and
+/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  Dispatch only
+/// after [`has_adx`] returned true.
+pub(crate) struct ProdAdxKernel;
+
+impl MulKernel for ProdAdxKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        {
+            if N == 4 {
+                // SAFETY: dispatched only after has_adx().
+                if let Some(r) = unsafe { ctx.mul_adx4_unchecked(a, b) } {
+                    return r;
+                }
+            }
+            if N >= 6 {
+                // SAFETY: as above.
+                return unsafe { ctx.mul_mulx(a, b) };
+            }
+        }
+        TunedKernel::mul(ctx, a, b)
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if N >= 6 {
+            // SAFETY: dispatched only after has_adx().
+            return unsafe { ctx.mul_mulx(a, a) };
+        }
+        TunedKernel::sqr(ctx, a)
+    }
+}
+
 /// The kernel [`Point::scalar_mul`](super::point::Point::scalar_mul) uses.
 pub(crate) type ProdKernel = TunedKernel;
 

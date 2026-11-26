@@ -38,8 +38,19 @@ pub trait PolyRing {
     /// Divide `g` and every entry of `others` by the leading coefficient of
     /// `g` (`g ≠ 0`), making `g` monic.
     fn make_monic(&self, g: &mut Self::P, others: &mut [&mut Self::P]);
-    /// Below this degree [`gcd`] and [`half_gcd`] run classical Euclid.
+    /// Degree from which [`xgcd`] and [`inv_mod`] use half-GCD (below:
+    /// classical extended Euclid).
     fn hgcd_threshold(&self) -> usize;
+    /// Degree from which [`gcd`] (no cofactors) uses half-GCD; classical
+    /// gcd tracks no cofactors, so its crossover is higher.
+    fn gcd_threshold(&self) -> usize {
+        self.hgcd_threshold()
+    }
+    /// Degree below which the [`half_gcd`] recursion stops and builds the
+    /// matrix by Euclidean steps.
+    fn hgcd_leaf(&self) -> usize {
+        128
+    }
 
     fn is_zero(&self, a: &Self::P) -> bool {
         self.deg(a) < 0
@@ -113,7 +124,7 @@ pub fn half_gcd<R: PolyRing>(r: &R, a: &R::P, b: &R::P) -> Mat<R::P> {
     if r.deg(b) < m {
         return Mat::identity(r);
     }
-    if (n as usize) < r.hgcd_threshold() {
+    if (n as usize) < r.hgcd_leaf() {
         return half_gcd_euclid(r, a, b, m);
     }
     let mu = m as usize;
@@ -137,7 +148,13 @@ pub fn half_gcd<R: PolyRing>(r: &R, a: &R::P, b: &R::P) -> Mat<R::P> {
 fn gcd_matrix<R: PolyRing>(r: &R, a: &R::P, b: &R::P, want_matrix: bool) -> (R::P, Mat<R::P>) {
     let mut total = Mat::identity(r);
     let (mut a, mut b) = (a.clone(), b.clone());
-    let thr = r.hgcd_threshold() as isize;
+    let thr = if want_matrix {
+        r.hgcd_threshold()
+    } else {
+        r.gcd_threshold()
+    };
+    // Clamp: a threshold of usize::MAX ("never") must not wrap to −1.
+    let thr = thr.min(isize::MAX as usize) as isize;
     while !r.is_zero(&b) {
         if r.deg(&a) >= thr {
             let m = half_gcd(r, &a, &b);

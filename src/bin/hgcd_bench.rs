@@ -77,7 +77,7 @@ fn main() {
 
     if which.contains("fp") {
         let f = poly::Fp64::new((1u64 << 61) - 1);
-        for &n in &[32usize, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 2048, 4096] {
+        for &n in &[64usize, 128, 256, 512, 1024, 2048, 4096, 8192, 16384] {
             let c = rand_fp(&f, &mut rng, n / 8);
             let a = poly::mul(&f, &rand_fp(&f, &mut rng, n - n / 8), &c);
             let b = poly::mul(&f, &rand_fp(&f, &mut rng, n - n / 8 - 1), &c);
@@ -85,7 +85,7 @@ fn main() {
             assert_eq!(poly::xgcd_with_threshold(&f, &a, &b, 0), want);
             assert_eq!(poly::gcd_with_threshold(&f, &a, &b, 0), want.0);
             assert_eq!(poly::xgcd(&f, &a, &b), want);
-            let reps = (2_000_000 / (n * n)).max(1);
+            let reps = (20_000_000 / (n * n)).max(1);
             for round in 0..rounds {
                 let mut arms = ["gcd_euclid", "gcd_hgcd", "xgcd_euclid", "xgcd_hgcd", "gcd_default"];
                 arms.shuffle(&mut rng);
@@ -105,7 +105,7 @@ fn main() {
     }
 
     if which.contains("gf2") {
-        for &n in &[256usize, 512, 1024, 1536, 2048, 3072, 4096, 8192, 16384, 32768] {
+        for &n in &[1024usize, 2048, 4096, 8192, 16384, 32768, 65536, 131072] {
             let c = rand_gf2(&mut rng, n / 8);
             let a = gf2::mul(&rand_gf2(&mut rng, n - n / 8), &c);
             let b = gf2::mul(&rand_gf2(&mut rng, n - n / 8 - 1), &c);
