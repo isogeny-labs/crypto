@@ -1,0 +1,34 @@
+{
+  "schema": "isogeny-labs/source-custody/v1",
+  "study_id": "norm-one-torus-m7-single-target-public-precommit-20261126",
+  "source_commit": "367a33b596897933d3ccb9257a67c8a59ebac716",
+  "execution_rule": "This source manifest must be committed and pushed before the public seed is expanded or the frozen runner is executed.",
+  "sha256": {
+    "examples/norm_one_torus_m7.rs": "1e7c733692646902245242a4859da9a19b38bcc1ab81977d3850dfabdd058e8e",
+    "examples/norm_one_torus_m7_verify.rs": "8b24e756d9ecdbfab8f660265eb8d7e957b5ca1cb77f4a515e1e082fb91e01e2",
+    "examples/support/norm_one_torus_m7.rs": "4db85d96f6286b7e6c4b0f9c53980a5b821f29c14468106fda6cb62cb5d7d846",
+    "examples/support/norm_one_torus_compare_kernel.rs": "c94d6e0e6ab35ffdd361226ef8cc432492981c257f4724b1d0c4ae1acd5b72b8",
+    "research/norm_one_torus_m7_single_target_20261126/PROTOCOL.md": "5f0b342f929081a2c9eaf0f71d51a7b6e0a2215a08f315f8043073cbebe9f2a2",
+    "research/norm_one_torus_m7_single_target_20261126/public-precommit/manifest.json": "f5c155890136c6a3276496d1e3cf7771ad8323804ea5e36571c5dfe7ad25f7e7",
+    "src/cryptanalysis/ic_boundary.rs": "36feaa1a910b71541b9041bfd24219932d98de87639c7d264955def8e3d449f7",
+    "src/cryptanalysis/ic_framework/pkm_semaev.rs": "957dae7826f04d4744fa6fde1eaee1666d2615dca7690ff980d252f98d1bf997",
+    "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+  },
+  "pre_execution_checks": {
+    "cargo_check_examples": "pass",
+    "cargo_test_examples": "pass: 3 tests",
+    "strict_clippy_changed_examples": "pass after allowing only inherited library lint classes duplicate_mod, unnecessary_cast, result_large_err, field_reassign_with_default, and redundant_locals",
+    "rustfmt": "pass",
+    "git_diff_check": "pass"
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "target": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.57",
+    "cpu": "Intel Xeon Platinum 8573C",
+    "visible_cpus": 5,
+    "isolation": "none; exact counts are primary and local wall time is only a producer diagnostic"
+  },
+  "proof_boundary": "public seed commitment, public witnesses, source hashes, and independent affine replay; not zero knowledge, a signed attestation, or proof of producer-host execution"
+}
