@@ -55,6 +55,8 @@ pub struct VerificationSummary {
     pub maximum_child_degree: usize,
     /// Whether normalized precision `p u<=34 M D` was admitted.
     pub normalized_precision_admitted: bool,
+    /// Whether source guards imply uniform packing and group-load closure.
+    pub source_guard_closure_admitted: bool,
     /// Whether all fixed radix-64 strict child guards hold.
     pub strict_source_refinement_admitted: bool,
 }
@@ -98,6 +100,7 @@ pub fn verify(certificate: &Certificate, meter: &mut Meter) -> Result<Verificati
         maximum_child_edges: children.maximum_child_edges,
         maximum_child_degree: children.maximum_degree,
         normalized_precision_admitted: source.normalized_precision_admitted,
+        source_guard_closure_admitted: packing.source_guard_closure_admitted,
         strict_source_refinement_admitted: children.strict_source_refinement_admitted,
     })
 }
@@ -108,7 +111,7 @@ pub fn verify_strict(
     meter: &mut Meter,
 ) -> Result<VerificationSummary, String> {
     let summary = verify(certificate, meter)?;
-    if !summary.strict_source_refinement_admitted {
+    if !summary.source_guard_closure_admitted || !summary.strict_source_refinement_admitted {
         return Err("node refinement strict source guards".into());
     }
     Ok(summary)

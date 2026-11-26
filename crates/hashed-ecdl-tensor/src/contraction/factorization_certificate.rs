@@ -678,6 +678,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(provenance_summary.edges, 2);
     assert_eq!(provenance_summary.packet_length, 4);
     assert!(!provenance_summary.source_capacity_admitted);
+    assert!(!provenance_summary.source_guard_closure_admitted);
 
     let mut bad_provenance = provenance;
     bad_provenance.packet_pairs[0][0].0 ^= 1;
@@ -751,6 +752,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.conditional_labels_verified);
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
+    assert!(!conditional_summary.source_guard_closure_admitted);
     let mut bad_degree_cap = conditional_provenance.clone();
     bad_degree_cap.source_degree_cap = Some(0);
     assert_eq!(
@@ -866,6 +868,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(serde_json::to_vec(&parsed_node).unwrap(), serialized_node);
     let node_summary = verify_node_refinement(&parsed_node, &mut meter).unwrap();
     assert!(node_summary.normalized_precision_admitted);
+    assert!(!node_summary.source_guard_closure_admitted);
     assert!(!node_summary.strict_source_refinement_admitted);
     assert_eq!(
         verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),

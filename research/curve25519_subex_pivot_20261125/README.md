@@ -407,9 +407,9 @@ With `N` vertices per side, `L` parallel edges per pair, and cyclic labels in
 `q=64^a` buckets, every class is full, `KL=M`, group loads are exactly `M/64`
 per side, and every child has `M/32` edges. A standalone exponent certificate
 checks the actual `Setup` degree, `LD`, and `2D^2 delta` guards at the
-schema-6 threshold and larger even root exponents. The unresolved step is
-closure: the old/packet child graph is not yet proved to retain this symmetric
-family or balanced conditional labels. `[pcc:unverified]`
+schema-6 threshold and larger even root exponents. Children do not need to
+retain this symmetric shape: the generic source-guard argument below closes
+their packing and shrink bounds. `[pcc:unverified]`
 
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
@@ -420,8 +420,7 @@ Their edge counts are
 packet counts are 74--78, maximum one-side loads are 260--262, and maximum
 degree is 32. The 508-edge path falls below the next `LD` guard and would use
 the production fallback. This is finite radix-two evidence, not radix-64
-recursive closure. It sharpens the next target to proving `max_class<=2M/D`
-and each side's group load `<=3M/64` from packet-pattern orbit counts.
+recursive closure; it exposed the class inequality used by the generic proof.
 `[pcc:unverified]`
 
 `CONDITIONAL_LABEL_GRAM.md` derives the exact greedy score from sparse
@@ -430,7 +429,27 @@ ordered-edge-pair objective exactly, while the independent provenance verifier
 retains its own quadratic replay. The former 107.32-second single path now
 takes 0.02 seconds and all four paths take 0.06 seconds in the warm debug
 harness. This optimization exposes the right auxiliary variables for an orbit
-proof; it does not itself prove the required caps. `[pcc:unverified]`
+analysis and independently preserves every label choice. `[pcc:unverified]`
+
+The deeper default control follows all 16 radix-two paths through `a=5` at the
+next `LD=32768` boundary. All packings pass: final edges are 32755--32786,
+degree is 256, maximum class is 36--40, padded mass is 65536, packet count is
+1188--1214, and maximum one-side load is 16406--16463. All 16 satisfy
+`max_class*D<=2M`; seven remain above `LD` and nine become fallbacks. The
+47.11-second control is still below the stronger `2D^2 delta` guard and is not
+a strict-history witness. `[pcc:unverified]`
+
+`PACKING_GUARD_CLOSURE.md` closes the producer-side recursive packing gap
+without an orbit hypothesis. The independently checked variance identity is
+`sum(c-M/D)^2<=2M delta`; the active guard `M>=2D^2 delta` forces every class
+to satisfy `cD<=2M`. Together with `M>=LD`, this gives padded mass and `KL` at
+most `3M`. Each coordinate/group on either side sums `D/64` classes and hence
+has load at most `2M/64`, so a child has at most `M/16` edges. Old degrees are
+preserved and packet degrees are at most `2L<=delta`. At the next call, either
+`Setup` rechecks the same guards or production falls back exactly. Thus child
+symmetry is unnecessary. The remaining boundary is independent refinement of
+this composition and the external factorization/contraction theorem, not
+packing closure. `[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical

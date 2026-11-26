@@ -69,6 +69,8 @@ pub struct VerificationSummary {
     pub packet_length: usize,
     /// Number of ordered row/column label classes.
     pub label_classes: usize,
+    /// Largest reconstructed row/column label class.
+    pub maximum_class: usize,
     /// Number of unordered digit patterns replayed before empty suppression.
     pub orientation_patterns: usize,
     /// Nonnegative slack in `K L<=3M`, when that inequality holds.
@@ -79,6 +81,9 @@ pub struct VerificationSummary {
     pub conditional_labels_verified: bool,
     /// Whether degree, variance, capacity, and all-coordinate balance were checked.
     pub source_bounds_verified: bool,
+    /// Whether the actual source guards imply the stronger class, padding,
+    /// packet-count, and per-side group-load closure bounds.
+    pub source_guard_closure_admitted: bool,
 }
 
 /// Coarse structural description ceiling for one packing-provenance object.
@@ -115,6 +120,34 @@ fn checked_product(values: &[usize], label: &str) -> Result<usize, String> {
 
 fn bit_width(value: usize) -> usize {
     (usize::BITS as usize - value.leading_zeros() as usize).max(1)
+}
+
+fn verify_source_guard_closure(
+    edges: usize,
+    label_classes: usize,
+    packet_length: usize,
+    degree_cap: Option<usize>,
+    maximum_class: usize,
+    radix: usize,
+    maximum_group_load: usize,
+) -> Result<bool, String> {
+    let Some(delta) = degree_cap else {
+        return Ok(false);
+    };
+    let edges = BigUint::from(edges);
+    let array = BigUint::from(label_classes);
+    let guard_admitted = edges >= BigUint::from(packet_length) * &array
+        && edges >= BigUint::from(2u8) * &array * &array * BigUint::from(delta);
+    if !guard_admitted {
+        return Ok(false);
+    }
+    if BigUint::from(maximum_class) * &array > BigUint::from(2u8) * &edges {
+        return Err("packing provenance source guard class cap".into());
+    }
+    if BigUint::from(maximum_group_load) * BigUint::from(radix) > BigUint::from(2u8) * &edges {
+        return Err("packing provenance source guard group cap".into());
+    }
+    Ok(true)
 }
 
 /// Derive a structural description ceiling without serializing the object.
@@ -539,6 +572,7 @@ pub fn verify(
     if provenance.source_degree_cap.is_some() && !source_capacity_admitted {
         return Err("packing provenance source capacity".into());
     }
+    let mut maximum_group_load = 0usize;
     if provenance.source_degree_cap.is_some() {
         for coordinate in 0..provenance.packet_exponent {
             let mut row_load = vec![0usize; provenance.radix];
@@ -564,6 +598,14 @@ pub fn verify(
                     .ok_or_else(|| "packing provenance column load".to_string())?;
             }
             let maximum = BigUint::from(3u8) * BigUint::from(provenance.edges.len());
+            maximum_group_load = maximum_group_load.max(
+                row_load
+                    .iter()
+                    .chain(&column_load)
+                    .copied()
+                    .max()
+                    .unwrap_or(0),
+            );
             if row_load
                 .iter()
                 .chain(&column_load)
@@ -573,6 +615,19 @@ pub fn verify(
             }
         }
     }
+    // The checked variance identity is
+    //   sum_c (c-M/D)^2 <= 2 M delta.
+    // If M>=2D^2 delta, one class above 2M/D would already exceed that
+    // complete budget. M>=LD then absorbs the final per-class padding block.
+    let source_guard_closure_admitted = verify_source_guard_closure(
+        provenance.edges.len(),
+        label_classes,
+        packet_length,
+        provenance.source_degree_cap,
+        maximum,
+        provenance.radix,
+        maximum_group_load,
+    )?;
     Ok(VerificationSummary {
         edges: provenance.edges.len(),
         left_vertices: provenance.row_labels.len(),
@@ -580,10 +635,32 @@ pub fn verify(
         packets: expected_packets.len(),
         packet_length,
         label_classes,
+        maximum_class: maximum,
         orientation_patterns,
         packing_slack: source_capacity_admitted.then(|| packing_rhs - packing_lhs),
         source_capacity_admitted,
         conditional_labels_verified: provenance.conditional_labels,
         source_bounds_verified: provenance.source_degree_cap.is_some(),
+        source_guard_closure_admitted,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn source_guard_closure_boundary_and_failures_are_exact() {
+        assert!(verify_source_guard_closure(32, 4, 2, Some(1), 8, 2, 16).unwrap());
+        assert!(!verify_source_guard_closure(32, 4, 2, Some(2), 8, 2, 16).unwrap());
+        assert!(!verify_source_guard_closure(32, 4, 2, None, 8, 2, 16).unwrap());
+        assert_eq!(
+            verify_source_guard_closure(32, 4, 2, Some(1), 17, 2, 16).unwrap_err(),
+            "packing provenance source guard class cap"
+        );
+        assert_eq!(
+            verify_source_guard_closure(512, 16, 2, Some(1), 64, 4, 257).unwrap_err(),
+            "packing provenance source guard group cap"
+        );
+    }
 }

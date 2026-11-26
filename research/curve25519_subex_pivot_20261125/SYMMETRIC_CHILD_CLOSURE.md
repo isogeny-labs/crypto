@@ -68,6 +68,28 @@ cuts that path to 0.02 seconds and the full four-path sweep to 0.06 seconds in
 the warm Rust debug harness. This remains finite radix-two evidence, not every
 coordinate, depth, or radix-64 closure. `[pcc:unverified]`
 
+## Four-level length-array boundary
+
+A larger default control starts with 128 vertices per root side and `M=32768`,
+then follows all 16 group paths through `a=1,2,3,4,5`. At the final scale,
+
+```text
+L=32, D=1024, LD=32768,
+edges                 32755 .. 32786,
+maximum degree        256 on every path,
+maximum class         36 .. 40,
+padded class mass     65536 on every path,
+packets               1188 .. 1214,
+maximum one-side load 16406 .. 16463.
+```
+
+All 16 production packings pass. Seven final paths retain at least `LD` edges;
+nine would fall back before another active scale. Every path additionally
+satisfies the proposed separator `maximum_class * D <= 2M`. The final exact
+control takes 47.11 seconds in the debug profile. This model does not satisfy
+the much stronger `M>=2D^2 delta` source guard, so it is shape evidence rather
+than a strict recursive witness. `[pcc:unverified]`
+
 ## New proof target
 
 For every source-admitted packet child at depth `d`, prove the following

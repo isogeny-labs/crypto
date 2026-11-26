@@ -111,3 +111,10 @@ scores, exposing packet orbits as the proof variables. The target is now an
 orbit-wise class cap `max_class<=2M/D` plus the existing one-side group-load
 and degree caps, uniformly over all source-admitted children.
 `[pcc:unverified]`
+
+`PACKING_GUARD_CLOSURE.md` now proves those caps directly from the variance
+inequality and the existing `M>=2D^2delta`, `M>=LD`, and `2L<=delta` guards.
+Consequently, children need not preserve the symmetric root shape at all. The
+cyclic root analysis remains an explicit exact witness, but recursive packing
+closure is graph-generic once `Setup` admits the next node.
+`[pcc:unverified]`

@@ -45,6 +45,14 @@ array * sum_class count(class)^2 - M^2 <= 2 M delta array,
 requires `KL<=3M`, and checks the radix group-port balance at every coordinate.
 `[pcc:unverified]`
 
+`PACKING_GUARD_CLOSURE.md` derives a stronger implication. When the same finite
+object also satisfies the active source guards `M>=2D^2delta` and `M>=LD`, the
+variance bound forces `maximum_class*D<=2M`. The verifier reports this strict
+guard closure and additionally checks the resulting per-side group load
+`<=2M/R`. The class cap gives padded mass and packet count at most `3M`.
+Allocated small controls correctly report that the asymptotic guards are not
+available. `[pcc:unverified]`
+
 ## Bounded evidence
 
 Every producer path in the bounded factorization controls now serializes,
@@ -67,8 +75,9 @@ The endpoint ports and source creation precisions also feed the separate
 schema-2 child provenance replay in `CHILD_PROVENANCE_CERTIFICATE.md`.
 `PROVENANCE_DESCRIPTION_ENVELOPE.md` gives the checked structural description
 ceiling for this object and the complete child family.
-It does not prove a uniform theorem about arbitrary-size label selection,
-construct an asymptotic graph family satisfying the complete recursion
-premises, or prove the external contraction theorem. Those are the next
-realization obligations; no practical Curve25519 attack follows.
+Together with `PACKING_GUARD_CLOSURE.md`, it gives a uniform producer-side
+packing theorem conditional on the source guards; child symmetry is not
+needed. It does not independently formalize that implication, discharge the
+factorization/refinement theorem, or prove the external contraction theorem.
+No practical Curve25519 attack follows.
 `[pcc:unverified]`

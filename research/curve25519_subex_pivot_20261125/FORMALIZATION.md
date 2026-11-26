@@ -99,7 +99,9 @@ partition certificates and the executed diagnostic. It begins after labels
 have been chosen for that corpus. A separate admitted three-edge control also
 replays the greedy conditional-expectation label selection, exact variance
 inequality, packet capacity, and every-coordinate group balance. The uniform
-arbitrary-size argument and the asymptotic R1 object remain open.
+arbitrary-size implication now follows from the source guards as stated in
+`PACKING_GUARD_CLOSURE.md`; independent formal refinement of that implication
+and the complete asymptotic R1 object remain open.
 `[pcc:unverified]`
 
 The schema-2 child verifier continues that finite refinement through one group
@@ -144,7 +146,8 @@ edges per pair and cyclic `64^a` labels. It proves uniform class size, `KL=M`,
 exact `M/64` endpoint load per side/group, and `M_child=M/32`, while checking
 the source degree, `LD`, and `2D^2 delta` guards by exponents. It passes at
 `lambda=2^26` and larger checked even exponents. This advances R1 at the root;
-closure of the old/packet child shape under the next packing call remains open.
+the generic source-guard lemma below removes the need for children to preserve
+that shape.
 `[pcc:unverified]`
 
 The native radix-two child probe separates an under-scale padding failure from
@@ -153,10 +156,9 @@ the first schedule point satisfying `M>=LD`. At `a=3`, `L=8`, `D=64`, the
 `M=512=LD` root yields four accepted two-group paths. Their next edge counts
 are 512/512/516/508, maximum class 10, padded mass 1024, 74--78 packets,
 one-side group loads 260--262, and maximum degree 32. The final 508-edge path
-is below the next `LD` guard and would fall back. This does not discharge R1:
-all coordinates, depths, and the radix-64 orbit argument remain open. It
-identifies the sufficient local targets `max_class<=2M/D`, one-side group load
-`<=3M/64`, and degree `<=delta`. `[pcc:unverified]`
+is below the next `LD` guard and would fall back. These controls exposed the
+sufficient class inequality but are finite diagnostics, not the proof below.
+`[pcc:unverified]`
 
 The production greedy labeler now computes exact degree-bucket and sparse
 incidence-Gram scores instead of rescanning all ordered edge pairs per
@@ -168,13 +170,31 @@ path to 0.02 seconds and enables the 0.06-second four-path control. The separate
 packing-provenance verifier still replays the original objective.
 `[pcc:unverified]`
 
-The schema-6 symbolic transcript now closes R1 item 4 at the scalar level once
-the packing premises hold. Each side contributes at most `3M/64` endpoints to
-one group, so a child has at most `6M/64` edges and
-`8*(6M/64)<=M`. Old degrees are unchanged, and packet vertices have degree at
-most `2L<=delta`. The independent verifier reconstructs the constants
-`64,3,2,8,6,48,2`; the remaining R1 gap is the uniform object/provenance
-refinement, not the shrink arithmetic. `[pcc:unverified]`
+A four-level default control follows all 16 radix-two paths to `a=5` from a
+root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,
+degree 256, maximum class 36--40, padded mass 65536, 1188--1214 packets, and
+maximum one-side load 16406--16463. The proposed class inequality
+`max_class*D<=2M` holds on all paths; seven retain `M>=LD` and nine fall back.
+This is not strict R1 evidence because the finite model does not satisfy
+`M>=2D^2 delta`. `[pcc:unverified]`
+
+`PACKING_GUARD_CLOSURE.md` supplies the graph-generic producer proof. From
+`D sum c^2-M^2<=2M delta D` it obtains
+`sum(c-M/D)^2<=2M delta`. The active guard `M>=2D^2 delta` therefore forces
+`cD<=2M` for every class. With `M>=LD`, padded mass and `KL` are at most `3M`;
+each one-side radix-64 group load is at most `2M/64`; every child has at most
+`M/16` edges; and packet degree is at most `2L<=delta`. The next node either
+rechecks the same guards or falls back. This closes R1's uniform packing,
+capacity, group-balance, shrink, and degree induction on the producer side.
+Independent formal refinement and the external factorization/contraction
+theorem remain open. `[pcc:unverified]`
+
+The schema-6 symbolic transcript independently retains the looser source
+arithmetic: `3M/64` endpoints per side give `6M/64` child edges and eightfold
+shrink. The guard-closure lemma strengthens those figures to `2M/64` per side
+and `M/16` per child. The transcript's constants remain valid; the remaining
+R1 gap is independent object/provenance refinement, not packing or shrink
+arithmetic. `[pcc:unverified]`
 
 ## R2 — Uniform precision history
 

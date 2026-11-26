@@ -355,3 +355,148 @@ fn first_guard_boundary_auxiliary_child_paths_accept_next_scale() {
         assert!(shape.maximum_group_load * grandchild_parameters.radix <= 3 * edges);
     }
 }
+
+#[test]
+fn four_level_auxiliary_paths_reach_next_length_array_boundary() {
+    let mut meter = Meter::new(Limits {
+        steps: 10_000_000_000,
+        vector: 10_000_000,
+        ..Limits::default()
+    });
+    let precision = 7;
+    let ring = Ring::new(4, precision, &mut meter).unwrap();
+    let parameters = [
+        Parameters {
+            radix: 2,
+            u: 1,
+            a: 1,
+            length: 2,
+            array: 4,
+        },
+        Parameters {
+            radix: 2,
+            u: 1,
+            a: 2,
+            length: 4,
+            array: 16,
+        },
+        Parameters {
+            radix: 2,
+            u: 1,
+            a: 3,
+            length: 8,
+            array: 64,
+        },
+        Parameters {
+            radix: 2,
+            u: 1,
+            a: 4,
+            length: 16,
+            array: 256,
+        },
+        Parameters {
+            radix: 2,
+            u: 1,
+            a: 5,
+            length: 32,
+            array: 1_024,
+        },
+    ];
+    let root = complete_multigraph(128, parameters[0].length, precision);
+    assert_eq!(root.edges.len(), 32_768);
+    let root_packing =
+        packing::pack(&root, &parameters[0], maximum_degree(&root), &mut meter).unwrap();
+    let mut frontier = vec![(0usize, root, root_packing)];
+    for depth in 0..4 {
+        let mut next = Vec::new();
+        for (path, graph, packing) in frontier {
+            for group in 0..parameters[depth].radix {
+                let child = packet_child(
+                    &graph,
+                    &packing,
+                    &parameters[depth],
+                    group,
+                    &ring,
+                    &mut meter,
+                );
+                let child_packing = packing::pack(
+                    &child,
+                    &parameters[depth + 1],
+                    maximum_degree(&child),
+                    &mut meter,
+                )
+                .unwrap();
+                next.push(((path << 1) | group, child, child_packing));
+            }
+        }
+        frontier = next;
+    }
+    assert_eq!(frontier.len(), 16);
+    let observed: Vec<_> = frontier
+        .into_iter()
+        .map(|(path, graph, packing)| {
+            (
+                path,
+                graph.edges.len(),
+                maximum_degree(&graph),
+                packing_shape(&graph, &packing, &parameters[4]),
+            )
+        })
+        .collect();
+    assert_eq!(
+        observed.iter().map(|entry| entry.0).collect::<Vec<_>>(),
+        (0..16).collect::<Vec<_>>()
+    );
+    assert_eq!(
+        observed.iter().map(|entry| entry.1).collect::<Vec<_>>(),
+        vec![
+            32_759, 32_767, 32_786, 32_760, 32_768, 32_764, 32_774, 32_766, 32_773, 32_755, 32_779,
+            32_765, 32_772, 32_766, 32_758, 32_776,
+        ]
+    );
+    assert!(observed.iter().all(|entry| entry.2 == 256));
+    assert_eq!(
+        observed
+            .iter()
+            .map(|entry| entry.3.maximum_class)
+            .collect::<Vec<_>>(),
+        vec![36, 40, 37, 38, 40, 36, 36, 37, 36, 36, 37, 38, 39, 38, 37, 37]
+    );
+    assert!(observed
+        .iter()
+        .all(|entry| entry.3.padded_class_mass == 65_536));
+    assert_eq!(
+        observed
+            .iter()
+            .map(|entry| entry.3.packets)
+            .collect::<Vec<_>>(),
+        vec![
+            1_205, 1_204, 1_188, 1_214, 1_200, 1_206, 1_207, 1_205, 1_206, 1_192, 1_195, 1_190,
+            1_202, 1_201, 1_198, 1_204,
+        ]
+    );
+    assert_eq!(
+        observed
+            .iter()
+            .map(|entry| entry.3.maximum_group_load)
+            .collect::<Vec<_>>(),
+        vec![
+            16_414, 16_417, 16_438, 16_455, 16_447, 16_463, 16_422, 16_433, 16_431, 16_430, 16_436,
+            16_433, 16_430, 16_419, 16_406, 16_420,
+        ]
+    );
+    let length_array = parameters[4].length * parameters[4].array;
+    assert_eq!(
+        observed
+            .iter()
+            .filter(|entry| entry.1 >= length_array)
+            .count(),
+        7
+    );
+    for (_, edges, _, shape) in observed {
+        assert!(shape.maximum_class * parameters[4].array <= 2 * edges);
+        assert!(shape.padded_class_mass <= 3 * edges);
+        assert!(shape.packets * parameters[4].length <= 3 * edges);
+        assert!(shape.maximum_group_load * parameters[4].radix <= 3 * edges);
+    }
+}

@@ -435,10 +435,10 @@
     "verifier_source": "crates/hashed-ecdl-tensor/src/node_refinement_certificate.rs",
     "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
     "wire_format": "schema-1 JSON bundle of source dimensions, schema-2 factorization, schema-3 packing and complete schema-2 child family",
-    "checks": "factorization verification before dependent interfaces; normalized source precision required; packing and child-family replay; exact cross-interface M,K,L,a,i,T,R equality; actual maximum child edges/degree; report-only and strict entry points",
-    "observed_gate": "admitted three-edge conditional-packing bundle serializes, round-trips and passes every composed finite interface with normalized precision; strict entry rejects the non-strict radix-2 child family; clearing required normalized precision rejects at context",
+    "checks": "factorization verification before dependent interfaces; normalized source precision required; packing and child-family replay; exact cross-interface M,K,L,a,i,T,R equality; actual maximum child edges/degree; source-guard packing closure; report-only and strict entry points requiring both guard closure and radix-64 child refinement",
+    "observed_gate": "admitted three-edge conditional-packing bundle serializes, round-trips and passes every composed finite interface with normalized precision; it reports source-guard closure and strict refinement false, so strict entry rejects; clearing required normalized precision rejects at context",
     "dependency_boundary": "imports serialized certificate verifiers and exact integers only, not graph, source packing, deformation, packet tensor or contraction implementations",
-    "claim_boundary": "generic finite node checker with fail-closed strict admission; no construction of a uniform arbitrary-size strict family, proof that the unreachable live branch emits bundles, external contraction proof or practical Curve25519 attack"
+    "claim_boundary": "generic finite node checker with fail-closed strict admission plus a separate producer-side uniform guard induction; no independently formalized composition, proof that the unreachable live branch emits bundles, external contraction proof or practical Curve25519 attack"
   },
   "symmetric_source_family_control": {
     "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_SOURCE_FAMILY.md",
@@ -447,7 +447,7 @@
     "construction": "N vertices per bipartite side, L parallel edges per vertex pair, cyclic labels modulo q=64^a, M=N^2L=2^lambda",
     "checks": "root u=floor(lambda/2^17), a=2u, label/array/class/packet/degree exponents; cyclic balanced class divisibility; exact KL=M; exact M/64 endpoint load per side/group and M/32 child edges; source degree and 2L<=delta using floor(9lambda/10); M>=LD; M>=2D^2delta using ceil(9lambda/10)",
     "observed_gate": "lambda=2^26 transcript passes with a=1024, log2N=33553920, log2degree=33554944, delta exponents [60397977,60397978] and child exponent lambda-5; larger checked even exponents pass; altered degree and odd vertex parity fail",
-    "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; no closure of old/packet children under the next conditional-label call, external contraction proof or practical Curve25519 attack"
+    "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; generic child closure is supplied separately by the source-guard lemma; no independent formal composition, external contraction proof or practical Curve25519 attack"
   },
   "symmetric_child_closure_control": {
     "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_CHILD_CLOSURE.md",
@@ -455,8 +455,9 @@
     "schedule": "native radix-two complete-multigraph root at a=1, then production packet children and conditional packing at a=2 and a=3 along every two-group path at coordinate zero",
     "under_scale_gate": "M=32 accepts a=2 with 10 packets, then the 32-edge degree-8 child rejects a=3 at packet padding: maximum class 2 and padded mass 512 exceed 3M=96; this model violates the next M>=LD=512 source guard",
     "guard_boundary_gate": "default control at root M=512=LD: paths 00/01/10/11 have a=2 packet counts 132/132/134/134, next edges 512/512/516/508, degree 32, maximum class 10, padded mass 1024, a=3 packet counts 74/78/77/77, and maximum one-side loads 261/261/260/262; all four packings pass and the 508-edge path is below the next LD guard",
-    "proof_target": "uniformly prove maximum pair-label class<=2M/D, coordinate/group endpoint load on either side<=3M/64 and maximum degree<=delta from old-vertex and packet-pattern orbit counts",
-    "claim_boundary": "all four finite radix-two group paths at one guard boundary plus one exact under-scale rejection; no all-coordinate, all-depth or radix-64 closure theorem, external contraction proof or practical Curve25519 attack"
+    "four_level_gate": "47.11-second default control with root M=LD=32768 follows all 16 paths through a=5: final edges 32755..32786, degree 256, maximum class 36..40, padded mass 65536, packets 1188..1214 and maximum one-side load 16406..16463; all packings and max_class*D<=2M checks pass; seven paths retain M>=LD and nine fall back; the finite model is below the stronger 2D^2delta guard",
+    "resolved_target": "the source-guard closure lemma proves maximum pair-label class<=2M/D, coordinate/group endpoint load on either side<=2M/64 and maximum child degree<=delta without packet-orbit assumptions",
+    "claim_boundary": "all four finite radix-two group paths at one guard boundary, all 16 paths at a deeper LD boundary, and one exact under-scale rejection; finite shape evidence only, with generic strict closure supplied by a separate algebraic lemma"
   },
   "conditional_label_gram_control": {
     "note": "research/curve25519_subex_pivot_20261125/CONDITIONAL_LABEL_GRAM.md",
@@ -465,8 +466,19 @@
     "column_score": "dot product of incidence profiles grouped by fixed row labels, accumulated by sparse row-label/column-bucket maps",
     "equivalence_gate": "3,280 cases with zero through three ordered edges on 3x3 vertices and one through four labels exactly match the retained quadratic reference; the standalone packing-provenance verifier keeps its independent ordered-edge-pair replay",
     "measured_gate": "warm debug single guard-boundary path fell from 107.32 seconds to 0.02 seconds, about 5,300x; all four group paths complete in 0.06 seconds",
-    "complete_library_result": "189 passed; 0 failed in 246.57 seconds",
-    "claim_boundary": "exact first-minimum implementation refinement and finite exhaustive equivalence; no proof that greedy Gram bucket scores imply the strict radix-64 class/group caps"
+    "complete_library_result": "191 passed; 0 failed in 288.34 seconds",
+    "claim_boundary": "exact first-minimum implementation refinement and finite exhaustive equivalence; the strict radix-64 caps follow separately from variance plus the source guards"
   },
-  "next_gate": "express the exact degree-bucket and incidence-Gram scores over packet-pattern/block-index/old-side orbits and prove max_class<=2M/D plus one-side group load<=3M/64 for every source-admitted child; then feed a uniform closed family through the schema-1 node interface and separately rederive the external contraction theorem"
+  "packing_guard_closure_control": {
+    "note": "research/curve25519_subex_pivot_20261125/PACKING_GUARD_CLOSURE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/packing_provenance_certificate.rs",
+    "variance_chain": "D sum(c^2)-M^2<=2MdeltaD, equivalently sum(c-M/D)^2<=2Mdelta; M>=2D^2delta implies cD<=2M for every class",
+    "capacity_chain": "height D<=(c+L)D<=2M+LD<=3M; KL<=height sum_patterns 2^j=height R^(2a)=height D<=3M",
+    "shrink_chain": "each one-side coordinate/group load sums D/R classes and is <=2M/R; child edges<=4M/R=M/16 at R=64; old degrees persist and packet degree<=2L<=delta",
+    "recursive_chain": "the next node either falls back or Setup rechecks M>=2D^2delta, M>=LD and 2L<=delta, so no symmetric child-shape invariant is required",
+    "executable_binding": "schema-3 summaries expose maximum_class and source_guard_closure_admitted; guard-admitted finite objects must also pass maximum_class*D<=2M and the stronger per-side 2M/R load cap",
+    "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
+    "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
+  },
+  "next_gate": "compose the strict root family and graph-generic source-guard closure through the schema-1 node interface and symbolic history as one independently checkable theorem; separately rederive the external factorization/contraction theorem"
 }

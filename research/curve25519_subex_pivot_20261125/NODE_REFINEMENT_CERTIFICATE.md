@@ -20,29 +20,32 @@ The verifier requires normalized precision and checks, in order:
 5. exact equality of edge, packet, packet-length, exponent, coordinate, tuple,
    and group dimensions across those interfaces.
 
-The report returns actual maximum child edges and degree and says whether the
-fixed radix-64 strict source guards hold. `verify_strict` rejects unless that
-flag is true. This separates a valid finite algebraic/refinement object from a
-strict theorem node rather than promoting one to the other.
+The report returns actual maximum child edges and degree, whether
+`M>=2D^2delta` and `M>=LD` imply uniform packing closure, and whether the fixed
+radix-64 child shrink/degree guards hold. `verify_strict` requires both guard
+closure and observed child refinement. This separates a valid finite
+algebraic/refinement object from a strict theorem node rather than promoting
+one to the other.
 `[pcc:unverified]`
 
 ## Native control
 
 The admitted three-edge conditional-packing fixture serializes and parses a
 complete node bundle. The composed verifier accepts it, including normalized
-precision, while reporting strict source refinement false because its radix-2
-children do not meet the eightfold-shrink and `2L<=delta` guards. The strict
-entry point rejects with `node refinement strict source guards`. Clearing the
-required normalized-precision flag rejects at the context gate.
+precision, while reporting source-guard closure and strict source refinement
+false because the small radix-2 object is below the asymptotic guards and its
+children do not meet the fixed radix-64 interface. The strict entry point
+rejects with `node refinement strict source guards`. Clearing the required
+normalized-precision flag rejects at the context gate.
 `[pcc:unverified]`
 
 ## Remaining construction boundary
 
 The checker is generic over finite certificate size: any supplied radix-64
-node satisfying every interface is accepted by the same code. It does not
-construct a uniform arbitrary-size sequence of such nodes, prove that the live
-unreachable `usize` branch emits the bundle, or prove the external contraction
-theorem. The schema-6 symbolic transcript supplies compatible scalar schedules
-and description accounting, but realizing those schedules remains the next
-construction problem. No practical Curve25519 attack follows.
+node satisfying every interface and both source guards is accepted by the same
+code. `PACKING_GUARD_CLOSURE.md` gives the uniform producer induction, while
+the strict root and schema-6 transcript supply compatible schedules. Their
+composition is not yet independently formalized, the live `usize` branch
+cannot allocate such a bundle, and the external contraction theorem remains
+unproved. No practical Curve25519 attack follows.
 `[pcc:unverified]`
