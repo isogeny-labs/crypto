@@ -71,9 +71,9 @@ cannot lower the exponent.  The calculation therefore rejects this known
 upper-bound family as a sub-rho mechanism; it is not a lower bound for unknown
 data structures. `[pcc:unverified]`
 
-More generally, if an implicit one-witness data structure has preprocessing
-`N^s` and query cost `N^t`, balancing preprocessing against the
-`p N^(t-(m-1))` relation-query cost gives, when `s-t >= 1`,
+More generally, if an implicit data structure has preprocessing `N^s` and
+amortized target-dependent batch cost `N^t` per target, balancing preprocessing
+against the `p N^(t-(m-1))` relation-query cost gives, when `s-t >= 1`,
 
 ```text
 E_rel = s / (s + m - 1 - t).

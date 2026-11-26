@@ -43,7 +43,7 @@ The status of the program is:
 | Theorem 17 | unconditional density-one statement for fixed \(m\) | sparse-regime \(m\)-sum expansion and the resulting exact separated-sketch barrier |
 | Theorem 18 | unconditional in the stated static-provenance model | product-tree preprocessing plus fully adaptive query branching |
 | Proposition 19 | exact reduction plus literature audit | split-tree recovery is group \(k\)SUM-Indexing; current indexing upper bounds remain above one-half after relation accounting |
-| Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and query exponent \(t\) |
+| Theorem 20 | exact exponent criterion | piecewise sub-rho conditions for preprocessing exponent \(s\) and amortized batch-query exponent \(t\) |
 | ARQP direct-sum conjecture | **open for \(m\ge3\)** | compact shared circuits, implicit evaluation points, batching, and witness recovery |
 
 In particular, this manuscript does **not** claim an unconditional
@@ -1574,16 +1574,17 @@ base of size \(N\) has charged preprocessing
 P=N^{s+o(1)}
 \]
 
-and answers a uniform target query in
+and, on a batch of \(B\) uniform targets, has total target-dependent work
 
 \[
-Q=N^{t+o(1)}
+T_{\rm query}=B\,N^{t+o(1)}.
 \]
 
-charged operations, returning at most \(N^{o(1)}\) verified relation witnesses `[pcc:unverified]`
-per query.  Assume \(0\le t<m-1\), constant rank gain, and
-\(N=p^{\alpha+o(1)}\) with \(0<\alpha\le1/m\).  The exact tuple-count upper
-bound gives the following optimized relation-stage exponent:
+The batch may share arbitrary target-dependent computation and return every
+verified decomposition it finds; output and verification are charged. Assume
+\(0\le t<m-1\), constant rank gain, and \(N=p^{\alpha+o(1)}\) with
+\(0<\alpha\le1/m\). The exact tuple-count upper bound gives the following
+optimized relation-stage exponent: `[pcc:unverified]`
 
 \[
 E_{\rm rel}(s,t;m)=
@@ -1613,8 +1614,9 @@ matrix algorithm.
 #### Proof
 
 Across a uniform target, the expected number of ordered decompositions is at
-most \(N^m/p\).  Therefore collecting \(\Theta(N)\) rows with
-\(N^{o(1)}\) reported witnesses per query requires at least
+most \(N^m/p\). Linearity of expectation applies to the whole batch even if
+all decompositions are returned and target-dependent work is shared.
+Therefore collecting \(\Theta(N)\) rows requires at least
 
 \[
 B=p^{1+o(1)}N^{-(m-1)}
@@ -1653,7 +1655,10 @@ is still decreasing at \(\alpha=1/m\), so the infimum is attained by taking
 coefficient by \(s_0=\max\{s,2\}\), so the identical case split applies.
 \(\square\)
 
-This criterion turns the broad ARQP question into a falsifiable target.  In
+This criterion turns the broad ARQP question into a falsifiable target. The
+exponent \(t\) is amortized over the complete collection batch, so ordinary
+multipoint evaluation and shared target processing do not escape the balance.
+In
 the balanced sparse branch \(s-t\ge1\), a candidate must cross the line
 \(s+t=m-1\), not merely compress the \(N^m\) expanded sum table.  In the
 boundary branch \(s-t<1\), it must instead achieve \(t<m/2-1\).  The trivial
