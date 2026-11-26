@@ -62,6 +62,8 @@ pub mod claim;
 pub mod claw;
 pub mod cm_folded;
 pub mod compare;
+pub mod complexity_accounting;
+pub mod complexity_model;
 pub mod conductor_gap;
 pub mod cover_quartic;
 pub mod curve25519_pair;
