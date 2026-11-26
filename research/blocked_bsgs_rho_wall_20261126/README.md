@@ -8,9 +8,11 @@ public, prime-order toy curves. The primary workload is one cold target with all
 solver setup charged. A separate secondary panel may reuse one BSGS table across
 64 targets; it is not evidence about the cold one-target problem.
 
-The frozen design is in [`PROTOCOL.md`](PROTOCOL.md), and the randomness
-contract is in [`seed-manifest.json`](seed-manifest.json). No timing result has
-been collected or interpreted yet.
+The frozen design is in [`PROTOCOL.md`](PROTOCOL.md), with the admitted CPU
+envelope corrected before timing in
+[`PROTOCOL-ADDENDUM-1.md`](PROTOCOL-ADDENDUM-1.md). The randomness contract is
+in [`seed-manifest.json`](seed-manifest.json). No timing result has been
+collected or interpreted yet.
 
 ## Sources checked
 
