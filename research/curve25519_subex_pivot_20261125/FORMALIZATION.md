@@ -189,6 +189,11 @@ native degree/right-endpoint-bucket row formula and proves the column score is
 uses those formulas, preserving the executable-schedule theorem and reducing
 the best observed cold build to 55 seconds. The remaining optimization target
 is a single-pass auxiliary-state replay of the evolving native buckets.
+`BucketStateReplay.lean` supplies the state invariant for that step: the empty
+maps represent all-unknown assignments, each insertion exactly updates the
+degree/right-endpoint or row-label/column-label port counts, and each state
+score equals the corresponding extensional incidence score. The executable
+fold and its trace equivalence are not yet connected.
 `[pcc:unverified]`
 `executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact

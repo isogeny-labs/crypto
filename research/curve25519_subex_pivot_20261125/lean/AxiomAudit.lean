@@ -5,6 +5,7 @@ import ConditionalVariance
 import ConditionalObjective
 import SparseLabelScore
 import IncidenceBucketScore
+import BucketStateReplay
 import LabelSequence
 import PackingLabelArtifact
 import ObjectiveBoundary
@@ -16,6 +17,7 @@ open Curve25519ConditionalVariance
 open Curve25519ConditionalObjective
 open Curve25519SparseLabelScore
 open Curve25519IncidenceBucketScore
+open Curve25519BucketStateReplay
 open Curve25519LabelSequence
 open Curve25519PackingLabelArtifact
 open Curve25519ObjectiveBoundary
@@ -65,6 +67,18 @@ open Curve25519ExtensionRingModel
 #print axioms columnCandidateScore_eq_incidenceProfileScore
 #print axioms firstMinimumRowLabel_eq_incidenceBucketScore
 #print axioms firstMinimumColumnLabel_eq_incidenceProfileScore
+#print axioms assignedRowBucketDegree_update
+#print axioms assignedRightBucketPorts_update
+#print axioms RowBucketState.empty_matches
+#print axioms RowBucketState.addVertex_matches
+#print axioms rowLabelBucketDegree_eq_assigned
+#print axioms rowRightBucketPorts_eq_assigned
+#print axioms RowBucketState.score_eq_incidenceBucketScore
+#print axioms assignedColumnProfilePorts_update
+#print axioms ColumnBucketState.empty_matches
+#print axioms ColumnBucketState.addVertex_matches
+#print axioms columnRowLabelPorts_eq_assigned
+#print axioms ColumnBucketState.score_eq_incidenceProfileScore
 #print axioms prefixAssignment_step
 #print axioms row_sequence_nonincreasing
 #print axioms column_sequence_nonincreasing

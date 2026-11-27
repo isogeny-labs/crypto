@@ -392,7 +392,12 @@ score is `q` times the row-label incidence-profile dot product. Positive scale
 invariance removes that final factor without changing ties. The artifact
 checker now evaluates these source-shaped scores, reducing the best observed
 cold build to 55 seconds. A single-pass replay of the evolving bucket maps is
-still needed for the sub-30-second target.
+still needed for the sub-30-second target. `BucketStateReplay.lean` now gives
+those auxiliary maps an exact invariant: empty maps equal all-unknown
+assignments, every row/column insertion equals extending the partial assignment
+by the selected label, and state-based scores equal the proved extensional
+incidence formulas. Connecting those transition theorems to one executable
+fold remains the last local step toward the single-pass checker.
 `[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,

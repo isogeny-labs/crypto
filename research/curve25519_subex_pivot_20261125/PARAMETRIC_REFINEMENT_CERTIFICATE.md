@@ -202,7 +202,9 @@ evidence for two independent claims:
    native degree/right-endpoint buckets compute the row score and the native
    row-label profile dot product computes the column score up to the positive
    factor `q`. The formal artifact checker now evaluates those formulas;
-   replaying the evolving bucket states in a single pass remains open
+   immutable auxiliary-state records now have proved empty-state, insertion,
+   and score invariants for both phases, while wiring them through one
+   executable artifact fold remains open
    `[pcc:unverified]`; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,

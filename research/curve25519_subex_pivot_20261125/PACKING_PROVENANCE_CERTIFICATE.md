@@ -103,6 +103,10 @@ overlap, and the column score equal to `q` times the row-label profile dot
 product. Computing those source-shaped formulas reduces the best observed cold
 build to 55 seconds. The next target is a single-pass replay of the evolving
 bucket maps rather than reconstructing each prefix independently.
+`BucketStateReplay.lean` now proves the required auxiliary invariant for both
+phases: empty state, exact row/column insertion, and equality of every
+state-derived candidate score with its extensional incidence formula. Wiring
+that state through one executable artifact fold remains open.
 `[pcc:unverified]`
 
 ## Remaining boundary
