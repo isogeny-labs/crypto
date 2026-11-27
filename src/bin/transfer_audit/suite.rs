@@ -896,8 +896,10 @@ mod tests {
     /// curve across the margin, fails here and needs a human reading of the
     /// new row before the pin is updated.
     // 31 since the registry's mixed-twist IC curves p101 and p1009 gained
-    // trait records (#2746); neither is class-weak.
-    const PINNED_SWEPT: usize = 31;
+    // trait records (#2746); neither is class-weak.  32 since the toy
+    // icv1-fp6-tm7-fc20da94 (embedding degree 11) gained a generator in
+    // the registry regeneration 204b6fe234; it is not class-weak.
+    const PINNED_SWEPT: usize = 32;
     const PINNED_CLASS_WEAK: &[&str] = &[
         "icv1-fp170-tm52213820118540299389901413-869d5d3c", // mnt/mnt1, the positive control
         "icv1-fp350-t35917316178020966140770026648761406645010658995732487-6e1654f7", // bn/bn350, -13.3 bits

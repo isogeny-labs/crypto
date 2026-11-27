@@ -35,6 +35,9 @@
 //! system resolved — the number to compare across coordinate systems —
 //! and stops cooperatively at a deadline, so a budget never leaves a
 //! thread behind.
+//! Root extraction uses closed forms through degree two and a scan-versus-
+//! Frobenius cost estimate for higher degrees. [`solve_with_root_mode`]
+//! retains explicit scan and algebraic controls for matched comparisons.
 //! An opt-in diagnostic policy (`F4_FP_LINEAR_ROOTS=1`, default off) first
 //! substitutes a pure univariate linear equation analytically. Other root
 //! finding and the final exact input check are unchanged.
@@ -963,14 +966,15 @@ pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
     per_point.saturating_mul(domain_len as u64)
 }
 
-/// An upper estimate of the Frobenius root finder's multiplications for a
+/// An estimate of the Frobenius root finder's multiplications for a
 /// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
 /// step a schoolbook product and a reduction, plus the gcd.  Used only to
 /// choose between the modes in [`DomainRootMode::Auto`]; never reported.
 pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
     let n = u64::from(degree) + 1;
-    let step = 2 * n * n;
-    powmod_muls(p).saturating_mul(step).saturating_add(n * n)
+    let square = n.saturating_mul(n);
+    let step = square.saturating_mul(2);
+    powmod_muls(p).saturating_mul(step).saturating_add(square)
 }
 
 /// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
@@ -9617,6 +9621,7 @@ struct VisitAccountingSession<'a> {
 }
 
 impl<'a> VisitAccountingSession<'a> {
+    #[allow(clippy::result_large_err)]
     fn begin(
         mut builder: VisitAccountingBuilder,
         context: &'a VisitAccountingContext,
@@ -10937,6 +10942,7 @@ fn visit_disposition(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 fn solve_visit_accounted_impl<F, S>(
     input: &[Poly],
     n_vars: usize,
@@ -11052,8 +11058,10 @@ where
                 .stopped()
         });
     if initial_accounting_stopped || account.control().stopped() {
-        let mut report = VisitReport::default();
-        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        let report = VisitReport {
+            accounting_v1: Some(Box::new(session.finish(VisitDispositionV1::Incomplete))),
+            ..VisitReport::default()
+        };
         return Ok(report);
     }
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
@@ -11116,6 +11124,7 @@ impl VisitAccountingExecutorV1 {
     /// solves through this API.  The report remains call-scoped; construction,
     /// replay, persistence, and whole-collector work need outer accounting.
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::result_large_err)]
     pub fn solve_first(
         &mut self,
         input: &[Poly],
@@ -11157,6 +11166,7 @@ impl VisitAccountingExecutorV1 {
 /// one-thread Rayon pool.  The returned record covers only this solver call;
 /// public-system construction, arbitrary callback work, replay, storage and
 /// the enclosing relation collector require their own ledger.
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -11183,6 +11193,7 @@ pub fn solve_visit_accounted_v1(
 /// sink's own persistence/storage implementation remains outer work.  Trace
 /// reuse is intentionally unsupported by v1.
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_traced_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -13111,7 +13122,8 @@ pub struct SolveReport {
     pub final_filter_ns: u64,
     pub timed_out: bool,
     /// `F_p` multiplications spent in row reduction, summed over the F4
-    /// runs of the substitution tree.
+    /// runs of the substitution tree. This excludes root extraction, whose
+    /// elapsed time is included in `root_selection_ns`.
     pub field_ops: u64,
     /// Block-reduced steps of the top-level run.
     pub blocked_steps: usize,
@@ -13336,11 +13348,13 @@ pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
         *muls += powmod_muls(e);
         powmod(a, e, p)
     };
+    if p % 4 == 3 {
+        let root = pw(n, (p + 1) / 4, muls);
+        *muls += 1;
+        return (mulmod(root, root, p) == n).then_some(root);
+    }
     if pw(n, (p - 1) / 2, muls) != 1 {
         return None;
-    }
-    if p % 4 == 3 {
-        return Some(pw(n, (p + 1) / 4, muls));
     }
     let (mut q, mut s) = (p - 1, 0u32);
     while q % 2 == 0 {
@@ -13391,6 +13405,9 @@ pub(crate) fn dense_roots_fp(
     muls: &mut u64,
     deadline: Option<Instant>,
 ) -> Option<Vec<u64>> {
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        return None;
+    }
     let mut roots = match h.len() {
         0 | 1 => Vec::new(),
         2 => {
@@ -13400,18 +13417,19 @@ pub(crate) fn dense_roots_fp(
         3 if p % 2 == 1 => {
             let (c0, c1, c2) = (h[0], h[1], h[2]);
             let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
-            *muls += 4;
-            let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+            *muls += 3;
             match sqrt_mod_counted(disc, p, muls) {
                 None => Vec::new(),
                 Some(s) => {
                     *muls += 2;
+                    let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
                     let neg_b = (p - c1) % p;
                     let r1 = mulmod((neg_b + s) % p, inv2a, p);
-                    let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
-                    if r1 == r2 {
+                    if s == 0 {
                         vec![r1]
                     } else {
+                        *muls += 1;
+                        let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
                         vec![r1, r2]
                     }
                 }
@@ -13427,20 +13445,93 @@ pub(crate) fn dense_roots_fp(
     };
     roots.sort_unstable();
     roots.dedup();
-    Some(roots)
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
+    }
 }
 
-/// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
-fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
-    (0..p)
-        .filter(|&x| {
-            let mut v = 0u64;
-            for (k, c) in coeffs {
-                v = (v + mulmod(*c, powmod(x, *k as u64, p), p)) % p;
-            }
-            v == 0
-        })
-        .collect()
+/// All roots of a sparse univariate polynomial over the prime field, in
+/// ascending order. A cancelled extraction is distinct from an empty root set.
+/// The automatic policy uses closed forms through degree two and the visitor's
+/// existing scan/Frobenius cost estimate for higher degrees.
+fn roots_univariate(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    mode: DomainRootMode,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let expired = || deadline.is_some_and(|d| Instant::now() >= d);
+    if expired() {
+        return None;
+    }
+    let exponents: Vec<u32> = coeffs
+        .iter()
+        .filter(|(_, c)| !c.is_multiple_of(p))
+        .map(|&(k, _)| k)
+        .collect();
+    let degree = exponents.iter().copied().max().unwrap_or(0);
+    let scan = mode == DomainRootMode::Scan
+        || p == 2
+        || (mode == DomainRootMode::Auto
+            && degree > 2
+            && domain_scan_cost(&exponents, p as usize) <= domain_frobenius_cost(degree, p));
+    if scan {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
+    }
+    let mut dense = vec![0; degree as usize + 1];
+    for &(k, c) in coeffs {
+        // Ignore zero terms before indexing, including a trailing term whose
+        // exponent exceeds the actual degree. Merge duplicate exponents.
+        if !c.is_multiple_of(p) {
+            dense[k as usize] =
+                ((u128::from(dense[k as usize]) + u128::from(c % p)) % u128::from(p)) as u64;
+        }
+    }
+    let dense = dense_trim(dense);
+    if dense.is_empty() {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
+    }
+    let mut muls = 0;
+    let roots = dense_roots_fp(&dense, p, &mut muls, deadline)?;
+    if expired() {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+/// Original sparse evaluation control, with cooperative cancellation. Keep
+/// the arithmetic and root order so historical small-field runs can replay.
+fn roots_univariate_exhaustive_until(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = Vec::new();
+    for x in 0..p {
+        if x % 256 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        let mut value = 0u64;
+        for &(k, c) in coeffs {
+            value = (value + mulmod(c, powmod(x, u64::from(k), p), p)) % p;
+        }
+        if value == 0 {
+            roots.push(x);
+        }
+    }
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+#[cfg(test)]
+fn roots_univariate_exhaustive(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
+    roots_univariate_exhaustive_until(coeffs, p, None).unwrap()
 }
 
 /// A forced assignment from a pure nonconstant linear univariate equation.
@@ -13496,8 +13587,22 @@ fn specialise(f: &Poly, i: usize, a: u64, p: u64) -> Vec<(Vec<u32>, u64)> {
 /// Solve a zero-dimensional system over `F_p` by degree-bounded F4 and
 /// substitution.  Solutions are full assignments `(x_0, …, x_{n−1})`.
 pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveReport {
+    solve_with_root_mode(input, n_vars, p, opts, DomainRootMode::Auto)
+}
+
+/// Solve with an explicit univariate root policy. `Scan` retains the exhaustive
+/// control, `Frobenius` forces algebraic extraction, and `Auto` is the normal
+/// [`solve`] policy. This policy applies to the full field. Finite-domain
+/// visitor extraction remains controlled by [`F4Options::domain_roots`].
+pub fn solve_with_root_mode(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    root_mode: DomainRootMode,
+) -> SolveReport {
     let linear_roots = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
-    solve_with_linear_roots(input, n_vars, p, opts, linear_roots)
+    solve_with_linear_roots(input, n_vars, p, opts, linear_roots, root_mode)
 }
 
 fn solve_with_linear_roots(
@@ -13506,6 +13611,7 @@ fn solve_with_linear_roots(
     p: u64,
     opts: &F4Options,
     linear_roots: bool,
+    root_mode: DomainRootMode,
 ) -> SolveReport {
     let t0 = Instant::now();
     let ops0 = field_ops_now();
@@ -13525,6 +13631,7 @@ fn solve_with_linear_roots(
         p,
         opts,
         linear_roots,
+        root_mode,
         &mut runs,
         &mut max_rows,
         &mut max_cols,
@@ -13598,6 +13705,7 @@ fn solve_rec(
     p: u64,
     opts: &F4Options,
     linear_roots: bool,
+    root_mode: DomainRootMode,
     runs: &mut usize,
     max_rows: &mut usize,
     max_cols: &mut usize,
@@ -13659,27 +13767,33 @@ fn solve_rec(
             if vars.len() == 1 {
                 let i = *vars.iter().next().unwrap();
                 let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
-                let roots = roots_univariate(&coeffs, p);
+                let Some(roots) = roots_univariate(&coeffs, p, root_mode, opts.deadline) else {
+                    *root_selection_ns += root_selection_start.elapsed().as_nanos();
+                    *timed_out = true;
+                    return Verdict::Undetermined;
+                };
                 if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
                     best = Some((i, roots));
                 }
             }
         }
     }
-    let (var, values): (usize, Vec<u64>) = match best {
-        Some(b) => b,
+    let (var, roots, field_values) = match best {
+        Some((i, roots)) => (i, roots, 0..0),
         None => {
             // Without a univariate element every value of the first
             // variable is tried.  With a truncation (`pairs_above_bound`)
             // the basis is that of a sub-ideal, so this and the root
             // enumeration above return a superset of the solutions, which
             // `solve` filters against the input.
-            (0, (0..p).collect())
+            // Iterate lazily so a large field cannot allocate p entries
+            // before the recursion gets a chance to observe its deadline.
+            (0, Vec::new(), 0..p)
         }
     };
     *root_selection_ns += root_selection_start.elapsed().as_nanos();
     let mut sols: Vec<Vec<u64>> = Vec::new();
-    for a in values {
+    for a in roots.into_iter().chain(field_values) {
         if let Some(d) = opts.deadline {
             if Instant::now() > d {
                 *timed_out = true;
@@ -13700,6 +13814,7 @@ fn solve_rec(
             p,
             opts,
             linear_roots,
+            root_mode,
             runs,
             max_rows,
             max_cols,
@@ -13748,6 +13863,193 @@ mod tests {
     use super::*;
     use std::collections::BTreeMap;
 
+    fn roots_test_rng(state: &mut u64) -> u64 {
+        *state = state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *state >> 11
+    }
+
+    #[test]
+    fn root_policies_match_every_small_cubic() {
+        for p in [2u64, 3, 5, 7] {
+            for encoded in 0..p.pow(4) {
+                let mut digits = encoded;
+                let coeffs: Vec<_> = (0..4)
+                    .map(|k| {
+                        let c = digits % p;
+                        digits /= p;
+                        (k, c)
+                    })
+                    .collect();
+                let want = roots_univariate_exhaustive(&coeffs, p);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(
+                        roots_univariate(&coeffs, p, mode, None),
+                        Some(want.clone()),
+                        "p={p} coeffs={coeffs:?} mode={mode:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_match_13_bit_repeated_root_polynomials() {
+        for p in [4099u64, 6151, 8191] {
+            for degree in [1, 2, 4, 8, 16, 32, 64] {
+                let mut dense = vec![1];
+                let mut want = Vec::new();
+                for k in 0..degree {
+                    // Include zero and repeated roots without relying on
+                    // the extraction implementation to construct the oracle.
+                    let root = (k / 2 * 137) % p;
+                    want.push(root);
+                    let mut next = vec![0; dense.len() + 1];
+                    for (i, &c) in dense.iter().enumerate() {
+                        next[i] = (next[i] + p - mulmod(c, root, p)) % p;
+                        next[i + 1] = (next[i + 1] + c) % p;
+                    }
+                    dense = next;
+                }
+                want.sort_unstable();
+                want.dedup();
+                let coeffs: Vec<_> = dense
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, c)| (i as u32, c))
+                    .collect();
+                assert_eq!(roots_univariate_exhaustive(&coeffs, p), want);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(roots_univariate(&coeffs, p, mode, None), Some(want.clone()));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_preserve_zero_terms_and_cancellation() {
+        let cases = [
+            vec![],
+            vec![(0, 0)],
+            vec![(1, 1), (1, 4)],
+            vec![(1, 1), (0, 4), (u32::MAX, 0)],
+            vec![(2, 6), (2, 4), (1, 1), (0, 4)],
+        ];
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            for coeffs in &cases {
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, None),
+                    Some(roots_univariate_exhaustive(coeffs, 5))
+                );
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, Some(Instant::now())),
+                    None
+                );
+            }
+            let mut opts = F4Options::new(Ordering::Grevlex, 4);
+            opts.deadline = Some(Instant::now());
+            let report =
+                solve_with_root_mode(&[vec![(vec![2], 1), (vec![0], 4)]], 1, 5, &opts, mode);
+            assert!(report.timed_out);
+            assert!(matches!(report.verdict, Verdict::Undetermined));
+        }
+        assert_eq!(domain_frobenius_cost(u32::MAX, 8191), u64::MAX);
+    }
+
+    #[test]
+    fn public_solver_root_modes_preserve_complete_solutions() {
+        let p = 101;
+        let input = vec![
+            vec![(vec![4, 0], 1), (vec![0, 0], p - 1)],
+            vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+        ];
+        let want: Vec<_> = (0..p)
+            .filter(|&x| input.iter().all(|g| eval(g, &[x, x], p) == 0))
+            .map(|x| vec![x, x])
+            .collect();
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            let report = solve_with_root_mode(&input, 2, p, &opts, mode);
+            assert!(!report.timed_out);
+            let Verdict::Solutions(mut got) = report.verdict else {
+                panic!("{mode:?}: no roots");
+            };
+            got.sort();
+            assert_eq!(got, want);
+        }
+        let Verdict::Solutions(mut got) = solve(&input, 2, p, &opts).verdict else {
+            panic!("default: no roots");
+        };
+        got.sort();
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn split_roots_match_the_exhaustive_scan() {
+        let mut state = 7u64;
+        for p in [3u64, 5, 7, 101, 10_007, 65_537] {
+            for trial in 0..60 {
+                let deg = 1 + (roots_test_rng(&mut state) % 12) as u32;
+                let mut coeffs: Vec<(u32, u64)> = Vec::new();
+                for k in 0..=deg {
+                    if !roots_test_rng(&mut state).is_multiple_of(3) {
+                        coeffs.push((k, roots_test_rng(&mut state) % p));
+                    }
+                }
+                if trial % 4 == 0 {
+                    // Force several roots, a repeated one and zero.
+                    let mut f = vec![1u64];
+                    for r in [0, 1 % p, 1 % p, (p - 2) % p, 5 % p] {
+                        let mut g = vec![0u64; f.len() + 1];
+                        for (i, &c) in f.iter().enumerate() {
+                            g[i + 1] = (g[i + 1] + c) % p;
+                            g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+                        }
+                        f = g;
+                    }
+                    coeffs = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+                }
+                let fast = roots_univariate(&coeffs, p, DomainRootMode::Frobenius, None);
+                let slow = roots_univariate_exhaustive(&coeffs, p);
+                assert_eq!(fast, Some(slow), "p={p} coeffs={coeffs:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn large_field_roots_use_the_split_path() {
+        let p = 2_147_483_647u64;
+        let want: Vec<u64> = vec![0, 3, 77_777, 1_234_567_890, 2_147_483_646];
+        // prod (x - r) * (x^2 + 1); -1 is a non-residue mod p = 3 (mod 4).
+        let mut f = vec![1u64, 0, 1];
+        for &r in &want {
+            let mut g = vec![0u64; f.len() + 1];
+            for (i, &c) in f.iter().enumerate() {
+                g[i + 1] = (g[i + 1] + c) % p;
+                g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+            }
+            f = g;
+        }
+        let coeffs: Vec<(u32, u64)> = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+        assert_eq!(
+            roots_univariate(&coeffs, p, DomainRootMode::Auto, None),
+            Some(want)
+        );
+        assert_eq!(
+            roots_univariate(&[(0, 5)], p, DomainRootMode::Auto, None),
+            Some(Vec::new())
+        );
+    }
+
     #[test]
     fn analytic_linear_roots_match_exhaustive_field_roots() {
         for p in [2, 3, 5, 7, 59] {
@@ -13756,7 +14058,10 @@ mod tests {
                     let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
                     let (var, root) = linear_assignment(&g, p).unwrap();
                     assert_eq!(var, 1);
-                    assert_eq!(roots_univariate(&[(1, a), (0, b)], p), vec![root]);
+                    assert_eq!(
+                        roots_univariate(&[(1, a), (0, b)], p, DomainRootMode::Auto, None),
+                        Some(vec![root])
+                    );
                 }
             }
         }
@@ -13781,8 +14086,10 @@ mod tests {
                     vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
                 ];
                 let opts = F4Options::new(Ordering::Grevlex, 8);
-                let baseline = solve_with_linear_roots(&input, 2, p, &opts, false);
-                let candidate = solve_with_linear_roots(&input, 2, p, &opts, true);
+                let baseline =
+                    solve_with_linear_roots(&input, 2, p, &opts, false, DomainRootMode::Auto);
+                let candidate =
+                    solve_with_linear_roots(&input, 2, p, &opts, true, DomainRootMode::Auto);
                 match (baseline.verdict, candidate.verdict) {
                     (Verdict::Inconsistent, Verdict::Inconsistent) => {}
                     (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {

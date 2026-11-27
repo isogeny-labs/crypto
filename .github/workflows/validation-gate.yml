@@ -14,7 +14,7 @@ name: validation-gate
 # Store data the gate reads through VALIDATION.json (session records named as
 # raw_data, replay inputs) and that this file never names: tools/artifacts/
 # wire_workflows.py pulls these declared paths with the ones it finds.
-# tools/artifacts pull: benchmarks/20261029-ic-aimed-gather/registry-binding-20261123
+# tools/artifacts pull: benchmarks/20261029-ic-aimed-gather/registry-binding-20261127
 # tools/artifacts pull: benchmarks/20261115-fes-k13-runpod/session experiments/31_solve_cost
 # tools/artifacts pull: experiments/37_solver_b_pivot_count
 # tools/artifacts pull: research/blindspots_20261018/01-fp2-gaudry-k2/raw
@@ -131,7 +131,7 @@ jobs:
             benchmarks/20261029-ic-aimed-gather/registry-binding-20261101 \
             benchmarks/20261029-ic-aimed-gather/registry-binding-20261105
       - name: Historical aimed-gather numeric custody controls
-        run: python3 benchmarks/20261029-ic-aimed-gather/registry-binding-20261123/test_numeric_fidelity.py
+        run: python3 benchmarks/20261029-ic-aimed-gather/registry-binding-20261127/test_numeric_fidelity.py
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Reject stale native curve catalog bindings
