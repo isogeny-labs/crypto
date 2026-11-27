@@ -749,6 +749,9 @@ pub struct RunOptions {
     pub inputs_sha256: PathBuf,
     pub baseline: PathBuf,
     pub candidate: PathBuf,
+    /// One immutable options file shared by both optimized arms. None keeps
+    /// the frozen legacy `solve` command and its original row semantics.
+    pub optimized_options: Option<PathBuf>,
     pub out: PathBuf,
     pub seed: u64,
     pub aa_rounds: usize,
@@ -817,6 +820,22 @@ fn absolute(path: &Path) -> Result<PathBuf> {
     Ok(fs::canonicalize(path)?)
 }
 
+fn solve_args<'a>(
+    problem: &'a Path,
+    receipt: &'a Path,
+    optimized_options: Option<&'a Path>,
+) -> Vec<&'a Path> {
+    match optimized_options {
+        Some(options) => vec![
+            Path::new("solve-hashed-optimized"),
+            problem,
+            options,
+            receipt,
+        ],
+        None => vec![Path::new("solve"), problem, receipt],
+    }
+}
+
 /// Execute the schedule; rows stream to `rows.jsonl` as they finish, so a
 /// killed driver still leaves every completed row.
 pub fn run(options: &RunOptions) -> Result<Value> {
@@ -852,6 +871,17 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     let candidate = absolute(&options.candidate)?;
     let baseline_sha = file_sha256(&baseline)?;
     let candidate_sha = file_sha256(&candidate)?;
+    let optimized_options = options
+        .optimized_options
+        .as_ref()
+        .map(|path| {
+            let path = absolute(path)?;
+            let bytes = fs::read(&path)?;
+            let policy: hashed_ecdl_tensor::optimized::Options = serde_json::from_slice(&bytes)?;
+            policy.validate()?;
+            Ok::<_, Box<dyn std::error::Error>>((path, sha256_hex(&bytes)))
+        })
+        .transpose()?;
     fs::create_dir(&options.out)?;
     for sub in ["receipts", "logs"] {
         fs::create_dir(options.out.join(sub))?;
@@ -893,7 +923,9 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             "position": execution.position, "slot": execution.slot,
             "pair_member": execution.pair_member, "arm": execution.arm(),
             "binary_sha256": binary_sha, "case_id": case.id, "split": case.split,
-            "problem_sha256": problem_sha, "command": "solve",
+            "problem_sha256": problem_sha,
+            "command": if optimized_options.is_some() { "solve-hashed-optimized" } else { "solve" },
+            "optimized_options_sha256": optimized_options.as_ref().map(|(_, hash)| hash),
             "status": Value::Null, "reason": Value::Null, "exit_code": Value::Null,
             "solve_wall_ns": Value::Null, "limit_ms": Value::Null,
             "replay_status": Value::Null, "replay_wall_ns": Value::Null,
@@ -909,9 +941,14 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             let limit = options.case_limit.min(remaining);
             row["limit_ms"] = json!(limit.as_millis() as u64);
             let logs = options.out.join("logs");
+            let command = solve_args(
+                problem_path,
+                &receipt_path,
+                optimized_options.as_ref().map(|(path, _)| path.as_path()),
+            );
             let outcome = run_child(
                 binary,
-                &[Path::new("solve"), problem_path, &receipt_path],
+                &command,
                 &logs.join(format!("{stem}.solve.out")),
                 &logs.join(format!("{stem}.solve.err")),
                 limit,
@@ -971,13 +1008,18 @@ pub fn run(options: &RunOptions) -> Result<Value> {
         rows_file.sync_data()?;
         rows.push(row);
     }
-    // Binaries must not change under the driver.
+    // Neither arm nor its shared policy may change under the driver.
     let binaries_unchanged =
         file_sha256(&baseline)? == baseline_sha && file_sha256(&candidate)? == candidate_sha;
+    let options_unchanged = optimized_options.as_ref().map_or(true, |(path, hash)| {
+        file_sha256(path).ok().as_ref() == Some(hash)
+    });
     let mut analysis = analyze(&rows);
     analysis["label"] = json!(options.label);
     analysis["protocol_complete"] = json!(protocol_complete);
-    analysis["evidence_class"] = json!(if protocol_complete {
+    analysis["evidence_class"] = json!(if !binaries_unchanged || !options_unchanged {
+        "invalid_mutated_arm_or_policy"
+    } else if protocol_complete {
         "protocol_schedule_requires_external_L2_admission"
     } else {
         "diagnostic_incomplete_panel"
@@ -989,7 +1031,8 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     });
     analysis["arms"] = json!({
         "baseline_sha256": baseline_sha, "candidate_sha256": candidate_sha,
-        "unchanged_after_run": binaries_unchanged,
+        "optimized_options_sha256": optimized_options.as_ref().map(|(_, hash)| hash),
+        "unchanged_after_run": binaries_unchanged && options_unchanged,
     });
     analysis["schedule"] = json!({
         "seed": options.seed.to_string(), "aa_rounds": options.aa_rounds,
@@ -1166,13 +1209,14 @@ fn value<'a>(args: &'a [String], i: &mut usize, flag: &str) -> Result<&'a str> {
         .ok_or_else(|| format!("{flag} needs a value").into())
 }
 
-pub const USAGE: &str = "usage: hashed-ecdl-panel run --panel DIR --inputs-sha256 FILE --baseline BIN --candidate BIN --out NEW_DIR --seed U64 --case-limit-secs S [--deadline-secs 1800] [--aa-rounds 5] [--ab-rounds 5] [--cases ID,ID] [--label TEXT] [--allow-incomplete-panel]\n       hashed-ecdl-panel analyze ROWS.jsonl\n       hashed-ecdl-panel hash PANEL_DIR";
+pub const USAGE: &str = "usage: hashed-ecdl-panel run --panel DIR --inputs-sha256 FILE --baseline BIN --candidate BIN --out NEW_DIR --seed U64 --case-limit-secs S [--optimized-options FILE] [--deadline-secs 1800] [--aa-rounds 5] [--ab-rounds 5] [--cases ID,ID] [--label TEXT] [--allow-incomplete-panel]\n       hashed-ecdl-panel analyze ROWS.jsonl\n       hashed-ecdl-panel hash PANEL_DIR";
 
 pub fn cli_run(args: &[String]) -> Result<()> {
     let mut panel = None;
     let mut hashes = None;
     let mut baseline = None;
     let mut candidate = None;
+    let mut optimized_options = None;
     let mut out = None;
     let mut seed = None;
     let mut case_limit = None;
@@ -1190,6 +1234,9 @@ pub fn cli_run(args: &[String]) -> Result<()> {
             "--inputs-sha256" => hashes = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--baseline" => baseline = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--candidate" => candidate = Some(PathBuf::from(value(args, &mut i, flag)?)),
+            "--optimized-options" => {
+                optimized_options = Some(PathBuf::from(value(args, &mut i, flag)?))
+            }
             "--out" => out = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--seed" => seed = Some(value(args, &mut i, flag)?.parse::<u64>()?),
             "--case-limit-secs" => case_limit = Some(value(args, &mut i, flag)?.parse::<f64>()?),
@@ -1220,6 +1267,7 @@ pub fn cli_run(args: &[String]) -> Result<()> {
         inputs_sha256: hashes.ok_or_else(|| missing("--inputs-sha256"))?,
         baseline: baseline.ok_or_else(|| missing("--baseline"))?,
         candidate: candidate.ok_or_else(|| missing("--candidate"))?,
+        optimized_options,
         out: out.ok_or_else(|| missing("--out"))?,
         seed: seed.ok_or_else(|| missing("--seed"))?,
         aa_rounds: aa,
@@ -1264,6 +1312,26 @@ pub fn cli_analyze(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn optimized_panel_uses_the_same_policy_for_either_arm() {
+        let problem = Path::new("problem.json");
+        let receipt = Path::new("receipt.json");
+        let options = Path::new("options.json");
+        assert_eq!(
+            solve_args(problem, receipt, Some(options)),
+            [
+                Path::new("solve-hashed-optimized"),
+                problem,
+                options,
+                receipt,
+            ]
+        );
+        assert_eq!(
+            solve_args(problem, receipt, None),
+            [Path::new("solve"), problem, receipt]
+        );
+    }
 
     #[test]
     fn sha256_matches_fips_vectors() {
