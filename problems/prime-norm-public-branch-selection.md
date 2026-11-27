@@ -490,3 +490,20 @@ representation/logarithms, support density/retry and complete expected bit
 cost remain open. These existence proofs use noncomputable choice. Distinct
 pairs, not merely distinct indices, are required for the product argument.
 Original criteria and nonscalar-origin/rank-directed W-jet interfaces unchanged.
+
+## 2026-11-27: actual weighted residual sum and scalar information
+
+098/build104/local052/PCC-20261127-9326d2 checks258 printed/six new,
+zero warnings/standard foundations. From actual principal factorization and
+explicit nonsingular rational residual point product, derive weighted
+input-plus-residual sum zero. Residual group sum is fixed by prescribed
+inputs, independent of h; a single residual point is determined. Under
+Q+sP+R=0 derive R=rP iff Q=(-s-r)P. Unsigned local, outside shared
+Transport53/57 audit/fresh. [pcc:unverified]
+
+Rational splitting and useful residual labels remain explicit obligations,
+not consequences of the low degree bound. Multi-point factorizations may
+vary while their sum stays fixed; adaptive support/smoothness methods are
+not excluded. Next target multiplicity/unit scalar congruence and actual
+public construction of useful labeled residual factors, class-conditioned
+success/retry and full expected bit cost. Original criteria unchanged.
