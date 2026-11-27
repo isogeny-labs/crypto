@@ -267,7 +267,11 @@ same shift with zero coefficients below it, and the complete native
 carryless-product fold is transported to a polynomial-addition fold. Stable
 width extension and a whole-polynomial shift identity now identify that fold
 with ordinary polynomial multiplication under an explicit left-width bound;
-the remaining packed arithmetic bridge is remainder refinement.
+each packed remainder XOR step is likewise proved to preserve `modByMonic`,
+arbitrary bounded shift lists compose, and a transparent trace replays the
+fuel recursion exactly. The public remainder theorem remains conditional on
+monicity, modulus width, and a trace-window bound; deriving that bound and the
+reduced-degree normal form is the remaining packed arithmetic bridge.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

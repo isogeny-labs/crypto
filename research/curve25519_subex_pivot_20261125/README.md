@@ -546,7 +546,13 @@ carryless-product fold decodes to the same fold with XOR replaced by polynomial
 addition. Width-extension stability and a whole-polynomial shift theorem then
 identify that fold with ordinary polynomial multiplication whenever the left
 packed value satisfies its explicit bit-width bound; the right width is the
-native `log2(right)+1` loop bound. Packed remainder correctness remains open.
+native `log2(right)+1` loop bound. For remainder, each native XOR clearing step
+is proved to add a monomial multiple of the decoded modulus and preserve
+`modByMonic`; arbitrary bounded shift lists compose, and a transparent trace
+replays the exact fuel recursion. The public remainder therefore preserves the
+polynomial residue under explicit monicity, modulus-width, and trace-window
+hypotheses. Automatically deriving the trace bound and reduced-degree normal
+form remains open.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

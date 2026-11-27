@@ -611,7 +611,12 @@ values. A width-extension theorem and a complete shift identity compose this
 with finite-sum multiplication: if the left packed value is below
 `2^leftWidth`, the native raw product decodes exactly to ordinary polynomial
 multiplication, with the right decoder using the native `log2(right)+1` bound.
-The packed remainder loop remains the next semantic refinement.
+Each packed remainder step is also transported to addition by `U^shift` times
+the decoded modulus and proved to preserve `modByMonic`. The proof composes over
+arbitrary bounded shift lists; a transparent shift trace exactly replays
+`gf2PackedRemainderFuel`, yielding a conditional semantic theorem for the
+public remainder. The remaining obligations are to derive the trace-window
+bound and the final reduced-degree property from the native control flow.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

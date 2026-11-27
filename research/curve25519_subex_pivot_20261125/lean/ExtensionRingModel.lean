@@ -1287,6 +1287,72 @@ theorem packedGF2Polynomial_shift_of_bound
     _ = X ^ index * packedGF2Polynomial leftWidth left := by
       rw [packedGF2Polynomial_extend leftWidth (rightWidth - index) left hleft]
 
+/-- One native remainder clearing step is polynomial addition by a monomial
+multiple of the modulus. For a monic decoded modulus, the step preserves
+`modByMonic` exactly. -/
+theorem packedGF2Polynomial_remainderStep
+    (modulusWidth extra value modulus shift : ℕ)
+    (hshift : shift < extra) (hmodulus : modulus < 2 ^ modulusWidth)
+    (hmonic : (packedGF2Polynomial modulusWidth modulus).Monic) :
+    packedGF2Polynomial (modulusWidth + extra)
+        (Nat.xor value (modulus * 2 ^ shift)) =
+          packedGF2Polynomial (modulusWidth + extra) value +
+            X ^ shift * packedGF2Polynomial modulusWidth modulus ∧
+      (packedGF2Polynomial (modulusWidth + extra)
+          (Nat.xor value (modulus * 2 ^ shift))) %ₘ
+          packedGF2Polynomial modulusWidth modulus =
+        (packedGF2Polynomial (modulusWidth + extra) value) %ₘ
+          packedGF2Polynomial modulusWidth modulus := by
+  have hstep :
+      packedGF2Polynomial (modulusWidth + extra)
+          (Nat.xor value (modulus * 2 ^ shift)) =
+        packedGF2Polynomial (modulusWidth + extra) value +
+          X ^ shift * packedGF2Polynomial modulusWidth modulus := by
+    rw [packedGF2Polynomial_xor]
+    rw [packedGF2Polynomial_shift_of_bound
+      modulusWidth extra modulus shift hshift hmodulus]
+  refine ⟨hstep, ?_⟩
+  rw [hstep]
+  apply Polynomial.modByMonic_eq_of_dvd_sub hmonic
+  use X ^ shift
+  ring
+
+/-- Any bounded list of native packed clearing shifts preserves the same
+polynomial residue class. -/
+theorem packedGF2Polynomial_remainderSteps
+    (modulusWidth extra initial modulus : ℕ) (shifts : List ℕ)
+    (hshifts : ∀ shift ∈ shifts, shift < extra)
+    (hmodulus : modulus < 2 ^ modulusWidth)
+    (hmonic : (packedGF2Polynomial modulusWidth modulus).Monic) :
+    (packedGF2Polynomial (modulusWidth + extra)
+        (shifts.foldl
+          (fun value shift => Nat.xor value (modulus * 2 ^ shift))
+          initial)) %ₘ packedGF2Polynomial modulusWidth modulus =
+      (packedGF2Polynomial (modulusWidth + extra) initial) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+  induction shifts generalizing initial with
+  | nil => rfl
+  | cons head tail ih =>
+      simp only [List.foldl_cons]
+      have hhead : head < extra := hshifts head (by simp)
+      have htail : ∀ shift ∈ tail, shift < extra := by
+        intro shift hmem
+        exact hshifts shift (by simp [hmem])
+      calc
+        (packedGF2Polynomial (modulusWidth + extra)
+            (tail.foldl
+              (fun value shift => Nat.xor value (modulus * 2 ^ shift))
+              (Nat.xor initial (modulus * 2 ^ head)))) %ₘ
+              packedGF2Polynomial modulusWidth modulus =
+          (packedGF2Polynomial (modulusWidth + extra)
+            (Nat.xor initial (modulus * 2 ^ head))) %ₘ
+              packedGF2Polynomial modulusWidth modulus :=
+            ih (Nat.xor initial (modulus * 2 ^ head)) htail
+        _ = (packedGF2Polynomial (modulusWidth + extra) initial) %ₘ
+              packedGF2Polynomial modulusWidth modulus :=
+          (packedGF2Polynomial_remainderStep modulusWidth extra initial
+            modulus head hhead hmodulus hmonic).2
+
 /-- Fuel-bounded polynomial remainder over `GF(2)`, using packed coefficient
 bits exactly as the native ring search does. -/
 def gf2PackedRemainderFuel : ℕ → ℕ → ℕ → ℕ
@@ -1302,6 +1368,72 @@ def gf2PackedRemainderFuel : ℕ → ℕ → ℕ → ℕ
 /-- Packed polynomial remainder with enough fuel to clear every source degree. -/
 def gf2PackedRemainder (value modulus : ℕ) : ℕ :=
   gf2PackedRemainderFuel (Nat.log2 value + 1) value modulus
+
+/-- The exact sequence of shift offsets taken by the fuel-bounded packed
+remainder loop. This trace is computational and carries no trusted result. -/
+def gf2PackedRemainderShiftsFuel : ℕ → ℕ → ℕ → List ℕ
+  | 0, _, _ => []
+  | fuel + 1, value, modulus =>
+      if value == 0 || decide (Nat.log2 value < Nat.log2 modulus) then
+        []
+      else
+        let shift := Nat.log2 value - Nat.log2 modulus
+        shift :: gf2PackedRemainderShiftsFuel fuel
+          (Nat.xor value (modulus * 2 ^ shift)) modulus
+
+/-- Replaying the emitted shift trace with the native XOR update reproduces
+the fuel-bounded remainder result exactly. -/
+theorem gf2PackedRemainderFuel_eq_fold_shifts
+    (fuel value modulus : ℕ) :
+    gf2PackedRemainderFuel fuel value modulus =
+      (gf2PackedRemainderShiftsFuel fuel value modulus).foldl
+        (fun current shift => Nat.xor current (modulus * 2 ^ shift))
+        value := by
+  induction fuel generalizing value with
+  | zero => rfl
+  | succ remaining ih =>
+      rw [gf2PackedRemainderFuel, gf2PackedRemainderShiftsFuel]
+      split
+      next hstop => rfl
+      next hcontinue =>
+        simp only [List.foldl_cons]
+        exact ih (Nat.xor value
+          (modulus * 2 ^ (Nat.log2 value - Nat.log2 modulus)))
+
+/-- Conditional semantic refinement for the fuel-bounded native remainder:
+if every emitted shift fits the declared extra window, the decoded result has
+the same polynomial residue as the input. -/
+theorem packedGF2Polynomial_remainderFuel_residue
+    (fuel modulusWidth extra value modulus : ℕ)
+    (hshifts : ∀ shift ∈ gf2PackedRemainderShiftsFuel fuel value modulus,
+      shift < extra)
+    (hmodulus : modulus < 2 ^ modulusWidth)
+    (hmonic : (packedGF2Polynomial modulusWidth modulus).Monic) :
+    (packedGF2Polynomial (modulusWidth + extra)
+        (gf2PackedRemainderFuel fuel value modulus)) %ₘ
+          packedGF2Polynomial modulusWidth modulus =
+      (packedGF2Polynomial (modulusWidth + extra) value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+  rw [gf2PackedRemainderFuel_eq_fold_shifts]
+  exact packedGF2Polynomial_remainderSteps modulusWidth extra value modulus
+    (gf2PackedRemainderShiftsFuel fuel value modulus) hshifts hmodulus hmonic
+
+/-- Public packed remainder preserves polynomial residue under the explicit
+monicity, modulus-width, and emitted-shift window hypotheses. -/
+theorem packedGF2Polynomial_remainder_residue
+    (modulusWidth extra value modulus : ℕ)
+    (hshifts : ∀ shift ∈ gf2PackedRemainderShiftsFuel
+        (Nat.log2 value + 1) value modulus, shift < extra)
+    (hmodulus : modulus < 2 ^ modulusWidth)
+    (hmonic : (packedGF2Polynomial modulusWidth modulus).Monic) :
+    (packedGF2Polynomial (modulusWidth + extra)
+        (gf2PackedRemainder value modulus)) %ₘ
+          packedGF2Polynomial modulusWidth modulus =
+      (packedGF2Polynomial (modulusWidth + extra) value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+  exact packedGF2Polynomial_remainderFuel_residue
+    (Nat.log2 value + 1) modulusWidth extra value modulus
+    hshifts hmodulus hmonic
 
 /-- Unreduced carryless product of two packed `GF(2)` polynomials. -/
 def gf2PackedRawProduct (left right : ℕ) : ℕ :=
