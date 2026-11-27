@@ -79,6 +79,12 @@ open Curve25519ExtensionRingModel
 #print axioms ColumnBucketState.addVertex_matches
 #print axioms columnRowLabelPorts_eq_assigned
 #print axioms ColumnBucketState.score_eq_incidenceProfileScore
+#print axioms replayRowStateAux_sound
+#print axioms replayRowState_sound
+#print axioms replayRowState_eq_executable
+#print axioms replayColumnStateAux_sound
+#print axioms replayColumnState_sound
+#print axioms replayColumnState_eq_executable
 #print axioms prefixAssignment_step
 #print axioms row_sequence_nonincreasing
 #print axioms column_sequence_nonincreasing

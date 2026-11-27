@@ -192,8 +192,13 @@ is a single-pass auxiliary-state replay of the evolving native buckets.
 `BucketStateReplay.lean` supplies the state invariant for that step: the empty
 maps represent all-unknown assignments, each insertion exactly updates the
 degree/right-endpoint or row-label/column-label port counts, and each state
-score equals the corresponding extensional incidence score. The executable
-fold and its trace equivalence are not yet connected.
+score equals the corresponding extensional incidence score. A fuel-bounded
+native-order fold now threads those states through rows and columns; its
+soundness theorem maintains the exact prefix assignment, and strong induction
+proves accepted arrays equal the original recursive schedule. The artifact
+checker uses this fold. The best observed cold build is 52 seconds; replacing
+nested functional updates by materialized finite maps is the next performance
+target.
 `[pcc:unverified]`
 `executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact

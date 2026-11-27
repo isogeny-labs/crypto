@@ -1,7 +1,7 @@
 module
 
 public import ObjectiveBoundary
-public import IncidenceBucketScore
+public import BucketStateReplay
 
 @[expose] public section
 
@@ -18,7 +18,7 @@ namespace Curve25519PackingLabelArtifact
 open Curve25519LabelSequence
 open Curve25519ConditionalObjective
 open Curve25519ObjectiveBoundary
-open Curve25519IncidenceBucketScore
+open Curve25519BucketStateReplay
 
 /-- Shared native projection: schema/radix/context, endpoint quadruples, then
 row and column labels. -/
@@ -273,27 +273,19 @@ theorem parsePackingLabelArtifact_columnLabel_val
   simp [PackingLabelArtifact.columnLabel, hindex,
     Nat.mod_eq_of_lt hlabel]
 
-/-- Replay each exact row-then-column first-minimum step from the serialized
-prefix. Positivity is checked before dependent finite types are formed. -/
+/-- Replay the exact row-then-column first-minimum schedule in single passes
+through the proved auxiliary bucket states. Positivity is checked before
+dependent finite types are formed. -/
 def PackingLabelArtifact.traceMatches (artifact : PackingLabelArtifact) : Bool :=
   if hlabels : 0 < artifact.labelCount then
     if hrows : 0 < artifact.rowCount then
       if hcolumns : 0 < artifact.columnCount then
-        (List.finRange artifact.rowCount).all (fun row =>
-          decide (artifact.rowLabel hlabels row =
-            firstMinimumLabel hlabels
-              (rowIncidenceBucketScore artifact.labelCount
-                (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
-                (prefixAssignment (artifact.rowLabel hlabels) row.val)
-                row))) &&
-        (List.finRange artifact.columnCount).all (fun column =>
-          decide (artifact.columnLabel hlabels column =
-            firstMinimumLabel hlabels
-              (columnIncidenceProfileScore
-                (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
-                (fun row => some (artifact.rowLabel hlabels row))
-                (prefixAssignment (artifact.columnLabel hlabels) column.val)
-                column)))
+        replayRowState hlabels
+            (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+            (artifact.rowLabel hlabels) &&
+          replayColumnState hlabels
+            (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+            (artifact.rowLabel hlabels) (artifact.columnLabel hlabels)
       else false
     else false
   else false
@@ -407,28 +399,15 @@ theorem parseReplayedPackingLabelArtifact_rows
           (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
         (artifact.rightEndpoint
           (parseReplayedPackingLabelArtifact_columnCount_pos hparse)) row := by
-  rw [executableRowLabels_eq, firstMinimumRowLabel_eq_incidenceBucketScore]
   have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
   have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
   have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
   have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hparse
   simp only [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns,
-    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
-  have hlocal := of_decide_eq_true (htrace.1 row (by simp))
-  have hprefix :
-      prefixAssignment (artifact.rowLabel hlabels) row.val =
-        prefixAssignment
-          (executableRowLabels hlabels (artifact.leftEndpoint hrows)
-            (artifact.rightEndpoint hcolumns)) row.val := by
-    funext vertex
-    simp only [prefixAssignment]
-    split_ifs with hbefore
-    · congr 1
-      exact parseReplayedPackingLabelArtifact_rows hparse vertex
-    · rfl
-  rw [hprefix] at hlocal
-  exact hlocal
-termination_by row.val
+    ↓reduceDIte, Bool.and_eq_true] at htrace
+  exact congrFun (replayRowState_eq_executable hlabels
+    (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+    (artifact.rowLabel hlabels) htrace.1) row
 
 /-- A replayed import's column array is exactly the executable native-order
 column trace after fixing the replayed row trace. -/
@@ -454,34 +433,19 @@ theorem parseReplayedPackingLabelArtifact_columns
   have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
   have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
   have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hparse
-  rw [executableColumnLabels_eq,
-    firstMinimumColumnLabel_eq_incidenceProfileScore hlabels _ _ _ _
-      (fun row => ⟨_, rfl⟩)]
   simp only [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns,
-    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
-  have hlocal := of_decide_eq_true (htrace.2 column (by simp))
+    ↓reduceDIte, Bool.and_eq_true] at htrace
   have hrowLabels :
       artifact.rowLabel hlabels =
         executableRowLabels hlabels (artifact.leftEndpoint hrows)
           (artifact.rightEndpoint hcolumns) := by
     funext row
     exact parseReplayedPackingLabelArtifact_rows hparse row
-  have hprefix :
-      prefixAssignment (artifact.columnLabel hlabels) column.val =
-        prefixAssignment
-          (executableColumnLabels hlabels (artifact.leftEndpoint hrows)
-            (artifact.rightEndpoint hcolumns)
-            (executableRowLabels hlabels (artifact.leftEndpoint hrows)
-              (artifact.rightEndpoint hcolumns))) column.val := by
-    funext vertex
-    simp only [prefixAssignment]
-    split_ifs with hbefore
-    · congr 1
-      exact parseReplayedPackingLabelArtifact_columns hparse vertex
-    · rfl
-  rw [hrowLabels, hprefix] at hlocal
-  exact hlocal
-termination_by column.val
+  have hcolumns := replayColumnState_eq_executable hlabels
+    (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+    (artifact.rowLabel hlabels) (artifact.columnLabel hlabels) htrace.2
+  rw [hrowLabels] at hcolumns
+  exact congrFun hcolumns column
 
 /-- A source-guard import proves every serialized left-endpoint fiber is at
 most its serialized degree cap. -/

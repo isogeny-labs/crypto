@@ -1,6 +1,7 @@
 module
 
 public import IncidenceBucketScore
+public import LabelSequence
 
 @[expose] public section
 
@@ -17,6 +18,7 @@ namespace Curve25519BucketStateReplay
 
 open Curve25519ConditionalObjective
 open Curve25519IncidenceBucketScore
+open Curve25519LabelSequence
 open scoped BigOperators
 
 /-- Total assigned row-port mass in one label bucket. -/
@@ -517,5 +519,287 @@ theorem ColumnBucketState.score_eq_incidenceProfileScore
         rw [hmatches rowLabel label,
           columnRowLabelPorts_eq_assigned left right rows columns vertex rowLabel label hunknown]
   · simp [hvertex]
+
+/-- Single-pass row replay over the next `remaining` native-order vertices. -/
+def replayRowStateAux
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (labels : Fin rowCount → Fin q) :
+    ℕ → ℕ → RowBucketState q (Fin columnCount) → Bool
+  | _, 0, _ => true
+  | k, remaining + 1, state =>
+      if hk : k < rowCount then
+        decide (labels ⟨k, hk⟩ =
+          firstMinimumLabel hq (state.score q left right ⟨k, hk⟩)) &&
+        replayRowStateAux hq left right labels (k + 1) remaining
+          (state.addVertex left right ⟨k, hk⟩ (labels ⟨k, hk⟩))
+      else false
+
+/-- Complete single-pass row replay from empty auxiliary state. -/
+def replayRowState
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (labels : Fin rowCount → Fin q) : Bool :=
+  replayRowStateAux hq left right labels 0 rowCount
+    (RowBucketState.empty q (Fin columnCount))
+
+/-- A successful row-state suffix replay gives the exact extensional
+incidence-score first minimum at every covered native-order vertex. -/
+theorem replayRowStateAux_sound
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (labels : Fin rowCount → Fin q)
+    (k remaining : ℕ)
+    (state : RowBucketState q (Fin columnCount))
+    (htotal : k + remaining = rowCount)
+    (hmatches : state.Matches left right (prefixAssignment labels k))
+    (htrace : replayRowStateAux hq left right labels k remaining state = true) :
+    ∀ (i : ℕ) (hi : i < rowCount), k ≤ i →
+      labels ⟨i, hi⟩ =
+        firstMinimumLabel hq
+          (rowIncidenceBucketScore q left right
+            (prefixAssignment labels i) ⟨i, hi⟩) := by
+  induction remaining generalizing k state with
+  | zero =>
+      intro i hi hki
+      omega
+  | succ remaining ih =>
+      have hk : k < rowCount := by omega
+      simp only [replayRowStateAux, hk, ↓reduceDIte, Bool.and_eq_true] at htrace
+      have hcurrent := of_decide_eq_true htrace.1
+      have hscore :
+          (fun label => state.score q left right ⟨k, hk⟩ label) =
+            rowIncidenceBucketScore q left right
+              (prefixAssignment labels k) ⟨k, hk⟩ := by
+        funext label
+        exact state.score_eq_incidenceBucketScore q left right
+          (prefixAssignment labels k) ⟨k, hk⟩ label hmatches
+          (prefixAssignment_next_unknown labels hk)
+      have hcurrent' : labels ⟨k, hk⟩ =
+          firstMinimumLabel hq
+            (fun label => state.score q left right ⟨k, hk⟩ label) := by
+        simpa only using hcurrent
+      rw [hscore] at hcurrent'
+      have hnextMatches := state.addVertex_matches left right
+        (prefixAssignment labels k) ⟨k, hk⟩ (labels ⟨k, hk⟩) hmatches
+        (prefixAssignment_next_unknown labels hk)
+      rw [prefixAssignment_step labels hk] at hnextMatches
+      have hnextTotal : k + 1 + remaining = rowCount := by omega
+      have hrest := ih (k + 1)
+        (state.addVertex left right ⟨k, hk⟩ (labels ⟨k, hk⟩))
+        hnextTotal hnextMatches htrace.2
+      intro i hi hki
+      by_cases hsame : i = k
+      · subst i
+        simpa only using hcurrent'
+      · exact hrest i hi (by omega)
+
+/-- Complete successful row-state replay gives every local extensional first
+minimum. -/
+theorem replayRowState_sound
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (labels : Fin rowCount → Fin q)
+    (htrace : replayRowState hq left right labels = true) :
+    ∀ row : Fin rowCount,
+      labels row = firstMinimumLabel hq
+        (rowIncidenceBucketScore q left right
+          (prefixAssignment labels row.val) row) := by
+  have hmatches :
+      (RowBucketState.empty q (Fin columnCount)).Matches left right
+        (prefixAssignment labels 0) := by
+    rw [prefixAssignment_zero]
+    exact RowBucketState.empty_matches q left right
+  intro row
+  exact replayRowStateAux_sound hq left right labels 0 rowCount _ (by omega) hmatches
+    htrace row.val row.isLt (Nat.zero_le _)
+
+/-- Successful single-pass row replay is extensionally equal to the original
+recursive executable row schedule. -/
+theorem replayRowState_eq_executable
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (labels : Fin rowCount → Fin q)
+    (htrace : replayRowState hq left right labels = true) :
+    labels = executableRowLabels hq left right := by
+  funext row
+  have hlabel : ∀ k (hk : k < rowCount),
+      labels ⟨k, hk⟩ = executableRowLabels hq left right ⟨k, hk⟩ := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | h k ih =>
+      intro hk
+      rw [executableRowLabels_eq, firstMinimumRowLabel_eq_incidenceBucketScore]
+      have hlocal := replayRowState_sound hq left right labels htrace ⟨k, hk⟩
+      rw [hlocal]
+      congr 2
+      funext vertex
+      simp only [prefixAssignment]
+      split_ifs with hbefore
+      · congr 1
+        exact ih vertex.val hbefore vertex.isLt
+      · rfl
+  exact hlabel row.val row.isLt
+
+/-- Single-pass column replay over the next `remaining` native-order vertices. -/
+def replayColumnStateAux
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (columnLabels : Fin columnCount → Fin q) :
+    ℕ → ℕ → ColumnBucketState q → Bool
+  | _, 0, _ => true
+  | k, remaining + 1, state =>
+      if hk : k < columnCount then
+        decide (columnLabels ⟨k, hk⟩ =
+          firstMinimumLabel hq
+            (state.score left right (fun row => some (rowLabels row)) ⟨k, hk⟩)) &&
+        replayColumnStateAux hq left right rowLabels columnLabels (k + 1) remaining
+          (state.addVertex left right (fun row => some (rowLabels row))
+            ⟨k, hk⟩ (columnLabels ⟨k, hk⟩))
+      else false
+
+/-- Complete single-pass column replay from empty auxiliary state. -/
+def replayColumnState
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (columnLabels : Fin columnCount → Fin q) : Bool :=
+  replayColumnStateAux hq left right rowLabels columnLabels 0 columnCount
+    (ColumnBucketState.empty q)
+
+/-- A successful column-state suffix replay gives the exact extensional
+profile-score first minimum at every covered native-order vertex. -/
+theorem replayColumnStateAux_sound
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (columnLabels : Fin columnCount → Fin q)
+    (k remaining : ℕ)
+    (state : ColumnBucketState q)
+    (htotal : k + remaining = columnCount)
+    (hmatches : state.Matches left right (fun row => some (rowLabels row))
+      (prefixAssignment columnLabels k))
+    (htrace : replayColumnStateAux hq left right rowLabels columnLabels
+      k remaining state = true) :
+    ∀ (i : ℕ) (hi : i < columnCount), k ≤ i →
+      columnLabels ⟨i, hi⟩ =
+        firstMinimumLabel hq
+          (columnIncidenceProfileScore left right
+            (fun row => some (rowLabels row))
+            (prefixAssignment columnLabels i) ⟨i, hi⟩) := by
+  induction remaining generalizing k state with
+  | zero =>
+      intro i hi hki
+      omega
+  | succ remaining ih =>
+      have hk : k < columnCount := by omega
+      simp only [replayColumnStateAux, hk, ↓reduceDIte, Bool.and_eq_true] at htrace
+      have hcurrent := of_decide_eq_true htrace.1
+      have hscore :
+          (fun label => state.score left right
+            (fun row => some (rowLabels row)) ⟨k, hk⟩ label) =
+            columnIncidenceProfileScore left right
+              (fun row => some (rowLabels row))
+              (prefixAssignment columnLabels k) ⟨k, hk⟩ := by
+        funext label
+        exact state.score_eq_incidenceProfileScore left right
+          (fun row => some (rowLabels row)) (prefixAssignment columnLabels k)
+          ⟨k, hk⟩ label hmatches (prefixAssignment_next_unknown columnLabels hk)
+      have hcurrent' : columnLabels ⟨k, hk⟩ =
+          firstMinimumLabel hq
+            (fun label => state.score left right
+              (fun row => some (rowLabels row)) ⟨k, hk⟩ label) := by
+        simpa only using hcurrent
+      rw [hscore] at hcurrent'
+      have hnextMatches := state.addVertex_matches left right
+        (fun row => some (rowLabels row)) (prefixAssignment columnLabels k)
+        ⟨k, hk⟩ (columnLabels ⟨k, hk⟩) hmatches
+        (prefixAssignment_next_unknown columnLabels hk)
+      rw [prefixAssignment_step columnLabels hk] at hnextMatches
+      have hnextTotal : k + 1 + remaining = columnCount := by omega
+      have hrest := ih (k + 1)
+        (state.addVertex left right (fun row => some (rowLabels row))
+          ⟨k, hk⟩ (columnLabels ⟨k, hk⟩))
+        hnextTotal hnextMatches htrace.2
+      intro i hi hki
+      by_cases hsame : i = k
+      · subst i
+        simpa only using hcurrent'
+      · exact hrest i hi (by omega)
+
+/-- Complete successful column-state replay gives every local extensional
+first minimum. -/
+theorem replayColumnState_sound
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (columnLabels : Fin columnCount → Fin q)
+    (htrace : replayColumnState hq left right rowLabels columnLabels = true) :
+    ∀ column : Fin columnCount,
+      columnLabels column = firstMinimumLabel hq
+        (columnIncidenceProfileScore left right
+          (fun row => some (rowLabels row))
+          (prefixAssignment columnLabels column.val) column) := by
+  have hmatches :
+      (ColumnBucketState.empty q).Matches left right
+        (fun row => some (rowLabels row)) (prefixAssignment columnLabels 0) := by
+    rw [prefixAssignment_zero]
+    exact ColumnBucketState.empty_matches q left right _
+  intro column
+  exact replayColumnStateAux_sound hq left right rowLabels columnLabels
+    0 columnCount _ (by omega) hmatches htrace column.val column.isLt (Nat.zero_le _)
+
+/-- Successful single-pass column replay is extensionally equal to the
+original recursive executable column schedule. -/
+theorem replayColumnState_eq_executable
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (columnLabels : Fin columnCount → Fin q)
+    (htrace : replayColumnState hq left right rowLabels columnLabels = true) :
+    columnLabels = executableColumnLabels hq left right rowLabels := by
+  funext column
+  have hlabel : ∀ k (hk : k < columnCount),
+      columnLabels ⟨k, hk⟩ =
+        executableColumnLabels hq left right rowLabels ⟨k, hk⟩ := by
+    intro k
+    induction k using Nat.strong_induction_on with
+    | h k ih =>
+      intro hk
+      rw [executableColumnLabels_eq,
+        firstMinimumColumnLabel_eq_incidenceProfileScore hq _ _ _ _
+          (fun row => ⟨rowLabels row, rfl⟩)]
+      have hlocal := replayColumnState_sound hq left right rowLabels columnLabels
+        htrace ⟨k, hk⟩
+      rw [hlocal]
+      congr 2
+      funext vertex
+      simp only [prefixAssignment]
+      split_ifs with hbefore
+      · congr 1
+        exact ih vertex.val hbefore vertex.isLt
+      · rfl
+  exact hlabel column.val column.isLt
 
 end Curve25519BucketStateReplay

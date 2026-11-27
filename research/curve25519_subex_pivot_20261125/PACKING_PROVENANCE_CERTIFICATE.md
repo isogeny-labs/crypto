@@ -105,8 +105,11 @@ build to 55 seconds. The next target is a single-pass replay of the evolving
 bucket maps rather than reconstructing each prefix independently.
 `BucketStateReplay.lean` now proves the required auxiliary invariant for both
 phases: empty state, exact row/column insertion, and equality of every
-state-derived candidate score with its extensional incidence formula. Wiring
-that state through one executable artifact fold remains open.
+state-derived candidate score with its extensional incidence formula. A
+fuel-bounded single-pass fold now maintains that invariant and is proved equal
+to the original recursive schedule; artifact replay uses it. The best observed
+cold build is 52 seconds, leaving materialized map updates and the sub-30-second
+target open.
 `[pcc:unverified]`
 
 ## Remaining boundary

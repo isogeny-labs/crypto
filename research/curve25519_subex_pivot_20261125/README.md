@@ -396,8 +396,13 @@ still needed for the sub-30-second target. `BucketStateReplay.lean` now gives
 those auxiliary maps an exact invariant: empty maps equal all-unknown
 assignments, every row/column insertion equals extending the partial assignment
 by the selected label, and state-based scores equal the proved extensional
-incidence formulas. Connecting those transition theorems to one executable
-fold remains the last local step toward the single-pass checker.
+incidence formulas. A fuel-bounded native-order fold now threads those states
+once through all rows and then all columns; its soundness theorem maintains
+the prefix invariant at every step, and strong induction proves its accepted
+arrays equal the original recursive executable schedule. The artifact checker
+uses that fold. The best observed cold module build is 52 seconds, so the next
+sub-30-second lead is a materialized finite-map representation that avoids
+normalizing nested functional updates.
 `[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,
