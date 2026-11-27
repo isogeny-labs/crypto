@@ -146,20 +146,20 @@ lake env lean PrecisionAxiomAudit.lean
 
 The build completes 9,057 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
-project axioms or admitted proofs. There are 51 explicitly audited declarations,
-including four reused precision declarations and fourteen new absorption/bridge
-declarations. The frozen pre-module precision-history source emits six Lean
+project axioms or admitted proofs. There are 53 explicitly audited declarations,
+including four reused precision declarations and fifteen new precision/schedule
+bridge declarations plus the natural-number mode/precision cancellation theorem.
+The frozen pre-module precision-history source emits six Lean
 module-compatibility warnings when imported into this project; its bytes are
 unchanged.
 
-The aggregate downstream theorem still consumes the variance, source-guard,
-precision, and mode inequalities as hypotheses, but the separate natural-number
-theorem now derives the mode inequality uniformly from the same packet-capacity
-and coordinate conditions checked by `audit_node_dimensions`. The separate
-precision theorem derives the normalized inequality from explicit history and
-schedule facts. The replay does not yet bind arbitrary native endpoint/label
-traces or recursion histories to those theorem inputs, or formalize the
-external contraction theorem. `[pcc:unverified]`
+The aggregate downstream theorem still consumes generic inequalities as
+hypotheses, but the separate natural-number chain derives the mode inequality
+from packet capacity, derives the normalized precision inequality from explicit
+history and schedule facts, and composes them through positive power-of-two
+cancellation to `n*p*u<=204*M^2`. The replay does not yet bind arbitrary native
+endpoint/label traces or recursion histories to those theorem inputs, or
+formalize the external contraction theorem. `[pcc:unverified]`
 
 ## Next measurable goal
 
@@ -176,8 +176,9 @@ evidence for two independent claims:
    active leaf cutoff, exact source quotient, and the exact root square-root
    definition. The leaf positivity and square inequality, depth bound `8^d<h`,
    schedule facts `u>=32,h<=512u`,
-   companion `nD<=6M` inequality, and scalar `pu<=34MD` implication are now
-   kernel-derived, so none remains an independent algebraic premise.
+   companion `nD<=6M` inequality, scalar `pu<=34MD` implication, and combined
+   `npu<=204M^2` product are now kernel-derived, so none remains an independent
+   algebraic premise.
 
 The acceptance target is a verifier that consumes those proof objects at each
 retained depth and emits the same parametric summary with

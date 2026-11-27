@@ -265,8 +265,10 @@ in the mode/precision cancellation. It also proves
 admitted coordinate. The axiom audit reports only `propext`,
 `Classical.choice`, and `Quot.sound`. The imported finite-history theorem and
 new absorption bridge now derive `pu<=34MD` from explicit numeric path and
-schedule facts. The native code-to-model bindings for graph labels and
-precision histories, finite factorization realization, and external
+schedule facts. A natural-number composition theorem combines that result with
+the packet-capacity mode bound and cancels the positive power-of-two dimension
+to derive `npu<=204M^2` directly. The native code-to-model bindings for graph
+labels and precision histories, finite factorization realization, and external
 contraction theorem remain explicit hypotheses or out of scope.
 `[pcc:unverified]`
 

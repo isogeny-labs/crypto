@@ -1,4 +1,5 @@
 import PrecisionHistory
+import ParametricRefinement
 
 /-!
 # Uniform precision absorption
@@ -280,5 +281,38 @@ theorem next_precision_mul_le_of_uniform_history
     (active_node_root_comparison s (M d) h hleafPositive haboveLeaf)
     (inherited_history_absorption h (u d) hscaleFloor hleafScale)
     (evaluation_history_absorption A (u d) hscaleFloor)
+
+/-- Packet capacity and the exact precision history compose directly to the
+coefficient-204 mode/precision product for the current call. -/
+theorem next_mode_precision_product_of_uniform_history
+    (s lambdaRoot A d h K : ℕ) (M u a i p : ℕ → ℕ)
+    (hroot : M 0 ≤ s) (hpzero : p 0 ≤ s)
+    (hshrink : ∀ k < d, 8 * M (k + 1) ≤ M k)
+    (hscale : ∀ k < d, 0 < u k ∧ u k ≤ M k)
+    (hexponent : ∀ k < d, a k ≤ A)
+    (hprecision : ∀ k < d,
+      p (k + 1) = CryptoLeanCore.TaperedPrecision.childPrecision
+        (p k) (M k) (u k) (a k) (i k))
+    (hnext : p (d + 1) = CryptoLeanCore.TaperedPrecision.childPrecision
+      (p d) (M d) (u d) (A + 2 * u d) (i d))
+    (hcurrent : u d ≤ M d) (hactive : i d < u d)
+    (haboveLeaf : s / h < M d)
+    (hthreshold : 2 ^ 26 ≤ lambdaRoot)
+    (hleaf : h = Nat.sqrt lambdaRoot)
+    (hsourceScale : u d = lambdaRoot / 2 ^ (17 + d))
+    (hpack : K * 2 ^ (A + 2 * u d) ≤ 3 * M d) :
+    (K * 2 ^ (i d + 1)) * p (d + 1) * u d ≤ 204 * (M d) ^ 2 := by
+  let D := 2 ^ (A + 2 * u d - i d)
+  have hi : i d ≤ A + 2 * u d := by omega
+  have hmode : (K * 2 ^ (i d + 1)) * D ≤ 6 * M d := by
+    exact Curve25519ParametricRefinement.mode_dimension_bound_of_packet_capacity
+      (M d) K (A + 2 * u d) (i d) hi hpack
+  have hprecisionBound : p (d + 1) * u d ≤ 34 * M d * D := by
+    exact next_precision_mul_le_of_uniform_history s lambdaRoot A d h M u a i p
+      hroot hpzero hshrink hscale hexponent hprecision hnext hcurrent hactive
+      haboveLeaf hthreshold hleaf hsourceScale
+  exact Curve25519ParametricRefinement.mode_precision_product_nat
+    (M d) D (K * 2 ^ (i d + 1)) (p (d + 1)) (u d)
+    (Nat.pow_pos (by decide)) hmode hprecisionBound
 
 end Curve25519PrecisionAbsorption

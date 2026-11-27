@@ -117,6 +117,21 @@ theorem mode_precision_product
       mul_le_mul_of_nonneg_left hprecision (mul_nonneg (by norm_num) hM)
     _ = 204 * M ^ 2 * D := by ring
 
+/-- Natural-number form of the same positive-dimension cancellation. This is
+the form consumed by the exact finite precision history. -/
+theorem mode_precision_product_nat
+    (M D n p u : ℕ)
+    (hD : 0 < D)
+    (hmode : n * D ≤ 6 * M)
+    (hprecision : p * u ≤ 34 * M * D) :
+    n * p * u ≤ 204 * M ^ 2 := by
+  apply Nat.le_of_mul_le_mul_right (c := D) ?_ hD
+  calc
+    n * p * u * D = (n * D) * (p * u) := by ring
+    _ ≤ (6 * M) * (p * u) := Nat.mul_le_mul_right (p * u) hmode
+    _ ≤ (6 * M) * (34 * M * D) := Nat.mul_le_mul_left (6 * M) hprecision
+    _ = 204 * M ^ 2 * D := by ring
+
 /-- Exact arithmetic for the tuple, local, root-u, and root-log constants. -/
 theorem cost_ledger_constants :
     14 ^ 2 < (204 : ℕ) ∧
@@ -161,6 +176,11 @@ theorem parametric_refinement_certificate :
       n * D ≤ 6 * M →
       p * u ≤ 34 * M * D →
       n * p * u ≤ 204 * M ^ 2) ∧
+    (∀ M D n p u : ℕ,
+      0 < D →
+      n * D ≤ 6 * M →
+      p * u ≤ 34 * M * D →
+      n * p * u ≤ 204 * M ^ 2) ∧
     (14 ^ 2 < (204 : ℕ) ∧
       (204 : ℕ) ≤ 15 ^ 2 ∧
       5 * 15 + 5 = 80 ∧
@@ -175,6 +195,7 @@ theorem parametric_refinement_certificate :
     tile_distance_identity,
     mode_dimension_bound_of_packet_capacity,
     mode_precision_product,
+    mode_precision_product_nat,
     cost_ledger_constants⟩
 
 end Curve25519ParametricRefinement

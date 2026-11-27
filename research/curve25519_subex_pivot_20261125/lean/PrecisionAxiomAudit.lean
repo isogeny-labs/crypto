@@ -23,3 +23,4 @@ open NativePrecisionHistory
 #print axioms leaf_positive_of_threshold
 #print axioms active_schedule_power_bounds
 #print axioms next_precision_mul_le_of_uniform_history
+#print axioms next_mode_precision_product_of_uniform_history

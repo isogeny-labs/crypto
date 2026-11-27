@@ -20,6 +20,7 @@ open Curve25519ObjectiveBoundary
 #print axioms tile_distance_identity
 #print axioms mode_dimension_bound_of_packet_capacity
 #print axioms mode_precision_product
+#print axioms mode_precision_product_nat
 #print axioms cost_ledger_constants
 #print axioms parametric_refinement_certificate
 #print axioms bipartite_degree_square_budget
