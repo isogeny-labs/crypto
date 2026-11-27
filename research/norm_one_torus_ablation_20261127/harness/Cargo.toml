@@ -1,0 +1,15 @@
+[package]
+name = "norm-one-torus-ablation"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Standalone factorial ablation and x-only query arm for the PR #5229 Prime31 norm-one-torus m=5 MITM"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[profile.release]
+codegen-units = 1
+debug = "line-tables-only"
