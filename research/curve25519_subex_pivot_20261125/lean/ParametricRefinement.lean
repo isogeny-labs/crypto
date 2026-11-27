@@ -52,6 +52,23 @@ theorem history_child_strict_shrink
     8 * child ≤ M := by
   nlinarith
 
+/-- A class cap plus length padding and a two-sided child-group bound compose
+directly to the eightfold shrink required by the retained history. -/
+theorem history_child_strict_shrink_of_class_capacity
+    (M D L c height child : ℝ)
+    (hM : 0 ≤ M)
+    (hD : 0 ≤ D)
+    (hclass : c * D ≤ 2 * M)
+    (hlength : L * D ≤ M)
+    (hheight : height ≤ c + L)
+    (hchild : child * 64 ≤ 2 * (height * D)) :
+    8 * child ≤ M := by
+  have hpadded : height * D ≤ 3 * M :=
+    padded_capacity M D L c height hD hclass hlength hheight
+  have hhistory : child * 64 ≤ 6 * M := by
+    nlinarith
+  exact history_child_strict_shrink M child hM hhistory
+
 /-- The stronger source-guard child numerator also implies eightfold shrink. -/
 theorem derived_child_strict_shrink
     (M child : ℝ)

@@ -215,6 +215,12 @@ evidence for two independent claims:
    propositions; separate theorems prove equivalence to the artifact Boolean
    checks. Compiler, allocation, integer conversion, and serde
    refinement remain open.
+   The positive exact-boundary control now has a structured formal source
+   record accepted through its own projection. A generic composition carries
+   strict source acceptance through its recomputed class cap, the length and
+   padded-height inequalities, and the two-sided child-group inequality to
+   the retained-history conclusion `8*child<=M`. The latter three inequalities
+   still need extraction from every live child constructor.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

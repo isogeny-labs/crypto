@@ -135,6 +135,14 @@ predicates. Lean proves the artifact Boolean shape and bounds checks equivalent
 to those source propositions.
 This aligns the source interfaces; it does not verify Rust compiler,
 allocation, integer-conversion, or serde behavior. `[pcc:unverified]`
+The exact-boundary 32-edge witness now also has a structured
+`PackingLabelSource` form whose artifact is proved field-for-field equal to
+the existing witness and whose own projection passes the strict parser. A new
+source-to-history theorem composes any strict source projection's recomputed
+class cap with length mass, padded group height, and a two-sided child-group
+bound to derive `8*child<=M`. Those last three premises still require binding
+to the live child constructor; the theorem is not yet an arbitrary-history
+producer refinement. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact

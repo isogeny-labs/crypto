@@ -467,6 +467,14 @@ records, and label arrays; artifact Boolean checks are proved equivalent to
 those propositions. This is source-interface alignment, not a proof of Rust
 compiler, allocator, conversion, or serialization semantics.
 `[pcc:unverified]`
+The positive 32-edge boundary fixture is now represented directly as a
+structured `PackingLabelSource`; its converted artifact is field-for-field
+the existing witness and its native-order projection passes strict import.
+For any strict source view, the premise-free class cap now composes with an
+explicit length-mass bound, padded group-height bound, and two-sided child
+group bound to prove the retained-history invariant `8*child<=M`. Binding
+those three child-construction premises at every live call remains open.
+`[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

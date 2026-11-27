@@ -270,6 +270,14 @@ every row/column label bound. Separate equivalence theorems discharge the
 flattened artifact's Boolean checks. Rust execution, allocation, integer
 conversion, and serde remain
 outside this formal refinement. `[pcc:unverified]`
+The exact-boundary source is now constructed as structured edges and labels,
+proved to convert to the existing artifact exactly, and accepted from its own
+canonical projection. `PackingLabelSource.historyChildStrictShrink` then
+feeds strict acceptance through the recomputed class cap, `padded_capacity`,
+and the historical child bound to obtain eightfold shrink. Its remaining
+premises name the unformalized constructor interface: source length mass,
+padded group height, and the two-sided child-group edge bound.
+`[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

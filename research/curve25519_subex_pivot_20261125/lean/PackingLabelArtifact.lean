@@ -1029,6 +1029,62 @@ theorem parseSourceGuardPackingLabelArtifact_classCap
     (parseSourceGuardPackingLabelArtifact_rightDegreeCap hparse)
     (parseSourceGuardPackingLabelArtifact_guard hparse)
 
+/-- A strictly accepted named source view feeds its recomputed class cap into
+the retained-history eightfold shrink. The only remaining premises describe
+the source length mass, padded group height, and two-sided child group. -/
+theorem PackingLabelSource.historyChildStrictShrink
+    (source : PackingLabelSource)
+    (hparse :
+      parseSourceGuardPackingLabelArtifact source.projectionValues =
+        some source.artifact)
+    (γ : Fin (source.artifact.labelCount * source.artifact.labelCount))
+    (L height child : ℝ)
+    (hM : 0 ≤ (source.artifact.edgeCount : ℝ))
+    (hlength :
+      L * ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ) ≤
+        (source.artifact.edgeCount : ℝ))
+    (hheight :
+      height ≤
+        (fiberSize
+          (classMap
+            (source.artifact.leftEndpoint
+              (parseReplayedPackingLabelArtifact_rowCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (source.artifact.rightEndpoint
+              (parseReplayedPackingLabelArtifact_columnCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (source.artifact.rowLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (source.artifact.columnLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))) γ : ℝ) + L)
+    (hchild :
+      child * 64 ≤ 2 *
+        (height *
+          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ))) :
+    8 * child ≤ (source.artifact.edgeCount : ℝ) := by
+  have hclass := parseSourceGuardPackingLabelArtifact_classCap hparse γ
+  exact Curve25519ParametricRefinement.history_child_strict_shrink_of_class_capacity
+    (source.artifact.edgeCount : ℝ)
+    ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ)
+    L
+    (fiberSize
+      (classMap
+        (source.artifact.leftEndpoint
+          (parseReplayedPackingLabelArtifact_rowCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+        (source.artifact.rightEndpoint
+          (parseReplayedPackingLabelArtifact_columnCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+        (source.artifact.rowLabel
+          (parseReplayedPackingLabelArtifact_labelCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+        (source.artifact.columnLabel
+          (parseReplayedPackingLabelArtifact_labelCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse)))) γ : ℝ)
+    height child hM (by positivity) hclass hlength hheight hchild
+
 /-- The shared native projection contains these exact fields. -/
 theorem packingLabelWitnessArtifactValues :
     packingLabelWitnessNumbers =
@@ -1069,6 +1125,34 @@ def packingLabelSourceGuardWitness : PackingLabelArtifact := {
   rowLabels := (List.range 32).map fun row => row % 2
   columnLabels := (List.range 32).map fun column => column / 2 % 2
 }
+
+/-- Structured named-source form of the shared exact-boundary native witness. -/
+def packingLabelSourceGuardWitnessSource : PackingLabelSource := {
+  schema := 3
+  radix := 2
+  packetExponent := 1
+  coordinate := 0
+  conditionalLabels := true
+  sourceDegreeCap := some 1
+  edges := (List.range 32).map fun edge => {
+    left := edge
+    leftPort := 0
+    right := edge
+    rightPort := 0
+  }
+  rowLabels := (List.range 32).map fun row => row % 2
+  columnLabels := (List.range 32).map fun column => column / 2 % 2
+}
+
+/-- The structured source view converts to the existing exact-boundary
+artifact without changing any header, endpoint, or label field. -/
+theorem packingLabelSourceGuardWitnessSource_artifact :
+    packingLabelSourceGuardWitnessSource.artifact =
+      packingLabelSourceGuardWitness := by
+  simp [packingLabelSourceGuardWitnessSource,
+    packingLabelSourceGuardWitness, PackingLabelSource.artifact]
+  rw [List.flatMap_map]
+  rfl
 
 /-- The shape- and bounds-checked parser returns the named projection. -/
 theorem packingLabelWitness_parsed :

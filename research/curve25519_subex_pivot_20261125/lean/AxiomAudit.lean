@@ -27,6 +27,7 @@ open Curve25519ExtensionRingModel
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
 #print axioms history_child_strict_shrink
+#print axioms history_child_strict_shrink_of_class_capacity
 #print axioms derived_child_strict_shrink
 #print axioms child_degree_cap
 #print axioms tile_distance_identity
@@ -130,6 +131,8 @@ open Curve25519ExtensionRingModel
 #print axioms parseSourceGuardPackingLabelArtifact_rightDegreeCap
 #print axioms parseSourceGuardPackingLabelArtifact_guard
 #print axioms parseSourceGuardPackingLabelArtifact_classCap
+#print axioms PackingLabelSource.historyChildStrictShrink
+#print axioms packingLabelSourceGuardWitnessSource_artifact
 #print axioms packingLabelSourceGuardWitnessArtifact_toList
 #print axioms packingLabelSourceGuardWitness_parsed
 #print axioms packingLabelSourceGuardWitness_rowReplay
@@ -138,6 +141,7 @@ open Curve25519ExtensionRingModel
 #print axioms packingLabelSourceGuardWitness_replayed
 #print axioms packingLabelSourceGuardWitness_sourceClassGuardMatches
 #print axioms packingLabelSourceGuardWitness_sourceGuardParsed
+#print axioms packingLabelSourceGuardWitnessSource_sourceGuardParsed
 #print axioms packingLabelWitnessArtifactValues
 #print axioms packingLabelWitness_parsed
 #print axioms packingLabelWitness_traceMatches

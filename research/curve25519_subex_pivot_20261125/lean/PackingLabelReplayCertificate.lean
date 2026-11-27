@@ -43,4 +43,25 @@ theorem packingLabelSourceGuardWitness_sourceGuardParsed :
     packingLabelSourceGuardWitness_replayed
     packingLabelSourceGuardWitness_sourceClassGuardMatches
 
+set_option maxRecDepth 100000 in
+/-- The positive exact-boundary witness is accepted directly from the
+structured named-source projection, not only from its embedded CSV. -/
+theorem packingLabelSourceGuardWitnessSource_sourceGuardParsed :
+    parseSourceGuardPackingLabelArtifact
+        packingLabelSourceGuardWitnessSource.projectionValues =
+      some packingLabelSourceGuardWitnessSource.artifact := by
+  apply (PackingLabelSource.parseSourceGuardProjection_iff _).mpr
+  rw [packingLabelSourceGuardWitnessSource_artifact]
+  have hspec := parseSourceGuardPackingLabelArtifact_iff.mp
+    packingLabelSourceGuardWitness_sourceGuardParsed
+  have hwell : packingLabelSourceGuardWitnessSource.WellFormed :=
+    (PackingLabelSource.artifact_wellFormed_iff _).mp (by
+      rw [packingLabelSourceGuardWitnessSource_artifact]
+      exact hspec.1.1.1)
+  have hbounded : packingLabelSourceGuardWitnessSource.Bounded :=
+    (PackingLabelSource.artifact_bounded_iff _).mp (by
+      rw [packingLabelSourceGuardWitnessSource_artifact]
+      exact hspec.1.1.2.1)
+  exact ⟨⟨⟨hwell, hbounded⟩, hspec.1.2⟩, hspec.2⟩
+
 end Curve25519PackingLabelArtifact
