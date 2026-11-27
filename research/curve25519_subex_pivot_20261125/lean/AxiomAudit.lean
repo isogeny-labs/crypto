@@ -154,6 +154,9 @@ open Curve25519ExtensionRingModel
 #print axioms packedGF2Polynomial_minimal_injective
 #print axioms gf2PackedIrreducibleAux_iff_semantic
 #print axioms gf2PackedIrreducible_iff_semantic
+#print axioms gf2PackedRabinSemanticAux_iff_closed
+#print axioms gf2PackedIrreducible_iff_closed
+#print axioms gf2PackedRabinClosed_final_power
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

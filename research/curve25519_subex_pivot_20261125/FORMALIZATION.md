@@ -642,7 +642,11 @@ fixed-window and minimal-window decoding are injective, so induction over
 `gf2PackedIrreducibleAux` converts every early exit to the polynomial GCD-one
 guard and its terminal comparison to decoded Frobenius equality. The public
 packed predicate is equivalent to that semantic trace. Only the external
-algebraic equivalence between this criterion and irreducibility remains.
+algebraic equivalence between this criterion and irreducibility remains. The
+semantic recursion is now additionally unrolled into a nonrecursive indexed
+family of the active Frobenius/GCD checks and terminal equality. Composing the
+arbitrary-step Frobenius theorem identifies that terminal equality with the
+closed `x^(2^degree)=x mod f` condition for every nonzero packed modulus.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

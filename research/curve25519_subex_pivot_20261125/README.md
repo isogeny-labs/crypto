@@ -578,7 +578,10 @@ early guard becomes polynomial GCD one, and the terminal native equality becomes
 equality of the decoded Frobenius values. Thus the public packed Boolean is
 equivalent to an explicit polynomial semantic trace. The remaining external
 step is the general theorem equating that criterion with irreducibility under
-the required degree and monicity hypotheses.
+the required degree and monicity hypotheses. The recursive trace is also
+unrolled into a single indexed family of every active Frobenius/GCD check plus
+the final equality; for nonzero modulus the latter is proved to be exactly
+`x^(2^degree)=x mod f`.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

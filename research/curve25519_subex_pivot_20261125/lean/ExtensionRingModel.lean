@@ -2630,6 +2630,110 @@ theorem gf2PackedIrreducible_iff_semantic (polynomial degree : ℕ) :
     polynomial (gf2PackedRemainder 2 polynomial)
     degree degree 0 (gf2PackedRemainder 2 polynomial)
 
+/-- Nonrecursive indexed form of the packed Rabin semantic trace: every active
+offset checks the corresponding Frobenius iterate, and the final iterate equals
+the start. -/
+def gf2PackedRabinClosedAux
+    (polynomial x degree remaining index value : ℕ) : Prop :=
+  (∀ offset, offset < remaining → index + offset + 1 ≤ degree / 2 →
+    EuclideanDomain.gcd
+      (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+      (packedGF2Polynomial
+        (Nat.log2
+          (Nat.xor
+            (gf2PackedFrobeniusIterate polynomial (offset + 1) value) x) + 1)
+        (Nat.xor
+          (gf2PackedFrobeniusIterate polynomial (offset + 1) value) x)) = 1) ∧
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedFrobeniusIterate polynomial remaining value) + 1)
+        (gf2PackedFrobeniusIterate polynomial remaining value) =
+      packedGF2Polynomial (Nat.log2 x + 1) x
+
+/-- The implementation-shaped semantic recursion is equivalent to a single
+indexed family of Frobenius GCD guards plus its final equality. -/
+theorem gf2PackedRabinSemanticAux_iff_closed
+    (polynomial x degree remaining index value : ℕ) :
+    gf2PackedRabinSemanticAux polynomial x degree remaining index value ↔
+      gf2PackedRabinClosedAux
+        polynomial x degree remaining index value := by
+  induction remaining generalizing index value with
+  | zero =>
+      simp [gf2PackedRabinSemanticAux, gf2PackedRabinClosedAux,
+        gf2PackedFrobeniusIterate]
+  | succ prior ih =>
+      let next := gf2PackedProduct value value polynomial
+      let nextIndex := index + 1
+      rw [gf2PackedRabinSemanticAux]
+      constructor
+      · rintro ⟨hfirst, htail⟩
+        have htailClosed := (ih nextIndex next).1 htail
+        refine ⟨?_, ?_⟩
+        · intro offset hoffset hactive
+          cases offset with
+          | zero =>
+              change EuclideanDomain.gcd
+                (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+                (packedGF2Polynomial
+                  (Nat.log2 (Nat.xor next x) + 1) (Nat.xor next x)) = 1
+              apply hfirst
+              dsimp [nextIndex] at hactive
+              omega
+          | succ priorOffset =>
+              have hprior : priorOffset < prior := by omega
+              have htailActive :
+                  nextIndex + priorOffset + 1 ≤ degree / 2 := by
+                dsimp [nextIndex]
+                omega
+              have hguard := htailClosed.1 priorOffset hprior htailActive
+              exact hguard
+        · exact htailClosed.2
+      · rintro ⟨hguards, hfinal⟩
+        refine ⟨?_, (ih nextIndex next).2 ?_⟩
+        · intro hactive
+          have hguard := hguards 0 (by omega) (by omega)
+          exact hguard
+        · refine ⟨?_, ?_⟩
+          · intro offset hoffset hactive
+            have hguard := hguards (offset + 1) (by omega) (by
+              dsimp [nextIndex] at hactive
+              omega)
+            exact hguard
+          · exact hfinal
+
+/-- Closed indexed polynomial specification of the public packed Rabin
+predicate. -/
+def gf2PackedRabinClosed (polynomial degree : ℕ) : Prop :=
+  let x := gf2PackedRemainder 2 polynomial
+  gf2PackedRabinClosedAux polynomial x degree degree 0 x
+
+/-- The public packed Rabin predicate is equivalent to the closed family of
+all required Frobenius GCD guards and its terminal equality. -/
+theorem gf2PackedIrreducible_iff_closed (polynomial degree : ℕ) :
+    gf2PackedIrreducible polynomial degree = true ↔
+      gf2PackedRabinClosed polynomial degree := by
+  rw [gf2PackedIrreducible_iff_semantic]
+  unfold gf2PackedRabinSemantic gf2PackedRabinClosed
+  exact gf2PackedRabinSemanticAux_iff_closed
+    polynomial (gf2PackedRemainder 2 polynomial)
+    degree degree 0 (gf2PackedRemainder 2 polynomial)
+
+/-- The terminal equality in the closed Rabin trace is the exact
+`x^(2^degree)=x` condition modulo the nonzero packed polynomial. -/
+theorem gf2PackedRabinClosed_final_power
+    (polynomial degree : ℕ) (hpolynomial : polynomial ≠ 0)
+    (hsemantic : gf2PackedRabinClosed polynomial degree) :
+    ((packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+        (gf2PackedRemainder 2 polynomial)) ^ (2 ^ degree)) %ₘ
+          packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial =
+      packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+        (gf2PackedRemainder 2 polynomial) := by
+  unfold gf2PackedRabinClosed gf2PackedRabinClosedAux at hsemantic
+  have htrace := packedGF2Polynomial_frobeniusIterate_from_remainder
+    degree 2 polynomial hpolynomial
+  exact htrace.symm.trans hsemantic.2
+
 /-- Search odd constant-one lower patterns in the exact native order. -/
 def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ
   | _, 0 => none

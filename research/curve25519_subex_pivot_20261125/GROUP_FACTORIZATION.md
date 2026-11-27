@@ -293,6 +293,9 @@ decoder injectivity translates the terminal equality, and induction over the
 auxiliary loop translates every active early exit to the exact polynomial GCD
 guard. The resulting public-Boolean equivalence stops at the explicit semantic
 Rabin trace; the general irreducibility theorem is still not claimed.
+That trace is now unrolled into one indexed family of all active guards and a
+terminal condition; the terminal condition is independently rewritten as the
+exact `x^(2^degree)=x mod f` polynomial identity for nonzero modulus.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
