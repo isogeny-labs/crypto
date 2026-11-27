@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use std::fs;
 
@@ -155,10 +155,24 @@ fn independent_roots(depth: usize) -> Vec<u64> {
     roots
 }
 
-fn independent_leaves(depth: usize) -> (Vec<u64>, Vec<Affine>) {
+#[derive(Clone, Copy, Debug)]
+struct IndexedLeaf {
+    index: u16,
+    point: Affine,
+}
+
+#[derive(Clone, Debug)]
+struct IndependentBase {
+    roots: Vec<u64>,
+    leaves_by_path: Vec<Vec<IndexedLeaf>>,
+    leaves: Vec<Affine>,
+}
+
+fn independent_base(depth: usize) -> IndependentBase {
     let roots = independent_roots(depth);
+    let mut leaves_by_path = vec![Vec::new(); roots.len()];
     let mut leaves = Vec::new();
-    for &x in &roots {
+    for (path, &x) in roots.iter().enumerate() {
         let rhs = right_hand_side(x);
         if rhs == 0 {
             continue;
@@ -172,11 +186,19 @@ fn independent_leaves(depth: usize) -> (Vec<u64>, Vec<Affine>) {
                     y,
                 };
                 assert!(valid_point(point));
+                leaves_by_path[path].push(IndexedLeaf {
+                    index: leaves.len() as u16,
+                    point,
+                });
                 leaves.push(point);
             }
         }
     }
-    (roots, leaves)
+    IndependentBase {
+        roots,
+        leaves_by_path,
+        leaves,
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -206,6 +228,268 @@ fn flat_support(leaves: &[Affine]) -> BTreeMap<Affine, FlatEntry> {
         }
     }
     support
+}
+
+#[derive(Clone, Debug)]
+struct AuditState {
+    support: BTreeMap<Affine, FlatEntry>,
+    semantic_id: usize,
+}
+
+#[derive(Clone, Debug)]
+struct AuditLevel {
+    node_count: usize,
+    states: Vec<AuditState>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct AuditLevelMetrics {
+    node_count: usize,
+    rows: usize,
+    nonempty_rows: usize,
+    columns: usize,
+    rank_gf2: usize,
+    entries: usize,
+}
+
+#[derive(Clone, Debug)]
+struct AuditSummary {
+    levels: Vec<AuditLevelMetrics>,
+    actual_states: usize,
+    unique_states: usize,
+    actual_entries: usize,
+    semantic_entries: usize,
+    actual_union_edges: usize,
+    unique_union_edges: usize,
+    root_support: usize,
+    leaf_rank_gf2: usize,
+    max_rank_gf2: usize,
+    peak_live_entries: usize,
+}
+
+#[derive(Default)]
+struct AuditInterner {
+    ids: BTreeMap<Vec<(Affine, u32)>, usize>,
+    entry_counts: Vec<usize>,
+    first_children: Vec<Vec<usize>>,
+}
+
+impl AuditInterner {
+    fn intern(&mut self, support: &BTreeMap<Affine, FlatEntry>, children: Vec<usize>) -> usize {
+        let key: Vec<_> = support
+            .iter()
+            .map(|(point, entry)| (*point, entry.multiplicity))
+            .collect();
+        if let Some(&id) = self.ids.get(&key) {
+            return id;
+        }
+        let id = self.ids.len();
+        self.ids.insert(key, id);
+        self.entry_counts.push(support.len());
+        self.first_children.push(children);
+        id
+    }
+}
+
+fn audit_pair_index(node_count: usize, left: usize, right: usize) -> usize {
+    assert!(left <= right && right < node_count);
+    (0..left).map(|row| node_count - row).sum::<usize>() + right - left
+}
+
+fn leaves_under(base: &IndependentBase, tree_level: usize, node: usize) -> Vec<IndexedLeaf> {
+    let path_span = 1_usize << tree_level;
+    base.leaves_by_path[node * path_span..(node + 1) * path_span]
+        .iter()
+        .flatten()
+        .copied()
+        .collect()
+}
+
+fn insert_direct(support: &mut BTreeMap<Affine, FlatEntry>, left: IndexedLeaf, right: IndexedLeaf) {
+    let sum = affine_add(left.point, right.point);
+    let witness = if left.index <= right.index {
+        [left.index, right.index]
+    } else {
+        [right.index, left.index]
+    };
+    support
+        .entry(sum)
+        .and_modify(|entry| {
+            entry.multiplicity += 1;
+            if witness < entry.witness {
+                entry.witness = witness;
+            }
+        })
+        .or_insert(FlatEntry {
+            multiplicity: 1,
+            witness,
+        });
+}
+
+fn direct_node_pair_support(
+    base: &IndependentBase,
+    tree_level: usize,
+    left_node: usize,
+    right_node: usize,
+) -> BTreeMap<Affine, FlatEntry> {
+    let left = leaves_under(base, tree_level, left_node);
+    let right = leaves_under(base, tree_level, right_node);
+    let mut support = BTreeMap::new();
+    if left_node == right_node {
+        for (left_index, &left_leaf) in left.iter().enumerate() {
+            for &right_leaf in right.iter().skip(left_index) {
+                insert_direct(&mut support, left_leaf, right_leaf);
+            }
+        }
+    } else {
+        for &left_leaf in &left {
+            for &right_leaf in &right {
+                insert_direct(&mut support, left_leaf, right_leaf);
+            }
+        }
+    }
+    support
+}
+
+fn audit_level_metrics(level: &AuditLevel) -> AuditLevelMetrics {
+    let points: BTreeSet<_> = level
+        .states
+        .iter()
+        .flat_map(|state| state.support.keys().copied())
+        .collect();
+    let columns: BTreeMap<_, _> = points
+        .into_iter()
+        .enumerate()
+        .map(|(index, point)| (point, index))
+        .collect();
+    let word_count = columns.len().div_ceil(64);
+    let mut pivots: BTreeMap<usize, Vec<u64>> = BTreeMap::new();
+    let mut nonempty_rows = 0;
+    let mut entries = 0;
+
+    for state in &level.states {
+        entries += state.support.len();
+        if state.support.is_empty() {
+            continue;
+        }
+        nonempty_rows += 1;
+        let mut row = vec![0_u64; word_count];
+        for point in state.support.keys() {
+            let column = columns[point];
+            row[column / 64] |= 1_u64 << (column % 64);
+        }
+        loop {
+            let pivot = row
+                .iter()
+                .enumerate()
+                .rev()
+                .find_map(|(word_index, &word)| {
+                    (word != 0).then(|| word_index * 64 + 63 - word.leading_zeros() as usize)
+                });
+            let Some(pivot) = pivot else { break };
+            if let Some(basis) = pivots.get(&pivot) {
+                for (value, &other) in row.iter_mut().zip(basis) {
+                    *value ^= other;
+                }
+            } else {
+                pivots.insert(pivot, row);
+                break;
+            }
+        }
+    }
+
+    AuditLevelMetrics {
+        node_count: level.node_count,
+        rows: level.states.len(),
+        nonempty_rows,
+        columns: columns.len(),
+        rank_gf2: pivots.len(),
+        entries,
+    }
+}
+
+fn child_semantic_ids(level: &AuditLevel, left_parent: usize, right_parent: usize) -> Vec<usize> {
+    let left = [2 * left_parent, 2 * left_parent + 1];
+    let right = [2 * right_parent, 2 * right_parent + 1];
+    let pairs: Vec<_> = if left_parent == right_parent {
+        vec![(left[0], left[0]), (left[0], left[1]), (left[1], left[1])]
+    } else {
+        vec![
+            (left[0], right[0]),
+            (left[0], right[1]),
+            (left[1], right[0]),
+            (left[1], right[1]),
+        ]
+    };
+    let mut ids: Vec<_> = pairs
+        .into_iter()
+        .map(|(mut a, mut b)| {
+            if a > b {
+                std::mem::swap(&mut a, &mut b);
+            }
+            level.states[audit_pair_index(level.node_count, a, b)].semantic_id
+        })
+        .collect();
+    ids.sort_unstable();
+    ids
+}
+
+fn independent_metric_audit(base: &IndependentBase) -> AuditSummary {
+    let depth = base.roots.len().ilog2() as usize;
+    assert_eq!(1_usize << depth, base.roots.len());
+    let mut interner = AuditInterner::default();
+    let mut levels = Vec::with_capacity(depth + 1);
+    let mut actual_union_edges = 0;
+
+    for tree_level in 0..=depth {
+        let node_count = base.roots.len() >> tree_level;
+        let mut states = Vec::with_capacity(node_count * (node_count + 1) / 2);
+        for left_node in 0..node_count {
+            for right_node in left_node..node_count {
+                let support = direct_node_pair_support(base, tree_level, left_node, right_node);
+                let children = if tree_level == 0 {
+                    Vec::new()
+                } else {
+                    let child_ids = child_semantic_ids(
+                        levels.last().expect("missing child audit level"),
+                        left_node,
+                        right_node,
+                    );
+                    actual_union_edges += child_ids.len();
+                    child_ids
+                };
+                let semantic_id = interner.intern(&support, children);
+                states.push(AuditState {
+                    support,
+                    semantic_id,
+                });
+            }
+        }
+        levels.push(AuditLevel { node_count, states });
+    }
+
+    let metrics: Vec<_> = levels.iter().map(audit_level_metrics).collect();
+    AuditSummary {
+        actual_states: levels.iter().map(|level| level.states.len()).sum(),
+        unique_states: interner.ids.len(),
+        actual_entries: metrics.iter().map(|metric| metric.entries).sum(),
+        semantic_entries: interner.entry_counts.iter().sum(),
+        actual_union_edges,
+        unique_union_edges: interner.first_children.iter().map(Vec::len).sum(),
+        root_support: levels.last().unwrap().states[0].support.len(),
+        leaf_rank_gf2: metrics[0].rank_gf2,
+        max_rank_gf2: metrics
+            .iter()
+            .map(|metric| metric.rank_gf2)
+            .max()
+            .unwrap_or(0),
+        peak_live_entries: metrics
+            .iter()
+            .map(|metric| metric.entries)
+            .max()
+            .unwrap_or(0),
+        levels: metrics,
+    }
 }
 
 fn support_digest(support: &BTreeMap<Affine, FlatEntry>) -> String {
@@ -274,9 +558,29 @@ struct CandidateDepth {
     roots: usize,
     lifting_abscissae: usize,
     signed_leaves: usize,
+    actual_states: usize,
+    unique_states: usize,
+    actual_entries: usize,
+    semantic_entries: usize,
+    actual_union_edges: usize,
+    unique_union_edges: usize,
     root_support: usize,
+    leaf_rank_gf2: usize,
+    max_rank_gf2: usize,
+    peak_live_entries: usize,
     support_sha256: String,
+    levels: BTreeMap<usize, CandidateLevel>,
     queries: BTreeMap<String, CandidateQuery>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct CandidateLevel {
+    node_count: usize,
+    rows: usize,
+    nonempty_rows: usize,
+    columns: usize,
+    rank_gf2: usize,
+    entries: usize,
 }
 
 #[derive(Clone, Debug)]
@@ -324,11 +628,40 @@ fn parse_candidate(text: &str) -> BTreeMap<usize, CandidateDepth> {
                     roots: number(&map, "full_roots"),
                     lifting_abscissae: number(&map, "lifting_abscissae"),
                     signed_leaves: number(&map, "signed_leaves"),
+                    actual_states: number(&map, "actual_states"),
+                    unique_states: number(&map, "unique_states"),
+                    actual_entries: number(&map, "actual_entries"),
+                    semantic_entries: number(&map, "semantic_entries"),
+                    actual_union_edges: number(&map, "actual_union_edges"),
+                    unique_union_edges: number(&map, "unique_union_edges"),
                     root_support: number(&map, "root_support"),
+                    leaf_rank_gf2: number(&map, "leaf_rank_gf2"),
+                    max_rank_gf2: number(&map, "max_rank_gf2"),
+                    peak_live_entries: number(&map, "peak_live_entries"),
                     support_sha256: map["support_sha256"].to_owned(),
+                    levels: BTreeMap::new(),
                     queries: BTreeMap::new(),
                 },
             );
+        } else if line.starts_with("LEVEL ") {
+            let map = fields(line);
+            let depth: usize = number(&map, "depth");
+            let tree_level = number(&map, "tree_level");
+            depths
+                .get_mut(&depth)
+                .expect("LEVEL preceded DEPTH")
+                .levels
+                .insert(
+                    tree_level,
+                    CandidateLevel {
+                        node_count: number(&map, "node_count"),
+                        rows: number(&map, "rows"),
+                        nonempty_rows: number(&map, "nonempty_rows"),
+                        columns: number(&map, "columns"),
+                        rank_gf2: number(&map, "rank_gf2"),
+                        entries: number(&map, "entries"),
+                    },
+                );
         } else if line.starts_with("QUERY ") {
             let map = fields(line);
             let depth: usize = number(&map, "depth");
@@ -369,15 +702,39 @@ fn main() {
     let mut verified_queries = 0;
     for depth in 1..=6 {
         let observed = &candidate[&depth];
-        let (roots, leaves) = independent_leaves(depth);
-        let support = flat_support(&leaves);
+        let base = independent_base(depth);
+        let support = flat_support(&base.leaves);
         let digest = support_digest(&support);
-        assert_eq!(observed.roots, roots.len());
-        assert_eq!(observed.lifting_abscissae, leaves.len() / 2);
-        assert_eq!(observed.signed_leaves, leaves.len());
+        let audit = independent_metric_audit(&base);
+        assert_eq!(observed.roots, base.roots.len());
+        assert_eq!(observed.lifting_abscissae, base.leaves.len() / 2);
+        assert_eq!(observed.signed_leaves, base.leaves.len());
+        assert_eq!(observed.actual_states, audit.actual_states);
+        assert_eq!(observed.unique_states, audit.unique_states);
+        assert_eq!(observed.actual_entries, audit.actual_entries);
+        assert_eq!(observed.semantic_entries, audit.semantic_entries);
+        assert_eq!(observed.actual_union_edges, audit.actual_union_edges);
+        assert_eq!(observed.unique_union_edges, audit.unique_union_edges);
         assert_eq!(observed.root_support, support.len());
+        assert_eq!(observed.root_support, audit.root_support);
+        assert_eq!(observed.leaf_rank_gf2, audit.leaf_rank_gf2);
+        assert_eq!(observed.max_rank_gf2, audit.max_rank_gf2);
+        assert_eq!(observed.peak_live_entries, audit.peak_live_entries);
         assert_eq!(observed.support_sha256, digest);
-        let (planted_target, _) = first_planted(&leaves);
+        assert_eq!(observed.levels.len(), audit.levels.len());
+        for (tree_level, expected) in audit.levels.iter().enumerate() {
+            let actual = observed
+                .levels
+                .get(&tree_level)
+                .expect("missing candidate LEVEL row");
+            assert_eq!(actual.node_count, expected.node_count);
+            assert_eq!(actual.rows, expected.rows);
+            assert_eq!(actual.nonempty_rows, expected.nonempty_rows);
+            assert_eq!(actual.columns, expected.columns);
+            assert_eq!(actual.rank_gf2, expected.rank_gf2);
+            assert_eq!(actual.entries, expected.entries);
+        }
+        let (planted_target, _) = first_planted(&base.leaves);
 
         for (label, query) in &observed.queries {
             let expected_target = if label == "planted" {
@@ -395,17 +752,21 @@ fn main() {
             };
             assert_eq!(query.target, expected_target);
             assert!(query.replay_ok);
-            let expected = flat_query(&support, &leaves, expected_target);
+            let expected = flat_query(&support, &base.leaves, expected_target);
             assert_eq!(query.found, expected.is_some());
             assert_eq!(query.witness, expected);
             verified_queries += 1;
         }
         assert_eq!(observed.queries.len(), 10);
         println!(
-            "VERIFY depth={} roots={} signed_leaves={} root_support={} support_sha256={} queries=10 status=ok",
+            "VERIFY depth={} roots={} signed_leaves={} states={} unique_states={} semantic_entries={} leaf_rank_gf2={} root_support={} support_sha256={} queries=10 metrics=ok status=ok",
             depth,
-            roots.len(),
-            leaves.len(),
+            base.roots.len(),
+            base.leaves.len(),
+            audit.actual_states,
+            audit.unique_states,
+            audit.semantic_entries,
+            audit.leaf_rank_gf2,
             support.len(),
             digest
         );
@@ -515,7 +876,17 @@ mod tests {
             affine_scalar(BASE_GENERATOR, SUBGROUP_ORDER),
             Affine::IDENTITY
         );
-        assert_eq!(independent_leaves(6).1.len(), 68);
+        assert_eq!(independent_base(6).leaves.len(), 68);
+    }
+
+    #[test]
+    fn direct_metric_audit_reaches_flat_root() {
+        let base = independent_base(2);
+        let audit = independent_metric_audit(&base);
+        assert_eq!(audit.levels.len(), 3);
+        assert_eq!(audit.levels[0].node_count, 4);
+        assert_eq!(audit.levels[2].node_count, 1);
+        assert_eq!(audit.root_support, flat_support(&base.leaves).len());
     }
 
     #[test]
