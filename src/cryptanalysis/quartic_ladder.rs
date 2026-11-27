@@ -1750,6 +1750,11 @@ pub struct QAttemptDiag {
     /// cycle in the component of "1" when found.
     pub inhom: u64,
     pub inhom_linked: u64,
+    /// Rank of the core's `(rhs, t coefficient)` pairs.  When it is 1 the
+    /// inhomogeneous information is a single direction: the scaled true
+    /// solution plus a shift of `t` lies in the kernel, so `t` is not
+    /// determined whatever the factor-base part (diagnosis only).
+    pub ab_rank: usize,
 }
 
 /// Rank of `rows` (columns `0..ncols`, minus `skip`) over `F_r`, dense
@@ -2246,6 +2251,14 @@ fn run_diem_inner(
             dg.rank_no_t = dense_rank(&core, cc, Some(ct), r);
             dg.inhom = res.decomp_relations;
             dg.inhom_linked = res.inhom_linked;
+            let ab: Vec<(Vec<(u32, u64)>, u64)> = core
+                .iter()
+                .map(|(t, rhs)| {
+                    let tc = t.iter().find(|&&(c, _)| c == ct).map_or(0, |&(_, v)| v);
+                    (vec![(0, *rhs % r), (1, tc % r)], 0)
+                })
+                .collect();
+            dg.ab_rank = dense_rank(&ab, 2, None, r);
         }
         if core.len() >= cc + margin(cc) {
             // Linked: no core row holds t, so t is not determined (counted scan)
