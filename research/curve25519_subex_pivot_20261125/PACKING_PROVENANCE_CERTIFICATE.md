@@ -75,7 +75,8 @@ admitted control exports `packing_label_witness.csv` from the same function.
 The transparent Lean parser in `lean/PackingLabelArtifact.lean`
 checks exact lengths and bounds, proves typed endpoint values are the serialized
 indices, proves typed row and column labels equal the serialized naturals
-without modulo wrapping, and replays the same strict-first-minimum algorithm. The
+without modulo wrapping, requires nonzero radix and an active coordinate below
+the packet exponent, and replays the same strict-first-minimum algorithm. The
 kernel-checked trace is rows `[0,1,0]` followed by columns `[0,0,1]`; both sides
 therefore exercise a nonzero choice. A generic checked-import theorem rewrites
 accepted serialized labels to the executable schedule and returns the strongest
@@ -90,6 +91,8 @@ recursive executable schedule by well-founded induction. The separate shared
 `packing_label_source_guard_witness.csv` is a degree-one matching with two
 labels and 32 edges, exactly `M=2(q^2)^2 delta`; the native verifier reports
 source-guard closure and Lean's strict parser accepts the same projection.
+The native verifier also now requires `conditional_labels` to equal cap
+presence in both directions; a missing-cap mutation fails at the context gate.
 `[pcc:unverified]`
 
 ## Remaining boundary

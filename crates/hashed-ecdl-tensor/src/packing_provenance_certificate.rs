@@ -433,7 +433,7 @@ pub fn verify(
         || provenance.edges.len() != factorization.edge_count
         || provenance.row_creation_precisions.len() != provenance.row_labels.len()
         || provenance.column_creation_precisions.len() != provenance.column_labels.len()
-        || (provenance.source_degree_cap.is_some() && !provenance.conditional_labels)
+        || provenance.conditional_labels != provenance.source_degree_cap.is_some()
     {
         return Err("packing provenance context".into());
     }

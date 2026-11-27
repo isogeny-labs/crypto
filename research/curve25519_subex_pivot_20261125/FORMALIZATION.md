@@ -189,7 +189,8 @@ certificate round trip, including all 596 three- through five-edge corpus
 cases. The formal importer
 checks its exact lengths and endpoint/label bounds, proves its typed endpoints
 and typed labels are their exact serialized natural values rather than modulo
-representatives, and replays the complete nontrivial native trace: rows
+representatives, checks nonzero radix and `coordinate<packetExponent` exactly
+as the native verifier does, and replays the complete nontrivial native trace: rows
 `[0,1,0]`, then columns `[0,0,1]`.
 `parseReplayedPackingLabelArtifact_classCap` rewrites every accepted artifact's
 serialized label arrays to that executable schedule and feeds them directly

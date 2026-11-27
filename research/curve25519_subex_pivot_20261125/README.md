@@ -384,7 +384,8 @@ overflow-checked canonical flat-projection function and constructs that
 projection before accepting every producer round trip in the 596-case corpus.
 The admitted three-edge projection binds endpoint quadruples and selected
 labels from that same function to the executable model. Lean parses and bounds it,
-proves the typed endpoints are the
+requires the same nonzero radix and active-coordinate range as the native
+provenance verifier, proves the typed endpoints are the
 serialized indices, proves the typed row and column labels retain their exact
 serialized natural values without modulo wrapping, and kernel-replays the
 nontrivial row `[0,1,0]` and column `[0,0,1]` traces. For every successfully

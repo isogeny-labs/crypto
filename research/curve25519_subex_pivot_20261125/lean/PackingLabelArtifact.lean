@@ -96,7 +96,8 @@ def PackingLabelArtifact.wellFormed (artifact : PackingLabelArtifact) : Bool :=
     artifact.conditionalLabels == 1 &&
     artifact.edgeFields.length == 4 * artifact.edgeCount &&
     artifact.rowLabels.length == artifact.rowCount &&
-    artifact.columnLabels.length == artifact.columnCount
+    artifact.columnLabels.length == artifact.columnCount &&
+    decide (0 < artifact.radix ∧ artifact.coordinate < artifact.packetExponent)
 
 /-- Endpoint and label fields lie inside their serialized array bounds. -/
 def PackingLabelArtifact.bounded (artifact : PackingLabelArtifact) : Bool :=
@@ -143,6 +144,17 @@ theorem parsePackingLabelArtifact_wellFormed
     (hparse : parsePackingLabelArtifact values = some artifact) :
     artifact.wellFormed = true :=
   (parsePackingLabelArtifact_components hparse).1
+
+/-- A checked projection has the same nonzero-radix and active-coordinate
+context required by the native provenance verifier. -/
+theorem parsePackingLabelArtifact_context
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact) :
+    0 < artifact.radix ∧ artifact.coordinate < artifact.packetExponent := by
+  have hwell := parsePackingLabelArtifact_wellFormed hparse
+  simp only [PackingLabelArtifact.wellFormed, Bool.and_eq_true,
+    beq_iff_eq, decide_eq_true_eq] at hwell
+  exact hwell.2
 
 /-- A shape-checked import retains every endpoint and label bound. -/
 theorem parsePackingLabelArtifact_bounded
@@ -221,7 +233,7 @@ theorem parsePackingLabelArtifact_rowLabel_val
   simp only [PackingLabelArtifact.wellFormed, Bool.and_eq_true,
     beq_iff_eq] at hwell
   have hrowLength : artifact.rowLabels.length = artifact.rowCount :=
-    hwell.1.2
+    hwell.1.1.2
   have hindex : row.val < artifact.rowLabels.length := by
     simpa only [hrowLength] using row.isLt
   have hbounded := parsePackingLabelArtifact_bounded hparse
@@ -246,7 +258,7 @@ theorem parsePackingLabelArtifact_columnLabel_val
     beq_iff_eq] at hwell
   have hcolumnLength :
       artifact.columnLabels.length = artifact.columnCount :=
-    hwell.2
+    hwell.1.2
   have hindex : column.val < artifact.columnLabels.length := by
     simpa only [hcolumnLength] using column.isLt
   have hbounded := parsePackingLabelArtifact_bounded hparse

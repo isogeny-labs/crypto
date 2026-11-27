@@ -932,6 +932,13 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
     assert!(!conditional_summary.source_guard_closure_admitted);
+    let mut missing_degree_cap = conditional_provenance.clone();
+    missing_degree_cap.source_degree_cap = None;
+    assert_eq!(
+        verify_packing_provenance(&conditional_certificate, &missing_degree_cap, &mut meter)
+            .unwrap_err(),
+        "packing provenance context"
+    );
     let label_fixture_values: Vec<usize> = include_str!(concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/../../research/curve25519_subex_pivot_20261125/packing_label_witness.csv"
