@@ -5,11 +5,13 @@ with no keyring signature and no matched rho reference. [pcc:unverified]
 
 ## Result
 
-PR #5229 reported a 4.67× speedup for its batch + signed-quotient lane. That
+PR #5229 reported a 4.67× speedup for its batch + signed-quotient lane (claim
+`PCC-20261126-7a50b7`, unverified standing) [pcc:unverified]. That
 ratio reproduces here (4.54× [4.52–4.55]). But its control used an i128
 extended-Euclid inversion (159 ns, against 78 ns for the same algorithm in
 native 64-bit words) and std SipHash. Fixing only those two gives the control a
 1.82× gain. Against that **fair control**, the PR lane is **2.49× [2.48–2.50]**.
+[pcc:unverified]
 
 A new arm, the **affine x-only query**, brings the total to **4.59×
 [4.58–4.60]** over the fair control (8.37× over the PR control), with the same
