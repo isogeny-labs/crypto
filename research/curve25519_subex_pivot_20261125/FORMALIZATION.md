@@ -261,8 +261,11 @@ right degree sequences have total ordered endpoint charge at most `2M delta`,
 and the scaled collision-objective inequality implies the exact centered
 variance sum and every `c_gamma D<=2M` class cap. Isolates are degree-zero
 entries and parallel edges contribute their full port multiplicity. What is
-not yet formalized is the first-minimum conditional-expectation descent that
-connects the native labeling algorithm to that scaled objective inequality.
+now also formalized is the exact one-vertex conditional-expectation step: the
+sum over every row or column label equals `q` times the old partial objective,
+so a minimum choice is nonincreasing. The remaining bridge is to compose these
+steps over the finite native vertex order and prove the initial endpoint-charge
+and final class-count identities for the exact model.
 `[pcc:unverified]`
 
 For the schema-2 factorization description, the same verifier reconstructs

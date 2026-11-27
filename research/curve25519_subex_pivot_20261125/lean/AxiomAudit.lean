@@ -2,9 +2,11 @@ module
 
 import ParametricRefinement
 import ConditionalVariance
+import ConditionalObjective
 
 open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
+open Curve25519ConditionalObjective
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
@@ -18,3 +20,11 @@ open Curve25519ConditionalVariance
 #print axioms class_variance_identity
 #print axioms variance_bound_of_scaled_objective
 #print axioms class_cap_of_scaled_objective
+#print axioms equalityPotential_update_sum
+#print axioms row_update_objective_sum
+#print axioms column_update_objective_sum
+#print axioms exists_candidate_le_of_sum_eq
+#print axioms exists_nonincreasing_row_label
+#print axioms exists_nonincreasing_column_label
+#print axioms minimum_row_label_nonincreasing
+#print axioms minimum_column_label_nonincreasing

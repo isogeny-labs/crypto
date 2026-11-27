@@ -94,9 +94,16 @@ kernel-checks the bipartite degree-square budget
 `sum_left deg^2+sum_right deg^2<=2M delta`, with zero-degree isolates and
 parallel-port multiplicity represented directly, the exact centered class
 variance identity, division of the scaled collision-objective inequality by
-positive `D`, and the resulting `c_gamma D<=2M` cap. The remaining variance
-step is now specifically the greedy first-minimum descent from the initial
-partially labeled objective to the final class collision sum.
+positive `D`, and the resulting `c_gamma D<=2M` cap.
+
+`lean/ConditionalObjective.lean` models the same scaled ordered-edge-pair
+objective as the native quadratic reference. For either a row or column
+vertex, it shows that summing the objective over all `q` candidate labels is
+exactly `q` times the preceding partial objective. Hence some candidate is
+nonincreasing, and any minimum candidate—including the native first minimum—is
+nonincreasing. The finite vertex-order composition and the initial
+endpoint-charge/final class-count identities for this exact model remain open.
+`[pcc:unverified]`
 
 The project pins Lean `v4.35.0` and mathlib commit
 `56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
@@ -108,7 +115,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-The build completes 9,050 jobs. `#print axioms` reports only `propext`,
+The build completes 9,051 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
 project axioms or admitted proofs. This formal replay still takes the variance,
 source guard, precision, and mode inequalities as hypotheses. It neither
@@ -122,9 +129,8 @@ arithmetic.
 A useful next certificate must replace the generic Boolean tokens with typed
 evidence for two independent claims:
 
-1. the remaining conditional-label descent theorem for an arbitrary admitted
-   bipartite multigraph: the first-minimum label choices do not increase the
-   scaled objective; and
+1. the remaining finite composition of the checked first-minimum steps,
+   including the initial endpoint-charge and final class-count identities; and
 2. the factorization/precision bounds `nD<=6M` and `pu<=34MD` for the exact
    finite rearrangement consumed by the child interface.
 

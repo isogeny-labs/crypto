@@ -65,11 +65,12 @@ incidence-Gram producer. `[pcc:unverified]`
 The pinned Lean project now checks the degree-sequence part of this argument,
 including isolates and parallel-port multiplicity, as well as the exact
 collision-to-centered-variance conversion and its per-class-cap consequence.
-The formal boundary is narrower than the displayed native argument: it still
-takes the final scaled collision-objective inequality as a hypothesis. A
-complete formal refinement must show that each native first-minimum label
-choice preserves the conditional-expectation descent from the initially
-unlabeled objective. `[pcc:unverified]`
+It now also models the exact partial ordered-edge-pair objective and checks the
+one-vertex averaging identity for rows and columns, implying that every native
+minimum choice is nonincreasing. The formal boundary is finite composition:
+connect those steps over the complete vertex order, bound the initial objective
+by the endpoint charges, and identify the final objective with
+`D sum_gamma c_gamma^2`. `[pcc:unverified]`
 
 ## Per-class cap
 

@@ -463,11 +463,12 @@
     "verifier_source": "crates/hashed-ecdl-tensor/src/parametric_refinement_certificate.rs",
     "formal_verifier": "research/curve25519_subex_pivot_20261125/lean/ParametricRefinement.lean",
     "formal_variance_verifier": "research/curve25519_subex_pivot_20261125/lean/ConditionalVariance.lean",
+    "formal_objective_verifier": "research/curve25519_subex_pivot_20261125/lean/ConditionalObjective.lean",
     "formal_toolchain": "Lean v4.35.0 with mathlib commit 56a005855ea17e0b0958f73ec801ae140b0a1679",
     "wire_format": "schema-1 JSON with the checked composition boundary, eight explicit generic premise tokens, five retained depth rows, reconstructed constants and ten explicit conclusions",
     "checks": "variance/source guards imply cD<=2M and KL<=3M; derived 2M/64 group load implies the history 3M/64 bound; child numerators 4 and 6 satisfy eightfold shrink at radix 64; old/packet degree closure; 6*34=204, sqrt ceiling 15, tuple constant 80, local constant 96, root-u constant 290 and root-log constant 148480; exact depth schedule equality",
     "observed_gate": "10204-byte threshold transcript reports conditional_parametric_implication across five depths; six focused tests pass for schedule, source/shrink, cost ledger, missing premise/conclusion and unsupported-promotion mutations",
-    "formal_checks": "kernel-checked bipartite degree-square budget, centered class-variance identity, scaled-objective conversion, per-class cap, padded capacity, nonnegative-parent child shrink, degree closure, positive-D mode/precision cancellation and exact ledger constants; 9050-job lake build passes",
+    "formal_checks": "kernel-checked exact row/column partial-objective averaging and minimum-label descent, bipartite degree-square budget, centered class-variance identity, scaled-objective conversion, per-class cap, padded capacity, nonnegative-parent child shrink, degree closure, positive-D mode/precision cancellation and exact ledger constants; 9051-job lake build passes",
     "formal_axiom_audit": "every exported theorem reports only propext, Classical.choice and Quot.sound; no project axiom or admitted proof",
     "dependency_boundary": "imports the composition-boundary verifier only, not graph, packing, factorization, contraction or producer implementations",
     "claim_boundary": "native replay plus Lean-kernel-checked downstream algebraic implications from explicit generic premises; premise realization, complete graph refinement, the external contraction theorem, unconditional total work and a practical Curve25519 attack remain unverified"
@@ -503,5 +504,5 @@
     "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
     "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
   },
-  "next_gate": "prove the remaining arbitrary-multigraph first-minimum conditional-objective descent, then bind its typed result and finite factorization/precision witnesses for nD<=6M and pu<=34MD into every retained depth; separately rederive the external contraction theorem"
+  "next_gate": "compose the checked row/column minimum-label steps over the native finite vertex order and prove the initial endpoint-charge and final class-count identities; then bind that typed result and finite factorization/precision witnesses for nD<=6M and pu<=34MD into every retained depth; separately rederive the external contraction theorem"
 }

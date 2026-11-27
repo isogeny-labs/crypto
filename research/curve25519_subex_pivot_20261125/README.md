@@ -439,8 +439,11 @@ The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled
 collision objective to every per-class cap, with isolates and parallel ports
 represented in the degree data. The exact remaining graph-side lemma is the
-greedy first-minimum conditional-objective descent; factorization/precision
-realization and the external theorem remain separate. `[pcc:unverified]`
+finite composition boundary: Lean now checks the exact row/column averaging
+identity and that every minimum label is nonincreasing, but still must compose
+the native vertex order and connect the initial and final objectives to endpoint
+charges and class counts. Factorization/precision realization and the external
+theorem remain separate. `[pcc:unverified]`
 
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
