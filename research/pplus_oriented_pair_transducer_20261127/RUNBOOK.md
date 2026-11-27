@@ -7,9 +7,11 @@ research/pplus_oriented_pair_transducer_20261127/run_census.sh
 ```
 
 The wrapper enforces checkpoint admission before building or executing the
-release candidate. It then validates every source-custody SHA-256, builds all
-three Rust binaries with `cargo --locked --release`, refuses to overwrite any
-existing `evidence/` directory, and runs these stages in order:
+release candidate. Because S3 is unavailable, the default gate requires a
+clean tracked checkpoint whose local head exactly matches the same branch on
+`origin`. It then validates every source-custody SHA-256, builds all three Rust
+binaries with `cargo --locked --release`, refuses to overwrite any existing
+`evidence/` directory, and runs these stages in order:
 
 1. exact oriented pair transducer;
 2. independently coded flat-support verifier;
@@ -26,5 +28,6 @@ The wrapper is orchestration only. All field/group arithmetic, exact support
 construction, independent replay, growth calculations, and promotion logic are
 implemented in the source-manifest-bound Rust binaries.
 
-The active custody record is `SOURCE_MANIFEST_2.json`; v1 is retained as the
-historical pre-amendment record.
+The active custody record is `SOURCE_MANIFEST_3.json`; v1 and v2 are retained
+as historical pre-amendment records. If S3 transport later becomes available,
+`PPLUS_CHECKPOINT_MODE=s3` selects the repository S3 gate explicitly.

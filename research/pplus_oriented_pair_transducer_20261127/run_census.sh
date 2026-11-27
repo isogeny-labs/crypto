@@ -3,10 +3,11 @@ set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
 study="$repo_root/research/pplus_oriented_pair_transducer_20261127"
-manifest="$study/SOURCE_MANIFEST_2.json"
+manifest="$study/SOURCE_MANIFEST_3.json"
 crate="$study/native/Cargo.toml"
 evidence="$study/evidence"
 source_commit="$(jq -er '.source_commit' "$manifest")"
+checkpoint_mode="${PPLUS_CHECKPOINT_MODE:-git}"
 
 cd "$repo_root"
 
@@ -20,7 +21,37 @@ if ! git merge-base --is-ancestor "$source_commit" HEAD; then
   exit 2
 fi
 
-scripts/checkpoint.sh gate
+case "$checkpoint_mode" in
+  git)
+    checkpoint_rel="research/pplus_oriented_pair_transducer_20261127/GIT_CHECKPOINT.md"
+    checkpoint="$repo_root/$checkpoint_rel"
+    if [[ ! -f "$checkpoint" ]] || ! git ls-files --error-unmatch "$checkpoint_rel" >/dev/null 2>&1; then
+      echo "run-census: missing tracked Git checkpoint $checkpoint" >&2
+      exit 2
+    fi
+    if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+      echo "run-census: Git checkpoint requires a clean worktree and index" >&2
+      exit 2
+    fi
+    branch="$(git symbolic-ref --quiet --short HEAD)" || {
+      echo "run-census: Git checkpoint requires a named branch" >&2
+      exit 2
+    }
+    local_head="$(git rev-parse HEAD)"
+    remote_head="$(git ls-remote --exit-code --heads origin "$branch" | awk 'NR == 1 { print $1 }')"
+    if [[ -z "$remote_head" ]] || [[ "$local_head" != "$remote_head" ]]; then
+      echo "run-census: local $local_head is not exactly pushed as origin/$branch" >&2
+      exit 2
+    fi
+    ;;
+  s3)
+    scripts/checkpoint.sh gate
+    ;;
+  *)
+    echo "run-census: unknown PPLUS_CHECKPOINT_MODE=$checkpoint_mode" >&2
+    exit 2
+    ;;
+esac
 
 jq -r '.files | to_entries[] | "\(.value)  \(.key)"' "$manifest" \
   | sha256sum --check --strict
@@ -45,6 +76,7 @@ trap 'status=$?; if [[ $status -ne 0 ]]; then echo "run-census: failed evidence 
   echo "started_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "head=$(git rev-parse HEAD)"
   echo "source_commit=$source_commit"
+  echo "checkpoint_mode=$checkpoint_mode"
   echo "source_manifest_sha256=$(sha256sum "$manifest" | cut -d' ' -f1)"
   echo "rustc=$(rustc --version)"
   echo "cargo=$(cargo --version)"
