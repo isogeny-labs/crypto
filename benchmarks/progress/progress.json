@@ -157,13 +157,13 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261126T0236Z-m31-shared-selector-counts-r1",
+  "latest_record": "20261127T0058Z-norm-one-torus-m5-ablation",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 20,
     "invalid": 11,
-    "measured": 344,
-    "open": 58
+    "measured": 351,
+    "open": 60
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -30113,6 +30113,36 @@
     },
     {
       "better": "lower",
+      "first": 1.9844674102165105,
+      "latest": 1.9844674102165105,
+      "latest_derived": {
+        "value_over_reference": 1.984467
+      },
+      "metric": "ic_over_ideal_rho_gae1_p131101_nofb",
+      "points": [
+        {
+          "commit": "8bc5537a8441",
+          "date": "2026-11-26",
+          "derived": {
+            "value_over_reference": 1.984467
+          },
+          "n": 20,
+          "record": "20261126T0333Z-quartic-diem-nofb",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.8354226870568757,
+            2.1632340213236523
+          ],
+          "summary": "IMPROVEMENT, order holds across the band (frozen rule): skipping the full-core fallback cuts quartic Diem 2lp-sfb-sge GAE_1 to 0.833x [0.758,0.907] (held-out seeds), 0 rescues of 16; IC/rho 131101 w=1 2.63 -> 1.98 [pcc:unverified]",
+          "value": 1.9844674102165105
+        }
+      ],
+      "problem": "ic:quartic-diem-2lp-la",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 2.7797,
       "latest": 2.7797,
       "latest_derived": {
@@ -30136,6 +30166,32 @@
           ],
           "summary": "IMPROVEMENT (frozen rule): SGE+coordinate Wiedemann cuts quartic Diem 2LP GAE_1 to 0.371x [0.340,0.406] of 2lp-sfb; IC/rho at 131101 w=1 7.75 -> 2.78 [pcc:unverified]",
           "value": 2.7797
+        }
+      ],
+      "problem": "ic:quartic-diem-2lp-la",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8324605695547613,
+      "latest": 0.8324605695547613,
+      "latest_derived": {},
+      "metric": "paired_gae1_nofb_over_sge_heldout_pooled",
+      "points": [
+        {
+          "commit": "8bc5537a8441",
+          "date": "2026-11-26",
+          "derived": {},
+          "n": 40,
+          "record": "20261126T0333Z-quartic-diem-nofb",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7580108149319122,
+            0.9066146062794362
+          ],
+          "summary": "IMPROVEMENT, order holds across the band (frozen rule): skipping the full-core fallback cuts quartic Diem 2lp-sfb-sge GAE_1 to 0.833x [0.758,0.907] (held-out seeds), 0 rescues of 16; IC/rho 131101 w=1 2.63 -> 1.98 [pcc:unverified]",
+          "value": 0.8324605695547613
         }
       ],
       "problem": "ic:quartic-diem-2lp-la",
@@ -30877,6 +30933,306 @@
       ],
       "problem": "ic:split-prime-p2-twist-coset-toy",
       "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 0.9997,
+      "latest": 0.9998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.01,
+        "improvement_vs_previous_percent": 0.01
+      },
+      "metric": "ratio_explicit_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.03,
+            "improvement_vs_previous_percent": 0.03
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.0
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.01,
+            "improvement_vs_previous_percent": -0.04
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9996
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9997
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.01,
+            "improvement_vs_previous_percent": 0.01
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0,
+            1.0
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 0.9998
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2132,
+      "latest": 1.2606,
+      "latest_derived": {
+        "improvement_vs_first_percent": 3.907,
+        "improvement_vs_previous_percent": -14.4079
+      },
+      "metric": "ratio_subspace_over_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1792,
+            1.2484
+          ],
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2132
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.9871,
+            "improvement_vs_previous_percent": 7.9871
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.4706
+          ],
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3101
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 7.6904,
+            "improvement_vs_previous_percent": -0.2748
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1669,
+            1.462
+          ],
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.3065
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 21.398,
+            "improvement_vs_previous_percent": 12.7287
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3004,
+            1.6667
+          ],
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.4728
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 3.907,
+            "improvement_vs_previous_percent": -14.4079
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1682,
+            1.3605
+          ],
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 1.2606
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 10.467,
+      "latest": 12.984,
+      "latest_derived": {
+        "improvement_vs_first_percent": -24.047,
+        "improvement_vs_previous_percent": 10.9892,
+        "value_over_reference": 31.286747
+      },
+      "metric": "s_trace2e",
+      "points": [
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 5.041908
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-17",
+          "reference": 2.076,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-17: native binary-subspace select=trace2e (D=6) costs 0.824 [0.801, 0.848] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 10.467
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -26.3113,
+            "improvement_vs_previous_percent": -26.3113,
+            "value_over_reference": 17.304974
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-19",
+          "reference": 0.764,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-19: native binary-subspace select=trace2e (D=7) costs 0.763 [0.680, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 13.221
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -8.2354,
+            "improvement_vs_previous_percent": 14.3106,
+            "value_over_reference": 20.560799
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-19",
+          "reference": 0.551,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-19: native binary-subspace select=trace2e (D=7) costs 0.765 [0.684, 0.857] of binary-subspace D=6 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 11.329
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -39.3618,
+            "improvement_vs_previous_percent": -28.7581,
+            "value_over_reference": 35.928571
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k0-23",
+          "reference": 0.406,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K0-23: native binary-subspace select=trace2e (D=8) costs 0.679 [0.600, 0.769] of binary-subspace D=7 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 14.587
+        },
+        {
+          "commit": "77301e80e7b5",
+          "date": "2026-11-25",
+          "derived": {
+            "improvement_vs_first_percent": -24.047,
+            "improvement_vs_previous_percent": 10.9892,
+            "value_over_reference": 31.286747
+          },
+          "n": 32,
+          "record": "20261125T2239Z-trace2e-k1-23",
+          "reference": 0.415,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "K1-23: native binary-subspace select=trace2e (D=8) costs 0.793 [0.735, 0.856] of binary-subspace D=8 in S on fresh targets (16x2, mitm m=2) and equals the explicit-x stand-in within 0.04%; all runs verified, replay-all audit clean",
+          "value": 12.984
+        }
+      ],
+      "problem": "ic:trace2e-builder",
+      "unit": "S"
     },
     {
       "better": "lower",
@@ -57320,6 +57676,251 @@
       ],
       "problem": "prime-field-chained-transfer-no-advantage",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.01541,
+      "latest": 0.01541,
+      "latest_derived": {},
+      "metric": "fair_control_total_wall",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 0.01541
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.006195,
+      "latest": 0.006195,
+      "latest_derived": {},
+      "metric": "pr5229_candidate_total_wall",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 0.006195
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 2.501,
+      "latest": 2.501,
+      "latest_derived": {},
+      "metric": "pr5229_lane_ratio_vs_fair_control_replication",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.489,
+            2.519
+          ],
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 2.501
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.487,
+      "latest": 2.487,
+      "latest_derived": {},
+      "metric": "pr5229_lane_ratio_vs_fair_control",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.476,
+            2.497
+          ],
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 2.487
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 4.538,
+      "latest": 4.538,
+      "latest_derived": {},
+      "metric": "pr5229_pair_ratio_reproduced",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.515,
+            4.554
+          ],
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 4.538
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "recall_mask_mismatches",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 4064,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 0.0
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 335768.0,
+      "latest": 335768.0,
+      "latest_derived": {},
+      "metric": "xonly_query_multiplications",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": null,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 335768.0
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "count"
+    },
+    {
+      "better": "higher",
+      "first": 4.623,
+      "latest": 4.623,
+      "latest_derived": {},
+      "metric": "xonly_ratio_vs_fair_control_replication",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.604,
+            4.65
+          ],
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 4.623
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 4.589,
+      "latest": 4.589,
+      "latest_derived": {},
+      "metric": "xonly_ratio_vs_fair_control",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.58,
+            4.604
+          ],
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 4.589
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.003358,
+      "latest": 0.003358,
+      "latest_derived": {},
+      "metric": "xonly_total_wall",
+      "points": [
+        {
+          "commit": "43db3d460583",
+          "date": "2026-11-27",
+          "derived": {},
+          "n": 41,
+          "record": "20261127T0058Z-norm-one-torus-m5-ablation",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+          "value": 0.003358
+        }
+      ],
+      "problem": "prime31-norm-one-torus-m5-mitm-component",
+      "unit": "wall_s"
     },
     {
       "better": "neutral",

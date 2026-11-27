@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="394" viewBox="0 0 760 394" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="white"/>
+<text x="20" y="28" font-size="17" font-weight="bold">Prime31 norm-one-torus m=5 MITM: median setup + query time (40 targets)</text>
+<text x="20" y="48" font-size="12" fill="#555">Local non-isolated diagnostic, 1 pinned core, randomized order. Ratios vs fair control, paired bootstrap 95% CI. [pcc:unverified]</text>
+<text x="220" y="86.1" font-size="13" text-anchor="end">PR #5229 control</text>
+<rect x="230" y="64" width="146.0" height="34" fill="#4C78A8"/>
+<rect x="376.0" y="64" width="205.9" height="34" fill="#F58518"/>
+<text x="589.9" y="86.1" font-size="12">28.1 ms · 0.55× [0.55–0.55]</text>
+<text x="220" y="138.1" font-size="13" text-anchor="end">Fair control (i64 inv + Fx)</text>
+<rect x="230" y="116" width="77.7" height="34" fill="#4C78A8"/>
+<rect x="307.7" y="116" width="115.2" height="34" fill="#F58518"/>
+<text x="430.9" y="138.1" font-size="12">15.4 ms · 1.00× [1.00–1.00]</text>
+<text x="220" y="190.1" font-size="13" text-anchor="end">PR #5229 candidate</text>
+<rect x="230" y="168" width="24.1" height="34" fill="#4C78A8"/>
+<rect x="254.1" y="168" width="53.6" height="34" fill="#F58518"/>
+<text x="315.7" y="190.1" font-size="12">6.2 ms · 2.49× [2.48–2.50]</text>
+<text x="220" y="242.1" font-size="13" text-anchor="end">PR candidate + i64 inv + Fx</text>
+<rect x="230" y="220" width="18.5" height="34" fill="#4C78A8"/>
+<rect x="248.5" y="220" width="43.3" height="34" fill="#F58518"/>
+<text x="299.8" y="242.1" font-size="12">4.9 ms · 3.13× [3.12–3.13]</text>
+<text x="220" y="294.1" font-size="13" text-anchor="end">Affine x-only query</text>
+<rect x="230" y="272" width="18.5" height="34" fill="#4C78A8"/>
+<rect x="248.5" y="272" width="23.5" height="34" fill="#F58518"/>
+<text x="280.0" y="294.1" font-size="12">3.4 ms · 4.59× [4.58–4.60]</text>
+<rect x="230" y="330" width="14" height="14" fill="#4C78A8"/><text x="250" y="342" font-size="12">setup (tables)</text>
+<rect x="370" y="330" width="14" height="14" fill="#F58518"/><text x="390" y="342" font-size="12">query (40 targets)</text>
+</svg>

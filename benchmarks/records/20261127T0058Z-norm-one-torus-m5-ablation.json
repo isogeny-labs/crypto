@@ -1,0 +1,262 @@
+{
+  "branch": "claude/norm-one-torus-fair-baseline-xonly-20261127",
+  "closed_utc": "2026-11-27T01:01:09+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./harness/run_all.sh",
+        "runs/replication"
+      ],
+      "cwd": "research/norm_one_torus_ablation_20261127",
+      "exit": 0,
+      "started_utc": "2026-11-27T00:59:20+00:00",
+      "wall_s": 101.468
+    }
+  ],
+  "commit": "43db3d460583253799a918810be5ab04fd62d6a7",
+  "commit_dirty": true,
+  "created_utc": "2026-11-27T00:58:55+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261127-norm-one-torus-m5-ablation"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 2,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261127T0058Z-norm-one-torus-m5-ablation",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 41,
+      "name": "fair_control_total_wall",
+      "note": "median setup+query, 40 targets, indiv+full+inv64+fx",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.01541
+    },
+    {
+      "baseline": 0.01541,
+      "better": "lower",
+      "n": 41,
+      "name": "pr5229_candidate_total_wall",
+      "note": "batch+quot+inv128+sip",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.006195
+    },
+    {
+      "baseline": 0.01541,
+      "better": "lower",
+      "n": 41,
+      "name": "xonly_total_wall",
+      "note": "batch+quot+inv64+fx, affine x-only query",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.003358
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "pr5229_lane_ratio_vs_fair_control",
+      "note": "round-paired bootstrap 95% CI",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.476,
+        2.497
+      ],
+      "unit": "ratio",
+      "value": 2.487
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "xonly_ratio_vs_fair_control",
+      "note": "round-paired bootstrap 95% CI",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.58,
+        4.604
+      ],
+      "unit": "ratio",
+      "value": 4.589
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "pr5229_pair_ratio_reproduced",
+      "note": "PR control / PR candidate; #5229 reported 4.669821",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.515,
+        4.554
+      ],
+      "unit": "ratio",
+      "value": 4.538
+    },
+    {
+      "baseline": 1093603.0,
+      "better": "lower",
+      "n": null,
+      "name": "xonly_query_multiplications",
+      "note": "40 queries; PR candidate 1093603",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 335768.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4064,
+      "name": "recall_mask_mismatches",
+      "note": "25 arms vs PR control and affine brute force; 86 decomposable",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "xonly_ratio_vs_fair_control_replication",
+      "note": "replication run under benchrec run; primary 4.589",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.604,
+        4.65
+      ],
+      "unit": "ratio",
+      "value": 4.623
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 41,
+      "name": "pr5229_lane_ratio_vs_fair_control_replication",
+      "note": "replication; primary 2.487",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.489,
+        2.519
+      ],
+      "unit": "ratio",
+      "value": 2.501
+    }
+  ],
+  "problem": "prime31-norm-one-torus-m5-mitm-component",
+  "raw": [
+    {
+      "bytes": 578,
+      "path": "research/norm_one_torus_ablation_20261127/runs/environment.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/54/5416d24d00df3f4806d10914f0f61ab08da291d2455d2eefdd903610d65d876e",
+      "sha256": "5416d24d00df3f4806d10914f0f61ab08da291d2455d2eefdd903610d65d876e",
+      "uploaded": false
+    },
+    {
+      "bytes": 774,
+      "path": "research/norm_one_torus_ablation_20261127/runs/fidelity.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f9/f93ee8960fdaefca48a75873f425df740d430b6ae30cf72654a014f856a05a0c",
+      "sha256": "f93ee8960fdaefca48a75873f425df740d430b6ae30cf72654a014f856a05a0c",
+      "uploaded": false
+    },
+    {
+      "bytes": 104,
+      "path": "research/norm_one_torus_ablation_20261127/runs/invbench.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/22/22e5760ab63bea868ecc27b17c95131ba531a1f036137765e5faf6e64de74c5f",
+      "sha256": "22e5760ab63bea868ecc27b17c95131ba531a1f036137765e5faf6e64de74c5f",
+      "uploaded": false
+    },
+    {
+      "bytes": 8919,
+      "path": "research/norm_one_torus_ablation_20261127/runs/ablate.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9c/9cc89a0db8da88b38d60cbe408ba4b0e36c631752b28aaef50629907ecaf485d",
+      "sha256": "9cc89a0db8da88b38d60cbe408ba4b0e36c631752b28aaef50629907ecaf485d",
+      "uploaded": false
+    },
+    {
+      "bytes": 864,
+      "path": "research/norm_one_torus_ablation_20261127/runs/xonly.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/88/8859cfe62e5772dbae440214fb8a41da7a64ca79a4108f00f328e39e49141b40",
+      "sha256": "8859cfe62e5772dbae440214fb8a41da7a64ca79a4108f00f328e39e49141b40",
+      "uploaded": false
+    },
+    {
+      "bytes": 248,
+      "path": "research/norm_one_torus_ablation_20261127/runs/recall.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/39a680c32d8a97c551d61b484a830cca229cf22ff91e6bb1dff4a00e56537de6",
+      "sha256": "39a680c32d8a97c551d61b484a830cca229cf22ff91e6bb1dff4a00e56537de6",
+      "uploaded": false
+    },
+    {
+      "bytes": 774,
+      "path": "research/norm_one_torus_ablation_20261127/runs/replication/fidelity.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f9/f93ee8960fdaefca48a75873f425df740d430b6ae30cf72654a014f856a05a0c",
+      "sha256": "f93ee8960fdaefca48a75873f425df740d430b6ae30cf72654a014f856a05a0c",
+      "uploaded": false
+    },
+    {
+      "bytes": 104,
+      "path": "research/norm_one_torus_ablation_20261127/runs/replication/invbench.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9a/9a40527a0244afb5af5c5c031709b9a930b0d9549ab3bb1684e8c5ec7ed67e4f",
+      "sha256": "9a40527a0244afb5af5c5c031709b9a930b0d9549ab3bb1684e8c5ec7ed67e4f",
+      "uploaded": false
+    },
+    {
+      "bytes": 8916,
+      "path": "research/norm_one_torus_ablation_20261127/runs/replication/ablate.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d0c66db513a0e09ac1dfb0d98ec8cc5ef5e73359e191e4bc30741217444672ed",
+      "sha256": "d0c66db513a0e09ac1dfb0d98ec8cc5ef5e73359e191e4bc30741217444672ed",
+      "uploaded": false
+    },
+    {
+      "bytes": 864,
+      "path": "research/norm_one_torus_ablation_20261127/runs/replication/xonly.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/273db2ebef5569044adea435737e63d535089fb24578f1d8e7e8fe0bf05199b2",
+      "sha256": "273db2ebef5569044adea435737e63d535089fb24578f1d8e7e8fe0bf05199b2",
+      "uploaded": false
+    },
+    {
+      "bytes": 248,
+      "path": "research/norm_one_torus_ablation_20261127/runs/replication/recall.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/39/39a680c32d8a97c551d61b484a830cca229cf22ff91e6bb1dff4a00e56537de6",
+      "sha256": "39a680c32d8a97c551d61b484a830cca229cf22ff91e6bb1dff4a00e56537de6",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261127-norm-one-torus-m5-ablation/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261127-norm-one-torus-m5-ablation/headline.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "norm-one-torus-m5-ablation",
+  "status": "measured",
+  "summary": "Local non-isolated diagnostic: PR #5229 lane 2.49x and affine x-only query 4.59x over a fair control (replication 2.50x, 4.62x); no matched rho; unsigned [pcc:unverified]",
+  "validation": null
+}
