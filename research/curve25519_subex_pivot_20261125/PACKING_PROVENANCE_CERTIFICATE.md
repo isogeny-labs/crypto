@@ -94,9 +94,11 @@ source-guard closure and Lean's strict parser accepts the same projection.
 The independent native verifier now replays the same proved auxiliary-state
 schedule instead of reevaluating every edge pair: row labels use degree and
 right-endpoint incidence buckets, then column labels use row-label incidence
-profiles. A test-only quadratic oracle agrees on isolates, parallel edges,
-shared endpoints, and label alphabets 1, 2, and 4. Exact-boundary degree-one
-matching controls also pass at `a=2,3,4`, respectively
+profiles. The production packer and independent importer both agree with the
+test-only quadratic oracle on all 3,280 ordered `3 x 3` multigraph controls
+through three edges and label alphabets 1 through 4, including isolates,
+parallel edges, and shared endpoints. Exact-boundary degree-one matching
+controls also pass at `a=2,3,4`, respectively
 `(M,D)=(512,16),(8192,64),(131072,256)`, with maximum classes
 `32,128,512`, packet counts `128,1024,8192`, and charged-step counts
 `15810,450038,13496226`. The three new rungs complete together in 0.71 seconds

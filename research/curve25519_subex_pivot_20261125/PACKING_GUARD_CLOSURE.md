@@ -59,8 +59,9 @@ sum_gamma (c_gamma-M/D)^2 <= 2 M delta.
 ```
 
 This is the inequality checked independently by the schema-3 packing
-provenance verifier. Its quadratic replay is separate from the optimized
-incidence-Gram producer. `[pcc:unverified]`
+provenance verifier. Its sparse auxiliary-state replay is separate from the
+optimized incidence-Gram producer, and both agree with the test-only quadratic
+oracle on the same 3,280-case finite corpus. `[pcc:unverified]`
 
 The pinned Lean project now checks the degree-sequence part of this argument,
 including isolates and parallel-port multiplicity, as well as the exact

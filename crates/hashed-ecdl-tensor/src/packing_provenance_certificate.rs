@@ -436,7 +436,9 @@ fn first_minimum(scores: &[BigUint], meter: &mut Meter) -> Result<usize, String>
 /// Replay the proved degree/incidence-bucket first-minimum schedule without
 /// importing the source packing implementation.
 fn sparse_conditional_labels(
-    provenance: &Certificate,
+    edges: &[EdgeEndpoints],
+    row_count: usize,
+    column_count: usize,
     labels: usize,
     meter: &mut Meter,
 ) -> Result<(Vec<usize>, Vec<usize>), String> {
@@ -447,20 +449,17 @@ fn sparse_conditional_labels(
         .vector(labels, "packing provenance conditional alphabet")
         .map_err(|error| error.to_string())?;
     meter
-        .vector(
-            provenance.row_labels.len(),
-            "packing provenance conditional row adjacency",
-        )
+        .vector(row_count, "packing provenance conditional row adjacency")
         .map_err(|error| error.to_string())?;
     meter
         .vector(
-            provenance.column_labels.len(),
+            column_count,
             "packing provenance conditional column adjacency",
         )
         .map_err(|error| error.to_string())?;
-    let mut row_edges = vec![Vec::new(); provenance.row_labels.len()];
-    let mut column_edges = vec![Vec::new(); provenance.column_labels.len()];
-    for (index, edge) in provenance.edges.iter().enumerate() {
+    let mut row_edges = vec![Vec::new(); row_count];
+    let mut column_edges = vec![Vec::new(); column_count];
+    for (index, edge) in edges.iter().enumerate() {
         meter
             .charge(1, "packing provenance conditional adjacency")
             .map_err(|error| error.to_string())?;
@@ -470,27 +469,26 @@ fn sparse_conditional_labels(
 
     meter
         .vector(
-            provenance.column_labels.len(),
+            column_count,
             "packing provenance conditional row incidence buckets",
         )
         .map_err(|error| error.to_string())?;
-    let mut right_bucket_ports =
-        vec![BTreeMap::<usize, usize>::new(); provenance.column_labels.len()];
+    let mut right_bucket_ports = vec![BTreeMap::<usize, usize>::new(); column_count];
     let mut bucket_degrees = vec![0usize; labels];
     let overlap_multiplier = BigUint::from(labels - 1);
-    let mut rows = Vec::with_capacity(provenance.row_labels.len());
-    for edges in &row_edges {
-        if edges.is_empty() {
+    let mut rows = Vec::with_capacity(row_count);
+    for incident_edges in &row_edges {
+        if incident_edges.is_empty() {
             rows.push(0);
             continue;
         }
-        let degree = BigUint::from(edges.len());
+        let degree = BigUint::from(incident_edges.len());
         let mut scores: Vec<BigUint> = bucket_degrees
             .iter()
             .map(|&old_degree| &degree * BigUint::from(old_degree))
             .collect();
-        for &edge_index in edges {
-            let right = provenance.edges[edge_index].right;
+        for &edge_index in incident_edges {
+            let right = edges[edge_index].right;
             for (&label, &ports) in &right_bucket_ports[right] {
                 meter
                     .charge(1, "packing provenance conditional row overlap")
@@ -500,13 +498,13 @@ fn sparse_conditional_labels(
         }
         let selected = first_minimum(&scores, meter)?;
         bucket_degrees[selected] = bucket_degrees[selected]
-            .checked_add(edges.len())
+            .checked_add(incident_edges.len())
             .ok_or_else(|| "packing provenance conditional row bucket degree".to_string())?;
-        for &edge_index in edges {
+        for &edge_index in incident_edges {
             meter
                 .charge(1, "packing provenance conditional row incidence")
                 .map_err(|error| error.to_string())?;
-            let right = provenance.edges[edge_index].right;
+            let right = edges[edge_index].right;
             let ports = right_bucket_ports[right].entry(selected).or_default();
             *ports = ports
                 .checked_add(1)
@@ -516,15 +514,15 @@ fn sparse_conditional_labels(
     }
 
     let mut row_label_column_ports = vec![BTreeMap::<usize, usize>::new(); labels];
-    let mut columns = Vec::with_capacity(provenance.column_labels.len());
-    for edges in &column_edges {
-        if edges.is_empty() {
+    let mut columns = Vec::with_capacity(column_count);
+    for incident_edges in &column_edges {
+        if incident_edges.is_empty() {
             columns.push(0);
             continue;
         }
         let mut scores = vec![BigUint::zero(); labels];
-        for &edge_index in edges {
-            let row_label = rows[provenance.edges[edge_index].left];
+        for &edge_index in incident_edges {
+            let row_label = rows[edges[edge_index].left];
             for (&column_label, &ports) in &row_label_column_ports[row_label] {
                 meter
                     .charge(1, "packing provenance conditional column overlap")
@@ -533,11 +531,11 @@ fn sparse_conditional_labels(
             }
         }
         let selected = first_minimum(&scores, meter)?;
-        for &edge_index in edges {
+        for &edge_index in incident_edges {
             meter
                 .charge(1, "packing provenance conditional column incidence")
                 .map_err(|error| error.to_string())?;
-            let row_label = rows[provenance.edges[edge_index].left];
+            let row_label = rows[edges[edge_index].left];
             let ports = row_label_column_ports[row_label]
                 .entry(selected)
                 .or_default();
@@ -550,12 +548,29 @@ fn sparse_conditional_labels(
     Ok((rows, columns))
 }
 
+#[cfg(test)]
+pub(crate) fn replay_conditional_labels_for_test(
+    edges: &[EdgeEndpoints],
+    row_count: usize,
+    column_count: usize,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(Vec<usize>, Vec<usize>), String> {
+    sparse_conditional_labels(edges, row_count, column_count, labels, meter)
+}
+
 fn verify_conditional_labels(
     provenance: &Certificate,
     labels: usize,
     meter: &mut Meter,
 ) -> Result<(), String> {
-    let (rows, columns) = sparse_conditional_labels(provenance, labels, meter)?;
+    let (rows, columns) = sparse_conditional_labels(
+        &provenance.edges,
+        provenance.row_labels.len(),
+        provenance.column_labels.len(),
+        labels,
+        meter,
+    )?;
     if rows != provenance.row_labels || columns != provenance.column_labels {
         return Err("packing provenance conditional labels".into());
     }
@@ -905,7 +920,14 @@ mod tests {
                 let mut sparse_meter = Meter::new(limits.clone());
                 let mut reference_meter = Meter::new(limits);
                 assert_eq!(
-                    sparse_conditional_labels(&provenance, labels, &mut sparse_meter).unwrap(),
+                    sparse_conditional_labels(
+                        &provenance.edges,
+                        provenance.row_labels.len(),
+                        provenance.column_labels.len(),
+                        labels,
+                        &mut sparse_meter,
+                    )
+                    .unwrap(),
                     reference_conditional_labels(&provenance, labels, &mut reference_meter)
                         .unwrap()
                 );

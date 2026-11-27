@@ -165,9 +165,10 @@ incidence-Gram scores instead of rescanning all ordered edge pairs per
 candidate. The row weight is
 `deg(v)deg(w)+(q-1)sum_r m(v,r)m(w,r)`; the column weight is the dot product of
 row-label incidence profiles. An exhaustive 3,280-case reference comparison
-preserves every first-minimum choice. It cuts the former 107.32-second single
+preserves every first-minimum choice in both the production packer and the
+independent sparse provenance verifier. It cuts the former 107.32-second single
 path to 0.02 seconds and enables the 0.06-second four-path control. The separate
-packing-provenance verifier still replays the original objective.
+quadratic objective remains compiled only as a differential oracle.
 `[pcc:unverified]`
 
 Lean now has a transparent version of the verifier's first-minimum rule as

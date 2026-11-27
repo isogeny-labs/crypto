@@ -442,9 +442,10 @@ not a uniform arbitrary-size Rust-to-Lean semantic refinement.
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row
 degree/right-endpoint buckets followed by column row-label profiles. Its
-test-only quadratic oracle agrees on isolate, parallel-edge, shared-endpoint,
-and 1/2/4-label controls. The exact strongest-boundary degree-one matching
-family now passes natively at `a=1,2,3,4`, reaching `M=131072`, `D=256`,
+test-only quadratic oracle agrees with both sparse implementations on all
+3,280 ordered `3 x 3` multigraph controls through three edges and label
+alphabets 1 through 4. The exact strongest-boundary degree-one matching family
+now passes natively at `a=1,2,3,4`, reaching `M=131072`, `D=256`,
 maximum class 512, and 8192 packets at the largest rung. The three new rungs
 take 0.71 seconds together after compilation and use 15,810, 450,038, and
 13,496,226 charged steps. This remains finite scaling evidence rather than a
@@ -771,9 +772,12 @@ collision objective to every per-class cap, with isolates and parallel ports
 represented in the degree data. The exact remaining graph-side lemma is the
 native binding: Lean now checks the complete row/column sequence, initial and
 final objective identities, scaled collision bound, and source-guard class cap
-for arbitrary finite endpoint maps. The Rust verifier must still expose typed
-endpoint/minimum-trace evidence before its generic-premise flag can change.
-Factorization/precision realization and the external theorem remain separate.
+for arbitrary finite endpoint maps. The native producer and independent
+importer now agree with the quadratic oracle on the full 3,280-case finite
+control, while the checked projection exposes exact endpoint and label values
+to the generic formal importer. A compiler-level semantic refinement from
+arbitrary Rust producer objects to that formal projection remains separate, as
+do factorization/precision realization and the external theorem.
 `[pcc:unverified]`
 
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
@@ -789,9 +793,9 @@ recursive closure; it exposed the class inequality used by the generic proof.
 `[pcc:unverified]`
 
 `CONDITIONAL_LABEL_GRAM.md` derives the exact greedy score from sparse
-incidence Gram forms. A 3,280-case exhaustive control matches the original
-ordered-edge-pair objective exactly, while the independent provenance verifier
-retains its own quadratic replay. The former 107.32-second single path now
+incidence Gram forms. A 3,280-case exhaustive control now matches the original
+ordered-edge-pair objective exactly in both the production labeler and the
+independent sparse provenance verifier. The former 107.32-second single path now
 takes 0.02 seconds and all four paths take 0.06 seconds in the warm debug
 harness. This optimization exposes the right auxiliary variables for an orbit
 analysis and independently preserves every label choice. `[pcc:unverified]`
