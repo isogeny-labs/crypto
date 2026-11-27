@@ -327,4 +327,32 @@ theorem class_cap_for_minimum_labels
     (class_cap_of_scaled_objective hD classes (edgeCount : ℝ) (δ : ℝ)
       (by positivity) hmass hobjective hguard)
 
+/-- The strongest source guard bounds every class produced by the complete
+executable first-minimum row-then-column schedule, with no external label or
+minimum-family premise. -/
+theorem class_cap_for_executable_labels
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (δ : ℕ)
+    (hleftCap : ∀ row, fiberSize left row ≤ δ)
+    (hrightCap : ∀ column, fiberSize right column ≤ δ)
+    (hguard : 2 * ((q * q : ℕ) : ℝ) ^ 2 * (δ : ℝ) ≤ (edgeCount : ℝ)) :
+    ∀ γ : Fin (q * q),
+      (fiberSize (classMap left right
+          (executableRowLabels hq left right)
+          (executableColumnLabels hq left right
+            (executableRowLabels hq left right))) γ : ℝ) *
+          ((q * q : ℕ) : ℝ) ≤
+        2 * (edgeCount : ℝ) := by
+  apply class_cap_for_minimum_labels hq left right
+    (executableRowLabels hq left right)
+    (executableColumnLabels hq left right (executableRowLabels hq left right))
+    δ hleftCap hrightCap
+  · exact executableRowLabels_minimum hq left right
+  · exact executableColumnLabels_minimum hq left right
+      (executableRowLabels hq left right)
+  · exact hguard
+
 end Curve25519ObjectiveBoundary

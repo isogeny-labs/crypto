@@ -177,8 +177,13 @@ label. `firstMinimumLabel_le` proves its selected cost is no greater than every
 candidate; `firstMinimumRowLabel_nonincreasing` and
 `firstMinimumColumnLabel_nonincreasing` instantiate the exact conditional
 objective and eliminate the abstract minimizer premise for each executable
-step. The remaining native boundary is to parse the complete endpoint/selected-
-label arrays and connect their full row-then-column trace to these steps.
+step. `executableRowLabels` and `executableColumnLabels` now use well-founded
+prefix recursion to construct the complete native-order schedule. Its exact
+prefix-minimum receipts prove the fully labeled objective nonincreasing, and
+`class_cap_for_executable_labels` carries those constructed labels through the
+strongest source guard to the final real-valued class cap without a caller-
+supplied label or minimizer family. The remaining native boundary is to parse
+the complete endpoint/selected-label arrays and prove they equal this trace.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

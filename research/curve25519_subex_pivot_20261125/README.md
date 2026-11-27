@@ -374,8 +374,13 @@ minimizer premise. A generic theorem proves the selected cost is at most every
 candidate cost; exact row and column corollaries feed that receipt into the
 conditional-objective averaging proof and show each executable choice is
 nonincreasing. Equal costs retain the earlier label by construction. Binding a
-complete serialized native endpoint/label trace to the resulting finite
-sequence remains separate. `[pcc:unverified]`
+complete serialized native endpoint/label trace remains separate.
+The formal layer now constructs that complete arbitrary-finite sequence itself:
+well-founded recursion labels rows in native order from their exact prefixes,
+then labels columns from the fixed rows and preceding column prefix. The
+complete executable schedule is proved nonincreasing and feeds directly into a
+new class-cap endpoint under the strongest source guard, with no supplied label
+or minimum-family premise. `[pcc:unverified]`
 
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
 group child. From schema-3 parent provenance and the accepted factorization

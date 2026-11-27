@@ -46,6 +46,11 @@ open Curve25519ExtensionRingModel
 #print axioms row_sequence_nonincreasing
 #print axioms column_sequence_nonincreasing
 #print axioms full_label_sequence_nonincreasing
+#print axioms executableRowLabels_eq
+#print axioms executableRowLabels_minimum
+#print axioms executableColumnLabels_eq
+#print axioms executableColumnLabels_minimum
+#print axioms executableFullLabelSequence_nonincreasing
 #print axioms sum_fiberSize
 #print axioms endpointPairCount_eq_sum_fiberSize_sq
 #print axioms initial_objective_bound
@@ -53,6 +58,7 @@ open Curve25519ExtensionRingModel
 #print axioms final_objective_eq_class_squares
 #print axioms scaled_class_collision_bound
 #print axioms class_cap_for_minimum_labels
+#print axioms class_cap_for_executable_labels
 #print axioms row_choice_expansion
 #print axioms packet_row_choice_expansion
 #print axioms packet_row_choice_expansion_by_exponent

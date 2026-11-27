@@ -176,4 +176,139 @@ theorem full_label_sequence_nonincreasing
     (fun row ↦ some (rowLabels row)) columnLabels hcolumnMinimum).trans
       (row_sequence_nonincreasing hq left right rowLabels (fun _ ↦ none) hrowMinimum)
 
+/-- Construct every row label in native order from the exact first-minimum
+objective over the already assigned row prefix. -/
+def executableRowLabels
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (vertex : Fin rowCount) : Fin q :=
+  firstMinimumRowLabel hq left right
+    (fun candidate =>
+      if _h : candidate.val < vertex.val then
+        some (executableRowLabels hq left right candidate)
+      else none)
+    (fun _ => none) vertex
+termination_by vertex.val
+
+/-- Unfold one constructed row label into the canonical prefix assignment. -/
+theorem executableRowLabels_eq
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (vertex : Fin rowCount) :
+    executableRowLabels hq left right vertex =
+      firstMinimumRowLabel hq left right
+        (prefixAssignment (executableRowLabels hq left right) vertex.val)
+        (fun _ => none) vertex := by
+  rw [executableRowLabels]
+  congr 2
+
+/-- Every constructed row label is a minimum for its exact native prefix. -/
+theorem executableRowLabels_minimum
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (k : ℕ) (hk : k < rowCount) (candidate : Fin q) :
+    conditionalObjective q left right
+        (Function.update
+          (prefixAssignment (executableRowLabels hq left right) k) ⟨k, hk⟩
+          (some (executableRowLabels hq left right ⟨k, hk⟩)))
+        (fun _ => none) ≤
+      conditionalObjective q left right
+        (Function.update
+          (prefixAssignment (executableRowLabels hq left right) k) ⟨k, hk⟩
+          (some candidate))
+        (fun _ => none) := by
+  rw [executableRowLabels_eq]
+  simpa only [firstMinimumRowLabel] using
+    (firstMinimumLabel_le hq
+      (fun label => conditionalObjective q left right
+        (Function.update
+          (prefixAssignment (executableRowLabels hq left right) k) ⟨k, hk⟩
+          (some label))
+        (fun _ => none)) candidate)
+
+/-- Construct every column label in native order after fixing all row labels. -/
+def executableColumnLabels
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (vertex : Fin columnCount) : Fin q :=
+  firstMinimumColumnLabel hq left right (fun row => some (rowLabels row))
+    (fun candidate =>
+      if _h : candidate.val < vertex.val then
+        some (executableColumnLabels hq left right rowLabels candidate)
+      else none)
+    vertex
+termination_by vertex.val
+
+/-- Unfold one constructed column label into the canonical prefix assignment. -/
+theorem executableColumnLabels_eq
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (vertex : Fin columnCount) :
+    executableColumnLabels hq left right rowLabels vertex =
+      firstMinimumColumnLabel hq left right (fun row => some (rowLabels row))
+        (prefixAssignment
+          (executableColumnLabels hq left right rowLabels) vertex.val)
+        vertex := by
+  rw [executableColumnLabels]
+  congr 2
+
+/-- Every constructed column label is a minimum for its exact native prefix. -/
+theorem executableColumnLabels_minimum
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount)
+    (rowLabels : Fin rowCount → Fin q)
+    (k : ℕ) (hk : k < columnCount) (candidate : Fin q) :
+    conditionalObjective q left right (fun row => some (rowLabels row))
+        (Function.update
+          (prefixAssignment
+            (executableColumnLabels hq left right rowLabels) k) ⟨k, hk⟩
+          (some (executableColumnLabels hq left right rowLabels ⟨k, hk⟩))) ≤
+      conditionalObjective q left right (fun row => some (rowLabels row))
+        (Function.update
+          (prefixAssignment
+            (executableColumnLabels hq left right rowLabels) k) ⟨k, hk⟩
+          (some candidate)) := by
+  rw [executableColumnLabels_eq]
+  simpa only [firstMinimumColumnLabel] using
+    (firstMinimumLabel_le hq
+      (fun label => conditionalObjective q left right
+        (fun row => some (rowLabels row))
+        (Function.update
+          (prefixAssignment
+            (executableColumnLabels hq left right rowLabels) k) ⟨k, hk⟩
+          (some label))) candidate)
+
+/-- The complete executable row-then-column first-minimum schedule cannot
+increase the exact conditional objective. -/
+theorem executableFullLabelSequence_nonincreasing
+    {q edgeCount rowCount columnCount : ℕ}
+    (hq : 0 < q)
+    (left : Fin edgeCount → Fin rowCount)
+    (right : Fin edgeCount → Fin columnCount) :
+    conditionalObjective q left right
+        (fun row => some (executableRowLabels hq left right row))
+        (fun column => some (executableColumnLabels hq left right
+          (executableRowLabels hq left right) column)) ≤
+      conditionalObjective q left right (fun _ => none) (fun _ => none) := by
+  apply full_label_sequence_nonincreasing hq left right
+    (executableRowLabels hq left right)
+    (executableColumnLabels hq left right (executableRowLabels hq left right))
+  · exact executableRowLabels_minimum hq left right
+  · exact executableColumnLabels_minimum hq left right
+      (executableRowLabels hq left right)
+
 end Curve25519LabelSequence
