@@ -163,6 +163,10 @@ open Curve25519ExtensionRingModel
 #print axioms gf2PackedRabinClosed_guard_add
 #print axioms gf2Polynomial_add_eq_sub
 #print axioms gf2PackedRabinClosed_guard_sub
+#print axioms gf2Polynomial_irreducible_of_half_degree_gcd
+#print axioms gf2PackedRemainder_two_of_log2
+#print axioms packedGF2Polynomial_two
+#print axioms gf2PackedIrreducible_sound
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

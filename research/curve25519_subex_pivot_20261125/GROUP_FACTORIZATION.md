@@ -256,8 +256,8 @@ record's polynomial field equals that result. Independently of that predicate,
 Lean rules out both monic linear factors and all four monic quadratic factor
 shapes over `GF(2)`, proving `U^4+U+1` irreducible; the artifact lower bits are
 proved to decode to the same polynomial. This is a degree-four selection and
-algebraic certificate, not arbitrary-degree Rabin correctness or compiler
-refinement.
+algebraic certificate; general packed acceptance soundness is proved below,
+while converse completeness and compiler refinement remain separate.
 `[pcc:unverified]`
 
 For arbitrary fixed widths, the packed natural representation now decodes to a
@@ -287,19 +287,23 @@ then identify a reduced start with its exact `2^steps` power modulo the packed
 modulus; packed remainders supply such starts automatically. A second induction
 uses the strict remainder-degree drop to prove the packed GCD fuel sufficient,
 refines its result to Euclidean polynomial GCD, and identifies the exact native
-`==1` guard. The general irreducibility equivalence is not claimed here. The
-control-flow half is now proved too:
+`==1` guard. The control-flow half is now proved too:
 decoder injectivity translates the terminal equality, and induction over the
 auxiliary loop translates every active early exit to the exact polynomial GCD
-guard. The resulting public-Boolean equivalence stops at the explicit semantic
-Rabin trace; the general irreducibility theorem is still not claimed.
+guard. The resulting public-Boolean equivalence reaches the explicit semantic
+Rabin trace.
 That trace is now unrolled into one indexed family of all active guards and a
 terminal condition; the terminal condition is independently rewritten as the
 exact `x^(2^degree)=x mod f` polynomial identity for nonzero modulus. Exact
 minimal-window XOR decoding, GCD invariance under `modByMonic`, and
 addition-equals-subtraction over `GF(2)` also rewrite every active guard as
 `gcd(f, x^(2^(offset+1))-x)=1`. This closes the standard Rabin criterion while
-leaving its general irreducibility equivalence explicitly unclaimed.
+the implementation's all-half-degree guards give a stronger soundness route.
+Any reducible exact-degree polynomial has an irreducible factor of degree at
+most half, contradicting its matching GCD-one guard. The public packed
+predicate therefore implies polynomial irreducibility when its packed `log2`
+matches the supplied degree and the degree is at least two; converse
+completeness remains unclaimed.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

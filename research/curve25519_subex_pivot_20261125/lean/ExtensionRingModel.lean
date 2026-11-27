@@ -4,6 +4,8 @@ public import GroupFactorization
 public import Mathlib.Data.Fintype.Basic
 public import Mathlib.Data.Nat.Bitwise
 public import Mathlib.Algebra.Polynomial.Degree.IsMonicOfDegree
+public import Mathlib.FieldTheory.Finite.Extension
+public import Mathlib.RingTheory.Polynomial.UniqueFactorization
 
 @[expose] public section
 
@@ -2905,6 +2907,140 @@ theorem gf2PackedRabinClosed_guard_sub
   rw [← gf2Polynomial_add_eq_sub]
   exact gf2PackedRabinClosed_guard_add polynomial degree offset
     hpolynomial hsemantic hhalf
+
+/-- A degree-`n` polynomial over `GF(2)` is irreducible if it is coprime to
+`X^(2^i)-X` at every positive index through `n/2`. This all-half-degrees
+criterion is stronger than the usual prime-divisor subset of Rabin guards. -/
+theorem gf2Polynomial_irreducible_of_half_degree_gcd
+    (polynomial : Polynomial (ZMod 2)) (degree : ℕ)
+    (hdegree : polynomial.natDegree = degree) (hdegreeTwo : 2 ≤ degree)
+    (hguards : ∀ index, 0 < index → index ≤ degree / 2 →
+      EuclideanDomain.gcd polynomial (X ^ (2 ^ index) - X) = 1) :
+    Irreducible polynomial := by
+  have hpolynomial : polynomial ≠ 0 := by
+    intro hzero
+    rw [hzero, natDegree_zero] at hdegree
+    omega
+  rw [irreducible_iff]
+  refine ⟨?_, ?_⟩
+  · intro hunit
+    have hzero := natDegree_eq_zero_of_isUnit hunit
+    omega
+  · intro left right hfactor
+    by_cases hleftUnit : IsUnit left
+    · exact Or.inl hleftUnit
+    by_cases hrightUnit : IsUnit right
+    · exact Or.inr hrightUnit
+    exfalso
+    have hproduct : left * right ≠ 0 := by
+      rw [← hfactor]
+      exact hpolynomial
+    have hleft : left ≠ 0 := left_ne_zero_of_mul hproduct
+    have hright : right ≠ 0 := right_ne_zero_of_mul hproduct
+    have hleftPos : 0 < left.natDegree := by
+      apply Nat.pos_of_ne_zero
+      intro hzero
+      apply hleftUnit
+      rw [Polynomial.isUnit_iff_degree_eq_zero,
+        Polynomial.degree_eq_natDegree hleft, hzero]
+      rfl
+    have hrightPos : 0 < right.natDegree := by
+      apply Nat.pos_of_ne_zero
+      intro hzero
+      apply hrightUnit
+      rw [Polynomial.isUnit_iff_degree_eq_zero,
+        Polynomial.degree_eq_natDegree hright, hzero]
+      rfl
+    have hsum : left.natDegree + right.natDegree = degree := by
+      rw [← Polynomial.natDegree_mul hleft hright, ← hfactor, hdegree]
+    have factor_contradiction
+        (small : Polynomial (ZMod 2)) (hsmall : small ≠ 0)
+        (hsmallPos : 0 < small.natDegree) (hsmallDvd : small ∣ polynomial)
+        (hsmallDegree : small.natDegree ≤ degree / 2) : False := by
+      obtain ⟨factor, hfactorIrreducible, hfactorSmall⟩ :=
+        Polynomial.exists_irreducible_of_natDegree_pos hsmallPos
+      have hfactorPolynomial : factor ∣ polynomial :=
+        dvd_trans hfactorSmall hsmallDvd
+      have hfactorDegree : factor.natDegree ≤ degree / 2 :=
+        le_trans (Polynomial.natDegree_le_of_dvd hfactorSmall hsmall)
+          hsmallDegree
+      have hfactorPos := hfactorIrreducible.natDegree_pos
+      have hfactorPower : factor ∣ X ^ (2 ^ factor.natDegree) - X := by
+        have hpower :=
+          (Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X
+            hfactorIrreducible).1 dvd_rfl
+        simpa using hpower
+      have hfactorGcd : factor ∣ EuclideanDomain.gcd polynomial
+          (X ^ (2 ^ factor.natDegree) - X) :=
+        EuclideanDomain.dvd_gcd hfactorPolynomial hfactorPower
+      rw [hguards factor.natDegree hfactorPos hfactorDegree] at hfactorGcd
+      exact hfactorIrreducible.not_isUnit (isUnit_iff_dvd_one.2 hfactorGcd)
+    by_cases hleftDegree : left.natDegree ≤ degree / 2
+    · exact factor_contradiction left hleft hleftPos
+        (hfactor ▸ dvd_mul_right left right) hleftDegree
+    · have hrightDegree : right.natDegree ≤ degree / 2 := by omega
+      exact factor_contradiction right hright hrightPos
+        (hfactor ▸ dvd_mul_left right left) hrightDegree
+
+/-- When the packed modulus has degree at least two, the native Rabin start
+`2` is already reduced. -/
+theorem gf2PackedRemainder_two_of_log2 (polynomial degree : ℕ)
+    (hlog : Nat.log2 polynomial = degree) (hdegreeTwo : 2 ≤ degree) :
+    gf2PackedRemainder 2 polynomial = 2 := by
+  unfold gf2PackedRemainder
+  rw [gf2PackedRemainderFuel]
+  simp [hlog]
+  omega
+
+/-- Minimal packed decoding sends the native bit pattern `2` to `X`. -/
+theorem packedGF2Polynomial_two :
+    packedGF2Polynomial (Nat.log2 2 + 1) 2 = X := by
+  change packedGF2Polynomial 2 2 = X
+  ext index
+  by_cases hzero : index = 0
+  · subst index
+    have hcoeff := packedGF2Polynomial_coeff 2 2 (⟨0, by omega⟩ : Fin 2)
+    norm_num at hcoeff ⊢
+    exact hcoeff
+  by_cases hone : index = 1
+  · subst index
+    have hcoeff := packedGF2Polynomial_coeff 2 2 (⟨1, by omega⟩ : Fin 2)
+    norm_num at hcoeff ⊢
+    exact hcoeff
+  have htwo : 2 ≤ index := by omega
+  rw [packedGF2Polynomial_coeff_eq_zero_of_le 2 2 index htwo, coeff_X]
+  simp [show (1 : ℕ) ≠ index by omega]
+
+/-- Soundness of the public packed Rabin predicate: when the supplied degree
+matches the packed modulus and is at least two, acceptance implies genuine
+polynomial irreducibility over `GF(2)`. -/
+theorem gf2PackedIrreducible_sound
+    (polynomial degree : ℕ) (hlog : Nat.log2 polynomial = degree)
+    (hdegreeTwo : 2 ≤ degree)
+    (haccepted : gf2PackedIrreducible polynomial degree = true) :
+    Irreducible
+      (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial) := by
+  have hpolynomial : polynomial ≠ 0 := by
+    intro hzero
+    subst polynomial
+    simp at hlog
+    omega
+  have hclosed :=
+    (gf2PackedIrreducible_iff_closed polynomial degree).1 haccepted
+  apply gf2Polynomial_irreducible_of_half_degree_gcd
+      (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial) degree
+  · exact (packedGF2Polynomial_natDegree
+      (Nat.log2 polynomial + 1) polynomial hpolynomial (by omega)).trans hlog
+  · exact hdegreeTwo
+  · intro index hindex hhalf
+    have hguard := gf2PackedRabinClosed_guard_sub
+      polynomial degree (index - 1) hpolynomial hclosed (by omega)
+    have hremainder :=
+      gf2PackedRemainder_two_of_log2 polynomial degree hlog hdegreeTwo
+    rw [hremainder] at hguard
+    rw [packedGF2Polynomial_two] at hguard
+    have hoffset : index - 1 + 1 = index := by omega
+    simpa only [hoffset] using hguard
 
 /-- Search odd constant-one lower patterns in the exact native order. -/
 def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ

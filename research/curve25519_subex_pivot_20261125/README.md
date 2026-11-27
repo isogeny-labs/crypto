@@ -533,8 +533,9 @@ every relevant monic factor over `GF(2)` as one of two linear or four quadratic
 shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
 is proved to decode to that polynomial, so packed-search acceptance is paired
 with an independent algebraic irreducibility certificate. This remains a
-degree-four finite result, not a general proof that the packed Rabin predicate
-or Rust search refines polynomial irreducibility.
+degree-four finite selection result; the general acceptance-soundness theorem
+appears below, while converse completeness and a Rust compiler refinement of
+the search remain separate.
 `[pcc:unverified]`
 
 The packed-search model now also has a general coefficient-level semantics
@@ -577,15 +578,20 @@ is now also kernel-checked: minimal packed decoding is injective, every active
 early guard becomes polynomial GCD one, and the terminal native equality becomes
 equality of the decoded Frobenius values. Thus the public packed Boolean is
 equivalent to an explicit polynomial semantic trace. The remaining external
-step is the general theorem equating that criterion with irreducibility under
-the required degree and monicity hypotheses. The recursive trace is also
+step is converse completeness under the required degree and monicity
+hypotheses. The recursive trace is also
 unrolled into a single indexed family of every active Frobenius/GCD check plus
 the final equality; for nonzero modulus the latter is proved to be exactly
 `x^(2^degree)=x mod f`. Minimal-window XOR decoding and GCD invariance under
 reduction now normalize every indexed guard too: for each active offset it is
 exactly `gcd(f, x^(2^(offset+1))-x)=1` over `GF(2)`, with the implementation's
 inner remainder removed. This is the complete standard Rabin criterion, while
-its external equivalence with irreducibility remains the unproved boundary.
+the implementation checks the stronger all-half-degree family. A new
+factorization argument shows those guards alone imply irreducibility: every
+nontrivial factorization has an irreducible factor of degree at most half,
+which would divide a guard declared coprime. Consequently a true public packed
+predicate is now proved sound whenever `log2(polynomial)=degree` and
+`degree>=2`. The converse/completeness direction remains separate.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

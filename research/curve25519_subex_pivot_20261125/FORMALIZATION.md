@@ -596,8 +596,8 @@ the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
 `U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
 that polynomial. The combined theorem therefore pairs selection with genuine
 irreducibility for this fixture. This closes the degree-four algebraic check,
-not a general equivalence proof for the packed Rabin predicate or a Rust
-compiler refinement of `Ring::new`.
+while the general acceptance-soundness theorem is proved separately below;
+converse completeness and a Rust compiler refinement of `Ring::new` remain.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
@@ -636,14 +636,12 @@ kernel-derived. The packed GCD is now refined separately: minimal-window
 remainder correctness drives a fuel induction, strict right-degree descent
 discharges the public sum-of-degrees bound, and the returned value plus native
 `==1` guard are proved equivalent to Euclidean polynomial GCD and equality to
-one. The remaining Rabin task is the general irreducibility theorem. The
-Boolean-loop portion is now closed as well:
+one. The Boolean-loop portion is now closed as well:
 fixed-window and minimal-window decoding are injective, so induction over
 `gf2PackedIrreducibleAux` converts every early exit to the polynomial GCD-one
 guard and its terminal comparison to decoded Frobenius equality. The public
-packed predicate is equivalent to that semantic trace. Only the external
-algebraic equivalence between this criterion and irreducibility remains. The
-semantic recursion is now additionally unrolled into a nonrecursive indexed
+packed predicate is equivalent to that semantic trace. The semantic recursion
+is now additionally unrolled into a nonrecursive indexed
 family of the active Frobenius/GCD checks and terminal equality. Composing the
 arbitrary-step Frobenius theorem identifies that terminal equality with the
 closed `x^(2^degree)=x mod f` condition for every nonzero packed modulus.
@@ -651,7 +649,18 @@ Minimal-window XOR is additionally identified with polynomial addition, and
 GCD invariance removes the inner `modByMonic` from every active guard. Since
 addition equals subtraction over `GF(2)`, each indexed guard now has the exact
 standard form `gcd(f, x^(2^(offset+1))-x)=1`. The remaining boundary is the
-external algebraic theorem equating this closed criterion with irreducibility.
+converse/completeness direction. For soundness, the implementation's stronger
+all-half-degree family is enough: in any nontrivial factorization, an
+irreducible factor of degree at most half would divide both the modulus and its
+own `X^(2^i)-X`, contradicting the corresponding GCD-one guard. Thus
+`gf2PackedIrreducible_sound` proves accepted packed polynomials irreducible
+whenever their packed `log2` equals the supplied degree and that degree is at
+least two.
+Sources checked: the all-half-degree loop in
+`crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
+`Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X` theorem in
+`Mathlib.FieldTheory.Finite.Extension`. The repository KB wrapper was
+unavailable because no `research-kb` executable was installed.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in
