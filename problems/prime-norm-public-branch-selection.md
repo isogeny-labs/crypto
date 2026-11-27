@@ -507,3 +507,20 @@ vary while their sum stays fixed; adaptive support/smoothness methods are
 not excluded. Next target multiplicity/unit scalar congruence and actual
 public construction of useful labeled residual factors, class-conditioned
 success/retry and full expected bit cost. Original criteria unchanged.
+
+## 2026-11-27: actual weighted scalar extraction
+
+100/build106/local053/PCC-20261127-2c4548 checks263 printed/five new,
+zero warnings/standard foundations. Actual independent non-target input
+and residual labels derive c and n_t*Q+c*P=0. Explicit ell*Q=0 and
+gcd(n_t,ell)=1 construct Q=(-Nat.gcdA(n_t,ell)*c)*P; actual generator
+order yields congruence for the unknown label. Composition uses actual
+principal factorization and exact residual point product. Unsigned local,
+outside shared audit/fresh. [pcc:unverified]
+
+This closes the stated conditional extraction algebra, not the public
+procedure for obtaining useful residual labels. Next actual finite-field
+coefficient-kernel sampler, class-conditioned success probability, support
+selection/label generation, retries and full expected bit cost. Charge all
+per-instance work; no reusable-precomputation shortcut. Original criteria
+and prior scope restrictions unchanged.
