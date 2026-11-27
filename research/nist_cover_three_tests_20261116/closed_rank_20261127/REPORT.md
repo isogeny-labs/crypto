@@ -53,6 +53,8 @@ this study does not change those maps.
 | Expanded balanced-image bound | 481images;464166pairs at each target0,2kappa | Only formal zero patterns;no2kappaquartet;core134/128/6 |
 | Stratified mixed-image pencils | 192pencils;274756candidate occurrences | 192known products;zero additional conics;core134/128/6 |
 | Full retained-image union | 685images;940506pairs at each0,kappa,2kappa | Formal zero,237known kappa rows,no2kappaquartet;direct236/230/6 |
+| Complete old-pair strata | 168choices for seeds0,32,64,96;164new pencils | 28distinct known products;zero additional conics;core134/128/6 |
+| Product-free four-line pencils | 512new pencils;734208candidate occurrences | Zero supported conics;core134/128/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -382,6 +384,44 @@ collector. It is synthetic and enters no actual elliptic matrix. See
 MIXED_IMAGE_CONIC_PROTOCOL.md and evidence/mixed-image-conics-v1/.
 [pcc:unverified]
 
+## Complete old-pair strata
+
+The192pencil plan used one old pair per seed. For seeds0,32,64,96,the
+extension enumerates every unordered pair on each of the seven old lines,
+combined with the seed's two new residual points. All168choices are general,
+mixed-image and nonbalanced. Four exact tuples were completed in the prior
+plan;the other164are scanned once. Native validation recomputes the prior
+plan digest and verifies the complete168-choice partition. [pcc:unverified]
+
+The164new pencils cover234684candidate occurrences and recover28distinct
+known line products,no additional conic and no independent row. Several
+pencils contain the same product,so28is a count of distinct accepted conics,
+not a count of pencils. Complete geometry and exact parent-row dependence
+certificates replay in final combine. Core ranks remain134/128/6;restored
+236/230are derived. This completes only these four seed strata. See
+MIXED_IMAGE_EXTENSION_PROTOCOL.md and evidence/mixed-image-extension-v1/.
+[pcc:unverified]
+
+## Product-free four-line pencils
+
+To test a selection without a guaranteed known product,for s=0..31choose
+one residual point from each of seeds s,s+32,s+64,s+96. The sixteen binary
+choices for each s give512raw tuples. Every tuple is general,mixed-image
+and nonbalanced. Native incidence checks show no known line contains two
+anchors. Two known lines therefore cannot cover all four anchors;none of
+the9180known products lies in an actual pencil. Known-product anchors fail
+this predicate in a separate rejection fixture. [pcc:unverified]
+
+Both completed192and164plans bind356distinct prior tuples;none repeats.
+All512admitted pencils cover734208candidate occurrences in four batches.
+No supported conic is found. Nonempty separate collector/replay fixtures
+still detect their known conic,and numerical/dependence/private-block
+controls pass. Final combine checks exact coverage and witness replay.
+Core ranks remain134/128/6;restored236/230are derived. This is a complete
+null for the fixed512choices,not all product-free conic pencils. See
+FOUR_LINE_CONIC_PROTOCOL.md and evidence/four-line-conics-v1/.
+[pcc:unverified]
+
 ## Full retained-image union with active auxiliaries
 
 The combined685-image domain contains all429original images plus256new
@@ -415,9 +455,12 @@ evidence/full-image-bound-v1/. [pcc:unverified]
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s, with one allowed CPU and1GiB virtual address space.
-Each of the31attempt reports retains its complete per-call and wrapper
+Each of the33attempt reports retains its complete per-call and wrapper
 costs,including failures. The mixed-image pipeline takes19.449build,
 9.890plan,62.225/50.167batch and13.691combine seconds;wrapper155.498seconds.
+The old-pair extension takes94.880wrapper seconds.
+The product-free four-line pipeline takes19.159build,10.483plan,
+38.878/38.587/37.997/38.333batch and11.871combine seconds;wrapper195.405seconds.
 The full685-image test takes15.501build,77.388worker and92.937wrapper
 seconds. The earlier mixed-sign pipeline takes17.343build,
 8.924plan,39.634/40.567/43.650/41.493/19.973batch and9.979combine seconds;
@@ -454,11 +497,20 @@ quadruples in new x-fibres without a supported conic. The481-image bound also
 excludes conics containing a four-slot zero-sum subpattern. The192mixed-image pencils have now completed and recovered only certified
 known products. Their null does not cover all conic pencils on the1434-point
 pool. The full685-image union now directly checks interactions
-between all460auxiliary labels and retains closed rank6. The next geometric
-coverage gap is mixed-image pencils outside the192frozen stratified choices.
-A successor must use distinct anchor tuples,skip the completed pencils and
-certify known-product row dependencies under the same dense/execution caps.
-No new fibre solve is needed for that saved-pool extension.
+between all460auxiliary labels and retains closed rank6. The old-pair extension completes all168choices for four seed strata,
+including164new scans and four reused tuples. The512product-free four-line
+pencils also complete with no supported conic. Other seed combinations and
+conic pencil types remain outside those finite domains.
+
+A distinct successor uses three points plus a tangent condition at one.
+These are four linear constraints on conic coefficients with a repeated
+intersection condition,instead of four distinct point conditions. A native
+implementation must check independence of those constraints,handle the
+next local coefficient at the forced tangent point,and verify complete
+parameter/tangency buckets before a scan. A nonempty same-collector fixture
+can use two known seed lines sharing an old anchor:their product has order
+at least two at that anchor. First freeze a bounded set and disjointness
+checks;this successor has not run. No new fibre solve is required.
 Nonrational individual elliptic traces and other higher-degree function
 relations remain open directions. Any positive candidate needs actual
 cover/KM and separate elliptic/elimination replay. [pcc:unverified]
@@ -478,14 +530,17 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   [complete same-image conic family](FULL_FIBRE_CONIC_PROTOCOL.md),
   [mixed-sign pencils](MIXED_SIGN_CONIC_PROTOCOL.md) and
   [expanded balanced-image bound](EXPANDED_BALANCED_PROTOCOL.md),
-  [mixed-image pencils](MIXED_IMAGE_CONIC_PROTOCOL.md) and
+  [mixed-image pencils](MIXED_IMAGE_CONIC_PROTOCOL.md),
+  [old-pair extension](MIXED_IMAGE_EXTENSION_PROTOCOL.md),
+  [four-line pencils](FOUR_LINE_CONIC_PROTOCOL.md) and
   [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
   run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
   run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
-  and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh.
+  and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
+  and run-four-line-conics.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.

@@ -162,6 +162,38 @@ if (full_image_source.parent/'exit-code.txt').exists() and (full_image_source.pa
         "no private-block restoration formula used. Both group engines,joins,basis "
         "reconstruction and corruption controls pass. Separate numerical rank7control "
         "is excluded from actual data.")
+extension_source=ROOT/'evidence/mixed-image-extension-v1/calls/combine/stdout.json'
+if (extension_source.parent/'exit-code.txt').exists() and (extension_source.parent/'exit-code.txt').read_text().strip()=='0':
+    extension=json.loads(extension_source.read_text())
+    attempts['mixed-image-extension-v1']=(
+        f"Complete old-pair strata for seeds 0,32,64,96 pass: {extension['raw_choices']} raw choices, "
+        f"{extension['degenerate_choices']} degenerate, {extension['completed_choices_skipped']} completed "
+        f"tuples skipped, {extension['excluded_image_choices']} image-pattern exclusions, "
+        f"{extension['mixed_image_pencils']} new pencils. "
+        f"{extension['candidate_occurrences']} candidate occurrences recover "
+        f"{extension['known_product_conics']} distinct known products and "
+        f"{extension['additional_conics']} additional conics. "
+        "Native prior-plan binding, exact domain partition, geometry replay and parent-row "
+        "certificates pass. Computed core "
+        f"{extension['core_full_rank']}/{extension['core_auxiliary_rank']}/{extension['closed_rank']}; "
+        f"restored full/auxiliary {extension['full_rank']}/{extension['auxiliary_rank']} are derived. "
+        "Separate numerical rank-seven control is excluded from actual data.")
+four_line_source=ROOT/'evidence/four-line-conics-v1/calls/combine/stdout.json'
+if (four_line_source.parent/'exit-code.txt').exists() and (four_line_source.parent/'exit-code.txt').read_text().strip()=='0':
+    four_line=json.loads(four_line_source.read_text())
+    attempts['four-line-conics-v1']=(
+        f"Product-free four-line selection completes {four_line['raw_choices']} raw choices: "
+        f"{four_line['mixed_image_pencils']} admitted pencils, "
+        f"{four_line['degenerate_choices']} degenerate and "
+        f"{four_line['excluded_image_choices']} image-pattern exclusions. "
+        f"{four_line['candidate_occurrences']} candidate occurrences yield "
+        f"{four_line['supported_conics']} supported conics and "
+        f"{four_line['independent_additional_rows']} independent added rows. "
+        "Native incidence checks exclude every known line product; both completed plans "
+        "bind 356 prior tuples and actual pencils repeat none. Full geometry collector, "
+        "nonempty separate fixtures and final coverage/replay controls pass. Computed core "
+        f"{four_line['core_full_rank']}/{four_line['core_auxiliary_rank']}/{four_line['closed_rank']}; "
+        f"restored {four_line['full_rank']}/{four_line['auxiliary_rank']} counts are derived.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -173,7 +205,7 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
-    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1'):
+    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1'):
         def call_order(call):
             if call.name=='build': return (0,0)
             if call.name=='plan': return (1,0)
@@ -261,7 +293,9 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Mixed sign*','mixed-sign-conics-v1/calls/combine'),
                         ('Balanced*','expanded-balanced-v1/calls/scan'),
                         ('Mixed image*','mixed-image-conics-v1/calls/combine'),
-                        ('Union685','full-image-bound-v1/calls/scan')]:
+                        ('Union685','full-image-bound-v1/calls/scan'),
+                        ('Old-pair*','mixed-image-extension-v1/calls/combine'),
+                        ('Four-line*','four-line-conics-v1/calls/combine')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
