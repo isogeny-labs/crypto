@@ -5,7 +5,7 @@ give **zero additional rank** on the unchanged original 225 elliptic columns.
 The positive-rank objective remains open. These are finite component results
 for the recorded P-192 d7/kernel3 construction. [pcc:unverified]
 
-![Recorded ranks. Norm225 uses the225-column diagnostic; other panels retain the429-column tangent matrix. One finite-domain evaluation per mode; no statistical error bars.](ranks.pdf)
+![Recorded full/auxiliary ranks above (log scale) and closed rank below. Norm225 uses the225-column diagnostic; other cases retain the original tangent matrix,with new auxiliary columns added for the residual graph. One finite-domain evaluation per case; no statistical error bars.](ranks.pdf)
 
 ## Frozen question and inputs
 
@@ -39,6 +39,9 @@ this study does not change those maps.
 | Original and lifted audits | Original tangent matrix plus sections | Full108, auxiliary102, closed6, gain0 |
 | Old signed-norm domain | 451 symbols;101926 pairs | Seven coefficient rows including zero; rank6 |
 | Augmented signed-norm domain | 859 symbols;369370 pairs | 109 rows including zero; full108, auxiliary102, closed6 |
+| Three-old-slot partial lines | 212843distinct pair/tangent lines | No partial section;seven complete sections |
+| Separate GMP geometry replay | All pair-line keys,tangent contacts and retained supports | Exact match;closed6 |
+| Two-residual graph | 106421new partial edges plus102seeds | Full106427,auxiliary106421,closed6,gain0 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -121,6 +124,52 @@ claim follows from this null norm test. Table payload492506432bytes; no
 giant table is committed, only source,input bindings and ordered-stream hash.
 See SIX_PROTOCOL.md and evidence/six-v1/. [pcc:unverified]
 
+## Partial lines and coupled residual images
+
+The three-old-slot search groups212226unordered pair lines and652tangents
+on the frozen652-point pool. Among212843distinct lines,212836have old
+support degree2and seven have degree4;none has degree3. None of the652old
+points is a flex. A hidden-support fixture recovers the fourth point of an
+actual known section;changed-line and omitted-pair controls reject. Thus
+this one-new-residual line family is empty on the saved pool.
+[pcc:unverified]
+
+A separate GMP prime-field implementation reproduces every ordered pair-line
+key and the complete stream digest,all tangent contact orders,the support
+histogram and seven retained supports. Histogram and off-curve corruptions
+reject. This independently checks the finite geometry arithmetic under one
+producer;the established elliptic map remains an input dependency. See
+PARTIAL_PROTOCOL.md,evidence/partial-v1/ and evidence/partial-audit-v1/.
+[pcc:unverified]
+
+The next collector retains both individual residual images of every rationally
+split quadratic on every old pair secant and tangent. It checks full polynomial
+products,curve incidence,fresh exceptional-safe map values and actual elliptic
+sums. All original204auxiliary columns and newly discovered image columns
+remain auxiliary. This tests two coupled columns rather than one aggregate
+trace. [pcc:unverified]
+
+| Recorded graph quantity | Native result |
+|---|---:|
+| Pair/tangent attempts |212878|
+| Rational split / irreducible sections |106463 /106415|
+| Fully old occurrences / unique sections |42 /7|
+| New partial / seed edges |106421 /102|
+| Total edge rows / auxiliary vertices |106523 /212842|
+| Singleton rows peeled |106319|
+| Core rows / components / largest component |204 /102 /2rows|
+| Full / auxiliary / closed rank |106427 /106421 /6|
+| Additional old-base rank |0|
+
+Every singleton witness is replayed after peeling. Each remaining component
+undergoes exact coefficient-aware elimination with the unchanged256-row,
+1024-column dense-helper caps. Its resulting old rows merge with the original
+rank-six baseline. All102core components add no new old-base rank. Eight
+separate synthetic controls match dense GMP ranks,including signed/unsigned
+triangles,opposite aliases,loops and zero-auxiliary rows;two corrupted singleton
+witnesses reject. Fixture rows never enter the actual matrix. See
+GRAPH_PROTOCOL.md and evidence/graph-v1/. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
@@ -130,7 +179,8 @@ pilot18.070; full lift98.915; original scan28.197; lifted scan131.778;
 failed old audit build1.642; corrected old audit5.887; lifted audit6.236;
 failed norm build1.583; corrected norm test17.734; failed trace build6.502;
 corrected trace test40.438; conic search27.453; signed-six171.878;
-same-image conic extension42.602.
+same-image conic extension42.602;partial lines22.842;separate geometry6.555;
+coupled residual graph277.788. The graph collector itself takes265.461seconds.
 The same-image conic wrapper first failed before build in0.012seconds.
 These are feasibility
 cost receipts, not speed comparisons or repeated timing estimates.
@@ -147,21 +197,23 @@ source snapshots and hashes identify the exact executed source.
 
 ## Next discriminating work
 
-Do not repeat the exhausted fixed-column line or single-trace families.
-A successor needs a concrete mechanism for additional supported divisors or
-for coupling several distinct residual image columns. The tested families
-do not exhaust those possibilities. Repeating the tested single-trace,
-same-image conic or length-six domains cannot produce a different result
-without changing the declared inputs or family. Any positive candidate still
-needs actual cover/KM and separate elliptic/elimination replay.
+The residual graph now covers every rationally split pair/tangent section
+on this652-point pool. A successor needs additional anchor points,a genuinely
+different function family,or nonrational residual-image information outside
+the tested domains. These possibilities remain unestablished. Repeating the
+same fixed inputs and relation families cannot produce a different rank.
+Any positive candidate still needs actual cover/KM and separate
+elliptic/elimination replay.
 [pcc:unverified]
 
 ## Sources and reproduction
 
 - Frozen protocols: PROTOCOL.md, SECTION_PROTOCOL.md, NORM_PROTOCOL.md,
-  TRACE_PROTOCOL.md, CONIC_PROTOCOL.md, FIBRE_CONIC_PROTOCOL.md, SIX_PROTOCOL.md.
+  TRACE_PROTOCOL.md, CONIC_PROTOCOL.md, FIBRE_CONIC_PROTOCOL.md, SIX_PROTOCOL.md,
+  PARTIAL_PROTOCOL.md and GRAPH_PROTOCOL.md.
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
-  run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh.
+  run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
+  run-audit-partial.sh and run-graph.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.
@@ -176,4 +228,4 @@ needs actual cover/KM and separate elliptic/elimination replay.
 Canonical graph scope: parent map flow is unchanged because no map changed.
 The index-calculus scoreboard and progress timeline receive no speed or
 PCC promotion: this is producer evidence of finite closure nulls. The new
-study-local rank graph records both finite domains, including the nulls.
+study-local rank graph records the completed finite domains,including nulls.

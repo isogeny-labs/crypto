@@ -47,9 +47,13 @@ attempts = {
     'trace-v2': 'Both domains passed at targets0,kappa,2kappa. Only the formal zero row at0; no quartet at2kappa. Closed rank6 in both modes; gain0.',
     'conics-v1': 'All64pencils completed on652points:41632candidate occurrences;21supported conics, exactly known line products; full108, auxiliary102, closed6, gain0. Repeated-line multiplicity control passed.',
     'fibre-conics-v1': 'Input-copy wrapper failed before any build or mathematical worker: a stray mode argument was passed to cp. Partial snapshot and full stderr retained.',
+    'partial-v1': 'All212843distinct pair/tangent lines checked:212836at old support degree2,seven at degree4,none at degree3. No old flex. Hidden-support extraction and corruption controls pass;closed rank6.',
+    'partial-audit-v1': 'Separate GMP prime-field arithmetic reproduces every ordered pair-line key,tangent contact and retained support. Geometry controls pass;closed rank6. This stage does not re-prove the parent elliptic map.',
+    'graph-v1': 'Complete rational two-residual graph:106421new partial edges;106319rows peeled;102two-row core components. Full/auxiliary/closed ranks106427/106421/6,gain0. Eight graph fixtures match dense ranks;two invalid singleton witnesses reject.',
 }
 
-selected = set(sys.argv[1:])
+figure_only = '--figure-only' in sys.argv[1:]
+selected = set(sys.argv[1:]) - {'--figure-only'}
 six_result = ROOT/'evidence/six-v1/calls/full/stdout.json'
 six_exit = six_result.parent/'exit-code.txt'
 if six_exit.exists() and six_exit.read_text().strip() == '0':
@@ -72,6 +76,8 @@ if fibre_exit.exists() and fibre_exit.read_text().strip() == '0':
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
+    if figure_only:
+        continue
     if selected and name not in selected:
         continue
     raw = ROOT/'evidence'/name
@@ -146,23 +152,40 @@ cases = [('Norm225',old),('Norm429',aug)]
 for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Conic64','conics-v1/calls/collect'),
                         ('Fibre conics','fibre-conics-v2/calls/collect'),
-                        ('Six225','six-v1/calls/full')]:
+                        ('Six225','six-v1/calls/full'),
+                        ('Partial','partial-v1/calls/collect'),
+                        ('Residual graph','graph-v1/calls/collect')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
         cases.append((label,json.loads(source.read_text())))
 data = {label:{k:record[k] for k in metrics} for label,record in cases}
 (ROOT/'rank-values.json').write_text(json.dumps(data, indent=2)+'\n')
-fig, axis = plt.subplots(figsize=(7.2, 3), layout='constrained')
-for position, key in enumerate(metrics):
-    x = [i+position*0.25 for i in range(len(cases))]
-    bars = axis.bar(x, [record[key] for _,record in cases], width=0.22, label=key.replace('_',' '))
-    axis.bar_label(bars, padding=2, fontsize=7 if len(cases)>4 else 10)
-axis.set_xticks([i+0.25 for i in range(len(cases))], [label for label,_ in cases])
-axis.tick_params(axis='x', labelsize=9)
-axis.set_ylabel('Recorded rank over subgroup field')
-axis.set_ylim(0,132)
-axis.legend(loc='upper left',bbox_to_anchor=(0,1.18),ncol=3,fontsize=9)
+fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(8.5,4.5),sharex=True,
+                                     gridspec_kw={'height_ratios':[2,1]},layout='constrained')
+for position, key in enumerate(metrics[:2]):
+    x = [i+(position-.5)*.36 for i in range(len(cases))]
+    values=[record[key] for _,record in cases]
+    bars=axis.bar(x,values,width=.33,label=key.replace('_',' '))
+    axis.bar_label(bars,labels=[str(v) if 0<v<1000 else '' for v in values],padding=2,fontsize=6.5)
+    for at,value in zip(x,values):
+        if not value:
+            axis.text(at,.9,'0',ha='center',va='bottom',fontsize=7)
+        elif value>=1000:
+            axis.annotate(f'{value:,}',(at,value),xytext=(-2 if position==0 else 2,2),
+                          textcoords='offset points',ha='right' if position==0 else 'left',
+                          va='bottom',fontsize=6.5)
+axis.set_yscale('log')
+axis.set_ylim(.7,max(record['full_rank'] for _,record in cases)*8)
+axis.set_ylabel('Full / auxiliary rank (log scale)')
+axis.legend(loc='upper left',bbox_to_anchor=(0,1.25),ncol=2,fontsize=9)
+closed_values=[record['closed_rank'] for _,record in cases]
+bars=closed_axis.bar(range(len(cases)),closed_values,width=.55,color='#54856d')
+closed_axis.bar_label(bars,padding=2,fontsize=8)
+closed_axis.set_ylim(0,max(closed_values)*1.5)
+closed_axis.set_ylabel('Closed rank')
+closed_axis.set_xticks(range(len(cases)),[label for label,_ in cases])
+closed_axis.tick_params(axis='x',labelsize=8)
 for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
