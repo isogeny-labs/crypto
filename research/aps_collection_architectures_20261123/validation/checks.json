@@ -1,0 +1,56 @@
+{
+  "schema": "aps.architecture-checks/v1",
+  "source": "e791ac91f7535cdc7bcd2c0ee09aa3c1af523621",
+  "producer_standing": "unverified",
+  "root_library_run": false,
+  "production_aps_f4": false,
+  "performance": false,
+  "tests": [
+    {
+      "toolchain": "1.98.0",
+      "library": 10,
+      "cli": 2,
+      "failed": 0,
+      "exit": 0
+    },
+    {
+      "toolchain": "1.99.1",
+      "library": 10,
+      "cli": 2,
+      "failed": 0,
+      "exit": 0
+    }
+  ],
+  "lint": [
+    {
+      "toolchain": "1.98.0",
+      "clippy_strict_exit": 0,
+      "format_exit": 0
+    },
+    {
+      "toolchain": "1.99.1",
+      "clippy_strict_exit": 0,
+      "format_exit": 0
+    }
+  ],
+  "earlier_failures": [
+    {
+      "kind": "library",
+      "passed": 9,
+      "failed": 1,
+      "exit": 101,
+      "reason": "missing intentional duplicate coverage before explicit paired-draw schedule"
+    },
+    {
+      "kind": "clippy",
+      "exit": 101,
+      "reason": "index-only scalar-row loop"
+    },
+    {
+      "kind": "pcc_path_lookup",
+      "exit": 3,
+      "reason": "relative claim path resolved from different cwd; ID lookup classified not_covered exit2"
+    }
+  ],
+  "raw_logs_published": false
+}

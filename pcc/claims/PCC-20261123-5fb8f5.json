@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:07:16Z",
+ "id": "PCC-20261123-5fb8f5",
+ "kind": "statement",
+ "producer": {
+  "commit": "e791ac91f7535cdc7bcd2c0ee09aa3c1af523621",
+  "model": "codex",
+  "session": "aps-collection-architectures-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_collection_architectures_20261123/validation/checks.json",
+    "sha256": "911f5fe2177e71bb38b0c4ee0fdc28700e9786bc7bf29b08b9ec06a06170066b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "tools/aps-collection-architectures",
+ "statement": "The source-pinned standalone architecture package passed 10 library and 2 CLI tests on Rust1.98.0 and1.99.1, strict lint and format on both. These are producer software checks, not a current-root full-suite pass or independent scientific validation. Earlier development failures are retained in the scoped check receipt."
+}

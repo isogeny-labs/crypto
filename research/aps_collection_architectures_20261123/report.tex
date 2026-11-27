@@ -1,0 +1,93 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{booktabs,tabularx,hyperref,amsmath}
+\hypersetup{hidelinks}
+\title{Four relation-collection architectures: bounded native qualification}
+\author{APS research implementation packet}
+\date{23 November 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Standing: unsigned producer assertion, not\_covered.}
+Claim PCC-20261123-4a854c. Four arms completed; deterministic repeat bytes
+agree. No timing, full-cost, scaling, exponent or production APS/F4 result.
+
+\section*{Implemented constructions}
+One- and two-large-point partials use exact affine keys and the existing
+signed symbolic graph. Every candidate row is checked on the source curve
+before insertion. Full constraints, unmatched attempts and dependent rows
+are retained. Separate target columns support coupled recovery with dense
+scalar elimination and original-curve checks.
+
+Four-point recursive decomposition builds every pair support, joins exact
+complements and retains complete increasing-index witnesses. Cold and shared
+queries are checked against exhaustive four-loop enumeration. This is standard
+meet-in-the-middle; construction is not free.
+
+Four partition rules are scored on pilot targets only. The rule is then frozen,
+pilot overlap refused, and fresh targets compared to a fixed-index rule.
+Complete roots, admitted roots and zero-denominator relations remain visible.
+The objective is pilot tuple volume per informative relation, not an unmeasured
+Gr\"obner-basis cost prediction.
+
+\section*{Fixed public fixtures and outcomes}
+$E_{17}:y^2=x^3+2x+2$, $P=(5,1)$, order19; and
+$E_{101}:y^2=x^3+59x+6$, $P=(78,4)$, order107.
+Targets have disclosed check scalars7,11,16. These are tiny known-answer
+controls, not unknown-log beacon targets.
+
+\begin{center}\begin{tabularx}{\linewidth}{lXX}\toprule
+Route & F17 & F101\\\midrule
+One large point & 164 matches/512 draws &32/512\\
+Two large points &162/512 &28/512\\
+Coupled targets & Both routes return7,11,16 &Both routes return7,11,16\\
+Recursive tuple sets &5,7,2; all three routes agree &5,7,2; all three routes agree\\
+Fresh useful relations &Selected1,0,1; fixed1,0,1 &Selected0,0,1; fixed0,0,1\\\bottomrule
+\end{tabularx}\end{center}
+
+Partial draws deliberately repeat in pairs; these are not independent samples.
+F17 selected x modulo four; F101 had zero useful pilot outcomes and explicitly
+fell back to the fixed rule. There is no observed fresh-target yield gain.
+Shared pair setup has28 entries and is reported once per batch; cold rows
+rebuild it for each target.
+
+\section*{Checks and limits}
+Final source passed 10 library plus 2 CLI tests on Rust 1.98.0 and 1.99.1, strict
+Clippy and formatting on both. The transport-only control retains four
+intentional errors and makes no scientific call. A pinned release build and
+dedicated qualifier exited zero; complete report bytes repeat identically.
+Original failed development boundaries remain in the packet's notes.
+
+Selected group API and graph semantic events are retained, but field work,
+scalar elimination, allocations, comparisons, construction and serialization
+are not fully priced. Total cost and memory are unknown. Both the affine
+producer and enumeration share the same group primitive; this is not an
+independent arithmetic audit. Native claim standing remains not\_covered.
+
+\section*{Next implementation and custody}
+Next: production APS partial witnesses; recursive builder/F4 integration;
+common-base multi-target labels; actual elimination-cost features; complete
+phase/memory accounting and independent replay/export. Growing-size experiments
+still require a frozen protocol, power/budget admission and a fresh successful
+source/protocol checkpoint. No benchmark or EKS run was launched.
+
+\noindent Source pin:
+\href{https://github.com/isogeny-labs/crypto/commit/e791ac91f7535cdc7bcd2c0ee09aa3c1af523621}{\texttt{e791ac91f7535cdc7bcd2c0ee09aa3c1af523621}}\par
+\noindent Complete literal output SHA256:\par
+\texttt{abef38e5b14b3635ecfbaad12f840241f4a74a5a5e3ded4adbba9bdb7a601623}\par
+\noindent The repository study includes the literal report, frozen plan,
+source/build custody, pre/post source digests and normalized validation.
+Raw dependency logs, host metadata, shared full logs and native ledger remain
+private. The merge/publication hold is unchanged.
+
+\section*{Sources checked}
+\begin{itemize}
+\item Native signed graph and ordinary affine library at base
+\texttt{015f50a6526b0ca85ad4556dc62fa20900e4723c}.
+\item Gaudry, Th\'eriault and Thom\'e, double large-prime variation, 2005
+preprint, sections2--3. The genus$\geq3$ complexity does not transfer here.
+\url{https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf}
+\item Amadori, Pintore and Sala, prime-field elliptic-curve DLP, sections2--3.
+\url{https://iris.unitn.it/handle/11572/202653}
+\end{itemize}
+KB unavailable; no novelty or best-known-complexity claim.
+\end{document}

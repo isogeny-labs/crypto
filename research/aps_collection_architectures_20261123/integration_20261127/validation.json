@@ -1,0 +1,50 @@
+{
+  "schema": "aps.integration-maintenance/v1",
+  "producer_standing": "unverified",
+  "previous_pr_head": "ea4a60fb09833a5da2035dd9da5dbf41a5e2d1d8",
+  "incoming_main": "c0a238743cf9afed77688a39cc1c33bfc135053f",
+  "merge_base": "015f50a6526b0ca85ad4556dc62fa20900e4723c",
+  "public_main_changed_paths": 12982,
+  "shared_task_paths": [
+    "docs/ACTIVE.md"
+  ],
+  "queue_resolution": "incoming main verbatim plus both task lines from prior PR head; removal of inserted lines exactly reconstructs incoming main",
+  "source_review": {
+    "package_files": 9,
+    "dependency_files": 22,
+    "all_match_public_candidate_git_blobs": true,
+    "task_code_lock_claims_and_frozen_evidence_unchanged": true,
+    "private_ledger_published": false
+  },
+  "checks": [
+    {
+      "command": "cargo +1.98.0 test --release --locked --offline --manifest-path tools/aps-collection-architectures/Cargo.toml",
+      "exit": 0,
+      "library_passed": 10,
+      "cli_passed": 2
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked --offline --manifest-path tools/aps-collection-architectures/Cargo.toml",
+      "exit": 0,
+      "library_passed": 10,
+      "cli_passed": 2
+    },
+    {
+      "command": "cargo +1.98.0 clippy --release --locked --offline --manifest-path tools/aps-collection-architectures/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0
+    }
+  ],
+  "historical_regression_fixtures_preserved": {
+    "coordinate_fields": [
+      17,
+      101
+    ],
+    "new_M31_evidence": false,
+    "new_research_experiment": false
+  },
+  "new_head_hosted_checks": "pending; old head checks do not transfer",
+  "full_root_library_run": false,
+  "performance_or_scaling_run": false,
+  "seed_policy": "no new randomized experiment; historical deterministic regressions unchanged, no fabricated seed provenance",
+  "limits": "same complete package and dependency input bytes validated; no signed independence, complete-cost result or current-root full-suite pass"
+}
