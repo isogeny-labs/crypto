@@ -185,8 +185,9 @@ strongest source guard to the final real-valued class cap without a caller-
 supplied label or minimizer family. `PackingLabelArtifact.lean` now parses a
 shared flat projection of the admitted three-edge schema-3 native control,
 checks its exact lengths and endpoint/label bounds, proves its typed endpoints
-are the serialized indices, and replays the complete nontrivial native trace:
-rows `[0,1,0]`, then columns `[0,0,1]`.
+and typed labels are their exact serialized natural values rather than modulo
+representatives, and replays the complete nontrivial native trace: rows
+`[0,1,0]`, then columns `[0,0,1]`.
 `parseReplayedPackingLabelArtifact_classCap` rewrites every accepted artifact's
 serialized label arrays to that executable schedule and feeds them directly
 into the strongest source-guard class-cap theorem. The remaining boundary is

@@ -57,6 +57,8 @@ open Curve25519ExtensionRingModel
 #print axioms parsePackingLabelArtifact_bounded
 #print axioms parsePackingLabelArtifact_leftEndpoint_val
 #print axioms parsePackingLabelArtifact_rightEndpoint_val
+#print axioms parsePackingLabelArtifact_rowLabel_val
+#print axioms parsePackingLabelArtifact_columnLabel_val
 #print axioms parseReplayedPackingLabelArtifact_labelCount_pos
 #print axioms parseReplayedPackingLabelArtifact_rowCount_pos
 #print axioms parseReplayedPackingLabelArtifact_columnCount_pos

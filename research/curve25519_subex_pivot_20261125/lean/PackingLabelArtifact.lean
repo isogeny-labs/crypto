@@ -200,6 +200,56 @@ theorem parsePackingLabelArtifact_rightEndpoint_val
   have hright := (hbounded.1.1 edge.val (by simp)).2
   simp [PackingLabelArtifact.rightEndpoint, Nat.mod_eq_of_lt hright]
 
+/-- A parsed typed row label is the exact serialized natural value, not merely
+its reduction modulo the label count. -/
+theorem parsePackingLabelArtifact_rowLabel_val
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact)
+    (hlabels : 0 < artifact.labelCount) (row : Fin artifact.rowCount) :
+    (artifact.rowLabel hlabels row).val =
+      artifact.rowLabels.getD row.val 0 := by
+  have hwell := parsePackingLabelArtifact_wellFormed hparse
+  simp only [PackingLabelArtifact.wellFormed, Bool.and_eq_true,
+    beq_iff_eq] at hwell
+  have hrowLength : artifact.rowLabels.length = artifact.rowCount :=
+    hwell.1.2
+  have hindex : row.val < artifact.rowLabels.length := by
+    simpa only [hrowLength] using row.isLt
+  have hbounded := parsePackingLabelArtifact_bounded hparse
+  simp only [PackingLabelArtifact.bounded, Bool.and_eq_true,
+    List.all_eq_true, decide_eq_true_eq] at hbounded
+  have hlabel := hbounded.1.2
+    artifact.rowLabels[row.val]
+    (List.mem_of_getElem rfl)
+  rw [List.getD_eq_getElem artifact.rowLabels 0 hindex]
+  simp [PackingLabelArtifact.rowLabel, hindex, Nat.mod_eq_of_lt hlabel]
+
+/-- A parsed typed column label is the exact serialized natural value, not
+merely its reduction modulo the label count. -/
+theorem parsePackingLabelArtifact_columnLabel_val
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact)
+    (hlabels : 0 < artifact.labelCount) (column : Fin artifact.columnCount) :
+    (artifact.columnLabel hlabels column).val =
+      artifact.columnLabels.getD column.val 0 := by
+  have hwell := parsePackingLabelArtifact_wellFormed hparse
+  simp only [PackingLabelArtifact.wellFormed, Bool.and_eq_true,
+    beq_iff_eq] at hwell
+  have hcolumnLength :
+      artifact.columnLabels.length = artifact.columnCount :=
+    hwell.2
+  have hindex : column.val < artifact.columnLabels.length := by
+    simpa only [hcolumnLength] using column.isLt
+  have hbounded := parsePackingLabelArtifact_bounded hparse
+  simp only [PackingLabelArtifact.bounded, Bool.and_eq_true,
+    List.all_eq_true, decide_eq_true_eq] at hbounded
+  have hlabel := hbounded.2
+    artifact.columnLabels[column.val]
+    (List.mem_of_getElem rfl)
+  rw [List.getD_eq_getElem artifact.columnLabels 0 hindex]
+  simp [PackingLabelArtifact.columnLabel, hindex,
+    Nat.mod_eq_of_lt hlabel]
+
 /-- Replay the exact executable row-then-column schedule against both native
 label arrays. Positivity is checked before dependent finite types are formed. -/
 def PackingLabelArtifact.traceMatches (artifact : PackingLabelArtifact) : Bool :=
