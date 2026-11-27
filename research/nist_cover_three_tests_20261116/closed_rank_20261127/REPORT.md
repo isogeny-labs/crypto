@@ -806,11 +806,81 @@ See [the frozen protocol](CLOSED_RESIDUAL_PROTOCOL.md),
 [the immutable attempt report](reports/closed-residual-v1/REPORT.pdf) and
 `evidence/closed-residual-v1/` for witnesses, hashes, exits and costs.
 
+## Actual ramification support and the retained exceptional points
+
+The retained pullback differential is
+$f^*\omega_E=L(x,y)\,dx/F_y$. On a smooth plane quartic, adjunction
+identifies a linear canonical section with its line-intersection divisor.
+The exact differential identity therefore identifies
+$\operatorname{Ram}(f)=C\cap\{L=0\}$. The new native run rechecks the small
+identity and global elliptic equation, without repeating the completed
+composition experiment. [pcc:unverified]
+
+![Actual canonical ramification supports, local map checks, image traces and auxiliary elimination. Values copied from ramification-v1; targeted axis classification is separate from the rank calculation.](ramification.pdf)
+
+The complete monic restriction factors with distinct degrees **1,1,2**,
+each with multiplicity one. Its degree is four and its infinity gcd is
+constant, so there are no omitted points at infinity. Each of the four
+geometric points has local order one for $L$ and actual map index two.
+The quadratic component and its image both have Frobenius degree two;
+a fresh conjugate local lift agrees in endpoints, valuations, leading
+coefficients and indices. Traces include every source conjugate. The
+three rational traces sum to $\kappa$ in GMP and the named OpenSSL group.
+The full factors, extension coordinates and local coefficients are in
+`evidence/ramification-v1/calls/full/stdout.json`.
+
+At every ramification support the displayed $Y$ rational function has
+numerator and denominator orders **1/1**. These removable values are
+resolved by the local jets; direct substitution into that fraction would
+miss them. The two rational points over $O$, retained pool indices **0**
+and **226**, instead have map index **one**, $X,Y$ valuations $(-2,-3)$,
+and $L$ order zero. This explicitly checks map ramification rather than
+inferring it from the source coordinate chart.
+
+Let the three signed-canonical trace columns be 685,686,687. None occurs
+among the retained 685 images, even up to sign. The actual principal
+relation from $L/L_H$ is
+
+$$e_{41}-e_{42}-e_{43}+e_{44}+e_{685}-e_{686}+e_{687}=0.$$
+
+All 460 old auxiliary columns remain active. Adding the three new ones
+and this one row changes the actual ranks from **236/230/6** to
+**237/231/6**: the row is independent, and its auxiliary part also adds
+one rank. It supplies no new relation supported entirely on the original
+225 columns. The separate old-unit numerical fixture reaches closed
+seven and fails both group-relation checks; it never enters actual data.
+
+For an involution with axis $L$, a center $V$ must satisfy
+$\nabla F(Q)\cdot V=0$ for every projective point $Q$ of $L$.
+Restricting the three homogeneous polar cubics gives a **4 by 3 matrix
+of rank three**, excluding a center over every extension field. The
+known Fermat reflection and its noncoordinate conjugate pass; an odd
+perturbation has polar rank two but fails exact invariance, showing why
+the necessary linear condition alone is insufficient.
+
+A derived consequence concerns a specific proposed factorization of
+this map. It cannot be a degree-two map to an elliptic curve followed
+by a degree-three isogeny, even over the algebraic closure. Such an
+isogeny is unramified in this characteristic; the double-cover involution
+would fix these four ramification points. The canonical plane embedding
+represents an involution as a projective reflection, and four distinct
+collinear fixed points force its axis to be $L$. The rank-three polar
+certificate excludes precisely that possibility. This does not classify
+all automorphisms, all elliptic quotients, or degree-three-first
+factorizations. This implication is a mathematical interpretation of
+the recorded certificate, not another measured search. [pcc:unverified]
+
+The principal row and local supports are verified components. Further
+closure needs other actual relations connecting the three new traces to
+the frozen base; this single row cannot eliminate them. A positive goal
+result still needs additional closed rank with separate elliptic and
+elimination replay and actual cover/KM validity.
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of43immutable attempt reports retains complete per-call and wrapper
+Each of44immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
@@ -845,6 +915,10 @@ and available source/input/binary hashes; it has no final result manifest.
 Each attempt's stdout, stderr, exits, source/input/binary manifests and costs
 remain under evidence/. The norm source commit is an ancestor; the frozen
 source snapshots and hashes identify the exact executed source.
+
+The ramification-support strict build takes 16.145 seconds, its native worker
+30.713 seconds and complete wrapper 46.908 seconds. These are resource
+receipts from one capped execution, not performance comparisons.
 
 ## Next discriminating work
 
@@ -883,18 +957,15 @@ The degree-five/six same-image successor now completes with no match;
 together with the prior target-$\kappa$ result it covers residue degrees
 one through six for the stated one-point residual pattern.
 
-The next structural step will reuse the actual retained differential
-$f^*\omega_E=L(x,y)\,dx/F_y$. Parent composition verification already
-checks this identity exactly, and `backmap.json` retains its linear $L$.
-Locate the intersection of that canonical line with $C$, classify its
-ramification and branch supports, and use those supports to select a
-cover-specific RR family. If appropriate, test for a compatible
-bielliptic involution with that ramification axis using exact polynomial
-conditions. No ramification factorization, symmetry or quotient is
-established by the present source review. Freeze a protocol before new
-execution; reuse completed differential evidence rather than repeating
-its full composition experiment. Positive old-base rank still requires
-actual support/KM validity and separate elliptic/elimination replay.
+The structural ramification follow-up now completes. The canonical line
+has simple support of degrees 1,1,2, with actual map index two at every
+geometric point. Its three fresh rational traces yield one actual row,
+which leaves closed rank six after full auxiliary elimination. The
+specified-axis reflection is excluded by a rank-three certificate.
+The next useful family must provide additional actual relations coupling
+these trace columns to the old base, or another independently justified
+pole class. Repeating the one principal Ram-H row cannot close that gap.
+Freeze that family before execution and retain the existing caps.
 [pcc:unverified]
 
 ## Sources and reproduction
@@ -924,7 +995,8 @@ actual support/KM validity and separate elliptic/elimination replay.
   [canonical-plus-exceptional six symbols](CANONICAL_SIX_PROTOCOL.md) and
   [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md) and
   [three whole residual traces](THREE_TRACE_PROTOCOL.md) and
-  [same-image closed residuals](CLOSED_RESIDUAL_PROTOCOL.md).
+  [same-image closed residuals](CLOSED_RESIDUAL_PROTOCOL.md) and
+  [actual ramification supports](RAMIFICATION_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -933,7 +1005,7 @@ actual support/KM validity and separate elliptic/elimination replay.
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
   run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
-  run-exceptional-conic-six.sh, run-three-trace-six.sh and run-closed-residual.sh.
+  run-exceptional-conic-six.sh, run-three-trace-six.sh, run-closed-residual.sh and run-ramification.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
@@ -965,3 +1037,7 @@ algebraically. Other parent-map and scoreboard graphs remain unchanged.
 
 The closed-residual diagram copies new native degree-five/six counts and
 identifies the reused low-degree bound; other completed figures remain unchanged.
+
+The ramification diagram and its editable values copy the new native support,
+local-index and trace/rank records. Other parent-map and scoreboard graphs
+remain unchanged.

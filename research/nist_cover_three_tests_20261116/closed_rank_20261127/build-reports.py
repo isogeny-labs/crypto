@@ -351,6 +351,21 @@ if (closed_residual_source.parent/'exit-code.txt').exists() and (closed_residual
         "from actual data. Brute small-domain comparisons and all query/row/missing-data "
         "corruptions pass. Combining the earlier kappa bound covers residue degrees "
         "one through six for this one same-image residual pattern in the fixed domain.")
+ramification_source=ROOT/'evidence/ramification-v1/calls/full/stdout.json'
+if (ramification_source.parent/'exit-code.txt').exists() and (ramification_source.parent/'exit-code.txt').read_text().strip()=='0':
+    ramification=json.loads(ramification_source.read_text())
+    attempts['ramification-v1']=(
+        "Actual differential ramification support: complete monic factorization has source "
+        f"degrees {[b['source_degree'] for b in ramification['branches']]} with all multiplicities one "
+        "and map indices two. All source-conjugate traces and the fresh quadratic-conjugate "
+        "local lift pass. No infinity support; the two retained rational O-preimages have "
+        "map index one. Actual polar rank three excludes a reflection with this specified "
+        "axis; positive/conjugated/odd-perturbation fixtures and all corruption controls pass. "
+        f"Ram-H is one independent actual row requiring {ramification['new_auxiliary_columns']} "
+        f"fresh trace auxiliaries: direct ranks {ramification['full_rank']}/"
+        f"{ramification['auxiliary_rank']}/{ramification['closed_rank']}. All 460 old auxiliaries "
+        "remain active. The isolated numerical old-unit fixture reaches closed seven and "
+        "fails the actual group-relation checks. No earlier enumeration rerun.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -511,6 +526,23 @@ if 'closed_residual' in globals():
     for suffix in ('svg','pdf'):
         subprocess.run(['dot','-T'+suffix,'closed-residual.dot','-o','closed-residual.'+suffix],cwd=ROOT,check=True)
 
+if 'ramification' in globals():
+    (ROOT/'ramification-values.json').write_text(json.dumps({
+        'source':'evidence/ramification-v1/calls/full/stdout.json',
+        'native':ramification,
+        'interpretation':'Ramification line support and actual principal Ram-H row; only specified-axis involution tested'},indent=2)+'\n')
+    dot=('digraph G {rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];'
+         'a[label="Exact pullback differential\\nRam = C intersect L\\nTotal geometric degree 4"];'
+         'b[label="Two rational points\\nOne quadratic conjugate pair\\nEach local map index 2"];'
+         'c[label="Three rational image traces\\nWeighted sum = kappa\\nAll three need fresh auxiliaries"];'
+         f'd[label="Actual Ram-H row\\nFull {ramification["full_rank"]}; auxiliary {ramification["auxiliary_rank"]}\\nClosed rank {ramification["closed_rank"]}"];'
+         'e[label="4 x 3 restricted polars\\nRank 3: no center\\nOnly this axis classified"];'
+         'f[label="Two retained points over O\\nMap index 1; poles (-2,-3)"];'
+         'a->b;b->c;c->d;a->e;a->f;}')
+    (ROOT/'ramification.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'ramification.dot','-o','ramification.'+suffix],cwd=ROOT,check=True)
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -541,7 +573,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('H+2R six','canonical-six-v1/calls/full'),
                         ('2H-2R six','exceptional-conic-six-v1/calls/full'),
                         ('Three traces','three-trace-six-v1/calls/full'),
-                        ('Closed m5/m6','closed-residual-v1/calls/full')]:
+                        ('Closed m5/m6','closed-residual-v1/calls/full'),
+                        ('Ramification','ramification-v1/calls/full')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -581,7 +614,7 @@ for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *([ROOT/'closed-residual.svg'] if (ROOT/'closed-residual.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *([ROOT/'closed-residual.svg'] if (ROOT/'closed-residual.svg').exists() else []), *([ROOT/'ramification.svg'] if (ROOT/'ramification.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
 
 # Compact only the editable rank SVG; source values and all sealed evidence stay exact.
@@ -594,4 +627,5 @@ s=re.sub(r'(?<![A-Za-z0-9_])(-?\d+\.\d{4,})',
 refs=set(re.findall(r'(?:url\(#|href="#)([^)" ]+)',s))
 s=re.sub(r' id="([^"]+)"',lambda m:m.group() if m[1] in refs else '',s)
 s=re.sub(r'style="([^"]*)"',lambda m:'style="'+re.sub(r'\s*([:;])\s*',r'\1',m[1])+'"',s)
+s=re.sub(r"font-family:'DejaVu Sans'[^;\"]*", "font-family:'DejaVu Sans',sans-serif",s)
 rank_svg.write_text(s.rstrip()+'\n')
