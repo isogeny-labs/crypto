@@ -506,9 +506,13 @@ geometric inverse used by the scalar mode series. The stronger Rust-shaped
 specialization keeps the finite-series remainder, derives the normalized tile
 shift `2^(i+1-v)j`, and proves from `v<=i<=a` that the outer
 `2^(a+1-v)` shift makes the `b=p-1` remainder zero in every coefficient ring
-where `2^p=0`. The remaining gap is the code-to-model link from concrete Rust
-Cauchy modes and child objects to these generic inputs, rather than the finite
-rearrangement, shift, cutoff, or geometric-series algebra itself.
+where `2^p=0`. It now additionally regroups row choices by their complete
+bounded mode-exponent vector, proves the exact `2M` endpoint mass of
+the row/column group fibers, and instantiates Fubini for complete packet/group
+Boolean entry tables and opaque retained-old-tensor terms. The remaining gap
+is the code-to-model link from concrete Rust Cauchy modes and child arrays to
+these typed inputs, rather than the finite rearrangement, child-interface,
+shift, cutoff, or geometric-series algebra itself.
 `[pcc:unverified]`
 
 The scalar half of that link now has a typed native witness. The standalone

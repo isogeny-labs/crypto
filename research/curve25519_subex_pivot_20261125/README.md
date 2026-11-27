@@ -439,14 +439,17 @@ every admitted coordinate and composes the existing finite precision-history
 theorem with uniform absorption to obtain `pu<=34MD` from explicit path facts;
 it also checks the generic packet row expansion, mode-fiber regrouping,
 group-assignment Fubini identity, 2-adic weight product, and high-weight
-truncation used in C1, together with the nilpotent truncated geometric inverse
-behind the scalar mode expansion. The scalar proof now retains the exact
+truncation used in C1. The typed child specialization groups row choices by
+their complete mode-exponent vector, proves exact `2M` endpoint mass, and
+factors complete packet/group Boolean tables with opaque retained-old-tensor
+terms. The replay also checks the nilpotent truncated geometric inverse behind
+the scalar mode expansion. The scalar proof now retains the exact
 geometric remainder, derives the normalized tile shift `2^(i+1-v)j`, and proves
 that Rust's outer `2^(a+1-v)` factor kills the first omitted coefficient under
 the source guard `v<=i<=a`. Its axiom audits contain only Lean/mathlib's
 standard `propext`, `Classical.choice`, and `Quot.sound`. Native graph and
-history bindings, finite factorization realization, a formal refinement from
-concrete Rust objects to these values, and the remaining external theorem
+history bindings, a formal refinement from concrete Rust scalar/mode/child
+objects to these typed values, and the remaining external theorem
 refinements are not discharged by this replay.
 `[pcc:unverified]`
 

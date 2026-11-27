@@ -50,7 +50,10 @@ open Curve25519GroupFactorization
 #print axioms class_cap_for_minimum_labels
 #print axioms row_choice_expansion
 #print axioms packet_row_choice_expansion
+#print axioms packet_row_choice_expansion_by_exponent
 #print axioms partitioned_assignment_factorization
+#print axioms complete_group_child_incidence_count
+#print axioms complete_child_family_factorization
 #print axioms sum_regroup_by_fibers
 #print axioms product_pow_two_weight
 #print axioms pow_two_multiple_vanishes

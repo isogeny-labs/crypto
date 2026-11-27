@@ -56,6 +56,16 @@ theorem packet_row_choice_expansion
   congr with row
   simp [packetRowFactor]
 
+/-- The exponent of one mode in a row-choice function. The `Fin` bound records
+that no mode can be selected more often than there are packet rows. -/
+def selectionExponent
+    {Row Mode : Type*} [Fintype Row] [DecidableEq Row] [DecidableEq Mode]
+    (selection : Row → Option Mode) (mode : Mode) :
+    Fin (Fintype.card Row + 1) :=
+  ⟨(Finset.univ.filter fun row ↦ selection row = some mode).card,
+    lt_of_le_of_lt (Finset.card_le_univ _)
+      (Nat.lt_succ_self (Fintype.card Row))⟩
+
 /-- A global Boolean incidence assignment is equivalent to one independent
 assignment on every group fiber. -/
 def assignmentByGroupEquiv
@@ -88,6 +98,87 @@ theorem partitioned_assignment_factorization
   rw [Fintype.prod_sum]
   exact Fintype.sum_equiv (assignmentByGroupEquiv group) _ _ (fun _ ↦ rfl)
 
+/-- One endpoint incidence for each side of every parent edge. `false` selects
+the row endpoint and `true` selects the column endpoint. -/
+abbrev EndpointIncidence (Edge : Type*) := Edge × Bool
+
+/-- Assign every parent endpoint incidence to its independently certified
+row or column group. -/
+def endpointGroup
+    {Edge Group : Type*}
+    (rowGroup columnGroup : Edge → Group) : EndpointIncidence Edge → Group
+  | (edge, false) => rowGroup edge
+  | (edge, true) => columnGroup edge
+
+/-- Exact endpoint mass across the complete group-child family: every parent
+edge occurs once through its row endpoint and once through its column endpoint,
+independently of how those endpoints are partitioned into groups. -/
+theorem complete_group_child_incidence_count
+    {Edge Group : Type*} [Fintype Edge] [Fintype Group] [DecidableEq Group]
+    (rowGroup columnGroup : Edge → Group) :
+    (∑ target, Fintype.card
+      {incidence : EndpointIncidence Edge //
+        endpointGroup rowGroup columnGroup incidence = target}) =
+      2 * Fintype.card Edge := by
+  have hfiber := Fintype.sum_fiberwise
+    (endpointGroup rowGroup columnGroup)
+    (fun _ : EndpointIncidence Edge ↦ 1)
+  simpa [Fintype.card_prod, Fintype.card_bool, Nat.mul_comm] using hfiber
+
+/-- Restrict one group-child assignment to the incidences owned by a single
+packet. This is the typed counterpart of the packet-table mask assembled by
+the standalone verifier. -/
+def restrictPacketAssignment
+    {Incidence Group Packet : Type*}
+    (group : Incidence → Group) (packet : Incidence → Packet)
+    (target : Group) (selectedPacket : Packet)
+    (assignment : {incidence // group incidence = target} → Bool) :
+    {incidence // group incidence = target ∧ packet incidence = selectedPacket} → Bool :=
+  fun incidence ↦ assignment ⟨incidence.1, incidence.2.1⟩
+
+/-- Semantic value of one complete certified child: the retained old tensors
+see the full group fiber, while each packet tensor sees exactly its ordered
+packet/group subfiber. -/
+def groupChildTerm
+    {Incidence Group Packet R : Type*}
+    [Fintype Packet] [CommSemiring R]
+    (group : Incidence → Group) (packet : Incidence → Packet)
+    (oldTerm : ∀ target : Group,
+      ({incidence // group incidence = target} → Bool) → R)
+    (packetEntry : ∀ (target : Group) (selectedPacket : Packet),
+      ({incidence // group incidence = target ∧
+        packet incidence = selectedPacket} → Bool) → R)
+    (target : Group)
+    (assignment : {incidence // group incidence = target} → Bool) : R :=
+  oldTerm target assignment *
+    ∏ selectedPacket,
+      packetEntry target selectedPacket
+        (restrictPacketAssignment group packet target selectedPacket assignment)
+
+/-- Instantiation of finite Fubini for the exact child interface checked by
+the native certificates: a complete group fiber of old tensors and one total
+Boolean entry table for every packet/group subfiber. -/
+theorem complete_child_family_factorization
+    {Incidence Group Packet R : Type*}
+    [Fintype Incidence] [DecidableEq Incidence]
+    [Fintype Group] [DecidableEq Group]
+    [Fintype Packet] [CommSemiring R]
+    (group : Incidence → Group) (packet : Incidence → Packet)
+    (oldTerm : ∀ target : Group,
+      ({incidence // group incidence = target} → Bool) → R)
+    (packetEntry : ∀ (target : Group) (selectedPacket : Packet),
+      ({incidence // group incidence = target ∧
+        packet incidence = selectedPacket} → Bool) → R) :
+    (∑ assignment : Incidence → Bool,
+        ∏ target,
+          groupChildTerm group packet oldTerm packetEntry target
+            (fun incidence ↦ assignment incidence.1)) =
+      ∏ target,
+        ∑ assignment,
+          groupChildTerm group packet oldTerm packetEntry target assignment := by
+  exact partitioned_assignment_factorization group
+    (groupChildTerm group packet oldTerm packetEntry)
+
 /-- Any finite sum can be regrouped by the fibers of a finite key map. Applied
 to row choices, the key is the resulting mode-exponent vector. -/
 theorem sum_regroup_by_fibers
@@ -101,6 +192,27 @@ theorem sum_regroup_by_fibers
   apply Finset.sum_congr rfl
   intro source _
   simp
+
+/-- The packet row expansion can be regrouped by the complete vector of mode
+multiplicities. This is the finite partition used by the native packet-entry
+verifier when it extracts one requested exponent vector. -/
+theorem packet_row_choice_expansion_by_exponent
+    {Row Mode R : Type*}
+    [Fintype Row] [DecidableEq Row] [Fintype Mode] [DecidableEq Mode]
+    [CommSemiring R]
+    (localTerm : Row → R)
+    (coefficient : Row → Mode → R)
+    (sourceForm : Mode → R) :
+    (∏ row, (localTerm row + ∑ mode, coefficient row mode * sourceForm mode)) =
+      ∑ beta : Mode → Fin (Fintype.card Row + 1),
+        ∑ selection : Row → Option Mode,
+          if selectionExponent selection = beta then
+            ∏ row, packetRowFactor localTerm coefficient sourceForm row (selection row)
+          else 0 := by
+  rw [packet_row_choice_expansion]
+  exact sum_regroup_by_fibers selectionExponent
+    (fun selection ↦
+      ∏ row, packetRowFactor localTerm coefficient sourceForm row (selection row))
 
 /-- Multiplying terms with known powers of two adds their weights exactly. -/
 theorem product_pow_two_weight

@@ -161,10 +161,15 @@ ratio is already nilpotent, it retains the next-power geometric remainder and
 proves that Rust's outer `2^(a+1-v)` shift kills that remainder when
 `v<=i<=a` and the coefficient ring satisfies `2^p=0`. Thus the exact
 `b=0..p-2` coefficient shape and cutoff used by `mode_coefficient` are
-kernel-checked. These theorems still do not identify a concrete Rust factor or
-inverse with the formal ring values, identify every Rust mode with an
-algebraic coefficient, or show that constructed child objects supply the
-required group-local functions. `[pcc:unverified]`
+kernel-checked. The formal packet bridge now also groups row choices by their
+complete bounded mode-exponent vector, proves that the row/column group fibers
+contain exactly `2M` endpoint incidences, and specializes finite Fubini to the
+certified child interface: one opaque old-tensor term on the complete group
+fiber and one total Boolean entry table on every packet/group subfiber. These
+theorems still do not identify a concrete Rust factor or inverse with the
+formal ring values, identify every Rust mode with an algebraic coefficient,
+or refine the accepted Rust child arrays into those typed group-local
+functions. `[pcc:unverified]`
 
 The native `CauchySourceWitness` narrows the first of those interfaces. It
 serializes the production base, numerator unit, and complete stored factor map.
@@ -175,8 +180,8 @@ types, but not `deformation`, packing, child construction, or recursion. This
 binds the concrete native values to the displayed scalar formulas. Composing
 the separately accepted packet-pair provenance now also reconstructs the full
 mode list in packet/tile/weight order and checks every source zero-suppression.
-A Lean refinement from the accepted witness and the all-child object mapping
-remain open. `[pcc:unverified]`
+A Lean refinement from the accepted witness and a concrete all-child
+Rust-to-typed-function mapping remain open. `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
@@ -187,7 +192,7 @@ separate semantic premise, covered by its own native mutation controls.
 This closes the abstract finite rearrangement skeleton of C1 items 1–3. What
 remains is an independent or kernel-checked refinement showing that every
 relevant Rust object and loop implements its inputs, plus the scalar mode
-and child object binding and separate interpolation, Hermite, and
+and concrete child-object binding and separate interpolation, Hermite, and
 creation-precision refinements.
 `[pcc:unverified]`
 
