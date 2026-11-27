@@ -37,10 +37,22 @@ against `x` survived Holm correction. The useful differences are therefore
 algebraic class, invariance, and exact extraction cost—not demonstrated
 relation-yield superiority.
 
-The chart pass emitted and verified 43 rows: 33 maintained EFD catalogue
-charts and 10 synthetic affine conversion/oracle baselines. See
+The chart pass emitted 43 rows that passed the registered checks: 33 maintained
+EFD catalogue charts and 10 synthetic affine conversion/oracle baselines. See
 [REPORT.md](REPORT.md), the printable [REPORT.pdf](REPORT.pdf), and the JSON
 artifacts under `artifacts/`.
+
+## Follow-on lead
+
+[LEAD-CKM19-NATIVE-PARITY.md](LEAD-CKM19-NATIVE-PARITY.md) opens a separate
+`open_next_step` experiment from Cheng--Kodera--Miyaji's 2019 observation that
+the fixed-target native twisted-Edwards system has unified total-degree parity.
+It freezes the comparison to native Edwards `y`, Montgomery `x`, and
+short-Weierstrass `x`; direct and symmetric `m=3,4` systems; an
+identical-system ordering control; complete relation/rank/recovery accounting;
+and matched `rho.negation` over three increasing rungs. Missing terms or an
+isolated solver win do not pass its greater-than-10% complete-cost gate. No
+lead experiment has been run.
 
 ## Instrument
 
@@ -97,6 +109,10 @@ decision vocabulary.
   `research/ecgfp5_representation_audit_20261102/README.md`.
 - FGHR 2014 and FHJRV 2014 as identified in that audit for Edwards/Jacobi and
   two-torsion-aware summation representations.
+- Cheng, Kodera and Miyaji, “Differences among Summation Polynomials over
+  Various Forms of Elliptic Curves,” IEICE Transactions on Fundamentals
+  E102-A(9), 1061--1071 (2019), DOI 10.1587/transfun.E102.A.1061; official
+  metadata plus user-supplied screenshots of the substantive pages.
 
 The shared research-KB MCP and CLI wrapper were unavailable in this runtime.
 The lead-atlas/repository read is a bounded fallback; no priority or absence
