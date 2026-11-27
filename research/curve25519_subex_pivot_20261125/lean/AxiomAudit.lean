@@ -106,6 +106,7 @@ open Curve25519ExtensionRingModel
 #print axioms degreeFourWitnessRecordValues
 #print axioms degreeFourPolynomialBits
 #print axioms degreeFourDenseNativeProduct
+#print axioms degreeFourWitnessRecord_decodes_mul
 #print axioms decodePowerBasis_mul_eq_mk
 #print axioms decodePowerBasis_mul_eq_reduced_mk
 #print axioms nativeExtension_pow_two_zero

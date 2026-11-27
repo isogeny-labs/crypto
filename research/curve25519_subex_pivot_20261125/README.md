@@ -495,8 +495,11 @@ the formal multiplication named lower-bit, left, right, and product fields
 instead of positional offsets. Lean kernel-checks the exact parsed record,
 proves that its lower bits `[1,1,0,0]` give monic degree-four packing `19`
 (`U^4+U+1`), and evaluates the audited source-shaped transition equations to
-`[1,1,1,1]^2=[30,29,0,3]` in precision five. This removes manual cross-file
-constant transfer for the fixed sample; it does not authenticate arbitrary
+`[1,1,1,1]^2=[30,29,0,3]` in precision five. That equality now composes with
+the universal `decodeNativeProductCoordinates` theorem, proving that the
+record's named product coordinates decode to the quotient-ring product of its
+named left and right coordinates. This removes manual cross-file constant
+transfer for the fixed sample; it does not authenticate arbitrary
 serialized witnesses into Lean or prove Rust compiler refinement.
 `[pcc:unverified]`
 

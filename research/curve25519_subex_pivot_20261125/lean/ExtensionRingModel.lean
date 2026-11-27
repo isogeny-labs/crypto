@@ -1100,6 +1100,19 @@ theorem degreeFourDenseNativeProduct :
       Fin.sum_univ_succ] <;>
     decide
 
+/-- The typed shared record reaches the universal quotient-product theorem:
+its named product coordinates decode as its named left/right product. -/
+theorem degreeFourWitnessRecord_decodes_mul :
+    decodePowerBasis 5 4 degreeFourLowerCoefficient
+        degreeFourDenseProductCoordinates =
+      decodePowerBasis 5 4 degreeFourLowerCoefficient
+          degreeFourDenseLeftCoordinates *
+        decodePowerBasis 5 4 degreeFourLowerCoefficient
+          degreeFourDenseRightCoordinates := by
+  rw [← degreeFourDenseNativeProduct]
+  exact decodeNativeProductCoordinates 5 4 degreeFourLowerCoefficient
+    degreeFourDenseLeftCoordinates degreeFourDenseRightCoordinates (by decide)
+
 /-- Coordinate-polynomial convolution followed by any finite logical reduction
 schedule represents the product of the decoded inputs. -/
 theorem decodePowerBasis_mul_eq_reduced_mk

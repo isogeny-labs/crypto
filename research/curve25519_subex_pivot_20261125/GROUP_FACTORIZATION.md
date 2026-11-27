@@ -225,9 +225,11 @@ reads the same artifact with a transparent kernel-reducible parser, proves that
 its degree-derived vector boundaries are exact in a typed record, proves that
 its lower bits pack to polynomial `19`, and proves that the exact formal
 transition evaluator maps its named left/right vectors to `[30,29,0,3]` at
-precision five. This closes manual cross-file transfer and positional field
-reads for one finite sample, not the remaining mechanized Rust compiler
-refinement or authenticated general witness binding.
+precision five. Composing that result with the universal decoder theorem proves
+that the named product coordinates represent multiplication in the quotient
+ring. This closes manual cross-file transfer and positional field reads for one
+finite sample, not the remaining mechanized Rust compiler refinement or
+authenticated general witness binding.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
