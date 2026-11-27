@@ -3581,7 +3581,7 @@ fn deferred_chunk_rows() -> usize {
             .ok()
             .and_then(|v| v.parse().ok())
             .filter(|&n| (1..=4096).contains(&n))
-            .unwrap_or(128)
+            .unwrap_or(64)
     })
 }
 
@@ -4584,10 +4584,10 @@ fn reduce_pairs_fl(
             deadline,
         );
     }
-    if fl_blocked_pairs()
-        && f4_fp_gemm_env_on()
-        && super::fp_gemm::supports_f64_gemm(fp.p)
-    {
+    // Wide primes: exact-f64 blocked D−C·B' (default on when the prime
+    // admits it).  Independent of F4_FP_GEMM (that flag is for deferred
+    // RREF panels, which still need packing-cost tuning).
+    if fl_blocked_pairs() && super::fp_gemm::supports_f64_gemm(fp.p) && fp.p > 1 << 16 {
         return reduce_pairs_blocked_f64(
             pair_rows,
             &bprime,
@@ -5200,7 +5200,6 @@ fn reduce_pairs_blocked_f64(
                 .map(|a| {
                     a.into_iter()
                         .map(|x| {
-                            // already reduced; cast is exact for residues < 2^32
                             debug_assert!(x >= 0.0 && x < fp.p as f64);
                             x as u32
                         })
