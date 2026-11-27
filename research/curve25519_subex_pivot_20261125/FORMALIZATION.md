@@ -573,20 +573,21 @@ uses its packed polynomial `19`, lower bits
 exact source-shaped evaluation without positional field offsets. The concrete
 evaluation is composed with `decodeNativeProductCoordinates`, so the typed
 record's product coordinates now decode as the quotient-ring product of its
-left and right coordinates. The remaining boundary is a mechanized compiler
-refinement from concrete Rust `Vec<BigUint>` execution to the model and an
-authenticated general serialized-witness-to-Lean binding; the current degree-4
-agreement is one finite shared-artifact sample.
-For arbitrary degree and precision, the typed interface now packages imported
-lists as `Fin degree` functions and proves the same decoded quotient-product
-conclusion conditionally on one explicit product-replay equality. Thus parsing,
-shape, polynomial packing, coordinate canonicality, dependent indexing, and
-universal decoding are generic; connecting native execution to that replay
-equality remains the compiler-refinement obligation. The committed degree-four
-fixture explicitly proves canonical-parser acceptance and its generic
-degree-indexed product-replay equality, then instantiates this arbitrary-degree
-endpoint; its quotient result no longer depends only on a parallel fixed-size
-statement.
+left and right coordinates. The formal layer now also has an executable
+natural-number replay of the exact zero-fast-path convolution, masked updates,
+retained-high reverse reduction, and truncation. Every transition preserves
+representatives below `2^precision`, and the complete replay is proved to cast
+coordinatewise to `nativeProductCoordinates`.
+For arbitrary degree and precision, `parseReplayedRingMultiplicationArtifact`
+packages imported lists as `Fin degree` functions, checks positive degree and
+every recomputed product coordinate, and
+`parsedReplayedRingMultiplicationArtifact_decodes_mul` yields the decoded
+quotient product without an external replay-equality premise. The committed
+degree-four fixture passes that generic executable boundary by kernel
+computation. The remaining boundary is a mechanized compiler refinement from
+concrete Rust `Vec<BigUint>` execution and serialization to this evaluator, plus
+external provenance for supplied records; the Lean-side arbitrary-record
+arithmetic check itself is no longer fixture-specific.
 The same fixture now has a transparent packed-`GF(2)` deterministic-selection
 model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
 loop, and odd candidate order, proves candidate `17` fails and candidate `19`

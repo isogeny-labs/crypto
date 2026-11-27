@@ -497,30 +497,38 @@ every successful parse has all four vector lengths equal to its encoded degree.
 The public canonical importer then recomputes the monic packed polynomial from
 those bits and rejects any left, right, or product coordinate outside
 `[0,2^precision)`. Its own generic theorem proves that every successful import
-satisfies the complete Boolean canonicality predicate. Lean kernel-checks that
-the committed record passes this boundary,
+satisfies the complete Boolean canonicality predicate. A third transparent
+boundary now recomputes the exact zero-fast-path convolution and descending
+reduction over natural representatives, checks every serialized product
+coordinate, and proves that its masked values cast to
+`nativeProductCoordinates`. Lean kernel-checks that the committed record passes
+this replayed boundary,
 proves that its lower bits `[1,1,0,0]` give monic degree-four packing `19`
 (`U^4+U+1`), and evaluates the audited source-shaped transition equations to
 `[1,1,1,1]^2=[30,29,0,3]` in precision five. That equality now composes with
 the universal `decodeNativeProductCoordinates` theorem, proving that the
 record's named product coordinates decode to the quotient-ring product of its
 named left and right coordinates. This removes manual cross-file constant
-transfer for the fixed sample; it does not authenticate arbitrary
-serialized witnesses into Lean or prove Rust compiler refinement.
+transfer for the fixed sample and makes arithmetic replay available to
+arbitrary serialized records; it does not prove that compiled Rust execution
+refines the Lean evaluator or authenticate a record's external provenance.
 `[pcc:unverified]`
 
 The canonical record interface is also no longer fixed to degree four. Generic
 projections turn any imported lists into `Fin artifact.degree` lower-bit and
 left/right/product coordinate functions over `ZMod (2^artifact.precision)`.
-`parsedCanonicalRingMultiplicationArtifact_decodes_mul` proves that a successful
-canonical import reaches quotient multiplication once an independent replay
-supplies the remaining equality between the serialized product and
-`nativeProductCoordinates`. That equality is precisely the compiler/replay
-binding still missing for arbitrary native records. For the committed fixture,
-Lean now separately proves canonical-parser acceptance, discharges that generic
-product-replay equality through the degree-indexed projections, and instantiates
-the arbitrary-degree endpoint. The fixed `Fin 4` theorem is therefore no longer
-the only path from the shared bytes to quotient multiplication.
+The earlier `parsedCanonicalRingMultiplicationArtifact_decodes_mul` theorem
+isolates an explicit product equality. The new executable natural-number
+transition model follows the same masked zero fast paths and reverse reduction,
+maintains canonical representatives after every update, and proves
+coordinatewise casting into `nativeProductCoordinates`.
+`parsedReplayedRingMultiplicationArtifact_decodes_mul` therefore carries every
+successful replayed import directly to quotient multiplication with no external
+equality premise. The committed fixture kernel-checks through that generic
+parser; the fixed `Fin 4` theorem is now only a concrete regression. The
+remaining implementation boundary is a compiler refinement from Rust
+`Vec<BigUint>` execution and its serialized output to this executable Lean
+model.
 `[pcc:unverified]`
 
 The deterministic-polynomial boundary is narrowed both generically and for
@@ -643,12 +651,14 @@ formulas, and the retained target plus all higher slots stay unchanged until
 truncation. The complete reverse fold is now composed: every returned low slot
 equals the logical reduced coefficient, the truncated coordinate polynomial is
 the reduced convolution, and decoding it gives the quotient product. A
-mechanized concrete-`Vec<BigUint>` compiler refinement and an authenticated
-general witness-to-Lean binding still require formal work. Deterministic
-polynomial selection and one accepted multiplication are independently replayed
-by native witnesses, and one committed fixed-sample artifact now supplies its
-exact bits, named coordinates, and transition counts to both Rust and Lean
-through a length-checked formal record.
+computable natural-number version now preserves canonical representatives,
+refines that modular fold, and checks arbitrary imported product coordinates
+before decoding. A mechanized concrete-`Vec<BigUint>` compiler refinement and
+authenticated external record provenance still require formal work.
+Deterministic polynomial selection and one accepted multiplication are
+independently replayed by native witnesses, and one committed fixed-sample
+artifact supplies its exact bits, named coordinates, and transition counts to
+both Rust and Lean through the replay-checked formal record.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

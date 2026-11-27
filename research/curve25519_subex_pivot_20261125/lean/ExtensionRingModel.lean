@@ -1000,6 +1000,290 @@ theorem decodeNativeProductCoordinates
           decodePowerBasis precision degree lowerCoefficient right :=
       (decodePowerBasis_mul_eq_mk precision degree lowerCoefficient left right).symm
 
+/-- A natural-number buffer is canonical and casts to a modular buffer. -/
+def naturalBufferSound (precision : ℕ) (natural : ℕ → ℕ)
+    (modular : ℕ → ZMod (2 ^ precision)) : Prop :=
+  (∀ index, natural index < 2 ^ precision) ∧
+    ∀ index, (natural index : ZMod (2 ^ precision)) = modular index
+
+/-- Executable natural-number form of one masked convolution update. -/
+def naturalConvolutionBufferStep
+    (precision degree : ℕ) (left right : Fin degree → ℕ)
+    (buffer : ℕ → ℕ) (i j : Fin degree) : ℕ → ℕ :=
+  if left i = 0 then buffer
+  else if right j = 0 then buffer
+  else Function.update buffer ((i : ℕ) + (j : ℕ))
+    ((buffer ((i : ℕ) + (j : ℕ)) + left i * right j) %
+      (2 ^ precision))
+
+/-- One executable masked convolution update remains canonical and refines the
+corresponding modular transition. -/
+theorem naturalConvolutionBufferStep_sound
+    (precision degree : ℕ) (left right : Fin degree → ℕ)
+    (buffer : ℕ → ℕ) (i j : Fin degree)
+    (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (naturalConvolutionBufferStep precision degree left right buffer i j)
+      (convolutionBufferStep precision degree
+        (fun index => left index) (fun index => right index) modular i j) := by
+  constructor
+  · intro index
+    by_cases hleft : left i = 0
+    · simpa [naturalConvolutionBufferStep, hleft] using hsound.1 index
+    by_cases hright : right j = 0
+    · simpa [naturalConvolutionBufferStep, hleft, hright] using hsound.1 index
+    by_cases hindex : (i : ℕ) + (j : ℕ) = index
+    · subst index
+      simp [naturalConvolutionBufferStep, hleft, hright]
+      exact Nat.mod_lt _ (by positivity)
+    · have hindex' : index ≠ (i : ℕ) + (j : ℕ) := Ne.symm hindex
+      simpa [naturalConvolutionBufferStep, hleft, hright, Function.update,
+        hindex, hindex'] using hsound.1 index
+  · intro index
+    rw [convolutionBufferStep_apply]
+    by_cases hleft : left i = 0
+    · simp [naturalConvolutionBufferStep, hleft, hsound.2]
+    by_cases hright : right j = 0
+    · simp [naturalConvolutionBufferStep, hleft, hright, hsound.2]
+    by_cases hindex : (i : ℕ) + (j : ℕ) = index
+    · subst index
+      simp [naturalConvolutionBufferStep, hleft, hright, ZMod.natCast_mod,
+        hsound.2]
+    · have hindex' : index ≠ (i : ℕ) + (j : ℕ) := Ne.symm hindex
+      simp [naturalConvolutionBufferStep, hleft, hright, Function.update,
+        hindex, hindex', hsound.2]
+
+private theorem naturalConvolutionBufferRow_sound
+    (precision degree : ℕ) (left right : Fin degree → ℕ)
+    (indices : List (Fin degree)) (i : Fin degree)
+    (buffer : ℕ → ℕ) (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (indices.foldl
+        (naturalConvolutionBufferStep precision degree left right · i ·) buffer)
+      (indices.foldl
+        (convolutionBufferStep precision degree
+          (fun index => left index) (fun index => right index) · i ·) modular) := by
+  induction indices generalizing buffer modular with
+  | nil => exact hsound
+  | cons j indices ih =>
+      simp only [List.foldl_cons]
+      apply ih
+      exact naturalConvolutionBufferStep_sound precision degree left right
+        buffer i j modular hsound
+
+private theorem naturalConvolutionBufferRows_sound
+    (precision degree : ℕ) (left right : Fin degree → ℕ)
+    (indices : List (Fin degree))
+    (buffer : ℕ → ℕ) (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (indices.foldl
+        (fun current i =>
+          (List.finRange degree).foldl
+            (naturalConvolutionBufferStep precision degree left right · i ·)
+            current)
+        buffer)
+      (indices.foldl
+        (fun current i =>
+          (List.finRange degree).foldl
+            (convolutionBufferStep precision degree
+              (fun index => left index) (fun index => right index) · i ·)
+            current)
+        modular) := by
+  induction indices generalizing buffer modular with
+  | nil => exact hsound
+  | cons i indices ih =>
+      simp only [List.foldl_cons]
+      apply ih
+      exact naturalConvolutionBufferRow_sound precision degree left right
+        (List.finRange degree) i buffer modular hsound
+
+/-- Executable natural-number form of the complete masked convolution. -/
+def naturalConvolutionBuffer
+    (precision degree : ℕ) (left right : Fin degree → ℕ) : ℕ → ℕ :=
+  (List.finRange degree).foldl
+    (fun buffer i =>
+      (List.finRange degree).foldl
+        (naturalConvolutionBufferStep precision degree left right · i ·) buffer)
+    0
+
+/-- The complete executable convolution remains canonical and refines the
+proved source-shaped modular convolution. -/
+theorem naturalConvolutionBuffer_sound
+    (precision degree : ℕ) (left right : Fin degree → ℕ) :
+    naturalBufferSound precision
+      (naturalConvolutionBuffer precision degree left right)
+      (convolutionBuffer precision degree
+        (fun index => left index) (fun index => right index)) := by
+  rw [naturalConvolutionBuffer, convolutionBuffer]
+  apply naturalConvolutionBufferRows_sound precision degree left right
+  constructor
+  · intro index
+    simp
+  · intro index
+    simp
+
+private theorem naturalMaskedSub_cast
+    (precision value coefficient : ℕ)
+    (hcoefficient : coefficient < 2 ^ precision) :
+    ((((value + 2 ^ precision - coefficient) % 2 ^ precision : ℕ) :
+        ZMod (2 ^ precision))) =
+      (value : ZMod (2 ^ precision)) - coefficient := by
+  rw [ZMod.natCast_mod]
+  have hle : coefficient ≤ value + 2 ^ precision := by omega
+  rw [Nat.cast_sub hle, Nat.cast_add]
+  simp
+
+/-- Executable natural-number form of one masked lower-bit reduction update. -/
+def naturalReductionBufferStep
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (offset : ℕ) (j : Fin degree) : ℕ → ℕ :=
+  let coefficient := buffer (degree + offset)
+  if coefficient = 0 then buffer
+  else if lowerCoefficient j then
+    Function.update buffer (offset + (j : ℕ))
+      ((buffer (offset + (j : ℕ)) + 2 ^ precision - coefficient) %
+        (2 ^ precision))
+  else buffer
+
+/-- One executable masked reduction update remains canonical and refines the
+corresponding modular transition. -/
+theorem naturalReductionBufferStep_sound
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (offset : ℕ) (j : Fin degree)
+    (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (naturalReductionBufferStep precision degree lowerCoefficient buffer offset j)
+      (nativeReductionBufferStep precision degree lowerCoefficient modular offset j) := by
+  constructor
+  · intro index
+    by_cases hcoefficient : buffer (degree + offset) = 0
+    · simpa [naturalReductionBufferStep, hcoefficient] using hsound.1 index
+    by_cases hbit : lowerCoefficient j
+    · by_cases hindex : offset + (j : ℕ) = index
+      · subst index
+        simp [naturalReductionBufferStep, hcoefficient, hbit]
+        exact Nat.mod_lt _ (by positivity)
+      · have hindex' : index ≠ offset + (j : ℕ) := Ne.symm hindex
+        simpa [naturalReductionBufferStep, hcoefficient, hbit, Function.update,
+          hindex, hindex'] using hsound.1 index
+    · simpa [naturalReductionBufferStep, hcoefficient, hbit] using hsound.1 index
+  · intro index
+    rw [nativeReductionBufferStep_apply]
+    by_cases hcoefficient : buffer (degree + offset) = 0
+    · have hmodular : modular (degree + offset) = 0 := by
+        rw [← hsound.2]
+        simp [hcoefficient]
+      simp [naturalReductionBufferStep, hcoefficient, hmodular, hsound.2]
+    by_cases hbit : lowerCoefficient j
+    · by_cases hindex : offset + (j : ℕ) = index
+      · subst index
+        rw [show naturalReductionBufferStep precision degree lowerCoefficient buffer
+            offset j (offset + (j : ℕ)) =
+              (buffer (offset + (j : ℕ)) + 2 ^ precision -
+                buffer (degree + offset)) % (2 ^ precision) by
+          simp [naturalReductionBufferStep, hcoefficient, hbit]]
+        rw [naturalMaskedSub_cast precision _ _ (hsound.1 (degree + offset)),
+          hsound.2, hsound.2]
+        simp [hbit, sub_eq_add_neg]
+      · have hindex' : index ≠ offset + (j : ℕ) := Ne.symm hindex
+        simp [naturalReductionBufferStep, hcoefficient, hbit,
+          hindex, hindex', hsound.2]
+    · simp [naturalReductionBufferStep, hcoefficient, hbit, hsound.2]
+
+private theorem naturalReductionBufferRow_sound_aux
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (indices : List (Fin degree)) (buffer : ℕ → ℕ) (offset : ℕ)
+    (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (indices.foldl
+        (naturalReductionBufferStep precision degree lowerCoefficient · offset ·)
+        buffer)
+      (indices.foldl
+        (nativeReductionBufferStep precision degree lowerCoefficient · offset ·)
+        modular) := by
+  induction indices generalizing buffer modular with
+  | nil => exact hsound
+  | cons j indices ih =>
+      simp only [List.foldl_cons]
+      apply ih
+      exact naturalReductionBufferStep_sound precision degree lowerCoefficient
+        buffer offset j modular hsound
+
+/-- Executable natural-number form of one complete lower-bit reduction row. -/
+def naturalReductionBufferRow
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (offset : ℕ) : ℕ → ℕ :=
+  (List.finRange degree).foldl
+    (naturalReductionBufferStep precision degree lowerCoefficient · offset ·)
+    buffer
+
+/-- One complete executable reduction row remains canonical and refines the
+proved source-shaped modular row. -/
+theorem naturalReductionBufferRow_sound
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (offset : ℕ)
+    (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (naturalReductionBufferRow precision degree lowerCoefficient buffer offset)
+      (nativeReductionBufferRow precision degree lowerCoefficient modular offset) := by
+  exact naturalReductionBufferRow_sound_aux precision degree lowerCoefficient
+    (List.finRange degree) buffer offset modular hsound
+
+/-- Executable natural-number form of the descending reduction schedule. -/
+def naturalReduceBufferDescending
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    ℕ → (ℕ → ℕ) → (ℕ → ℕ)
+  | 0, buffer => buffer
+  | count + 1, buffer =>
+      naturalReduceBufferDescending precision degree lowerCoefficient count
+        (naturalReductionBufferRow precision degree lowerCoefficient buffer count)
+
+/-- The complete executable descending reduction remains canonical and refines
+the proved source-shaped modular schedule. -/
+theorem naturalReduceBufferDescending_sound
+    (precision degree count : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (modular : ℕ → ZMod (2 ^ precision))
+    (hsound : naturalBufferSound precision buffer modular) :
+    naturalBufferSound precision
+      (naturalReduceBufferDescending precision degree lowerCoefficient count buffer)
+      (nativeReduceBufferDescending precision degree lowerCoefficient count modular) := by
+  induction count generalizing buffer modular with
+  | zero => exact hsound
+  | succ count ih =>
+      rw [naturalReduceBufferDescending, nativeReduceBufferDescending]
+      apply ih
+      exact naturalReductionBufferRow_sound precision degree lowerCoefficient
+        buffer count modular hsound
+
+/-- Executable natural-number coordinates returned by the complete replay. -/
+def naturalProductCoordinates
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ℕ) : Fin degree → ℕ :=
+  fun index =>
+    naturalReduceBufferDescending precision degree lowerCoefficient (degree - 1)
+      (naturalConvolutionBuffer precision degree left right) index
+
+/-- Every executable natural-number product coordinate casts to the universal
+source-shaped modular product coordinate. -/
+theorem naturalProductCoordinates_cast
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ℕ) (index : Fin degree) :
+    (naturalProductCoordinates precision degree lowerCoefficient left right index :
+        ZMod (2 ^ precision)) =
+      nativeProductCoordinates precision degree lowerCoefficient
+        (fun candidate => left candidate) (fun candidate => right candidate) index := by
+  exact (naturalReduceBufferDescending_sound precision degree (degree - 1)
+    lowerCoefficient (naturalConvolutionBuffer precision degree left right)
+    (convolutionBuffer precision degree
+      (fun candidate => left candidate) (fun candidate => right candidate))
+    (naturalConvolutionBuffer_sound precision degree left right)).2 index
+
 /-- Canonical comma-separated multiplication witness consumed by both the native
 control and this formal model. The fields are degree, precision, packed
 polynomial, lower bits, left/right/product coordinates, and transition counts. -/
@@ -3687,6 +3971,118 @@ def RingMultiplicationArtifact.productCoordinates
     (index : Fin artifact.degree) : ZMod (2 ^ artifact.precision) :=
   artifact.product.getD index.val 0
 
+/-- Natural-number left coordinates consumed by the executable replay. -/
+def RingMultiplicationArtifact.leftNatural
+    (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : ℕ :=
+  artifact.left.getD index.val 0
+
+/-- Natural-number right coordinates consumed by the executable replay. -/
+def RingMultiplicationArtifact.rightNatural
+    (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : ℕ :=
+  artifact.right.getD index.val 0
+
+/-- Executable source-shaped product coordinate recomputed from a record. -/
+def RingMultiplicationArtifact.replayedProductCoordinate
+    (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : ℕ :=
+  naturalProductCoordinates artifact.precision artifact.degree
+    artifact.lowerCoefficient artifact.leftNatural artifact.rightNatural index
+
+/-- Every executable replay coordinate casts to the proved modular transition. -/
+theorem RingMultiplicationArtifact.replayedProductCoordinate_cast
+    (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) :
+    (artifact.replayedProductCoordinate index : ZMod (2 ^ artifact.precision)) =
+      nativeProductCoordinates artifact.precision artifact.degree
+        artifact.lowerCoefficient artifact.leftCoordinates
+        artifact.rightCoordinates index := by
+  change
+    (naturalProductCoordinates artifact.precision artifact.degree
+        artifact.lowerCoefficient artifact.leftNatural artifact.rightNatural index :
+      ZMod (2 ^ artifact.precision)) =
+    nativeProductCoordinates artifact.precision artifact.degree
+      artifact.lowerCoefficient
+      (fun candidate => artifact.left.getD candidate.val 0)
+      (fun candidate => artifact.right.getD candidate.val 0) index
+  exact naturalProductCoordinates_cast artifact.precision artifact.degree
+    artifact.lowerCoefficient artifact.leftNatural artifact.rightNatural index
+
+/-- Boolean check that every serialized product coordinate equals its replay. -/
+def RingMultiplicationArtifact.productReplayed
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  (List.finRange artifact.degree).all fun index =>
+    decide (artifact.product.getD index.val 0 =
+      artifact.replayedProductCoordinate index)
+
+/-- Complete executable import condition, including positive degree. -/
+def RingMultiplicationArtifact.replayed
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  decide (0 < artifact.degree) && artifact.productReplayed
+
+/-- Fail closed unless the canonical record passes the executable replay. -/
+def validateReplayedRingMultiplicationArtifact
+    (artifact : RingMultiplicationArtifact) : Option RingMultiplicationArtifact :=
+  if artifact.replayed then some artifact else none
+
+/-- Generic checked import boundary with transparent product replay. -/
+def parseReplayedRingMultiplicationArtifact
+    (values : List ℕ) : Option RingMultiplicationArtifact := do
+  let artifact ← parseCanonicalRingMultiplicationArtifact values
+  validateReplayedRingMultiplicationArtifact artifact
+
+private theorem parseReplayedRingMultiplicationArtifact_components
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseReplayedRingMultiplicationArtifact values = some artifact) :
+    parseCanonicalRingMultiplicationArtifact values = some artifact ∧
+      artifact.replayed = true := by
+  unfold parseReplayedRingMultiplicationArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, hcanonical, hvalidate⟩
+  unfold validateReplayedRingMultiplicationArtifact at hvalidate
+  split at hvalidate
+  next hreplayed =>
+    have hartifact : candidate = artifact := Option.some.inj hvalidate
+    subst candidate
+    exact ⟨hcanonical, hreplayed⟩
+  next => simp at hvalidate
+
+/-- Successful replayed import retains every canonical-import guarantee. -/
+theorem parseReplayedRingMultiplicationArtifact_canonical
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.canonical = true :=
+  parseCanonicalRingMultiplicationArtifact_canonical
+    (parseReplayedRingMultiplicationArtifact_components hparse).1
+
+/-- Successful replayed import certifies the degree needed by decoding. -/
+theorem parseReplayedRingMultiplicationArtifact_degree_pos
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseReplayedRingMultiplicationArtifact values = some artifact) :
+    0 < artifact.degree := by
+  have hreplayed := (parseReplayedRingMultiplicationArtifact_components hparse).2
+  have hparts : decide (0 < artifact.degree) = true ∧
+      artifact.productReplayed = true := by
+    simpa only [RingMultiplicationArtifact.replayed, Bool.and_eq_true] using hreplayed
+  exact of_decide_eq_true hparts.1
+
+/-- Successful replayed import discharges the generic modular product equality. -/
+theorem parseReplayedRingMultiplicationArtifact_product
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.productCoordinates =
+      nativeProductCoordinates artifact.precision artifact.degree
+        artifact.lowerCoefficient artifact.leftCoordinates
+        artifact.rightCoordinates := by
+  have hreplayed := (parseReplayedRingMultiplicationArtifact_components hparse).2
+  have hparts : decide (0 < artifact.degree) = true ∧
+      artifact.productReplayed = true := by
+    simpa only [RingMultiplicationArtifact.replayed, Bool.and_eq_true] using hreplayed
+  have hall : artifact.productReplayed = true := hparts.2
+  simp only [RingMultiplicationArtifact.productReplayed, List.all_eq_true] at hall
+  funext index
+  have hcoordinate := hall index (by simp)
+  have hnatural := of_decide_eq_true hcoordinate
+  rw [RingMultiplicationArtifact.productCoordinates, hnatural]
+  exact artifact.replayedProductCoordinate_cast index
+
 /-- Generic checked-import endpoint. Once an independent replay establishes that
 the serialized product equals the universal native transition function, the
 imported coordinates decode as quotient-ring multiplication. -/
@@ -3711,6 +4107,23 @@ theorem parsedCanonicalRingMultiplicationArtifact_decodes_mul
     exact decodeNativeProductCoordinates artifact.precision artifact.degree
       artifact.lowerCoefficient artifact.leftCoordinates
       artifact.rightCoordinates hdegree
+
+/-- A successful generic replayed import decodes directly as quotient product,
+without an external product-equality premise. -/
+theorem parsedReplayedRingMultiplicationArtifact_decodes_mul
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.canonical = true ∧
+      decodePowerBasis artifact.precision artifact.degree
+          artifact.lowerCoefficient artifact.productCoordinates =
+        decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.leftCoordinates *
+          decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.rightCoordinates := by
+  exact parsedCanonicalRingMultiplicationArtifact_decodes_mul
+    (parseReplayedRingMultiplicationArtifact_components hparse).1
+    (parseReplayedRingMultiplicationArtifact_degree_pos hparse)
+    (parseReplayedRingMultiplicationArtifact_product hparse)
 
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=
@@ -3748,6 +4161,13 @@ theorem degreeFourWitnessRecord_polynomialSelected :
 than reaching the record through its fallback value. -/
 theorem degreeFourWitnessRecordAccepted :
     parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers =
+      some degreeFourWitnessRecord := by
+  decide
+
+/-- The committed bytes also pass the executable source-shaped product replay
+parser rather than relying on a separately supplied equality. -/
+theorem degreeFourWitnessRecordReplayedAccepted :
+    parseReplayedRingMultiplicationArtifact degreeFourWitnessNumbers =
       some degreeFourWitnessRecord := by
   decide
 
@@ -3852,9 +4272,8 @@ theorem degreeFourWitnessRecord_generic_decodes_mul :
             degreeFourWitnessRecord.degree
             degreeFourWitnessRecord.lowerCoefficient
             degreeFourWitnessRecord.rightCoordinates := by
-  exact parsedCanonicalRingMultiplicationArtifact_decodes_mul
-    degreeFourWitnessRecordAccepted (by decide)
-    degreeFourWitnessRecord_productReplay
+  exact parsedReplayedRingMultiplicationArtifact_decodes_mul
+    degreeFourWitnessRecordReplayedAccepted
 
 /-- The typed shared record reaches the universal quotient-product theorem:
 its named product coordinates decode as its named left/right product. -/

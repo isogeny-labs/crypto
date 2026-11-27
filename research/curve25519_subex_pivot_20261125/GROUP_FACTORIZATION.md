@@ -227,26 +227,31 @@ through a canonical importer that recomputes the packed polynomial and checks
 all coordinate bounds. The committed record passes that boundary; its lower
 bits pack to polynomial `19`, and the exact formal
 transition evaluator maps its named left/right vectors to `[30,29,0,3]` at
-precision five. Composing that result with the universal decoder theorem proves
-that the named product coordinates represent multiplication in the quotient
-ring. This closes manual cross-file transfer and positional field reads for one
-finite sample, not the remaining mechanized Rust compiler refinement or
-authenticated general witness binding.
+precision five. A computable natural-number version of the exact masked loops
+now preserves canonical representatives and is proved to cast coordinatewise
+to that modular evaluator. Composing the replay check with the universal
+decoder theorem proves that any successfully replayed record's named product
+coordinates represent multiplication in the quotient ring. This closes manual
+cross-file transfer and the Lean-side arbitrary-record arithmetic check, not
+the remaining mechanized Rust compiler refinement or external record
+provenance.
 `[pcc:unverified]`
 
 The same typed interface projects arbitrary canonical records into dependent
-`Fin degree` lower-bit and coordinate functions. A generic theorem carries any
-successful canonical import to quotient-ring multiplication, conditional only
-on the explicit equality of its product coordinates with the formal native
-transition function. This isolates the remaining arbitrary-record gap as the
-native compiler/replay equality rather than parsing or finite-vector transport.
+`Fin degree` lower-bit and coordinate functions. Its replayed importer executes
+the zero-fast-path convolution and descending reduction over natural
+representatives, checks every serialized output coordinate, and carries every
+successful import to quotient-ring multiplication without an explicit equality
+premise. The remaining implementation gap is the compiler/serialization
+refinement from concrete Rust `Vec<BigUint>` execution to this evaluator rather
+than parsing, finite-vector transport, or Lean-side arithmetic replay.
 `[pcc:unverified]`
 
 The committed degree-four artifact now travels through that generic route too:
-its canonical parser acceptance and degree-indexed product-replay equality are
-kernel-checked, and the arbitrary-degree endpoint returns its canonicality
-receipt together with decoded multiplication. The older fixed-size theorem is
-retained as a direct concrete regression, not as the only formal bridge.
+its replayed-parser acceptance is kernel-checked, and the arbitrary-degree
+endpoint returns its canonicality receipt together with decoded multiplication.
+The older fixed-size and explicit-equality theorems are retained as direct
+regressions, not as the only formal bridge.
 `[pcc:unverified]`
 
 A transparent packed-`GF(2)` search model also follows the native degree-four
