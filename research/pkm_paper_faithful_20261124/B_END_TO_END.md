@@ -80,3 +80,17 @@ under concurrent load gave 53.8 s, 15.5 s and 20.4 s instead of 6.7 s, 2.0 s and
 load-sensitive by up to 8×; the `p = 2^18` pair was measured back to back and
 the 6× gap between `B = 11` and `B = 2` is larger than that swing, but the
 absolute minutes are not portable.
+
+## Correctness gate
+
+`examples/pkm_mixed_crosscheck.rs` checks the F4 relation finder against the
+exhaustive `m = 2` scan (`pkm_smooth_tower::decompose_m2`) on three mixed
+chains — `3·5`, `7·7`, `3·5·7` — at `p = 1009`:
+
+```
+{"p":1009,"targets":24,"decided":24,"with_relations":15,"ok":true}
+```
+
+24/24 systems decided by F4, 15 of them with a relation, every relation set
+identical to the brute-force result. This is what the `B > 2` runs above stand
+on: without it the algebraic path had only been checked against itself.
