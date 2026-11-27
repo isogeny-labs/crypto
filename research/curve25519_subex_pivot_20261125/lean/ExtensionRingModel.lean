@@ -80,6 +80,73 @@ theorem coordinatePolynomial_mk
   rw [← C_mul_X_pow_eq_monomial, map_mul, map_pow]
   rfl
 
+/-- Source-shaped nested `i,j` convolution sum accumulated by the native
+multiplication loops before high-degree reduction. -/
+noncomputable def convolutionPolynomial
+    (precision degree : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    Polynomial (ZMod (2 ^ precision)) :=
+  ∑ i : Fin degree, ∑ j : Fin degree,
+    monomial ((i : ℕ) + (j : ℕ)) (left i * right j)
+
+/-- Multiplying coordinate polynomials produces exactly the source-shaped
+nested finite convolution sum. -/
+theorem coordinatePolynomial_mul
+    (precision degree : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    coordinatePolynomial precision degree left *
+        coordinatePolynomial precision degree right =
+      convolutionPolynomial precision degree left right := by
+  rw [coordinatePolynomial, coordinatePolynomial, convolutionPolynomial,
+    Finset.sum_mul]
+  simp_rw [Finset.mul_sum, monomial_mul_monomial]
+
+/-- Exact value accumulated in one native convolution-buffer slot. -/
+noncomputable def convolutionCoefficient
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    ZMod (2 ^ precision) :=
+  ∑ i : Fin degree, ∑ j : Fin degree,
+    if (i : ℕ) + (j : ℕ) = index then left i * right j else 0
+
+/-- Each coefficient of the source-shaped convolution polynomial is exactly
+the corresponding native buffer-slot sum. -/
+theorem convolutionPolynomial_coeff
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    (convolutionPolynomial precision degree left right).coeff index =
+      convolutionCoefficient precision degree index left right := by
+  let coefficient : Polynomial (ZMod (2 ^ precision)) →+
+      ZMod (2 ^ precision) :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun a b => coeff_add a b index }
+  change coefficient
+      (∑ i : Fin degree, ∑ j : Fin degree,
+        monomial ((i : ℕ) + (j : ℕ)) (left i * right j)) = _
+  rw [map_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [map_sum]
+  apply Finset.sum_congr rfl
+  intro j _
+  simp [coefficient, coeff_monomial]
+
+/-- The convolution has no nonzero coefficient beyond its native `2d-1`
+buffer support. -/
+theorem convolutionCoefficient_eq_zero_of_bound
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (hbound : degree + degree ≤ index + 1) :
+    convolutionCoefficient precision degree index left right = 0 := by
+  rw [convolutionCoefficient]
+  apply Finset.sum_eq_zero
+  intro i _
+  apply Finset.sum_eq_zero
+  intro j _
+  have hne : (i : ℕ) + (j : ℕ) ≠ index := by omega
+  simp [hne]
+
 /-- Multiplication of decoded coordinate vectors is projection of the ordinary
 coordinate-polynomial convolution product. -/
 theorem decodePowerBasis_mul_eq_mk

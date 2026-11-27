@@ -533,10 +533,12 @@ proves that it clears the targeted coefficient, and proves by induction that
 every finite reduction-offset schedule preserves the quotient value. The
 coordinate-polynomial projection theorem additionally identifies decoded
 multiplication with ordinary polynomial convolution followed by any verified
-reduction schedule. The remaining scalar gap is the native
-array-to-polynomial coefficient invariant and proof that the actual descending
-schedule leaves only the returned low coordinates, plus deterministic
-polynomial selection and accepted witness instantiation.
+reduction schedule. That convolution is now kernel-expanded into the same
+nested finite `i,j` monomial sum as the Rust loops, with the exact conditional
+pair sum for every buffer slot and zero support beyond `2d-1`. The remaining
+scalar gap is the mutable native accumulation/update invariant and proof that
+the actual descending schedule leaves only the returned low coordinates, plus
+deterministic polynomial selection and accepted witness instantiation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

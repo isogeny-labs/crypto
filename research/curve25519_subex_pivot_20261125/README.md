@@ -480,9 +480,12 @@ coefficient, and every finite offset schedule preserves the quotient value.
 Low coordinate vectors also decode exactly as quotient projections of their
 coordinate polynomials; their decoded product is therefore the projection of
 ordinary coordinate convolution followed by any verified reduction schedule.
-The native in-place array correspondence, schedule-completeness/low-coordinate
-theorem, deterministic polynomial selection, and accepted-vector elaboration
-still require concrete refinement.
+The convolution product is also the exact nested finite `i,j` monomial sum
+accumulated by the Rust loops; its coefficient at each buffer index is the
+corresponding conditional pair sum, and it has no support beyond `2d-1` slots.
+The mutable native accumulation/update correspondence,
+schedule-completeness/low-coordinate theorem, deterministic polynomial
+selection, and accepted-vector elaboration still require concrete refinement.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

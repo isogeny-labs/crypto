@@ -195,9 +195,12 @@ logical polynomial reduction step clears its targeted coefficient and preserves
 the quotient value; induction now proves preservation for every finite offset
 schedule. Coordinate vectors now decode exactly as quotient projections of
 their low coordinate polynomials, so coordinate-polynomial convolution followed
-by any such schedule is proved to represent the decoded product. Matching the
-native in-place array to that polynomial convolution/reduction schedule,
-proving the descending schedule leaves only low coordinates, deterministic
+by any such schedule is proved to represent the decoded product. The polynomial
+product is now expanded into the exact nested finite `i,j` sum used by the Rust
+loops; every buffer coefficient equals its source-shaped conditional pair sum,
+and all coefficients beyond the native `2d-1` support vanish. Matching mutable
+native accumulation and reduction updates to those polynomial formulas, proving
+the descending schedule leaves only low coordinates, deterministic
 irreducible-polynomial selection, and accepted-vector elaboration remain open.
 `[pcc:unverified]`
 
