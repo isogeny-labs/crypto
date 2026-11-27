@@ -1,6 +1,7 @@
 module
 
 public import GroupFactorization
+public import Mathlib.Data.Fintype.Basic
 
 @[expose] public section
 
@@ -146,6 +147,109 @@ theorem convolutionCoefficient_eq_zero_of_bound
   intro j _
   have hne : (i : ℕ) + (j : ℕ) ≠ index := by omega
   simp [hne]
+
+/-- One source-shaped mutable convolution update, including the native
+zero-coordinate fast paths and the masked-ring addition semantics. -/
+noncomputable def convolutionBufferStep
+    (precision degree : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (buffer : ℕ → ZMod (2 ^ precision)) (i j : Fin degree) :
+    ℕ → ZMod (2 ^ precision) :=
+  if left i = 0 then buffer
+  else if right j = 0 then buffer
+  else Function.update buffer ((i : ℕ) + (j : ℕ))
+    (buffer ((i : ℕ) + (j : ℕ)) + left i * right j)
+
+/-- Reading any slot after one mutable convolution update gives the old value
+plus exactly the source pair's contribution when its indices select that slot. -/
+theorem convolutionBufferStep_apply
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (buffer : ℕ → ZMod (2 ^ precision)) (i j : Fin degree) :
+    convolutionBufferStep precision degree left right buffer i j index =
+      buffer index +
+        if (i : ℕ) + (j : ℕ) = index then left i * right j else 0 := by
+  by_cases hleft : left i = 0
+  · simp [convolutionBufferStep, hleft]
+  by_cases hright : right j = 0
+  · simp [convolutionBufferStep, hleft, hright]
+  by_cases hindex : (i : ℕ) + (j : ℕ) = index
+  · subst index
+    simp [convolutionBufferStep, hleft, hright]
+  · have hindex' : index ≠ (i : ℕ) + (j : ℕ) := Ne.symm hindex
+    simp [convolutionBufferStep, Function.update, hleft, hright, hindex, hindex']
+
+private theorem convolutionBufferFoldJ_apply
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (buffer : ℕ → ZMod (2 ^ precision)) (i : Fin degree)
+    (indices : List (Fin degree)) :
+    (indices.foldl
+        (convolutionBufferStep precision degree left right · i ·) buffer) index =
+      buffer index +
+        (indices.map fun (j : Fin degree) =>
+          if (i : ℕ) + (j : ℕ) = index then left i * right j else 0).sum := by
+  induction indices generalizing buffer with
+  | nil => simp
+  | cons j indices ih =>
+      rw [List.foldl_cons, ih, convolutionBufferStep_apply]
+      simp only [List.map_cons, List.sum_cons]
+      ring
+
+/-- One complete native inner-loop row adds exactly the conditional sum over
+all right-hand coordinates to every buffer slot. -/
+theorem convolutionBufferRow_apply
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (buffer : ℕ → ZMod (2 ^ precision)) (i : Fin degree) :
+    ((List.finRange degree).foldl
+        (convolutionBufferStep precision degree left right · i ·) buffer) index =
+      buffer index + ∑ j : Fin degree,
+        if (i : ℕ) + (j : ℕ) = index then left i * right j else 0 := by
+  rw [convolutionBufferFoldJ_apply]
+  congr 1
+
+/-- The full zero-initialized mutable nested-loop convolution buffer. -/
+noncomputable def convolutionBuffer
+    (precision degree : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    ℕ → ZMod (2 ^ precision) :=
+  (List.finRange degree).foldl
+    (fun buffer i =>
+      (List.finRange degree).foldl
+        (convolutionBufferStep precision degree left right · i ·) buffer)
+    0
+
+private theorem convolutionBufferFoldI_apply
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (buffer : ℕ → ZMod (2 ^ precision)) (indices : List (Fin degree)) :
+    (indices.foldl
+        (fun buffer i =>
+          (List.finRange degree).foldl
+            (convolutionBufferStep precision degree left right · i ·) buffer)
+        buffer) index =
+      buffer index +
+        (indices.map fun (i : Fin degree) => ∑ j : Fin degree,
+          if (i : ℕ) + (j : ℕ) = index then left i * right j else 0).sum := by
+  induction indices generalizing buffer with
+  | nil => simp
+  | cons i indices ih =>
+      rw [List.foldl_cons, ih, convolutionBufferRow_apply]
+      simp only [List.map_cons, List.sum_cons]
+      ring
+
+/-- The final contents of every slot in the mutable source-shaped nested-loop
+buffer equal the kernel-checked conditional convolution coefficient. -/
+theorem convolutionBuffer_apply
+    (precision degree index : ℕ)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    convolutionBuffer precision degree left right index =
+      convolutionCoefficient precision degree index left right := by
+  rw [convolutionBuffer, convolutionBufferFoldI_apply,
+    Pi.zero_apply, zero_add, convolutionCoefficient]
+  rw [← List.sum_toFinset _ (List.nodup_finRange degree),
+    List.toFinset_finRange]
 
 /-- Multiplication of decoded coordinate vectors is projection of the ordinary
 coordinate-polynomial convolution product. -/

@@ -198,9 +198,11 @@ their low coordinate polynomials, so coordinate-polynomial convolution followed
 by any such schedule is proved to represent the decoded product. The polynomial
 product is now expanded into the exact nested finite `i,j` sum used by the Rust
 loops; every buffer coefficient equals its source-shaped conditional pair sum,
-and all coefficients beyond the native `2d-1` support vanish. Matching mutable
-native accumulation and reduction updates to those polynomial formulas, proving
-the descending schedule leaves only low coordinates, deterministic
+and all coefficients beyond the native `2d-1` support vanish. The
+zero-initialized mutable nested loops, including both zero-coordinate fast paths
+and each `i+j` update, now provably finish with exactly those buffer values.
+Matching mutable native high-degree reduction updates to the polynomial steps,
+proving the descending schedule leaves only low coordinates, deterministic
 irreducible-polynomial selection, and accepted-vector elaboration remain open.
 `[pcc:unverified]`
 

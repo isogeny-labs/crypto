@@ -536,9 +536,12 @@ multiplication with ordinary polynomial convolution followed by any verified
 reduction schedule. That convolution is now kernel-expanded into the same
 nested finite `i,j` monomial sum as the Rust loops, with the exact conditional
 pair sum for every buffer slot and zero support beyond `2d-1`. The remaining
-scalar gap is the mutable native accumulation/update invariant and proof that
-the actual descending schedule leaves only the returned low coordinates, plus
-deterministic polynomial selection and accepted witness instantiation.
+formal fold models the zero-initialized mutable loop, both zero-coordinate fast
+paths, and each `i+j` slot update, proving that every final slot equals that
+conditional pair sum. The remaining scalar gap is the mutable native
+high-degree reduction invariant and proof that the actual descending schedule
+leaves only the returned low coordinates, plus deterministic polynomial
+selection and accepted witness instantiation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

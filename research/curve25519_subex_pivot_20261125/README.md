@@ -483,7 +483,9 @@ ordinary coordinate convolution followed by any verified reduction schedule.
 The convolution product is also the exact nested finite `i,j` monomial sum
 accumulated by the Rust loops; its coefficient at each buffer index is the
 corresponding conditional pair sum, and it has no support beyond `2d-1` slots.
-The mutable native accumulation/update correspondence,
+The zero-initialized mutable nested loops are formal too: both zero-coordinate
+fast paths and every `i+j` update compose to exactly those final slot values.
+The mutable high-degree reduction correspondence,
 schedule-completeness/low-coordinate theorem, deterministic polynomial
 selection, and accepted-vector elaboration still require concrete refinement.
 `[pcc:unverified]`
