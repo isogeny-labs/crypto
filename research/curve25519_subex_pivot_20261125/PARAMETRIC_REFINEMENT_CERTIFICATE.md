@@ -198,9 +198,12 @@ evidence for two independent claims:
    strict first-minimum tie rule, and each row/column candidate objective is a
    fixed offset plus `2q` times a directed interaction score. The formal
    artifact checker now evaluates that score and derives equality with the
-   original quadratic schedule. Proving that the native incidence buckets
-   compute the same score, with replayable bucket-state auxiliaries, remains
-   open; and
+   original quadratic schedule. A second kernel-checked split proves that the
+   native degree/right-endpoint buckets compute the row score and the native
+   row-label profile dot product computes the column score up to the positive
+   factor `q`. The formal artifact checker now evaluates those formulas;
+   replaying the evolving bucket states in a single pass remains open
+   `[pcc:unverified]`; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
    active leaf cutoff, exact source quotient, and the exact root square-root

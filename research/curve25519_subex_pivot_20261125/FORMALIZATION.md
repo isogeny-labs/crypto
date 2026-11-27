@@ -183,8 +183,13 @@ candidate objective is a label-independent offset plus `2q` times its directed
 selected-label interaction score. The artifact checker evaluates this smaller
 score, while the theorem recovers the exact quadratic objective and first-label
 tie rule. The best observed cold artifact build fell from 229 seconds to 145
-seconds; the remaining optimization target is a formal refinement from this
-edge-pair score to the native incidence buckets. `[pcc:unverified]`
+seconds. `IncidenceBucketScore.lean` proves the edge-pair score equal to the
+native degree/right-endpoint-bucket row formula and proves the column score is
+`q` times the native row-label profile dot product. The artifact checker now
+uses those formulas, preserving the executable-schedule theorem and reducing
+the best observed cold build to 55 seconds. The remaining optimization target
+is a single-pass auxiliary-state replay of the evolving native buckets.
+`[pcc:unverified]`
 `executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact
 prefix-minimum receipts prove the fully labeled objective nonincreasing, and

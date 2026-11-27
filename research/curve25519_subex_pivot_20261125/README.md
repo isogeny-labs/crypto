@@ -383,8 +383,16 @@ fixed offset plus `2q` times the directed interaction score. The checked
 artifact replay evaluates that score and uses the proved affine identity to
 recover the original quadratic first minimum, including ties. On the shared
 32-edge strict fixture this reduced the best observed cold artifact-module
-build from 229 seconds to 145 seconds (about 37%); the sub-30-second target now
-requires proving and executing the next incidence-bucket compression.
+build from 229 seconds to 145 seconds (about 37%).
+`IncidenceBucketScore.lean` now proves the next split as well. While columns
+are unknown, the row score is exactly the current degree times the selected
+label-bucket degree plus `(q-1)` times the shared-right-port overlap obtained
+from right-endpoint incidence buckets. Once all rows are fixed, the column
+score is `q` times the row-label incidence-profile dot product. Positive scale
+invariance removes that final factor without changing ties. The artifact
+checker now evaluates these source-shaped scores, reducing the best observed
+cold build to 55 seconds. A single-pass replay of the evolving bucket maps is
+still needed for the sub-30-second target.
 `[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,

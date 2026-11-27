@@ -97,8 +97,12 @@ The formal replay no longer reevaluates candidate-independent terms: an exact
 affine decomposition proves that the quadratic objective is an offset plus
 `2q` times a directed interaction score for rows and columns. Computing that
 proved score reduced the best observed cold 32-edge artifact build from 229 to
-145 seconds. The next target is the native incidence-bucket compression of the
-same score.
+145 seconds. A second formal split now proves the row score equal to degree
+times selected-label bucket degree plus `(q-1)` times the right-endpoint
+overlap, and the column score equal to `q` times the row-label profile dot
+product. Computing those source-shaped formulas reduces the best observed cold
+build to 55 seconds. The next target is a single-pass replay of the evolving
+bucket maps rather than reconstructing each prefix independently.
 `[pcc:unverified]`
 
 ## Remaining boundary
