@@ -6,6 +6,23 @@
 this file are `[pcc:unverified]`. This file reports no new measurement and no
 security reduction.
 
+## Native symbolic qualification status (2026-11-27)
+
+The first two execution stages now have a native Rust instrument and a frozen
+subprotocol under [`degree_study/`](degree_study/PROTOCOL.md). The instrument
+uses the shared `cryptanalysis::f4_fp` engine and a fixed public order-251
+subgroup over `F_1019`; it covers Montgomery `u`, short-Weierstrass `x`, the
+square-free and raw-norm `w=u+u^-1` quotient, twisted-Edwards `y`, an Edwards
+bilinear tree, Montgomery affine-with-slope, A/A, planted, and unsatisfiable
+controls. Exact pre-run tests establish the degree-two isogeny on all subgroup
+scalars and `Norm(f_3)=h_3^4`.
+
+No affected native-F4 comparison had run when protocol
+`e43dc87d2991eac64e96e64225fee97ac935e04d94ae06b52fd8e857adcc74d8`
+was frozen. The user-supplied standalone-prototype numbers are disclosed as
+prior calibration only. This small-field panel can qualify algebra and solver
+instrumentation; it cannot promote the complete-cost lead defined below.
+
 ## Decision question
 
 On one elliptic curve and one prime-order subgroup at a time, does the
