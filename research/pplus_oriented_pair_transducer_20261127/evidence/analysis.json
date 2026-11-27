@@ -1,0 +1,19 @@
+{
+  "schema": "isogeny-labs/pplus-oriented-pair-transducer-analysis/v1",
+  "correctness": {"verifier_pass": true, "candidate_queries": 60, "all_replay_ok": true, "depth_six_finite_misses": 8, "pass": true},
+  "depths": [
+    {"depth": 1, "signed_leaves": 2, "leaf_rank_gf2": 1, "semantic_entries": 3, "root_support": 3},
+    {"depth": 2, "signed_leaves": 4, "leaf_rank_gf2": 3, "semantic_entries": 19, "root_support": 9},
+    {"depth": 3, "signed_leaves": 8, "leaf_rank_gf2": 10, "semantic_entries": 125, "root_support": 33},
+    {"depth": 4, "signed_leaves": 16, "leaf_rank_gf2": 36, "semantic_entries": 527, "root_support": 129},
+    {"depth": 5, "signed_leaves": 30, "leaf_rank_gf2": 120, "semantic_entries": 2455, "root_support": 451},
+    {"depth": 6, "signed_leaves": 68, "leaf_rank_gf2": 595, "semantic_entries": 15769, "root_support": 2313}
+  ],
+  "growth": {
+    "leaf_rank_gf2": {"ratio_4_to_5": 3.333333333, "quadratic_4_to_5": 3.515625000, "pass_4_to_5": true, "ratio_5_to_6": 4.958333333, "quadratic_5_to_6": 5.137777778, "pass_5_to_6": true, "slope_3_to_6": 1.910772639, "pass_slope": true, "pass": true},
+    "semantic_entries": {"ratio_4_to_5": 4.658444023, "quadratic_4_to_5": 3.515625000, "pass_4_to_5": false, "ratio_5_to_6": 6.423217923, "quadratic_5_to_6": 5.137777778, "pass_5_to_6": false, "slope_3_to_6": 2.277027554, "pass_slope": false, "pass": false},
+    "root_support": {"ratio_4_to_5": 3.496124031, "quadratic_4_to_5": 3.515625000, "pass_4_to_5": true, "ratio_5_to_6": 5.128603104, "quadratic_5_to_6": 5.137777778, "pass_5_to_6": true, "slope_3_to_6": 1.986534323, "pass_slope": true, "pass": true}
+  },
+  "projection": {"residual_queries": 27370, "root_support": 2313, "miss_probes": 2313, "optimistic_probes": 63306810, "panel_fe_tenths": [67589783054, 103154425150, 166436178150], "field_equivalent_limit_tenths": 16000000, "probe_limit": 1600000, "panels_pass": false, "probe_floor_pass": false, "pass": false},
+  "promotion": {"correctness_pass": true, "growth_pass": false, "projection_pass": false, "eligible": false, "verdict": "stop-before-m7-integration"}
+}
