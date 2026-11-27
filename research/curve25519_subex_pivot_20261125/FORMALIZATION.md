@@ -539,9 +539,11 @@ pair sum for every buffer slot and zero support beyond `2d-1`. The remaining
 formal fold models the zero-initialized mutable loop, both zero-coordinate fast
 paths, and each `i+j` slot update, proving that every final slot equals that
 conditional pair sum. The remaining scalar gap is the mutable native
-high-degree reduction invariant and proof that the actual descending schedule
-leaves only the returned low coordinates, plus deterministic polynomial
-selection and accepted witness instantiation.
+high-degree reduction/truncation invariant, plus deterministic polynomial
+selection and accepted witness instantiation. The exact polynomial schedule is
+no longer a gap: offsets `d-2,...,0` preserve the quotient, each cleared high
+coefficient stays cleared through all later lower steps, and every coefficient
+at index at least `d` vanishes after reducing a `2d-1` convolution.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

@@ -358,6 +358,33 @@ theorem binaryPolynomial_coeff_degree
     · simp [coefficient, h]
   rw [hsum, add_zero]
 
+/-- The binary modulus has no coefficient above its declared monic degree. -/
+theorem binaryPolynomial_coeff_eq_zero_of_lt
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (hindex : degree < index) :
+    (binaryPolynomial precision degree lowerCoefficient).coeff index = 0 := by
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  have hne : index ≠ degree := Nat.ne_of_gt hindex
+  have hx : (X ^ degree : Polynomial (ZMod (2 ^ precision))).coeff index = 0 := by
+    rw [coeff_X_pow]
+    simp [hne]
+  rw [binaryPolynomial, coeff_add, hx, zero_add]
+  change coefficient
+    (∑ coefficientIndex,
+      if lowerCoefficient coefficientIndex then
+        monomial (coefficientIndex : ℕ) 1 else 0) = 0
+  rw [map_sum]
+  apply Finset.sum_eq_zero
+  intro coefficientIndex _
+  by_cases h : lowerCoefficient coefficientIndex
+  · simp [coefficient, h, coeff_monomial,
+      ne_of_lt (lt_trans coefficientIndex.isLt hindex)]
+  · simp [coefficient, h]
+
 /-- Logical polynomial form of one descending native reduction update. It
 subtracts the targeted coefficient times a shifted copy of the modulus. -/
 noncomputable def binaryReductionStep
@@ -377,6 +404,26 @@ theorem binaryReductionStep_coeff
   rw [binaryReductionStep, coeff_sub, coeff_monomial_mul,
     binaryPolynomial_coeff_degree]
   simp
+
+/-- A logical reduction update cannot change any coefficient strictly above
+the step's targeted high index. -/
+theorem binaryReductionStep_coeff_of_lt
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset index : ℕ)
+    (hindex : degree + offset < index) :
+    (binaryReductionStep precision degree lowerCoefficient polynomial offset).coeff
+        index = polynomial.coeff index := by
+  have hoffset : offset ≤ index := by omega
+  have hsplit : index - offset + offset = index := Nat.sub_add_cancel hoffset
+  have hdegree : degree < index - offset := by omega
+  have hproduct :
+      (monomial offset (polynomial.coeff (degree + offset)) *
+          binaryPolynomial precision degree lowerCoefficient).coeff index = 0 := by
+    rw [← hsplit, coeff_monomial_mul,
+      binaryPolynomial_coeff_eq_zero_of_lt precision degree (index - offset)
+        lowerCoefficient hdegree,
+      mul_zero]
+  rw [binaryReductionStep, coeff_sub, hproduct, sub_zero]
 
 /-- One logical reduction step preserves the represented quotient value. -/
 theorem binaryReductionStep_mk
@@ -411,6 +458,99 @@ theorem binaryReduceOffsets_mk
   | nil => rfl
   | cons offset offsets ih =>
       rw [binaryReduceOffsets, ih, binaryReductionStep_mk]
+
+/-- Apply exactly the descending source offsets `count-1,...,0`. For the native
+`2d-1` product buffer, `count=d-1`. -/
+noncomputable def binaryReduceDescending
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    ℕ → Polynomial (ZMod (2 ^ precision)) →
+      Polynomial (ZMod (2 ^ precision))
+  | 0, polynomial => polynomial
+  | count + 1, polynomial =>
+      binaryReduceDescending precision degree lowerCoefficient count
+        (binaryReductionStep precision degree lowerCoefficient polynomial count)
+
+/-- A descending schedule of `count` steps leaves every coefficient at or
+above `degree+count` unchanged. -/
+theorem binaryReduceDescending_coeff_of_bound
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (count index : ℕ) (polynomial : Polynomial (ZMod (2 ^ precision)))
+    (hbound : degree + count ≤ index) :
+    (binaryReduceDescending precision degree lowerCoefficient count polynomial).coeff
+        index = polynomial.coeff index := by
+  induction count generalizing polynomial with
+  | zero => rfl
+  | succ count ih =>
+      rw [binaryReduceDescending]
+      calc
+        (binaryReduceDescending precision degree lowerCoefficient count
+            (binaryReductionStep precision degree lowerCoefficient polynomial
+              count)).coeff index =
+            (binaryReductionStep precision degree lowerCoefficient polynomial
+              count).coeff index := ih _ (by omega)
+        _ = polynomial.coeff index :=
+          binaryReductionStep_coeff_of_lt precision degree lowerCoefficient
+            polynomial count index (by omega)
+
+/-- The exact descending schedule clears every targeted coefficient
+`degree+offset` for `offset<count`; later lower steps cannot reintroduce it. -/
+theorem binaryReduceDescending_coeff
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (count offset : ℕ) (polynomial : Polynomial (ZMod (2 ^ precision)))
+    (hoffset : offset < count) :
+    (binaryReduceDescending precision degree lowerCoefficient count polynomial).coeff
+        (degree + offset) = 0 := by
+  induction count generalizing polynomial with
+  | zero => omega
+  | succ count ih =>
+      rw [binaryReduceDescending]
+      by_cases hlast : offset = count
+      · subst offset
+        calc
+          (binaryReduceDescending precision degree lowerCoefficient count
+              (binaryReductionStep precision degree lowerCoefficient polynomial
+                count)).coeff (degree + count) =
+              (binaryReductionStep precision degree lowerCoefficient polynomial
+                count).coeff (degree + count) :=
+            binaryReduceDescending_coeff_of_bound precision degree
+              lowerCoefficient count (degree + count) _ (by omega)
+          _ = 0 := binaryReductionStep_coeff precision degree lowerCoefficient
+            polynomial count
+      · exact ih _ (by omega)
+
+/-- The exact descending source schedule preserves the represented quotient. -/
+theorem binaryReduceDescending_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (count : ℕ) (polynomial : Polynomial (ZMod (2 ^ precision))) :
+    AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (binaryReduceDescending precision degree lowerCoefficient count polynomial) =
+      AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        polynomial := by
+  induction count generalizing polynomial with
+  | zero => rfl
+  | succ count ih =>
+      rw [binaryReduceDescending, ih, binaryReductionStep_mk]
+
+/-- For positive degree, the native `d-1` descending offsets clear every high
+coefficient of the `2d-1` coordinate convolution, so only indices below `d`
+remain for truncation. -/
+theorem convolutionReduction_coeff_eq_zero
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision))
+    (hdegree : 0 < degree) (hindex : degree ≤ index) :
+    (binaryReduceDescending precision degree lowerCoefficient (degree - 1)
+        (convolutionPolynomial precision degree left right)).coeff index = 0 := by
+  by_cases hwithin : index < degree + (degree - 1)
+  · let offset := index - degree
+    have hoffset : offset < degree - 1 := by omega
+    have hsplit : degree + offset = index := by omega
+    rw [← hsplit]
+    exact binaryReduceDescending_coeff precision degree lowerCoefficient
+      (degree - 1) offset _ hoffset
+  · rw [binaryReduceDescending_coeff_of_bound precision degree lowerCoefficient
+      (degree - 1) index _ (by omega), convolutionPolynomial_coeff]
+    exact convolutionCoefficient_eq_zero_of_bound precision degree index left right
+      (by omega)
 
 /-- Coordinate-polynomial convolution followed by any finite logical reduction
 schedule represents the product of the decoded inputs. -/

@@ -485,9 +485,11 @@ accumulated by the Rust loops; its coefficient at each buffer index is the
 corresponding conditional pair sum, and it has no support beyond `2d-1` slots.
 The zero-initialized mutable nested loops are formal too: both zero-coordinate
 fast paths and every `i+j` update compose to exactly those final slot values.
-The mutable high-degree reduction correspondence,
-schedule-completeness/low-coordinate theorem, deterministic polynomial
-selection, and accepted-vector elaboration still require concrete refinement.
+The exact descending polynomial offsets `d-2,...,0` now preserve the quotient,
+clear every target without later reintroduction, and leave no coefficient at
+index at least `d`. The mutable high-degree reduction/truncation correspondence,
+deterministic polynomial selection, and accepted-vector elaboration still
+require concrete refinement.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

@@ -202,8 +202,11 @@ and all coefficients beyond the native `2d-1` support vanish. The
 zero-initialized mutable nested loops, including both zero-coordinate fast paths
 and each `i+j` update, now provably finish with exactly those buffer values.
 Matching mutable native high-degree reduction updates to the polynomial steps,
-proving the descending schedule leaves only low coordinates, deterministic
-irreducible-polynomial selection, and accepted-vector elaboration remain open.
+deterministic irreducible-polynomial selection, and accepted-vector elaboration
+remain open. At the polynomial level the exact source offsets `d-2,...,0` now
+preserve the quotient, clear every targeted coefficient without later
+reintroduction, and leave every coefficient at index at least `d` equal to zero
+for the `2d-1` convolution.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
