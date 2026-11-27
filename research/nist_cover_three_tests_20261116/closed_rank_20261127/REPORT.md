@@ -65,6 +65,7 @@ this study does not change those maps.
 | Same-image residual m=5,6 | Shared 101,926 pairs; 902 multiple queries | No matches in either degree; direct 108/102/6 |
 | Actual ramification | Degrees 1,1,2; four simple geometric supports | Map indices 2; specified-axis polar rank 3; Ram-H gives 237/231/6 |
 | Individual ramification poles | H+2B1, H+2B2, H+Q; 15,390,826 triples each | Zero words in all three; joint 237/231/6; partial poles reduce to canonical H |
+| Mixed ramification pole | H+B1+B2; one new 15,390,826-triple comparison | Zero words; reused three prior receipts; complete four-case family remains 237/231/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -964,11 +965,63 @@ remain outside the result. Necessary candidates would still require
 actual RR/KM realization and separate replay for positive goal
 completion. [pcc:unverified]
 
+## Complete degree-two ramification-supported pole family
+
+The mixed class $D=H+B_1+B_2$ supplies the remaining case. Its image
+target is
+
+$$\kappa+P_1+P_2=2\kappa-T.$$
+
+The full reference is $h+e_{685}-e_{686}$. Both group implementations
+check this reference, the target identity and public half before table
+allocation. Signed comparison with all completed targets confirms this
+is a new search. The new executable accepts only plan, family 3 and
+combine modes; attempts to enumerate the completed families 0,1,2 reject.
+[pcc:unverified]
+
+The new worker checks all **15,390,826 unordered triples**, with every
+shifted value/hash agreeing in GMP and named OpenSSL. Both exact joins
+return **zero candidate words**. The native four-family combine imports
+and validates the previous three receipts without enumerating them;
+its row counts are **0,0,0,0**. All 688 columns and 463 auxiliaries
+remain active, and actual/candidate ranks stay **237/231/6**.
+[pcc:unverified]
+
+![Complete degree-two ramification-supported inventory, three imported bounds, one new mixed bound and joint elimination. Only the mixed target is newly enumerated.](ramification-degree-two.pdf)
+
+This exhausts the declared support family, rather than just a list of
+chosen examples. The three closed ramification components have degrees
+$1,1,2$, so an effective $\mathbb F_p$ divisor of degree two supported
+there has multiplicities $(a,b,c)$ with $a+b+2c=2$. Native enumeration
+and exact inventory comparison give precisely
+
+$$2B_1,\qquad 2B_2,\qquad Q,\qquad B_1+B_2.$$
+
+Missing and duplicated inventory entries reject. A nonempty signed
+two-auxiliary control uses old symbols $G,2G$, fresh $3G,4G$, and
+reference $G+3(2G)+3G-4G=6G$. Both joins agree with exhaustive small
+words. The baseline and candidates have ranks 2/1/1; an isolated
+numerical old unit reaches closed two and fails both group checks.
+Omitting or flipping either auxiliary also rejects. No fixture enters
+actual data. [pcc:unverified]
+
+For incomplete mixed poles, $L(H+B_i)=L(H)$ again reduces the function
+to the canonical space. Thus the four null full-pole bounds, together
+with the prior canonical bound, show that **every function in $L(H+Z)$
+for every effective degree-two $\mathbb F_p$ divisor $Z$ supported on
+this ramification set yields only the original rank-six projected span**,
+provided all of its actual individual zero images belong to the frozen
+signed rational domain. Degree-zero and degree-one additions reduce to
+that same canonical case. Closed source points with listed rational
+images are included by repeated image slots. This conclusion concerns
+the retained P-192 construction and this exact pole/image family; it
+does not exhaust other divisor classes or relations. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of45immutable attempt reports retains complete per-call and wrapper
+Each of46immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
@@ -1013,6 +1066,11 @@ plan 15.918 seconds, family workers 185.503/185.083/184.422 seconds and
 combine 17.949 seconds. The serial wrapper totals 606.283 seconds across
 all six calls; the 600-second limit applies to each native worker.
 These are single-execution resource receipts, not performance comparisons.
+
+The mixed-ramification run has strict build 18.256 seconds, plan 15.954,
+new family 184.736 and combine 17.691 seconds, with wrapper 236.703 seconds.
+Only one new target-specific stream is enumerated; all three prior
+family results are imported. These are resource receipts only.
 
 ## Next discriminating work
 
@@ -1061,14 +1119,22 @@ $H+Q$ now yield no new old-base relation. The full-pole bounds are null;
 Riemann--Roch reduces every incomplete new pole to the already bounded
 canonical space. No extra simple-pole enumeration is needed.
 
-The remaining degree-two divisor supported on the ramification set is
-$B_1+B_2$: the complete list is $2B_1,B_1+B_2,2B_2,Q$.
-Its pole class $H+B_1+B_2$ has target
-$\kappa+P_1+P_2=2\kappa-T$. Preflight that target, freeze its protocol,
-and test it without repeating the three completed searches. Reuse their
-receipts in a joint elimination check. This fourth target is not tested
-by the current run. Positive old-base gain still needs actual RR/KM and
-separate elliptic/elimination replay. [pcc:unverified]
+The mixed case $H+B_1+B_2$ now completes with zero words. The four-case
+inventory and Riemann--Roch reduction close every effective degree-at-most-two
+ramification-supported addition to $H$, on the fixed old zero-image domain.
+Do not repeat these four target searches or add simple-pole enumerations.
+
+A concrete next support comes from the tangent at each rational $B_i$.
+Its residual degree-two divisor $Z_i$ satisfies $Z_i\sim H-2B_i$,
+so $H+Z_i\sim2H-2B_i$ has image target $2\kappa-2P_i$.
+This is the retained exceptional-tangent-conic construction with the
+exceptional point replaced by a ramification point. First classify the
+actual tangent intersections and check those targets against every prior
+signed bound under a frozen protocol. Some cases may overlap and must
+reuse existing bounds; no tangent-residual case is established here.
+The residuals of $B_1+B_2$ and $Q$ exchange those already-tested classes.
+Any new positive candidate still needs actual RR/KM and separate
+elliptic/elimination replay. [pcc:unverified]
 
 ## Sources and reproduction
 
@@ -1099,7 +1165,8 @@ separate elliptic/elimination replay. [pcc:unverified]
   [three whole residual traces](THREE_TRACE_PROTOCOL.md) and
   [same-image closed residuals](CLOSED_RESIDUAL_PROTOCOL.md) and
   [actual ramification supports](RAMIFICATION_PROTOCOL.md) and
-  [individual ramification poles](RAMIFICATION_POLE_PROTOCOL.md).
+  [individual ramification poles](RAMIFICATION_POLE_PROTOCOL.md) and
+  [mixed ramification pole](RAMIFICATION_MIXED_POLE_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -1108,7 +1175,7 @@ separate elliptic/elimination replay. [pcc:unverified]
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
   run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
-  run-exceptional-conic-six.sh, run-three-trace-six.sh, run-closed-residual.sh, run-ramification.sh and run-ramification-poles.sh.
+  run-exceptional-conic-six.sh, run-three-trace-six.sh, run-closed-residual.sh, run-ramification.sh, run-ramification-poles.sh and run-ramification-mixed-pole.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
@@ -1149,3 +1216,7 @@ The individual-ramification pole diagram copies all three new native target
 family results and their joint ranks; its partial-pole reduction is the
 written Riemann--Roch argument. Other parent-map and scoreboard figures
 remain unchanged.
+
+The complete degree-two ramification diagram copies the native four-case
+inventory, imported/new result distinction and joint ranks. Other parent-map
+and scoreboard figures remain unchanged.
