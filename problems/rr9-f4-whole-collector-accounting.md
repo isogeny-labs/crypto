@@ -3,7 +3,7 @@
 - **Status:** `open`
 - **Kind:** implementation gap; measurement and accounting gap
 - **Affected work:** the prospective [Prime31 common-support RR9/F4 protocol](../research/prime31_shared_coefficient_membership_20261118/PROTOCOL_RR9_F4_20261120.md) and its [machine-readable v1 protocol](../research/prime31_shared_coefficient_membership_20261118/protocol-rr9-f4-v1.json), the [RR9 and closures development report](../research/prime31_rr9_and_closures_20261119/REPORT.md) and [raw result](../research/prime31_rr9_and_closures_20261119/RESULTS.json), and the separate [B8 full-eight precursor protocol](../research/prime31_ic_20261115/rr9/RR9_FULL8_F4_PROTOCOL_20261122.md)
-- **Next action owner:** draft PR #5274; next token slice is remaining specialization/evaluation and root arithmetic, followed by allocation/scratch ownership and independent call-ledger review
+- **Next action owner:** draft PR #5274; next token slice is allocation/capacity/scratch plus remaining root-bookkeeping and operation ownership, followed by an independent complete-call-ledger review
 - **Last updated:** 2026-11-27
 
 ## Problem
@@ -76,11 +76,12 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   later native/root/delivery work, but they do not yet cover every deep charge
   site; the operation gate remains false.
   Draft PR #5274 continues that migration by binding every GM, generic
-  normalization/explicit monic and admitted wide-field reducer
+  normalization/explicit monic, admitted wide-field reducer, candidate
+  evaluation, branch-specialization and admitted root-field-arithmetic
   Visit-accounting mutation to the same exclusive route. The current
   implementation binds each admitted call to a unique accounting context and
   records
-  `accounting_token_mode=borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1`;
+  `accounting_token_mode=borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1`;
   rejected preflight records retain `not_started_preflight_rejected`.
   Accounted entry rejects `p <= 2^16` before token creation. The legacy
   narrow-field deferred/FL reducers remain unchanged and open; they are not
@@ -108,10 +109,25 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   overflow and every charge-boundary overflow stop before the corresponding
   mutation. Tokenless native plain/record/replay entry under an unsuspended
   ledger is rejected, and a native stop is polled before wrapper follow-on
-  work. Separate `jv_bitops` telemetry plus specialization/evaluation and
-  other scalar arithmetic, roots, symbolic/matrix construction beyond current
-  modeled observations, and allocation/scratch helpers remain
-  non-authoritative shadows.
+  work. Owned specialization and evaluation validate the call authority,
+  reserve each exact term or finite-domain-point field-operation bundle, then
+  use raw Barrett arithmetic without re-entering TLS hooks. A refused later
+  counter in a bundle does not roll back an earlier reservation, so failed
+  scalar calls are described as exact admitted bundles rather than exact
+  executed-operation prefixes. Finite-domain Scan charges additions that its
+  former diagnostic omitted. Finite-domain Frobenius and unrestricted roots
+  use one fallible shared observer that admits every represented
+  multiplication, addition/subtraction and inversion before execution;
+  accounting refusal remains distinct from deadline expiry. Deterministic
+  root sets and finite-domain order are preserved.
+  Root/coefficient vectors and maps, domain-index/hash probes,
+  filtering/sort/dedup, RNG, Auto-mode costing, remaining report bookkeeping,
+  symbolic/matrix construction beyond current modeled observations, separate
+  `jv_bitops` telemetry, and allocation/capacity/scratch helpers remain
+  non-authoritative shadows. In particular, checked root/scan diagnostic-total
+  aggregation still occurs after the represented field work and can itself
+  block a record after that work; it is not included in the per-operation
+  root-ownership claim.
   Modeled normalization observations also do not cover clone/filter/allocation
   work. Operation, memory and work-ownership gates therefore all remain false,
   no checklist item is closed, and no ledger is promotion-ready.
@@ -154,12 +170,12 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   instrumentation costs.
 - **Missing capability:** source-complete call-owned operation,
   allocation/capacity and scratch accounting; propagation of the borrowed
-  token through specialization/evaluation and other scalar arithmetic, roots,
+  token through root bookkeeping, remaining report/branch work,
   remaining symbolic/matrix work and allocator-owned work; prospective runner
   integration; and a distinct whole-collector ledger that covers every
   attempt and phase in a common, source-bound schema. Narrow deferred/FL
-  reducers and multiworker execution remain unclaimed regimes, not gaps hidden
-  inside the admitted wide profile.
+  reducers, sibling batching and multiworker execution remain unclaimed
+  regimes, not gaps hidden inside the admitted wide profile.
 - **What this evidence does not establish:** it does not invalidate the B4/B8
   fibre observations, supply a B31 cost ratio, refute any unexecuted RR9 stratum,
   or justify abandoning the active RR9 lane. Only a regime ruled out by its
@@ -225,17 +241,16 @@ still require prospective executions and independent replay.
 
 - **Action or proof obligation:** retain the reviewed token boundary through
   traversal, delivery, native-driver orchestration, GM, generic
-  normalization/explicit monic work and the admitted wide reducer cluster.
-  Extend it next through specialization/evaluation and other scalar
-  arithmetic, roots and allocator-owned work while retaining TLS only as a
-  differential shadow. Route every admitted allocation/capacity/scratch
-  lifetime and remaining operation/branch through checked call-owned
+  normalization/explicit monic work, the admitted wide reducer cluster,
+  specialization/evaluation and admitted Scan/Frobenius/unrestricted root
+  field arithmetic. Route every admitted allocation/capacity/scratch lifetime,
+  root bookkeeping and remaining operation/branch through checked call-owned
   accounting; extend the typed stop to every unowned operation or overflow;
-  close the remaining phase and hand-count controls; and keep all three
-  promotion gates false until that review passes. Keep both copied-source
-  bridges compiling, then integrate only through a prospectively frozen
-  successor RR9 runner schema. Do not combine this slice with a B31 run or the
-  whole-collector implementation.
+  close the remaining phase and hand-count controls; then obtain an
+  independent complete-call-ledger review while all three promotion gates
+  remain false. Keep both copied-source bridges compiling, then integrate only
+  through a prospectively frozen successor RR9 runner schema. Do not combine
+  this slice with a B31 run or the whole-collector implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to
   exercise each phase, then the existing public B8 known-chart case only as a
   non-registered integration preflight. Compare solutions, completion states
@@ -351,3 +366,18 @@ This does not establish multiworker ownership, narrow deferred/FL ownership,
 symbolic/matrix or allocation completeness, roots, remaining scalar
 arithmetic, or whole-collector accounting. All promotion gates remain false;
 no scientific case was run and every unrefuted regime remains open.
+
+2026-11-27: Draft PR #5274 extended the exclusive borrowed-token route
+through candidate evaluation, branch specialization, finite-domain Scan and
+Frobenius extraction, and unrestricted root field arithmetic. Owned scalar
+routes validate authority and reserve exact term/point bundles before raw
+Barrett arithmetic; a failed later reservation is not described as executed
+work. The shared root kernel observes every represented multiplication,
+addition/subtraction and inversion before execution and returns accounting
+refusal distinctly from deadline expiry. Deterministic legacy root sets and
+domain filtering order are preserved. Accepted records use
+`borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1`.
+Root vectors/maps, domain-index/hash probes, filtering/sort/dedup, RNG,
+remaining report and symbolic/matrix work, and allocation/capacity/scratch
+remain open. All promotion gates remain false; no scientific case was run and
+every unrefuted regime remains open.

@@ -653,6 +653,106 @@ impl ReducerMeter<'_> {
     }
 }
 
+/// Exclusive accounting route for scalar field arithmetic outside the F4
+/// reducer.  The admitted visitor is confined to a wide prime and one owner
+/// thread, so owned work can charge its exact field-operation prefix and then
+/// use raw Barrett arithmetic without re-entering the TLS accounting shadow.
+#[derive(Clone, Copy)]
+struct ScalarMeter<'a> {
+    account: VisitHelperAccount<'a>,
+}
+
+impl<'a> From<VisitHelperAccount<'a>> for ScalarMeter<'a> {
+    fn from(account: VisitHelperAccount<'a>) -> Self {
+        Self { account }
+    }
+}
+
+impl ScalarMeter<'_> {
+    fn control(self) -> Result<(), F4Stop> {
+        if self.account.control().stopped() {
+            Err(F4Stop::Accounting)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> Result<(), F4Stop> {
+        if self.account.charge(counter, amount).stopped() {
+            Err(F4Stop::Accounting)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn checked_add(
+        self,
+        left: u64,
+        right: u64,
+        counter: &'static str,
+        detail: &'static str,
+    ) -> Result<u64, F4Stop> {
+        match left.checked_add(right) {
+            Some(sum) => Ok(sum),
+            None => {
+                if self
+                    .account
+                    .checked_arithmetic_block("counter_overflow", Some(counter), detail)
+                    .stopped()
+                {
+                    Err(F4Stop::Accounting)
+                } else {
+                    Ok(u64::MAX)
+                }
+            }
+        }
+    }
+
+    fn checked_count(
+        self,
+        value: usize,
+        counter: &'static str,
+        detail: &'static str,
+    ) -> Result<u64, F4Stop> {
+        match u64::try_from(value) {
+            Ok(value) => Ok(value),
+            Err(_) => {
+                if self
+                    .account
+                    .checked_arithmetic_block("counter_overflow", Some(counter), detail)
+                    .stopped()
+                {
+                    Err(F4Stop::Accounting)
+                } else {
+                    Ok(u64::MAX)
+                }
+            }
+        }
+    }
+
+    fn admit_field_work(
+        self,
+        multiplications: u64,
+        additions: u64,
+        inversions: u64,
+    ) -> Result<(), F4Stop> {
+        self.control()?;
+        if multiplications != 0 {
+            self.charge(
+                VisitAccountingCounter::FieldMultiplications,
+                multiplications,
+            )?;
+        }
+        if additions != 0 {
+            self.charge(VisitAccountingCounter::FieldAdditions, additions)?;
+        }
+        if inversions != 0 {
+            self.charge(VisitAccountingCounter::FieldInversions, inversions)?;
+        }
+        Ok(())
+    }
+}
+
 #[inline]
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
     visit_account_charge(VisitAccountingCounter::FieldMultiplications, 1);
@@ -702,6 +802,28 @@ fn barrett_mul_raw(a: u64, b: u64, fp: Barrett) -> u64 {
     debug_assert!(a < fp.p && b < fp.p);
     // `fp.p < 2^32`, so the product is strictly below 2^64.
     fp.reduce(a * b)
+}
+
+#[inline]
+fn barrett_add_raw(a: u64, b: u64, fp: Barrett) -> u64 {
+    debug_assert!(a < fp.p && b < fp.p);
+    fp.reduce(a + b)
+}
+
+/// The square-and-multiply loop of [`powmod`] without accounting hooks.
+/// Keep the final squaring on the high bit: [`powmod_muls`] models this exact
+/// loop and the legacy helper has the same operation sequence.
+fn powmod_barrett_raw(mut base: u64, mut exponent: u64, fp: Barrett) -> u64 {
+    let mut result = 1u64;
+    base = fp.reduce(base);
+    while exponent > 0 {
+        if exponent & 1 == 1 {
+            result = barrett_mul_raw(result, base, fp);
+        }
+        base = barrett_mul_raw(base, base, fp);
+        exponent >>= 1;
+    }
+    result
 }
 
 /// Reduction modulo a fixed `p < 2³²` by Barrett's method: a precomputed
@@ -9333,12 +9455,13 @@ static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
 ///
 /// The authoritative ledger is still worker TLS. The borrowed token gates
 /// traversal, native-driver, GM, generic normalization/explicit monic work,
-/// and the admitted wide-field reducer cluster. It cannot enter detached
-/// `'static` work. Specialization and other scalar arithmetic, roots,
+/// the admitted wide-field reducer cluster, candidate evaluation,
+/// specialization, and admitted root field arithmetic. It cannot enter
+/// detached `'static` work. Root allocation/index/sort/RNG bookkeeping,
 /// symbolic/matrix construction beyond the current modeled observations,
-/// allocations, and separate `jv_bitops` telemetry remain non-authoritative
-/// shadows until later migration. Narrow reducers and multiworker Rayon are
-/// outside the admitted profile.
+/// allocations generally, and separate `jv_bitops` telemetry remain
+/// non-authoritative shadows. Narrow reducers, sibling batching and
+/// multiworker Rayon are outside the admitted profile.
 struct VisitAccountingContext {
     id: NonZeroU64,
     owner_thread: ThreadId,
@@ -10011,7 +10134,7 @@ impl VisitAccountingBuilder {
     fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
         self.token_identity = Some(token.id());
         self.arm.accounting_token_mode =
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1";
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1";
     }
 
     fn block(
@@ -11330,21 +11453,44 @@ where
                         return VisitEnd::AccountingStopped;
                     }
                 }
-                let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
-                let original_satisfied = residual_satisfied.then(|| {
+                let mut residual_satisfied = true;
+                for g in input {
+                    match eval_routed(g, &[], self.p, self.account.into()) {
+                        Ok(0) => {}
+                        Ok(_) => {
+                            residual_satisfied = false;
+                            break;
+                        }
+                        Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                        Err(_) => unreachable!("evaluation has no non-accounting stop"),
+                    }
+                }
+                let original_satisfied = if residual_satisfied {
                     for g in self.original {
                         if self
                             .account
                             .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
                             .stopped()
                         {
-                            return false;
+                            return VisitEnd::AccountingStopped;
                         }
                     }
-                    self.original
-                        .iter()
-                        .all(|g| eval(g, &self.assignment, self.p) == 0)
-                });
+                    let mut satisfied = true;
+                    for g in self.original {
+                        match eval_routed(g, &self.assignment, self.p, self.account.into()) {
+                            Ok(0) => {}
+                            Ok(_) => {
+                                satisfied = false;
+                                break;
+                            }
+                            Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                            Err(_) => unreachable!("evaluation has no non-accounting stop"),
+                        }
+                    }
+                    Some(satisfied)
+                } else {
+                    None
+                };
                 (residual_satisfied, original_satisfied)
             };
             if self.account.control().stopped() {
@@ -11564,62 +11710,70 @@ where
                     coefficients[e[var] as usize] = *c;
                 }
                 self.report.domain_frobenius_univariates += 1;
-                let before = self.report.domain_root_field_multiplications;
-                let roots = domain_roots_frobenius(
+                let (roots, multiplications) = roots_fp_routed(
                     &coefficients,
-                    self.domain_index[original].as_ref().expect("built above"),
                     self.p,
-                    &mut self.report.domain_root_field_multiplications,
+                    VISIT_ROOT_SEED,
                     self.opts.deadline,
+                    self.account.into(),
                 );
-                match self
-                    .report
-                    .domain_root_field_multiplications
-                    .checked_sub(before)
+                if add_root_multiplication_diagnostic(
+                    &mut self.report.domain_root_field_multiplications,
+                    multiplications,
+                    "finite-domain root multiplication diagnostic overflowed",
+                    self.account.into(),
+                )
+                .is_err()
                 {
-                    Some(muls) => {
-                        if self
-                            .account
-                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
-                            .stopped()
-                        {
-                            return VisitEnd::AccountingStopped;
-                        }
-                    }
-                    None => {
-                        if self
-                            .account
-                            .block(
-                                "counter_underflow",
-                                Some("field_multiplications"),
-                                "finite-domain root counter regressed",
-                            )
-                            .stopped()
-                        {
-                            return VisitEnd::AccountingStopped;
-                        }
-                    }
-                }
-                if self.account.control().stopped() {
                     return VisitEnd::AccountingStopped;
                 }
-                let Some(roots) = roots else {
-                    return VisitEnd::TimedOut;
+                let rational = match roots {
+                    Ok(Some(roots)) => roots,
+                    Ok(None) => return VisitEnd::TimedOut,
+                    Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                    Err(_) => unreachable!("root arithmetic has no other stop"),
                 };
-                roots
+                let index = self.domain_index[original].as_ref().expect("built above");
+                let mut hits: Vec<(usize, u64)> = rational
+                    .into_iter()
+                    .filter_map(|root| index.get(&root).map(|&position| (position, root)))
+                    .collect();
+                hits.sort_unstable_by_key(|&(position, _)| position);
+                hits.into_iter().map(|(_, root)| root).collect()
             } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
-                let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
-                let per_point = domain_scan_cost(&exponents, 1);
                 for &x in domain {
                     if self.expired() {
                         return VisitEnd::TimedOut;
                     }
-                    self.report.domain_evaluations += 1;
-                    self.report.domain_scan_field_multiplications += per_point;
-                    let value = g.iter().fold(0, |v, (e, c)| {
-                        (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
-                    });
+                    let (value, multiplications) =
+                        match eval_univariate_routed(g, var, x, self.p, self.account.into()) {
+                            Ok(result) => result,
+                            Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                            Err(_) => unreachable!("root scan has no non-accounting stop"),
+                        };
+                    let Some(evaluations) = self.report.domain_evaluations.checked_add(1) else {
+                        self.account.block(
+                            "counter_overflow",
+                            None,
+                            "finite-domain evaluation diagnostic overflowed",
+                        );
+                        return VisitEnd::AccountingStopped;
+                    };
+                    let Some(total_multiplications) = self
+                        .report
+                        .domain_scan_field_multiplications
+                        .checked_add(multiplications)
+                    else {
+                        self.account.block(
+                            "counter_overflow",
+                            Some("field_multiplications"),
+                            "finite-domain root multiplication diagnostic overflowed",
+                        );
+                        return VisitEnd::AccountingStopped;
+                    };
+                    self.report.domain_evaluations = evaluations;
+                    self.report.domain_scan_field_multiplications = total_multiplications;
                     if value == 0 {
                         roots.push(x);
                     }
@@ -11632,45 +11786,29 @@ where
                     coefficients[e[var] as usize] = *c;
                 }
                 self.report.factored_univariates += 1;
-                let before = self.report.root_field_multiplications;
-                let roots = super::glv_invariant_base::poly_roots_fp_counted_until(
+                let (roots, multiplications) = roots_fp_routed(
                     &coefficients,
                     self.p,
-                    0x4634_524f_4f54,
-                    &mut self.report.root_field_multiplications,
+                    VISIT_ROOT_SEED,
                     self.opts.deadline,
+                    self.account.into(),
                 );
-                match self.report.root_field_multiplications.checked_sub(before) {
-                    Some(muls) => {
-                        if self
-                            .account
-                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
-                            .stopped()
-                        {
-                            return VisitEnd::AccountingStopped;
-                        }
-                    }
-                    None => {
-                        if self
-                            .account
-                            .block(
-                                "counter_underflow",
-                                Some("field_multiplications"),
-                                "unrestricted root counter regressed",
-                            )
-                            .stopped()
-                        {
-                            return VisitEnd::AccountingStopped;
-                        }
-                    }
-                }
-                if self.account.control().stopped() {
+                if add_root_multiplication_diagnostic(
+                    &mut self.report.root_field_multiplications,
+                    multiplications,
+                    "unrestricted root multiplication diagnostic overflowed",
+                    self.account.into(),
+                )
+                .is_err()
+                {
                     return VisitEnd::AccountingStopped;
                 }
-                let Some(roots) = roots else {
-                    return VisitEnd::TimedOut;
-                };
-                roots
+                match roots {
+                    Ok(Some(roots)) => roots,
+                    Ok(None) => return VisitEnd::TimedOut,
+                    Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                    Err(_) => unreachable!("root arithmetic has no other stop"),
+                }
             };
             if self
                 .account
@@ -11767,7 +11905,12 @@ where
                 }
                 let mut sub = Vec::with_capacity(generating_set.len());
                 for g in generating_set {
-                    let specialized = specialise(g, var, value, self.p);
+                    let specialized =
+                        match specialise_routed(g, var, value, self.p, self.account.into()) {
+                            Ok(specialized) => specialized,
+                            Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                            Err(_) => unreachable!("specialization has no non-accounting stop"),
+                        };
                     let normalized = match normalise_owned_routed(
                         specialized,
                         self.p,
@@ -12167,12 +12310,14 @@ pub struct VisitFirstReportV1 {
 /// The executor owns a one-thread Rayon pool and exposes no caller callback or
 /// trace sink, preventing those extension points from submitting unrelated
 /// work to that pool. Traversal, delivery, native-driver orchestration, GM,
-/// generic normalization/explicit monic work, and the wide-field pair/RREF
-/// and final polynomial reducers now borrow a session-branded token. The
+/// generic normalization/explicit monic work, the wide-field pair/RREF and
+/// final polynomial reducers, candidate evaluation, specialization, and the
+/// admitted root field operations now borrow a session-branded token. The
 /// accounted profile admits only `p > 2^16`; legacy narrow-field behavior is
-/// unchanged. Specialization and other scalar arithmetic, roots,
-/// symbolic/matrix construction beyond current modeled observations,
-/// allocations, and separate `jv_bitops` telemetry still use shadows.
+/// unchanged. Root allocation/index/sort/RNG bookkeeping, symbolic/matrix
+/// construction beyond current modeled observations, allocations generally,
+/// and separate `jv_bitops` telemetry still use shadows. Sibling batching is
+/// preflight-excluded.
 /// `work_ownership_complete` therefore remains false until every admitted
 /// charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
@@ -13068,7 +13213,7 @@ mod visit_accounting_tests {
         assert_reconciles_in_modes(
             record,
             ownership_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1",
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1",
         );
     }
 
@@ -13132,7 +13277,7 @@ mod visit_accounting_tests {
         assert!(!record.accounting_complete);
         assert_eq!(
             record.arm.accounting_token_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
         );
     }
 
@@ -13575,7 +13720,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -14567,6 +14712,731 @@ mod visit_accounting_tests {
     }
 
     #[test]
+    fn scalar_specialization_and_evaluation_routes_are_exact() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let specialized_input = vec![(vec![3, 2], 5), (vec![0, 1], 7), (vec![2, 0], 11)];
+            let evaluated_input = vec![(vec![2, 0], 3), (vec![1, 3], 2), (vec![0, 0], 11)];
+
+            let run_specialization = |owned: bool, id: &str| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let helper = if owned {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let output =
+                    specialise_routed(&specialized_input, 0, 2, ACCOUNTED_TEST_P, helper).unwrap();
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (output, record)
+            };
+            let legacy_specialization = run_specialization(false, "scalar-specialization-legacy");
+            let owned_specialization = run_specialization(true, "scalar-specialization-owned");
+            assert_eq!(
+                legacy_specialization.0,
+                vec![(vec![2], 40), (vec![1], 7), (vec![0], 44)]
+            );
+            assert_eq!(owned_specialization.0, legacy_specialization.0);
+            let mut expected_specialization = VisitAccountingWorkV1::default();
+            expected_specialization.field_multiplications = 10;
+            for record in [&legacy_specialization.1, &owned_specialization.1] {
+                assert_eq!(non_time_work(record.total.clone()), expected_specialization);
+                assert_reconciles(record);
+            }
+
+            let run_evaluation = |owned: bool, id: &str| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let helper = if owned {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let output =
+                    eval_routed(&evaluated_input, &[5, 7], ACCOUNTED_TEST_P, helper).unwrap();
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (output, record)
+            };
+            let legacy_evaluation = run_evaluation(false, "scalar-evaluation-legacy");
+            let owned_evaluation = run_evaluation(true, "scalar-evaluation-owned");
+            assert_eq!(legacy_evaluation.0, 3516);
+            assert_eq!(owned_evaluation.0, legacy_evaluation.0);
+            let mut expected_evaluation = VisitAccountingWorkV1::default();
+            expected_evaluation.field_multiplications = 12;
+            expected_evaluation.field_additions = 3;
+            for record in [&legacy_evaluation.1, &owned_evaluation.1] {
+                assert_eq!(non_time_work(record.total.clone()), expected_evaluation);
+                assert_reconciles(record);
+            }
+        });
+    }
+
+    #[test]
+    fn scalar_routes_match_legacy_deterministic_panel() {
+        in_owner_pool(|| {
+            fn next(state: &mut u64) -> u64 {
+                *state = state
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1_442_695_040_888_963_407);
+                *state
+            }
+
+            let opts = F4Options::new(Ordering::Grevlex, 8);
+            for (prime_index, p) in [65_537, 131_071, 2_147_483_647].into_iter().enumerate() {
+                let mut state = 0x5343_414c_4152_0000 ^ p;
+                let mut cases: Vec<(Poly, Vec<u64>, usize, u64)> = Vec::new();
+                for case_index in 0..32usize {
+                    let n_vars = 1 + (next(&mut state) % 4) as usize;
+                    let term_count = 1 + (next(&mut state) % 6) as usize;
+                    let mut polynomial = Vec::with_capacity(term_count);
+                    for term_index in 0..term_count {
+                        let exponents =
+                            (0..n_vars).map(|_| (next(&mut state) % 6) as u32).collect();
+                        let sampled = next(&mut state) % p;
+                        let coefficient = if (case_index + term_index) % 7 == 0 {
+                            0
+                        } else {
+                            sampled
+                        };
+                        polynomial.push((exponents, coefficient));
+                    }
+                    let point = (0..n_vars).map(|_| next(&mut state) % p).collect();
+                    let variable = (next(&mut state) % n_vars as u64) as usize;
+                    let value = next(&mut state) % p;
+                    cases.push((polynomial, point, variable, value));
+                }
+
+                let run = |owned: bool, id: &str| {
+                    let context = VisitAccountingContext::new().unwrap();
+                    let session = VisitAccountingSession::begin(
+                        VisitAccountingBuilder::new(request(id), &opts, false),
+                        &context,
+                    )
+                    .ok()
+                    .expect("test owns the accounted session");
+                    let account = VisitAccount::On(session.token());
+                    let helper = if owned {
+                        VisitHelperAccount::from(account)
+                    } else {
+                        VisitHelperAccount::LegacyTls
+                    };
+                    let mut outputs = Vec::with_capacity(cases.len());
+                    for (polynomial, point, variable, value) in &cases {
+                        let specialized =
+                            specialise_routed(polynomial, *variable, *value, p, helper).unwrap();
+                        let evaluated = eval_routed(polynomial, point, p, helper).unwrap();
+                        outputs.push((specialized, evaluated));
+                    }
+                    let record = session.finish(VisitDispositionV1::Incomplete);
+                    (outputs, record)
+                };
+
+                let legacy = run(false, &format!("scalar-panel-{prime_index}-legacy"));
+                let owned = run(true, &format!("scalar-panel-{prime_index}-owned"));
+                assert_eq!(owned.0, legacy.0, "output panel for p={p}");
+                assert_eq!(
+                    non_time_work(owned.1.total.clone()),
+                    non_time_work(legacy.1.total.clone()),
+                    "ledger panel for p={p}"
+                );
+                let evaluated_terms = cases
+                    .iter()
+                    .map(|(polynomial, _, _, _)| polynomial.len() as u64)
+                    .sum::<u64>();
+                assert_eq!(owned.1.total.field_additions, evaluated_terms);
+                assert!(owned.1.total.field_multiplications > evaluated_terms);
+                assert_reconciles(&legacy.1);
+                assert_reconciles(&owned.1);
+            }
+        });
+    }
+
+    #[test]
+    fn root_field_routes_are_exact_and_deadline_is_distinct() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let coefficients = [ACCOUNTED_TEST_P - 1, 1];
+            let run = |owned: bool, id: &str| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let helper = if owned {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let (roots, multiplications) = roots_fp_routed(
+                    &coefficients,
+                    ACCOUNTED_TEST_P,
+                    VISIT_ROOT_SEED,
+                    None,
+                    helper,
+                );
+                let roots = roots.unwrap().unwrap();
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (roots, multiplications, record)
+            };
+            let legacy = run(false, "linear-root-legacy");
+            let owned = run(true, "linear-root-owned");
+            assert_eq!(legacy.0, vec![1]);
+            assert_eq!(owned.0, legacy.0);
+            assert_eq!(legacy.1, 1);
+            assert_eq!(owned.1, legacy.1);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.field_multiplications = 1;
+            expected.field_additions = 1;
+            expected.field_inversions = 1;
+            for record in [&legacy.2, &owned.2] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                assert_reconciles(record);
+            }
+
+            let deadline_context = VisitAccountingContext::new().unwrap();
+            let deadline_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("root-deadline"), &opts, false),
+                &deadline_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let (deadline, multiplications) = roots_fp_routed(
+                &coefficients,
+                ACCOUNTED_TEST_P,
+                VISIT_ROOT_SEED,
+                Some(Instant::now() - Duration::from_secs(1)),
+                VisitHelperAccount::Owned(deadline_session.token()),
+            );
+            assert_eq!(deadline.unwrap(), None);
+            assert_eq!(multiplications, 0);
+            let deadline_record = deadline_session.finish(VisitDispositionV1::TimedOut);
+            assert!(deadline_record.blocker.as_ref().is_some_and(|blocker| {
+                blocker.code == "memory_tracking_gap"
+                    || blocker.code == "operation_tracking_gap"
+                    || blocker.code == "work_ownership_gap"
+            }));
+            assert_no_non_time_work(&deadline_record);
+            assert_reconciles(&deadline_record);
+        });
+    }
+
+    #[test]
+    fn finite_domain_scan_route_is_exact_and_domain_ordered() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let polynomial = vec![(vec![2], 1), (vec![1], ACCOUNTED_TEST_P - 3), (vec![0], 2)];
+            let domain = [2, 0, 3, 1];
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("finite-domain-scan-exact"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let account = VisitAccount::On(session.token());
+            let mut roots = Vec::new();
+            let mut diagnostic_multiplications = 0u64;
+            for x in domain {
+                let (value, multiplications) =
+                    eval_univariate_routed(&polynomial, 0, x, ACCOUNTED_TEST_P, account.into())
+                        .unwrap();
+                diagnostic_multiplications += multiplications;
+                if value == 0 {
+                    roots.push(x);
+                }
+            }
+            assert_eq!(
+                account.charge_usize(VisitAccountingCounter::RootCandidates, roots.len()),
+                VisitAccountingControl::Continue
+            );
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(roots, vec![2, 1]);
+            assert_eq!(diagnostic_multiplications, 32);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.field_multiplications = 32;
+            expected.field_additions = 12;
+            expected.root_candidates = 2;
+            assert_eq!(non_time_work(record.total.clone()), expected);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn observed_root_route_matches_legacy_deterministic_panel() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let p = ACCOUNTED_TEST_P;
+            let polynomials = [
+                vec![p - 1, 1],
+                vec![2, p - 3, 1],
+                vec![p - 6, 11, p - 6, 1],
+                vec![p - 1, 0, 0, 0, 1],
+            ];
+            let run = |coefficients: &[u64], owned: bool, id: &str| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let helper = if owned {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let (roots, multiplications) =
+                    roots_fp_routed(coefficients, p, VISIT_ROOT_SEED, None, helper);
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (roots.unwrap().unwrap(), multiplications, record)
+            };
+            for (index, polynomial) in polynomials.iter().enumerate() {
+                let legacy = run(polynomial, false, &format!("root-panel-{index}-legacy"));
+                let owned = run(polynomial, true, &format!("root-panel-{index}-owned"));
+                assert_eq!(owned.0, legacy.0, "root set case {index}");
+                assert_eq!(owned.1, legacy.1, "diagnostic case {index}");
+                assert_eq!(
+                    non_time_work(owned.2.total.clone()),
+                    non_time_work(legacy.2.total.clone()),
+                    "ledger case {index}"
+                );
+                assert!(owned.2.total.field_multiplications > 0);
+                assert_reconciles(&legacy.2);
+                assert_reconciles(&owned.2);
+            }
+        });
+    }
+
+    #[test]
+    fn scalar_routes_reject_wrong_and_foreign_owners_before_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            for route in 0..3u8 {
+                let owner_context = VisitAccountingContext::new().unwrap();
+                let wrong_context = VisitAccountingContext::new().unwrap();
+                let mismatch_session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(
+                        request(&format!("scalar-token-mismatch-{route}")),
+                        &opts,
+                        false,
+                    ),
+                    &owner_context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let wrong = VisitHelperAccount::Owned(wrong_context.unbound_test_token());
+                let malformed = vec![(vec![1], 1)];
+                match route {
+                    0 => assert!(matches!(
+                        specialise_routed(&malformed, usize::MAX, 1, 0, wrong),
+                        Err(F4Stop::Accounting)
+                    )),
+                    1 => assert!(matches!(
+                        eval_routed(&malformed, &[], 0, wrong),
+                        Err(F4Stop::Accounting)
+                    )),
+                    2 => {
+                        let (roots, multiplications) =
+                            roots_fp_routed(&[1, 1], 0, VISIT_ROOT_SEED, None, wrong);
+                        assert!(matches!(roots, Err(F4Stop::Accounting)));
+                        assert_eq!(multiplications, 0);
+                    }
+                    _ => unreachable!(),
+                }
+                let mismatch_record = mismatch_session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(
+                    mismatch_record.blocker.as_ref().unwrap().code,
+                    "accounting_token_mismatch"
+                );
+                assert_no_non_time_work(&mismatch_record);
+                assert_reconciles(&mismatch_record);
+            }
+
+            for route in 0..3u8 {
+                let foreign_context = VisitAccountingContext::new().unwrap();
+                let foreign_session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(
+                        request(&format!("scalar-foreign-owner-{route}")),
+                        &opts,
+                        false,
+                    ),
+                    &foreign_context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let token = foreign_session.token();
+                std::thread::scope(|scope| {
+                    scope
+                        .spawn(move || {
+                            let malformed = vec![(vec![1], 1)];
+                            let helper = VisitHelperAccount::Owned(token);
+                            match route {
+                                0 => assert!(matches!(
+                                    specialise_routed(&malformed, usize::MAX, 1, 0, helper),
+                                    Err(F4Stop::Accounting)
+                                )),
+                                1 => assert!(matches!(
+                                    eval_routed(&malformed, &[], 0, helper),
+                                    Err(F4Stop::Accounting)
+                                )),
+                                2 => {
+                                    let (roots, multiplications) =
+                                        roots_fp_routed(&[1, 1], 0, VISIT_ROOT_SEED, None, helper);
+                                    assert!(matches!(roots, Err(F4Stop::Accounting)));
+                                    assert_eq!(multiplications, 0);
+                                }
+                                _ => unreachable!(),
+                            }
+                        })
+                        .join()
+                        .unwrap();
+                });
+                let foreign_record = foreign_session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(
+                    foreign_record.blocker.as_ref().unwrap().code,
+                    "foreign_thread_work"
+                );
+                assert_no_non_time_work(&foreign_record);
+                assert_reconciles(&foreign_record);
+            }
+        });
+    }
+
+    #[test]
+    fn scalar_route_overflows_stop_at_term_prefixes() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let input = vec![(vec![2, 0], 3), (vec![1, 3], 2), (vec![0, 0], 11)];
+
+            let multiplication_context = VisitAccountingContext::new().unwrap();
+            let multiplication_session = begin_counter_overflow_session(
+                &multiplication_context,
+                "scalar-multiplication-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldMultiplications,
+            );
+            assert!(matches!(
+                specialise_routed(
+                    &input,
+                    0,
+                    2,
+                    ACCOUNTED_TEST_P,
+                    VisitHelperAccount::Owned(multiplication_session.token()),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            let multiplication_record =
+                multiplication_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(multiplication_record.total.field_multiplications, u64::MAX);
+            assert_eq!(multiplication_record.total.field_additions, 0);
+            assert_overflow_reconciles(&multiplication_record);
+
+            let addition_context = VisitAccountingContext::new().unwrap();
+            let addition_session = begin_counter_overflow_session(
+                &addition_context,
+                "scalar-addition-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldAdditions,
+            );
+            assert!(matches!(
+                eval_routed(
+                    &input,
+                    &[5, 7],
+                    ACCOUNTED_TEST_P,
+                    VisitHelperAccount::Owned(addition_session.token()),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            let addition_record = addition_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(addition_record.total.field_multiplications, 4);
+            assert_eq!(addition_record.total.field_additions, u64::MAX);
+            assert_overflow_reconciles(&addition_record);
+        });
+    }
+
+    #[test]
+    fn observed_root_overflows_stop_at_field_prefixes() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let coefficients = [ACCOUNTED_TEST_P - 1, 1];
+            for (counter, expected_multiplications, expected_additions, expected_inversions) in [
+                (VisitAccountingCounter::FieldInversions, 0, 0, u64::MAX),
+                (VisitAccountingCounter::FieldMultiplications, u64::MAX, 0, 1),
+                (VisitAccountingCounter::FieldAdditions, 1, u64::MAX, 1),
+            ] {
+                let context = VisitAccountingContext::new().unwrap();
+                let session =
+                    begin_counter_overflow_session(&context, counter.name(), &opts, false, counter);
+                let (roots, diagnostic_multiplications) = roots_fp_routed(
+                    &coefficients,
+                    ACCOUNTED_TEST_P,
+                    VISIT_ROOT_SEED,
+                    None,
+                    VisitHelperAccount::Owned(session.token()),
+                );
+                assert!(matches!(roots, Err(F4Stop::Accounting)));
+                assert_eq!(
+                    diagnostic_multiplications,
+                    u64::from(matches!(counter, VisitAccountingCounter::FieldAdditions))
+                );
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(record.total.field_multiplications, expected_multiplications);
+                assert_eq!(record.total.field_additions, expected_additions);
+                assert_eq!(record.total.field_inversions, expected_inversions);
+                assert_overflow_reconciles(&record);
+            }
+        });
+    }
+
+    #[test]
+    fn accounted_linear_domain_root_phases_are_exact() {
+        let input = vec![vec![(vec![1], 1), (vec![0], ACCOUNTED_TEST_P - 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let (solutions, record) = in_owner_pool(|| {
+            let mut solutions = Vec::new();
+            let report = solve_visit_accounted_v1(
+                &input,
+                1,
+                ACCOUNTED_TEST_P,
+                &opts,
+                &[Some(vec![1])],
+                request("linear-domain-root-phases"),
+                |solution| {
+                    solutions.push(solution.to_vec());
+                    false
+                },
+            )
+            .unwrap();
+            (solutions, report.accounting_v1.unwrap())
+        });
+        assert_eq!(solutions, vec![vec![1]]);
+
+        let phase = |wanted| {
+            non_time_work(
+                record
+                    .phases
+                    .iter()
+                    .find(|phase| phase.phase == wanted)
+                    .unwrap()
+                    .work
+                    .clone(),
+            )
+        };
+        let mut root = VisitAccountingWorkV1::default();
+        root.field_multiplications = 4;
+        root.field_additions = 2;
+        root.root_candidates = 1;
+        assert_eq!(phase(VisitAccountingPhaseV1::RootExtraction), root);
+
+        let mut specialization = VisitAccountingWorkV1::default();
+        specialization.specialization_terms = 2;
+        specialization.field_multiplications = 4;
+        specialization.field_additions = 1;
+        specialization.word_operations = 4;
+        specialization.sort_comparisons = 2;
+        assert_eq!(
+            phase(VisitAccountingPhaseV1::Specialization),
+            specialization
+        );
+
+        let mut verification = VisitAccountingWorkV1::default();
+        verification.candidate_terms_checked = 2;
+        verification.field_multiplications = 3;
+        verification.field_additions = 2;
+        assert_eq!(
+            phase(VisitAccountingPhaseV1::CandidateVerification),
+            verification
+        );
+        assert_reconciles(&record);
+    }
+
+    #[test]
+    fn accounted_frobenius_and_auto_root_routes_match_without_double_charge() {
+        let input = vec![vec![
+            (vec![2], 1),
+            (vec![1], ACCOUNTED_TEST_P - 3),
+            (vec![0], 2),
+        ]];
+        let mut auto_domain = vec![2, 0, 3, 1];
+        auto_domain.extend(4..48);
+        assert!(
+            domain_frobenius_cost(2, ACCOUNTED_TEST_P)
+                < domain_scan_cost(&[2, 1, 0], auto_domain.len())
+        );
+
+        let run = |mode: DomainRootMode, domain: Vec<u64>, id: &str| {
+            let opts = F4Options::new(Ordering::Grevlex, 4).with_domain_roots(mode);
+            let domain_len = domain.len() as u64;
+            let (solutions, report) = in_owner_pool(|| {
+                let mut solutions = Vec::new();
+                let report = solve_visit_accounted_v1(
+                    &input,
+                    1,
+                    ACCOUNTED_TEST_P,
+                    &opts,
+                    &[Some(domain)],
+                    request(id),
+                    |solution| {
+                        solutions.push(solution.to_vec());
+                        false
+                    },
+                )
+                .unwrap();
+                (solutions, report)
+            });
+            (solutions, report, domain_len)
+        };
+
+        let frobenius = run(
+            DomainRootMode::Frobenius,
+            vec![2, 0, 3, 1],
+            "accounted-frobenius-root-route",
+        );
+        let auto = run(
+            DomainRootMode::Auto,
+            auto_domain,
+            "accounted-auto-frobenius-root-route",
+        );
+        for (solutions, report, domain_len) in [&frobenius, &auto] {
+            assert_eq!(solutions, &vec![vec![2], vec![1]]);
+            assert!(report.complete && !report.timed_out && report.resource_limit.is_none());
+            assert_eq!(report.domain_evaluations, 0);
+            assert_eq!(report.domain_frobenius_univariates, 1);
+            assert_eq!(report.domain_index_entries, *domain_len);
+            assert!(report.domain_root_field_multiplications > 0);
+            let root = non_time_work(
+                accounting(report)
+                    .phases
+                    .iter()
+                    .find(|phase| phase.phase == VisitAccountingPhaseV1::RootExtraction)
+                    .unwrap()
+                    .work
+                    .clone(),
+            );
+            assert_eq!(
+                root.field_multiplications, report.domain_root_field_multiplications,
+                "the observed root core must not also charge TLS"
+            );
+            assert!(root.field_additions > 0);
+            assert!(root.field_inversions > 0);
+            assert_eq!(root.root_candidates, 2);
+            assert_reconciles(accounting(report));
+        }
+        assert_eq!(accounting(&frobenius.1).arm.domain_root_mode, "frobenius");
+        assert_eq!(accounting(&auto.1).arm.domain_root_mode, "auto");
+        let root_work = |report: &VisitReport| {
+            non_time_work(
+                accounting(report)
+                    .phases
+                    .iter()
+                    .find(|phase| phase.phase == VisitAccountingPhaseV1::RootExtraction)
+                    .unwrap()
+                    .work
+                    .clone(),
+            )
+        };
+        assert_eq!(root_work(&frobenius.1), root_work(&auto.1));
+    }
+
+    #[test]
+    fn scalar_root_structural_overflows_stop_before_downstream_work() {
+        in_owner_pool(|| {
+            let input = vec![vec![(vec![1], 1), (vec![0], ACCOUNTED_TEST_P - 1)]];
+            let domains = [Some(vec![1])];
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let run = |counter, id: &str| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = begin_counter_overflow_session(&context, id, &opts, false, counter);
+                let mut callback_entered = false;
+                let report = solve_visit_impl(
+                    &input,
+                    1,
+                    ACCOUNTED_TEST_P,
+                    &opts,
+                    &domains,
+                    VisitAccount::On(session.token()),
+                    |_| {
+                        callback_entered = true;
+                        false
+                    },
+                    None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                    None,
+                )
+                .unwrap();
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                assert!(!report.complete);
+                assert!(!report.timed_out && report.resource_limit.is_none());
+                assert!(!callback_entered);
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().counter,
+                    Some(counter.name())
+                );
+                assert_overflow_reconciles(&record);
+                (report, record)
+            };
+
+            let (_, root_record) = run(
+                VisitAccountingCounter::RootCandidates,
+                "root-candidate-overflow",
+            );
+            assert_eq!(root_record.total.root_candidates, u64::MAX);
+            assert_eq!(root_record.total.branch_deliveries, 0);
+            assert_eq!(root_record.total.specialization_terms, 0);
+            assert_eq!(root_record.total.callback_deliveries, 0);
+
+            let (_, specialization_record) = run(
+                VisitAccountingCounter::SpecializationTerms,
+                "specialization-term-overflow",
+            );
+            assert_eq!(specialization_record.total.branch_deliveries, 1);
+            assert_eq!(specialization_record.total.specialization_terms, u64::MAX);
+            let specialization_phase = &specialization_record
+                .phases
+                .iter()
+                .find(|phase| phase.phase == VisitAccountingPhaseV1::Specialization)
+                .unwrap()
+                .work;
+            assert_eq!(specialization_phase.field_multiplications, 0);
+            assert_eq!(specialization_phase.field_additions, 0);
+            assert_eq!(specialization_record.total.callback_deliveries, 0);
+
+            let (_, candidate_record) = run(
+                VisitAccountingCounter::CandidateTermsChecked,
+                "candidate-term-overflow",
+            );
+            assert_eq!(candidate_record.total.candidate_terms_checked, u64::MAX);
+            let candidate_phase = &candidate_record
+                .phases
+                .iter()
+                .find(|phase| phase.phase == VisitAccountingPhaseV1::CandidateVerification)
+                .unwrap()
+                .work;
+            assert_eq!(candidate_phase.field_multiplications, 0);
+            assert_eq!(candidate_phase.field_additions, 0);
+            assert_eq!(candidate_record.total.callback_deliveries, 0);
+        });
+    }
+
+    #[test]
     fn accounted_profile_rejects_narrow_fields_but_legacy_remains_available() {
         let legacy = solve_visit(
             &[],
@@ -14799,7 +15669,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -15207,7 +16077,7 @@ mod visit_accounting_tests {
             assert!(callback_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 callback_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
             );
 
             let trace_context = VisitAccountingContext::new().unwrap();
@@ -15257,7 +16127,7 @@ mod visit_accounting_tests {
             assert!(trace_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 trace_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -15721,11 +16591,66 @@ pub(crate) fn domain_position_index(domain: &[u64]) -> FxMap<u64, usize> {
     index
 }
 
+/// The shared rational-root kernel with its field operations owned by this
+/// visitor call. `Ok(None)` is only a deadline; an observer refusal is the
+/// distinct `F4Stop::Accounting` error. The returned multiplication count is
+/// the successfully admitted diagnostic prefix, including an interrupted run.
+fn roots_fp_routed(
+    coefficients: &[u64],
+    p: u64,
+    seed: u64,
+    deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
+) -> (Result<Option<Vec<u64>>, F4Stop>, u64) {
+    let meter = ScalarMeter::from(account);
+    if let Err(stop) = meter.control() {
+        return (Err(stop), 0);
+    }
+    let mut multiplications = 0u64;
+    let result = super::glv_invariant_base::poly_roots_fp_observed_until(
+        coefficients,
+        p,
+        seed,
+        deadline,
+        &mut |operation| {
+            use super::glv_invariant_base::RootFieldOperation;
+
+            match operation {
+                RootFieldOperation::Multiplication => {
+                    meter.admit_field_work(1, 0, 0)?;
+                    multiplications = meter.checked_add(
+                        multiplications,
+                        1,
+                        "field_multiplications",
+                        "root multiplication diagnostic overflowed",
+                    )?;
+                }
+                RootFieldOperation::Addition => meter.admit_field_work(0, 1, 0)?,
+                RootFieldOperation::Inversion => meter.admit_field_work(0, 0, 1)?,
+            }
+            Ok(())
+        },
+    );
+    (result, multiplications)
+}
+
+fn add_root_multiplication_diagnostic(
+    total: &mut u64,
+    delta: u64,
+    detail: &'static str,
+    account: VisitHelperAccount<'_>,
+) -> Result<(), F4Stop> {
+    *total =
+        ScalarMeter::from(account).checked_add(*total, delta, "field_multiplications", detail)?;
+    Ok(())
+}
+
 /// The roots in a finite domain of the univariate `coefficients` (low to
 /// high), in domain order: the counted `F_p`-root finder
 /// ([`super::glv_invariant_base::poly_roots_fp_counted_until`]), then the
 /// domain index.  Exact because the domain lies in `F_p`; `None` only when
 /// the deadline expires.  Multiplications are added to `muls`.
+#[cfg(test)]
 pub(crate) fn domain_roots_frobenius(
     coefficients: &[u64],
     index: &FxMap<u64, usize>,
@@ -16073,6 +16998,87 @@ fn specialise(f: &Poly, i: usize, a: u64, p: u64) -> Vec<(Vec<u32>, u64)> {
         .collect()
 }
 
+/// Token-routed counterpart of [`specialise`] for the admitted visitor.
+/// Each term's complete multiplication bundle is admitted before its first
+/// field operation; owned arithmetic then stays below the TLS hooks.
+fn specialise_routed(
+    f: &Poly,
+    i: usize,
+    a: u64,
+    p: u64,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    let meter = ScalarMeter::from(account);
+    meter.control()?;
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(specialise(f, i, a, p));
+    }
+    let fp = Barrett::new(p);
+    let mut specialized = Vec::with_capacity(f.len());
+    for (exponents, coefficient) in f {
+        let exponent = u64::from(exponents[i]);
+        let multiplications = meter.checked_add(
+            powmod_muls(exponent),
+            1,
+            "field_multiplications",
+            "specialization term multiplication count overflowed",
+        )?;
+        meter.admit_field_work(multiplications, 0, 0)?;
+        let mut remaining = exponents.clone();
+        remaining.remove(i);
+        let power = powmod_barrett_raw(a, exponent, fp);
+        specialized.push((
+            remaining,
+            barrett_mul_raw(fp.reduce(*coefficient), power, fp),
+        ));
+    }
+    Ok(specialized)
+}
+
+/// Evaluate one univariate at one finite-domain point. Unlike general
+/// [`eval`], the visitor's scan multiplies every coefficient by `x^e`, even
+/// for `e = 0`; this helper preserves that exact operation sequence.
+fn eval_univariate_routed(
+    f: &Poly,
+    variable: usize,
+    x: u64,
+    p: u64,
+    account: VisitHelperAccount<'_>,
+) -> Result<(u64, u64), F4Stop> {
+    let meter = ScalarMeter::from(account);
+    meter.control()?;
+    let mut multiplications = 0u64;
+    for (exponents, _) in f {
+        let term = meter.checked_add(
+            powmod_muls(u64::from(exponents[variable])),
+            1,
+            "field_multiplications",
+            "finite-domain root term multiplication count overflowed",
+        )?;
+        multiplications = meter.checked_add(
+            multiplications,
+            term,
+            "field_multiplications",
+            "finite-domain root evaluation multiplication count overflowed",
+        )?;
+    }
+    let additions = meter.checked_count(
+        f.len(),
+        "field_additions",
+        "finite-domain root evaluation term count does not fit u64",
+    )?;
+    meter.admit_field_work(multiplications, additions, 0)?;
+
+    let fp = Barrett::new(p);
+    let mut value = 0u64;
+    for (exponents, coefficient) in f {
+        let power = powmod_barrett_raw(x, u64::from(exponents[variable]), fp);
+        let term = barrett_mul_raw(fp.reduce(*coefficient), power, fp);
+        value = barrett_add_raw(value, term, fp);
+    }
+    Ok((value, multiplications))
+}
+
 /// Solve a zero-dimensional system over `F_p` by degree-bounded F4 and
 /// substitution.  Solutions are full assignments `(x_0, …, x_{n−1})`.
 pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveReport {
@@ -16321,6 +17327,54 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
         visit_account_charge(VisitAccountingCounter::FieldAdditions, 1);
     }
     v
+}
+
+/// Token-routed counterpart of [`eval`] for candidate verification. A term's
+/// multiplications and its accumulator addition are admitted before any of
+/// that term's field arithmetic or mutation.
+fn eval_routed(
+    f: &Poly,
+    x: &[u64],
+    p: u64,
+    account: VisitHelperAccount<'_>,
+) -> Result<u64, F4Stop> {
+    let meter = ScalarMeter::from(account);
+    meter.control()?;
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(eval(f, x, p));
+    }
+    let fp = Barrett::new(p);
+    let mut value = 0u64;
+    for (exponents, coefficient) in f {
+        let mut multiplications = 0u64;
+        for &exponent in exponents {
+            if exponent == 0 {
+                continue;
+            }
+            let factor = meter.checked_add(
+                powmod_muls(u64::from(exponent)),
+                1,
+                "field_multiplications",
+                "candidate term factor multiplication count overflowed",
+            )?;
+            multiplications = meter.checked_add(
+                multiplications,
+                factor,
+                "field_multiplications",
+                "candidate term multiplication count overflowed",
+            )?;
+        }
+        meter.admit_field_work(multiplications, 1, 0)?;
+        let mut term = fp.reduce(*coefficient);
+        for (index, &exponent) in exponents.iter().enumerate() {
+            if exponent > 0 {
+                let power = powmod_barrett_raw(x[index], u64::from(exponent), fp);
+                term = barrett_mul_raw(term, power, fp);
+            }
+        }
+        value = barrett_add_raw(value, term, fp);
+    }
+    Ok(value)
 }
 
 #[cfg(test)]

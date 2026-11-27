@@ -1077,9 +1077,79 @@ fn poly_trim(mut v: Vec<u64>) -> Vec<u64> {
     v
 }
 
-fn poly_mul(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+/// Field operations performed by the shared rational-root finder.
+///
+/// An observer is called before each represented operation.  This lets a
+/// caller refuse work without confusing that refusal with the root finder's
+/// cooperative deadline.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum RootFieldOperation {
+    Multiplication,
+    Addition,
+    Inversion,
+}
+
+#[inline]
+fn root_mul<E>(
+    a: u64,
+    b: u64,
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<u64, E> {
+    observe(RootFieldOperation::Multiplication)?;
+    Ok(mulm(a, b, p))
+}
+
+#[inline]
+fn root_add<E>(
+    a: u64,
+    b: u64,
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<u64, E> {
+    observe(RootFieldOperation::Addition)?;
+    Ok(addm(a, b, p))
+}
+
+#[inline]
+fn root_sub<E>(
+    a: u64,
+    b: u64,
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<u64, E> {
+    observe(RootFieldOperation::Addition)?;
+    Ok(subm(a, b, p))
+}
+
+#[inline]
+fn root_neg<E>(
+    a: u64,
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<u64, E> {
+    observe(RootFieldOperation::Addition)?;
+    Ok(negm(a, p))
+}
+
+#[inline]
+fn root_inv<E>(
+    a: u64,
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<u64, E> {
+    observe(RootFieldOperation::Inversion)?;
+    Ok(inv_mod(a, p))
+}
+
+fn poly_mul_observed<E>(
+    a: &[u64],
+    b: &[u64],
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Vec<u64>, E> {
     if a.is_empty() || b.is_empty() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
     let mut out = vec![0u64; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
@@ -1087,62 +1157,92 @@ fn poly_mul(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
             continue;
         }
         for (j, &y) in b.iter().enumerate() {
-            out[i + j] = addm(out[i + j], mulm(x, y, p), p);
-            *muls += 1;
+            let product = root_mul(x, y, p, observe)?;
+            out[i + j] = root_add(out[i + j], product, p, observe)?;
         }
     }
-    poly_trim(out)
+    Ok(poly_trim(out))
 }
 
-fn poly_rem(a: &[u64], m: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+fn poly_rem_observed<E>(
+    a: &[u64],
+    m: &[u64],
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Vec<u64>, E> {
     let mut a = a.to_vec();
     let dm = m.len() - 1;
-    let inv_lead = inv_mod(m[dm], p);
+    let inv_lead = root_inv(m[dm], p, observe)?;
     while a.len() > dm {
         let da = a.len() - 1;
-        let c = mulm(a[da], inv_lead, p);
-        *muls += 1;
+        let c = root_mul(a[da], inv_lead, p, observe)?;
         if c != 0 {
             for k in 0..=dm {
-                a[da - dm + k] = subm(a[da - dm + k], mulm(c, m[k], p), p);
+                let product = root_mul(c, m[k], p, observe)?;
+                a[da - dm + k] = root_sub(a[da - dm + k], product, p, observe)?;
             }
-            *muls += dm as u64 + 1;
         }
         a.pop();
         a = poly_trim(a);
     }
-    a
+    Ok(a)
 }
 
-fn poly_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+fn poly_gcd_observed<E>(
+    a: &[u64],
+    b: &[u64],
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Vec<u64>, E> {
     let (mut a, mut b) = (poly_trim(a.to_vec()), poly_trim(b.to_vec()));
     while !b.is_empty() {
-        let r = poly_rem(&a, &b, p, muls);
+        let r = poly_rem_observed(&a, &b, p, observe)?;
         a = b;
         b = r;
     }
     if let Some(&lead) = a.last() {
-        let inv = inv_mod(lead, p);
+        let inv = root_inv(lead, p, observe)?;
         for c in &mut a {
-            *c = mulm(*c, inv, p);
+            *c = root_mul(*c, inv, p, observe)?;
         }
-        *muls += a.len() as u64;
     }
-    a
+    Ok(a)
 }
 
 /// `base^e mod m`.
-fn poly_powmod(base: &[u64], mut e: u64, m: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+fn poly_powmod_observed<E>(
+    base: &[u64],
+    mut e: u64,
+    m: &[u64],
+    p: u64,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Vec<u64>, E> {
     let mut acc = vec![1u64];
-    let mut b = poly_rem(base, m, p, muls);
+    let mut b = poly_rem_observed(base, m, p, observe)?;
     while e > 0 {
         if e & 1 == 1 {
-            acc = poly_rem(&poly_mul(&acc, &b, p, muls), m, p, muls);
+            let product = poly_mul_observed(&acc, &b, p, observe)?;
+            acc = poly_rem_observed(&product, m, p, observe)?;
         }
-        b = poly_rem(&poly_mul(&b, &b, p, muls), m, p, muls);
+        let square = poly_mul_observed(&b, &b, p, observe)?;
+        b = poly_rem_observed(&square, m, p, observe)?;
         e >>= 1;
     }
-    acc
+    Ok(acc)
+}
+
+#[cfg(test)]
+fn poly_mul(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let mut observe = |operation| {
+        if operation == RootFieldOperation::Multiplication {
+            *muls += 1;
+        }
+        Ok::<(), std::convert::Infallible>(())
+    };
+    match poly_mul_observed(a, b, p, &mut observe) {
+        Ok(product) => product,
+        Err(never) => match never {},
+    }
 }
 
 /// The roots in `F_p` of a polynomial (coefficients low to high), by
@@ -1170,51 +1270,87 @@ pub fn poly_roots_fp_counted_until(
     muls: &mut u64,
     deadline: Option<std::time::Instant>,
 ) -> Option<Vec<u64>> {
+    let mut observe = |operation| {
+        if operation == RootFieldOperation::Multiplication {
+            *muls += 1;
+        }
+        Ok::<(), std::convert::Infallible>(())
+    };
+    match poly_roots_fp_observed_until(f, p, seed, deadline, &mut observe) {
+        Ok(roots) => roots,
+        Err(never) => match never {},
+    }
+}
+
+/// The same deterministic rational-root extraction with a fallible operation
+/// observer.  The observer runs immediately before every field multiplication,
+/// addition/subtraction, and inversion.  Its error is returned distinctly from
+/// `Ok(None)`, which means only that the cooperative deadline expired.
+pub(crate) fn poly_roots_fp_observed_until<E>(
+    f: &[u64],
+    p: u64,
+    seed: u64,
+    deadline: Option<std::time::Instant>,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Option<Vec<u64>>, E> {
     let expired = || deadline.is_some_and(|d| std::time::Instant::now() >= d);
     if expired() {
-        return None;
+        return Ok(None);
     }
     let f = poly_trim(f.to_vec());
     if f.len() <= 1 {
-        return Some(Vec::new());
+        return Ok(Some(Vec::new()));
     }
     if p == 2 {
-        return Some(
-            (0..2)
-                .filter(|&x| f.iter().rev().fold(0, |v, &c| (v * x + c) % 2) == 0)
-                .collect(),
-        );
+        let mut roots = Vec::new();
+        for x in 0..2 {
+            let mut value = 0;
+            for &coefficient in f.iter().rev() {
+                value = root_mul(value, x, p, observe)?;
+                value = root_add(value, coefficient, p, observe)?;
+            }
+            if value == 0 {
+                roots.push(x);
+            }
+        }
+        return Ok(Some(roots));
     }
     if f.len() == 2 {
-        return Some(vec![negm(mulm(f[0], inv_mod(f[1], p), p), p)]);
+        let inverse = root_inv(f[1], p, observe)?;
+        let scaled = root_mul(f[0], inverse, p, observe)?;
+        return Ok(Some(vec![root_neg(scaled, p, observe)?]));
     }
     // x^p − x mod f
-    let xp = poly_powmod(&[0, 1], p, &f, p, muls);
+    let xp = poly_powmod_observed(&[0, 1], p, &f, p, observe)?;
     let mut xp_minus_x = xp;
     if xp_minus_x.len() < 2 {
         xp_minus_x.resize(2, 0);
     }
-    xp_minus_x[1] = subm(xp_minus_x[1], 1, p);
-    let g = poly_gcd(&f, &poly_trim(xp_minus_x), p, muls);
+    xp_minus_x[1] = root_sub(xp_minus_x[1], 1, p, observe)?;
+    let g = poly_gcd_observed(&f, &poly_trim(xp_minus_x), p, observe)?;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x524F_4F54);
     let mut out = Vec::new();
     let mut stack = vec![g];
     while let Some(h) = stack.pop() {
         if expired() {
-            return None;
+            return Ok(None);
         }
         match h.len() {
             0 | 1 => {}
-            2 => out.push(negm(mulm(h[0], inv_mod(h[1], p), p), p)),
+            2 => {
+                let inverse = root_inv(h[1], p, observe)?;
+                let scaled = root_mul(h[0], inverse, p, observe)?;
+                out.push(root_neg(scaled, p, observe)?);
+            }
             _ => {
                 // Split h with gcd((x + δ)^((p−1)/2) − 1, h).
                 let delta = rng.gen_range(0..p);
-                let mut s = poly_powmod(&[delta, 1], (p - 1) / 2, &h, p, muls);
+                let mut s = poly_powmod_observed(&[delta, 1], (p - 1) / 2, &h, p, observe)?;
                 if s.is_empty() {
                     s.push(0);
                 }
-                s[0] = subm(s[0], 1, p);
-                let d = poly_gcd(&h, &poly_trim(s), p, muls);
+                s[0] = root_sub(s[0], 1, p, observe)?;
+                let d = poly_gcd_observed(&h, &poly_trim(s), p, observe)?;
                 if d.len() <= 1 || d.len() == h.len() {
                     stack.push(h);
                     continue;
@@ -1222,16 +1358,16 @@ pub fn poly_roots_fp_counted_until(
                 let mut q = h.clone();
                 // h / d by long division (exact).
                 let mut quotient = vec![0u64; h.len() - d.len() + 1];
-                let inv_lead = inv_mod(*d.last().unwrap(), p);
+                let inv_lead = root_inv(*d.last().unwrap(), p, observe)?;
                 while q.len() >= d.len() && !q.is_empty() {
                     let dq = q.len() - 1;
-                    let c = mulm(q[dq], inv_lead, p);
+                    let c = root_mul(q[dq], inv_lead, p, observe)?;
                     quotient[dq - (d.len() - 1)] = c;
                     for k in 0..d.len() {
+                        let product = root_mul(c, d[k], p, observe)?;
                         q[dq - (d.len() - 1) + k] =
-                            subm(q[dq - (d.len() - 1) + k], mulm(c, d[k], p), p);
+                            root_sub(q[dq - (d.len() - 1) + k], product, p, observe)?;
                     }
-                    *muls += d.len() as u64 + 1;
                     q.pop();
                     q = poly_trim(q);
                 }
@@ -1243,9 +1379,9 @@ pub fn poly_roots_fp_counted_until(
     out.sort_unstable();
     out.dedup();
     if expired() {
-        None
+        Ok(None)
     } else {
-        Some(out)
+        Ok(Some(out))
     }
 }
 
@@ -1701,6 +1837,131 @@ mod tests {
         assert!(poly_roots_fp(&[1, 0, 1], 7, 1).is_empty());
         // x² + 1 over F_13 has roots 5 and 8.
         assert_eq!(poly_roots_fp(&[1, 0, 1], 13, 1), vec![5, 8]);
+    }
+
+    #[test]
+    fn observed_linear_root_has_exact_operations_and_distinct_stops() {
+        // x - 1 over F_101: invert the leading coefficient, multiply the
+        // constant, then negate it.
+        let mut operations = Vec::new();
+        let roots = poly_roots_fp_observed_until(&[100, 1], 101, 7, None, &mut |operation| {
+            operations.push(operation);
+            Ok::<(), &'static str>(())
+        })
+        .unwrap()
+        .unwrap();
+        assert_eq!(roots, vec![1]);
+        assert_eq!(
+            operations,
+            vec![
+                RootFieldOperation::Inversion,
+                RootFieldOperation::Multiplication,
+                RootFieldOperation::Addition,
+            ]
+        );
+
+        let mut prefix = Vec::new();
+        let stopped = poly_roots_fp_observed_until(&[100, 1], 101, 7, None, &mut |operation| {
+            prefix.push(operation);
+            if operation == RootFieldOperation::Multiplication {
+                Err("multiplication refused")
+            } else {
+                Ok(())
+            }
+        });
+        assert_eq!(stopped, Err("multiplication refused"));
+        assert_eq!(
+            prefix,
+            vec![
+                RootFieldOperation::Inversion,
+                RootFieldOperation::Multiplication,
+            ]
+        );
+
+        let mut deadline_observations = 0usize;
+        let expired = poly_roots_fp_observed_until(
+            &[100, 1],
+            101,
+            7,
+            Some(std::time::Instant::now() - std::time::Duration::from_secs(1)),
+            &mut |_| {
+                deadline_observations += 1;
+                Ok::<(), ()>(())
+            },
+        );
+        assert_eq!(expired, Ok(None));
+        assert_eq!(deadline_observations, 0);
+    }
+
+    #[test]
+    fn observed_characteristic_two_quadratic_has_exact_horner_trace() {
+        // x^2 + x over F_2 has roots 0 and 1.  The dedicated p=2 path
+        // evaluates three coefficients at each of two points, with one
+        // multiplication followed by one addition for every Horner step.
+        let mut operations = Vec::new();
+        let roots = poly_roots_fp_observed_until(&[0, 1, 1], 2, 3, None, &mut |operation| {
+            operations.push(operation);
+            Ok::<(), std::convert::Infallible>(())
+        })
+        .unwrap()
+        .unwrap();
+        assert_eq!(roots, vec![0, 1]);
+        let expected: Vec<_> = (0..6)
+            .flat_map(|_| {
+                [
+                    RootFieldOperation::Multiplication,
+                    RootFieldOperation::Addition,
+                ]
+            })
+            .collect();
+        assert_eq!(operations, expected);
+    }
+
+    #[test]
+    fn counted_root_multiplications_match_the_observed_core() {
+        let cases = [
+            (vec![100, 1], 101, 7),
+            // (x - 2)(x - 5)(x - 9) over F_101.
+            (vec![11, 73, 85, 1], 101, 1),
+            // The characteristic-two Horner branch also represents every
+            // multiplication rather than treating evaluation as free.
+            (vec![0, 1], 2, 3),
+        ];
+        for (index, (polynomial, p, seed)) in cases.into_iter().enumerate() {
+            let mut observed_multiplications = 0u64;
+            let observed =
+                poly_roots_fp_observed_until(&polynomial, p, seed, None, &mut |operation| {
+                    if operation == RootFieldOperation::Multiplication {
+                        observed_multiplications += 1;
+                    }
+                    Ok::<(), std::convert::Infallible>(())
+                })
+                .unwrap()
+                .unwrap();
+
+            let mut counted_multiplications = 0u64;
+            let counted = poly_roots_fp_counted_until(
+                &polynomial,
+                p,
+                seed,
+                &mut counted_multiplications,
+                None,
+            )
+            .unwrap();
+            assert_eq!(counted, observed, "root mismatch in case {index}");
+            assert_eq!(
+                counted_multiplications, observed_multiplications,
+                "multiplication mismatch in case {index}"
+            );
+            assert!(counted_multiplications > 0, "empty count in case {index}");
+        }
+
+        let mut linear_multiplications = 0u64;
+        assert_eq!(
+            poly_roots_fp_counted(&[100, 1], 101, 7, &mut linear_multiplications),
+            vec![1]
+        );
+        assert_eq!(linear_multiplications, 1);
     }
 
     #[test]
