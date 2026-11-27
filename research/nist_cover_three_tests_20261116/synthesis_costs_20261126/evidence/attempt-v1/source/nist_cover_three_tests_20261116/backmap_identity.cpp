@@ -1,0 +1,8 @@
+// Structural normalization/clearing identities; identity/v1 field only.
+#include "identity_arithmetic.hpp"
+int main(int argc,char** argv){try{
+    require(argc==2,"usage: backmap_identity NEW-output-directory");std::string dir=argv[1];auto x=var("x"),c=var("c"),cx=mul({c,x});auto numerator=add({num(1),mul({num(2),cx}),mul({num(8),power(cx,2)})}),denominator=add({num(1),mul({num(2),cx})});auto numerator_prime=add({mul({num(2),c}),mul({num(16),power(c,2),x})});
+    issue(dir+"/cover-differential.identity.json","Generic cleared cover differential normalization",{"x","c"},sub(mul({numerator_prime,denominator}),mul({numerator,num(2),c})),mul({num(16),power(c,2),x,add({num(1),cx})}),5);
+    auto A=var("A"),B=var("B"),V=var("V"),L=var("L"),a=var("a"),b=var("b");auto cubic=add({power(A,3),mul({a,A,power(B,2)}),mul({b,power(B,3)})});auto cleared=sub(power(V,2),mul({num(4),power(L,2),B,cubic}));
+    issue(dir+"/elliptic-clearing.identity.json","Generic elliptic rational-map denominator clearing",{"A","B","V","L","a","b"},mul({cleared,power(B,3)}),sub(mul({power(V,2),power(B,3)}),mul({cubic,power(mul({num(2),L,power(B,2)}),2)})),10);
+}catch(const std::exception& e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}
