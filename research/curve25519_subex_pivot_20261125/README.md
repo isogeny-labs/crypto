@@ -573,7 +573,12 @@ packed remainder in the GCD loop strictly reduces the right degree, proves the
 public sum-of-degrees fuel sufficient, identifies the returned packed value
 with polynomial GCD, and proves the native `==1` guard equivalent to polynomial
 GCD equaling one. Composing these facts through the Rabin Boolean control flow
-and proving the general irreducibility equivalence remain separate.
+is now also kernel-checked: minimal packed decoding is injective, every active
+early guard becomes polynomial GCD one, and the terminal native equality becomes
+equality of the decoded Frobenius values. Thus the public packed Boolean is
+equivalent to an explicit polynomial semantic trace. The remaining external
+step is the general theorem equating that criterion with irreducibility under
+the required degree and monicity hypotheses.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

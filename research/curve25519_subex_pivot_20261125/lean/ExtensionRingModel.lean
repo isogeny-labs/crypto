@@ -2446,6 +2446,66 @@ theorem gf2PackedGcd_guard_iff (left right : ℕ) :
         (packedGF2Polynomial (Nat.log2 left + 1) left) = 1 := by
   simpa [beq_iff_eq] using gf2PackedGcd_eq_one_iff left right
 
+/-- Fixed-window packed decoding is injective when both source naturals fit in
+the declared bit window. -/
+theorem packedGF2Polynomial_injective_of_lt
+    (width left right : ℕ) (hleft : left < 2 ^ width)
+    (hright : right < 2 ^ width)
+    (heq : packedGF2Polynomial width left = packedGF2Polynomial width right) :
+    left = right := by
+  apply Nat.eq_of_testBit_eq
+  intro index
+  by_cases hindex : index < width
+  · let packedIndex : Fin width := ⟨index, hindex⟩
+    have hcoeff := congrArg (fun polynomial : Polynomial (ZMod 2) =>
+      polynomial.coeff index) heq
+    have hleftCoeff := packedGF2Polynomial_coeff width left packedIndex
+    have hrightCoeff := packedGF2Polynomial_coeff width right packedIndex
+    change (packedGF2Polynomial width left).coeff index = _ at hleftCoeff
+    change (packedGF2Polynomial width right).coeff index = _ at hrightCoeff
+    rw [hleftCoeff, hrightCoeff] at hcoeff
+    change (if left.testBit index then (1 : ZMod 2) else 0) =
+      if right.testBit index then 1 else 0 at hcoeff
+    cases hleftBit : left.testBit index <;>
+      cases hrightBit : right.testBit index <;> simp_all
+  · have hpow : 2 ^ width ≤ 2 ^ index :=
+      Nat.pow_le_pow_right (by decide) (by omega)
+    have hleftBit := Nat.testBit_eq_false_of_lt (lt_of_lt_of_le hleft hpow)
+    have hrightBit := Nat.testBit_eq_false_of_lt (lt_of_lt_of_le hright hpow)
+    simp [hleftBit, hrightBit]
+
+/-- Minimal `log2+1` packed decoding is injective even when the two source
+values use different minimal windows. -/
+theorem packedGF2Polynomial_minimal_injective (left right : ℕ)
+    (heq : packedGF2Polynomial (Nat.log2 left + 1) left =
+      packedGF2Polynomial (Nat.log2 right + 1) right) :
+    left = right := by
+  let leftWidth := Nat.log2 left + 1
+  let rightWidth := Nat.log2 right + 1
+  have hleftFit : left < 2 ^ leftWidth := by
+    by_cases hleft : left = 0
+    · simp [hleft, leftWidth]
+    · exact ((Nat.log2_eq_iff hleft).mp rfl).2
+  have hrightFit : right < 2 ^ rightWidth := by
+    by_cases hright : right = 0
+    · simp [hright, rightWidth]
+    · exact ((Nat.log2_eq_iff hright).mp rfl).2
+  apply packedGF2Polynomial_injective_of_lt
+    (leftWidth + rightWidth) left right
+  · exact lt_of_lt_of_le hleftFit
+      (Nat.pow_le_pow_right (by decide) (by omega))
+  · exact lt_of_lt_of_le hrightFit
+      (Nat.pow_le_pow_right (by decide) (by omega))
+  · calc
+      packedGF2Polynomial (leftWidth + rightWidth) left =
+          packedGF2Polynomial leftWidth left :=
+        packedGF2Polynomial_extend leftWidth rightWidth left hleftFit
+      _ = packedGF2Polynomial rightWidth right := heq
+      _ = packedGF2Polynomial (leftWidth + rightWidth) right := by
+        rw [add_comm]
+        exact (packedGF2Polynomial_extend rightWidth leftWidth right
+          hrightFit).symm
+
 /-- Native-shaped Rabin loop: repeated Frobenius squaring, early gcd checks
 through half the degree, and the final `x^(2^degree)=x` equality. -/
 def gf2PackedIrreducibleAux (polynomial x degree : ℕ) : ℕ → ℕ → ℕ → Bool
@@ -2459,10 +2519,116 @@ def gf2PackedIrreducibleAux (polynomial x degree : ℕ) : ℕ → ℕ → ℕ �
       else
         gf2PackedIrreducibleAux polynomial x degree remaining nextIndex next
 
+/-- Polynomial-level meaning of every Boolean branch in the packed Rabin
+auxiliary loop. Native square-and-reduce values are decoded at each guard;
+their arithmetic semantics are supplied by the Frobenius trace theorem. -/
+def gf2PackedRabinSemanticAux
+    (polynomial x degree : ℕ) : ℕ → ℕ → ℕ → Prop
+  | 0, _, value =>
+      packedGF2Polynomial (Nat.log2 value + 1) value =
+        packedGF2Polynomial (Nat.log2 x + 1) x
+  | remaining + 1, index, value =>
+      let next := gf2PackedProduct value value polynomial
+      let nextIndex := index + 1
+      (nextIndex ≤ degree / 2 →
+        EuclideanDomain.gcd
+          (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+          (packedGF2Polynomial (Nat.log2 (Nat.xor next x) + 1)
+            (Nat.xor next x)) = 1) ∧
+        gf2PackedRabinSemanticAux
+          polynomial x degree remaining nextIndex next
+
+/-- The native Rabin auxiliary loop returns true exactly when every active
+early guard has polynomial GCD one and the final minimally decoded Frobenius
+value equals the start. -/
+theorem gf2PackedIrreducibleAux_iff_semantic
+    (polynomial x degree remaining index value : ℕ) :
+    gf2PackedIrreducibleAux polynomial x degree remaining index value = true ↔
+      gf2PackedRabinSemanticAux
+        polynomial x degree remaining index value := by
+  induction remaining generalizing index value with
+  | zero =>
+      simp only [gf2PackedIrreducibleAux, gf2PackedRabinSemanticAux,
+        beq_iff_eq]
+      constructor
+      · rintro rfl
+        rfl
+      · exact packedGF2Polynomial_minimal_injective value x
+  | succ prior ih =>
+      rw [gf2PackedIrreducibleAux, gf2PackedRabinSemanticAux]
+      let next := gf2PackedProduct value value polynomial
+      let nextIndex := index + 1
+      change
+        (if decide (nextIndex ≤ degree / 2) &&
+            !(gf2PackedGcd (Nat.xor next x) polynomial == 1) then
+          false
+        else
+          gf2PackedIrreducibleAux
+            polynomial x degree prior nextIndex next) = true ↔ _
+      by_cases hhalf : nextIndex ≤ degree / 2
+      · cases hguard :
+          (gf2PackedGcd (Nat.xor next x) polynomial == 1) with
+        | false =>
+            have hhalf' : index < degree / 2 := by
+              dsimp [nextIndex] at hhalf
+              omega
+            have hnotGuard : ¬EuclideanDomain.gcd
+                (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+                (packedGF2Polynomial (Nat.log2 (Nat.xor next x) + 1)
+                  (Nat.xor next x)) = 1 := by
+              intro hpoly
+              have hnative := (gf2PackedGcd_guard_iff
+                (Nat.xor next x) polynomial).2 hpoly
+              rw [hguard] at hnative
+              contradiction
+            have hnotGuard' : ¬EuclideanDomain.gcd
+                (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+                (packedGF2Polynomial
+                  (Nat.log2
+                    (gf2PackedProduct value value polynomial ^^^ x) + 1)
+                  (gf2PackedProduct value value polynomial ^^^ x)) = 1 := by
+              simpa [next] using hnotGuard
+            simp [hhalf, hnotGuard', nextIndex]
+        | true =>
+            have hhalf' : index < degree / 2 := by
+              dsimp [nextIndex] at hhalf
+              omega
+            have hpoly := (gf2PackedGcd_guard_iff
+              (Nat.xor next x) polynomial).1 hguard
+            have hpoly' : EuclideanDomain.gcd
+                (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+                (packedGF2Polynomial
+                  (Nat.log2
+                    (gf2PackedProduct value value polynomial ^^^ x) + 1)
+                  (gf2PackedProduct value value polynomial ^^^ x)) = 1 := by
+              simpa [next] using hpoly
+            simp [hhalf, hpoly', ih, next, nextIndex]
+      · have hhalf' : ¬index < degree / 2 := by
+          dsimp [nextIndex] at hhalf
+          omega
+        simp [hhalf, ih, next, nextIndex]
+
 /-- Rabin irreducibility predicate used by the deterministic packed search. -/
 def gf2PackedIrreducible (polynomial degree : ℕ) : Bool :=
   let x := gf2PackedRemainder 2 polynomial
   gf2PackedIrreducibleAux polynomial x degree degree 0 x
+
+/-- Polynomial GCD/final-equality specification of the complete packed Rabin
+control flow. -/
+def gf2PackedRabinSemantic (polynomial degree : ℕ) : Prop :=
+  let x := gf2PackedRemainder 2 polynomial
+  gf2PackedRabinSemanticAux polynomial x degree degree 0 x
+
+/-- The public packed Rabin Boolean is equivalent to its polynomial semantic
+guard trace. This is a control-flow refinement, not yet the external theorem
+equating that criterion with irreducibility under all required hypotheses. -/
+theorem gf2PackedIrreducible_iff_semantic (polynomial degree : ℕ) :
+    gf2PackedIrreducible polynomial degree = true ↔
+      gf2PackedRabinSemantic polynomial degree := by
+  unfold gf2PackedIrreducible gf2PackedRabinSemantic
+  exact gf2PackedIrreducibleAux_iff_semantic
+    polynomial (gf2PackedRemainder 2 polynomial)
+    degree degree 0 (gf2PackedRemainder 2 polynomial)
 
 /-- Search odd constant-one lower patterns in the exact native order. -/
 def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ

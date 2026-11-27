@@ -636,8 +636,13 @@ kernel-derived. The packed GCD is now refined separately: minimal-window
 remainder correctness drives a fuel induction, strict right-degree descent
 discharges the public sum-of-degrees bound, and the returned value plus native
 `==1` guard are proved equivalent to Euclidean polynomial GCD and equality to
-one. The remaining Rabin task is the Boolean-loop composition and the general
-irreducibility theorem.
+one. The remaining Rabin task is the general irreducibility theorem. The
+Boolean-loop portion is now closed as well:
+fixed-window and minimal-window decoding are injective, so induction over
+`gf2PackedIrreducibleAux` converts every early exit to the polynomial GCD-one
+guard and its terminal comparison to decoded Frobenius equality. The public
+packed predicate is equivalent to that semantic trace. Only the external
+algebraic equivalence between this criterion and irreducibility remains.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

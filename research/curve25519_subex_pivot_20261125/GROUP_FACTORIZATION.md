@@ -287,8 +287,12 @@ then identify a reduced start with its exact `2^steps` power modulo the packed
 modulus; packed remainders supply such starts automatically. A second induction
 uses the strict remainder-degree drop to prove the packed GCD fuel sufficient,
 refines its result to Euclidean polynomial GCD, and identifies the exact native
-`==1` guard. Full Rabin control-flow composition and a general irreducibility
-equivalence are not claimed here.
+`==1` guard. The general irreducibility equivalence is not claimed here. The
+control-flow half is now proved too:
+decoder injectivity translates the terminal equality, and induction over the
+auxiliary loop translates every active early exit to the exact polynomial GCD
+guard. The resulting public-Boolean equivalence stops at the explicit semantic
+Rabin trace; the general irreducibility theorem is still not claimed.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
