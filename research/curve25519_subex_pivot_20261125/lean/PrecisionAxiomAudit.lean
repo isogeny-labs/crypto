@@ -14,4 +14,12 @@ open NativePrecisionHistory
 #print axioms evaluation_zero_absorption
 #print axioms evaluation_history_absorption
 #print axioms active_node_root_comparison
+#print axioms cumulative_eightfold_shrink
+#print axioms active_depth_of_shrink_history
+#print axioms scale_floor_of_power_bound
+#print axioms scale_dominates_depth
+#print axioms leaf_scale_of_source_quotient
+#print axioms leaf_square_bound
+#print axioms leaf_positive_of_threshold
+#print axioms active_schedule_power_bounds
 #print axioms next_precision_mul_le_of_uniform_history

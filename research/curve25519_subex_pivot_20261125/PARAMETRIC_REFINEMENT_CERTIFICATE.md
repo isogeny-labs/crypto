@@ -121,14 +121,17 @@ zero-degree isolates and distinct parallel edges directly. `[pcc:unverified]`
 
 `lean/PrecisionAbsorption.lean` imports the repository's existing exact
 `childPrecision` model and finite-history theorem without changing their
-sources. It kernel-checks `81hu<=2^(u+1)` from `u>=32,h<=512u`, the
-evaluation-loss absorption for every prior exponent, the root-to-current
-comparison from the active leaf cutoff, and the composed
+sources. It derives `8^d<h` from the root bound, eightfold shrink history and
+active leaf cutoff; derives the square bound and positivity from the exact
+leaf definition `h=floor(sqrt(lambda))`; derives `u>=32,h<=512u` from that
+depth bound, the exact source quotient and threshold; kernel-checks both precision
+absorptions; and proves the composed
 `p_next*u<=34*M*2^(A+2u-i)` conclusion. The imported source files retain
 SHA-256 values `92e4300c...951989a` and `0a235579...cd4b4`; their declarations
 and the new bridge are audited together. This theorem still requires a native
-path witness for the exact precision recurrence, shrink history, scale floor,
-and leaf comparison. `[pcc:unverified]`
+path witness for the exact precision recurrence and shrink history, root and
+active-cutoff facts, exact source quotient, and exact square-root definition.
+`[pcc:unverified]`
 
 The project pins Lean `v4.35.0` and mathlib commit
 `56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
@@ -143,8 +146,8 @@ lake env lean PrecisionAxiomAudit.lean
 
 The build completes 9,057 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
-project axioms or admitted proofs. There are 43 explicitly audited declarations,
-including four reused precision declarations and six new absorption/bridge
+project axioms or admitted proofs. There are 51 explicitly audited declarations,
+including four reused precision declarations and fourteen new absorption/bridge
 declarations. The frozen pre-module precision-history source emits six Lean
 module-compatibility warnings when imported into this project; its bytes are
 unchanged.
@@ -170,9 +173,11 @@ evidence for two independent claims:
    graph theorem at each active call; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
-   active leaf cutoff, `u>=32`, and `h<=512u`. The companion `nD<=6M`
-   inequality and the scalar `pu<=34MD` implication are now kernel-derived, so
-   neither remains an independent algebraic premise.
+   active leaf cutoff, exact source quotient, and the exact root square-root
+   definition. The leaf positivity and square inequality, depth bound `8^d<h`,
+   schedule facts `u>=32,h<=512u`,
+   companion `nD<=6M` inequality, and scalar `pu<=34MD` implication are now
+   kernel-derived, so none remains an independent algebraic premise.
 
 The acceptance target is a verifier that consumes those proof objects at each
 retained depth and emits the same parametric summary with
