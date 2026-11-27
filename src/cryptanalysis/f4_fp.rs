@@ -9617,6 +9617,7 @@ struct VisitAccountingSession<'a> {
 }
 
 impl<'a> VisitAccountingSession<'a> {
+    #[allow(clippy::result_large_err)]
     fn begin(
         mut builder: VisitAccountingBuilder,
         context: &'a VisitAccountingContext,
@@ -10937,6 +10938,7 @@ fn visit_disposition(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 fn solve_visit_accounted_impl<F, S>(
     input: &[Poly],
     n_vars: usize,
@@ -11052,8 +11054,10 @@ where
                 .stopped()
         });
     if initial_accounting_stopped || account.control().stopped() {
-        let mut report = VisitReport::default();
-        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        let report = VisitReport {
+            accounting_v1: Some(Box::new(session.finish(VisitDispositionV1::Incomplete))),
+            ..VisitReport::default()
+        };
         return Ok(report);
     }
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
@@ -11116,6 +11120,7 @@ impl VisitAccountingExecutorV1 {
     /// solves through this API.  The report remains call-scoped; construction,
     /// replay, persistence, and whole-collector work need outer accounting.
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::result_large_err)]
     pub fn solve_first(
         &mut self,
         input: &[Poly],
@@ -11157,6 +11162,7 @@ impl VisitAccountingExecutorV1 {
 /// one-thread Rayon pool.  The returned record covers only this solver call;
 /// public-system construction, arbitrary callback work, replay, storage and
 /// the enclosing relation collector require their own ledger.
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -11183,6 +11189,7 @@ pub fn solve_visit_accounted_v1(
 /// sink's own persistence/storage implementation remains outer work.  Trace
 /// reuse is intentionally unsupported by v1.
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_traced_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -13431,7 +13438,23 @@ pub(crate) fn dense_roots_fp(
 }
 
 /// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
+/// Field sizes below this keep the exhaustive scan, so the counted
+/// operations of every existing small-field measurement are unchanged.
+/// Above it the scan (about `p * terms` modular powers) cannot finish:
+/// at `p = 2^31 - 1` one degree-21 polynomial needs hours.
+const ROOTS_EXHAUSTIVE_MAX_P: u64 = 1 << 28;
+
+/// All roots in `F_p` of `sum c * x^k`, ascending.  Exact on both paths:
+/// the large-field path returns the roots of `gcd(f, x^p - x)`, which are
+/// exactly the `F_p` roots of `f`.
 fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
+    if p < ROOTS_EXHAUSTIVE_MAX_P {
+        return roots_univariate_exhaustive(coeffs, p);
+    }
+    roots_univariate_split(coeffs, p).unwrap_or_else(|| roots_univariate_exhaustive(coeffs, p))
+}
+
+fn roots_univariate_exhaustive(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
     (0..p)
         .filter(|&x| {
             let mut v = 0u64;
@@ -13441,6 +13464,154 @@ fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
             v == 0
         })
         .collect()
+}
+
+// Dense polynomials over F_p, lowest degree first, without trailing zeros.
+fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+    a
+}
+
+fn upoly_monic(a: Vec<u64>, p: u64) -> Vec<u64> {
+    match a.last() {
+        Some(&lead) if lead != 1 => {
+            let inv = inv_mod_u64(lead, p);
+            a.into_iter().map(|c| mulmod(c, inv, p)).collect()
+        }
+        _ => a,
+    }
+}
+
+/// Quotient and remainder of `a` by a monic nonzero `m`.
+fn upoly_divrem(a: &[u64], m: &[u64], p: u64) -> (Vec<u64>, Vec<u64>) {
+    let dm = m.len() - 1;
+    let mut r = a.to_vec();
+    if r.len() <= dm {
+        return (Vec::new(), upoly_trim(r));
+    }
+    let mut q = vec![0u64; r.len() - dm];
+    for i in (dm..r.len()).rev() {
+        let c = r[i];
+        if c == 0 {
+            continue;
+        }
+        q[i - dm] = c;
+        for (j, &mj) in m.iter().enumerate() {
+            let k = i - dm + j;
+            r[k] = (r[k] + p - mulmod(c, mj, p)) % p;
+        }
+    }
+    r.truncate(dm);
+    (upoly_trim(q), upoly_trim(r))
+}
+
+fn upoly_mulrem(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut c = vec![0u64; a.len() + b.len() - 1];
+    for (i, &ai) in a.iter().enumerate() {
+        for (j, &bj) in b.iter().enumerate() {
+            c[i + j] = (c[i + j] + mulmod(ai, bj, p)) % p;
+        }
+    }
+    upoly_divrem(&c, m, p).1
+}
+
+fn upoly_powrem(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Vec<u64> {
+    let mut r = upoly_divrem(&[1], m, p).1;
+    let mut b = upoly_divrem(base, m, p).1;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = upoly_mulrem(&r, &b, m, p);
+        }
+        b = upoly_mulrem(&b, &b, m, p);
+        e >>= 1;
+    }
+    r
+}
+
+/// `a - c` for a constant `c`.
+fn upoly_sub_const(mut a: Vec<u64>, c: u64, p: u64) -> Vec<u64> {
+    if a.is_empty() {
+        a.push(0);
+    }
+    a[0] = (a[0] + p - c % p) % p;
+    upoly_trim(a)
+}
+
+/// Monic gcd; the gcd of two zero polynomials is zero (empty).
+fn upoly_gcd(a: Vec<u64>, b: Vec<u64>, p: u64) -> Vec<u64> {
+    let (mut a, mut b) = (upoly_trim(a), upoly_trim(b));
+    while !b.is_empty() {
+        let bm = upoly_monic(b, p);
+        let r = upoly_divrem(&a, &bm, p).1;
+        a = bm;
+        b = r;
+    }
+    upoly_monic(a, p)
+}
+
+/// Roots of a monic, squarefree `g` that splits into distinct linear
+/// factors over F_p (odd p), by Cantor-Zassenhaus equal-degree splitting
+/// with the deterministic shifts `x + 1, x + 2, ...`.
+fn upoly_split_linear(g: Vec<u64>, p: u64, out: &mut Vec<u64>) -> Option<()> {
+    match g.len() {
+        0 => return None,
+        1 => return Some(()),
+        2 => {
+            out.push((p - g[0]) % p);
+            return Some(());
+        }
+        _ => {}
+    }
+    // Each shift fails to split with probability about 2^(1 - deg g).
+    for a in 1..=256u64 {
+        let t = upoly_powrem(&[a % p, 1], (p - 1) / 2, &g, p);
+        let d = upoly_gcd(g.clone(), upoly_sub_const(t, 1, p), p);
+        if d.len() > 1 && d.len() < g.len() {
+            let (q, r) = upoly_divrem(&g, &d, p);
+            debug_assert!(r.is_empty());
+            upoly_split_linear(d, p, out)?;
+            return upoly_split_linear(upoly_monic(q, p), p, out);
+        }
+    }
+    None
+}
+
+/// The F_p roots of `sum c * x^k` through `gcd(f, x^p - x)`, ascending.
+/// `None` for the zero polynomial (every element is a root) or an even
+/// field, which the exhaustive scan handles.
+fn roots_univariate_split(coeffs: &[(u32, u64)], p: u64) -> Option<Vec<u64>> {
+    if p < 3 || p.is_multiple_of(2) {
+        return None;
+    }
+    let deg = coeffs.iter().map(|(k, _)| *k as usize).max()?;
+    let mut f = vec![0u64; deg + 1];
+    for (k, c) in coeffs {
+        f[*k as usize] = (f[*k as usize] + c % p) % p;
+    }
+    let f = upoly_monic(upoly_trim(f), p);
+    match f.len() {
+        0 => return None,
+        1 => return Some(Vec::new()),
+        _ => {}
+    }
+    let xp = upoly_powrem(&[0, 1], p, &f, p);
+    // x^p - x reduced modulo f.
+    let mut h = xp;
+    if h.len() < 2 {
+        h.resize(2, 0);
+    }
+    h[1] = (h[1] + p - 1) % p;
+    let g = upoly_gcd(f, upoly_trim(h), p);
+    let mut roots = Vec::with_capacity(g.len().saturating_sub(1));
+    upoly_split_linear(g, p, &mut roots)?;
+    roots.sort_unstable();
+    roots.dedup();
+    Some(roots)
 }
 
 /// A forced assignment from a pure nonconstant linear univariate equation.
@@ -13747,6 +13918,69 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    fn roots_test_rng(state: &mut u64) -> u64 {
+        *state = state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *state >> 11
+    }
+
+    #[test]
+    fn split_roots_match_the_exhaustive_scan() {
+        let mut state = 7u64;
+        for p in [3u64, 5, 7, 101, 10_007, 65_537] {
+            for trial in 0..60 {
+                let deg = 1 + (roots_test_rng(&mut state) % 12) as u32;
+                let mut coeffs: Vec<(u32, u64)> = Vec::new();
+                for k in 0..=deg {
+                    if !roots_test_rng(&mut state).is_multiple_of(3) {
+                        coeffs.push((k, roots_test_rng(&mut state) % p));
+                    }
+                }
+                if trial % 4 == 0 {
+                    // Force several roots, a repeated one and zero.
+                    let mut f = vec![1u64];
+                    for r in [0, 1 % p, 1 % p, (p - 2) % p, 5 % p] {
+                        let mut g = vec![0u64; f.len() + 1];
+                        for (i, &c) in f.iter().enumerate() {
+                            g[i + 1] = (g[i + 1] + c) % p;
+                            g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+                        }
+                        f = g;
+                    }
+                    coeffs = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+                }
+                let fast = roots_univariate_split(&coeffs, p);
+                let slow = roots_univariate_exhaustive(&coeffs, p);
+                match fast {
+                    Some(r) => assert_eq!(r, slow, "p={p} coeffs={coeffs:?}"),
+                    None => {
+                        assert_eq!(slow.len() as u64, p, "only the zero polynomial is deferred")
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn large_field_roots_use_the_split_path() {
+        let p = 2_147_483_647u64;
+        let want: Vec<u64> = vec![0, 3, 77_777, 1_234_567_890, 2_147_483_646];
+        // prod (x - r) * (x^2 + 1); -1 is a non-residue mod p = 3 (mod 4).
+        let mut f = vec![1u64, 0, 1];
+        for &r in &want {
+            let mut g = vec![0u64; f.len() + 1];
+            for (i, &c) in f.iter().enumerate() {
+                g[i + 1] = (g[i + 1] + c) % p;
+                g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+            }
+            f = g;
+        }
+        let coeffs: Vec<(u32, u64)> = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+        assert_eq!(roots_univariate(&coeffs, p), want);
+        assert_eq!(roots_univariate(&[(0, 5)], p), Vec::<u64>::new());
+    }
 
     #[test]
     fn analytic_linear_roots_match_exhaustive_field_roots() {
