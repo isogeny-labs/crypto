@@ -1,0 +1,41 @@
+name: Chained cubic canonical identity replay
+on:
+  pull_request:
+    paths:
+      - 'research/chained_cubic_coordinate_20261127/**'
+      - '.github/workflows/chained-cubic-identity-record.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/chained_cubic_coordinate_20261127/**'
+      - '.github/workflows/chained-cubic-identity-record.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-native-identity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CARGO_BUILD_JOBS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+      - name: Acquire immutable source and original result commits
+        run: git fetch --no-tags --filter=blob:none --depth=1 origin 82852f5636edfbae2e9c4f1323450da75c0c0176 be0916263876ff77ee364578e1c29176b443c262
+      - name: Install official pinned compiler tools
+        run: rustup toolchain install 1.99.1 --profile minimal --component clippy --component rustfmt
+      - name: Replay the frozen canonical identity using exact whole crate sources
+        run: python3 research/chained_cubic_coordinate_20261127/ci_identity_k.py "$RUNNER_TEMP/chained-cubic-identity"
+      - name: Preserve whole originals, sources, archives and qualifier
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chained-cubic-identity-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chained-cubic-identity
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30

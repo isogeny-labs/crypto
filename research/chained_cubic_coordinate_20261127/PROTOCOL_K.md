@@ -1,0 +1,11 @@
+# Portable canonical identity replay K
+
+This first portability/integration replay uses exact frozen source J82852f56 and original result be091626. It is a distinct execution of the fixed object, justified by the new portable workflow and offline dependency-source layout. It cannot replace original Cloud binaries or independently sign either PCC record.
+
+Before strict calls, read all whole K driver/workflow/protocol/lock inputs from the published head, every complete SOURCE_LOCK_J input and lock from the immutable source, all four whole original result references, and every whole official dependency archive. Check original source hashes and restore its recorded modes into two separate copies. Match direct official Rust1.99.1 tool and named runtime bytes to the source lock; locate this host's installation. The old Cloud dispatcher/index cache is not executed and is not asserted identical.
+
+For portability, extract the same twelve checksum-pinned whole official crate archives into a fresh standard Cargo directory source. Verify and guard all extracted bytes and the generated per-file checksum metadata; write/guard the explicit directory-source Cargo config before strict calls. This changes dependency location only; package versions, source bytes, features, identity checker, SHA compatibility adapter and mathematical predicates stay frozen. Cargo remains locked/offline, single-worker, with verbose whole compiler commands retained.
+
+Use the same Rust warning/optimization/overflow/debug/codegen flags and120second/2GiB virtual-memory limits per strict/native phase. Preserve first failures, full stdout/stderr/argv/status, complete original source/archive copies, target outputs and the separate0555 qualifier. Do not suppress warnings, relax byte comparisons, raise caps or retry unchanged.
+
+Compare entire native stdout, canonical certificate JSON, integer-lift JSON and canonical statement bytes with result be091626. Independently check the statement file's standard SHA256 identifier as custody metadata. Python only acquires files, hashes, serializes metadata, guards paths and launches processes; mathematical computations remain the exact Rust source. Hosted CI is a separate subsequent execution, retaining whole originals through normal uncompressed artifact transport. No timing, new cohort, third PCC or novelty clearance is claimed.
