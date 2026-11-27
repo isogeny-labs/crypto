@@ -1,6 +1,6 @@
 # Parametric one-step refinement certificate
 
-The schema-1 parametric-refinement certificate checks the algebraic implication
+The schema-2 parametric-refinement certificate checks the algebraic implication
 from explicit generic node premises to packing capacity, group load, strict
 shrink, degree preservation, and the symbolic cost ledger. It consumes the
 strict-root/history composition boundary but never identifies the normalized
@@ -20,9 +20,12 @@ M >= LD,
 2L <= delta,
 maximum old-vertex degree <= delta,
 pu <= 34MD,
-nD <= 6M,
 and the next call rechecks the guards or takes exact fallback.
 ```
+
+The verifier derives `nD<=6M` instead of accepting it as a premise: packet
+admission gives `KL<=3M`, while the admitted power-of-two coordinate satisfies
+`2^(i+1)D=2L`, hence `nD=2KL<=6M`. `[pcc:unverified]`
 
 All size and counting quantities are nonnegative, and `D>0` where the
 mode/precision proof cancels it. The explicit nonnegativity premise matters:
@@ -70,12 +73,15 @@ cargo run --quiet --locked \
   --bin parametric-refinement-certificate-check
 ```
 
-The threshold transcript is 10,204 bytes and reports
+The threshold transcript is 10,202 bytes and reports
 `conditional_parametric_implication`. Six focused tests cover the accepted
 five-depth composition, missing/reordered schedule data, source/shrink-rule
 constants, tuple/cost-ledger constants, missing premises/conclusions, and every
-unsupported promotion. The checker imports the composition-boundary verifier,
-not graph, packing, factorization, contraction, or producer code.
+unsupported promotion. Its summary reports
+`mode_dimension_bound_derived=true`; the wire object no longer contains a
+caller-supplied mode-bound Boolean. The checker imports the
+composition-boundary verifier, not graph, packing, factorization, contraction,
+or producer code.
 `[pcc:unverified]`
 
 ## Lean kernel replay
@@ -84,10 +90,12 @@ not graph, packing, factorization, contraction, or producer code.
 real-inequality chain. It kernel-checks the single-class cap
 `[pcc:unverified]` from the scaled variance and source guard, padded capacity,
 both child-shrink bounds, degree closure,
-the `6*34=204` mode/precision product after cancelling positive `D`, and the
-exact cost-ledger constants. The proof makes `M>=0` explicit in both shrink
-lemmas; Lean rejected the first draft without it, exposing a genuine missing
-domain condition in that standalone formulation.
+the exact power-of-two identity `2^(i+1)*2^(a-i)=2*2^a`, the resulting
+`nD<=6M` bound from packet admission `K*2^a<=3M`, the `6*34=204`
+mode/precision product after cancelling positive `D`, and the exact
+cost-ledger constants. The proof makes `M>=0` explicit in both shrink lemmas;
+Lean rejected the first draft without it, exposing a genuine missing domain
+condition in that standalone formulation.
 
 `lean/ConditionalVariance.lean` moves one premise boundary upstream. It
 kernel-checks the bipartite degree-square budget
@@ -123,10 +131,14 @@ lake env lean AxiomAudit.lean
 
 The build completes 9,053 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
-project axioms or admitted proofs. This formal replay still takes the variance,
-source guard, precision, and mode inequalities as hypotheses. It neither
-proves that an arbitrary admitted multigraph realizes them nor formalizes the
-external contraction theorem. `[pcc:unverified]`
+project axioms or admitted proofs. There are 33 explicitly audited theorems.
+The aggregate downstream theorem still consumes the variance, source-guard,
+precision, and mode inequalities as hypotheses, but the separate natural-number
+theorem now derives the mode inequality uniformly from the same packet-capacity
+and coordinate conditions checked by `audit_node_dimensions`. The replay does
+not yet bind an arbitrary native endpoint/label trace to the graph theorem,
+derive the normalized precision inequality, or formalize the external
+contraction theorem. `[pcc:unverified]`
 
 ## Next measurable goal
 
@@ -138,8 +150,10 @@ evidence for two independent claims:
 1. a typed code-to-model binding, or replayable proof object, showing that the
    native endpoint arrays and first-minimum traces instantiate the formal
    graph theorem at each active call; and
-2. the factorization/precision bounds `nD<=6M` and `pu<=34MD` for the exact
-   finite rearrangement consumed by the child interface.
+2. a typed derivation or producer-bound witness for `pu<=34MD` at every active
+   call. The companion `nD<=6M` inequality is now kernel-derived from packet
+   admission and the exact tile/distance identity, so it is no longer an
+   independent factorization premise.
 
 The acceptance target is a verifier that consumes those proof objects at each
 retained depth and emits the same parametric summary with

@@ -17,6 +17,8 @@ open Curve25519ObjectiveBoundary
 #print axioms history_child_strict_shrink
 #print axioms derived_child_strict_shrink
 #print axioms child_degree_cap
+#print axioms tile_distance_identity
+#print axioms mode_dimension_bound_of_packet_capacity
 #print axioms mode_precision_product
 #print axioms cost_ledger_constants
 #print axioms parametric_refinement_certificate

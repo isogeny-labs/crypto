@@ -239,22 +239,26 @@ data without changing `96`, `290`, or `148480`. This strengthens R2's finite
 replay and proves consistency of its scalar premises, but does not discharge
 R1's graph-realization premise. `[pcc:unverified]`
 
-The schema-1 parametric-refinement certificate now separates those normalized
+The schema-2 parametric-refinement certificate now separates those normalized
 examples from the generic implication. It consumes the checked root/history
-schedule, assumes the variance/source/precision/mode premise tokens explicitly,
-and reconstructs `cD<=2M`, `KL<=3M`, the `4M/64` derived child bound, the
-history's `6M/64` bound, eightfold shrink, degree preservation, and the complete
-`80,96,290,148480` ledger across every retained depth. Its accepted summary
-still reports that the generic premises remain assumed, so this is not a graph
-realization or an external contraction proof. `[pcc:unverified]`
+schedule, assumes the variance/source/precision premise tokens explicitly, and
+reconstructs `cD<=2M`, `KL<=3M`, `nD<=6M`, the `4M/64` derived child bound,
+the history's `6M/64` bound, eightfold shrink, degree preservation, and the
+complete `80,96,290,148480` ledger across every retained depth. Its accepted
+summary reports `mode_dimension_bound_derived=true` while keeping the remaining
+generic premises assumed, so this is not a graph realization or an external
+contraction proof. `[pcc:unverified]`
 
 The accompanying Lean 4.35 project independently kernel-checks the downstream
 real-inequality implications and exact ledger arithmetic. Its theorem
 statements expose nonnegative `M` in the child-shrink steps and positive `D`
-in the mode/precision cancellation. The axiom audit reports only `propext`,
-`Classical.choice`, and `Quot.sound`; the conditional-label variance theorem,
-finite factorization realization, and external contraction theorem remain
-explicit hypotheses or out of scope. `[pcc:unverified]`
+in the mode/precision cancellation. It also proves
+`2^(i+1)*2^(a-i)=2*2^a` and derives `nD<=6M` directly from `KL<=3M` for every
+admitted coordinate. The axiom audit reports only `propext`,
+`Classical.choice`, and `Quot.sound`; the native code-to-model binding,
+normalized-precision derivation `pu<=34MD`, finite factorization realization,
+and external contraction theorem remain explicit hypotheses or out of scope.
+`[pcc:unverified]`
 
 The next Lean module closes two more graph-side algebra layers: capped left and
 right degree sequences have total ordered endpoint charge at most `2M delta`,

@@ -1,10 +1,11 @@
 //! Parametric one-step implication for the strict recursion schedule.
 //!
-//! This certificate treats graph-generic source and factorization bounds as
-//! explicit premises. It independently checks the algebra that turns those
-//! premises into capacity, group-load, strict-shrink, degree, and cost-ledger
-//! conclusions across the symbolic depth schedule. It does not prove that a
-//! graph realizes the premises or prove the external contraction theorem.
+//! This certificate treats graph-generic source and normalized-precision
+//! bounds as explicit premises. It independently checks the algebra that turns
+//! those premises into capacity, mode dimension, group-load, strict-shrink,
+//! degree, and cost-ledger conclusions across the symbolic depth schedule. It
+//! does not prove that a graph realizes the premises or prove the external
+//! contraction theorem.
 
 use crate::composition_boundary_certificate::{
     verify as verify_composition, Certificate as CompositionCertificate,
@@ -12,7 +13,7 @@ use crate::composition_boundary_certificate::{
 use serde::{Deserialize, Serialize};
 
 /// Current parametric-refinement wire schema.
-pub const SCHEMA: u32 = 1;
+pub const SCHEMA: u32 = 2;
 
 /// Explicit premises to the parametric implication.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -29,8 +30,6 @@ pub struct Premises {
     pub parent_degree_bound_available: bool,
     /// The local precision analysis supplies `pu<=34MD`.
     pub normalized_precision_bound_available: bool,
-    /// The local mode analysis supplies `nD<=6M`.
-    pub mode_dimension_bound_available: bool,
     /// The next call either rechecks all source guards or uses exact fallback.
     pub recheck_or_fallback_available: bool,
 }
@@ -118,6 +117,8 @@ pub struct Assertions {
     pub class_cap_derived: bool,
     /// Class cap plus `LD<=M` imply `KL<=3M`.
     pub packet_capacity_derived: bool,
+    /// Packet capacity plus the tile/distance identity imply `nD<=6M`.
+    pub mode_dimension_bound_derived: bool,
     /// The derived group cap implies the history group bound.
     pub history_group_bound_derived: bool,
     /// The history group bound implies eightfold child shrink.
@@ -164,6 +165,8 @@ pub struct VerificationSummary {
     pub active_depths: usize,
     /// Derived packet-capacity coefficient.
     pub packet_capacity_factor: u64,
+    /// Whether the mode-dimension bound was derived from packet capacity.
+    pub mode_dimension_bound_derived: bool,
     /// Derived child-edge numerator over radix 64.
     pub derived_child_edge_numerator: u64,
     /// History child-edge numerator over radix 64.
@@ -374,12 +377,12 @@ pub fn assemble(composition: CompositionCertificate) -> Result<Certificate, Stri
             packet_degree_guard_available: true,
             parent_degree_bound_available: true,
             normalized_precision_bound_available: true,
-            mode_dimension_bound_available: true,
             recheck_or_fallback_available: true,
         },
         assertions: Assertions {
             class_cap_derived: true,
             packet_capacity_derived: true,
+            mode_dimension_bound_derived: true,
             history_group_bound_derived: true,
             strict_child_shrink_derived: true,
             child_degree_bound_derived: true,
@@ -420,7 +423,6 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         || !premises.packet_degree_guard_available
         || !premises.parent_degree_bound_available
         || !premises.normalized_precision_bound_available
-        || !premises.mode_dimension_bound_available
         || !premises.recheck_or_fallback_available
     {
         return Err("parametric premise missing".into());
@@ -452,6 +454,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     let assertions = &certificate.assertions;
     if !assertions.class_cap_derived
         || !assertions.packet_capacity_derived
+        || !assertions.mode_dimension_bound_derived
         || !assertions.history_group_bound_derived
         || !assertions.strict_child_shrink_derived
         || !assertions.child_degree_bound_derived
@@ -475,6 +478,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         root_u: composition.u,
         active_depths: certificate.depths.len(),
         packet_capacity_factor: constants.packet_capacity_factor,
+        mode_dimension_bound_derived: true,
         derived_child_edge_numerator: constants.derived_child_edge_numerator,
         history_child_edge_numerator: constants.history_child_edge_numerator,
         local_child_exponent_constant: constants.local_child_exponent_constant,
@@ -510,6 +514,7 @@ mod tests {
         let summary = verify(&certificate()).unwrap();
         assert_eq!(summary.active_depths, 5);
         assert_eq!(summary.packet_capacity_factor, 3);
+        assert!(summary.mode_dimension_bound_derived);
         assert_eq!(summary.derived_child_edge_numerator, 4);
         assert_eq!(summary.history_child_edge_numerator, 6);
         assert_eq!(summary.local_child_exponent_constant, 96);
@@ -570,7 +575,7 @@ mod tests {
         assert_eq!(verify(&premise).unwrap_err(), "parametric premise missing");
 
         let mut conclusion = certificate();
-        conclusion.assertions.packet_capacity_derived = false;
+        conclusion.assertions.mode_dimension_bound_derived = false;
         assert_eq!(
             verify(&conclusion).unwrap_err(),
             "parametric conclusion missing"

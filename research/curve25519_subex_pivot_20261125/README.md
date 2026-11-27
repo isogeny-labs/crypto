@@ -430,10 +430,12 @@ theorem remain false. `[pcc:unverified]`
 
 A pinned Lean 4.35/mathlib replay now kernel-checks the same downstream
 real-inequality and ledger chain. It makes the parent-size nonnegativity and
-positive-dimension cancellation conditions explicit; its axiom audit contains
-only Lean/mathlib's standard `propext`, `Classical.choice`, and `Quot.sound`.
-The variance, finite factorization/precision realization, and external theorem
-are not discharged by this replay. `[pcc:unverified]`
+positive-dimension cancellation conditions explicit. It also derives
+`nD<=6M` from `KL<=3M` and the exact power-of-two tile/distance identity for
+every admitted coordinate; its axiom audit contains only Lean/mathlib's
+standard `propext`, `Classical.choice`, and `Quot.sound`. The native graph
+binding, normalized-precision derivation, finite factorization realization,
+and external theorem are not discharged by this replay. `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled

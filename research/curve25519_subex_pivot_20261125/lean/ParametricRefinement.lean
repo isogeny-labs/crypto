@@ -70,6 +70,33 @@ theorem child_degree_cap
     max oldDegree packetDegree ≤ δ := by
   exact max_le hold (hpacket.trans hguard)
 
+/-- The source's power-of-two tile period and interaction distance multiply to
+twice the packet length at every admitted coordinate. -/
+theorem tile_distance_identity
+    (a i : ℕ)
+    (hi : i ≤ a) :
+    2 ^ (i + 1) * 2 ^ (a - i) = 2 * 2 ^ a := by
+  calc
+    2 ^ (i + 1) * 2 ^ (a - i) = 2 ^ ((i + 1) + (a - i)) := by
+      exact (pow_add 2 (i + 1) (a - i)).symm
+    _ = 2 ^ (a + 1) := by congr 1; omega
+    _ = 2 * 2 ^ a := by rw [pow_succ]; ring
+
+/-- Packet admission alone supplies the source mode-dimension inequality.
+Here `2^(i+1)` is the tile period and `2^(a-i)` is the exact interaction
+distance for packet length `2^a`. -/
+theorem mode_dimension_bound_of_packet_capacity
+    (M K a i : ℕ)
+    (hi : i ≤ a)
+    (hpack : K * 2 ^ a ≤ 3 * M) :
+    (K * 2 ^ (i + 1)) * 2 ^ (a - i) ≤ 6 * M := by
+  calc
+    (K * 2 ^ (i + 1)) * 2 ^ (a - i) = K * (2 * 2 ^ a) := by
+      rw [mul_assoc, tile_distance_identity a i hi]
+    _ = 2 * (K * 2 ^ a) := by ring
+    _ ≤ 2 * (3 * M) := Nat.mul_le_mul_left 2 hpack
+    _ = 6 * M := by ring
+
 /-- The mode and normalized-precision bounds compose to coefficient 204 after
 cancelling the positive dimension parameter. -/
 theorem mode_precision_product
@@ -120,6 +147,12 @@ theorem parametric_refinement_certificate :
       packetDegree ≤ 2 * L →
       2 * L ≤ δ →
       max oldDegree packetDegree ≤ δ) ∧
+    (∀ a i : ℕ, i ≤ a →
+      2 ^ (i + 1) * 2 ^ (a - i) = 2 * 2 ^ a) ∧
+    (∀ M K a i : ℕ,
+      i ≤ a →
+      K * 2 ^ a ≤ 3 * M →
+      (K * 2 ^ (i + 1)) * 2 ^ (a - i) ≤ 6 * M) ∧
     (∀ M D n p u : ℝ,
       0 ≤ M →
       0 < D →
@@ -139,6 +172,8 @@ theorem parametric_refinement_certificate :
     history_child_strict_shrink,
     derived_child_strict_shrink,
     child_degree_cap,
+    tile_distance_identity,
+    mode_dimension_bound_of_packet_capacity,
     mode_precision_product,
     cost_ledger_constants⟩
 

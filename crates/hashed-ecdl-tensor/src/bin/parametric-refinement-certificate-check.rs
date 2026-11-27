@@ -43,7 +43,7 @@ fn run() -> Result<(), String> {
         serde_json::from_slice(&bytes).map_err(|error| format!("certificate JSON: {error}"))?;
     let summary = verify(&certificate)?;
     let report = json!({
-        "schema": "hashed-ecdl-parametric-refinement-certificate-check/v1",
+        "schema": "hashed-ecdl-parametric-refinement-certificate-check/v2",
         "valid": true,
         "status": "conditional_parametric_implication",
         "input_bytes": bytes.len(),
