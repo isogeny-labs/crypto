@@ -200,7 +200,9 @@ evidence for two independent claims:
    formal artifact's canonical flat encoder is now proved to round-trip through
    the checked, replayed, and strict parsers for every artifact satisfying the
    corresponding formal predicates. This removes the arbitrary-size formal
-   parser-surjectivity subgap, but not the cross-language Rust producer binding.
+   parser-surjectivity subgap. Every successfully parsed list also re-encodes
+   exactly, removing alternate formal encodings and accepted trailing data,
+   but not the cross-language Rust producer binding.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

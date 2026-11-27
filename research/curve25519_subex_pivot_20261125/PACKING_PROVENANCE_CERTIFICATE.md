@@ -111,8 +111,11 @@ the unchecked parser is a left inverse whenever the two declared split lengths
 hold, and proves every well-formed bounded artifact round-trips through the
 checked parser. The replay and source-guard parsers inherit that round trip
 when their formal trace and guard predicates hold. This is arbitrary-finite
-formal encoder/parser closure; it does not identify the encoder with Rust's
-compiler, overflow, or serde semantics. `[pcc:unverified]`
+formal encoder/parser closure. Conversely, projecting any successful unchecked
+parse reconstructs the complete original flat value list, and every checked
+parse inherits that identity; accepted trailing data or alternate flat shapes
+are therefore impossible. These theorems do not identify the encoder with
+Rust's compiler, overflow, or serde semantics. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact

@@ -443,8 +443,11 @@ own canonical header/edge/row/column projection. The unchecked parser is proved
 to recover every artifact with the declared edge and row split lengths; the
 checked, replayed, and strict source-guard parsers are proved to recover every
 artifact satisfying their respective formal predicates. This closes the
-arbitrary-finite Lean encoder/parser round trip, while the cross-language
-Rust-to-Lean compiler and serialization refinement remains open.
+arbitrary-finite Lean encoder/parser round trip. In the converse direction,
+every successfully parsed flat list re-encodes exactly, including its complete
+suffix, so the checked importer admits no alternate canonical representation.
+The cross-language Rust-to-Lean compiler and serialization refinement remains
+open.
 `[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as

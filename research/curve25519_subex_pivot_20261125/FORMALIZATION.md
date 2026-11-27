@@ -249,8 +249,10 @@ unchecked parser is a left inverse under its declared split lengths, that every
 well-formed bounded artifact survives checked parsing, and that the replayed
 and strict source-guard parsers accept the projection when the corresponding
 formal trace and guard predicates hold. These statements quantify over every
-formal artifact; they do not yet refine Rust construction, integer conversion,
-or serialization to that projection. `[pcc:unverified]`
+formal artifact. Conversely, every successful unchecked or checked parse
+projects back to the exact complete input list, excluding alternate encodings
+and accepted trailing data. The result does not yet refine Rust construction,
+integer conversion, or serialization to that projection. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

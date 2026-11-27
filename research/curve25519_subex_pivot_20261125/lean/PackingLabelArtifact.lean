@@ -208,6 +208,50 @@ theorem parsePackingLabelArtifact_projectionValues
     hshape.1.1.1.2 hshape.1.1.2]
   simp [hwell, hbounded]
 
+/-- The unchecked parser retains every input field: projecting any successful
+parse reconstructs the original flat value list exactly. -/
+theorem PackingLabelArtifact.projectionValues_of_parseUnchecked
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifactUnchecked values = some artifact) :
+    artifact.projectionValues = values := by
+  rcases values with _ | ⟨schema, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨radix, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨packetExponent, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨coordinate, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨conditionalLabels, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨sourceDegreeCap, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨edgeCount, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨rowCount, values⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  rcases values with _ | ⟨columnCount, fields⟩
+  · simp [parsePackingLabelArtifactUnchecked] at hparse
+  simp [parsePackingLabelArtifactUnchecked] at hparse
+  subst artifact
+  simp [PackingLabelArtifact.projectionValues, List.take_append_drop]
+
+/-- Checked parsing and canonical projection are inverse on every accepted
+flat value list. -/
+theorem PackingLabelArtifact.projectionValues_of_parse
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact) :
+    artifact.projectionValues = values := by
+  unfold parsePackingLabelArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, hparsed, hchecked⟩
+  split at hchecked
+  next =>
+    have hartifact : candidate = artifact := Option.some.inj hchecked
+    subst candidate
+    exact artifact.projectionValues_of_parseUnchecked hparsed
+  next => simp at hchecked
+
 private theorem parsePackingLabelArtifact_components
     {values : List ℕ} {artifact : PackingLabelArtifact}
     (hparse : parsePackingLabelArtifact values = some artifact) :
