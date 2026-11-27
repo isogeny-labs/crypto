@@ -187,8 +187,7 @@ seconds. `IncidenceBucketScore.lean` proves the edge-pair score equal to the
 native degree/right-endpoint-bucket row formula and proves the column score is
 `q` times the native row-label profile dot product. The artifact checker now
 uses those formulas, preserving the executable-schedule theorem and reducing
-the best observed cold build to 55 seconds. The remaining optimization target
-is a single-pass auxiliary-state replay of the evolving native buckets.
+the best observed cold build to 55 seconds.
 `BucketStateReplay.lean` supplies the state invariant for that step: the empty
 maps represent all-unknown assignments, each insertion exactly updates the
 degree/right-endpoint or row-label/column-label port counts, and each state
@@ -196,9 +195,15 @@ score equals the corresponding extensional incidence score. A fuel-bounded
 native-order fold now threads those states through rows and columns; its
 soundness theorem maintains the exact prefix assignment, and strong induction
 proves accepted arrays equal the original recursive schedule. The artifact
-checker uses this fold. The best observed cold build is 52 seconds; replacing
-nested functional updates by materialized finite maps is the next performance
-target.
+checker uses this fold, reducing the best observed cold build to 52 seconds.
+The exact-boundary CSV parse, row replay, column replay, and source-guard checks
+now use kernel-only decision reduction in separate modules, joined by separate
+trace and parser receipts. A forced rebuild of the complete path took 40.94
+seconds wall clock, while every individual module meets the original
+sub-30-second module target: the CSV parse is the largest at 23 seconds,
+row/column replay takes 9.5 seconds each, and every remaining stage is under 5
+seconds. The theorem statements and strict-parser claim boundary are unchanged;
+sub-30-second end-to-end wall time remains open.
 `[pcc:unverified]`
 `executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact

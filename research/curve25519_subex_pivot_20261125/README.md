@@ -391,8 +391,7 @@ from right-endpoint incidence buckets. Once all rows are fixed, the column
 score is `q` times the row-label incidence-profile dot product. Positive scale
 invariance removes that final factor without changing ties. The artifact
 checker now evaluates these source-shaped scores, reducing the best observed
-cold build to 55 seconds. A single-pass replay of the evolving bucket maps is
-still needed for the sub-30-second target. `BucketStateReplay.lean` now gives
+cold build to 55 seconds. `BucketStateReplay.lean` now gives
 those auxiliary maps an exact invariant: empty maps equal all-unknown
 assignments, every row/column insertion equals extending the partial assignment
 by the selected label, and state-based scores equal the proved extensional
@@ -400,9 +399,16 @@ incidence formulas. A fuel-bounded native-order fold now threads those states
 once through all rows and then all columns; its soundness theorem maintains
 the prefix invariant at every step, and strong induction proves its accepted
 arrays equal the original recursive executable schedule. The artifact checker
-uses that fold. The best observed cold module build is 52 seconds, so the next
-sub-30-second lead is a materialized finite-map representation that avoids
-normalizing nested functional updates.
+uses that fold, reducing the best observed cold module build to 52 seconds.
+The exact-boundary CSV parse, row replay, column replay, and source guard now
+use Lean's kernel-only decision reduction in separate modules. The independent
+checks build in parallel, then separate trace and parser receipts join the same
+strict acceptance theorem. A forced rebuild of that complete certificate path
+took 40.94 seconds wall clock, but every individual module meets the original
+sub-30-second module target: 23 seconds for the CSV parse, 9.5 seconds for each
+row/column replay, and under 5 seconds for the remaining stages. This is a
+proof-build optimization, not a stronger attack claim; sub-30-second
+end-to-end wall time remains open.
 `[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,

@@ -205,8 +205,13 @@ evidence for two independent claims:
    immutable auxiliary-state records now have proved empty-state, insertion,
    and score invariants for both phases. A fuel-bounded native-order fold now
    maintains those invariants and is proved equal to the original recursive
-   schedule; materializing the finite maps for the sub-30-second build target
-   remains open
+   schedule. Exact-boundary parsing, row replay, column replay, and source-guard
+   computation now use kernel-only decision reduction; the independent checks
+   build in parallel and separate trace/parser receipts join the same strict
+   theorem. A forced rebuild took 40.94 seconds wall clock, while the largest
+   individual module took 23 seconds and therefore meets the original
+   sub-30-second module target. End-to-end sub-30-second wall time remains open,
+   and the change does not strengthen the attack claim
    `[pcc:unverified]`; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,

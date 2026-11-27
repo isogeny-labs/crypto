@@ -11,6 +11,9 @@ public import BucketStateReplay
 This module imports the compact projection of the native schema-3 packing
 provenance fixture.  It checks the projection's shape and bounds, then replays
 the exact row-then-column strict-first-minimum schedule from `LabelSequence`.
+The exact-boundary parse, row, column, and source-guard receipts live in
+separate kernel-reduction modules so their independent certificates can build
+in parallel before the final parser receipt is joined.
 -/
 
 namespace Curve25519PackingLabelArtifact
@@ -320,6 +323,24 @@ def parseSourceGuardPackingLabelArtifact
     (values : List ℕ) : Option PackingLabelArtifact := do
   let artifact ← parseReplayedPackingLabelArtifact values
   if artifact.sourceClassGuardMatches then some artifact else none
+
+/-- Successful shape/bounds parsing and trace replay construct a successful
+replayed import. -/
+theorem parseReplayedPackingLabelArtifact_of_components
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact)
+    (htrace : artifact.traceMatches = true) :
+    parseReplayedPackingLabelArtifact values = some artifact := by
+  simp [parseReplayedPackingLabelArtifact, hparse, htrace]
+
+/-- Successful replay and source-guard checking construct a successful strict
+import. -/
+theorem parseSourceGuardPackingLabelArtifact_of_components
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hreplayed : parseReplayedPackingLabelArtifact values = some artifact)
+    (hguard : artifact.sourceClassGuardMatches = true) :
+    parseSourceGuardPackingLabelArtifact values = some artifact := by
+  simp [parseSourceGuardPackingLabelArtifact, hreplayed, hguard]
 
 private theorem parseReplayedPackingLabelArtifact_components
     {values : List ℕ} {artifact : PackingLabelArtifact}
@@ -639,52 +660,6 @@ def packingLabelSourceGuardWitness : PackingLabelArtifact := {
   rowLabels := (List.range 32).map fun row => row % 2
   columnLabels := (List.range 32).map fun column => column / 2 % 2
 }
-
-set_option maxRecDepth 100000 in
-/-- The positive native source-guard projection parses to its named value. -/
-theorem packingLabelSourceGuardWitness_parsed :
-    parsePackingLabelArtifact packingLabelSourceGuardWitnessNumbers =
-      some packingLabelSourceGuardWitness := by
-  decide +revert
-
-private theorem packingLabelSourceGuardWitness_leftEndpoint :
-    packingLabelSourceGuardWitness.leftEndpoint (by decide) =
-      fun edge : Fin 32 => edge := by
-  funext edge
-  fin_cases edge <;> apply Fin.ext <;> decide
-
-private theorem packingLabelSourceGuardWitness_rightEndpoint :
-    packingLabelSourceGuardWitness.rightEndpoint (by decide) =
-      fun edge : Fin 32 => edge := by
-  funext edge
-  fin_cases edge <;> apply Fin.ext <;> decide
-
-set_option maxHeartbeats 2000000 in
-set_option maxRecDepth 100000 in
-/-- The exact-boundary native projection passes executable trace replay. -/
-theorem packingLabelSourceGuardWitness_traceMatches :
-    packingLabelSourceGuardWitness.traceMatches = true := by
-  decide +revert
-
-/-- The exact-boundary projection parses and replays to its named artifact. -/
-theorem packingLabelSourceGuardWitness_replayed :
-    parseReplayedPackingLabelArtifact packingLabelSourceGuardWitnessNumbers =
-      some packingLabelSourceGuardWitness := by
-  simp [parseReplayedPackingLabelArtifact, packingLabelSourceGuardWitness_parsed,
-    packingLabelSourceGuardWitness_traceMatches]
-
-/-- The degree-one matching meets the source-class guard at equality. -/
-theorem packingLabelSourceGuardWitness_sourceClassGuardMatches :
-    packingLabelSourceGuardWitness.sourceClassGuardMatches = true := by
-  decide
-
-/-- The strict parser accepts the positive exact-boundary native projection. -/
-theorem packingLabelSourceGuardWitness_sourceGuardParsed :
-    parseSourceGuardPackingLabelArtifact packingLabelSourceGuardWitnessNumbers =
-      some packingLabelSourceGuardWitness := by
-  simp [parseSourceGuardPackingLabelArtifact,
-    packingLabelSourceGuardWitness_replayed,
-    packingLabelSourceGuardWitness_sourceClassGuardMatches]
 
 /-- The shape- and bounds-checked parser returns the named projection. -/
 theorem packingLabelWitness_parsed :

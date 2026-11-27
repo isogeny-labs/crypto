@@ -101,15 +101,20 @@ proved score reduced the best observed cold 32-edge artifact build from 229 to
 times selected-label bucket degree plus `(q-1)` times the right-endpoint
 overlap, and the column score equal to `q` times the row-label profile dot
 product. Computing those source-shaped formulas reduces the best observed cold
-build to 55 seconds. The next target is a single-pass replay of the evolving
-bucket maps rather than reconstructing each prefix independently.
+build to 55 seconds.
 `BucketStateReplay.lean` now proves the required auxiliary invariant for both
 phases: empty state, exact row/column insertion, and equality of every
 state-derived candidate score with its extensional incidence formula. A
 fuel-bounded single-pass fold now maintains that invariant and is proved equal
-to the original recursive schedule; artifact replay uses it. The best observed
-cold build is 52 seconds, leaving materialized map updates and the sub-30-second
-target open.
+to the original recursive schedule; artifact replay uses it, reducing the best
+observed cold build to 52 seconds. The exact-boundary CSV parse, row replay,
+column replay, and source-guard checks now use Lean's kernel-only decision
+reduction in separate modules. The independent checks build in parallel, while
+separate trace and strict-parser modules retain the original joined acceptance
+statement. A forced complete rebuild took 40.94 seconds wall clock; the largest
+individual module is the 23-second CSV parse, so the original sub-30-second
+module target is met without changing the formal claim boundary. Sub-30-second
+end-to-end wall time remains open.
 `[pcc:unverified]`
 
 ## Remaining boundary

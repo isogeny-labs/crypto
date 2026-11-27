@@ -7,7 +7,7 @@ import SparseLabelScore
 import IncidenceBucketScore
 import BucketStateReplay
 import LabelSequence
-import PackingLabelArtifact
+import PackingLabelReplayCertificate
 import ObjectiveBoundary
 import GroupFactorization
 import ExtensionRingModel
@@ -101,6 +101,8 @@ open Curve25519ExtensionRingModel
 #print axioms parsePackingLabelArtifact_rightEndpoint_val
 #print axioms parsePackingLabelArtifact_rowLabel_val
 #print axioms parsePackingLabelArtifact_columnLabel_val
+#print axioms parseReplayedPackingLabelArtifact_of_components
+#print axioms parseSourceGuardPackingLabelArtifact_of_components
 #print axioms parseReplayedPackingLabelArtifact_labelCount_pos
 #print axioms parseReplayedPackingLabelArtifact_rowCount_pos
 #print axioms parseReplayedPackingLabelArtifact_columnCount_pos
@@ -113,6 +115,8 @@ open Curve25519ExtensionRingModel
 #print axioms parseSourceGuardPackingLabelArtifact_guard
 #print axioms parseSourceGuardPackingLabelArtifact_classCap
 #print axioms packingLabelSourceGuardWitness_parsed
+#print axioms packingLabelSourceGuardWitness_rowReplay
+#print axioms packingLabelSourceGuardWitness_columnReplay
 #print axioms packingLabelSourceGuardWitness_traceMatches
 #print axioms packingLabelSourceGuardWitness_replayed
 #print axioms packingLabelSourceGuardWitness_sourceClassGuardMatches
