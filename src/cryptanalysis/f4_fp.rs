@@ -3580,6 +3580,104 @@ fn deferred_parallel() -> bool {
     *PAR.get_or_init(|| std::env::var("F4_FP_DEFERRED_PAR").as_deref() != Ok("0"))
 }
 
+/// Exact `f64` GEMM trailing updates in deferred RREF (`p < 2^26`).  Default
+/// on when [`fp_gemm::supports_f64_gemm`] holds; `F4_FP_GEMM=0` keeps the
+/// per-pivot `add_lazy` path as a same-binary control.
+fn f4_fp_gemm_env_on() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() != Ok("0"))
+}
+
+/// Whether a deferred chunk should use blocked exact-`f64` GEMM against
+/// `known`: enough pivots and trailing width that packing beats rank-1
+/// `add_lazy`, and the prime admits exact `f64` accumulation.
+fn deferred_gemm_worthwhile(p: u64, n_rows: usize, n_cols: usize, n_pivots: usize) -> bool {
+    f4_fp_gemm_env_on()
+        && super::fp_gemm::supports_f64_gemm(p)
+        && n_pivots >= 8
+        && n_cols >= 64
+        && n_rows.saturating_mul(n_pivots).saturating_mul(n_cols) >= (1 << 16)
+}
+
+/// Reduce every row of `sources` by the pivots `known` with blocked exact
+/// `f64` GEMM trailing updates.  Panels of at most `min(64, k_safe_f64(p))`
+/// pivots: multipliers are formed by the same left-looking triangular rule
+/// as [`reduce_lazy_by`], then one `C += A·B (mod p)` writes the trailing
+/// submatrix.  Returns fully-reduced accumulators (`pending = 0`); counted
+/// ops match the nonzero-factor `add_lazy` total (`n − c` per factor).
+fn reduce_chunk_by_known_gemm(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+) -> Vec<(Vec<u64>, usize)> {
+    use super::fp_gemm::{detect_gemm_simd, gemm_f64_mod_p, k_safe_f64};
+    let m = sources.len();
+    let n = sources[0].len();
+    let p = fp.p;
+    let bm = ((1u128 << 64) / u128::from(p)) as u64;
+    let simd = detect_gemm_simd();
+    let k_cap = k_safe_f64(p).min(64).max(1);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut b_pack = Vec::new();
+    let mut panel_start = 0usize;
+    while panel_start < known.len() {
+        let k = (known.len() - panel_start).min(k_cap);
+        let panel = &known[panel_start..panel_start + k];
+        let c_min = panel[0].0;
+        let w = n - c_min;
+        if w == 0 {
+            panel_start += k;
+            continue;
+        }
+        let mut a = vec![0f64; m * k];
+        let mut ops = 0usize;
+        for (i, acc) in accs.iter().enumerate() {
+            let mut ell = vec![0u64; k];
+            for j in 0..k {
+                let cj = panel[j].0;
+                let mut v = u128::from(acc[cj]);
+                for jprev in 0..j {
+                    let f = ell[jprev];
+                    if f != 0 {
+                        v += u128::from(p - f) * u128::from(panel[jprev].1[cj]);
+                    }
+                }
+                let f = (v % u128::from(p)) as u64;
+                ell[j] = f;
+                if f != 0 {
+                    a[i * k + j] = (p - f) as f64;
+                    ops += n - cj;
+                }
+            }
+        }
+        count_ops(ops);
+        let mut b = vec![0f64; k * w];
+        for j in 0..k {
+            let prow = &panel[j].1;
+            for t in 0..w {
+                b[j * w + t] = f64::from(prow[c_min + t]);
+            }
+        }
+        let mut c = vec![0f64; m * w];
+        for (i, acc) in accs.iter().enumerate() {
+            for t in 0..w {
+                c[i * w + t] = acc[c_min + t] as f64;
+            }
+        }
+        gemm_f64_mod_p(simd, m, w, k, &a, k, &b, w, &mut c, w, p, bm, &mut b_pack);
+        for (i, acc) in accs.iter_mut().enumerate() {
+            for t in 0..w {
+                acc[c_min + t] = c[i * w + t] as u64;
+            }
+        }
+        panel_start += k;
+    }
+    accs.into_iter().map(|a| (a, 0usize)).collect()
+}
+
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
 /// increasing pivot column, with the bounded normalisation that keeps the
 /// accumulators far below `u64` overflow; `pending` carries the count of
@@ -3648,18 +3746,27 @@ fn rref32_deferred(
             return None;
         }
         let n_cols = chunk[0].len();
-        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
-            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
-            let mut pending = 0usize;
-            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
-            (acc, pending)
-        };
         let o0 = pp_ops();
         let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
-        let mut reduced: Vec<(Vec<u64>, usize)> = if spread {
-            chunk.par_iter().map(reduce_one).collect()
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm(chunk, &known, fp)
         } else {
-            chunk.iter().map(reduce_one).collect()
+            let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
+                let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+                let mut pending = 0usize;
+                reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+                (acc, pending)
+            };
+            if spread {
+                chunk.par_iter().map(reduce_one).collect()
+            } else {
+                chunk.iter().map(reduce_one).collect()
+            }
         };
         let o1 = pp_ops();
         pp_add(
@@ -15358,6 +15465,58 @@ mod tests {
                     widened_deferred, wide,
                     "deferred p={p}, shape={rows}x{cols}"
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn reduce_chunk_gemm_matches_lazy_on_ntt_prime() {
+        // Direct A/B of the blocked GEMM helper against per-row `reduce_lazy_by`
+        // on p = 786433 (exact-f64 GEMM prime used by E2LOCMS45).
+        let p = 786_433u64;
+        assert!(super::super::fp_gemm::supports_f64_gemm(p));
+        let fp = Barrett::new(p);
+        let simd = lazy_simd_kind();
+        let mut x = 0xC0FF_EE00_D15C_AFE1u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for (n_piv, n_rows, n_cols) in [(12usize, 16usize, 96usize), (24, 32, 128), (40, 48, 160)]
+        {
+            let mut known: Vec<(usize, Vec<u32>)> = Vec::with_capacity(n_piv);
+            for j in 0..n_piv {
+                let c = j * (n_cols / n_piv);
+                let mut row = vec![0u32; n_cols];
+                row[c] = 1;
+                for t in (c + 1)..n_cols {
+                    row[t] = (next() % p) as u32;
+                }
+                // Zero earlier pivot columns (forward-elim shape).
+                for &(pc, _) in &known {
+                    row[pc] = 0;
+                }
+                known.push((c, row));
+            }
+            let sources: Vec<Vec<u32>> = (0..n_rows)
+                .map(|_| (0..n_cols).map(|_| (next() % p) as u32).collect())
+                .collect();
+            let gemm = reduce_chunk_by_known_gemm(&sources, &known, fp);
+            let lazy: Vec<(Vec<u64>, usize)> = sources
+                .iter()
+                .map(|s| {
+                    let mut acc: Vec<u64> = s.iter().copied().map(u64::from).collect();
+                    let mut pending = 0usize;
+                    reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+                    normalize_lazy(&mut acc, fp);
+                    (acc, 0usize)
+                })
+                .collect();
+            assert_eq!(gemm.len(), lazy.len(), "row count {n_piv}/{n_rows}x{n_cols}");
+            for (i, ((ga, _), (la, _))) in gemm.iter().zip(lazy.iter()).enumerate() {
+                assert_eq!(ga, la, "row {i} piv={n_piv} {n_rows}x{n_cols}");
             }
         }
     }
