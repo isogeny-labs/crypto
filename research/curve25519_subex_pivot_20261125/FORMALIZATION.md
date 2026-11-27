@@ -248,6 +248,14 @@ history's `6M/64` bound, eightfold shrink, degree preservation, and the complete
 still reports that the generic premises remain assumed, so this is not a graph
 realization or an external contraction proof. `[pcc:unverified]`
 
+The accompanying Lean 4.35 project independently kernel-checks the downstream
+real-inequality implications and exact ledger arithmetic. Its theorem
+statements expose nonnegative `M` in the child-shrink steps and positive `D`
+in the mode/precision cancellation. The axiom audit reports only `propext`,
+`Classical.choice`, and `Quot.sound`; the conditional-label variance theorem,
+finite factorization realization, and external contraction theorem remain
+explicit hypotheses or out of scope. `[pcc:unverified]`
+
 For the schema-2 factorization description, the same verifier reconstructs
 `Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks
 `Delta_d floor(sqrt(lambda)) ceil(sqrt(u_d))<=2^(lambda-1)` at every retained

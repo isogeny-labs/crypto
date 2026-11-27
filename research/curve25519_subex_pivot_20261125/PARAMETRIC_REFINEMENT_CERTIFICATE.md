@@ -24,6 +24,10 @@ nD <= 6M,
 and the next call rechecks the guards or takes exact fallback.
 ```
 
+All size and counting quantities are nonnegative, and `D>0` where the
+mode/precision proof cancels it. The explicit nonnegativity premise matters:
+without `M>=0`, `64 child<=6M` would not imply `8 child<=M` over the reals.
+
 The checker proves implications from these premises. It does not treat their
 Boolean tokens as evidence that an arbitrary graph realizes them, and its
 summary reports `generic_premises_remain_assumed=true`. `[pcc:unverified]`
@@ -74,9 +78,38 @@ unsupported promotion. The checker imports the composition-boundary verifier,
 not graph, packing, factorization, contraction, or producer code.
 `[pcc:unverified]`
 
+## Lean kernel replay
+
+`lean/ParametricRefinement.lean` gives a second, typed proof of the downstream
+real-inequality chain. It kernel-checks the single-class cap
+`[pcc:unverified]` from the scaled variance and source guard, padded capacity,
+both child-shrink bounds, degree closure,
+the `6*34=204` mode/precision product after cancelling positive `D`, and the
+exact cost-ledger constants. The proof makes `M>=0` explicit in both shrink
+lemmas; Lean rejected the first draft without it, exposing a genuine missing
+domain condition in that standalone formulation.
+
+The project pins Lean `v4.35.0` and mathlib commit
+`56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
+
+```text
+cd research/curve25519_subex_pivot_20261125/lean
+lake update
+lake build
+lake env lean AxiomAudit.lean
+```
+
+The build completes 9,049 jobs. `#print axioms` reports only `propext`,
+`Classical.choice`, and `Quot.sound` for each exported theorem; there are no
+project axioms or admitted proofs. This formal replay still takes the variance,
+source guard, precision, and mode inequalities as hypotheses. It neither
+proves that an arbitrary admitted multigraph realizes them nor formalizes the
+external contraction theorem. `[pcc:unverified]`
+
 ## Next measurable goal
 
-The remaining local gap is now premise evidence, not coefficient arithmetic.
+The remaining local gap is now premise evidence, not downstream coefficient
+arithmetic.
 A useful next certificate must replace the generic Boolean tokens with typed
 evidence for two independent claims:
 

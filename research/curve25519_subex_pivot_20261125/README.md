@@ -428,6 +428,13 @@ all five retained threshold depths. Its summary keeps
 `generic_premises_remain_assumed=true`; graph realization and the external
 theorem remain false. `[pcc:unverified]`
 
+A pinned Lean 4.35/mathlib replay now kernel-checks the same downstream
+real-inequality and ledger chain. It makes the parent-size nonnegativity and
+positive-dimension cancellation conditions explicit; its axiom audit contains
+only Lean/mathlib's standard `propext`, `Classical.choice`, and `Quot.sound`.
+The variance, finite factorization/precision realization, and external theorem
+are not discharged by this replay. `[pcc:unverified]`
+
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
 `M=32<LD=512` child fails exactly at packet padding, while all four two-group
