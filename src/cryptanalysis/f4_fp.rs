@@ -3571,7 +3571,19 @@ fn normalize_lazy(acc: &mut [u64], fp: Barrett) {
 /// chunk's rows are independent of each other until they are stored, so
 /// their reductions run in parallel; a smaller chunk finds pivots sooner
 /// for the rows after it, a larger one spreads better.
-const DEFERRED_CHUNK: usize = 64;
+/// Rows reduced together against the pivots known before the chunk.
+/// Larger than 64 amortises the deferred schedule on wide NTT free-column
+/// matrices (m=3 t=5 is ~28k rows); override with `F4_FP_DEFERRED_CHUNK`.
+fn deferred_chunk_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_CHUNK")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=4096).contains(&n))
+            .unwrap_or(128)
+    })
+}
 
 /// `F4_FP_DEFERRED_PAR=0` runs the deferred elimination row by row on one
 /// thread, as it did before the chunks; a same-binary control.
@@ -3580,37 +3592,52 @@ fn deferred_parallel() -> bool {
     *PAR.get_or_init(|| std::env::var("F4_FP_DEFERRED_PAR").as_deref() != Ok("0"))
 }
 
-/// Exact `f64` GEMM trailing updates in deferred RREF (`p < 2^26`).  Default
-/// on when [`fp_gemm::supports_f64_gemm`] holds; `F4_FP_GEMM=0` keeps the
-/// per-pivot `add_lazy` path as a same-binary control.
+/// Exact `f64` SpMM/GEMM trailing updates in deferred RREF and wide FL
+/// blocked pair updates (`p` with [`fp_gemm::supports_f64_gemm`]).  Opt-in
+/// (`F4_FP_GEMM=1`): on NTT cells the parallel AVX `add_lazy` path is
+/// faster until panels are large enough that packing amortises; default
+/// off keeps that path.  Same-binary control: unset vs `=1`.
 fn f4_fp_gemm_env_on() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() != Ok("0"))
+    *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() == Ok("1"))
+}
+
+/// Wide-prime deferred RREF (default on when the prime admits exact `f64`
+/// arithmetic).  `F4_FP_WIDE_DEFERRED=0` forces classical [`rref`].
+fn wide_deferred_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_WIDE_DEFERRED").as_deref() != Ok("0"))
 }
 
 /// Whether a deferred chunk should use blocked exact-`f64` GEMM against
 /// `known`: enough pivots and trailing width that packing beats rank-1
 /// `add_lazy`, and the prime admits exact `f64` accumulation.
 fn deferred_gemm_worthwhile(p: u64, n_rows: usize, n_cols: usize, n_pivots: usize) -> bool {
+    // Prefer SpMM/GEMM only when the panel is large enough that packing
+    // beats parallel AVX `add_lazy` (smaller panels regress on NTT cells).
     f4_fp_gemm_env_on()
         && super::fp_gemm::supports_f64_gemm(p)
-        && n_pivots >= 8
-        && n_cols >= 64
-        && n_rows.saturating_mul(n_pivots).saturating_mul(n_cols) >= (1 << 16)
+        && n_pivots >= 32
+        && n_cols >= 256
+        && n_rows >= 16
+        && n_rows.saturating_mul(n_pivots).saturating_mul(n_cols) >= (1 << 20)
 }
 
 /// Reduce every row of `sources` by the pivots `known` with blocked exact
-/// `f64` GEMM trailing updates.  Panels of at most `min(64, k_safe_f64(p))`
+/// `f64` SpMM/GEMM trailing updates.  Panels of at most `min(64, k_safe_f64(p))`
 /// pivots: multipliers are formed by the same left-looking triangular rule
-/// as [`reduce_lazy_by`], then one `C += A·B (mod p)` writes the trailing
-/// submatrix.  Returns fully-reduced accumulators (`pending = 0`); counted
-/// ops match the nonzero-factor `add_lazy` total (`n − c` per factor).
+/// as [`reduce_lazy_by`], then adaptive [`fp_gemm::spmm_or_gemm_f64`] writes
+/// the trailing submatrix (sparse `A` avoids zero-factor flops).  Returns
+/// fully-reduced accumulators (`pending = 0`); counted ops match the
+/// nonzero-factor `add_lazy` total (`n − c` per factor).
 fn reduce_chunk_by_known_gemm(
     sources: &[Vec<u32>],
     known: &[(usize, Vec<u32>)],
     fp: Barrett,
 ) -> Vec<(Vec<u64>, usize)> {
-    use super::fp_gemm::{detect_gemm_simd, gemm_f64_mod_p, k_safe_f64};
+    use super::fp_gemm::{
+        detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p, spmm_or_gemm_f64,
+    };
     let m = sources.len();
     let n = sources[0].len();
     let p = fp.p;
@@ -3621,7 +3648,8 @@ fn reduce_chunk_by_known_gemm(
         .iter()
         .map(|s| s.iter().copied().map(u64::from).collect())
         .collect();
-    let mut b_pack = Vec::new();
+    let mut a_dense_buf = Vec::new();
+    let mut b_pack_buf = Vec::new();
     let mut panel_start = 0usize;
     while panel_start < known.len() {
         let k = (known.len() - panel_start).min(k_cap);
@@ -3632,7 +3660,7 @@ fn reduce_chunk_by_known_gemm(
             panel_start += k;
             continue;
         }
-        let mut a = vec![0f64; m * k];
+        let mut a_rows: Vec<Vec<(u32, f64)>> = vec![Vec::new(); m];
         let mut ops = 0usize;
         for (i, acc) in accs.iter().enumerate() {
             let mut ell = vec![0u64; k];
@@ -3648,7 +3676,7 @@ fn reduce_chunk_by_known_gemm(
                 let f = (v % u128::from(p)) as u64;
                 ell[j] = f;
                 if f != 0 {
-                    a[i * k + j] = (p - f) as f64;
+                    a_rows[i].push((j as u32, (p - f) as f64));
                     ops += n - cj;
                 }
             }
@@ -3667,7 +3695,22 @@ fn reduce_chunk_by_known_gemm(
                 c[i * w + t] = acc[c_min + t] as f64;
             }
         }
-        gemm_f64_mod_p(simd, m, w, k, &a, k, &b, w, &mut c, w, p, bm, &mut b_pack);
+        spmm_or_gemm_f64(
+            simd,
+            m,
+            w,
+            k,
+            &a_rows,
+            &b,
+            w,
+            &mut c,
+            w,
+            &mut a_dense_buf,
+            &mut b_pack_buf,
+        );
+        for i in 0..m {
+            reduce_f64_slice_mod_p(&mut c[i * w..(i + 1) * w], p, bm);
+        }
         for (i, acc) in accs.iter_mut().enumerate() {
             for t in 0..w {
                 acc[c_min + t] = c[i * w + t] as u64;
@@ -3676,6 +3719,25 @@ fn reduce_chunk_by_known_gemm(
         panel_start += k;
     }
     accs.into_iter().map(|a| (a, 0usize)).collect()
+}
+
+/// Parallel strip wrapper around [`reduce_chunk_by_known_gemm`]: when the
+/// chunk is wide enough that the lazy path would have used rayon, split into
+/// row strips so packing stays concurrent with other strips.
+fn reduce_chunk_by_known_gemm_par(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    const STRIP: usize = 16;
+    if !spread || sources.len() <= STRIP {
+        return reduce_chunk_by_known_gemm(sources, known, fp);
+    }
+    sources
+        .par_chunks(STRIP)
+        .flat_map_iter(|sub| reduce_chunk_by_known_gemm(sub, known, fp))
+        .collect()
 }
 
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
@@ -3712,7 +3774,7 @@ fn reduce_lazy_by(
 /// coefficient and the row when it is stored.  A bounded normalization
 /// keeps even the largest supported prime far below `u64` overflow.
 ///
-/// Rows are taken in chunks of [`DEFERRED_CHUNK`]: every row of a chunk is
+/// Rows are taken in chunks of [`deferred_chunk_rows`]: every row of a chunk is
 /// reduced in parallel against the pivots known before the chunk, then the
 /// rows are stored one at a time, each first reduced again against the
 /// whole pivot list so the pivots its chunk-mates contributed (and any
@@ -3737,7 +3799,7 @@ fn rref32_deferred(
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
-    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
     let _def_ns = PpNs(PP_DEF_NS, Instant::now());
     pp_add(PP_DEF_ROWS, sources.len() as u64);
     for chunk in sources.chunks(chunk_rows) {
@@ -3754,7 +3816,7 @@ fn rref32_deferred(
             n_cols,
             known.len(),
         ) {
-            reduce_chunk_by_known_gemm(chunk, &known, fp)
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
         } else {
             let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
                 let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
@@ -3829,6 +3891,135 @@ fn rref32_deferred(
         },
         pp_ops() - o0,
     );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// Deferred RREF for residues stored as `u32` with a general [`Barrett`]
+/// prime (`p < 2^32`, including NTT primes above `2^16` where
+/// [`Barrett32`] refuses).  Same schedule as [`rref32_deferred`]'s 64-bit
+/// accumulator path, including exact-`f64` GEMM trailing updates.
+fn rref_u32_barrett_deferred(
+    rows: &mut Vec<Vec<u32>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<usize>> {
+    debug_assert!(fp.p < (1 << 32));
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+        } else {
+            let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
+                let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+                let mut pending = 0usize;
+                reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+                (acc, pending)
+            };
+            if spread {
+                chunk.par_iter().map(reduce_one).collect()
+            } else {
+                chunk.iter().map(reduce_one).collect()
+            }
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        let known_before = known.len();
+        for (acc, pending) in reduced.iter_mut() {
+            if known.len() > known_before {
+                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
+                reduce_lazy_by(acc, &known, fp, simd, pending);
+            }
+            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p);
+            for x in &mut row[c..] {
+                *x = fp.reduce(u64::from(*x) * inv) as u32;
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at = known.partition_point(|(pc, _)| *pc < c);
+            known.insert(at, (c, row));
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+        let mut pending = 0usize;
+        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
+        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    // Prefer GEMM panels for back-substitution when the trailing width and
+    // pivot count amortise packing; otherwise the parallel lazy path.
+    let o0 = pp_ops();
+    let reduced: Vec<Vec<u32>> = if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len())
+        && known.len() >= 2
+    {
+        // One GEMM-style reduce of each pivot row by the later pivots:
+        // build sources = known rows, then for i reduce by known[i+1..].
+        // Fall back to per-row lazy when the triangular structure makes a
+        // single packed call awkward — still use GEMM per row panel via
+        // reduce_chunk against the suffix.
+        (0..known.len())
+            .into_par_iter()
+            .map(|i| {
+                let src = known[i].1.clone();
+                let suffix = &known[i + 1..];
+                if deferred_gemm_worthwhile(fp.p, 1, n_cols, suffix.len()) {
+                    let mut out = reduce_chunk_by_known_gemm(&[src], suffix, fp);
+                    let (acc, _) = out.pop().unwrap();
+                    acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+                } else {
+                    back(i)
+                }
+            })
+            .collect()
+    } else {
+        let spread = parallel && known.len() * n_cols > PAR_WORK;
+        if spread {
+            (0..known.len()).into_par_iter().map(back).collect()
+        } else {
+            (0..known.len()).map(back).collect()
+        }
+    };
+    pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
     let pivots = known.iter().map(|(c, _)| *c).collect();
     *rows = reduced;
     Some(pivots)
@@ -3982,7 +4173,7 @@ fn rref32_deferred_n32(
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
-    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
     let _def_ns = PpNs(PP_DEF_NS, Instant::now());
     pp_add(PP_DEF_ROWS, sources.len() as u64);
     for chunk in sources.chunks(chunk_rows) {
@@ -4367,8 +4558,27 @@ fn reduce_pairs_fl(
     pp_add(PP_FLB_NS, pp_ns(t_flb));
     let t_pairs = Instant::now();
     let _pairs_ns = PpNs(PP_PAIRS_NS, t_pairs);
-    if fl_blocked_pairs() {
+    // `reduce_pairs_blocked` asserts `p ≤ 2¹⁶` (u64 accumulators without
+    // mid-tile normalisation).  Larger primes that still fit in `u32`
+    // coefficients (`supports_f64_gemm`, including the NTT prime 786433)
+    // take the per-row lazy path below, or the exact-f64 blocked form.
+    if fl_blocked_pairs() && fp.p <= 1 << 16 {
         return reduce_pairs_blocked(
+            pair_rows,
+            &bprime,
+            &bstart,
+            reducer_at,
+            &free_index,
+            n_free,
+            fp,
+            deadline,
+        );
+    }
+    if fl_blocked_pairs()
+        && f4_fp_gemm_env_on()
+        && super::fp_gemm::supports_f64_gemm(fp.p)
+    {
+        return reduce_pairs_blocked_f64(
             pair_rows,
             &bprime,
             &bstart,
@@ -4870,6 +5080,122 @@ fn reduce_pairs_blocked(
         Some(
             acc.into_iter()
                 .map(|a| a.into_iter().map(|x| fp.reduce(x) as u32).collect())
+                .collect(),
+        )
+    };
+    let o0 = pp_ops();
+    let (spread, rows_per_block) = pairs_blocked_dispatch(pair_rows, n_free);
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if spread {
+        pair_rows.par_chunks(rows_per_block).map(block).collect()
+    } else {
+        pair_rows.chunks(rows_per_block).map(block).collect()
+    };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
+    let mut out = Vec::with_capacity(pair_rows.len());
+    for b in blocks {
+        out.extend(b?);
+    }
+    Some(out)
+}
+
+/// [`reduce_pairs_blocked`] for primes with exact `f64` GEMM (`p` up to the
+/// `supports_f64_gemm` bound, including 786433): same hit grouping and
+/// column tiles, with `f64` accumulators reduced every `k_safe_f64(p)`
+/// updates so every partial sum stays strictly ≤ 2⁵³.
+#[allow(clippy::too_many_arguments)]
+fn reduce_pairs_blocked_f64(
+    pair_rows: &[Vec<(u32, u64)>],
+    bprime: &[Vec<u32>],
+    bstart: &[usize],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    use super::fp_gemm::{
+        axpy_f64, cvt_u32_to_f64, detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p,
+    };
+    const NONE: u32 = u32::MAX;
+    assert!(bprime.len() < 1 << 31, "reducer index fits u32");
+    let simd = detect_gemm_simd();
+    let k_safe = k_safe_f64(fp.p).max(1);
+    let bm = ((1u128 << 64) / u128::from(fp.p)) as u64;
+    // B' as f64 once: every block reuses the same panels.
+    let bprime_f64: Vec<Vec<f64>> = bprime
+        .iter()
+        .map(|row| {
+            let mut out = vec![0f64; row.len()];
+            cvt_u32_to_f64(simd, row, &mut out);
+            out
+        })
+        .collect();
+    let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc: Vec<Vec<f64>> = vec![vec![0f64; n_free]; rows.len()];
+        let mut hits: Vec<(u32, u32, f64)> = Vec::new();
+        for (i, r) in rows.iter().enumerate() {
+            for &(c, v) in r {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[i][fi as usize] += v as f64;
+                } else {
+                    hits.push((reducer_at[c as usize], i as u32, (fp.p - v) as f64));
+                }
+            }
+        }
+        hits.sort_unstable_by_key(|&(j, i, _)| (j, i));
+        let mut pending = vec![0usize; rows.len()];
+        let mut from = 0usize;
+        while from < n_free {
+            let to = (from + FL_PAIR_TILE).min(n_free);
+            for &(j, i, factor) in &hits {
+                let j = j as usize;
+                let i = i as usize;
+                let start = bstart[j].max(from);
+                if start >= to {
+                    continue;
+                }
+                axpy_f64(
+                    simd,
+                    &mut acc[i][start..to],
+                    &bprime_f64[j][start..to],
+                    factor,
+                );
+                pending[i] += 1;
+                if pending[i] >= k_safe {
+                    reduce_f64_slice_mod_p(&mut acc[i], fp.p, bm);
+                    pending[i] = 0;
+                }
+            }
+            from = to;
+        }
+        for (i, a) in acc.iter_mut().enumerate() {
+            if pending[i] > 0 {
+                reduce_f64_slice_mod_p(a, fp.p, bm);
+            }
+        }
+        count_ops(
+            hits.iter()
+                .map(|&(j, _, _)| n_free - bstart[j as usize])
+                .sum(),
+        );
+        Some(
+            acc.into_iter()
+                .map(|a| {
+                    a.into_iter()
+                        .map(|x| {
+                            // already reduced; cast is exact for residues < 2^32
+                            debug_assert!(x >= 0.0 && x < fp.p as f64);
+                            x as u32
+                        })
+                        .collect()
+                })
                 .collect(),
         )
     };
@@ -7238,6 +7564,16 @@ fn f4_with_arithmetic(
             // Products an entry below `p` can take without reaching `2⁶⁴`
             // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
             let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
+            // Wide primes (above the narrow/deferred gate at 2¹⁶) still admit
+            // Faugère–Lachartre when coefficients fit in `u32` and exact `f64`
+            // panels are safe — the NTT prime 786433 is the motivating case.
+            // `F4_FP_FL=0` keeps the cascade below as a same-binary control.
+            let fl_wide = resume_here.is_none()
+                && opts.resource_limits.is_none()
+                && fl_enabled()
+                && n_cols >= fl_min_cols()
+                && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES
+                && super::fp_gemm::supports_f64_gemm(p);
             let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                 if deadline.is_some_and(|d| Instant::now() > d) {
                     return None;
@@ -7302,6 +7638,21 @@ fn f4_with_arithmetic(
             // part of the reduction
             let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
                 Some(Vec::new())
+            } else if fl_wide {
+                reduce_pairs_fl(
+                    pair_rows,
+                    reducers,
+                    &reducer_at,
+                    &free_cols,
+                    n_cols,
+                    fp,
+                    deadline,
+                )
+                .map(|rows| {
+                    rows.into_iter()
+                        .map(|r| r.into_iter().map(u64::from).collect())
+                        .collect()
+                })
             } else if parallel {
                 pair_rows.par_iter().map(reduce_pair_row).collect()
             } else {
@@ -7397,13 +7748,46 @@ fn f4_with_arithmetic(
                 let piv = match &block_classes {
                     Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
                     None => {
-                        let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                            if top.is_some() && opts.checkpoint.is_some() {
-                                Some(&mut snapshot_hook)
-                            } else {
-                                None
-                            };
-                        rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        let want_hook = top.is_some() && opts.checkpoint.is_some();
+                        // Deferred lazy/SpMM RREF for free-column matrices on
+                        // exact-f64 primes (NTT 786433): classical `rref` uses
+                        // per-entry Barrett reduces; deferred keeps AVX lazy
+                        // accumulators (GEMM panels optional via F4_FP_GEMM).
+                        // `F4_FP_WIDE_DEFERRED=0` restores classical `rref`.
+                        let use_wide_deferred = resume_arg.is_none()
+                            && !want_hook
+                            && wide_deferred_enabled()
+                            && super::fp_gemm::supports_f64_gemm(p)
+                            && rows.len() >= 8
+                            && rows.first().map(|r| r.len()).unwrap_or(0) >= 64;
+                        if use_wide_deferred {
+                            let mut rows32: Vec<Vec<u32>> = rows
+                                .iter()
+                                .map(|r| {
+                                    r.iter()
+                                        .map(|&v| {
+                                            debug_assert!(v < p);
+                                            v as u32
+                                        })
+                                        .collect()
+                                })
+                                .collect();
+                            let piv =
+                                rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                            rows = rows32
+                                .into_iter()
+                                .map(|r| r.into_iter().map(u64::from).collect())
+                                .collect();
+                            Some(piv)
+                        } else {
+                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                if want_hook {
+                                    Some(&mut snapshot_hook)
+                                } else {
+                                    None
+                                };
+                            rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        }
                     }
                 };
                 piv.map(|piv| (rows, piv))
@@ -9799,15 +10183,18 @@ impl Drop for VisitAccountingSession<'_> {
     }
 }
 
-const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 33] = [
+const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 36] = [
     "F4_DEBUG",
     "F4_FP_BRANCH",
+    "F4_FP_DEFERRED_CHUNK",
     "F4_FP_DEFERRED_PAR",
     "F4_FP_FL",
     "F4_FP_FL_BLOCKED",
     "F4_FP_FL_MIN_COLS",
     "F4_FP_FREEZE",
+    "F4_FP_GEMM",
     "F4_FP_GM",
+    "F4_FP_WIDE_DEFERRED",
     "F4_FP_LAZY_AVX2",
     "F4_FP_LAZY_AVX512",
     "F4_FP_LAZY_SIMD",
