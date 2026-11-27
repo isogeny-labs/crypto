@@ -1,0 +1,157 @@
+name: Point index native pair publication
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the reviewed main source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          path: driver
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+            /research/unified_point_index_20261127/panel-bridge-20261127/
+      - name: Require a frozen reviewed source and protocol manifest
+        id: pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C driver rev-parse HEAD)" = "$GITHUB_SHA"
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          inputs="$study/publish-inputs.json"
+          jq -e '.schema=="point-index.publish-inputs/v1" and .status=="frozen"
+            and .experiment_submitted==false
+            and (.baseline_revision|test("^[a-f0-9]{40}$"))
+            and (.candidate_revision|test("^[a-f0-9]{40}$"))
+            and .baseline_revision!=.candidate_revision
+            and all(.spec_sha256,.protocol_sha256; type=="string" and test("^[a-f0-9]{64}$"))
+            and all(.spec_path,.protocol_path; type=="string" and test("^[a-zA-Z0-9_./-]+\\.json$"))' "$inputs" >/dev/null
+          for kind in spec protocol; do
+            path=$(jq -er --arg kind "$kind" '.[$kind+"_path"]' "$inputs")
+            digest=$(jq -er --arg kind "$kind" '.[$kind+"_sha256"]' "$inputs")
+            [[ $path == research/unified_point_index_20261127/panel-bridge-20261127/* && $path != *../* ]]
+            test -f "driver/$path" && test ! -L "driver/$path"
+            test "$(sha256sum "driver/$path" | cut -d' ' -f1)" = "$digest"
+          done
+          echo "baseline=$(jq -er .baseline_revision "$inputs")" >> "$GITHUB_OUTPUT"
+          echo "candidate=$(jq -er .candidate_revision "$inputs")" >> "$GITHUB_OUTPUT"
+      - name: Check out the frozen baseline source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.baseline }}
+          path: baseline
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Check out the frozen candidate source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.candidate }}
+          path: candidate
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Install the native static toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends musl-tools
+          rustup toolchain install 1.78.0 --profile minimal --target x86_64-unknown-linux-musl
+      - name: Rebuild the exact native pair without AWS identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          CARGO_TARGET_DIR="$RUNNER_TEMP/point-index-panel-tests" cargo +1.78.0 test --locked --release \
+            --manifest-path driver/crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl-panel
+          "$study/test-publish-pair.sh"
+          "$study/build-pair.sh" baseline '${{ steps.pins.outputs.baseline }}' \
+            candidate '${{ steps.pins.outputs.candidate }}' driver "$GITHUB_SHA" \
+            "$study/optimized-options.json" "$RUNNER_TEMP/point-index-pair"
+          (cd "$RUNNER_TEMP/point-index-pair" && sha256sum -c SHA256SUMS)
+      - name: Transfer the tested bundle as data
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: point-index-main-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/point-index-pair
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: us-east-2
+      ISOLAB_IMAGE_REPOSITORY: ${{ vars.ISOLAB_IMAGE_REPOSITORY }}
+    steps:
+      - name: Check out the trusted publisher from the same main commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          path: driver
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/unified_point_index_20261127/panel-bridge-20261127/
+      - name: Download the bundle from this workflow run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: point-index-main-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/point-index-pair
+      - name: Verify the bundle against the frozen main manifest before AWS
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C driver rev-parse HEAD)" = "$GITHUB_SHA"
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          inputs="$study/publish-inputs.json"
+          bundle="$RUNNER_TEMP/point-index-pair"
+          jq -e --slurpfile frozen "$inputs" --arg driver "$GITHUB_SHA" '
+            .schema=="point-index.build-pair/v2" and .driver_revision==$driver
+            and .baseline_revision==$frozen[0].baseline_revision
+            and .candidate_revision==$frozen[0].candidate_revision
+            and $frozen[0].status=="frozen" and .experiment_submitted==false
+          ' "$bundle/build-info.json" >/dev/null
+          (cd "$bundle" && sha256sum -c SHA256SUMS)
+          test -z "$(find "$bundle" -maxdepth 1 -type l -print -quit)"
+          "$study/publish-pair.sh" --check-only "$bundle" "$GITHUB_SHA"
+      - name: Obtain the existing temporary publisher identity
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: point-index-publish-${{ github.run_id }}
+          aws-region: us-east-2
+      - name: Publish the verified pair without running its executables
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v aws
+          command -v docker
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          "$study/publish-pair.sh" "$RUNNER_TEMP/point-index-pair" "$GITHUB_SHA" "$RUNNER_TEMP/point-index-image.json"
+      - name: Retain the immutable image receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: point-index-image-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/point-index-image.json
+          if-no-files-found: warn
+          retention-days: 30

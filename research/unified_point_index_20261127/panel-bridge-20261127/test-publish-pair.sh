@@ -51,6 +51,8 @@ if [[ $1 == login ]]; then cat >/dev/null; fi
 EOF
 chmod +x "$scratch/bin/aws" "$scratch/bin/docker"
 export PATH="$scratch/bin:$PATH"
+"$here/publish-pair.sh" --check-only "$scratch/bundle" "$driver_revision" > "$scratch/check-only.out"
+[[ ! -s $TEST_PUBLISH_CALLS && ! -e $TEST_EXECUTED ]]
 "$here/publish-pair.sh" "$scratch/bundle" "$driver_revision" "$scratch/image.json" > "$scratch/success.out"
 [[ ! -e $TEST_EXECUTED ]]
 jq -e --arg base "$base_revision" --arg candidate "$candidate_revision" --arg driver "$driver_revision" '

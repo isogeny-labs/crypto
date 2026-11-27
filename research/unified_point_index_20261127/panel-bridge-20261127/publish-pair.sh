@@ -1,16 +1,25 @@
 #!/usr/bin/env bash
 # Trusted-main publisher. Treat the unprivileged build bundle as data.
 set -euo pipefail
-[[ $# == 3 ]] || { echo 'usage: publish-pair.sh BUNDLE_DIR DRIVER_REVISION NEW_OUTPUT.json' >&2; exit 2; }
+check_only=false
+if [[ $# == 3 && $1 == --check-only ]]; then
+  check_only=true
+  shift
+elif [[ $# != 3 ]]; then
+  echo 'usage: publish-pair.sh [--check-only] BUNDLE_DIR DRIVER_REVISION [NEW_OUTPUT.json]' >&2
+  exit 2
+fi
 here=$(cd "$(dirname "$0")" && pwd)
 bundle=$(realpath "$1")
 revision=$2
-output=$3
+output=${3:-}
 : "${ISOLAB_IMAGE_REPOSITORY:?}" "${AWS_REGION:?}" "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}"
 [[ $revision =~ ^[a-f0-9]{40}$ && $GITHUB_RUN_ID =~ ^[0-9]+$ && $GITHUB_RUN_ATTEMPT =~ ^[0-9]+$ ]]
 [[ $ISOLAB_IMAGE_REPOSITORY == 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks ]]
 [[ $AWS_REGION == us-east-2 ]]
-[[ ! -e $output && ! -L $output ]] || { echo 'publisher output already exists' >&2; exit 2; }
+if [[ $check_only == false ]]; then
+  [[ ! -e $output && ! -L $output ]] || { echo 'publisher output already exists' >&2; exit 2; }
+fi
 for name in baseline candidate panel optimized-options.json build-info.json SHA256SUMS; do
   [[ -f $bundle/$name && ! -L $bundle/$name ]] || { echo "missing or symlinked bundle file: $name" >&2; exit 2; }
 done
@@ -47,6 +56,10 @@ for field in baseline candidate panel optimized-options.json; do
   printf '%s  %s\n' "$digest" "$field" >> "$expected_list"
 done
 cmp -s "$expected_list" "$bundle/SHA256SUMS" || { echo 'bundle checksum list mismatch' >&2; exit 2; }
+if [[ $check_only == true ]]; then
+  echo 'Pair bundle verified without AWS identity; no image or experiment submitted.'
+  exit 0
+fi
 context=$(mktemp -d)
 trap 'rm -rf "$context"; rm -f "$expected_list"' EXIT
 for name in baseline candidate panel; do install -m755 "$bundle/$name" "$context/$name"; done
