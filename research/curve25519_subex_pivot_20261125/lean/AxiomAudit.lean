@@ -102,6 +102,7 @@ open Curve25519ExtensionRingModel
 #print axioms nativeConvolutionReduceDescending_refines
 #print axioms nativeProductPolynomial_eq
 #print axioms decodeNativeProductCoordinates
+#print axioms degreeFourWitnessArtifactValues
 #print axioms degreeFourPolynomialBits
 #print axioms degreeFourDenseNativeProduct
 #print axioms decodePowerBasis_mul_eq_mk

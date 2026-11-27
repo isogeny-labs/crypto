@@ -744,26 +744,33 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     let serialized_multiplication = serde_json::to_vec(&multiplication_witness).unwrap();
     let multiplication_witness: RingMultiplicationWitness =
         serde_json::from_slice(&serialized_multiplication).unwrap();
-    assert_eq!(multiplication_witness.polynomial, BigUint::from(19u8));
-    assert_eq!(
-        multiplication_witness.lower_coefficients,
-        vec![true, true, false, false]
-    );
-    assert_eq!(multiplication_witness.left, vec![BigUint::from(1u8); 4]);
-    assert_eq!(multiplication_witness.right, vec![BigUint::from(1u8); 4]);
-    assert_eq!(
-        multiplication_witness.product,
-        vec![
-            BigUint::from(30u8),
-            BigUint::from(29u8),
-            BigUint::from(0u8),
-            BigUint::from(3u8),
-        ]
-    );
     let multiplication_summary =
         verify_ring_multiplication_witness(&multiplication_witness, &mut meter).unwrap();
-    assert_eq!(multiplication_summary.convolution_products, 16);
-    assert_eq!(multiplication_summary.reductions, 6);
+    let fixture_values: Vec<BigUint> = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../research/curve25519_subex_pivot_20261125/ring_multiplication_witness.csv"
+    ))
+    .trim()
+    .split(',')
+    .map(|value| BigUint::parse_bytes(value.as_bytes(), 10).unwrap())
+    .collect();
+    let mut observed_values = vec![
+        BigUint::from(multiplication_witness.degree),
+        BigUint::from(multiplication_witness.precision),
+        multiplication_witness.polynomial.clone(),
+    ];
+    observed_values.extend(
+        multiplication_witness
+            .lower_coefficients
+            .iter()
+            .map(|&value| BigUint::from(u8::from(value))),
+    );
+    observed_values.extend(multiplication_witness.left.iter().cloned());
+    observed_values.extend(multiplication_witness.right.iter().cloned());
+    observed_values.extend(multiplication_witness.product.iter().cloned());
+    observed_values.push(BigUint::from(multiplication_summary.convolution_products));
+    observed_values.push(BigUint::from(multiplication_summary.reductions));
+    assert_eq!(observed_values, fixture_values);
     let mut bad_multiplication = multiplication_witness.clone();
     bad_multiplication.product[0] ^= BigUint::from(1u8);
     assert_eq!(

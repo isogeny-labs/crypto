@@ -956,27 +956,65 @@ theorem decodeNativeProductCoordinates
           decodePowerBasis precision degree lowerCoefficient right :=
       (decodePowerBasis_mul_eq_mk precision degree lowerCoefficient left right).symm
 
+/-- Canonical comma-separated multiplication witness consumed by both the native
+control and this formal model. The fields are degree, precision, packed
+polynomial, lower bits, left/right/product coordinates, and transition counts. -/
+def degreeFourWitnessArtifact : String :=
+  include_str ".." / "ring_multiplication_witness.csv"
+
+/-- Transparent decimal digit parser used by the kernel-checked artifact reader. -/
+def degreeFourWitnessDigit : Char → Option ℕ
+  | '0' => some 0
+  | '1' => some 1
+  | '2' => some 2
+  | '3' => some 3
+  | '4' => some 4
+  | '5' => some 5
+  | '6' => some 6
+  | '7' => some 7
+  | '8' => some 8
+  | '9' => some 9
+  | _ => none
+
+/-- Transparent comma-separated decimal parser; the final newline is required. -/
+def parseDegreeFourWitness : List Char → ℕ → List ℕ → Option (List ℕ)
+  | [], _, _ => none
+  | '\n' :: [], current, values => some ((current :: values).reverse)
+  | ',' :: rest, current, values =>
+      parseDegreeFourWitness rest 0 (current :: values)
+  | character :: rest, current, values => do
+      let digit ← degreeFourWitnessDigit character
+      parseDegreeFourWitness rest (10 * current + digit) values
+
+/-- Parse the shared decimal witness without trusting an opaque runtime parser. -/
+def degreeFourWitnessNumbers : List ℕ :=
+  (parseDegreeFourWitness degreeFourWitnessArtifact.toList 0 []).getD []
+
+/-- The committed shared artifact has the exact accepted native fields. -/
+theorem degreeFourWitnessArtifactValues :
+    degreeFourWitnessNumbers =
+      [4, 5, 19, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+        30, 29, 0, 3, 16, 6] := by
+  decide
+
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
-irreducible binary polynomial `U^4 + U + 1`, packed as integer `19`. -/
+irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/
 def degreeFourLowerCoefficient (index : Fin 4) : Bool :=
-  index.val == 0 || index.val == 1
+  degreeFourWitnessNumbers.getD (3 + index.val) 0 == 1
 
 /-- The dense canonical coordinate vector serialized by the native degree-four
 multiplication control. -/
-def degreeFourDenseCoordinates (_ : Fin 4) : ZMod (2 ^ 5) := 1
+def degreeFourDenseCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
+  degreeFourWitnessNumbers.getD (7 + index.val) 0
 
 /-- The exact canonical native product serialized by the same control. -/
 def degreeFourDenseProductCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
-  match index.val with
-  | 0 => 30
-  | 1 => 29
-  | 2 => 0
-  | _ => 3
+  degreeFourWitnessNumbers.getD (15 + index.val) 0
 
 /-- The serialized packed polynomial `19` is exactly the monic degree-four bit
 plus the accepted lower-bit vector. -/
 theorem degreeFourPolynomialBits :
-    19 = 2 ^ 4 + ∑ index : Fin 4,
+    degreeFourWitnessNumbers.getD 2 0 = 2 ^ 4 + ∑ index : Fin 4,
       if degreeFourLowerCoefficient index then 2 ^ (index : ℕ) else 0 := by
   decide
 
@@ -992,6 +1030,7 @@ theorem degreeFourDenseNativeProduct :
       nativeReductionBufferRow_apply, convolutionBuffer_apply,
       convolutionCoefficient, degreeFourLowerCoefficient,
       degreeFourDenseCoordinates, degreeFourDenseProductCoordinates,
+      degreeFourWitnessNumbers, degreeFourWitnessArtifact,
       Fin.sum_univ_succ] <;>
     decide
 

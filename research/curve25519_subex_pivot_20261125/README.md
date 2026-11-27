@@ -478,20 +478,23 @@ independently replays the zero-fast-path nested convolution, retained-high
 reverse reduction, and final truncation before comparing every product
 coordinate, charging each executed product and reduction. The dense degree-4,
 precision-5 control exercises both convolution and reduction, round-trips
-through JSON, asserts polynomial `19`, lower bits `[1,1,0,0]`, product
-`[30,29,0,3]`, and exact transition counts `16/6`, and rejects an altered
-output coordinate. This is bounded
+through JSON, flattens the observed polynomial `19`, lower bits `[1,1,0,0]`,
+inputs, product `[30,29,0,3]`, and exact transition counts `16/6`, and compares
+them with the committed `ring_multiplication_witness.csv` artifact before
+rejecting an altered output coordinate. This is bounded
 concrete `Vec<BigUint>` code-to-transition
 evidence; it is not a mechanized Rust compiler refinement or a universal Lean
 instantiation. `[pcc:unverified]`
 
-The same control now has a concrete kernel-checked Lean counterpart. The formal
-model defines the accepted lower bits `[1,1,0,0]`, proves that the monic
-degree-four packing is exactly `19` (`U^4+U+1`), and evaluates the audited
-source-shaped transition equations to
-`[1,1,1,1]^2=[30,29,0,3]` in precision five. This manually instantiates the
-native sample values; it does not authenticate arbitrary serialized witnesses
-into Lean or prove Rust compiler refinement. `[pcc:unverified]`
+The same committed artifact now has a concrete kernel-checked Lean consumer.
+The formal model reads it with `include_str`, parses its decimal fields with a
+transparent digit/comma parser, kernel-checks the exact parsed list, proves that
+its lower bits `[1,1,0,0]` give monic degree-four packing `19`
+(`U^4+U+1`), and evaluates the audited source-shaped transition equations to
+`[1,1,1,1]^2=[30,29,0,3]` in precision five. This removes manual cross-file
+constant transfer for the fixed sample; it does not authenticate arbitrary
+serialized witnesses into Lean or prove Rust compiler refinement.
+`[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
@@ -521,8 +524,8 @@ the reduced convolution, and decoding it gives the quotient product. A
 mechanized concrete-`Vec<BigUint>` compiler refinement and an authenticated
 general witness-to-Lean binding still require formal work. Deterministic
 polynomial selection and one accepted multiplication are independently replayed
-by native witnesses, and that sample's exact bits and coordinates are now also
-instantiated in Lean.
+by native witnesses, and one committed fixed-sample artifact now supplies its
+exact bits, coordinates, and transition counts to both Rust and Lean.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

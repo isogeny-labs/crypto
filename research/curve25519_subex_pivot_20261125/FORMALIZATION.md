@@ -557,12 +557,15 @@ power-basis decoding is exactly the product of the decoded inputs. A native
 with the deterministic polynomial and lower-bit vector. Its standalone verifier
 independently executes the same zero-fast-path convolution, retained-high reverse
 reduction, and truncation transition order, and rejects a changed output. The
-formal model now fixes that sample's packed polynomial `19`, lower bits
-`[1,1,0,0]`, dense inputs, and product `[30,29,0,3]`, and kernel-checks the
-exact source-shaped evaluation. The remaining boundary is a mechanized compiler
+native control flattens those fields plus exact `16/6` transition counts and
+compares them with `ring_multiplication_witness.csv`. The formal model consumes
+that same artifact through `include_str` and a transparent decimal parser,
+kernel-checks its complete field list, then uses its packed polynomial `19`,
+lower bits `[1,1,0,0]`, dense inputs, and product `[30,29,0,3]` in the exact
+source-shaped evaluation. The remaining boundary is a mechanized compiler
 refinement from concrete Rust `Vec<BigUint>` execution to the model and an
 authenticated general serialized-witness-to-Lean binding; the current degree-4
-agreement is one finite manually instantiated sample.
+agreement is one finite shared-artifact sample.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
