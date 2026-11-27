@@ -67,10 +67,13 @@ including isolates and parallel-port multiplicity, as well as the exact
 collision-to-centered-variance conversion and its per-class-cap consequence.
 It now also models the exact partial ordered-edge-pair objective and checks the
 one-vertex averaging identity for rows and columns, implying that every native
-minimum choice is nonincreasing. The formal boundary is finite composition:
-connect those steps over the complete vertex order, bound the initial objective
-by the endpoint charges, and identify the final objective with
-`D sum_gamma c_gamma^2`. `[pcc:unverified]`
+minimum choice is nonincreasing. The finite composition is also checked:
+prefix updates cover the complete row-then-column order, the initial objective
+is bounded through squared degree fibers, and the final objective is exactly
+`D sum_gamma c_gamma^2`. Together with the source guard this yields every
+`c_gamma D<=2M` cap for an arbitrary finite bipartite multigraph. A native
+code-to-model binding remains required before the Rust schema may replace its
+generic Boolean premise with this theorem. `[pcc:unverified]`
 
 ## Per-class cap
 

@@ -101,9 +101,15 @@ objective as the native quadratic reference. For either a row or column
 vertex, it shows that summing the objective over all `q` candidate labels is
 exactly `q` times the preceding partial objective. Hence some candidate is
 nonincreasing, and any minimum candidate—including the native first minimum—is
-nonincreasing. The finite vertex-order composition and the initial
-endpoint-charge/final class-count identities for this exact model remain open.
-`[pcc:unverified]`
+nonincreasing.
+
+`lean/LabelSequence.lean` composes those steps over the complete native row
+order followed by the complete column order. `lean/ObjectiveBoundary.lean`
+then identifies common-endpoint ordered pairs with squared degree fibers,
+bounds the initially unknown objective, identifies the fully labeled objective
+with the `q^2` encoded class collision sum, and combines the degree cap and
+source guard into `c_gamma D<=2M` for every class. The statements admit
+zero-degree isolates and distinct parallel edges directly. `[pcc:unverified]`
 
 The project pins Lean `v4.35.0` and mathlib commit
 `56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
@@ -115,7 +121,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-The build completes 9,051 jobs. `#print axioms` reports only `propext`,
+The build completes 9,053 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
 project axioms or admitted proofs. This formal replay still takes the variance,
 source guard, precision, and mode inequalities as hypotheses. It neither
@@ -129,8 +135,9 @@ arithmetic.
 A useful next certificate must replace the generic Boolean tokens with typed
 evidence for two independent claims:
 
-1. the remaining finite composition of the checked first-minimum steps,
-   including the initial endpoint-charge and final class-count identities; and
+1. a typed code-to-model binding, or replayable proof object, showing that the
+   native endpoint arrays and first-minimum traces instantiate the formal
+   graph theorem at each active call; and
 2. the factorization/precision bounds `nD<=6M` and `pu<=34MD` for the exact
    finite rearrangement consumed by the child interface.
 

@@ -263,9 +263,11 @@ variance sum and every `c_gamma D<=2M` class cap. Isolates are degree-zero
 entries and parallel edges contribute their full port multiplicity. What is
 now also formalized is the exact one-vertex conditional-expectation step: the
 sum over every row or column label equals `q` times the old partial objective,
-so a minimum choice is nonincreasing. The remaining bridge is to compose these
-steps over the finite native vertex order and prove the initial endpoint-charge
-and final class-count identities for the exact model.
+so a minimum choice is nonincreasing. The finite row-then-column composition,
+initial endpoint-charge bound, final class-count identity, scaled collision
+bound, and source-guard per-class cap are now kernel-checked as well. The next
+bridge is a typed correspondence between the native endpoint/label replay and
+these formal inputs, not another scalar variance lemma.
 `[pcc:unverified]`
 
 For the schema-2 factorization description, the same verifier reconstructs

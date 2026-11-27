@@ -3,10 +3,14 @@ module
 import ParametricRefinement
 import ConditionalVariance
 import ConditionalObjective
+import LabelSequence
+import ObjectiveBoundary
 
 open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
 open Curve25519ConditionalObjective
+open Curve25519LabelSequence
+open Curve25519ObjectiveBoundary
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
@@ -28,3 +32,14 @@ open Curve25519ConditionalObjective
 #print axioms exists_nonincreasing_column_label
 #print axioms minimum_row_label_nonincreasing
 #print axioms minimum_column_label_nonincreasing
+#print axioms prefixAssignment_step
+#print axioms row_sequence_nonincreasing
+#print axioms column_sequence_nonincreasing
+#print axioms full_label_sequence_nonincreasing
+#print axioms sum_fiberSize
+#print axioms endpointPairCount_eq_sum_fiberSize_sq
+#print axioms initial_objective_bound
+#print axioms final_objective_eq_pair_collisions
+#print axioms final_objective_eq_class_squares
+#print axioms scaled_class_collision_bound
+#print axioms class_cap_for_minimum_labels
