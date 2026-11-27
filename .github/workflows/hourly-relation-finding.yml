@@ -74,6 +74,8 @@ jobs:
           bash scripts/sparse-checkout.sh apply --profile minimal --path results/
           df -h /
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.100.1"
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
