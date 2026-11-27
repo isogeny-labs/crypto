@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import subprocess
+import sys
 
 import matplotlib
 matplotlib.use('Agg')
@@ -42,9 +43,37 @@ attempts = {
     'audit-lifted-v1': 'Independent audit of the lifted pool passed. Full rank108, auxiliary102, closed6, gain0.',
     'norms-v1': 'Strict build failed: audit::SSL/OpenSSL type ambiguity and misleading indentation. No mathematical worker ran.',
     'norms-v2': 'Both signed-norm domains passed. Old101926 pairs:7rows, rank6. Augmented369370 pairs:109rows including zero, full108, auxiliary102, closed6, gain0.',
+    'trace-v1': 'Strict build failed: integer multiplication in a boolean condition under -Werror. No mathematical worker ran.',
+    'trace-v2': 'Both domains passed at targets0,kappa,2kappa. Only the formal zero row at0; no quartet at2kappa. Closed rank6 in both modes; gain0.',
+    'conics-v1': 'All64pencils completed on652points:41632candidate occurrences;21supported conics, exactly known line products; full108, auxiliary102, closed6, gain0. Repeated-line multiplicity control passed.',
+    'fibre-conics-v1': 'Input-copy wrapper failed before any build or mathematical worker: a stray mode argument was passed to cp. Partial snapshot and full stderr retained.',
 }
 
+selected = set(sys.argv[1:])
+six_result = ROOT/'evidence/six-v1/calls/full/stdout.json'
+six_exit = six_result.parent/'exit-code.txt'
+if six_exit.exists() and six_exit.read_text().strip() == '0':
+    six = json.loads(six_result.read_text())
+    attempts['six-v1'] = (
+        f"Pilot and full length-six workers passed. Full original225-column domain: "
+        f"{six['unordered_triples']} triples;{six['distinct_nonzero_spanning_rows']} "
+        f"nonzero spanning rows;closed rank{six['closed_rank']};gain{six['candidate_gain']}. "
+        "Separate arithmetic and nonempty known-answer controls passed.")
+fibre_result = ROOT/'evidence/fibre-conics-v2/calls/collect/stdout.json'
+fibre_exit = fibre_result.parent/'exit-code.txt'
+if fibre_exit.exists() and fibre_exit.read_text().strip() == '0':
+    fibre = json.loads(fibre_result.read_text())
+    attempts['fibre-conics-v2'] = (
+        f"Fibre extension passed:{fibre['four_point_image_groups']} signed image groups;"
+        f"{fibre['degenerate_image_groups_excluded']} degenerate groups excluded;"
+        f"{fibre['pencil_count']} pencils;{fibre['candidate_occurrences']} candidate occurrences;"
+        f"{fibre['supported_conics']} supported conics;closed rank{fibre['closed_rank']};"
+        f"gain{fibre['candidate_gain']}. All declared controls passed.")
+if selected - attempts.keys():
+    raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
+    if selected and name not in selected:
+        continue
     raw = ROOT/'evidence'/name
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
@@ -54,9 +83,13 @@ for name, outcome in attempts.items():
         entries.append({'call': call.name,
                         'exit': int((call/'exit-code.txt').read_text()),
                         **json.loads((call/'cost.json').read_text())})
+    wrapper_lines = (raw/'wrapper-stderr-and-cost.txt').read_text().splitlines()
+    cost_line = next(line for line in reversed(wrapper_lines) if line.startswith('{"wall_seconds":'))
+    commit_file = raw/'source-commit.txt'
     records = {'attempt': name, 'calls': entries,
-               'wrapper': json.loads((raw/'wrapper-stderr-and-cost.txt').read_text()),
-               'source_commit': (raw/'source-commit.txt').read_text().strip()}
+               'wrapper': json.loads(cost_line),
+               'source_commit': commit_file.read_text().strip() if commit_file.exists()
+               else 'not captured: wrapper failed before this stage'}
     (destination/'recorded-values.json').write_text(json.dumps(records, indent=2)+'\n')
     # Times are resource receipts; labels distinguish builds from mathematical workers.
     if len(entries) >= 2:
@@ -64,7 +97,9 @@ for name, outcome in attempts.items():
              [r['wall_seconds'] for r in entries], f'{name}: one execution per call',
              'Recorded wall seconds')
     else:
-        dot = 'digraph G {rankdir=LR;node[shape=box];a[label="Frozen sources and inputs"];b[label="Strict native build"];c[label="Build failure; no worker"];a->b->c;}\n'
+        middle = 'Strict native build' if entries else 'Input copy'
+        last = 'Build failure; no worker' if entries else 'Wrapper failure; no build or worker'
+        dot = f'digraph G {{rankdir=LR;node[shape=box];a[label="Source snapshot"];b[label="{middle}"];c[label="{last}"];a->b->c;}}\n'
         (destination/'calls.dot').write_text(dot)
         for suffix in ('svg', 'pdf'):
             subprocess.run(['dot', '-T'+suffix, 'calls.dot', '-o', 'calls.'+suffix], cwd=destination, check=True)
@@ -81,17 +116,23 @@ for name, outcome in attempts.items():
 
 Complete wrapper: {records['wrapper']['wall_seconds']} wall seconds. These are
 resource receipts, not performance comparisons. Host: Linux6.18.57 x86_64;
-exact allowed CPU is in the attempt's resource-envelope.txt. One CPU,
-1GiB address-space cap,300s strict build and600s per native worker. No
+allowed CPU is in resource-envelope.txt when that stage was reached. Declared
+limits:one CPU,1GiB address space,300s build and600s per native worker. No
 random seeds or statistical sampling: fixed inputs and bounded deterministic
 enumerations. Sample size is one execution per listed call. No timing spread
 was measured.
 
 Exact command/configuration: frozen source/run script and protocol under
-../../evidence/{name}/source/. Source ancestor: `{records['source_commit']}`.
-The manifest identifies the actual frozen source, including uncommitted
-changes at execution time. Inputs, stdout, stderr, terminal exits, cost
-receipts and immutable subject hashes are under ../../evidence/{name}/.
+../../evidence/{name}/source/. Source ancestor,when captured:
+
+```
+{records['source_commit']}
+```
+
+The manifest,when reached,identifies the frozen source, including uncommitted
+changes at execution time. Available inputs,stdout,stderr,terminal exits,cost
+receipts and subject hashes are under ../../evidence/{name}/. A pre-build
+wrapper failure has no compiler,worker or later-stage sealing receipt.
 See ../../REPORT.md for controls, domain limits, primary references,
 interpretation and follow-up; no positive additional rank is established.
 '''
@@ -100,18 +141,28 @@ interpretation and follow-up; no positive additional rank is established.
 
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
-data = {'old_norm': {k:old[k] for k in ('full_rank','auxiliary_rank','closed_rank')},
-        'augmented_norm': {k:aug[k] for k in ('full_rank','auxiliary_rank','closed_rank')}}
+metrics = ('full_rank','auxiliary_rank','closed_rank')
+cases = [('Norm225',old),('Norm429',aug)]
+for label, relative in [('Trace429','trace-v2/calls/augmented'),
+                        ('Conic64','conics-v1/calls/collect'),
+                        ('Fibre conics','fibre-conics-v2/calls/collect'),
+                        ('Six225','six-v1/calls/full')]:
+    source = ROOT/'evidence'/relative/'stdout.json'
+    terminal = source.parent/'exit-code.txt'
+    if terminal.exists() and terminal.read_text().strip() == '0':
+        cases.append((label,json.loads(source.read_text())))
+data = {label:{k:record[k] for k in metrics} for label,record in cases}
 (ROOT/'rank-values.json').write_text(json.dumps(data, indent=2)+'\n')
-fig, axis = plt.subplots(figsize=(6.8, 3), layout='constrained')
-for position, key in enumerate(('full_rank','auxiliary_rank','closed_rank')):
-    x = [position*0.25, 1+position*0.25]
-    bars = axis.bar(x, [old[key],aug[key]], width=0.22, label=key.replace('_',' '))
-    axis.bar_label(bars, padding=2)
-axis.set_xticks([0.25,1.25], ['Original225-column domain','Existing429-column domain'])
+fig, axis = plt.subplots(figsize=(7.2, 3), layout='constrained')
+for position, key in enumerate(metrics):
+    x = [i+position*0.25 for i in range(len(cases))]
+    bars = axis.bar(x, [record[key] for _,record in cases], width=0.22, label=key.replace('_',' '))
+    axis.bar_label(bars, padding=2, fontsize=7 if len(cases)>4 else 10)
+axis.set_xticks([i+0.25 for i in range(len(cases))], [label for label,_ in cases])
+axis.tick_params(axis='x', labelsize=9)
 axis.set_ylabel('Recorded rank over subgroup field')
 axis.set_ylim(0,132)
-axis.legend(loc='upper left')
+axis.legend(loc='upper left',bbox_to_anchor=(0,1.18),ncol=3,fontsize=9)
 for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
