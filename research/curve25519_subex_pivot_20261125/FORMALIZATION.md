@@ -588,6 +588,16 @@ computation. The remaining boundary is a mechanized compiler refinement from
 concrete Rust `Vec<BigUint>` execution and serialization to this evaluator, plus
 external provenance for supplied records; the Lean-side arbitrary-record
 arithmetic check itself is no longer fixture-specific.
+`parseSelectedReplayedRingMultiplicationArtifact` adds the deterministic
+modulus boundary: it requires degree at least two, reruns the packed search, and
+checks every typed lower bit against the selected packed value. The generic
+`parsedSelectedReplayedRingMultiplicationArtifact_certificate` then combines
+canonicality, exact selection, irreducibility of the artifact's actual
+precision-one `binaryPolynomial`, and quotient multiplication. The degree-four
+fixture passes this combined parser by kernel computation. Thus both search and
+product contents of an arbitrary supplied artifact are checked in Lean; a
+compiler/serialization refinement proving that concrete Rust emitted the
+artifact remains separate.
 The same fixture now has a transparent packed-`GF(2)` deterministic-selection
 model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
 loop, and odd candidate order, proves candidate `17` fails and candidate `19`

@@ -247,6 +247,15 @@ refinement from concrete Rust `Vec<BigUint>` execution to this evaluator rather
 than parsing, finite-vector transport, or Lean-side arithmetic replay.
 `[pcc:unverified]`
 
+The selected-replayed importer further requires degree at least two, recomputes
+the deterministic packed irreducible-polynomial search, and checks every typed
+lower bit against that selected value. One generic endpoint now returns
+canonicality, exact selection, irreducibility of the actual precision-one
+quotient modulus, and decoded multiplication together. This closes the
+Lean-side arbitrary-artifact search/product check while leaving concrete Rust
+compiler/serialization refinement and external provenance separate.
+`[pcc:unverified]`
+
 The committed degree-four artifact now travels through that generic route too:
 its replayed-parser acceptance is kernel-checked, and the arbitrary-degree
 endpoint returns its canonicality receipt together with decoded multiplication.

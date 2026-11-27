@@ -4125,6 +4125,129 @@ theorem parsedReplayedRingMultiplicationArtifact_decodes_mul
     (parseReplayedRingMultiplicationArtifact_degree_pos hparse)
     (parseReplayedRingMultiplicationArtifact_product hparse)
 
+/-- Check every typed lower bit against the selected packed polynomial. -/
+def RingMultiplicationArtifact.selectedLowerBits
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  (List.finRange artifact.degree).all fun index =>
+    decide (artifact.lowerCoefficient index =
+      packedLowerCoefficient artifact.degree artifact.polynomial index)
+
+/-- Check the exact deterministic polynomial choice and its lower bits. -/
+def RingMultiplicationArtifact.selectionReplayed
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  decide (2 ≤ artifact.degree) &&
+    (decide (firstIrreducibleBinaryPolynomial artifact.degree =
+      some artifact.polynomial) && artifact.selectedLowerBits)
+
+/-- Fail closed unless a replayed product also uses the selected modulus. -/
+def validateSelectedReplayedRingMultiplicationArtifact
+    (artifact : RingMultiplicationArtifact) : Option RingMultiplicationArtifact :=
+  if artifact.selectionReplayed then some artifact else none
+
+/-- Checked import boundary for deterministic modulus selection and product
+replay. -/
+def parseSelectedReplayedRingMultiplicationArtifact
+    (values : List ℕ) : Option RingMultiplicationArtifact := do
+  let artifact ← parseReplayedRingMultiplicationArtifact values
+  validateSelectedReplayedRingMultiplicationArtifact artifact
+
+private theorem parseSelectedReplayedRingMultiplicationArtifact_components
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    parseReplayedRingMultiplicationArtifact values = some artifact ∧
+      artifact.selectionReplayed = true := by
+  unfold parseSelectedReplayedRingMultiplicationArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, hreplayed, hvalidate⟩
+  unfold validateSelectedReplayedRingMultiplicationArtifact at hvalidate
+  split at hvalidate
+  next hselection =>
+    have hartifact : candidate = artifact := Option.some.inj hvalidate
+    subst candidate
+    exact ⟨hreplayed, hselection⟩
+  next => simp at hvalidate
+
+private theorem parseSelectedReplayedRingMultiplicationArtifact_conditions
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    decide (2 ≤ artifact.degree) = true ∧
+      decide (firstIrreducibleBinaryPolynomial artifact.degree =
+        some artifact.polynomial) = true ∧
+      artifact.selectedLowerBits = true := by
+  have hselection :=
+    (parseSelectedReplayedRingMultiplicationArtifact_components hparse).2
+  simpa only [RingMultiplicationArtifact.selectionReplayed, Bool.and_eq_true]
+    using hselection
+
+/-- Every selected-replayed import has degree at least two. -/
+theorem parseSelectedReplayedRingMultiplicationArtifact_degree
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    2 ≤ artifact.degree :=
+  of_decide_eq_true
+    (parseSelectedReplayedRingMultiplicationArtifact_conditions hparse).1
+
+/-- Every selected-replayed import carries the deterministic packed choice. -/
+theorem parseSelectedReplayedRingMultiplicationArtifact_polynomial
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    firstIrreducibleBinaryPolynomial artifact.degree =
+      some artifact.polynomial :=
+  of_decide_eq_true
+    (parseSelectedReplayedRingMultiplicationArtifact_conditions hparse).2.1
+
+/-- Every selected-replayed import's typed lower bits are the packed bits. -/
+theorem parseSelectedReplayedRingMultiplicationArtifact_lowerCoefficient
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.lowerCoefficient =
+      packedLowerCoefficient artifact.degree artifact.polynomial := by
+  have hall :=
+    (parseSelectedReplayedRingMultiplicationArtifact_conditions hparse).2.2
+  simp only [RingMultiplicationArtifact.selectedLowerBits, List.all_eq_true] at hall
+  funext index
+  exact of_decide_eq_true (hall index (by simp))
+
+/-- The actual precision-one quotient modulus of every selected-replayed import
+is irreducible. -/
+theorem parseSelectedReplayedRingMultiplicationArtifact_irreducible
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    Irreducible (binaryPolynomial 1 artifact.degree artifact.lowerCoefficient) := by
+  rw [parseSelectedReplayedRingMultiplicationArtifact_lowerCoefficient hparse]
+  exact selectedBinaryPolynomial_irreducible artifact.degree artifact.polynomial
+    (parseSelectedReplayedRingMultiplicationArtifact_degree hparse)
+    (parseSelectedReplayedRingMultiplicationArtifact_polynomial hparse)
+
+/-- A selected-replayed import certifies canonicality, modulus selection and
+irreducibility, and decoded quotient multiplication in one endpoint. -/
+theorem parsedSelectedReplayedRingMultiplicationArtifact_certificate
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.canonical = true ∧
+      firstIrreducibleBinaryPolynomial artifact.degree =
+        some artifact.polynomial ∧
+      Irreducible (binaryPolynomial 1 artifact.degree artifact.lowerCoefficient) ∧
+      decodePowerBasis artifact.precision artifact.degree
+          artifact.lowerCoefficient artifact.productCoordinates =
+        decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.leftCoordinates *
+          decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.rightCoordinates := by
+  have hreplayed := parsedReplayedRingMultiplicationArtifact_decodes_mul
+    (parseSelectedReplayedRingMultiplicationArtifact_components hparse).1
+  exact ⟨hreplayed.1,
+    parseSelectedReplayedRingMultiplicationArtifact_polynomial hparse,
+    parseSelectedReplayedRingMultiplicationArtifact_irreducible hparse,
+    hreplayed.2⟩
+
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=
   (parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers).getD default
@@ -4170,6 +4293,34 @@ theorem degreeFourWitnessRecordReplayedAccepted :
     parseReplayedRingMultiplicationArtifact degreeFourWitnessNumbers =
       some degreeFourWitnessRecord := by
   decide
+
+/-- The committed fixture passes deterministic selection plus product replay. -/
+theorem degreeFourWitnessRecordSelectedReplayedAccepted :
+    parseSelectedReplayedRingMultiplicationArtifact degreeFourWitnessNumbers =
+      some degreeFourWitnessRecord := by
+  decide
+
+/-- Combined selected-modulus and quotient-product certificate for the
+committed fixture. -/
+theorem degreeFourWitnessRecord_selectedReplayedCertificate :
+    degreeFourWitnessRecord.canonical = true ∧
+      firstIrreducibleBinaryPolynomial degreeFourWitnessRecord.degree =
+        some degreeFourWitnessRecord.polynomial ∧
+      Irreducible (binaryPolynomial 1 degreeFourWitnessRecord.degree
+        degreeFourWitnessRecord.lowerCoefficient) ∧
+      decodePowerBasis degreeFourWitnessRecord.precision
+          degreeFourWitnessRecord.degree degreeFourWitnessRecord.lowerCoefficient
+          degreeFourWitnessRecord.productCoordinates =
+        decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.leftCoordinates *
+          decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.rightCoordinates := by
+  exact parsedSelectedReplayedRingMultiplicationArtifact_certificate
+    degreeFourWitnessRecordSelectedReplayedAccepted
 
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
 irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/

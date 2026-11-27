@@ -531,6 +531,17 @@ remaining implementation boundary is a compiler refinement from Rust
 model.
 `[pcc:unverified]`
 
+A stronger selected-replayed importer now composes that arithmetic boundary
+with the deterministic packed search. It requires degree at least two,
+recomputes `firstIrreducibleBinaryPolynomial`, and checks every typed lower bit
+against the selected packed value. Its generic certificate proves canonicality,
+the exact selected polynomial, irreducibility of the actual precision-one
+`binaryPolynomial` used by the quotient, and decoded multiplication in one
+statement. The committed degree-four record passes this combined parser by
+kernel computation. This authenticates arbitrary supplied artifact contents
+inside Lean; it does not prove that Rust produced those contents.
+`[pcc:unverified]`
+
 The deterministic-polynomial boundary is narrowed both generically and for
 this fixture.
 A transparent packed-`GF(2)` model follows the native remainder, carryless
