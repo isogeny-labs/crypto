@@ -26,9 +26,9 @@ pinned; 5 runs × 3 repetitions per binary; medians):
 
 | curve | set-up old → new | ratio | collect | collect_setup |
 |:--|--:|--:|--:|--:|
-| k0n41 | 57.2 → 45.9 ms | **0.803** | 36.3 → 27.5 ms | 2.11 → 0.69 ms |
-| k0n53 | 436.7 → 403.5 ms | **0.924** | 234.8 → 211.5 ms | 11.5 → 4.2 ms |
-| k0n61 | 1,697 → 1,520 ms | **0.895** | 1,387 → 1,198 ms | 17.9 → 6.0 ms |
+| icv1-f2m41-tm2308219-7f48b14a | 57.2 → 45.9 ms | **0.803** | 36.3 → 27.5 ms | 2.11 → 0.69 ms |
+| icv1-f2m53-tm56619371-dac20a85 | 436.7 → 403.5 ms | **0.924** | 234.8 → 211.5 ms | 11.5 → 4.2 ms |
+| icv1-f2m61-t158598901-ab42b6c5 | 1,697 → 1,520 ms | **0.895** | 1,387 → 1,198 ms | 17.9 → 6.0 ms |
 
 IC online time is unchanged (none of this touches the descent). `build` and
 `verify` moved ±10% in both directions on unchanged code: that is noise.

@@ -148,30 +148,7 @@ impl Fp {
 
 #[inline(always)]
 fn inv_mod(a: u64, m: u64) -> u64 {
-    if m < (1u64 << 63) {
-        let (mut r0, mut r1) = (m, a);
-        let (mut s0, mut s1) = (0i64, 1i64);
-        while r1 != 0 {
-            let q = r0 / r1;
-            (r0, r1) = (r1, r0 - q * r1);
-            (s0, s1) = (s1, s0.wrapping_sub((q as i64).wrapping_mul(s1)));
-        }
-        assert_eq!(r0, 1, "not invertible");
-        return if s0 < 0 {
-            (s0 + m as i64) as u64
-        } else {
-            s0 as u64
-        };
-    }
-    let (mut r0, mut r1) = (m as i128, a as i128);
-    let (mut s0, mut s1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (s0, s1) = (s1, s0 - q * s1);
-    }
-    assert_eq!(r0, 1, "not invertible");
-    s0.rem_euclid(m as i128) as u64
+    crypto_lib::gcd::int::inv_mod_u64(a, m).expect("not invertible")
 }
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
@@ -284,11 +261,8 @@ fn brent(n: u64) -> u64 {
     unreachable!()
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 // ---------------------------------------------------------------- curves
@@ -329,9 +303,7 @@ impl Curve {
         Some((x3, f.sub(f.mul(l, f.sub(x1, x3)), y1)))
     }
     fn mul(&self, f: &Fp, p: Pt, k: u64) -> Pt {
-        let Some((px, py)) = p else {
-            return None;
-        };
+        let (px, py) = p?;
         if k == 0 {
             return None;
         }
@@ -722,6 +694,7 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
 ///   at `BATCH = 16`; `BATCH = 64` still ~3.6× worse.
 /// - `BATCH = 32` with `HashMap`: bit-exact iters, ~1.2× slower ns/op median
 ///   despite ~0.8% fewer retired instructions (working-set / cache effect).
+///
 /// `HashMap` + `BATCH = 16` stays on the measured frontier pending a
 /// cache-friendly shared DP representation that does not enlarge the
 /// per-walker working set.
@@ -962,16 +935,7 @@ where
                 if next_job < jobs.len() {
                     let (a_idx, s) = jobs[next_job];
                     let (inst, lens) = get_arm(a_idx);
-                    active[l] = Walker::init(
-                        f,
-                        next_job,
-                        a_idx,
-                        s,
-                        inst,
-                        lens,
-                        n,
-                        seed_base ^ s,
-                    );
+                    active[l] = Walker::init(f, next_job, a_idx, s, inst, lens, n, seed_base ^ s);
                     next_job += 1;
                 } else {
                     // Swap-remove and ALSO keep `nums/dens/x2s/is_inf` aligned for remaining `l..`!
@@ -988,7 +952,9 @@ where
         }
     }
 
-    out.into_iter().map(|e| e.expect("all jobs solved")).collect()
+    out.into_iter()
+        .map(|e| e.expect("all jobs solved"))
+        .collect()
 }
 
 /// One solve by the cryptanalysis repository's `ca solve --alg rho`:
@@ -2225,7 +2191,14 @@ fn main() {
         let chunk_sz = jobs.len().div_ceil(n_threads).max(16);
         jobs.par_chunks(chunk_sz)
             .flat_map_iter(|chunk| {
-                rho_batch_jobs(&f, chunk, |a| (&arms[a].inst, &arms[a].lens), n, seed_base, dp_bits)
+                rho_batch_jobs(
+                    &f,
+                    chunk,
+                    |a| (&arms[a].inst, &arms[a].lens),
+                    n,
+                    seed_base,
+                    dp_bits,
+                )
             })
             .collect()
     };

@@ -1,0 +1,61 @@
+{
+  "schema": "m31-ci-precondition-observation/v1",
+  "observed_at": "2026-11-24T04:07:43.872Z",
+  "head": "42cbbf529176ef49767575e7415520647dd41959",
+  "baseline": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "standing": "pcc:unverified",
+  "scope": "Read-only deterministic source-precondition inspection; baseline workflows were not executed",
+  "blobs": [
+    {
+      "path": "src/cryptanalysis/prime_radical_root.rs",
+      "baseline_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654",
+      "current_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654"
+    },
+    {
+      "path": "src/cryptanalysis/prime_root_trace.rs",
+      "baseline_blob": "27be9d2730fc0f75c68c615376ca596ccd365122",
+      "current_blob": "27be9d2730fc0f75c68c615376ca596ccd365122"
+    },
+    {
+      "path": "research/amm_digit_perf_20261118/round123_quad_ab.py",
+      "baseline_blob": "920a0519653658e680527f56ef5b715d4dcd07b9",
+      "current_blob": "920a0519653658e680527f56ef5b715d4dcd07b9"
+    },
+    {
+      "path": "research/amm_digit_perf_20261118/round124_native_trace_ab.py",
+      "baseline_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2",
+      "current_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2"
+    },
+    {
+      "path": ".github/workflows/radical-root-round123.yml",
+      "baseline_blob": "a51c011ec0871eb8b2dd7525ce11058f084f60f0",
+      "current_blob": "a51c011ec0871eb8b2dd7525ce11058f084f60f0"
+    },
+    {
+      "path": ".github/workflows/radical-root-round124.yml",
+      "baseline_blob": "1ce6a8500f2dbeb3bd0c5ed95dad545427fa4b16",
+      "current_blob": "1ce6a8500f2dbeb3bd0c5ed95dad545427fa4b16"
+    }
+  ],
+  "failures": [
+    {
+      "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45323167283",
+      "job_id": 138206293394,
+      "script": "research/amm_digit_perf_20261118/round123_quad_ab.py",
+      "line": 23,
+      "predicate": "frozen.count(old) == 1",
+      "actual_count": 0,
+      "required_count": 1
+    },
+    {
+      "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45323167354",
+      "job_id": 138206293705,
+      "script": "research/amm_digit_perf_20261118/round124_native_trace_ab.py",
+      "line": 12,
+      "predicate": "reciprocal_64 and let quotient both occur in field_value",
+      "reciprocal_64": false,
+      "let_quotient": false
+    }
+  ],
+  "note": "Both observed failures precede compilation and benchmark execution. Scripts, exact inputs and workflows are unchanged from baseline. No rerun or scientific workload was dispatched."
+}

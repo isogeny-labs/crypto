@@ -41,11 +41,8 @@ fn point(p: FastPoint) -> Value {
         json!({"x":p.x,"y":p.y})
     }
 }
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 fn full_degree(gf: &Gf2, b: u64) -> bool {
     let mut c = b;

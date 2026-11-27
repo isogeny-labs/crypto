@@ -73,11 +73,7 @@ fn ng(a: u64, p: u64) -> u64 {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 fn fnv(f: &[u64]) -> u64 {

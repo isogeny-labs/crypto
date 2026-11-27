@@ -2,12 +2,13 @@ name: Rootfind Round 132 source-exact low-degree roots A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round132-direct-low-degree-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round132/**
       - .github/workflows/rootfind_round132.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:

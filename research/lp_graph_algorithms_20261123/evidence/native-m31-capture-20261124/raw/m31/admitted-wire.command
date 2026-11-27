@@ -1,0 +1,1 @@
+jq -se $'length == 613 and all(.[];\n  has("id") and has("small") and has("large") and has("rhs"))' /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/derived/admitted.jsonl 

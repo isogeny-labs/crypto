@@ -1,0 +1,554 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "rows.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json"
+    ],
+    "script": {
+      "path": "../native/src/main.rs",
+      "sha256": "c62b053ccee36cb62883a6d353012975bc09537ce17bac1004265edf619366f5"
+    }
+  },
+  "arms": [
+    {
+      "description": "Exact accepted14.69M snapshots and original borrowed decoder; equal full LTO/raw_value dependency settings",
+      "id": "baseline",
+      "instrument": {
+        "binary_sha256": "2d516ba4757fd7721998cbcc85ec38b5fb48b9425b1245f3252731b2d3b8d390",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bins",
+            "--manifest-path",
+            "research/trace_zero_cold10m_20261124/native/Cargo.toml",
+            "--features",
+            "legacy-halftrace"
+          ]
+        ],
+        "commit": "ea67bc09caed0ab0f79f9893d91581859d13907e",
+        "env": {
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold10m-candidate2-target",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        },
+        "flags": {
+          "features": "legacy-halftrace",
+          "profile.release.codegen-units": "1",
+          "profile.release.debug": "line-tables-only",
+          "profile.release.lto": "fat",
+          "serde_json.features": "raw_value on every arm"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "role": "baseline"
+    },
+    {
+      "description": "First qualified12.286M field/linearized/ledger snapshots and original borrowed decoder; equal full LTO/raw_value dependency settings",
+      "id": "incumbent",
+      "instrument": {
+        "binary_sha256": "38e5069542bc7fcf5cda19c673f96106f881c1e6c550b607bcce4dba417aa6a7",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bins",
+            "--manifest-path",
+            "research/trace_zero_cold10m_20261124/native/Cargo.toml",
+            "--features",
+            "incumbent"
+          ]
+        ],
+        "commit": "ea67bc09caed0ab0f79f9893d91581859d13907e",
+        "env": {
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold10m-candidate2-target",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        },
+        "flags": {
+          "features": "incumbent",
+          "profile.release.codegen-units": "1",
+          "profile.release.debug": "line-tables-only",
+          "profile.release.lto": "fat",
+          "serde_json.features": "raw_value on every arm"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "role": "reference"
+    },
+    {
+      "description": "Deferred complete coefficient tails, checked compact ASCII/raw-point ingestion, sparse trace setup and fixed map lookup; equal full LTO/raw_value dependency settings",
+      "id": "elimination",
+      "instrument": {
+        "binary_sha256": "7437710f4344654943dce241ba9ed58e39107fde2e5001b15bd61e166e8d8796",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bins",
+            "--manifest-path",
+            "research/trace_zero_cold10m_20261124/native/Cargo.toml"
+          ]
+        ],
+        "commit": "ea67bc09caed0ab0f79f9893d91581859d13907e",
+        "env": {
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold10m-candidate2-target",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        },
+        "flags": {
+          "features": "",
+          "profile.release.codegen-units": "1",
+          "profile.release.debug": "line-tables-only",
+          "profile.release.lto": "fat",
+          "serde_json.features": "raw_value on every arm"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Exact accepted14.69M snapshots and original borrowed decoder; equal full LTO/raw_value dependency settings",
+      "id": "baseline-aa",
+      "instrument": {
+        "binary_sha256": "2d516ba4757fd7721998cbcc85ec38b5fb48b9425b1245f3252731b2d3b8d390",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bins",
+            "--manifest-path",
+            "research/trace_zero_cold10m_20261124/native/Cargo.toml",
+            "--features",
+            "legacy-halftrace"
+          ]
+        ],
+        "commit": "ea67bc09caed0ab0f79f9893d91581859d13907e",
+        "env": {
+          "CARGO_TARGET_DIR": "/workspace/scratch/cold10m-candidate2-target",
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        },
+        "flags": {
+          "features": "legacy-halftrace",
+          "profile.release.codegen-units": "1",
+          "profile.release.debug": "line-tables-only",
+          "profile.release.lto": "fat",
+          "serde_json.features": "raw_value on every arm"
+        },
+        "repo": "crypto",
+        "threads": 1
+      },
+      "role": "control_aa",
+      "same_instrument_as": "baseline"
+    }
+  ],
+  "claims": [
+    {
+      "class": "comparative",
+      "decided_by": [
+        "cold",
+        "oracle",
+        "incremental"
+      ],
+      "id": "cold10m",
+      "text": "Finite complete cold-query instructions of the configured implementation; strictly below10M prospective target. No native-rate or isolated per-change attribution."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Both uniform fixed cases have separate polynomial-arithmetic negative proofs; embedded across every arm. No null-population/structural claim.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Positive planted/cancellation known answers embedded in every arm; extra planted-1 largest-class pilot must Found/replay.",
+      "present": false
+    }
+  },
+  "created": "2026-11-24",
+  "decision_rule": {
+    "comparison_ids": [
+      "oracle",
+      "cold",
+      "incremental"
+    ],
+    "effect_size_measure": "Ratio of identical-boundary complete cold-process or complete relation-oracle simulated instructions",
+    "interval": "Exact repeat ranges only; exposed anchors, no population CI",
+    "multiple_comparison_correction": "other",
+    "statistic": "Per-cell five-repeat min/median/max; exact paired median ratios, six A/A discrepancies and explicit no-regression checks",
+    "text": "Exact common outputs, valid phase calibration, all A/A<=1%, and no cold/oracle regression>1% against either control. Goal only if unchanged n131 uniform cold median<10,000,000Ir. Run full120 rows after freeze even if pilot misses; never exclude rows or redefine boundary.",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "cloud_spend_usd": 0,
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "state": "explicit_user_exception_authorized"
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 600
+  },
+  "extensions": {
+    "audit_source_sha256": "dbb88b941071c6c0a087d4942f6288ffeb1fb527bb795dc276cc92e578fe4ac5",
+    "authorization": "Persistent explicit local CPU0/2GiB/600seconds per fixed panel, zero paid resources and zero infrastructure retries.",
+    "binary_inventory": "checks/binary-identities.json",
+    "curve_slugs": {
+      "131": "icv1-f2m131-tm22283658519494248867-115e0dc5",
+      "83": "icv1-f2m83-tm6151469093347-debefd74"
+    },
+    "equivalence_rows": 195,
+    "external_comparison_gap": "No external-fastest, native-runtime, warmed-throughput or full-DLP claim.",
+    "goal_candidate_ceiling_ir_exclusive": 10000000,
+    "operation_ledgers": "Informational; unused symbolic table operations may disappear. Complete Ir and all semantic/group/witness checks mandatory.",
+    "original_workload_sha256": "2a1712a97cb882ddd26e0a6c37a17c70a5ba9fc8fb57bb0a2d681331e0cabeb5",
+    "payload_root": "../../trace_zero_projected_20261115/inputs",
+    "phase_calibration": "All3 phased/unphased totals within0.1%.",
+    "planned_rows": 120,
+    "primary_cases": [
+      "scale-n83-d12-distinct-planted-0",
+      "scale-n83-d12-uniform",
+      "scale-n83-d12-cancellation",
+      "scale-n131-d12-distinct-planted-0",
+      "scale-n131-d12-uniform",
+      "scale-n131-d12-cancellation"
+    ],
+    "prior_panel": "../grid-audit.json; ../../trace_zero_cold15m_20261124/candidate3/grid-audit.json",
+    "prior_reference_ir": 14688697,
+    "scope": "Whole second candidate versus exact14.69M baseline and first12.286M incumbent. Deferred coefficient tails keep complete fallback; direct raw-point construction retains full syntax/type/ASCII validation and extended decoder fallback. All cold setup/admission/equations/order/root/group/replay/output stay charged.",
+    "source_inventory": "checks/source-inputs.json",
+    "units": "Fewer than10 million total instructions per unchanged cold query; no instruction-rate criterion.",
+    "workload_path": "../input-index.json",
+    "workload_sha256": "d4919c15af70d5fcc277a85be295346bf0cb0c94e17b80be8bc586797a0f92aa"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "29404836ca545fc625a314a5f8985e9e307d90f27348064ac52e2ea5d5446593",
+    "commit": "adfa8aa729f3e8769a868f8201da120e38635b45",
+    "frozen_at": "2026-11-24T04:54:28Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "No timing, scaling, population, full-DLP or challenge-recovery claim.",
+    "UNKNOWN is not UNSAT; no row deletion, adaptive seeds or comparison of unpaired favorable subsets.",
+    "Native group counters exclude field/ANF, non-group inversions and SAT work; they are not a complete cost unit."
+  ],
+  "literature": [
+    {
+      "claim": "Retrospective lead selection only. Preserve original row order, first contradiction/rank index and exact remainder/root checks. No novelty or measured-gain claim.",
+      "provenance": "internal",
+      "ref": "../checks/pilot-profile.txt; src/cryptanalysis/trace_zero_linearized.rs; serde_json RawValue contract; checked ASCII field construction; standard lazy linear maps and sparse matrix initialization"
+    },
+    {
+      "claim": "Inline only the inactive guard; retain every active event, scope transition, allocation and nested/drop behavior.",
+      "provenance": "internal",
+      "ref": "src/binary_ecc/operation_tally.rs; baseline_operation_tally_snapshot.rs; Rust atomic/TLS scope semantics"
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [
+      "instructions",
+      "oracle_instructions",
+      "setup_instructions",
+      "post_instructions",
+      "field_mul",
+      "field_square"
+    ],
+    "isolation_required": "none",
+    "order": "alternate",
+    "record": [
+      "binary_sha256",
+      "instance",
+      "seed",
+      "arm",
+      "replicate",
+      "result",
+      "instructions",
+      "setup_instructions",
+      "oracle_instructions",
+      "post_instructions",
+      "field_mul",
+      "field_square"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "distribution",
+        "definition": "Sum calibrated setup/oracle/post counter dumps from one complete fresh process, all setup and verification charged.",
+        "id": "instructions",
+        "kind": "counted",
+        "name": "Whole cold-process Ir",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl instructions",
+        "uncertainty": "range",
+        "unit": "simulated instructions"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "distribution",
+        "definition": "Client-request partition from before solver call through returned report. Includes base admission, all projection/precompute/search, roots/lifts and internal replay; given context/input construction is separate setup, not silently free.",
+        "id": "oracle_instructions",
+        "kind": "counted",
+        "name": "Complete relation-oracle Ir",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl oracle_instructions",
+        "uncertainty": "range",
+        "unit": "simulated instructions"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "Parsing the same compact Case input, curve/variety construction, eager/lazy symbolic preparation and input point decoding.",
+        "id": "setup_instructions",
+        "kind": "counted",
+        "name": "Setup Ir",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl setup_instructions",
+        "uncertainty": "range",
+        "unit": "simulated instructions"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "Wrapper replay, serialization, destruction and process exit.",
+        "id": "post_instructions",
+        "kind": "counted",
+        "name": "Post Ir",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl post_instructions",
+        "uncertainty": "range",
+        "unit": "simulated instructions"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "Informational compact-workspace ledger only; excludes general F2m table construction. It cannot price the constructor change; complete Ir is primary.",
+        "id": "field_mul",
+        "kind": "counted",
+        "name": "Field multiplies",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl field_mul",
+        "uncertainty": "range",
+        "unit": "field operations"
+      },
+      {
+        "aggregation": "distribution",
+        "definition": "Informational compact-workspace ledger only; excludes general F2m table construction. It cannot price the constructor change; complete Ir is primary.",
+        "id": "field_square",
+        "kind": "counted",
+        "name": "Field squares",
+        "resolution": "1 counted operation",
+        "source": "rows.jsonl field_square",
+        "uncertainty": "range",
+        "unit": "field operations"
+      }
+    ]
+  },
+  "protocol_id": "TZ10M-20261124-lazy-wire",
+  "question": "Does the complete deferred-map/checked-wire bundle bring the unchanged n131 uniform cold query strictly below10M Ir, versus14.69M baseline and12.286M incumbent?",
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Four-arm rotation by field/kind/repetition; fixed five rounds.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation."
+    }
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 6,
+    "power": {
+      "alpha": 0.05,
+      "correction": "other",
+      "method": "exact",
+      "note": "Descriptive fixed six-cell A/B/A, five exact repeat ranges; no population p-value or CI.",
+      "passes": true,
+      "tests_in_family": 3
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 71.84738279815491,
+      "fixed_seconds": 17.182148218154907,
+      "measured_on": "Fresh16-call pilot; each field/arm maximum times15. Original epoch retained; fixed120-row primary, no downscale or deadline reset.",
+      "per_sample_seconds": 0.45554362150000005,
+      "threads": 1
+    },
+    "replicates": 5,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "120 fixed primary rows =6cases*4arms*5repeats;16pilot calls; phased/unphased calibration for all three binaries;600seconds combined, zero retries or paid resources. A missed strict10M criterion is retained as a result."
+    }
+  ],
+  "study_dir": "research/trace_zero_cold10m_20261124/candidate2",
+  "variable_ledger": {
+    "comparisons": [
+      {
+        "arms": [
+          "baseline",
+          "elimination"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "oracle",
+        "threshold": "All common outputs/replay equal and no>1% cold/oracle regression against either control; n131 uniform cold median strictly<10,000,000Ir."
+      },
+      {
+        "arms": [
+          "baseline",
+          "elimination"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "cold",
+        "threshold": "All common outputs/replay equal and no>1% cold/oracle regression against either control; n131 uniform cold median strictly<10,000,000Ir."
+      },
+      {
+        "arms": [
+          "baseline",
+          "baseline-aa"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "aa"
+      },
+      {
+        "arms": [
+          "incumbent",
+          "elimination"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "implementation"
+        ],
+        "id": "incremental",
+        "threshold": "All common outputs/replay equal and no>1% cold/oracle regression against either control; n131 uniform cold median strictly<10,000,000Ir."
+      }
+    ],
+    "crosses_map": true,
+    "factors": [
+      {
+        "how": "Same compiler/common control harness; both controls retain original borrowed decoder, candidate adds validated direct raw-point construction. Equal raw_value dependency feature and LTO flags. Entire implementation bundle differs; no isolated attribution.",
+        "name": "instrument",
+        "treatment": "crossed",
+        "value": "Three exact numerical implementation variants, same common harness/compiler/flags"
+      },
+      {
+        "how": "Six disclosed prior d12 cases. Identical compact single-query payload on every arm; eight hashes include the two additional positive pilot targets. No old all-workload parser result is used as a new arm.",
+        "name": "instances",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Rotate four arms by field/kind/repetition, five rounds.",
+        "name": "order",
+        "treatment": "crossed"
+      },
+      {
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception.",
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "Same Intel Xeon Platinum8573C, CPU0. Deterministic calibrated instruction counts only; no native-clock or uncontended-isolation claim.",
+        "name": "host",
+        "treatment": "measured"
+      },
+      {
+        "how": "Fresh native/profile children per call. Each pays full field-cache construction, parsing, relation work and replay. Lazy symbolic context fixed.",
+        "name": "cache_and_layout",
+        "treatment": "measured"
+      },
+      {
+        "how": "Outer600second total guard, no retries; raw process output and flushed JSONL prefixes retained.",
+        "name": "preemption",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Deterministic frozen Rust summary and separate Rust grid audit; no adaptive cases or population inference.",
+        "name": "analyst",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "accepted14.69M",
+          "incumbent12.286M",
+          "lazy-wire-candidate"
+        ],
+        "name": "implementation"
+      }
+    ]
+  },
+  "version": 1
+}

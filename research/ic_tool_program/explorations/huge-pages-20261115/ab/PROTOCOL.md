@@ -5,7 +5,7 @@ optimizing the index calculus until nothing is left.
 
 ## Why
 
-Collection is now 70–85% of set-up. Scan-probe cycles a summand at k0n53
+Collection is now 70–85% of set-up. Scan-probe cycles a summand at icv1-f2m53-tm56619371-dac20a85
 are: subtract 4.7, key 9.9, filter 9.8, admitted 5.0, trial 1.3.
 
 The filter stage and the admitted stage read the pair table at random:
@@ -31,8 +31,8 @@ same arrays at random.
   rounds an arm):
   - the host's noise was as large as the effect: the key stage alone
     moved about 15% between processes;
-  - filter over key went from 0.92–1.00 to 0.83–0.94 at k0n61;
-  - at k0n53 there was no visible change.
+  - filter over key went from 0.92–1.00 to 0.83–0.94 at icv1-f2m61-t158598901-ab42b6c5;
+  - at icv1-f2m53-tm56619371-dac20a85 there was no visible change.
 
 ## Arms: one binary, three labels
 
@@ -46,7 +46,7 @@ same arrays at random.
 
 ## Workload, schedule, metrics and statistics
 
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench --cpus 2` with `RAYON_NUM_THREADS=1`.
 - **Schedule:** **24 rounds**, cycled over the six orders of `a q h` (four
   cycles).
@@ -78,8 +78,8 @@ Medians `a / h`:
 
 | row | filter | admitted | collect | build | set-up |
 |:--|:--|:--|:--|:--|:--|
-| k0n53 | [0.97, 1.08] | [0.97, 1.08] | [0.98, 1.04] | [0.90, 1.05] | [0.97, 1.03] |
-| k0n61 | [1.03, 1.15] | [1.02, 1.12] | [1.00, 1.06] | [0.90, 1.05] | [0.99, 1.05] |
+| icv1-f2m53-tm56619371-dac20a85 | [0.97, 1.08] | [0.97, 1.08] | [0.98, 1.04] | [0.90, 1.05] | [0.97, 1.03] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.03, 1.15] | [1.02, 1.12] | [1.00, 1.06] | [0.90, 1.05] | [0.99, 1.05] |
 
 ## Identity
 

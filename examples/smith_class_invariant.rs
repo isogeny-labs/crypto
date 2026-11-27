@@ -315,16 +315,40 @@ fn qmonic(k: &Fq, a: &[E]) -> Vec<E> {
     a
 }
 
-fn qgcd(k: &Fq, a: &[E], b: &[E]) -> Vec<E> {
-    let (mut a, mut b) = (a.to_vec(), b.to_vec());
-    qtrim(k, &mut a);
-    qtrim(k, &mut b);
-    while !b.is_empty() {
-        let r = qdivrem(k, &a, &b).1;
-        a = b;
-        b = r;
+/// `F_{p^m}` as a coefficient field of the shared polynomial GCD.
+struct QField<'a>(&'a Fq);
+
+impl crypto_lib::gcd::poly::PolyField for QField<'_> {
+    type E = E;
+    fn zero(&self) -> E {
+        [0; 16]
     }
-    qmonic(k, &a)
+    fn one(&self) -> E {
+        self.0.one()
+    }
+    fn add(&self, a: E, b: E) -> E {
+        self.0.add(&a, &b)
+    }
+    fn sub(&self, a: E, b: E) -> E {
+        self.0.sub(&a, &b)
+    }
+    fn mul(&self, a: E, b: E) -> E {
+        self.0.mul(&a, &b)
+    }
+    fn inv(&self, a: E) -> E {
+        self.0.inv(&a)
+    }
+    fn is_zero(&self, a: E) -> bool {
+        self.0.is_zero(&a)
+    }
+    fn neg(&self, a: E) -> E {
+        self.0.neg(&a)
+    }
+}
+
+fn qgcd(k: &Fq, a: &[E], b: &[E]) -> Vec<E> {
+    // Monic gcd through the shared module (empty if both zero).
+    crypto_lib::gcd::poly::gcd(&QField(k), a, b)
 }
 
 /// One root in `F_q` of a squarefree polynomial over `F_q` that splits in `F_q`.
@@ -418,11 +442,7 @@ struct Split {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn lcm(a: u64, b: u64) -> u64 {

@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:19:42Z",
+ "id": "PCC-20261124-36f87f",
+ "kind": "execution",
+ "producer": {
+  "commit": "655cbc9cb9a68b6a499fe75dabf2804bc3326075",
+  "model": "GPT-6-Astra-Pro",
+  "session": "rr5-coprime-sectors-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/QUALIFICATION.json",
+    "sha256": "54a841953e52598d32c8b67c908241253fae066fec05e09e316de12f32e596f9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/native/selector_sectors.rs",
+    "sha256": "33589e2f414ea1c4c252382ba3a60ccc6dd8e67c31f7ab0766ecf33aef5e44bb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/library-tests-02/stdout.txt",
+    "sha256": "94a889651c57ddc3e99ef5d9299fc852e27dc86d47843ede583b9061c8182896"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/library-tests-02/pre-command-sources.sha256",
+    "sha256": "dcd9a9d488e74f7d17662f127f5883c1851b71d15b3990a9aff49c236d818383"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/library-tests-02/pre-call-binary.sha256",
+    "sha256": "7641777035317473b8743171537d3be8309afc168285cbf36a69142f7e12dfe0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/example-tests-01/stdout.txt",
+    "sha256": "3471fd5ca2c9c7823e25a83eb158ec2949a850df139fdf47270af004bfecd5a8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "M31 RR5 coprime-sector constructor development controls; not extraction, benchmark or formal proof",
+ "statement": "Unsigned local Rust 1.100.0 construction qualification: 35 native library tests and 8 public-example tests passed after retaining one compiler failure and one 33-pass/2-fail unit run. All five degree sectors retain quadratic equations with inventories 59/60, 53/54, 56/57, 58/59 and 59/60; controls check 20 fixed factor assignments, 32 dense selector remainders, 270 auxiliary mutations and three wrong root partitions. No B677 extraction or solver-cost measurement was performed."
+}

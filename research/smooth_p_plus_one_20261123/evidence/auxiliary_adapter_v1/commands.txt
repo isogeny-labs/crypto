@@ -1,0 +1,18 @@
+Native software qualification only; no scientific or solver execution.
+Working directory: /workspace/scratch/isogeny-labs-crypto
+RUSTUP_HOME=/workspace/scratch/rust/rustup
+CARGO_HOME=/workspace/scratch/rust/cargo
+CARGO_TARGET_DIR=/workspace/scratch/rr5-production-target
+CARGO_BUILD_JOBS=2
+RUST_TEST_THREADS=1
+Cargo: /workspace/scratch/rust/cargo/bin/cargo +1.99.1
+
+Preflight:
+python3 tools/pcc/pcc.py lint-prose research/smooth_p_plus_one_20261123/AUXILIARY_ADAPTER.md
+cargo +1.99.1 generate-lockfile --offline --manifest-path research/smooth_p_plus_one_20261123/auxiliary-rr5/Cargo.toml
+Both completed successfully before tests.
+
+Qualification:
+cargo +1.99.1 test --release --locked --manifest-path research/smooth_p_plus_one_20261123/auxiliary-rr5/Cargo.toml
+cargo +1.99.1 build --release --locked --manifest-path research/smooth_p_plus_one_20261123/auxiliary-rr5/Cargo.toml
+Logs and exit codes retained separately. Passing suites are not repeated.

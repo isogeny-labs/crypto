@@ -205,7 +205,9 @@ fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
     acc
 }
 fn invmod(a: u64, r: u64) -> u64 {
-    powmod(a, r - 2, r)
+    // `r` is prime: the old Fermat power `a^(r-2)` is the inverse of a
+    // unit; a non-unit (`a ≡ 0`) keeps the old Fermat value.
+    crypto_lib::gcd::int::inv_mod_u64(a, r).unwrap_or_else(|| powmod(a, r - 2, r))
 }
 
 // ---------------------------------------------------------- row space

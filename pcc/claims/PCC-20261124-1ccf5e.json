@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:00:56Z",
+ "id": "PCC-20261124-1ccf5e",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b6f1c7a3adb65a6dd21bedac932ee32ece822a9c",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/probe-01-summary.json",
+    "sha256": "e8878dec327caeb692094d23bc49dae42e358cb535c39a1ec7b43b1c2d1d5075"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/probe-01-events.jsonl",
+    "sha256": "1282192c8294a4914032973e3e9a0caddd081558e83032ee40a622a05c14c08f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/probe-01-launcher.json",
+    "sha256": "6178119162ce39bfd0b2452d67fe569b5eab830fb90fbcfa41e8b53b11c7268e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/probe-01-raw.sha256",
+    "sha256": "e589e827a24f27edf65e6f04eb46ef8db7c02d7433914fa88a208fb1463dd8ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The once-only H2 phase-1 local probe exits natively 0 with post-worker hash check 0 and empty stderr. Generic reference construction completes but template compilation refuses with development witness shape/budget; no online case is applied. Recorded learning work is 33418328 modular products, 40 nontrivial inversions and 32515052 coefficient updates. The specific failed sub-bound was not retained, so no narrower cause or full-family impossibility is asserted."
+}

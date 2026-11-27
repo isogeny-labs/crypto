@@ -321,6 +321,41 @@ pub trait DecompositionOracle<G: CountedGroup> {
         point: G::Elt,
     ) -> Option<Vec<usize>>;
 
+    /// Preferred number of independent targets to hand to
+    /// [`decompose_batch`](Self::decompose_batch).  The default of one
+    /// preserves the scalar relation loop for every existing oracle.
+    ///
+    /// A value greater than one is only a scheduling hint: the pipeline
+    /// keeps target order and charges every target the batch actually
+    /// evaluates, including work after an earlier target in that batch
+    /// would have completed the matrix.
+    fn preferred_batch_size(&self) -> usize {
+        1
+    }
+
+    /// Decompose independent targets as one native batch.  `out[i]` is the
+    /// answer for `points[i]`.  The default calls [`decompose`](Self::decompose)
+    /// in order, so opting a relation source into batching cannot change an
+    /// oracle that has not supplied a batch kernel.
+    fn decompose_batch(
+        &mut self,
+        ctx: &InstanceCtx<G>,
+        fb: &FactorBase<G::Elt>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        points: &[G::Elt],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        assert_eq!(
+            points.len(),
+            out.len(),
+            "decompose_batch requires one output slot per point"
+        );
+        for (slot, &point) in out.iter_mut().zip(points) {
+            *slot = self.decompose(ctx, fb, ops, counters, point);
+        }
+    }
+
     /// Select the cache-line relation guard.  Both representations return
     /// identical membership answers; the default preserves every recorded
     /// run's hash-map path.

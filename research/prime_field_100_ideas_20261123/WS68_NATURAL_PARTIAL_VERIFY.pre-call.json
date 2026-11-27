@@ -1,0 +1,10 @@
+{
+  "record_type":"immutable_pre_call",
+  "conductor_task":"T-74",
+  "admission":"read-only independent native verifier of already frozen local EC source stream",
+  "input":{"path":"WS68_NATURAL_PARTIAL.stdout","bytes":23188,"sha256":"922945c9a81568d23a504e2d296ef6c468f8dd47738e9b9e8a303ce12246f2b3"},
+  "source":{"path":"WS68_NATURAL_PARTIAL_VERIFY.rs","sha256":"4d613b1c4d557e42d09aa5ad1328b8e09ffd2140e83bebbdd1a8d6e729892616"},
+  "immutable_qualifier":{"path":"WS68_NATURAL_PARTIAL_VERIFY.qualifier.rs","sha256":"4d613b1c4d557e42d09aa5ad1328b8e09ffd2140e83bebbdd1a8d6e729892616"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_NATURAL_PARTIAL_VERIFY","WS68_NATURAL_PARTIAL_VERIFY.qualifier.rs","-o","WS68_NATURAL_PARTIAL_VERIFY.bin"],
+  "expected":"Parse all accepted source rows independently, reconstruct canonical EC points and two-point decompositions, verify aG+bQ and curve identity, compute full source-matrix rank and target pin without producer imports. Preserve any assertion failure."
+}

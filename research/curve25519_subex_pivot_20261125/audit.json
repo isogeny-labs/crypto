@@ -1,0 +1,484 @@
+{
+  "date": "2026-11-25",
+  "goal": "classical total expected r^o(1) ECDLP work for ordinary prime-field elliptic curves",
+  "fixed_arity_decision": "closed_for_total_subexponential_goal_under_uniform_target_coverage",
+  "counting_gate": {
+    "factor_base": "B",
+    "fixed_arity": "m",
+    "maximum_covered_residues": "sum_{j=0}^m B^j",
+    "attempts_for_theta_B_rows": "Omega(r/B^(m-1))",
+    "consequence_when_B_is_r_o_1": "r^(1-o(1)) target attempts"
+  },
+  "pair_image": {
+    "arity": 3,
+    "explicit_degree": "B^2",
+    "ordinary_total_before_linear_algebra": "Theta(B^2+r/B)",
+    "optimum": "B=Theta(r^(1/3)), work=Theta(r^(2/3))"
+  },
+  "finite_native_gate": {
+    "source": "crates/hashed-ecdl-tensor/src/bin/curve25519-subex-gate.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --bin curve25519-subex-gate",
+    "test_result": {
+      "passed": 4,
+      "failed": 0
+    },
+    "curve25519_pair_split_best_power_of_two_base": "2^84",
+    "curve25519_pair_split_work_bits_before_linear_algebra": 170,
+    "curve25519_pair_split_over_sqrt_ceiling": "8796093022208",
+    "curve25519_m3_probe_base": "2^16",
+    "curve25519_m3_target_attempts_lower_bits": 220,
+    "root_package_build": "blocked_by_pre_existing_unrelated_duplicate_symbols_and_module_schema_drift; standalone crate passed"
+  },
+  "growing_arity_child_transition": {
+    "source_commit": "42907c9e999cc00d6abe7a50bfc1023250edd1b9",
+    "source_sha256": "671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860",
+    "scope": "D.4.6-D.4.7 mode factorization, packet description locality, retained creation precision and entry-cost envelope",
+    "outcome": "no_local_contradiction_found",
+    "native_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::coupled_controls -- --nocapture",
+    "native_result": {
+      "passed": 5,
+      "failed": 0
+    },
+    "claim_boundary": "bounded native controls and focused source audit; not a proof of D.1 or a practical Curve25519 attack"
+  },
+  "active_call_certificate": {
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-active-call-audit.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
+    "test_result": {
+      "passed": 14,
+      "failed": 0
+    },
+    "derived_envelope": "with n=K*2^(i+1), K*L<=3M and D=L/2^i imply n*D<=6M; weighted tuple count is at most 2^(5*ceil(sqrt(n*p)))",
+    "conditional_consequence": "if p<=c*M*D/u uniformly, the local branching exponent is O(sqrt(c)*M/sqrt(u))",
+    "default_fixture": {
+      "M": 64,
+      "K": 8,
+      "a": 2,
+      "u": 2,
+      "i": 0,
+      "p": 128,
+      "mode_tuple_log2_bound": 230,
+      "active_call_child_invocations_log2_bound": 248,
+      "packet_description_slots_bound": 20456,
+      "packet_entry_choice_log2_bound": 44,
+      "precision_md_over_u_coefficient": 1
+    },
+    "claim_boundary": "finite dimension/work envelope conditional on supplied dimensions; actual child-history refinement and bit-operation induction remain open"
+  },
+  "child_structure_refinement_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/port_mass_controls.rs",
+    "test": "contraction::recursive::port_mass_controls::child_port_mass_source_controls",
+    "source_contexts": 2080,
+    "tuple_states": 3388,
+    "group_child_calls": 25490,
+    "mode_placement_checks": 7351,
+    "radix64_packet_vertices": 262144,
+    "radix64_isolated_packets": 254016,
+    "observed_gate": "old vertices, isolates, ordered endpoint identities, packet ownership, creation precision, endpoint mass and every mode packet/target/source placement match independent source-object ledgers",
+    "focused_result": "1 passed; 0 failed",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "forced source-object accounting bypasses production Setup admission; not a live recursive refinement theorem or timing claim"
+  },
+  "implementation_boundary": {
+    "note": "research/curve25519_subex_pivot_20261125/IMPLEMENTATION_BOUNDARY.md",
+    "native_graph_root_u": 0,
+    "first_symbolic_active_lambda": 131072,
+    "first_symbolic_active_u": 1,
+    "uniform_history_lambda": "2^26",
+    "uniform_history_source_guards": true,
+    "uniform_history_all_proof_invariants": false,
+    "first_passing_power_of_two_scan_log2_lambda": 480,
+    "first_passing_active_depths": 80,
+    "claim_boundary": "bounded exact symbolic scan; no allocated graph, exact global threshold, practical Curve25519 attack or runtime claim"
+  },
+  "uniform_source_history_bridge": {
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
+    "test_result": {
+      "passed": 13,
+      "failed": 0
+    },
+    "packet_capacity_binding": "production packing rejects unless K*L<=3M",
+    "history_inputs": "finite-history p_d<=81*s*2^A component on origin/main; native strict 8-fold child shrink; root-fixed leaf cutoff floor(s/floor(sqrt(lambda)))",
+    "lambda_threshold": "2^26",
+    "derived_scale_floor": 32,
+    "threshold_cases": [
+      {
+        "depth": 0,
+        "u": 512
+      },
+      {
+        "depth": 1,
+        "u": 256
+      },
+      {
+        "depth": 2,
+        "u": 128
+      },
+      {
+        "depth": 3,
+        "u": 64
+      },
+      {
+        "depth": 4,
+        "u": 32
+      }
+    ],
+    "threshold_result": "all inherited-precision and evaluation-loss absorptions pass, giving the conditional local constant 34 at every possible active depth",
+    "negative_control": "lambda=2^23 reaches u=16 and u=8 and fails inherited-precision absorption",
+    "claim_boundary": "exact symbolic integer schedule plus producer derivation; no allocated graph, practical Curve25519 attack, signed verification or complete bit-cost theorem"
+  },
+  "symbolic_history_certificate_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMBOLIC_HISTORY_CERTIFICATE.md",
+    "producer_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/symbolic_history_certificate.rs",
+    "command_source": "crates/hashed-ecdl-tensor/src/bin/symbolic-history-certificate-check.rs",
+    "emitter_source": "crates/hashed-ecdl-tensor/src/bin/symbolic-history-certificate-emit.rs",
+    "fixture": "crates/hashed-ecdl-tensor/examples/symbolic-history-certificate.json",
+    "wire_format": "schema-6 JSON, 7717-byte payload and 7718-byte newline-terminated fixture",
+    "checks": "exact leaf divisor and root scale; complete eight-fold-shrink depth coverage; every u, prior/current packet exponent and shrink factor; first/last tile and distance exponents proving tau*D=2L across each coordinate range; normalized M=uL, K=3u and p=34LD endpoint witnesses; exact KL=3M, tauD=2L, nD=6M, pu=34MD and npu=204M^2 identities; packing-to-strict-shrink constants R=64, balance 3 per side, 2 sides, child numerator 6, shrink factor 8, strict numerator 48<=64, packet degree factor 2; provenance structural multipliers header 11, entry 3, vertex 7 and combined nonvertex 14 with one tuple factor; description overhead Delta=2L+16(lambda+a+u+1) and Delta*h*ceil(sqrt(u))<=2^(lambda-1) at every depth; inherited and evaluation precision absorptions; geometric scale comparison; tuple exponent constant 80; leaf and packet-entry absorption; local ledger 80+1+4+5+6=96; tree, root-u and root-log exponent constants",
+    "mutations": "schema mismatch, missing depth, altered precision transition, altered normalized precision, altered packing shrink constant, altered provenance composition multiplier, altered description overhead, altered source constant, altered final composition constant",
+    "standalone_gate": "7718-byte fixture accepted with five active depths, ten normalized coordinate witnesses, strict packing shrink true, provenance description composed true, description overhead constant 1, root u 512, tuple exponent constant 80, root-u exponent constant 290 and root-log exponent constant 148480; 1 MiB input cap",
+    "dependency_boundary": "verifier imports exact integers and serialization only, not admission::dimensions, contraction, packing, deformation, factorization or graph code",
+    "claim_boundary": "independent exact replay of one normalized dimension family and conditional certificate-description composition; no symbolic graph realization, external theorem proof, kernel-checked description derivation or practical Curve25519 attack"
+  },
+  "arithmetic_and_tree_certificate": {
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/dimensions.rs",
+    "arithmetic_native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-arithmetic-audit.rs",
+    "tree_native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-history-audit.rs",
+    "test_command": "cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib contraction::recursive::dimension_controls -- --nocapture",
+    "test_result": {
+      "passed": 14,
+      "failed": 0
+    },
+    "width_formulas": {
+      "retained_jet_coefficients": "J<=8ML",
+      "maximum_multiplicity": "q_max<=4M",
+      "ring_multiplication_temporary_bits": "2p+1",
+      "rational_multiplier_bits": "(J+q_max)(a+1)+1",
+      "rational_accumulator_bits": "J*(J+q_max)(a+1)+J+p+ceil(log2(J+1))+1"
+    },
+    "default_arithmetic_fixture": {
+      "M": 64,
+      "K": 8,
+      "a": 2,
+      "u": 2,
+      "i": 0,
+      "p": 128,
+      "extension_degree": 32,
+      "ring_multiplication_temporary_bits": 257,
+      "rational_multiplier_bits": 3649,
+      "rational_accumulator_bits": 3503179,
+      "interpolation_ring_operations_bound": 2172538584,
+      "recovery_ring_operations_bound": 14206128,
+      "recovery_rational_operations_bound": 63312
+    },
+    "tree_constants": {
+      "local_child_exponent": "96*M/sqrt(u)",
+      "path_sum": "at most 3*s/sqrt(u_0)",
+      "active_tree_exponent_constant": 288,
+      "leaf_exponent_constant": 1,
+      "packet_entry_exponent_constant": 1,
+      "total_root_u_exponent_constant": 290,
+      "total_root_log_exponent_constant": 148480
+    },
+    "derived_source_cost_envelope": "(s+description_length)^O(1) * 2^(290*s/sqrt(u_0)) <= (s+description_length)^O(1) * 2^(148480*s/sqrt(lambda))",
+    "claim_boundary": "unverified producer-level source-cost certificate; no independent Rust refinement, kernel-checked whole theorem, practical Curve25519 attack or verification of the external contraction/reduction theorem"
+  },
+  "prime_field_reduction_ledger": {
+    "primary_source_commit": "1ee44e562b1b9a50ea339f3b8f81112b5a24b96f",
+    "primary_source_pdf_sha256": "82e273629b437660607117d5e99f400141ed7aa78b25c6749b03651f42deaa11",
+    "source_scope": "Bochum v0.2 Theorem 4 and Lemmas 9-13",
+    "library_source": "crates/hashed-ecdl-tensor/src/admission/reduction.rs",
+    "native_source": "crates/hashed-ecdl-tensor/src/bin/tensor-reduction-audit.rs",
+    "success_chain": {
+      "fixed_target_seed_average": "at least 2/5",
+      "good_seed_probability": "at least 1/4",
+      "enough_relations_given_good_seed": "at least 3/4 within 20(N+1) targets",
+      "nonzero_extraction_coefficient": "1-1/r",
+      "per_trial": "3(r-1)/(16r)>1/6",
+      "expected_trials": "at most 6"
+    },
+    "curve25519_finite_ledger": {
+      "field_bits": 255,
+      "subgroup_bits": 253,
+      "slots": 2,
+      "target_membership_mass": "85070591730234615865843651857942052865",
+      "columns_upper_bound_using_4p": "5444517870735015415413993718908291383340",
+      "expected_contraction_calls_bits": 149,
+      "dense_elimination_work_bits": 412,
+      "unit_constant_relation_phase_exponent_surrogate": 392,
+      "unit_constant_linear_algebra_exponent_surrogate": 399
+    },
+    "total_expected_work": "2^O(b/(log b)^(1/4))=r^o(1), including setup, relation generation, dense linear algebra and target recovery, conditional on the contraction theorem and producer source-cost audit",
+    "native_boundary": "finite retry/column/resource caps return an unknown limit error; every host-representable input uses the finite-size fallback",
+    "claim_boundary": "unverified producer composition; not an independent refinement proof, practical attack, deployed-curve result or verification of the external theorem"
+  },
+  "three_level_nested_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::three_nested_contractions_reach_the_third_child_and_match_direct_count",
+    "parameters": {
+      "radix": 2,
+      "u": 1,
+      "a": 1,
+      "length": 2,
+      "array": 4,
+      "requested_active_layers": 3
+    },
+    "observed_gate": "the recovered value equaled independent direct contraction; visits were [1,20,412,9080] through depths zero to three; every active visit through depth two emitted a serialized schema-2 certificate that passed standalone verification and the independent NodeDimensions cross-check",
+    "certificate_transcript": "433 certificates total: counts [1,20,412] and bytes [641,15500,374096] at depths [0,1,2], 390237 bytes total; unique records (depth,edges,precision,bytes,modes,tuples,tuple_log2_bound) are (0,1,3,641,1,2,15), (1,1,67,775,1,2,60), and (2,1,131,908,1,2,85)",
+    "focused_result": "1 passed in 6.39 seconds with certificate capture under Rust 1.78 debug",
+    "complete_library_result": "185 passed; 0 failed",
+    "discarded_preflight": "the larger diagnostic taper a=2,length=4 at every level exceeded 60 seconds; a heterogeneous u=2 root plus two compact levels remained live past 90 seconds; both were interrupted and no result from either is claimed",
+    "claim_boundary": "bounded exact counterexample search through the production deformation/child/interpolation/recovery routines with executed-node certificates; diagnostic recursion is non-strict and the one-edge child does not satisfy source shrinkage, so this is not a source-admitted history or asymptotic induction proof"
+  },
+  "strict_backend_boundary_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "test": "contraction::recursive::tests::usize_backend_cannot_enter_the_strict_source_branch",
+    "finite_witness": "Setup::new(usize::MAX,0) returns no recursive parameters at depth zero or usize::BITS",
+    "universal_reason": "every host-representable edge count has lambda<=usize::BITS<128*1024, so root u=floor(lambda/(128*1024)) is zero and all deeper u values are zero",
+    "focused_result": "1 passed; 0 failed under Rust 1.78",
+    "claim_boundary": "proves unreachability of the current allocated strict branch, not the symbolic contraction theorem; an implicit representation would require a fresh refinement and cost audit"
+  },
+  "multi_taper_hermite_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "test": "contraction::recursive::tests::multi_taper_hermite_recovers_extension_polynomials_across_precisions",
+    "cases": [
+      {
+        "extension_degree": 4,
+        "edges": 2,
+        "u": 2,
+        "a": 2,
+        "length": 4,
+        "root_precisions": [3, 5, 7]
+      },
+      {
+        "extension_degree": 6,
+        "edges": 3,
+        "u": 3,
+        "a": 3,
+        "length": 8,
+        "root_precisions": [5]
+      }
+    ],
+    "common_parameters": {
+      "coefficient_patterns": ["scalar", "mixed extension coordinates"]
+    },
+    "observed_gate": "every tapered recovery was 2-adically integral and returned the exact polynomial constant",
+    "focused_result": "1 passed in 5.63 seconds",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "bounded polynomial identity controls for two and three taper valuations; not a quantified Hermite recovery theorem or Rust refinement proof"
+  },
+  "hermite_precision_controls": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/HERMITE_IDENTITY.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "positive_loss_test": "contraction::recursive::dimension_controls::node_precision_covers_exact_rational_loss_on_small_source_grids",
+    "negative_test": "contraction::recursive::tests::root_precision_jets_are_insufficient_for_tapered_hermite_recovery",
+    "positive_gate": "the exact tapered-grid layer sum matches -v2(E_t(0)) and the rational-multiplier loss is strictly below the 8h(L/2^i) node allowance on source-shaped small grids",
+    "negative_gate": "root-precision jets lifted into the declared child rings return 7 instead of the true constant 3",
+    "focused_result": "2 passed; 0 failed",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "the negative is not a live-path counterexample because active computes at child_precision; the all-parameter layer-sum derivation, deformation-evaluation allowance and Rust refinement remain independently unverified"
+  },
+  "interpolation_control": {
+    "source": "crates/hashed-ecdl-tensor/src/ring.rs",
+    "test": "ring::tests::units_and_interpolation_over_nonfields",
+    "cases": "extension degrees 1/3/4/8; coefficient precisions 1/3/17; extension-valued polynomials of every sampled length through nine",
+    "observed_gate": "all pairwise binary-lift differences invert, every polynomial round-trips, and duplicate points fail closed",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "ring-level interpolation identity only; evaluate_at-to-deformation refinement remains unverified"
+  },
+  "cauchy_mode_series_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+    "test": "contraction::deformation::tests::integral_kernel_and_geometric_mode_series_match",
+    "cases": [
+      {"u": 1, "a": 2, "length": 4, "precision": 5},
+      {"u": 2, "a": 4, "length": 16, "precision": 7}
+    ],
+    "observed_gate": "the finite geometric mode series equals every active Cauchy weight; each coefficient has its claimed 2-adic divisibility and the first omitted coefficient is zero",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "scalar kernel identity across two tapers; full modes-to-child packet factorization and Rust refinement remain unverified"
+  },
+  "packet_entry_coefficient_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+    "test": "contraction::deformation::tests::packet_entry_matches_exhaustive_multimode_coefficient_oracle",
+    "cases": "all 64 assignments to four row and two column ports; two incoming modes with exponents 1 and 2; two outgoing forms with exponents 1 and 2",
+    "observed_gate": "production depth-first coefficient extraction equals independent exhaustive row-choice enumeration on every assignment",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "packet-local coefficient identity; global modes-to-group assignment, child product and Rust refinement remain unverified"
+  },
+  "group_mode_mutation_control": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::generated_mode_removal_or_reassignment_changes_the_group_product",
+    "fixture": "two correlated parallel ports with a shared arity-two predicate, radix two and nontrivial Cauchy sample",
+    "observed_gate": "production evaluate_at and the extracted modes-to-child group product equal an independent direct deformation oracle; removing a generated mode and flipping a target group are each detected",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "finite load-bearing mutation gate; unique placement and factorization for every admitted graph remain unverified"
+  },
+  "direct_group_factorization_control": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
+    "producer_theorem": "for every validated packed graph and arbitrary old tensor entry functions, non-strict evaluate_at equals the direct deformed contraction modulo the working precision",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::direct_deformation_matches_group_factorization_for_all_binary_tables",
+    "cases": "1,536 configurations: all 256 endpoint-table pairs in three parallel-port label/sample cases, plus all 256 behavior pairs for split-left, split-right, and split-both vertex partitions",
+    "oracle_boundary": "directly sums independent left/right incidence assignments and the full Cauchy packet kernel without modes, child, next_tuple, PacketTensor::entry, or evaluate_at",
+    "observed_gate": "the extracted modes-to-child group product equals the direct deformation semantics in every case",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "exhaustive finite arity-two family; quantified refinement for every admitted graph remains unverified"
+  },
+  "three_edge_partition_basis_control": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::direct_factorization_matches_every_three_edge_partition_basis",
+    "cases": "all 25 left/right set-partition pairs of three labeled edges, all 64 products of per-vertex delta-table bases, and four label schedules; 6,400 total configurations",
+    "basis_reason": "both direct and extracted contractions are separately linear in each old tensor table, so the product delta basis determines arbitrary tensor entries for each tested structural shape",
+    "observed_gate": "the extracted modes-to-child group product equals direct deformation semantics in every case",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "arbitrary tensor tables on exhaustive three-edge vertex partitions under four label schedules; larger edge/packet counts and all labels remain unverified"
+  },
+  "four_edge_partition_orbit_control": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::direct_factorization_matches_four_edge_partition_orbits",
+    "cases": "33 graph-shape orbits covering all 225 left/right set-partition pairs of four labeled edges under simultaneous edge relabeling; four label schedules; all 256 delta-basis coefficients; 33,792 comparisons",
+    "independent_oracle": "direct packet-kernel coefficient map indexed by old left/right incidence mask",
+    "production_side": "symbolic coefficient map using production modes, next_tuple, child construction, and packet entries",
+    "baseline": "536.50 seconds under Rust 1.78 debug when rerunning complete delta contractions",
+    "optimized": "3.96 seconds under Rust 1.78 debug by batching child assignments into coefficient maps; about 135x faster and below the 90-second target",
+    "observed_gate": "the production-derived symbolic map equals the direct packet-kernel map for every coefficient",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "four-edge graph-shape orbits under four label schedules; larger edge counts and all possible labels remain unverified"
+  },
+  "five_edge_partition_orbit_control": {
+    "identity_note": "research/curve25519_subex_pivot_20261125/GROUP_FACTORIZATION.md",
+    "refinement_note": "research/curve25519_subex_pivot_20261125/COEFFICIENT_MAP_REFINEMENT.md",
+    "description_envelope_note": "research/curve25519_subex_pivot_20261125/CERTIFICATE_DESCRIPTION_ENVELOPE.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/coupled_controls.rs",
+    "test": "contraction::recursive::coupled_controls::direct_factorization_matches_five_edge_partition_orbits",
+    "cases": "91 graph-shape orbits covering all 2,704 left/right set-partition pairs of five labeled edges; four label schedules; all 1,024 delta-basis coefficients; 372,736 comparisons",
+    "oracles": "direct packet-kernel map; independent same-group plus mode-row/source expansion map; production-derived symbolic child map",
+    "mode_expansion_boundary": "the middle map does not call child, next_tuple, or PacketTensor::entry",
+    "observed_gate": "all three maps agree for every coefficient",
+    "runtime": "51.71 seconds for the original two-map gate and 76.17 seconds for the triangular three-map gate under Rust 1.78 debug; both below the 90-second scaling target",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "five-edge graph-shape orbits under four label schedules; larger edge counts and all possible labels remain unverified"
+  },
+  "factorization_certificate_control": {
+    "refinement_note": "research/curve25519_subex_pivot_20261125/COEFFICIENT_MAP_REFINEMENT.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/factorization_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "command_source": "crates/hashed-ecdl-tensor/src/bin/factorization-certificate-check.rs",
+    "fixture": "crates/hashed-ecdl-tensor/examples/factorization-certificate.json",
+    "test": "contraction::recursive::factorization_certificate::independent_certificate_checks_all_six_factorization_obligations",
+    "shape_sweep_test": "contraction::recursive::factorization_certificate::serialized_certificate_covers_every_three_edge_partition_shape",
+    "four_edge_shape_sweep_test": "contraction::recursive::factorization_certificate::serialized_certificate_covers_four_edge_partition_orbits",
+    "five_edge_shape_sweep_test": "contraction::recursive::factorization_certificate::serialized_certificate_covers_five_edge_partition_orbits",
+    "checks": "exact packet coverage; incidence groups; mode target/source placement; one residue key per packet, weight and tile; checked mode-count ceilings; crossing scalar series; independent Cartesian retained-tuple coverage with a checked generating-function ceiling; independent packet coefficient tables",
+    "wire_format": "schema-2 JSON with a validated tile period, 2172 bytes for the correlated two-port fixture, deterministic byte-for-byte round trip",
+    "shape_sweep": "all 25 three-edge left/right set-partition pairs under four label schedules; 100 certificates, 52 satisfying the source KL<=3M premise; 318734 total bytes; 3187.34 average bytes; 10146 maximum bytes at [0,1,1]/[0,1,1] schedule 3; 0.34 seconds warm Rust 1.78 debug",
+    "four_edge_shape_sweep": "33 simultaneous-edge-relabeling partition-pair orbits under four label schedules; 132 certificates, 87 satisfying the source KL<=3M premise; 792556 total bytes; 6004.21 average bytes; 20777 maximum bytes at [0,0,1,1]/[0,0,1,1] schedule 3; about 0.60 seconds checker, 0.51 seconds producer, 0.13 seconds JSON, and 1.12-1.26 seconds complete warm Rust 1.78 debug gate",
+    "five_edge_shape_sweep": "91 simultaneous-edge-relabeling partition-pair orbits under four label schedules; 364 certificates, 146 satisfying the source KL<=3M premise; 3652442 total bytes; 10034.18 average bytes; 43460 maximum bytes at [0,0,0,1,1]/[0,0,0,1,1] schedule 3; 2.06 seconds verifier, 1.88 seconds producer, 0.55 seconds JSON, and 4.93 seconds complete warm Rust 1.78 debug gate",
+    "description_envelope": "with tau=2^(i+1), n=K*tau, S=2^(2L)+R-1 and H=TRK: Q_b<=n, Q<=n*(p-1), log2(T)<=5*ceil(sqrt(n*p)), entry values <= TKS, ring elements <= KL^2+QL+TKS, JSON bytes <= 64(A+C+F+1), and canonical binary bits <= (Ed+QL)p+IB+64(C+F+1), with A,C,F,I,B defined in CERTIFICATE_DESCRIPTION_ENVELOPE.md",
+    "source_count_bridge": "the verifier reconstructs one nonempty tile residue key per packet, weight and mode, rejects duplicate keys, reconstructs the exact weighted tuple set, and enforces the same Q and T bounds as admission::dimensions without trusting producer counts; standalone verify_source_dimensions takes (a,u,i), requires uniform L=2^a packets, reconstructs (M,K,L,tau,D,p), checks KL<=3M and nD<=6M, reports or requires pu<=34MD, and recomputes the envelope; a separate BigUint cross-check covers all 596 partition certificates, with exact field agreement for the 285 admitted cases and explicit capacity rejection for the other 311; non-strict diagnostic histories use report-only precision status",
+    "five_edge_description_ceiling": "32519488 JSON bytes and 19154282 canonical binary bits, versus 43460 observed maximum JSON bytes",
+    "mutations": "schema mismatch, invalid tile period (both too small and non-power-of-two), noncanonical ring element, overflowing structural count, duplicate packet edge, duplicate mode row slot, duplicate mode tile key, reassigned mode target, removed retained tuple, altered packet table entry",
+    "observed_gate": "serialized honest certificate accepted and all ten malformed-certificate classes rejected",
+    "standalone_gate": "2173-byte newline-terminated fixture accepted in 224 charged steps; schema mutation rejected with process status 2; 64 MiB input cap, default work/vector/width limits and 1024-mode depth cap; source report tau=2, modes-per-weight bound 4, attempted-mode bound 16, tuple-log2 bound 25; optional --source A U I emits the independently refined source dimensions or rejects a non-admitted shape",
+    "dependency_boundary": "verifier imports exact ring arithmetic but not contraction, deformation, packing, child construction or packet tensors",
+    "implementation_diagnostic": "checker found and localized an initial producer bug that indexed packet table bits by global child edge instead of local packet port",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "standalone native verifier in the same Rust crate as producer and ring arithmetic, with bounded positive controls through five edges; recursive packing/precision history and external contraction theorems remain separate, with no theorem-assistant or separately implemented arithmetic kernel"
+  },
+  "weighted_tuple_enumeration_control": {
+    "source": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+    "test": "contraction::recursive::tests::weighted_enumeration_has_no_missing_or_repeated_monomials",
+    "cases": "83,970 exhaustive small-state configurations over zero through four modes, two target groups, weights 1/2/3, bounds 0/1/2, and precisions 1 through 6; plus two multi-packet fixtures",
+    "observed_gate": "production next_tuple enumerates every and only admissible exponent vector exactly once",
+    "producer_proof": "research/curve25519_subex_pivot_20261125/WEIGHTED_TUPLE_ITERATOR.md",
+    "complete_library_result": "185 passed; 0 failed",
+    "claim_boundary": "producer-side general argument plus finite exact controls; independent or kernel-checked iterator refinement remains unverified"
+  },
+  "packing_provenance_control": {
+    "note": "research/curve25519_subex_pivot_20261125/PACKING_PROVENANCE_CERTIFICATE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/packing_provenance_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "wire_format": "schema-3 JSON with endpoint vertex/port indices, source tensor creation precisions and deterministic byte-for-byte round trip on every producer path",
+    "checks": "edge-order endpoint vertex/port indices; left/right vertex labels and tensor creation precisions including isolates; optional exact greedy conditional-expectation replay with first-minimum tie breaking; actual left/right source degree<=claimed delta; exact variance inequality; exact ordered label classes; padded class height; unordered digit-pair pattern order; copy-index and slot reconstruction; empty-packet suppression; exact packet array and pair-pattern equality; active-coordinate left/right group equality; KL<=3M admission and every-coordinate radix group-port balance when source bounds are claimed",
+    "observed_gate": "all 596 three- through five-edge partition certificates, the correlated two-edge fixture, and the executed non-strict diagnostic serialize, parse, round-trip and independently replay; a packet-pair mutation is rejected; a dedicated admitted three-edge source control replays conditional label selection and all packing bounds, while label and understated-degree-cap mutations are rejected",
+    "dependency_boundary": "verifier imports the serialized factorization type and generic Meter only, not graph, packing, deformation or contraction code",
+    "claim_boundary": "complete finite replay from a bipartite edge skeleton through optional conditional-expectation labels and source packing bounds to packet/group objects; no uniform arbitrary-size label-selection theorem, asymptotic graph realization, external contraction proof or practical Curve25519 attack"
+  },
+  "child_provenance_control": {
+    "note": "research/curve25519_subex_pivot_20261125/CHILD_PROVENANCE_CERTIFICATE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/child_provenance_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "wire_format": "schema-2 JSON with deterministic round trip for each checked child",
+    "checks": "parent port uniqueness and contiguity; selected old-vertex order and stable parent tensor source across both bipartite sides; selected isolates; preserved old degrees, port indices and creation precision; one child packet vertex per parent packet including isolates; packet creation precision; row-before-column incidence order; packet ownership; sequential packet-port indices; exact child edge order; exact beta/group/packet entry-table key and truth-table arity; exact Cartesian tuple/group family coverage; no duplicate keys; exactly 2M child incidences per tuple; exact family packet-table count; actual eightfold edge-shrink and max_degree<=delta with 2L<=delta guards; strict-source admission only when both hold at radix 64",
+    "observed_gate": "every retained beta/group child on every producer path serializes, round-trips and replays for the correlated fixture, all 596 three- through five-edge certificates and the executed diagnostic; the admitted three-edge source control binds every packet table/value, while packet-port, parent-precision, packet-precision, beta, missing-child and duplicate-child mutations are rejected",
+    "dependency_boundary": "verifier imports the serialized packing/factorization types and generic Meter only, not graph, deformation, packet-tensor or contraction code; producer control requires retained Arc identity and packet kind before serialization",
+    "claim_boundary": "finite interface from parent tensor references/topology through creation precision to independently checked packet coefficient tables; arbitrary old tensors are referenced rather than re-serialized; no uniform arbitrary-size refinement, external contraction proof or practical Curve25519 attack"
+  },
+  "provenance_description_control": {
+    "note": "research/curve25519_subex_pivot_20261125/PROVENANCE_DESCRIPTION_ENVELOPE.md",
+    "packing_source": "crates/hashed-ecdl-tensor/src/packing_provenance_certificate.rs",
+    "child_source": "crates/hashed-ecdl-tensor/src/child_provenance_certificate.rs",
+    "checks": "exact structural atom/container/field counts; 64-byte JSON allowance per structural unit; actual-maximum integer width in canonical binary; complete-family reductions sum_group O=V, sum_group E=2M, children=TR and packet vertices=TRK",
+    "observed_gate": "every producer path checks actual packing and aggregate child JSON bytes against the derived ceilings; admitted three-edge control records packing 414<=4672 bytes and child family 3764<=37440 bytes with binary ceilings 2564 and 21824 bits",
+    "asymptotic_shape": "child atoms TR(2+Q+2K)+4TV+8TM with analogous container/field formulas, hence T times a polynomial structural factor rather than a second tuple exponential",
+    "claim_boundary": "finite structural envelope with schema-6 composition into one tuple factor plus polynomial original-description data; arbitrary-size realization, a separately kernel-checked proof and the external contraction theorem remain unverified"
+  },
+  "node_refinement_control": {
+    "note": "research/curve25519_subex_pivot_20261125/NODE_REFINEMENT_CERTIFICATE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/node_refinement_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "wire_format": "schema-1 JSON bundle of source dimensions, schema-2 factorization, schema-3 packing and complete schema-2 child family",
+    "checks": "factorization verification before dependent interfaces; normalized source precision required; packing and child-family replay; exact cross-interface M,K,L,a,i,T,R equality; actual maximum child edges/degree; source-guard packing closure; report-only and strict entry points requiring both guard closure and radix-64 child refinement",
+    "observed_gate": "admitted three-edge conditional-packing bundle serializes, round-trips and passes every composed finite interface with normalized precision; it reports source-guard closure and strict refinement false, so strict entry rejects; clearing required normalized precision rejects at context",
+    "dependency_boundary": "imports serialized certificate verifiers and exact integers only, not graph, source packing, deformation, packet tensor or contraction implementations",
+    "claim_boundary": "generic finite node checker with fail-closed strict admission plus a separate producer-side uniform guard induction; no independently formalized composition, proof that the unreachable live branch emits bundles, external contraction proof or practical Curve25519 attack"
+  },
+  "symmetric_source_family_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_SOURCE_FAMILY.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/symmetric_source_family_certificate.rs",
+    "wire_format": "schema-1 JSON exponent transcript; no graph allocation",
+    "construction": "N vertices per bipartite side, L parallel edges per vertex pair, cyclic labels modulo q=64^a, M=N^2L=2^lambda",
+    "checks": "root u=floor(lambda/2^17), a=2u, label/array/class/packet/degree exponents; cyclic balanced class divisibility; exact KL=M; exact M/64 endpoint load per side/group and M/32 child edges; source degree and 2L<=delta using floor(9lambda/10); M>=LD; M>=2D^2delta using ceil(9lambda/10)",
+    "observed_gate": "lambda=2^26 transcript passes with a=1024, log2N=33553920, log2degree=33554944, delta exponents [60397977,60397978] and child exponent lambda-5; larger checked even exponents pass; altered degree and odd vertex parity fail",
+    "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; generic child closure is supplied separately by the source-guard lemma; no independent formal composition, external contraction proof or practical Curve25519 attack"
+  },
+  "symmetric_child_closure_control": {
+    "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_CHILD_CLOSURE.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/symmetric_child_controls.rs",
+    "schedule": "native radix-two complete-multigraph root at a=1, then production packet children and conditional packing at a=2 and a=3 along every two-group path at coordinate zero",
+    "under_scale_gate": "M=32 accepts a=2 with 10 packets, then the 32-edge degree-8 child rejects a=3 at packet padding: maximum class 2 and padded mass 512 exceed 3M=96; this model violates the next M>=LD=512 source guard",
+    "guard_boundary_gate": "default control at root M=512=LD: paths 00/01/10/11 have a=2 packet counts 132/132/134/134, next edges 512/512/516/508, degree 32, maximum class 10, padded mass 1024, a=3 packet counts 74/78/77/77, and maximum one-side loads 261/261/260/262; all four packings pass and the 508-edge path is below the next LD guard",
+    "four_level_gate": "47.11-second default control with root M=LD=32768 follows all 16 paths through a=5: final edges 32755..32786, degree 256, maximum class 36..40, padded mass 65536, packets 1188..1214 and maximum one-side load 16406..16463; all packings and max_class*D<=2M checks pass; seven paths retain M>=LD and nine fall back; the finite model is below the stronger 2D^2delta guard",
+    "resolved_target": "the source-guard closure lemma proves maximum pair-label class<=2M/D, coordinate/group endpoint load on either side<=2M/64 and maximum child degree<=delta without packet-orbit assumptions",
+    "claim_boundary": "all four finite radix-two group paths at one guard boundary, all 16 paths at a deeper LD boundary, and one exact under-scale rejection; finite shape evidence only, with generic strict closure supplied by a separate algebraic lemma"
+  },
+  "conditional_label_gram_control": {
+    "note": "research/curve25519_subex_pivot_20261125/CONDITIONAL_LABEL_GRAM.md",
+    "source": "crates/hashed-ecdl-tensor/src/contraction/packing.rs",
+    "row_score": "deg(v)deg(w)+(q-1) sum_r m(v,r)m(w,r), accumulated by degree buckets and sparse opposite-vertex label incidences",
+    "column_score": "dot product of incidence profiles grouped by fixed row labels, accumulated by sparse row-label/column-bucket maps",
+    "equivalence_gate": "3,280 cases with zero through three ordered edges on 3x3 vertices and one through four labels exactly match the retained quadratic reference; the standalone packing-provenance verifier keeps its independent ordered-edge-pair replay",
+    "measured_gate": "warm debug single guard-boundary path fell from 107.32 seconds to 0.02 seconds, about 5,300x; all four group paths complete in 0.06 seconds",
+    "complete_library_result": "191 passed; 0 failed in 288.34 seconds",
+    "claim_boundary": "exact first-minimum implementation refinement and finite exhaustive equivalence; the strict radix-64 caps follow separately from variance plus the source guards"
+  },
+  "packing_guard_closure_control": {
+    "note": "research/curve25519_subex_pivot_20261125/PACKING_GUARD_CLOSURE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/packing_provenance_certificate.rs",
+    "variance_chain": "D sum(c^2)-M^2<=2MdeltaD, equivalently sum(c-M/D)^2<=2Mdelta; M>=2D^2delta implies cD<=2M for every class",
+    "capacity_chain": "height D<=(c+L)D<=2M+LD<=3M; KL<=height sum_patterns 2^j=height R^(2a)=height D<=3M",
+    "shrink_chain": "each one-side coordinate/group load sums D/R classes and is <=2M/R; child edges<=4M/R=M/16 at R=64; old degrees persist and packet degree<=2L<=delta",
+    "recursive_chain": "the next node either falls back or Setup rechecks M>=2D^2delta, M>=LD and 2L<=delta, so no symmetric child-shape invariant is required",
+    "executable_binding": "schema-3 summaries expose maximum_class and source_guard_closure_admitted; guard-admitted finite objects must also pass maximum_class*D<=2M and the stronger per-side 2M/R load cap",
+    "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
+    "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
+  },
+  "next_gate": "compose the strict root family and graph-generic source-guard closure through the schema-1 node interface and symbolic history as one independently checkable theorem; separately rederive the external factorization/contraction theorem"
+}

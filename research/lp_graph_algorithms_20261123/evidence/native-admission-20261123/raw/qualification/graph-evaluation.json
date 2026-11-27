@@ -1,0 +1,272 @@
+{
+  "schema": "lp-graph-eval/v1",
+  "modulus": 2147446831,
+  "label": "planted-prime31-admission-correctness-only",
+  "rows": 5,
+  "lp_columns": 2,
+  "incidences": 6,
+  "arity_histogram": {
+    "0": 1,
+    "1": 2,
+    "2": 2
+  },
+  "rank": {
+    "two_entry_rows": 5,
+    "exact_for_stream": true,
+    "gain_dsu": {
+      "vertices": 2,
+      "rows": 5,
+      "rank": 2,
+      "left_nullity": 3,
+      "components": 1,
+      "unflagged_components": 0,
+      "unions": 1,
+      "balanced_cycles": 0,
+      "unbalanced_cycles": 1,
+      "singletons": 2,
+      "zero_rows": 1
+    },
+    "gain_dsu_ns": 1503,
+    "dense_rank": 2,
+    "dense_matches": true,
+    "structural_lower_bound": 2,
+    "matching_rank": 2
+  },
+  "cores": {
+    "lp_graph_max_core": 2,
+    "lp_graph_two_core_vertices": 2,
+    "incidence_two_core_rows": 2,
+    "incidence_two_core_columns": 2,
+    "ns": 2193
+  },
+  "matching": {
+    "structural_rank": 2,
+    "phases": 1,
+    "hopcroft_karp_ns": 621,
+    "dm": {
+      "structural_rank": 2,
+      "over_rows": 5,
+      "over_columns": 2,
+      "under_rows": 0,
+      "under_columns": 0,
+      "well_size": 0,
+      "fine_blocks": [],
+      "structural_left_nullity_lower_bound": 3
+    },
+    "dm_ns": 1873,
+    "fine_block_count": 0,
+    "largest_fine_block": 0
+  },
+  "trees": {
+    "vertices": 2,
+    "edges": 2,
+    "bfs": {
+      "cycles": 1,
+      "total_length": 2,
+      "max_length": 2
+    },
+    "bfs_ns": 1492,
+    "low_stretch": {
+      "cycles": 1,
+      "total_length": 2,
+      "max_length": 2
+    },
+    "low_stretch_ns": 1152
+  },
+  "pivot_filter": {
+    "report": {
+      "input_relations": 5,
+      "input_large_vertices": 2,
+      "duplicate_relations": 0,
+      "peeled_relations": 0,
+      "core_relations": 4,
+      "core_large_vertices": 2,
+      "pivots": 2,
+      "merges": 4,
+      "rejected_fill": 0,
+      "complete_relations": 3,
+      "cycles_closed": 2
+    },
+    "mst_stats": null,
+    "refused": false,
+    "ns": 12248,
+    "residual_columns": 2,
+    "residual_nonzeros": 5,
+    "source_terms": 7,
+    "max_row_weight": 2,
+    "replayed": 3,
+    "replay_failures": 0,
+    "exact_projected_rank": {
+      "input_rows": 3,
+      "useful_small_rank": 2,
+      "augmented_rank": 2,
+      "independent_row_indices": [
+        0,
+        1
+      ],
+      "redundant_row_indices": [
+        2
+      ],
+      "inconsistent_row_indices": [],
+      "augmented_basis_row_indices": [
+        0,
+        1
+      ],
+      "augmented_basis_nonzeros": 3,
+      "augmented_basis_source_terms": 4,
+      "elimination_steps": 3,
+      "elimination_multiply_add_terms": 3,
+      "normalization_multiplications": 4,
+      "inverse_calls": 2,
+      "pivot_nonzeros": 2,
+      "peak_working_nonzeros": 4
+    },
+    "rank_audit_ns": 4347
+  },
+  "mst_filter": {
+    "report": {
+      "input_relations": 5,
+      "input_large_vertices": 2,
+      "duplicate_relations": 0,
+      "peeled_relations": 0,
+      "core_relations": 4,
+      "core_large_vertices": 2,
+      "pivots": 2,
+      "merges": 4,
+      "rejected_fill": 0,
+      "complete_relations": 3,
+      "cycles_closed": 2
+    },
+    "mst_stats": {
+      "trees": 2,
+      "edge_evaluations": 6,
+      "infeasible_edge_candidates": 0,
+      "normalized_rows": 6,
+      "selected_edges": 4,
+      "largest_column_degree": 3,
+      "largest_active_coefficients": 20,
+      "input_nonzeros": 15,
+      "output_nonzeros": 5,
+      "budget_refusals": 0
+    },
+    "refused": false,
+    "ns": 11046,
+    "residual_columns": 2,
+    "residual_nonzeros": 5,
+    "source_terms": 7,
+    "max_row_weight": 2,
+    "replayed": 3,
+    "replay_failures": 0,
+    "exact_projected_rank": {
+      "input_rows": 3,
+      "useful_small_rank": 2,
+      "augmented_rank": 2,
+      "independent_row_indices": [
+        0,
+        1
+      ],
+      "redundant_row_indices": [
+        2
+      ],
+      "inconsistent_row_indices": [],
+      "augmented_basis_row_indices": [
+        0,
+        1
+      ],
+      "augmented_basis_nonzeros": 3,
+      "augmented_basis_source_terms": 4,
+      "elimination_steps": 3,
+      "elimination_multiply_add_terms": 3,
+      "normalization_multiplications": 4,
+      "inverse_calls": 2,
+      "pivot_nonzeros": 2,
+      "peak_working_nonzeros": 4
+    },
+    "rank_audit_ns": 861
+  },
+  "forest_filter": {
+    "lp_rank": 2,
+    "lp_left_nullity": 3,
+    "witness_stats": {
+      "rows": 5,
+      "independent_rows": 2,
+      "tree_edges": 1,
+      "anchors": 1,
+      "dependent_rows": 3,
+      "source_terms": 7,
+      "adjacency_scans": 0,
+      "reroot_steps": 0,
+      "path_steps": 2,
+      "parent_path_reads": 2,
+      "inverse_calls": 5,
+      "anchor_cache_hits": 1,
+      "anchor_cache_misses": 1,
+      "independent_projection_skips": 2
+    },
+    "witness_ns": 7742,
+    "materialization_ns": 4376,
+    "refused": false,
+    "exact_projected_rank": {
+      "input_rows": 3,
+      "useful_small_rank": 2,
+      "augmented_rank": 2,
+      "independent_row_indices": [
+        0,
+        1
+      ],
+      "redundant_row_indices": [
+        2
+      ],
+      "inconsistent_row_indices": [],
+      "augmented_basis_row_indices": [
+        0,
+        1
+      ],
+      "augmented_basis_nonzeros": 3,
+      "augmented_basis_source_terms": 4,
+      "elimination_steps": 3,
+      "elimination_multiply_add_terms": 3,
+      "normalization_multiplications": 4,
+      "inverse_calls": 2,
+      "pivot_nonzeros": 2,
+      "peak_working_nonzeros": 4
+    },
+    "rank_audit_ns": 601,
+    "summary_and_replay_ns": 2384,
+    "residual_columns": 2,
+    "residual_nonzeros": 5,
+    "source_terms": 7,
+    "max_row_weight": 2,
+    "replayed": 3,
+    "replay_failures": 0
+  },
+  "residual_elimination": {
+    "vertices": 2,
+    "edges": 1,
+    "fill_edges": 0,
+    "width": 1,
+    "clique_work": 1,
+    "truncated": false
+  },
+  "residual_elimination_ns": 2483,
+  "residual_rows_skipped_for_width": 0,
+  "partitions": [
+    {
+      "parts": 2,
+      "block_connectivity_minus_one": 2,
+      "fm_connectivity_minus_one": 0,
+      "fm": {
+        "parts": 2,
+        "part_sizes": [
+          0,
+          3
+        ],
+        "connectivity_minus_one": 0,
+        "cut_nets": 0,
+        "fm_passes": 2,
+        "fm_moves": 1
+      },
+      "fm_ns": 3625
+    }
+  ]
+}

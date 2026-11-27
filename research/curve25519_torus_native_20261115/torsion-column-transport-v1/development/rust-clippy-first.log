@@ -1,0 +1,25 @@
+    Checking torus-reverse-multiplier v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-reverse-multiplier)
+    Checking torus-column-transport v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-column-transport)
+error: the loop variable `c` is only used to index `m[i]`
+   --> src/linear.rs:167:18
+    |
+167 |         for c in 0..n {
+    |                  ^^^^
+    |
+note: for this index operation
+   --> src/linear.rs:170:42
+    |
+170 |                 x = f.add(&x, &f.mul(k, &m[i][c]));
+    |                                          ^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+    |
+167 -         for c in 0..n {
+167 +         for <item> in m[i].iter().take(n) {
+    |
+
+error: could not compile `torus-column-transport` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-column-transport` (lib test) due to 1 previous error

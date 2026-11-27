@@ -1,0 +1,612 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 49.35625,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 55.46487563750001,
+    "ns_per_frobenius": null,
+    "ns_per_hashed_tensor_step": 80.240429875,
+    "ns_per_inversion": 36.68092336875,
+    "ns_per_legendre": 25.09345784375,
+    "ns_per_lookup": 0.773708575,
+    "ns_per_row_op": 1.0233524875,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 32.893670237500004,
+    "ns_per_word_xor": 0.1476739,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion",
+      "ns_per_hashed_tensor_step"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion",
+      "ns_per_hashed_tensor_step"
+    ]
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 13.784437958,
+  "instance": "icv1-fp14-tm43-158b6914",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp14-tm43-158b6914 | prime-isogeny[aux=ordinary,seed=0,t=7] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + random | 142 | 71 | 2.0 | 0.402 | 127 | 51 | 51 | 5.0 | — | 2189395.186 | 1142867.13× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 3.8932208236230585,
+    "mean_s": 1.9157040469062554,
+    "mean_s_walk": 1.2171220846029243,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 1.07534526781524,
+    "per_run": [
+      {
+        "planted": 9331,
+        "s": 1.9544596473430274,
+        "s_walk": 1.2715761561026926,
+        "seed": 124055164282,
+        "steps": 144,
+        "steps_over_expected": 1.4348200439216696,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 3.1867896257882293,
+        "s_walk": 2.2762783041344496,
+        "seed": 124055164283,
+        "steps": 250,
+        "steps_over_expected": 2.568505016896816,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.6640379326775976,
+        "s_walk": 0.9890036769687609,
+        "seed": 124055164280,
+        "steps": 107,
+        "steps_over_expected": 1.1159711452724097,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.4756562799216433,
+        "s_walk": 0.7849235531498102,
+        "seed": 124055164281,
+        "steps": 83,
+        "steps_over_expected": 0.8856913851368331,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.8838165275595444,
+        "s_walk": 1.1852345652562133,
+        "seed": 124055164286,
+        "steps": 130,
+        "steps_over_expected": 1.337393991556618,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 2.464659956890404,
+        "s_walk": 1.6954348748035901,
+        "seed": 124055164287,
+        "steps": 185,
+        "steps_over_expected": 1.9130933918955595,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.6797364037405937,
+        "s_walk": 1.0204006190947532,
+        "seed": 124055164284,
+        "steps": 112,
+        "steps_over_expected": 1.151398800677883,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 3.8932208236230585,
+        "s_walk": 3.0925987994102524,
+        "seed": 124055164285,
+        "steps": 324,
+        "steps_over_expected": 3.4896240574391224,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.6483394616146014,
+        "s_walk": 0.9497574993112703,
+        "seed": 124055164274,
+        "steps": 108,
+        "steps_over_expected": 1.071686576015568,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.318671569291681,
+        "s_walk": 0.6750342557088368,
+        "seed": 124055164275,
+        "steps": 70,
+        "steps_over_expected": 0.7616945912176765,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.1145914454727306,
+        "s_walk": 0.46310489635838803,
+        "seed": 124055164272,
+        "steps": 55,
+        "steps_over_expected": 0.5225579172307315,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.6718871682090957,
+        "s_walk": 1.0204006190947532,
+        "seed": 124055164273,
+        "steps": 110,
+        "steps_over_expected": 1.151398800677883,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 2.2370321264769593,
+        "s_walk": 1.5462993997051262,
+        "seed": 124055164278,
+        "steps": 167,
+        "steps_over_expected": 1.7448120287195612,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.6012440484256127,
+        "s_walk": 0.918360557185278,
+        "seed": 124055164279,
+        "steps": 99,
+        "steps_over_expected": 1.0362589206100947,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.7817764656500692,
+        "s_walk": 1.1067422099412323,
+        "seed": 124055164276,
+        "steps": 122,
+        "steps_over_expected": 1.2488248530429347,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 1.07534526781524,
+        "s_walk": 0.47880336742138424,
+        "seed": 124055164277,
+        "steps": 53,
+        "steps_over_expected": 0.5402717449334682,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 25.60420630374681,
+    "mean_s": 11.358334391298474,
+    "mean_s_walk": 3.4095116839944883,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 6.624754788584398,
+    "per_run": [
+      {
+        "planted": 9331,
+        "s": 12.040727305318088,
+        "s_walk": 4.819430616339835,
+        "seed": 124055164282,
+        "steps": 614,
+        "steps_over_expected": 3.845349280638192,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 11.33429610748326,
+        "s_walk": 4.317079542323956,
+        "seed": 124055164283,
+        "steps": 550,
+        "steps_over_expected": 3.4445311145781847,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 10.565071025396445,
+        "s_walk": 3.767633055119089,
+        "seed": 124055164280,
+        "steps": 480,
+        "steps_over_expected": 3.006136245450052,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 9.701655116931654,
+        "s_walk": 1.161686858661719,
+        "seed": 124055164281,
+        "steps": 148,
+        "steps_over_expected": 0.9268920090137661,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 6.624754788584398,
+        "s_walk": 1.0910437388782361,
+        "seed": 124055164286,
+        "steps": 139,
+        "steps_over_expected": 0.8705269544115776,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 12.684364618900933,
+        "s_walk": 4.607501256989386,
+        "seed": 124055164287,
+        "steps": 587,
+        "steps_over_expected": 3.6762541168316263,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 9.175756336321282,
+        "s_walk": 1.6012440484256127,
+        "seed": 124055164284,
+        "steps": 204,
+        "steps_over_expected": 1.2776079043162722,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 25.60420630374681,
+        "s_walk": 13.838202242031153,
+        "seed": 124055164285,
+        "steps": 1763,
+        "steps_over_expected": 11.041287918184254,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 16.106631310634107,
+        "s_walk": 5.926172826281067,
+        "seed": 124055164274,
+        "steps": 755,
+        "steps_over_expected": 4.728401802739144,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 13.328001932483778,
+        "s_walk": 4.764485967619348,
+        "seed": 124055164275,
+        "steps": 607,
+        "steps_over_expected": 3.8015097937253786,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 7.7785924117146195,
+        "s_walk": 1.3500685114176736,
+        "seed": 124055164272,
+        "steps": 172,
+        "steps_over_expected": 1.0771988212862686,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 8.47717437401795,
+        "s_walk": 0.9105113216537798,
+        "seed": 124055164273,
+        "steps": 116,
+        "steps_over_expected": 0.7264829259837626,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 10.031323009254574,
+        "s_walk": 1.8916657630910425,
+        "seed": 124055164278,
+        "steps": 241,
+        "steps_over_expected": 1.5093309065697136,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 9.88218753415611,
+        "s_walk": 1.5933948128941147,
+        "seed": 124055164279,
+        "steps": 203,
+        "steps_over_expected": 1.2713451204715847,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 11.585471644491198,
+        "s_walk": 2.1035951224414915,
+        "seed": 124055164276,
+        "steps": 268,
+        "steps_over_expected": 1.6784260703762792,
+        "verified": true
+      },
+      {
+        "planted": 9331,
+        "s": 6.813136441340353,
+        "s_walk": 0.8084712597443046,
+        "seed": 124055164277,
+        "steps": 103,
+        "steps_over_expected": 0.6450667360028237,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 278926377.0708824,
+          "group_ops": {
+            "adds": 1920,
+            "doubles": 3071,
+            "scalar_mults": 254
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 51,
+            "pkm_grid_fp_mults_uncharged": 244798,
+            "pkm_system_fp_mults_uncharged": 2286,
+            "pkm_system_specialisations": 127,
+            "pkm_system_terms": 2032,
+            "relations": 51,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 127,
+            "solver_ops": 94952087615,
+            "sqrt_solves": 0,
+            "target_guard_probes": 127,
+            "trials": 127,
+            "unliftable_systems": 0
+          },
+          "wall_ns": 13781415167,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 254
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 7, mode chain, engine f4",
+        "gae_before_solver": 4992.990852,
+        "hit_rate": 0.4015748031496063,
+        "name": "pkm-semaev",
+        "relations_found": 51,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 193458
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 127,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3450,
+            "max_nnz_max": 1028386,
+            "max_rows_max": 3716,
+            "refutations": 76,
+            "staircase_stops": 0,
+            "steps": 2667
+          },
+          "gae": 278921384.0800304,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1449837903387523,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 94952087615,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 635,
+          "wall_ns": 13766513563
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 15,
+          "n_vars": 14,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 127
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 71,
+        "columns": 71,
+        "cost": {
+          "gae": 4598.75482,
+          "group_ops": {
+            "adds": 1699,
+            "doubles": 2456,
+            "scalar_mults": 366
+          },
+          "native": {
+            "aux_bsgs_table_entries": 241,
+            "aux_count_gae": 198,
+            "aux_curves_filtered_out": 172,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 175,
+            "aux_filter_false_positives": 1,
+            "aux_legendre_symbols": 404,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 3698,
+            "aux_sqrt_solves": 189,
+            "aux_tower_build_gae": 457,
+            "aux_two_sylow_rejected": 1,
+            "legendre_symbols": 532,
+            "sqrt_solves": 260,
+            "velu_evaluations_uncharged": 14
+          },
+          "wall_ns": 345250,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 426,
+            "index_point_negations": 142,
+            "index_sort_word_ops": 568
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 7, seed = 0; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 142
+      },
+      "group_order": 16231,
+      "instance": "icv1-fp14-tm43-158b6914",
+      "label": "prime-isogeny[aux=ordinary,seed=0,t=7] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + random",
+      "linear_algebra": {
+        "cost": {
+          "gae": 14.099119999999997,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 72,
+            "pinned_by_repeated_row": 0,
+            "rank": 51,
+            "repeated_column_rows": 0,
+            "row_ops": 680,
+            "rows": 51,
+            "single_column_rows": 2,
+            "two_column_rows": 49
+          },
+          "wall_ns": 136124,
+          "work_native": {
+            "column_part_inserts": 51,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 13853,
+            "pivot_inversion_steps": 1428,
+            "row_build_modr_adds": 153,
+            "row_build_modr_muls": 102,
+            "row_build_words": 10914,
+            "row_key_mixes": 100
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 51,
+        "rows": 51,
+        "work": 680,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 13.986464267334126,
+      "r": 16231,
+      "recovered": 9331,
+      "rho_s": 1.9157040469062554,
+      "s": 2189395.18608933,
+      "s_over_rho": 1142867.1300376845,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "0",
+          "t": "7"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 123212651130,
+        "solver": null,
+        "solver_budget_seconds": 30,
+        "solver_params": {},
+        "targets": "Random"
+      },
+      "total_gae": 278931008.9248224,
+      "verified": true,
+      "verify": {
+        "gae": 19.0,
+        "group_ops": {
+          "adds": 6,
+          "doubles": 13,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1250
+      },
+      "wall_seconds": 13.782283833
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "217cb14dba455c846e1069d7afc1a833791ba87077b8f425ffa5620a03004d7a",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

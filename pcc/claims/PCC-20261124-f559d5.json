@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:50:41Z",
+ "id": "PCC-20261124-f559d5",
+ "kind": "statement",
+ "producer": {
+  "commit": "345ec56c03861ff31f811b702973857816260ba1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/accounting.json",
+    "sha256": "654a2fc44329e7dff9b240a08f6c43f7f34187547afdf937cfca6627b15b0109"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/build-cost.json",
+    "sha256": "e8bd8af87228c0125635813532436b98f3a67920e4617f60dfa91148cdce2ac1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/templates-cost.json",
+    "sha256": "7f5bea5c53886fce9e6f809b56629687532b4e94ca32d966ffe0758b78597ff5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/u-cost.json",
+    "sha256": "c724b503a44928fd7c17acd00620475fba357fe0faac141b0866617e2b6b1df6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/v-cost.json",
+    "sha256": "6840942ce7fcd23c17c7c165bec98aefb066d452c7a554bb1b242d01f3374714"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/w-cost.json",
+    "sha256": "c6bcf77f994b126da0018ff006193b3eb1b1211260c7e73fa364c621fc4bbe75"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/collision-cost.json",
+    "sha256": "03dbd2dcb3de19e0f17cbae9744a3eacab32564882eaa9a74e1d5c53b5d5d553"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/three_row_20261124/evidence/qualification-v1/unknown-cost.json",
+    "sha256": "75bef97300cda7747805b70a39114f9292321f530b36e49608df3a1f0be0e79c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "recorded local development costs for the frozen P192 three-row audit",
+ "statement": "The accounting receipt copies seven native process cost records and exits: strict build, structural enumeration, U/V/W query arms and two rejecting CLI controls. It explicitly excludes metadata/staging/publication/rendering, original map synthesis/setup, admitted collection and independent signing. These are local diagnostic costs with no admitted benchmark, complete end-to-end cost or speed comparison claim."
+}

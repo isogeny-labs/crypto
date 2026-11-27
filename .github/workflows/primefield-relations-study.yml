@@ -1,0 +1,60 @@
+name: M31 shared-selector study
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/primefield_relations_20261125/**'
+      - '.github/workflows/primefield-relations-study.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: research/primefield_relations_20261125
+          sparse-checkout-cone-mode: true
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.100.0'
+      - name: Replay fixed M31 evidence
+        shell: bash
+        run: |
+          RUSTC="$(rustup which rustc)" bash research/primefield_relations_20261125/check.sh \
+            "$RUNNER_TEMP/m31-shared-selector-replay" attempt-002
+      - name: Check counted M31 measurement contracts
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/m31-shared-selector-replay"
+          CARGO_TARGET_DIR="$RUNNER_TEMP/m31-shared-selector-measurement-target" \
+            cargo test --manifest-path research/primefield_relations_20261125/measurement/Cargo.toml \
+              --offline --locked --release --bins -- --test-threads=1 \
+              > "$RUNNER_TEMP/m31-shared-selector-replay/measurement-tests.stdout" \
+              2> "$RUNNER_TEMP/m31-shared-selector-replay/measurement-tests.stderr"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: m31-shared-selector-replay
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/m31-shared-selector-replay/*.json
+            ${{ runner.temp }}/m31-shared-selector-replay/*.txt
+            ${{ runner.temp }}/m31-shared-selector-replay/*.tsv
+            ${{ runner.temp }}/m31-shared-selector-replay/*.stdout
+            ${{ runner.temp }}/m31-shared-selector-replay/*.stderr
+            ${{ runner.temp }}/m31-shared-selector-replay/*.sha256
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/*.json
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/*.stdout
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/*.stderr
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/*.txt
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/*.sha256
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/frozen/source-manifest.sha256
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/frozen/QUALIFIER.md
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/frozen/run.sh
+            research/primefield_relations_20261125/shared-terminal-gate/results/attempt-002/frozen/src/*.rs

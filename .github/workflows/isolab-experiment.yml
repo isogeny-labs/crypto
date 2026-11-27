@@ -28,6 +28,10 @@ on:
         description: Run the frozen exact norm-branch rank census as one non-timing Spot command Job
         type: boolean
         default: false
+      rr5_b677_gate:
+        description: Run the registered RR5 B677 correctness gate with fixed targets and limits
+        type: boolean
+        default: false
       instance_type:
         description: Spot worker type; c8a has one thread per core
         type: string
@@ -77,6 +81,8 @@ jobs:
           bash taskq/deploy/eks-karpenter/test-checkpoint-source.sh
           taskq/deploy/eks-karpenter/remote/test-launch-remote.sh
           taskq/deploy/eks-karpenter/remote/test-launch-remote-command.sh
+          bash taskq/deploy/eks-karpenter/rr5-b677/test-contract.sh
+          bash taskq/deploy/eks-karpenter/rr5-b677/test-artifacts.sh
           taskq/deploy/eks-karpenter/test-censored-gates.sh
           taskq/deploy/eks-karpenter/test-ic-sweep.sh
           taskq/deploy/eks-karpenter/resume/test-publisher.sh
@@ -98,6 +104,17 @@ jobs:
     env:
       SOURCE_REVISION: ${{ inputs.source_revision || github.sha }}
     steps:
+      - name: Validate fixed RR5 mode before building
+        if: inputs.rr5_b677_gate
+        env:
+          PUBLISH_ONLY: ${{ inputs.publish_only }}
+          SIZE_SWEEP: ${{ inputs.size_sweep }}
+          RESUMABLE: ${{ inputs.resumable }}
+          NORM_BRANCH_CENSUS: ${{ inputs.norm_branch_census }}
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$PUBLISH_ONLY" != true && "$SIZE_SWEEP" != true && "$RESUMABLE" != true && "$NORM_BRANCH_CENSUS" != true ]]
       - name: Validate the immutable source revision
         run: '[[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]'
       - name: Check out workflow tooling
@@ -121,12 +138,23 @@ jobs:
             tests
             examples
       - name: Materialize native build inputs
+        if: '!inputs.rr5_b677_gate'
         working-directory: source
         run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path research/prime_leads_chase_20261113/norm-branch-census --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
+      - name: Materialize the complete fixed RR5 source closure
+        if: inputs.rr5_b677_gate
+        working-directory: source
+        run: |
+          git sparse-checkout set --no-cone /src/ /crates/ /examples/prime31_rr5_quartic.rs \
+            /research/prime31_four_summand_20261122/ /research/prime31_ic_20261115/native/ \
+            /research/cheap_ecdlp_cold_gate_20261123/ \
+            /research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv \
+            /taskq/deploy/eks-karpenter/rr5-b677/ /.gitignore
       # build-bundle compiles ecbench + isolab-fresh-owner from Git-tracked Rust
       # only. five_leads / pencil study logs are store-backed, unrecovered while
       # S3 is AllAccessDisabled, and are not compile inputs — do not pull them.
       - name: Skip unrecovered research store hydration for the native build
+        if: '!inputs.rr5_b677_gate'
         working-directory: source
         run: |
           set -euo pipefail
@@ -137,8 +165,15 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends musl-tools
           rustup toolchain install 1.99.1 --profile minimal --target x86_64-unknown-linux-musl
+      - name: Install the RR5 qualification toolchain
+        if: inputs.rr5_b677_gate
+        run: rustup toolchain install 1.100.0 --profile minimal --target x86_64-unknown-linux-musl
       - name: Build the tested commit without AWS credentials
+        if: '!inputs.rr5_b677_gate'
         run: control/taskq/deploy/eks-karpenter/build-bundle source "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-build"
+      - name: Build and qualify the fixed RR5 payload without AWS credentials
+        if: inputs.rr5_b677_gate
+        run: control/taskq/deploy/eks-karpenter/rr5-b677/build-bundle source "$SOURCE_REVISION" "$RUNNER_TEMP/rr5-b677-build"
       - name: Build the frozen norm-branch census payload without AWS credentials
         if: inputs.norm_branch_census
         working-directory: source
@@ -171,6 +206,7 @@ jobs:
             "$RUNNER_TEMP/isolab-build/build-info.json" > "$RUNNER_TEMP/isolab-build/build-info.next.json"
           mv "$RUNNER_TEMP/isolab-build/build-info.next.json" "$RUNNER_TEMP/isolab-build/build-info.json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: '!inputs.rr5_b677_gate'
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -184,11 +220,21 @@ jobs:
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
+      - name: Retain the RR5 build including failures
+        if: always() && inputs.rr5_b677_gate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rr5-b677-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-b677-build
+          if-no-files-found: warn
+          retention-days: 21
+          compression-level: 0
   experiment:
     needs: build
     if: >-
       !github.event.pull_request.draft &&
-      (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+      (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') &&
+      (!inputs.rr5_b677_gate || github.ref == 'refs/heads/main')
     runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 150
     permissions:
@@ -206,10 +252,29 @@ jobs:
         with:
           persist-credentials: false
           sparse-checkout: |
+            scripts
             taskq/deploy/eks-karpenter
             tools/artifacts
             .artifacts
             research/rootfind_k13_l2_admission_probe_20261116
+      - name: Check out the exact RR5 checkpoint source
+        if: inputs.rr5_b677_gate
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ env.SOURCE_REVISION }}
+          path: rr5-checkpoint-source
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/
+            /crates/
+            /examples/prime31_rr5_quartic.rs
+            /research/prime31_four_summand_20261122/
+            /research/prime31_ic_20261115/native/
+            /research/cheap_ecdlp_cold_gate_20261123/
+            /research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv
+            /taskq/deploy/eks-karpenter/rr5-b677/
+            /.gitignore
       - name: Check out the tested norm-branch checkpoint inputs
         if: inputs.norm_branch_census
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -221,6 +286,7 @@ jobs:
             scripts
             research/prime_leads_chase_20261113/norm-branch-census
       - name: Pull store data this workflow reads (tools/artifacts)
+        if: '!inputs.rr5_b677_gate'
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -259,17 +325,29 @@ jobs:
           printf 'pull_paths=%s\n' "${#pull_paths[@]}"
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${pull_paths[@]}"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        if: '!inputs.rr5_b677_gate'
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/isolab-build
+      - name: Download the tested RR5 payload
+        if: inputs.rr5_b677_gate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rr5-b677-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-b677-build
       - name: Validate mutually exclusive experiment modes
         env:
           PUBLISH_ONLY: ${{ inputs.publish_only }}
           SIZE_SWEEP: ${{ inputs.size_sweep }}
           RESUMABLE: ${{ inputs.resumable }}
           NORM_BRANCH_CENSUS: ${{ inputs.norm_branch_census }}
+          RR5_B677_GATE: ${{ inputs.rr5_b677_gate }}
         run: |
           set -euo pipefail
+          if [[ "$RR5_B677_GATE" == true ]]; then
+            [[ "$GITHUB_REF" == refs/heads/main ]]
+            [[ "$PUBLISH_ONLY" != true && "$SIZE_SWEEP" != true && "$RESUMABLE" != true && "$NORM_BRANCH_CENSUS" != true ]]
+          fi
           if [[ "$NORM_BRANCH_CENSUS" == true && ( "$PUBLISH_ONLY" == true || "$SIZE_SWEEP" == true || "$RESUMABLE" == true ) ]]; then
             echo 'norm_branch_census cannot be combined with publish_only, size_sweep, or resumable' >&2
             exit 2
@@ -283,7 +361,7 @@ jobs:
             sudo "$RUNNER_TEMP/awscli-install/aws/install"
           fi
       - name: Read the experiment spec from the tested commit
-        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
+        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.rr5_b677_gate'
         env:
           GH_TOKEN: ${{ github.token }}
           SPEC_PATH: ${{ inputs.spec_path }}
@@ -323,7 +401,83 @@ jobs:
           scripts/checkpoint.sh gate
           install -m644 .resume/.last-push "$RUNNER_TEMP/norm-branch-checkpoint.txt"
           grep -F "s3://$CHECKPOINT_BUCKET/$CHECKPOINT_PREFIX/" "$RUNNER_TEMP/norm-branch-checkpoint.txt"
+      - name: Checkpoint the exact RR5 inputs before publication or launch
+        if: inputs.rr5_b677_gate
+        working-directory: rr5-checkpoint-source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          CHECKPOINT_AWS_PROFILE: github-oidc-ambient
+          CHECKPOINT_AWS_REGION: us-east-2
+          CHECKPOINT_BUCKET: setec-astronomy-artifacts
+          CHECKPOINT_PREFIX: checkpoints
+          CHECKPOINT_SESSION: github-actions-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          mkdir -p "$RUNNER_TEMP/rr5-receipts"
+          # The checked-in trigger role has no ListBucket/raw-record grant.
+          # Fail before publishing or launching if this necessary readback
+          # permission is absent. Object-read authorization is also required;
+          # this list probe alone does not establish it or grant any access.
+          aws s3api list-objects-v2 --bucket "$ISOLAB_BUCKET" --prefix runs/ \
+            --max-keys 1 --query '{KeyCount:KeyCount}' \
+            > "$RUNNER_TEMP/rr5-receipts/readback-list-access.json"
+          sha256sum -c "$RUNNER_TEMP/rr5-b677-build/source.sha256" > "$RUNNER_TEMP/rr5-receipts/source-readback.txt"
+          paths=()
+          while IFS= read -r line; do paths+=(--path "${line:66}"); done < "$RUNNER_TEMP/rr5-b677-build/source.sha256"
+          python3 ../taskq/deploy/eks-karpenter/check-experiment-git --repository "$GITHUB_REPOSITORY" "${paths[@]}" \
+            > "$RUNNER_TEMP/rr5-receipts/publication.json"
+          git update-ref refs/remotes/origin/checkpoint-source "$SOURCE_REVISION"
+          install -d -m755 .resume
+          install -m644 ../taskq/deploy/eks-karpenter/rr5-b677/RESUME.md .resume/RESUME.md
+          printf '\nWorkflow run: %s/%s; exact tested source: %s.\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$SOURCE_REVISION" >> .resume/RESUME.md
+          # Use trusted workflow tooling, never a script from the selected source
+          # revision, while the publisher job holds AWS credentials.
+          ../scripts/checkpoint.sh gate
+          install -m644 .resume/.last-push "$RUNNER_TEMP/rr5-receipts/checkpoint.txt"
+          grep -F "s3://$CHECKPOINT_BUCKET/$CHECKPOINT_PREFIX/" "$RUNNER_TEMP/rr5-receipts/checkpoint.txt"
+      - name: Publish the fixed RR5 payload and resolve the image digest
+        if: inputs.rr5_b677_gate
+        run: taskq/deploy/eks-karpenter/rr5-b677/publish-image "$RUNNER_TEMP/rr5-b677-build" "$SOURCE_REVISION" "$RUNNER_TEMP/rr5-receipts/image.json"
+      - name: Prepare the fixed RR5 command request
+        if: inputs.rr5_b677_gate
+        env:
+          INSTANCE_TYPE: ${{ inputs.instance_type }}
+          DEADLINE: ${{ inputs.seconds }}
+        run: |
+          set -euo pipefail
+          taskq/deploy/eks-karpenter/rr5-b677/prepare-request "$RUNNER_TEMP/rr5-receipts/image.json" \
+            "$SOURCE_REVISION" "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-rr5" "$INSTANCE_TYPE" "$DEADLINE" \
+            > "$RUNNER_TEMP/rr5-receipts/request.json"
+      - name: Launch the registered RR5 correctness gate once
+        id: rr5_launch
+        if: inputs.rr5_b677_gate
+        run: taskq/deploy/eks-karpenter/remote/launch-remote-command "$RUNNER_TEMP/rr5-receipts/request.json"
+      - name: Collect RR5 receipts including scientific failures
+        if: always() && inputs.rr5_b677_gate && steps.rr5_launch.outcome != 'skipped'
+        run: |
+          taskq/deploy/eks-karpenter/rr5-b677/collect "$RUNNER_TEMP/rr5-receipts/image.json" \
+            "$RUNNER_TEMP/rr5-receipts/request.json" "$ISOLAB_CLIENT_OUTPUT" \
+            "$RUNNER_TEMP/rr5-b677-build" "$RUNNER_TEMP/rr5-receipts/evidence"
+      - name: Preserve RR5 launcher diagnostics after any outcome
+        if: always() && inputs.rr5_b677_gate
+        run: |
+          mkdir -p "$RUNNER_TEMP/rr5-receipts"
+          if [[ -d "$ISOLAB_CLIENT_OUTPUT" ]]; then
+            cp -R "$ISOLAB_CLIENT_OUTPUT" "$RUNNER_TEMP/rr5-receipts/client-retained"
+          fi
+      - name: Retain RR5 publication and command receipts
+        if: always() && inputs.rr5_b677_gate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rr5-b677-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-receipts
+          if-no-files-found: warn
+          retention-days: 30
       - name: Publish the commit image and resolve its immutable digest
+        if: '!inputs.rr5_b677_gate'
         run: taskq/deploy/eks-karpenter/publish-image "$RUNNER_TEMP/isolab-build" "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-image.json"
       - name: Publish the frozen norm-branch payload as a digest-pinned layer
         if: inputs.norm_branch_census
@@ -365,7 +519,7 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
       - name: Prepare the versioned experiment request
-        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
+        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.rr5_b677_gate'
         env:
           INSTANCE_TYPE: ${{ inputs.instance_type }}
           DEADLINE: ${{ inputs.seconds }}
@@ -451,10 +605,10 @@ jobs:
           checker_verdict=$(grep -o 'verdict=[A-Z_]*' "$artifacts/checker.stdout")
           [[ -n "$producer_verdict" && "$producer_verdict" == "$checker_verdict" ]]
       - name: Launch, await and verify the EKS experiment
-        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
+        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.rr5_b677_gate'
         run: taskq/deploy/eks-karpenter/remote/launch-remote "$RUNNER_TEMP/isolab-request.json"
       - name: Submit resumable computation and verify its fresh L2 epoch
-        if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
+        if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.rr5_b677_gate'
         run: |
           set -euo pipefail
           taskq/deploy/eks-karpenter/resume/fetch-client "$RUNNER_TEMP/isolab-recovery-client"
@@ -462,7 +616,7 @@ jobs:
           "$client" submit "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
           "$client" wait "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
       - name: Report the outcome
-        if: always() && !inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census
+        if: always() && !inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.rr5_b677_gate
         run: |
           if [[ -f "$ISOLAB_CLIENT_OUTPUT/result.json" ]]; then
             if jq -e '.schema=="isolab.eks.recovery-result/v1"' "$ISOLAB_CLIENT_OUTPUT/result.json" >/dev/null; then
@@ -512,3 +666,47 @@ jobs:
       - name: Report publication-only scope
         if: always() && inputs.publish_only
         run: printf 'Publication-only request. No experiment submission was requested; inspect publication receipts and job status.\n' >> "$GITHUB_STEP_SUMMARY"
+  rr5-replay:
+    needs: [build, experiment]
+    if: always() && inputs.rr5_b677_gate && needs.build.result == 'success' && needs.experiment.result != 'skipped'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out trusted receipt tooling
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: taskq/deploy/eks-karpenter/rr5-b677
+      - name: Download the exact tested binary bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rr5-b677-build-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-b677-build
+      - name: Download the recorded execution evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: rr5-b677-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-receipts
+      - name: Replay recorded rows without AWS credentials
+        run: |
+          taskq/deploy/eks-karpenter/rr5-b677/replay "$RUNNER_TEMP/rr5-b677-build" \
+            "$RUNNER_TEMP/rr5-receipts/evidence" "$RUNNER_TEMP/rr5-replay"
+      - name: Retain RR5 replay results including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: rr5-b677-replay-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/rr5-replay
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Report the qualified RR5 outcome
+        if: always()
+        run: |
+          if [[ -f "$RUNNER_TEMP/rr5-replay/replay.json" ]]; then
+            jq -r '"RR5 fixed gate passed: \(.fixed_gate_passed). [pcc:unverified]\n\nSource: \(.source_revision)\n\nAll four calls replayed: \(.all_four_calls_replayed); per-call identity checks passed: \(.per_call_identity_checks_passed). [pcc:unverified]\n\nExtraction completeness remains source-bound; there is no cold ECDLP cost or speed claim."' \
+              "$RUNNER_TEMP/rr5-replay/replay.json" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf 'No qualified RR5 outcome. Inspect retained build, checkpoint, launcher, transport and replay diagnostics.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi

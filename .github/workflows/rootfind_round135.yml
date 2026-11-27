@@ -2,12 +2,13 @@ name: Rootfind Round 135 guarded Atkin source-exact A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round135-atkin-p5mod8-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round135/**
       - .github/workflows/rootfind_round135.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -26,7 +27,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --no-tags --depth=1 origin automation/rootfind-round134-jacobi-tonelli-20261123
+          # Historical round 134 baseline from merged PR #5003.
+          git fetch --no-tags --depth=1 origin ba91444f6158aa0ce4230a3e28243c606871e1fc
           mkdir -p /tmp/rootfind_round135
           git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round135/baseline.rs
           cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round135/optimized.rs

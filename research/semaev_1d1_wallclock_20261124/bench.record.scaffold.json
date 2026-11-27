@@ -1,0 +1,101 @@
+{
+  "branch": "claude/semaev-projection-1d1-bench-20261124",
+  "closed_utc": null,
+  "commands": [],
+  "commit": "fb383f5562968c3cc318d88731e4d3124bac2067",
+  "commit_dirty": false,
+  "created_utc": "2026-11-24T16:56:24+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v819-x86_64-with-glibc2.39"
+  },
+  "id": "20261124T1656Z-semaev-1d1-fastpath-wallclock",
+  "metrics": [
+    {
+      "baseline": 0.006017971,
+      "better": "lower",
+      "n": 21,
+      "name": "build_wall_s_b64_fast",
+      "note": "build_fast, B=64 (2080 pairs), median of 21; baseline=generic path median, same binary; contended shared VM (loadavg~14 on 4 cores), no PMU, NOT isolab; spread=min..max",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.000981769,
+        0.005736744
+      ],
+      "unit": "wall_s",
+      "value": 0.001201067
+    },
+    {
+      "baseline": 0.020447822,
+      "better": "lower",
+      "n": 21,
+      "name": "q3_wall_s_100targets_fast",
+      "note": "decompose_three_fast_path over 100 targets, median of 21; baseline=generic path median, same binary; contended shared VM (loadavg~14 on 4 cores), no PMU, NOT isolab; spread=min..max",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.001085716,
+        0.00512553
+      ],
+      "unit": "wall_s",
+      "value": 0.001106981
+    },
+    {
+      "baseline": 1.397816275,
+      "better": "lower",
+      "n": 21,
+      "name": "q4_wall_s_100targets_fast",
+      "note": "decompose_four_fast_path over 100 targets, median of 21; baseline=generic path median, same binary; contended shared VM (loadavg~14 on 4 cores), no PMU, NOT isolab; spread=min..max",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.066846016,
+        0.141208998
+      ],
+      "unit": "wall_s",
+      "value": 0.095162457
+    }
+  ],
+  "problem": "kernel:semaev_projection_1d1_fastpath",
+  "raw": [
+    {
+      "bytes": 4020,
+      "path": "research/semaev_1d1_wallclock_20261124/raw_wallclock.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/7344f0c914b1a25b18016d16cdafb237774ad3c4186bb1a99196d9f18958b891",
+      "sha256": "7344f0c914b1a25b18016d16cdafb237774ad3c4186bb1a99196d9f18958b891",
+      "uploaded": false
+    },
+    {
+      "bytes": 28,
+      "path": "research/semaev_1d1_wallclock_20261124/host_loadavg_before.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d3/d3e6df0518423a52714c71966770fa1775a96ebbe712f0de6f4260fb173c0903",
+      "sha256": "d3e6df0518423a52714c71966770fa1775a96ebbe712f0de6f4260fb173c0903",
+      "uploaded": false
+    },
+    {
+      "bytes": 29,
+      "path": "research/semaev_1d1_wallclock_20261124/host_loadavg_after.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d27f321ede9b1d4dcc279c924dc7d1ae6fb6b5eca9950bb85007e8b7a6cb125",
+      "sha256": "4d27f321ede9b1d4dcc279c924dc7d1ae6fb6b5eca9950bb85007e8b7a6cb125",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "semaev-1d1-fastpath-wallclock",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

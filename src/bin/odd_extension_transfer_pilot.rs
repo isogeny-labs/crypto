@@ -89,7 +89,7 @@ impl CatalogK2 {
             return Err(FieldError::InvalidModulus);
         }
         let (c0, c1) = (low[0], low[1]);
-        if (0..p).any(|root| (mul(root, root, p) + mul(c1, root, p) + c0) % p == 0) {
+        if (0..p).any(|root| (mul(root, root, p) + mul(c1, root, p) + c0).is_multiple_of(p)) {
             return Err(FieldError::ReducibleModulus);
         }
         if c1 != 0 {
@@ -122,6 +122,7 @@ impl CatalogK2 {
         K2 { a: 1, b: 0 }
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn from_base(&self, value: u64) -> K2 {
         K2 {
             a: value % self.p,
@@ -218,6 +219,7 @@ impl CatalogK2 {
             .element(value.a, mul(value.b, self.reference_scale, self.p))
     }
 
+    #[allow(clippy::wrong_self_convention)]
     fn from_reference(&self, value: Fp2) -> K2 {
         K2 {
             a: value.a % self.p,
@@ -943,7 +945,7 @@ fn neg(value: u64, p: u64) -> u64 {
 }
 
 fn inverse(value: u64, p: u64) -> Option<u64> {
-    (value % p != 0).then(|| {
+    (!value.is_multiple_of(p)).then(|| {
         (1..p)
             .find(|candidate| mul(value, *candidate, p) == 1)
             .expect("nonzero element in a pilot prime field")

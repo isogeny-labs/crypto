@@ -16,8 +16,8 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use crypto_lib::cryptanalysis::jacobian_transfer::{
-    class_name, cost::CostModel, report, CurveTransfers, RouteClass, TransferFile,
-    DEFAULT_FACTOR_BUDGET,
+    class_name, cost::CostModel, read_registry, report, CurveTransfers, Field, RegistryCurve,
+    RouteClass, TransferFile, DEFAULT_FACTOR_BUDGET,
 };
 
 const REGISTRY: &str = "docs/curves/registry.json";
@@ -54,6 +54,19 @@ enum Cmd {
         catalog: String,
         #[arg(long, default_value = OUT)]
         report: String,
+    },
+    /// Inventory extension fields for security review (not a security verdict).
+    ExtensionFields {
+        #[arg(long, default_value = REGISTRY)]
+        registry: String,
+        #[arg(long, default_value = OUT)]
+        report: String,
+        /// Manifest used to check the report's source-row digest.
+        #[arg(long, default_value = CATALOG)]
+        catalog: String,
+        /// Case-insensitive substring of the slug or standard name.
+        #[arg(long)]
+        name: Option<String>,
     },
     /// Every route of one curve (slug, standard name or legacy spelling).
     Show {
@@ -174,6 +187,58 @@ fn show(c: &CurveTransfers) {
     }
 }
 
+fn extension_inventory(
+    curves: &[RegistryCurve],
+    report: &TransferFile,
+    name: Option<&str>,
+) -> serde_json::Value {
+    let included: std::collections::HashSet<&str> =
+        report.curves.iter().map(|c| c.slug.as_str()).collect();
+    let filter = name.map(str::to_lowercase);
+    let mut rows: Vec<_> = curves.iter().filter_map(|c| {
+        let (characteristic, degree, kind) = match &c.field {
+            Field::Binary { n, .. } if *n > 1 => ("2".to_string(), *n, "binary"),
+            Field::Extension { p, k } => (p.to_string(), *k, "extension"),
+            _ => return None,
+        };
+        if let Some(query) = &filter {
+            if !c.slug.to_lowercase().contains(query) && !c.standard_names.iter().any(|n| n.to_lowercase().contains(query)) {
+                return None;
+            }
+        }
+        Some(serde_json::json!({
+            "slug": c.slug, "standard_names": c.standard_names, "family": c.family,
+            "field_kind": kind, "characteristic": characteristic, "extension_degree": degree,
+            "group_order": c.order.to_string(),
+            "recorded_subgroup_order": c.subgroup_order.as_ref().map(ToString::to_string),
+            "subgroup_order_status": if c.subgroup_order.is_some() { "registry_recorded_unverified" } else { "missing" },
+            "included_in_transfer_report": included.contains(c.slug.as_str()),
+            "security_review": "requires_concrete_assessment"
+        }))
+    }).collect();
+    rows.sort_by(|a, b| a["slug"].as_str().cmp(&b["slug"].as_str()));
+    serde_json::json!({
+        "scope": "all parseable registry rows over extension fields; report membership does not establish report freshness",
+        "note": "A field alone is not a security verdict; the Diem theorem is asymptotic and does not assign a fixed-instance work factor.",
+        "count": rows.len(), "curves": rows
+    })
+}
+
+fn report_input_digest(
+    registry: &str,
+    manifest: &str,
+    report: &TransferFile,
+) -> Result<serde_json::Value, String> {
+    let restricted = crypto_lib::cryptanalysis::cover_catalog::restrict(registry, manifest)?;
+    let digest = crypto_lib::cryptanalysis::cover_catalog::rows_sha256(&restricted);
+    Ok(serde_json::json!({
+        "status": if digest == report.catalog_rows_sha256 { "matching" } else { "mismatch" },
+        "current": digest,
+        "report": report.catalog_rows_sha256,
+        "scope": "manifest-selected registry rows only; matching does not verify report calculations or code freshness"
+    }))
+}
+
 fn run(cli: Cli) -> Result<bool, String> {
     match cli.cmd {
         Cmd::Build {
@@ -222,6 +287,26 @@ fn run(cli: Cli) -> Result<bool, String> {
                 parsed.factor_budget
             );
             Ok(false)
+        }
+        Cmd::ExtensionFields {
+            registry,
+            report,
+            catalog,
+            name,
+        } => {
+            let text =
+                std::fs::read_to_string(&registry).map_err(|e| format!("{registry}: {e}"))?;
+            let manifest =
+                std::fs::read_to_string(&catalog).map_err(|e| format!("{catalog}: {e}"))?;
+            let curves = read_registry(&text)?;
+            let file = load(&report)?;
+            let mut inventory = extension_inventory(&curves, &file, name.as_deref());
+            inventory["report_input_digest"] = report_input_digest(&text, &manifest, &file)?;
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&inventory).map_err(|e| e.to_string())?
+            );
+            Ok(true)
         }
         Cmd::Show { name, report, json } => {
             let file = load(&report)?;
@@ -357,5 +442,61 @@ fn main() -> ExitCode {
             eprintln!("error: {e}");
             ExitCode::FAILURE
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn report_digest_detects_mismatch_and_only_confirms_input_equality() {
+        let registry = std::fs::read_to_string(REGISTRY).unwrap();
+        let manifest = std::fs::read_to_string(CATALOG).unwrap();
+        let mut report = load(OUT).unwrap();
+        report.catalog_rows_sha256 = "deliberately different".into();
+        let mismatch = report_input_digest(&registry, &manifest, &report).unwrap();
+        assert_eq!(mismatch["status"], "mismatch");
+        report.catalog_rows_sha256 = mismatch["current"].as_str().unwrap().to_string();
+        let matching = report_input_digest(&registry, &manifest, &report).unwrap();
+        assert_eq!(matching["status"], "matching");
+        assert!(matching["scope"]
+            .as_str()
+            .unwrap()
+            .contains("does not verify"));
+        assert!(report_input_digest(&registry, "{}", &report).is_err());
+    }
+
+    #[test]
+    fn inventory_finds_both_extension_families_and_reports_membership() {
+        let curves = read_registry(&std::fs::read_to_string(REGISTRY).unwrap()).unwrap();
+        let report = load(OUT).unwrap();
+        let result = extension_inventory(&curves, &report, None);
+        let rows = result["curves"].as_array().unwrap();
+        let expected = curves
+            .iter()
+            .filter(|c| match &c.field {
+                Field::Binary { n, .. } => *n > 1,
+                Field::Extension { .. } => true,
+                _ => false,
+            })
+            .count();
+        assert_eq!(rows.len(), expected);
+        assert!(rows.iter().any(|r| r["field_kind"] == "binary"));
+        assert!(rows.iter().any(|r| r["field_kind"] == "extension"));
+        assert!(rows
+            .iter()
+            .any(|r| r["included_in_transfer_report"] == false));
+        assert!(rows
+            .iter()
+            .any(|r| r["subgroup_order_status"] == "missing"
+                && r["recorded_subgroup_order"].is_null()));
+        let first = rows[0]["slug"].as_str().unwrap();
+        let found = extension_inventory(&curves, &report, Some(&first.to_uppercase()));
+        assert!(found["curves"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r["slug"] == first));
     }
 }

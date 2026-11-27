@@ -1111,7 +1111,7 @@ fn supported_direct_record(
         "recovered_generator": point_json(&recovered),
         "field_primality": prime_proof_evidence(cover.modulus()),
         "exact_order_evidence": {
-            "annihilator_primality": prime_proof_evidence(&annihilator),
+            "annihilator_primality": prime_proof_evidence(annihilator),
             "generated_subgroup_cardinality": {
                 "status": "proved",
                 "argument": "prime annihilator plus checked nonidentity and annihilation",
@@ -1340,6 +1340,7 @@ fn odd_transfer_catalog(
 
         let graph_map = &graph_maps[&map_uid];
         let family;
+        #[allow(clippy::needless_late_init)]
         let map_status;
         let mut named_subgroups = Vec::new();
         let mut failures = Vec::new();

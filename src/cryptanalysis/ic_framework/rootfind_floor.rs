@@ -106,6 +106,8 @@ impl WordBloom {
 pub struct RootfindFloorOracle<'i> {
     m: u32,
     instance: &'i PrimeInstance,
+    /// Versioned production identity that requires lane target scheduling.
+    batch_v1: bool,
     field: Option<Fp64>,
     reps: Arc<Vec<FloorRep>>,
     /// `m = 2`: Montgomery abscissa → (plus, minus) base indices.
@@ -137,6 +139,7 @@ impl<'i> RootfindFloorOracle<'i> {
         Self {
             m,
             instance,
+            batch_v1: false,
             field: None,
             reps: Arc::new(Vec::new()),
             x_map: Arc::new(fast_map(0)),
@@ -157,6 +160,14 @@ impl<'i> RootfindFloorOracle<'i> {
             bloom_passes: 0,
             bloom_false_positives: 0,
         }
+    }
+
+    /// The production lane-batched identity. Unlike [`Self::new`], this is
+    /// rejected by the pipeline unless its target source supplies lanes.
+    pub fn new_batch_v1(m: u32, instance: &'i PrimeInstance) -> Self {
+        let mut oracle = Self::new(m, instance);
+        oracle.batch_v1 = true;
+        oracle
     }
 
     pub fn ifma_prepared(&self) -> bool {
@@ -185,6 +196,7 @@ impl<'i> RootfindFloorOracle<'i> {
         Self {
             m: self.m,
             instance: self.instance,
+            batch_v1: self.batch_v1,
             field: self.field,
             reps: Arc::clone(&self.reps),
             x_map: Arc::clone(&self.x_map),
@@ -308,7 +320,11 @@ impl<'i> RootfindFloorOracle<'i> {
 
 impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
     fn name(&self) -> &str {
-        "rootfind-floor"
+        if self.batch_v1 {
+            "rootfind-floor-batch-v1"
+        } else {
+            "rootfind-floor"
+        }
     }
 
     fn summands(&self) -> u32 {
@@ -331,6 +347,31 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
             "m",
             "summands, 2 or 3; 3 builds the negation-folded pair table",
         )]
+    }
+
+    fn preferred_batch_size(&self) -> usize {
+        if self.batch_v1 {
+            8
+        } else {
+            1
+        }
+    }
+
+    fn decompose_batch(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        points: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        assert_eq!(
+            points.len(),
+            out.len(),
+            "decompose_batch requires one output slot per point"
+        );
+        self.decompose_lanes(ctx, fb, ops, counters, points, out);
     }
 
     fn prepare(
@@ -753,8 +794,12 @@ impl RootfindFloorOracle<'_> {
                 if skip[lane] {
                     return;
                 }
-                adds += 1;
-                for (x, summand) in [(x_minus, plus[j]), (x_plus, minus[j])] {
+                // The scalar floor path charges one group addition for every
+                // signed candidate. Derive the ledger charge from the same
+                // array we probe so accounting cannot drift from the work.
+                let candidates = [(x_minus, plus[j]), (x_plus, minus[j])];
+                adds += candidates.len() as u64;
+                for (x, summand) in candidates {
                     let pass = bloom.map(|b| b.maybe(x)).unwrap_or(true);
                     if pass {
                         bloom_passes += 1;
@@ -1036,7 +1081,8 @@ mod tests {
         assert_eq!(floor.mismatches, 0);
     }
 
-    /// IFMA / scalar lanes recover the same m=3 verdicts as single decompose.
+    /// IFMA / scalar lanes recover the same m=3 verdicts as single decompose,
+    /// including deliberately planted witnesses.
     #[test]
     fn floor_lanes_match_single_m3() {
         let inst = prime_instance_for(20, 59297);
@@ -1047,9 +1093,14 @@ mod tests {
         floor
             .prepare(&c, &fb, &params, &mut GroupOps::default())
             .unwrap();
-        let mut state = 0xF100_00A5_u64;
         let mut targets = Vec::new();
-        for _ in 0..8 {
+        for [i, j, k] in [[0, 2, 4], [1, 5, 9]] {
+            let mut scratch = GroupOps::default();
+            let pair = inst.curve.add(&mut scratch, fb.points[i], fb.points[j]);
+            targets.push(inst.curve.add(&mut scratch, pair, fb.points[k]));
+        }
+        let mut state = 0xF100_00A5_u64;
+        while targets.len() < 8 {
             state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
             let mut scratch = GroupOps::default();
             targets.push(inst.curve.mul(
@@ -1064,6 +1115,16 @@ mod tests {
             let mut cters = OracleCounters::default();
             single.push(floor.decompose(&c, &fb, &mut o, &mut cters, t));
         }
+        for i in 0..2 {
+            let witness = single[i]
+                .as_ref()
+                .expect("the deliberately planted target must decompose");
+            let mut ops = GroupOps::default();
+            let sum = witness.iter().fold(inst.curve.identity(), |acc, &j| {
+                inst.curve.add(&mut ops, acc, fb.points[j])
+            });
+            assert_eq!(sum, targets[i], "planted witness {i} must re-add");
+        }
         for enable in [false, true] {
             if enable && !floor.ifma_prepared() {
                 continue;
@@ -1076,6 +1137,67 @@ mod tests {
             for i in 0..8 {
                 assert_eq!(out[i], single[i], "mode ifma={enable} lane {i}");
             }
+        }
+    }
+
+    /// Shared-inversion lanes must charge the same group additions as eight
+    /// independent scalar probes on an all-miss corpus.  In particular, the
+    /// IFMA callback emits two signed candidates per nondegenerate row.
+    #[test]
+    fn floor_lanes_match_scalar_charged_adds_on_misses_m3() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 32);
+        let c = ctx(&inst);
+        let (_, params) = Params::parse_spec("rootfind-floor:m=3").unwrap();
+        let mut floor = RootfindFloorOracle::new(3, &inst);
+        floor
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+
+        let mut state = 0xADD5_C0DE_u64;
+        let mut targets = Vec::new();
+        let mut scalar_adds = 0u64;
+        for _ in 0..4096 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(7);
+            let mut scratch = GroupOps::default();
+            let target = inst.curve.mul(
+                &mut scratch,
+                inst.generator_point(),
+                1 + state % (inst.r - 1),
+            );
+            let mut ops = GroupOps::default();
+            let mut counters = OracleCounters::default();
+            if floor
+                .decompose(&c, &fb, &mut ops, &mut counters, target)
+                .is_none()
+            {
+                targets.push(target);
+                scalar_adds += ops.adds;
+                if targets.len() == 8 {
+                    break;
+                }
+            }
+        }
+        assert_eq!(
+            targets.len(),
+            8,
+            "the fixed corpus must contain eight misses"
+        );
+
+        for enable in [false, true] {
+            if enable && !floor.ifma_prepared() {
+                continue;
+            }
+            floor.set_ifma_enabled(enable);
+            let mut out = vec![None; targets.len()];
+            let mut ops = GroupOps::default();
+            let mut counters = OracleCounters::default();
+            floor.decompose_lanes(&c, &fb, &mut ops, &mut counters, &targets, &mut out);
+            assert!(out.iter().all(Option::is_none), "mode ifma={enable}");
+            assert_eq!(
+                ops.adds, scalar_adds,
+                "charged additions must match scalar probes; mode ifma={enable}"
+            );
         }
     }
 

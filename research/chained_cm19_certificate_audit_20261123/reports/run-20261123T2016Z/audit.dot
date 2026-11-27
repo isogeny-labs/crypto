@@ -1,0 +1,10 @@
+digraph Audit {
+ graph [rankdir=LR,bgcolor="white",ranksep=0.55];
+ node [shape=box,style="rounded,filled",fillcolor="#e7f0f5",color="#26465c",fontname="DejaVu Sans",fontsize=13,margin="0.16,0.12"];
+ edge [color="#38536e",fontname="DejaVu Sans",fontsize=11];
+ source [label="Frozen actual C7 witnesses\n9 torsion points; 16 conic cells\n32 printed rank certificates"];
+ verify [label="Separate native arithmetic\nBareiss + full nullspace checks\nMultiplication-operator units"];
+ result [label="All witnesses verify\nSign -1: common degree 3\nSign +1: common degree 0",fillcolor="#e0f2e7"];
+ source -> verify [label="no candidate search"];
+ verify -> result [label="actual mutations reject\noriginals restore"];
+}

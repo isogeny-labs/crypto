@@ -230,11 +230,7 @@ fn hasse_multiple(curve: &Curve4, pt: &Pt4, p: u64) -> u64 {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn mulmod(a: u64, b: u64, n: u64) -> u64 {
@@ -242,13 +238,8 @@ fn mulmod(a: u64, b: u64, n: u64) -> u64 {
 }
 
 fn invmod(a: u64, n: u64) -> u64 {
-    let (mut t, mut nt, mut r, mut nr) = (0i128, 1i128, n as i128, a as i128);
-    while nr != 0 {
-        let qq = r / nr;
-        (t, nt) = (nt, t - qq * nt);
-        (r, nr) = (nr, r - qq * nr);
-    }
-    (t.rem_euclid(n as i128)) as u64
+    // Unchecked as before: 0 when a is not a unit (also for a = 0).
+    crypto_lib::gcd::int::inv_mod_u64(a, n).unwrap_or(0)
 }
 
 /// `±R` represented by the point whose `y` is the smaller of `y`, `−y`;

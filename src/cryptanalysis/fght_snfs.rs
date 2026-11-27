@@ -448,13 +448,8 @@ pub fn sieve(trap: &Trapdoor, fb: &FactorBase, a_max: i64, b_max: i64) -> Vec<Re
     out
 }
 
-fn gcd_i64(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let t = a % b;
-        a = b;
-        b = t;
-    }
-    a
+fn gcd_i64(a: u64, b: u64) -> u64 {
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 // ── Linear algebra mod q ───────────────────────────────────────────────

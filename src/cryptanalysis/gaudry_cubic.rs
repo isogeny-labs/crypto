@@ -3203,6 +3203,9 @@ pub struct GaudryReport {
     /// Present only when a non-default large-prime path ran.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lp_variant: Option<String>,
+    /// Only with [`GaudryOptions::capture_relations`]; never serialized.
+    #[serde(skip)]
+    pub captured_relations: Option<Vec<SparseRel>>,
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -3272,6 +3275,12 @@ pub struct GaudryOptions {
     /// every record written before the harvester existed is unchanged.
     #[serde(skip_serializing_if = "Harvester::is_default")]
     pub harvester: Harvester,
+    /// Keep a copy of every relation offered to the large-prime
+    /// eliminator (before reduction) in [`GaudryReport::captured_relations`],
+    /// so graph tools can be run on the real stream.  Off by default; not
+    /// serialized when off, so existing reports are unchanged.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub capture_relations: bool,
 }
 
 impl Default for GaudryOptions {
@@ -3287,6 +3296,7 @@ impl Default for GaudryOptions {
             max_merge_level: 0,
             arity: 3,
             harvester: Harvester::Eliminator,
+            capture_relations: false,
         }
     }
 }
@@ -4608,6 +4618,7 @@ fn run_gaudry_impl(
         s4_f4_stats: None,
         harvest: None,
         lp_variant: None,
+        captured_relations: None,
     };
     let mut la = std::time::Duration::ZERO;
     while rep.residuals < max_residuals {
@@ -4865,6 +4876,11 @@ fn run_gaudry_impl(
                     hasher.update(&coefficient.to_le_bytes());
                     input_hash_bytes += 16;
                 }
+            }
+            if opts.capture_relations {
+                rep.captured_relations
+                    .get_or_insert_with(Vec::new)
+                    .push(rel.clone());
             }
             let fulls: Vec<SparseRel> = if lp_count == 0 {
                 vec![rel]

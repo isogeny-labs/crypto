@@ -1,0 +1,60 @@
+{
+  "schema": "prime31-external-ci-root-audit-v1",
+  "date_utc": "2026-11-24",
+  "p": 2147483647,
+  "r": 2147446831,
+  "curve": {
+    "a": 847514846,
+    "b": 2087444724,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "provenance": "inherited root STATE; no point count or new curve computation"
+  },
+  "parent_head": "91d9599c60434b232ed7bb2abd15d6d53cdc0bcd",
+  "repair_pr": 5078,
+  "repair_head": "f4a5570be83710b7b4580076497abd72caeeb46a",
+  "merge": "ee44af42892026802dd55bfe96d383faea697926",
+  "merge_time_utc": "2026-11-24T15:48:21Z",
+  "tested_checkout": "a2df68ded11dec65b5cbaa9f8fe56a40ca5f1b15",
+  "identical_tree": "b1104b42d432d526083d25526c5f03ec47da2f24",
+  "ordered_parents": [
+    "ff7207be25f57bf27c225ce5fb09bd808730f606",
+    "f4a5570be83710b7b4580076497abd72caeeb46a"
+  ],
+  "blobs": {
+    "oracle": "246953d6b33af884f86578e080a7fa6cb06121b8",
+    "guard": "7f991783bd99d4f95ec4df1a94b50e79be693b51",
+    "lock": "afc9511377b3549c26a44d8e285e865e2d2041b4"
+  },
+  "runs": [
+    {
+      "id": 45427881542,
+      "job": 138565812548,
+      "scope": "all-targets + wide-vars compile; core 10 tests",
+      "conclusion": "success",
+      "manual_full_library": "skipped"
+    },
+    {
+      "id": 45427767861,
+      "job": 138564343636,
+      "scope": "adjacent m2 x-only and planted F4 original-Rust controls",
+      "conclusion": "success",
+      "unit_tests": 7
+    },
+    {
+      "id": 45427881976,
+      "job": 138565342763,
+      "scope": "ecbench build success; spec validation failure; no fresh sessions",
+      "conclusion": "failure"
+    }
+  ],
+  "historical_timing": "unqualified fixed-panel diagnostic; no independent seed panel, manifest or raw per-repeat timing observed",
+  "native_tests_this_run": 0,
+  "random_experiments_this_run": 0,
+  "paid_compute": 0,
+  "native_workers": 0,
+  "pcc": "unverified",
+  "impact_score": 4
+}

@@ -1,0 +1,336 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TZ50-20261123-candidate1-remaining-profile",
+  "version": 1,
+  "created": "2026-11-23",
+  "repository": "crypto",
+  "study_dir": "research/trace_zero_cold50_20261123",
+  "question": "Which costs remain in the qualified parser/kernel prototype, before another candidate edit?",
+  "claims": [
+    {
+      "id": "profile",
+      "text": "Descriptive absolute instruction hotspots for one unmodified fixed cold query; no comparison or performance gain claim.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "description": "Identical fresh source-bound candidate1 profile; no gain comparison",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "59acf7d1cb2b55ef92457fdc8cfff5bf5858039c",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_halftrace_elimination_20261123/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "c89f88ed68ff4db620fca68e61c97ea72d5ddd9f5e5c339e763d23dffe458602",
+        "threads": 1,
+        "flags": {
+          "profile.release.debug": "line-tables-only"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        }
+      }
+    },
+    {
+      "id": "baseline-aa",
+      "role": "control_aa",
+      "description": "Identical fresh source-bound candidate1 profile; no gain comparison",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "59acf7d1cb2b55ef92457fdc8cfff5bf5858039c",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_halftrace_elimination_20261123/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "c89f88ed68ff4db620fca68e61c97ea72d5ddd9f5e5c339e763d23dffe458602",
+        "threads": 1,
+        "flags": {
+          "profile.release.debug": "line-tables-only"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "VALGRIND_INCLUDE": "/workspace/scratch/profile-tools/root/usr/include"
+        }
+      },
+      "same_instrument_as": "baseline"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "not_applicable_reason": null,
+      "comparison": "aa"
+    },
+    "positive": {
+      "present": false,
+      "not_applicable_reason": "Absolute single-query diagnostic, not a method comparison; existing fixed-query truth/replay is retained.",
+      "arm": null,
+      "expected_detection": null
+    },
+    "negative": {
+      "present": false,
+      "not_applicable_reason": "Absolute single-query diagnostic, not a method comparison; existing fixed-query truth/replay is retained.",
+      "arm": null,
+      "null_population": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "algorithm",
+        "levels": [
+          "baseline"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "504a9c6a6ae668a0488b1e24efab7f443331c083f84f3aaee3186af24e35cef7",
+        "how": "Source-identical retained incumbent; no production edit before fresh absolute profile."
+      },
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "Six disclosed prior d12 cases. Identical compact single-query payload on every arm; eight hashes include the two additional positive pilot targets. No old all-workload parser result is used as a new arm."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Rotate three arms by field/kind/repetition; five rounds."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Intel Xeon Platinum8573C x86 virtual host; CPU0; simulated instructions only; no cross-host ratio or native-time claim."
+      },
+      {
+        "name": "cache_and_layout",
+        "treatment": "measured",
+        "how": "Fresh native and Callgrind process for every arm/query; lazy symbolic context fixed; no free reusable projector."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "Outer600second total guard, no retries; raw process output and flushed JSONL prefixes retained."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Compiled deterministic summary is hashed before affected data, with no adaptive sample selection or population inference."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "absolute",
+        "arms": [
+          "baseline"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Nonzero observed whole-process Ir and successful original fixed-query result; no gain criterion."
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "baseline",
+          "baseline-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Three-arm rotation by field/kind/repetition.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation."
+    },
+    "instance_sampling": {
+      "rule": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "other",
+      "passes": true,
+      "note": "One descriptive deterministic profile; no statistical test or population power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 1,
+      "threads": 1,
+      "estimated_total_seconds": 2,
+      "measured_on": "Planning only, retained identical-query pilot; bounded single profile."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "instructions",
+        "name": "Whole cold-process Ir",
+        "unit": "simulated instructions",
+        "kind": "counted",
+        "definition": "Whole fresh process unphased Callgrind Ir, including all per-query setup and replay.",
+        "source": "profiles/candidate1-cold/hotspots.json total_ir",
+        "aggregation": "distribution",
+        "resolution": "1 counted operation",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "instructions"
+    ],
+    "record": [
+      "binary_sha256",
+      "instructions",
+      "command",
+      "host"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "state": "explicit_user_exception_authorized",
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "cloud_spend_usd": 0
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Two absolute A/A profiles of the same fixed baseline cold query, CPU0/2GiB, at most600seconds combined, zero retries or paid resources.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Absolute hotspot description only; no comparison or improvement decision.",
+    "comparison_ids": [
+      "absolute"
+    ],
+    "statistic": "Exact observed hotspot counts",
+    "interval": "Single fixed profile; no population interval",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Not applicable to an absolute diagnostic",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../tools/profile.sh",
+      "sha256": "42a7c0dee60712fb3a767647043136d154b5c5713cda76930c027c2571ac5375"
+    },
+    "inputs": [
+      "profiles/candidate1-cold/callgrind.out"
+    ],
+    "outputs": [
+      "profiles/candidate1-cold/hotspots.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No timing, scaling, population, full-DLP or challenge-recovery claim.",
+    "UNKNOWN is not UNSAT; no row deletion, adaptive seeds or comparison of unpaired favorable subsets.",
+    "Native group counters exclude field/ANF, non-group inversions and SAT work; they are not a complete cost unit."
+  ],
+  "literature": [
+    {
+      "ref": "src/binary_ecc/f2m.rs; src/binary_ecc/trace_zero.rs; src/cryptanalysis/trace_zero_word_field.rs; prior half-trace report",
+      "provenance": "internal",
+      "claim": "Existing byte table already uses low-bit recurrence; profile other cold/oracle costs before choosing an algorithm."
+    },
+    {
+      "ref": "num-bigint0.4.8 src/biguint/convert.rs from_str_radix; research/trace_zero_experiments_20261109/native/src/lib.rs unwire",
+      "provenance": "internal",
+      "claim": "Inspect the real hexadecimal ingestion and native field conversions; preserve accepted syntax and every input/witness. No novelty claim."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "896df531977aa06996ca1a972387a550aa95477928919b40a305a2f87b1f232d",
+    "commit": "0bc9d5a2f21795612c10df1c22764811b92c9ea0",
+    "frozen_at": "2026-11-23T23:26:48Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "planned_rows": 2,
+    "authorization": "Persistent explicit local CPU0/2GiB/600second/zero-paid envelope; separate absolute diagnostic before comparative panel.",
+    "input": "../trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json",
+    "retained_source_inventory": "checks/source-inputs.json",
+    "source_identity": "Candidate1 field/current common source inventory, hash-bound before another edit."
+  }
+}

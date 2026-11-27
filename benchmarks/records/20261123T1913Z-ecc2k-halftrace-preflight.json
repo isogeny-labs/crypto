@@ -1,0 +1,79 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T19:18:16+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_halftrace_elimination_20261123/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T19:14:23+00:00",
+      "wall_s": 10.085
+    }
+  ],
+  "commit": "8d3905a93a5197ee0c19117f4052468bf6846c47",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T19:13:53+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T1913Z-ecc2k-halftrace-preflight",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "pilot_calls",
+      "note": "Largest-class engineering feasibility pilot; not the primary gain result.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 12.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-halftrace-setup",
+  "raw": [
+    {
+      "bytes": 1200,
+      "path": "research/trace_zero_halftrace_elimination_20261123/calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/edb402040f4b1bc8519ccd701bbe1f1dcd1a316d601b4ef057b2ec33fb72e2ef",
+      "sha256": "edb402040f4b1bc8519ccd701bbe1f1dcd1a316d601b4ef057b2ec33fb72e2ef",
+      "uploaded": false
+    },
+    {
+      "bytes": 19935,
+      "path": "research/trace_zero_halftrace_elimination_20261123/preflight.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c1/c1f99240f2395fbed0e77a1d11b42f289198dbc4a194704ffd785e9c1b1a23ae",
+      "sha256": "c1f99240f2395fbed0e77a1d11b42f289198dbc4a194704ffd785e9c1b1a23ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 176,
+      "path": "research/trace_zero_halftrace_elimination_20261123/preflight-gate.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e12cf0bcf45ebfeeea93f864bd67e9515616ce85100eb9e3e76ee4a9831ddfa5",
+      "sha256": "e12cf0bcf45ebfeeea93f864bd67e9515616ce85100eb9e3e76ee4a9831ddfa5",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_halftrace_elimination_20261123/preflight.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-halftrace-preflight",
+  "status": "measured",
+  "summary": "Both partition calibrations and12-call engineering pilot complete; fixed source/cases/criteria retained. No primary gain conclusion.",
+  "validation": null
+}

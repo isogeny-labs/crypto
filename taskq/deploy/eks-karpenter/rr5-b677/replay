@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Run in a separate unprivileged job without AWS credentials. This replays rows,
+# not extraction; completion remains evidence tied to the reviewed producer.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'usage: replay BUNDLE EVIDENCE_DIR OUTPUT_DIR' >&2; exit 2; }
+bundle=$(realpath "$1") evidence=$(realpath "$2") output=$3
+[[ ! -e "$output" ]]
+mkdir -p "$output"
+output=$(realpath "$output")
+here=$(cd "$(dirname "$0")" && pwd)
+"$here/verify-artifacts" "$bundle" "$evidence" > "$output/transport.stdout" 2> "$output/transport.stderr"
+export RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1 RUST_TEST_THREADS=1
+ulimit -v 2097152
+chmod u+x "$bundle/verify-call" "$bundle/rr5-b677-receipt-check"
+revision=$(jq -er .source_revision "$evidence/image.json")
+protocol=$(jq -er .protocol_sha256 "$evidence/image.json")
+producer=$(jq -er '.payload_sha256["rr5-b677-gate"]' "$bundle/build-info.json")
+checker=$(jq -er '.payload_sha256["rr5-b677-receipt-check"]' "$bundle/build-info.json")
+failed=0 replay_failed=0 identity_failed=0
+for name in positive-structured positive-cofactor h0-structured w0-structured; do
+  case_name=${name%-*} presentation=${name#*-}
+  source_call="$evidence/payload/$name" call="$output/$name"
+  mkdir "$call"
+  if [[ ! -f "$source_call/producer.stdout" || ! -f "$source_call/producer.exit" ]]; then
+    printf 'missing recorded call\n' > "$call/not-replayed.txt"
+    failed=1 replay_failed=1 identity_failed=1
+    continue
+  fi
+  cp "$source_call/producer.stdout" "$source_call/producer.exit" "$call/"
+  set +e
+  timeout --signal=KILL 30 "$bundle/verify-call" "$call" "$case_name" "$presentation" \
+    > "$call/replay.stdout" 2> "$call/replay.stderr"
+  status=$?
+  set -e
+  printf '%s\n' "$status" > "$call/replay.exit"
+  if [[ "$status" != 0 ]]; then failed=1 replay_failed=1 identity_failed=1; continue; fi
+  if ! jq -es --arg revision "$revision" --arg protocol "$protocol" \
+    --arg producer "$producer" --arg checker "$checker" \
+    --arg case_name "$case_name" --arg presentation "$presentation" '
+    length==1 and (.[0] | .schema=="rr5.b677.pre-call/v1"
+      and .source_revision==$revision and .protocol_sha256==$protocol
+      and .producer_sha256==$producer and .checker_sha256==$checker
+      and .workers==1 and .address_space_bytes==2147483648
+      and .case==$case_name and .presentation==$presentation
+      and .argv==["rr5-b677-gate","--case",$case_name,"--presentation",$presentation])
+  ' "$source_call/pre-call.json" > "$call/identity.stdout" 2> "$call/identity.stderr"; then failed=1 identity_failed=1; fi
+  if ! jq -es 'length==1 and (.[0] | .schema=="rr5.b677.post-call/v1"
+    and .producer_exit==0 and .verification_exit==0 and .accepted==true)' \
+    "$source_call/post-call.json" >/dev/null; then failed=1 identity_failed=1; fi
+done
+if ! jq -e '.state=="succeeded" and .exit_code==0 and .pods[0].exit_code==0' \
+  "$evidence/client/result.json" >/dev/null; then failed=1; fi
+if ! jq -e '.exit_status==0 and .scientific_run_completed==true' \
+  "$evidence/payload/job-exit.json" >/dev/null; then failed=1; fi
+if ! jq -es 'length==1 and (.[0] | .schema=="rr5.b677.sequence/v1"
+  and .all_requested_calls_accepted==true and .retries==0 and .scientific_worker_count==1
+  and .outer_wall_seconds==180 and .complete_cold_cost==null)' \
+  "$evidence/payload/sequence.json" >/dev/null; then failed=1; fi
+if [[ -e "$evidence/payload/followups-not-run.json" ]]; then failed=1; fi
+jq -n --arg revision "$revision" --arg protocol "$protocol" --argjson failed "$failed" \
+  --argjson replay_failed "$replay_failed" --argjson identity_failed "$identity_failed" '
+  {schema:"rr5.b677.replay/v1",source_revision:$revision,protocol_sha256:$protocol,
+    fixed_gate_passed:($failed==0),transport_bindings_passed:true,
+    all_four_calls_replayed:($replay_failed==0),per_call_identity_checks_passed:($identity_failed==0),
+    independent_completeness_proof:false,complete_cold_cost:null,
+    signed_pcc:false,scope:"inspect per-call replay and identity outcomes; extraction completeness is source-bound metadata"}
+' > "$output/replay.json"
+exit "$failed"

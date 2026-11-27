@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Trusted publisher treats tested code as data and never executes it here.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'usage: publish-image BUNDLE REVISION OUTPUT.json' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+bundle=$(realpath "$1") revision=$2 output=$3
+: "${ISOLAB_IMAGE_REPOSITORY:?}" "${AWS_REGION:?}" "${GITHUB_RUN_ID:?}" "${GITHUB_RUN_ATTEMPT:?}"
+[[ "$revision" =~ ^[a-f0-9]{40}$ && "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+[[ "$ISOLAB_IMAGE_REPOSITORY" == 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks ]]
+[[ "$AWS_REGION" == us-east-2 ]]
+for name in build-info.json PROTOCOL.md source-manifest.json source.sha256 \
+  rr5-b677-gate rr5-b677-receipt-check run sequence verify-call; do
+  [[ -f "$bundle/$name" && ! -L "$bundle/$name" ]]
+done
+jq -es --arg revision "$revision" \
+  --arg protocol "$(sha256sum "$bundle/PROTOCOL.md" | cut -d' ' -f1)" '
+  length==1 and (.[0] | .schema=="rr5.b677.build/v1" and .source_revision==$revision
+  and .source_repository=="https://github.com/isogeny-labs/crypto" and .protocol_sha256==$protocol
+  and .target=="x86_64-unknown-linux-musl" and .architecture=="linux/amd64"
+  and (.payload_sha256|keys)==["rr5-b677-gate","rr5-b677-receipt-check","run","sequence","verify-call"]
+  and (.metadata_sha256|keys)==["source-manifest.json","source.sha256"]
+  and all(.payload_sha256[],.metadata_sha256[]; type=="string" and test("^[a-f0-9]{64}$"))
+  and .registered_extraction_executed==false)
+' "$bundle/build-info.json" >/dev/null
+for field in payload_sha256 metadata_sha256; do
+  while IFS= read -r name; do
+    [[ $(sha256sum "$bundle/$name" | cut -d' ' -f1) == "$(jq -er --arg field "$field" --arg name "$name" '.[$field][$name]' "$bundle/build-info.json")" ]]
+  done < <(jq -r --arg field "$field" '.[$field]|keys[]' "$bundle/build-info.json")
+done
+context=$(mktemp -d)
+trap 'rm -rf "$context"' EXIT
+for name in build-info.json PROTOCOL.md source-manifest.json source.sha256 \
+  rr5-b677-gate rr5-b677-receipt-check run sequence verify-call; do
+  install -m644 "$bundle/$name" "$context/$name"
+done
+registry=${ISOLAB_IMAGE_REPOSITORY%%/*}
+repository=${ISOLAB_IMAGE_REPOSITORY#*/}
+tag="gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${revision}-rr5-b677"
+aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$registry"
+if ! aws ecr-public get-login-password --region us-east-1 \
+  | docker login --username AWS --password-stdin public.ecr.aws >/dev/null 2>&1; then
+  echo 'warning: public ECR authentication unavailable; pinned base pull may fail' >&2
+fi
+docker build --platform linux/amd64 --file "$here/Dockerfile" \
+  --build-arg "SOURCE_REVISION=$revision" --tag "$ISOLAB_IMAGE_REPOSITORY:$tag" "$context"
+docker push "$ISOLAB_IMAGE_REPOSITORY:$tag"
+digest=$(aws ecr describe-images --repository-name "$repository" --image-ids "imageTag=$tag" \
+  --query 'imageDetails[0].imageDigest' --output text)
+[[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]]
+jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg revision "$revision" \
+  --arg build "$(sha256sum "$bundle/build-info.json" | cut -d' ' -f1)" \
+  --arg protocol "$(jq -er .protocol_sha256 "$bundle/build-info.json")" \
+  '{schema:"rr5.b677.image/v1",image_uri:$image,source_revision:$revision,
+    protocol_sha256:$protocol,build_info_sha256:$build}' > "$output"

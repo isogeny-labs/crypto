@@ -614,4 +614,7 @@ mod tests {
 
 #[path = "large_prime_filter_mst.rs"]
 mod mst;
-pub use mst::{filter_large_primes_mst, MstAttempt, MstLimits, MstStats};
+pub use mst::{
+    filter_large_primes_mst, filter_large_primes_mst_with, MstAttempt, MstLimits, MstStats,
+    MstStrategy,
+};

@@ -4,7 +4,7 @@
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
 - **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md), [Boolean ordinate offsets](../research/prime_factor_base_degree_20261031/pencil_search_20261101/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
-- **Last updated:** 2026-11-01
+- **Last updated:** 2026-11-24
 
 ## Problem
 
@@ -133,6 +133,32 @@ refused before any upload; no new research panel was launched. A checkpoint
 authorization or explicit owner-approved alternative, final runnable native
 protocol and the existing evidence gates would permit testing the lead.
 Resolving the checkpoint conflict would not itself establish an improvement.
+
+2026-11-24: [conditional linearized trace fibers](../research/trace_linearized_fibers_20261124/README.md)
+identify the trace-zero one-dimensional S3 kernel, its explicit aligned basis,
+and normalized ratio-class operator reuse. The new scalar adapter keeps all
+determinant-zero and coordinate-zero branches and has exact development
+controls; it does not search unknown leaves or return signed group relations.
+The proposed small-quotient-set criterion still needs actual inventory density,
+ratio search, all setup and relation-rank work. Standard half-trace is already
+a reusable field-wide map and must be in the reference; repeated Gaussian
+elimination alone would be too weak a comparator. The successful-work exit
+conditions remain open. [pcc:unverified]
+
+2026-11-24: [trace-kernel auxiliary basis selection](../research/trace_kernel_basis_20261124/README.md)
+adds a native single-auxiliary coefficient constructor and minimum-weight
+vector-basis selector. Its objective counts descended coefficient occurrences,
+with the same leaf domains and complete auxiliary trace hyperplane in every
+arm. The written additive-support argument and small development controls do
+not price actual solving or independent relations. The separate three-size
+panel remains unexecuted: the session has no S3 checkpoint upload profile/token
+or known paid-budget balance. No local rerouting occurred. The next comparison
+must keep trace elimination in the reference, bind exact native source and
+targets, and charge selection, complete solving, failures, point checks and
+incremental rank. The existing successful-work exit conditions remain open.
+The current IDC1 v1 odd-prime evaluator cannot certify these binary-field
+identities, and no Lean build or signed claim standing is asserted.
+[pcc:unverified]
 
 2026-10-19: finite chart-union screen supplies a specific candidate and
 cofactor/rank diagnostics. Successful solver work and regularity remain

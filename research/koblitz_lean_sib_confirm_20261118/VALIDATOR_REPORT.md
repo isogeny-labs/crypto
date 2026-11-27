@@ -206,7 +206,7 @@ from 0.70 to 0.80.
   - `priced = G − C + w(U + n_C)`, with `cost.unpriced` looked up as the band does;
   - `NON_OPERATION_COUNTERS` excluded;
   - table and sibling work behind markers;
-  - C and n_C from `PRICED_NATIVE` and the pinned K_1/GF(2^23), K_1/GF(2^29) and K_0/GF(2^37) rows
+  - C and n_C from `PRICED_NATIVE` and the pinned icv1-f2m23-tm5197-1f85e9e1, icv1-f2m29-tm40309-30c52b96 and icv1-f2m37-tm534059-32aad96b rows
     of `docs/ic/calibration.json`.
 
   It pairs by (session, workload, round). Workload ids are distinct across sessions, so pooled pairs

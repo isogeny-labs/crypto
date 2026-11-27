@@ -53,3 +53,13 @@ No manifest digest was changed.
 The other 159 entries, all pulled by `validation-gate`, were never committed
 to Git: their manifests were added in the same commit as the rest of their
 run, without the file. They still need their original store.
+
+## Cayley-product M31 development cases (2026-11-25)
+
+`aa02a987378a24ba7f04803e508be084371f6bb76d96249de0f5a4b276653e4c`
+is the 521,012-byte case stream retained from the two identical development
+runs in `research/cayley_chord_m31_20261125/evidence/`. One deterministic gzip
+payload supplies both named files. The study manifest retains the original
+size and digest; the normal artifact reader checks both before installation.
+This is a publication of existing correctness evidence, with no new sample
+and no claim that the disabled S3 store received an upload. [pcc:unverified]

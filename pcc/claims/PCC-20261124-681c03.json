@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:07:12Z",
+ "id": "PCC-20261124-681c03",
+ "kind": "statement",
+ "producer": {
+  "commit": "0a2e495ef2d5ec76f9a4c2a8ef5c200f93a6e7f4",
+  "model": "",
+  "session": "codex-ecc2k-cold50-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/checks/pdf-review.json",
+    "sha256": "c0771a09547708f6e9cf1ebe6ac99634503368752b07f6aa86d8ba29ce10fe16"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/checks/archive-custody.json",
+    "sha256": "db24fe778722b2882faaf05e8c4a2974f1fa86a64c3b396d0648b5b543862fbb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/checks/export-check.txt",
+    "sha256": "2f9f3df99ad1889ec2ee7365198c185a3f13630ef7b9deb031552cd6776b0c3f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate3/checks/source-final.json",
+    "sha256": "02b28b85b459d1089fd3866cf9936926c2c89410406911ee727bc5f2d438ae02"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The final cold50 three-page report is visually inspected. Strict canonical export has zero findings, all frozen numerical source inputs remain unchanged, and both complete archives independently extract with every original member length/hash equal. This establishes unsigned local producer custody and report checks, not remote-store custody or independent scientific admission."
+}

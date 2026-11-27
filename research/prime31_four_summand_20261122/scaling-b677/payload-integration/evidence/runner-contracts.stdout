@@ -1,0 +1,58 @@
+ok 1 - sequence good preserves control order and followup gate
+ok 2 - sequence structured_failure preserves control order and followup gate
+ok 3 - sequence checker_reject preserves control order and followup gate
+ok 4 - sequence cofactor_failure preserves control order and followup gate
+ok 5 - sequence refuses evidence-directory reuse without another call
+ok 6 - verify-call good transport/replay contract
+ok 7 - verify-call multivalue_input transport/replay contract
+ok 8 - verify-call multivalue_result transport/replay contract
+ok 9 - verify-call overdegree transport/replay contract
+ok 10 - verify-call fractional_degree transport/replay contract
+ok 11 - verify-call too_many_assignments transport/replay contract
+ok 12 - verify-call wrong_limits transport/replay contract
+ok 13 - verify-call wrong_resources transport/replay contract
+ok 14 - verify-call wrong_presentation transport/replay contract
+ok 15 - verify-call partial_traversal transport/replay contract
+ok 16 - verify-call checker_multivalue transport/replay contract
+ok 17 - verify-call checker_rank_mismatch transport/replay contract
+ok 18 - verify-call checker_tail transport/replay contract
+ok 19 - request emits the fixed command, resources, mode, and no retries
+ok 20 - request rejects .image_uri="104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks:latest"
+ok 21 - request rejects .image_uri|=sub("104186811093";"000000000000")
+ok 22 - request rejects .source_revision="0000000000000000000000000000000000000000"
+ok 23 - request rejects .protocol_sha256="short"
+ok 24 - request rejects .build_info_sha256="short"
+ok 25 - request rejects .schema="unexpected"
+ok 26 - request rejects multiple JSON values
+ok 27 - request rejects seconds=299
+ok 28 - request rejects seconds=1801
+ok 29 - request rejects seconds=300.5
+ok 30 - request rejects seconds=0300
+ok 31 - request rejects an invalid job name
+ok 32 - request rejects an invalid instance selector
+ok 33 - request rejects extra mode/resource arguments
+ok 34 - publisher good byte/source binding
+ok 35 - publisher wrong_repository byte/source binding
+ok 36 - publisher wrong_revision byte/source binding
+ok 37 - publisher wrong_protocol byte/source binding
+ok 38 - publisher wrong_payload byte/source binding
+ok 39 - publisher wrong_metadata byte/source binding
+ok 40 - publisher multi_json byte/source binding
+ok 41 - publisher symlink byte/source binding
+ok 42 - runner good preserves the final process outcome
+ok 43 - runner upload_failure preserves the final process outcome
+ok 44 - runner exit_record_failure preserves the final process outcome
+ok 45 - runner checksum_failure preserves the final process outcome
+ok 46 - runner child_failure preserves the final process outcome
+ok 47 - runner child_signal preserves the final process outcome
+ok 48 - runner outer deadline kills the sequence and descendants and archives nonzero
+ok 49 - runner TERM promptly stops the entire mock process group and archives nonzero
+ok 50 - runner rejects wrong_protocol before dispatch and archives failure
+ok 51 - runner rejects wrong_payload before dispatch and archives failure
+ok 52 - runner rejects wrong_metadata before dispatch and archives failure
+ok 53 - runner rejects wrong_repository before dispatch and archives failure
+ok 54 - runner rejects multi_json before dispatch and archives failure
+ok 55 - runner rejects an unregistered result destination: s3://setec-astronomy-artifacts/runs/mock/
+ok 56 - runner rejects an unregistered result destination: s3://isolab-results-000000000000-us-east-2/runs/mock/
+ok 57 - runner rejects an unregistered result destination: s3://isolab-results-104186811093-us-east-2/other/mock/
+1..57

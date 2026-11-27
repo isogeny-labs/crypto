@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T02:37:45Z",
+ "id": "PCC-20261125-f4dbc1",
+ "kind": "execution",
+ "producer": {
+  "commit": "683b73d59772a6c68e34709bf0ed0ad925a7e6f7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/msolve_input_audit_v1/self_test.jsonl",
+    "sha256": "340f2db299e1d46db056a53b625fc0926752847cbb8574bbd73349a718b24c67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/msolve_input_audit_v1/build_c.txt",
+    "sha256": "543e1498b5fddfcf40c31d75d661fa1f8940135944be145d74df6a4160e3ed60"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/msolve_input_audit_v1/build_rust.txt",
+    "sha256": "b4bfd2f6013c0f0355323cb0c164d506824723385cbc6191fc053088f89549a9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/diagnostics/msolve-0.7.5-parser.inc",
+    "sha256": "af84e067fe235afacd685e9c2403c0ad31a2165e149260958a0575d948e3b1e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/examples/msolve-input-audit.rs",
+    "sha256": "db4aaddd7496a4d53a350208646260ef75a913e4c447a04862709e6bb9a9e1c0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-msolve-input-audit",
+ "statement": "The isolated upstream msolve v0.7.5 parser excerpt and Rust companion build. Seven synthetic parser cases, three literal-input rejection cases and two residual controls pass. Non-leading explicit plus-zero terms become plus-one under this excerpt; leading zero and the zero-free form retain their expected terms. No scientific retained input has yet been processed by the new program. The isolated excerpt is not byte-identification of the installed solver."
+}

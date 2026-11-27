@@ -49,12 +49,9 @@ fn sub_mod(a: &BigUint, b: &BigUint, p: &BigUint) -> BigUint {
 }
 
 fn mod_inv(a: &BigUint, p: &BigUint) -> BigUint {
-    use num_integer::Integer;
-    let a_i = a.to_bigint().unwrap();
-    let p_i = p.to_bigint().unwrap();
-    let g = a_i.extended_gcd(&p_i);
-    let r = ((g.x % &p_i) + &p_i) % &p_i;
-    r.to_biguint().unwrap()
+    // Non-unit `a` (never expected here): the old body returned a
+    // value without checking; keep returning one (0).
+    crate::gcd::int::modinv_big(a, p).unwrap_or_default()
 }
 
 /// Affine `(x, y)` or the point at infinity.

@@ -1,0 +1,79 @@
+$ python3 evidence/reproduce.py
+p=101, N=83, radix=2, y²=x³+6x+9, P=(0, 3)
+  batched CRT norm checked the projection with 180 finite factor evaluations
+  signed tuples in brute force = 256
+  distinct signed half sums = 13, 13
+  distinct projective half abscissas = 7, 7
+  nonidentity abscissa support = 30/41
+  max distinct signed half-pair matches per target = 4
+  max ordered signed tuple witnesses per target = 6
+  max reduced specialized half-abscissa quotient dimension = 4
+  target-first batch checked all 83 points with 1079 residual lookups
+  projective S3/gcd checked 8 points with 6 distinct abscissas; reduced batch quotient dimension = 10
+p=101, N=83, radix=4, y²=x³+6x+9, P=(0, 3)
+  batched CRT norm checked the projection with 1600 finite factor evaluations
+  signed tuples in brute force = 4096
+  distinct signed half sums = 41, 41
+  distinct projective half abscissas = 21, 21
+  nonidentity abscissa support = 41/41
+  max distinct signed half-pair matches per target = 22
+  max ordered signed tuple witnesses per target = 52
+  max reduced specialized half-abscissa quotient dimension = 22
+  target-first batch checked all 83 points with 3403 residual lookups
+  projective S3/gcd checked 7 points with 5 distinct abscissas; reduced batch quotient dimension = 91
+p=509, N=479, radix=5, y²=x³+2x+10, P=(3, 68)
+  batched CRT norm checked the projection with 3600 finite factor evaluations
+  signed tuples in brute force = 10000
+  distinct signed half sums = 61, 61
+  distinct projective half abscissas = 31, 31
+  nonidentity abscissa support = 239/239
+  max distinct signed half-pair matches per target = 11
+  max ordered signed tuple witnesses per target = 24
+  max reduced specialized half-abscissa quotient dimension = 11
+  target-first batch checked all 479 points with 29219 residual lookups
+  projective S3/gcd checked 7 points with 5 distinct abscissas; reduced batch quotient dimension = 37
+p=1009, N=1069, radix=6, y²=x³+4x+10, P=(0, 162)
+  batched CRT norm checked the projection with 7056 finite factor evaluations
+  signed tuples in brute force = 20736
+  distinct signed half sums = 85, 85
+  distinct projective half abscissas = 43, 43
+  nonidentity abscissa support = 534/534
+  max distinct signed half-pair matches per target = 8
+  max ordered signed tuple witnesses per target = 22
+  max reduced specialized half-abscissa quotient dimension = 8
+  target-first batch checked all 1069 points with 90865 residual lookups
+  projective S3/gcd checked 7 points with 5 distinct abscissas; reduced batch quotient dimension = 31
+p=5003, N=5011, radix=9, y²=x³+2x+13, P=(1, 4)
+  batched CRT norm checked the projection with 32400 finite factor evaluations
+  signed tuples in brute force = 104976
+  distinct signed half sums = 181, 181
+  distinct projective half abscissas = 91, 91
+  nonidentity abscissa support = 2505/2505
+  max distinct signed half-pair matches per target = 8
+  max ordered signed tuple witnesses per target = 24
+  max reduced specialized half-abscissa quotient dimension = 8
+  target-first batch checked all 5011 points with 906991 residual lookups
+  projective S3/gcd checked 7 points with 5 distinct abscissas; reduced batch quotient dimension = 31
+$ python3 evidence/reproduce.py --field 101 --all-gcd-targets
+p=101, N=83, radix=2, y²=x³+6x+9, P=(0, 3)
+  batched CRT norm checked the projection with 1476 finite factor evaluations
+  signed tuples in brute force = 256
+  distinct signed half sums = 13, 13
+  distinct projective half abscissas = 7, 7
+  nonidentity abscissa support = 30/41
+  max distinct signed half-pair matches per target = 4
+  max ordered signed tuple witnesses per target = 6
+  max reduced specialized half-abscissa quotient dimension = 4
+  target-first batch checked all 83 points with 1079 residual lookups
+  projective S3/gcd checked 83 points with 42 distinct abscissas; reduced batch quotient dimension = 85
+p=101, N=83, radix=4, y²=x³+6x+9, P=(0, 3)
+  batched CRT norm checked the projection with 16400 finite factor evaluations
+  signed tuples in brute force = 4096
+  distinct signed half sums = 41, 41
+  distinct projective half abscissas = 21, 21
+  nonidentity abscissa support = 41/41
+  max distinct signed half-pair matches per target = 22
+  max ordered signed tuple witnesses per target = 52
+  max reduced specialized half-abscissa quotient dimension = 22
+  target-first batch checked all 83 points with 3403 residual lookups
+  projective S3/gcd checked 83 points with 42 distinct abscissas; reduced batch quotient dimension = 841

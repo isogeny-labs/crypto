@@ -5,6 +5,8 @@ on:
     branches: [research/prime31-aps-reusable-s3-buffers-20261117]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
       - research/prime31_ic_20261115/native/examples/prime31_aps_buffer_audit.rs
       - research/prime31_ic_20261115/native/APS_REUSABLE_S3_BUFFER_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-s3-buffer-reuse.yml
@@ -12,6 +14,8 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
       - research/prime31_ic_20261115/native/examples/prime31_aps_buffer_audit.rs
       - research/prime31_ic_20261115/native/APS_REUSABLE_S3_BUFFER_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-s3-buffer-reuse.yml
@@ -47,13 +51,15 @@ jobs:
           persist-credentials: false
       - name: Install pinned Rust 1.100
         run: rustup toolchain install 1.100.0 --profile minimal
-      - name: Overlay only new Rust oracle and Rust audit, freeze fresh target seed
+      - name: Overlay new Rust oracle, audit and locked dependencies; freeze target seed
         run: |
           set -euo pipefail
           path=research/prime31_ic_20261115/native/examples
           cmp "aps-old/${path}/prime31_aps_one_relation.rs" "aps-new/${path}/prime31_aps_one_relation.rs"
           cp "${path}/prime31_aps_one_relation.rs" "aps-new/${path}/prime31_aps_one_relation.rs"
           cp "${path}/prime31_aps_buffer_audit.rs" "aps-new/${path}/prime31_aps_buffer_audit.rs"
+          cp research/prime31_ic_20261115/native/Cargo.toml aps-new/research/prime31_ic_20261115/native/Cargo.toml
+          cp research/prime31_ic_20261115/native/Cargo.lock aps-new/research/prime31_ic_20261115/native/Cargo.lock
           # Target seeds change in the two temporary test checkouts only.
           # The existing source, arithmetic, rho, source profile and workflow pin
           # are all preserved. Fail closed if source layout changes.
@@ -72,6 +78,8 @@ jobs:
           sha256sum "aps-old/${path}/prime31_aps_one_relation.rs" \
             "aps-new/${path}/prime31_aps_one_relation.rs" \
             "aps-new/${path}/prime31_aps_buffer_audit.rs" \
+            "aps-new/research/prime31_ic_20261115/native/Cargo.toml" \
+            "aps-new/research/prime31_ic_20261115/native/Cargo.lock" \
             > prime31-aps-buffer-source-shas.txt
           echo 'Immutable old/new Rust source manifest:'
           cat prime31-aps-buffer-source-shas.txt

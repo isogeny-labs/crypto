@@ -67,6 +67,42 @@ fn counts() {
     }
 }
 
+/// Exact, matched support census for the three ways to lift one product edge of every
+/// cubic S_3 link.  The planted instance and variable count are identical across arms.
+fn edgecounts() {
+    for &n in &[11u32, 13, 17, 19] {
+        let f = field(n);
+        for &(a, b) in &[(0u64, 1u64), (1, 1)] {
+            let c = Curve { f, a, b };
+            for &m in &[3usize, 4, 5] {
+                for &l in &[3usize, 4, 5] {
+                    let mut rng = Rng(SEED
+                        ^ 0xED63
+                        ^ (n as u64) << 32
+                        ^ (m as u64) << 16
+                        ^ (l as u64) << 8
+                        ^ a);
+                    let p = plant(&c, l, m, &mut rng);
+                    for rep in Rep::EDGES {
+                        let built = build(&c, rep, &p);
+                        let s = system_stats(&built);
+                        let ok = systems::holds(&built);
+                        let by: Vec<String> = s
+                            .terms_by_degree
+                            .iter()
+                            .map(|(d, k)| format!("\"{d}\":{k}"))
+                            .collect();
+                        println!(
+                            "{{\"n\":{n},\"a\":{a},\"b\":{b},\"m\":{m},\"l\":{l},\"rep\":\"{}\",\"nvars\":{},\"neqs\":{},\"max_degree\":{},\"terms\":{},\"distinct_monomials\":{},\"terms_by_degree\":{{{}}},\"planted_holds\":{ok}}}",
+                            rep.name(), s.nvars, s.neqs, s.max_degree, s.terms, s.distinct_monomials, by.join(",")
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
 fn census() {
     for &n in &[11u32, 13] {
         let f = field(n);
@@ -201,9 +237,10 @@ fn export() {
 fn main() {
     match std::env::args().nth(1).as_deref() {
         Some("counts") => counts(),
+        Some("edgecounts") => edgecounts(),
         Some("census") => census(),
         Some("powersum") => powersum(),
         Some("export") => export(),
-        _ => eprintln!("usage: replead-derive counts|census|powersum|export"),
+        _ => eprintln!("usage: replead-derive counts|edgecounts|census|powersum|export"),
     }
 }

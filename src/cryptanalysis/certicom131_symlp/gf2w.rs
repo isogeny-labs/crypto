@@ -536,45 +536,9 @@ fn poly_of(irr: &IrreduciblePoly) -> Vec<u64> {
     v
 }
 
-fn poly_deg(v: &[u64]) -> i64 {
-    for i in (0..v.len()).rev() {
-        if v[i] != 0 {
-            return 64 * i as i64 + 63 - v[i].leading_zeros() as i64;
-        }
-    }
-    -1
-}
-
 fn poly_gcd_is_one(f: &[u64], h: &W3) -> bool {
-    let mut a: Vec<u64> = f.to_vec();
-    let mut b: Vec<u64> = vec![h[0], h[1], h[2], 0];
-    loop {
-        let db = poly_deg(&b);
-        if db < 0 {
-            return poly_deg(&a) == 0;
-        }
-        // a mod b
-        loop {
-            let da = poly_deg(&a);
-            if da < db {
-                break;
-            }
-            let s = (da - db) as u32;
-            let words = (s / 64) as usize;
-            let bits = s % 64;
-            for i in (0..a.len()).rev() {
-                if i < words {
-                    break;
-                }
-                let mut v = b[i - words] << bits;
-                if bits != 0 && i > words {
-                    v |= b[i - words - 1] >> (64 - bits);
-                }
-                a[i] ^= v;
-            }
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
+    // gcd(f, h) = 1 in GF(2)[x], by the shared bit-packed gcd (same word layout).
+    crate::gcd::gf2::deg(&crate::gcd::gf2::gcd(f, h)) == 0
 }
 
 #[cfg(test)]

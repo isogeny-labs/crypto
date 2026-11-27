@@ -420,30 +420,9 @@ fn ptrim(mut a: Vec<u64>) -> Vec<u64> {
     a
 }
 
-fn pgcd(mut a: Vec<u64>, mut b: Vec<u64>, p: u64) -> Vec<u64> {
-    a = ptrim(a);
-    b = ptrim(b);
-    while !b.is_empty() {
-        let r = prem(&a, &b, p);
-        a = b;
-        b = r;
-    }
-    a
-}
-
-fn prem(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-    let mut r = a.to_vec();
-    let db = b.len() - 1;
-    let inv = invm(b[db], p);
-    while r.len() > db && !r.is_empty() {
-        let c = mulm(*r.last().unwrap(), inv, p);
-        let s = r.len() - 1 - db;
-        for (i, &bi) in b.iter().enumerate() {
-            r[s + i] = (r[s + i] + p - mulm(c, bi, p)) % p;
-        }
-        r = ptrim(r);
-    }
-    r
+fn pgcd(a: Vec<u64>, b: Vec<u64>, p: u64) -> Vec<u64> {
+    // Shared gcd (monic; callers only read its length).
+    crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(p), &a, &b)
 }
 
 fn det(mut m: Vec<Vec<u64>>, p: u64) -> u64 {
@@ -1258,11 +1237,8 @@ pub fn jacobian_order(
     Err("the Jacobian's exponent leaves several candidate orders".into())
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 /// A built plane-quartic workload: the Jacobian, `#J(F_p) = h·r` with `r`

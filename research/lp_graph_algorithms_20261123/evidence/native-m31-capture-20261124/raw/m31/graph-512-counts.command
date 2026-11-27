@@ -1,0 +1,1 @@
+jq $'{\n    schema,modulus,label,rows,lp_columns,incidences,arity_histogram,\n    rank:{two_entry_rows:.rank.two_entry_rows,exact_for_stream:.rank.exact_for_stream,\n          gain_dsu:.rank.gain_dsu,dense_rank:.rank.dense_rank,dense_matches:.rank.dense_matches}\n  }' /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/graph-512.json 

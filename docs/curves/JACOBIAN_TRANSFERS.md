@@ -39,6 +39,39 @@ Implementation: [`src/cryptanalysis/jacobian_transfer/`](../../src/cryptanalysis
 `report.rs` the table and charts), [`src/bin/jacobian_transfers.rs`](../../src/bin/jacobian_transfers.rs),
 workflow [`jacobian-transfers.yml`](../../.github/workflows/jacobian-transfers.yml).
 
+## Extension-field review inventory
+
+`jacobian_transfers extension-fields [--name SUBSTRING]` lists registry curves
+whose field has extension degree greater than one. It includes binary fields
+as well as `fpk` fields, and searches all rows of the supplied registry rather
+than only the transfer-report manifest. The JSON identifies the characteristic,
+degree, group order, the largest subgroup order recorded among the row's
+representations, and whether the slug appears in the supplied transfer report.
+The subgroup choice is a metadata summary, not a claim about every generator:
+inspect the relevant representation and independently verify its order. A
+recorded subgroup is **unverified**; missing orders remain null. The `report_input_digest` compares the report's
+stored digest with the current manifest-selected registry rows. A mismatch
+marks the report's inputs stale. A match does not verify calculations or code
+freshness: use `jacobian_transfers check` separately. The command fails
+if registry parsing or the report fails; it does not silently omit bad rows.
+
+Every row needs a concrete review. Check source provenance and field
+representation; curve and subgroup order and their verification; the claimed
+security level; relevant published algorithms and their assumptions; and a
+fully charged, comparable cost including setup, online work and memory.
+Include binary-specific routes and intermediate subfields where applicable.
+Retain missing evidence as unknown. Formula results in this report are leads,
+not measurements or a proof that a fixed curve is weak or secure.
+
+[Diem (2011)](https://doi.org/10.1112/S0010437X10005075) proves a
+subexponential expected-time result for sequences with `n → ∞` and
+`n/log(q) → 0` over `F_(q^n)`. Neither limit can be decided from an individual
+field; fixed degree alone does not satisfy the first limit, and a fixed base
+field cannot satisfy both limits. The theorem supplies no concrete security
+bits for an individual row. Intermediate subfields may provide other choices
+of `q` and `n`; inventory degree is relative to the prime field, not a claim
+that all such choices have been assessed.
+
 ## What a row is, and is not
 
 A row is a **formula**.  Its `ratio_log2` is `log2(rho on E) − log2(route)`

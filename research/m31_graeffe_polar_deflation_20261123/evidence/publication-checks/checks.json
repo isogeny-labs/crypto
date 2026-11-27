@@ -1,0 +1,59 @@
+[
+  {
+    "check": "claim",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "--keyring-ref",
+      "ea922ca25fa85005c6f45ec5b53a7d91e1b293e2",
+      "verify",
+      "PCC-20261124-f381e2",
+      "--json"
+    ],
+    "exit_code": 2,
+    "stdout_bytes": 946,
+    "stderr_bytes": 0
+  },
+  {
+    "check": "ledger",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "ledger",
+      "verify",
+      "--base",
+      "ea922ca25fa85005c6f45ec5b53a7d91e1b293e2"
+    ],
+    "exit_code": 0,
+    "stdout_bytes": 15433,
+    "stderr_bytes": 0
+  },
+  {
+    "check": "prose",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "research/m31_graeffe_polar_deflation_20261123/REPORT.md",
+      "research/m31_graeffe_polar_deflation_20261123/PR_BODY.md",
+      "research/m31_graeffe_polar_deflation_20261123/SOURCE_REVIEW.md",
+      "research/m31_graeffe_polar_deflation_20261123/RECEIPT_REVIEW.md",
+      "research/m31_graeffe_polar_deflation_20261123/PROOF_STATUS.md"
+    ],
+    "exit_code": 0,
+    "stdout_bytes": 25,
+    "stderr_bytes": 0
+  },
+  {
+    "check": "math-prose",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "research/m31_graeffe_polar_deflation_20261123/MATHEMATICS.md"
+    ],
+    "exit_code": 1,
+    "stdout_bytes": 569,
+    "stderr_bytes": 0
+  }
+]

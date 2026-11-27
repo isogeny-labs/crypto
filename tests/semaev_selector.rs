@@ -9,9 +9,11 @@
 
 use std::collections::BTreeSet;
 
-use crypto::cryptanalysis::pkm_smooth_tower::{is_prime, powm, sqrtm, Curve, Pt};
-use crypto::cryptanalysis::semaev_prime_poly::{resultant_formal, Curve as PolynomialCurve, Fp};
-use crypto::cryptanalysis::semaev_selector::{
+use crypto_lib::cryptanalysis::pkm_smooth_tower::{is_prime, powm, sqrtm, Curve, Pt};
+use crypto_lib::cryptanalysis::semaev_prime_poly::{
+    resultant_formal, Curve as PolynomialCurve, Fp,
+};
+use crypto_lib::cryptanalysis::semaev_selector::{
     lift_selector_pairs, quadratic_selector_resultant, selector_coordinate_pairs, SelectorError,
     SelectorExtraction, SignedPair, MAX_SELECTOR_DEGREE,
 };
@@ -65,7 +67,7 @@ fn selector_polynomial(p: u64, d: usize) -> Vec<u64> {
 /// Generate the known split selector independently of polynomial factorization.
 /// The primitive-root search has a fixed finite bound, including on Prime31.
 fn selector_roots_reference(p: u64, d: usize) -> Vec<u64> {
-    assert!(d > 0 && (p - 1) % d as u64 == 0);
+    assert!(d > 0 && (p - 1).is_multiple_of(d as u64));
     if d == 1 {
         return vec![1];
     }
@@ -73,9 +75,9 @@ fn selector_roots_reference(p: u64, d: usize) -> Vec<u64> {
     let mut prime_divisors = Vec::new();
     let mut divisor = 2;
     while divisor * divisor <= remaining {
-        if remaining % divisor == 0 {
+        if remaining.is_multiple_of(divisor) {
             prime_divisors.push(divisor);
-            while remaining % divisor == 0 {
+            while remaining.is_multiple_of(divisor) {
                 remaining /= divisor;
             }
         }

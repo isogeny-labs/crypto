@@ -1,0 +1,46 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "lead e2e smoke: root-finding and double-large-prime IC on one binary target",
+  "description": "Correctness and accounting check only. One public target, cold independent runs, strong signed-Frobenius rho and its A/A control. Native work may remain unpriced; no performance claim.",
+  "workloads": {
+    "curves": [{
+      "kind": "binary_explicit",
+      "n": 11,
+      "modulus": 2323,
+      "a": 1,
+      "b": 1,
+      "group_order": 1982,
+      "r": 991,
+      "gx": 1193,
+      "gy": 1007
+    }],
+    "targets_per_curve": 1,
+    "target_seed": 20261125,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rootfind-m2", "role": "baseline", "method": {"id": "ic.pipeline", "params": {
+      "factor_base": "koblitz-standard-subspace:dimension=4",
+      "oracle": "pdp3-koblitz:m=2,engine=rootfind-negfold",
+      "max_trials": "20000"
+    }}},
+    {"name": "double-large-prime", "role": "candidate", "method": {"id": "ic.large_prime", "params": {
+      "small_dimension": "3",
+      "envelope_dimension": "4",
+      "summands": "n-1",
+      "large_primes": "2",
+      "max_trials": "20000",
+      "max_states": "100000"
+    }}},
+    {"name": "rho-aa", "role": "control", "method": {"id": "rho.signed_frobenius_strong"}}
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 2026112501,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

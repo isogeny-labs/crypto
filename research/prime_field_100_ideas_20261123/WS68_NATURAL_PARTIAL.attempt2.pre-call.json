@@ -1,0 +1,9 @@
+{
+  "record_type":"immutable_pre_call_amendment",
+  "parent_pre_call":"WS68_NATURAL_PARTIAL.pre-call.json",
+  "conductor_tasks":["T-58","T-63"],
+  "attempt1":{"source":"WS68_NATURAL_PARTIAL.attempt1.rs","source_sha256":"affeeec36573dc381392296dbb27616a18b3eb496ec6c925a6ffabd2027bd4f6","stderr":"WS68_NATURAL_PARTIAL.attempt1.stderr","stderr_sha256":"c58eeb036743470da4d1f85e7e1f51e49e3115618ebc1da961338df64cfcfa5d","compile_exit_code":1,"run_executed":false},
+  "correction":"The group-identity assertion called ca with the wrong arity. Compute aG and bQ separately, call ca(ag,bq,verify), and compare to r. No target, seed, cap, base, policies, cost boundary, or expected outcome changed.",
+  "attempt2":{"source":"WS68_NATURAL_PARTIAL.rs","source_sha256":"d72684fc48e19206e21c053b8e04ce7366c181852ed8973fb5aff9e851a1abd4","qualifier":"WS68_NATURAL_PARTIAL.qualifier.rs","qualifier_sha256":"d72684fc48e19206e21c053b8e04ce7366c181852ed8973fb5aff9e851a1abd4","compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_NATURAL_PARTIAL","WS68_NATURAL_PARTIAL.qualifier.rs","-o","WS68_NATURAL_PARTIAL.bin"]},
+  "admission":"same bounded user-authorized local bypass, compile failure preserved, no retry of an executed experiment"
+}

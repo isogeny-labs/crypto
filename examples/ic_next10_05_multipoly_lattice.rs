@@ -261,11 +261,7 @@ impl Sys {
 }
 
 fn gcd(a: i128, b: i128) -> i128 {
-    if b == 0 {
-        a.abs()
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_i128(a, b) as i128
 }
 
 fn multisets(len: usize, max: i64) -> Vec<Vec<i64>> {

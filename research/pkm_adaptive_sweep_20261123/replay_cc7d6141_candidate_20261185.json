@@ -1,0 +1,3843 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 47.19125,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 43.52542,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 0.833740234375,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.2718759765625,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_word_xor"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 16,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 12.555478291,
+  "instance": "icv1-fp13-tm13-9e2d11f6",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.101 | 79 | 8 | 8 | 5.0 | — | 197596.436 | 84314.96× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.135 | 96 | 13 | 13 | 5.0 | — | 227864.504 | 97230.43× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.140 | 86 | 12 | 12 | 5.0 | — | 200820.736 | 85690.77× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.127 | 79 | 10 | 10 | 5.0 | — | 185297.939 | 79067.15× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.146 | 89 | 13 | 13 | 5.0 | — | 206909.242 | 88288.76× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.109 | 92 | 10 | 10 | 5.0 | — | 211154.928 | 90100.40× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.111 | 117 | 13 | 13 | 5.0 | — | 268368.663 | 114513.67× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.126 | 95 | 12 | 12 | 5.0 | — | 217978.180 | 93011.90× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.200 | 85 | 17 | 17 | 5.0 | — | 201169.720 | 85839.69× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.118 | 136 | 16 | 16 | 5.0 | — | 309581.986 | 132099.51× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.133 | 120 | 16 | 16 | 5.0 | — | 275398.471 | 117513.30× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.152 | 112 | 17 | 17 | 5.0 | — | 263371.395 | 112381.32× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.131 | 122 | 16 | 16 | 5.0 | — | 278958.857 | 119032.53× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.099 | 131 | 13 | 13 | 5.0 | — | 294708.340 | 125752.88× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.127 | 79 | 10 | 10 | 5.0 | — | 183312.297 | 78219.87× | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.111 | 108 | 12 | 12 | 5.0 | — | 244076.649 | 104148.20× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 2.3435514087742737,
+    "mean_s": 2.3435514087742737,
+    "mean_s_walk": 1.3067074521650497,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 2.3435514087742737,
+    "per_run": [
+      {
+        "planted": 1058,
+        "s": 2.3435514087742737,
+        "s_walk": 1.3067074521650497,
+        "seed": 1400727105,
+        "steps": 73,
+        "steps_over_expected": 1.4744614665114981,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 13.72042824773302,
+    "mean_s": 13.72042824773302,
+    "mean_s_walk": 1.2498940846796127,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 13.72042824773302,
+    "per_run": [
+      {
+        "planted": 1058,
+        "s": 13.72042824773302,
+        "s_walk": 1.2498940846796127,
+        "seed": 1400727105,
+        "steps": 88,
+        "steps_over_expected": 0.9972711928046922,
+        "verified": true
+      }
+    ],
+    "runs": 1
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 13910811.56294864,
+          "group_ops": {
+            "adds": 334,
+            "doubles": 378,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 8,
+            "pkm_grid_fp_mults_uncharged": 13083,
+            "pkm_system_fp_mults_uncharged": 1404,
+            "pkm_system_specialisations": 78,
+            "pkm_system_terms": 1248,
+            "relations": 8,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 78,
+            "solver_ops": 309809208,
+            "sqrt_solves": 0,
+            "target_guard_probes": 79,
+            "trials": 79,
+            "unliftable_systems": 0,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 32,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 77
+          },
+          "wall_ns": 658376126,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 77,
+            "walk_modr_adds": 156
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 712.0,
+        "hit_rate": 0.10126582278481013,
+        "name": "pkm-semaev",
+        "relations_found": 8,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 41542
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 78,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 30729,
+            "max_rows_max": 821,
+            "refutations": 70,
+            "staircase_stops": 0,
+            "steps": 968
+          },
+          "gae": 13910099.56294864,
+          "name": "f4-fp-tower",
+          "ns_per_op": 2.118836267771615,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 309809208,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 390,
+          "wall_ns": 656434986
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 79
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 80542,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.3427120030196278,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 8,
+            "repeated_column_rows": 0,
+            "row_ops": 76,
+            "rows": 8,
+            "single_column_rows": 0,
+            "two_column_rows": 8
+          },
+          "wall_ns": 15915,
+          "work_native": {
+            "column_part_inserts": 8,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 573,
+            "pivot_inversion_steps": 208,
+            "row_build_modr_adds": 24,
+            "row_build_modr_muls": 16,
+            "row_build_words": 440,
+            "row_key_mixes": 16
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 8,
+        "rows": 8,
+        "work": 76,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1058,
+      "rho_s": 2.3435514087742737,
+      "s": 197596.43626747566,
+      "s_over_rho": 84314.9570040039,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20261185,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 13911967.905660644,
+      "verified": true,
+      "verify": {
+        "gae": 12.0,
+        "group_ops": {
+          "adds": 2,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1042
+      },
+      "wall_seconds": 0.658562292
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 16041857.298678251,
+          "group_ops": {
+            "adds": 377,
+            "doubles": 372,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 13,
+            "pkm_grid_fp_mults_uncharged": 18728,
+            "pkm_system_fp_mults_uncharged": 1710,
+            "pkm_system_specialisations": 95,
+            "pkm_system_terms": 1516,
+            "relations": 13,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 95,
+            "solver_ops": 377689607,
+            "sqrt_solves": 0,
+            "target_guard_probes": 96,
+            "trials": 96,
+            "unliftable_systems": 0,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 33,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 94
+          },
+          "wall_ns": 759321211,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 94,
+            "walk_modr_adds": 190
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 749.0,
+        "hit_rate": 0.13541666666666666,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18459
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 95,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29439,
+            "max_rows_max": 821,
+            "refutations": 82,
+            "staircase_stops": 0,
+            "steps": 1192
+          },
+          "gae": 16041108.298678251,
+          "name": "f4-fp-tower",
+          "ns_per_op": 2.0042911903583303,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 377689607,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 475,
+          "wall_ns": 756999952
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 96
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 67375,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.1094383227822955,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 176,
+            "rows": 13,
+            "single_column_rows": 1,
+            "two_column_rows": 12
+          },
+          "wall_ns": 24040,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1071,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 25
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 176,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1913,
+      "rho_s": 2.3435514087742737,
+      "s": 227864.50350567285,
+      "s_over_rho": 97230.42671585802,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20301688,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 16043020.408116573,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1166
+      },
+      "wall_seconds": 0.759455333
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 14137817.672926655,
+          "group_ops": {
+            "adds": 338,
+            "doubles": 364,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 12,
+            "pkm_grid_fp_mults_uncharged": 20910,
+            "pkm_system_fp_mults_uncharged": 1530,
+            "pkm_system_specialisations": 85,
+            "pkm_system_terms": 1360,
+            "relations": 12,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 85,
+            "solver_ops": 338540668,
+            "sqrt_solves": 0,
+            "target_guard_probes": 86,
+            "trials": 86,
+            "unliftable_systems": 0,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 34,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 84
+          },
+          "wall_ns": 669323669,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 84,
+            "walk_modr_adds": 170
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 702.0,
+        "hit_rate": 0.13953488372093023,
+        "name": "pkm-semaev",
+        "relations_found": 12,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19125
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 85,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 31757,
+            "max_rows_max": 821,
+            "refutations": 73,
+            "staircase_stops": 0,
+            "steps": 1067
+          },
+          "gae": 14137115.672926655,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9706588397232088,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 338540668,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 425,
+          "wall_ns": 667148160
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 86
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 68000,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.173073373308082,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 12,
+            "repeated_column_rows": 0,
+            "row_ops": 123,
+            "rows": 12,
+            "single_column_rows": 0,
+            "two_column_rows": 12
+          },
+          "wall_ns": 21915,
+          "work_native": {
+            "column_part_inserts": 12,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 815,
+            "pivot_inversion_steps": 312,
+            "row_build_modr_adds": 36,
+            "row_build_modr_muls": 24,
+            "row_build_words": 660,
+            "row_key_mixes": 24
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 12,
+        "rows": 12,
+        "work": 123,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2768,
+      "rho_s": 2.3435514087742737,
+      "s": 200820.73605831282,
+      "s_over_rho": 85690.7748242426,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20342191,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 14138977.846000029,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1208
+      },
+      "wall_seconds": 0.669465125
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 13044918.62127513,
+          "group_ops": {
+            "adds": 297,
+            "doubles": 356,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 10,
+            "pkm_grid_fp_mults_uncharged": 13420,
+            "pkm_system_fp_mults_uncharged": 1422,
+            "pkm_system_specialisations": 79,
+            "pkm_system_terms": 1264,
+            "relations": 10,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 79,
+            "solver_ops": 313868323,
+            "sqrt_solves": 0,
+            "target_guard_probes": 79,
+            "trials": 79,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 78
+          },
+          "wall_ns": 617432833,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 78,
+            "walk_modr_adds": 156
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 653.0,
+        "hit_rate": 0.12658227848101267,
+        "name": "pkm-semaev",
+        "relations_found": 10,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19125
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 79,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29437,
+            "max_rows_max": 821,
+            "refutations": 69,
+            "staircase_stops": 0,
+            "steps": 988
+          },
+          "gae": 13044265.62127513,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9612530315778314,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 313868323,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 395,
+          "wall_ns": 615575200
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 79
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 72542,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.6960572669721612,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 10,
+            "repeated_column_rows": 0,
+            "row_ops": 96,
+            "rows": 10,
+            "single_column_rows": 2,
+            "two_column_rows": 8
+          },
+          "wall_ns": 17334,
+          "work_native": {
+            "column_part_inserts": 10,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 701,
+            "pivot_inversion_steps": 260,
+            "row_build_modr_adds": 30,
+            "row_build_modr_muls": 20,
+            "row_build_words": 550,
+            "row_key_mixes": 18
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 10,
+        "rows": 10,
+        "work": 96,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3623,
+      "rho_s": 2.3435514087742737,
+      "s": 185297.93882828281,
+      "s_over_rho": 79067.15343837817,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20382694,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 13046080.317332398,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 6,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1083
+      },
+      "wall_seconds": 0.617564541
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 14566480.951394591,
+          "group_ops": {
+            "adds": 331,
+            "doubles": 355,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 13,
+            "pkm_grid_fp_mults_uncharged": 18870,
+            "pkm_system_fp_mults_uncharged": 1602,
+            "pkm_system_specialisations": 89,
+            "pkm_system_terms": 1424,
+            "relations": 13,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 89,
+            "solver_ops": 354398297,
+            "sqrt_solves": 0,
+            "target_guard_probes": 89,
+            "trials": 89,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 88
+          },
+          "wall_ns": 689586792,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 88,
+            "walk_modr_adds": 176
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 686.0,
+        "hit_rate": 0.14606741573033707,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18583
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 89,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 31757,
+            "max_rows_max": 821,
+            "refutations": 76,
+            "staircase_stops": 0,
+            "steps": 1119
+          },
+          "gae": 14565794.951394591,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9395636966054608,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 354398297,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 445,
+          "wall_ns": 687378071
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 89
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 66500,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.0140680045294417,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 114,
+            "rows": 13,
+            "single_column_rows": 0,
+            "two_column_rows": 13
+          },
+          "wall_ns": 23749,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 952,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 26
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 114,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 4478,
+      "rho_s": 2.3435514087742737,
+      "s": 206909.24170505043,
+      "s_over_rho": 88288.75736643997,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20423197,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 14567644.965462595,
+      "verified": true,
+      "verify": {
+        "gae": 19.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 12,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1250
+      },
+      "wall_seconds": 0.689720833
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 14865409.163377745,
+          "group_ops": {
+            "adds": 316,
+            "doubles": 349,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 10,
+            "pkm_grid_fp_mults_uncharged": 13856,
+            "pkm_system_fp_mults_uncharged": 1656,
+            "pkm_system_specialisations": 92,
+            "pkm_system_terms": 1472,
+            "relations": 10,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 92,
+            "solver_ops": 365442231,
+            "sqrt_solves": 0,
+            "target_guard_probes": 92,
+            "trials": 92,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 91
+          },
+          "wall_ns": 703681000,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 91,
+            "walk_modr_adds": 182
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 665.0,
+        "hit_rate": 0.10869565217391304,
+        "name": "pkm-semaev",
+        "relations_found": 10,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 20167
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 92,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29439,
+            "max_rows_max": 821,
+            "refutations": 82,
+            "staircase_stops": 0,
+            "steps": 1144
+          },
+          "gae": 14864744.163377745,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9195533479544677,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 365442231,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 460,
+          "wall_ns": 701485858
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 92
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 70833,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.431048319007761,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 10,
+            "repeated_column_rows": 0,
+            "row_ops": 81,
+            "rows": 10,
+            "single_column_rows": 1,
+            "two_column_rows": 9
+          },
+          "wall_ns": 19917,
+          "work_native": {
+            "column_part_inserts": 10,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 696,
+            "pivot_inversion_steps": 260,
+            "row_build_modr_adds": 30,
+            "row_build_modr_muls": 20,
+            "row_build_words": 550,
+            "row_key_mixes": 19
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 10,
+        "rows": 10,
+        "work": 81,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 377,
+      "rho_s": 2.3435514087742737,
+      "s": 211154.92779396218,
+      "s_over_rho": 90100.40360258221,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20463700,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 14866566.594426064,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 8,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 792
+      },
+      "wall_seconds": 0.703815833
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 18893596.169522952,
+          "group_ops": {
+            "adds": 406,
+            "doubles": 390,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 13,
+            "pkm_grid_fp_mults_uncharged": 16976,
+            "pkm_system_fp_mults_uncharged": 2070,
+            "pkm_system_specialisations": 115,
+            "pkm_system_terms": 1840,
+            "relations": 13,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 115,
+            "solver_ops": 456897792,
+            "sqrt_solves": 0,
+            "target_guard_probes": 117,
+            "trials": 117,
+            "unliftable_systems": 0,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 64,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 114
+          },
+          "wall_ns": 894232336,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 114,
+            "walk_modr_adds": 232
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 796.0,
+        "hit_rate": 0.1111111111111111,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19542
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 115,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29439,
+            "max_rows_max": 821,
+            "refutations": 102,
+            "staircase_stops": 0,
+            "steps": 1432
+          },
+          "gae": 18892800.169522952,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9513660858312925,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 456897792,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 575,
+          "wall_ns": 891574856
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 117
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 67000,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.7207585324345085,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 154,
+            "rows": 13,
+            "single_column_rows": 1,
+            "two_column_rows": 12
+          },
+          "wall_ns": 23872,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 922,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 25
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 154,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1232,
+      "rho_s": 2.3435514087742737,
+      "s": 268368.66328220465,
+      "s_over_rho": 114513.66600170596,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20504203,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 18894754.890281484,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 3,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 750
+      },
+      "wall_seconds": 0.894366125
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 15345804.016025217,
+          "group_ops": {
+            "adds": 326,
+            "doubles": 363,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 12,
+            "pkm_grid_fp_mults_uncharged": 14852,
+            "pkm_system_fp_mults_uncharged": 1692,
+            "pkm_system_specialisations": 94,
+            "pkm_system_terms": 1503,
+            "relations": 12,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 94,
+            "solver_ops": 373897886,
+            "sqrt_solves": 0,
+            "target_guard_probes": 95,
+            "trials": 95,
+            "unliftable_systems": 0,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 27,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 93
+          },
+          "wall_ns": 726359043,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 93,
+            "walk_modr_adds": 188
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 689.0,
+        "hit_rate": 0.12631578947368421,
+        "name": "pkm-semaev",
+        "relations_found": 12,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18959
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 94,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 31759,
+            "max_rows_max": 821,
+            "refutations": 82,
+            "staircase_stops": 0,
+            "steps": 1175
+          },
+          "gae": 15345115.016025217,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9367725416880266,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 373897886,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 470,
+          "wall_ns": 724155159
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 95
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 67709,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.226075162900962,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 12,
+            "repeated_column_rows": 0,
+            "row_ops": 126,
+            "rows": 12,
+            "single_column_rows": 1,
+            "two_column_rows": 11
+          },
+          "wall_ns": 23041,
+          "work_native": {
+            "column_part_inserts": 12,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 878,
+            "pivot_inversion_steps": 312,
+            "row_build_modr_adds": 36,
+            "row_build_modr_muls": 24,
+            "row_build_words": 660,
+            "row_key_mixes": 23
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 12,
+        "rows": 12,
+        "work": 126,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2087,
+      "rho_s": 2.3435514087742737,
+      "s": 217978.17981807727,
+      "s_over_rho": 93011.90449757806,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20544706,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 15346964.24210038,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1166
+      },
+      "wall_seconds": 0.726493833
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 14162383.771779727,
+          "group_ops": {
+            "adds": 355,
+            "doubles": 357,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 17,
+            "pkm_grid_fp_mults_uncharged": 23971,
+            "pkm_system_fp_mults_uncharged": 1512,
+            "pkm_system_specialisations": 84,
+            "pkm_system_terms": 1344,
+            "relations": 17,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 84,
+            "solver_ops": 334850851,
+            "sqrt_solves": 0,
+            "target_guard_probes": 85,
+            "trials": 85,
+            "unliftable_systems": 0,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 28,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 83
+          },
+          "wall_ns": 670506125,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 83,
+            "walk_modr_adds": 168
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 712.0,
+        "hit_rate": 0.2,
+        "name": "pkm-semaev",
+        "relations_found": 17,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 21708
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 84,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29440,
+            "max_rows_max": 821,
+            "refutations": 67,
+            "staircase_stops": 0,
+            "steps": 1076
+          },
+          "gae": 14161671.771779727,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.995834835133807,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 334850851,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 420,
+          "wall_ns": 668306993
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 85
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 75334,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.597087690051122,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 17,
+            "repeated_column_rows": 0,
+            "row_ops": 147,
+            "rows": 17,
+            "single_column_rows": 1,
+            "two_column_rows": 16
+          },
+          "wall_ns": 33792,
+          "work_native": {
+            "column_part_inserts": 17,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1329,
+            "pivot_inversion_steps": 442,
+            "row_build_modr_adds": 51,
+            "row_build_modr_muls": 34,
+            "row_build_words": 935,
+            "row_key_mixes": 33
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 17,
+        "rows": 17,
+        "work": 147,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2942,
+      "rho_s": 2.3435514087742737,
+      "s": 201169.71959455637,
+      "s_over_rho": 85839.68708404496,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20585209,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 14163548.368867418,
+      "verified": true,
+      "verify": {
+        "gae": 19.0,
+        "group_ops": {
+          "adds": 8,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1375
+      },
+      "wall_seconds": 0.670663625
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 21795254.39914709,
+          "group_ops": {
+            "adds": 442,
+            "doubles": 385,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 16,
+            "pkm_grid_fp_mults_uncharged": 22229,
+            "pkm_system_fp_mults_uncharged": 2412,
+            "pkm_system_specialisations": 134,
+            "pkm_system_terms": 2144,
+            "relations": 16,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 134,
+            "solver_ops": 533109970,
+            "sqrt_solves": 0,
+            "target_guard_probes": 136,
+            "trials": 136,
+            "unliftable_systems": 0,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 64,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 133
+          },
+          "wall_ns": 1031644042,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 133,
+            "walk_modr_adds": 270
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 827.0,
+        "hit_rate": 0.11764705882352941,
+        "name": "pkm-semaev",
+        "relations_found": 16,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19708
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 134,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 31862,
+            "max_rows_max": 821,
+            "refutations": 118,
+            "staircase_stops": 0,
+            "steps": 1670
+          },
+          "gae": 21794427.39914709,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9292572449920604,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 533109970,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 670,
+          "wall_ns": 1028506272
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 136
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 69166,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.303778217956189,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 16,
+            "repeated_column_rows": 0,
+            "row_ops": 187,
+            "rows": 16,
+            "single_column_rows": 2,
+            "two_column_rows": 14
+          },
+          "wall_ns": 30959,
+          "work_native": {
+            "column_part_inserts": 16,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1237,
+            "pivot_inversion_steps": 416,
+            "row_build_modr_adds": 48,
+            "row_build_modr_muls": 32,
+            "row_build_words": 880,
+            "row_key_mixes": 30
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 16,
+        "rows": 16,
+        "work": 187,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3797,
+      "rho_s": 2.3435514087742737,
+      "s": 309581.98640893656,
+      "s_over_rho": 132099.50729045641,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20625712,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 21796418.702925306,
+      "verified": true,
+      "verify": {
+        "gae": 18.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1041
+      },
+      "wall_seconds": 1.031787375
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 19388531.88684343,
+          "group_ops": {
+            "adds": 363,
+            "doubles": 345,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 16,
+            "pkm_grid_fp_mults_uncharged": 24342,
+            "pkm_system_fp_mults_uncharged": 2160,
+            "pkm_system_specialisations": 120,
+            "pkm_system_terms": 1920,
+            "relations": 16,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 120,
+            "solver_ops": 477199162,
+            "sqrt_solves": 0,
+            "target_guard_probes": 120,
+            "trials": 120,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 119
+          },
+          "wall_ns": 917804500,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 119,
+            "walk_modr_adds": 238
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 708.0,
+        "hit_rate": 0.13333333333333333,
+        "name": "pkm-semaev",
+        "relations_found": 16,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18500
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 120,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 30725,
+            "max_rows_max": 821,
+            "refutations": 104,
+            "staircase_stops": 0,
+            "steps": 1504
+          },
+          "gae": 19387823.88684343,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9173035429597003,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 477199162,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 600,
+          "wall_ns": 914935644
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 120
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 66791,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 4.381481273011417,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 16,
+            "repeated_column_rows": 0,
+            "row_ops": 248,
+            "rows": 16,
+            "single_column_rows": 0,
+            "two_column_rows": 16
+          },
+          "wall_ns": 32083,
+          "work_native": {
+            "column_part_inserts": 16,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1254,
+            "pivot_inversion_steps": 416,
+            "row_build_modr_adds": 48,
+            "row_build_modr_muls": 32,
+            "row_build_words": 880,
+            "row_key_mixes": 32
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 16,
+        "rows": 16,
+        "work": 248,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 4652,
+      "rho_s": 2.3435514087742737,
+      "s": 275398.47067749227,
+      "s_over_rho": 117513.30465651334,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20666215,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 19389695.268324703,
+      "verified": true,
+      "verify": {
+        "gae": 16.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 12,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1000
+      },
+      "wall_seconds": 0.917945417
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 18541757.647206847,
+          "group_ops": {
+            "adds": 385,
+            "doubles": 350,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 17,
+            "pkm_grid_fp_mults_uncharged": 25785,
+            "pkm_system_fp_mults_uncharged": 2016,
+            "pkm_system_specialisations": 112,
+            "pkm_system_terms": 1792,
+            "relations": 17,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 112,
+            "solver_ops": 445887612,
+            "sqrt_solves": 0,
+            "target_guard_probes": 112,
+            "trials": 112,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 111
+          },
+          "wall_ns": 877729709,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 111,
+            "walk_modr_adds": 222
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 735.0,
+        "hit_rate": 0.15178571428571427,
+        "name": "pkm-semaev",
+        "relations_found": 17,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19250
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 112,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29448,
+            "max_rows_max": 821,
+            "refutations": 95,
+            "staircase_stops": 0,
+            "steps": 1412
+          },
+          "gae": 18541022.647206847,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9623196775424208,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 445887612,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 560,
+          "wall_ns": 874974035
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 112
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 68334,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.7101252715016027,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 17,
+            "repeated_column_rows": 0,
+            "row_ops": 210,
+            "rows": 17,
+            "single_column_rows": 0,
+            "two_column_rows": 17
+          },
+          "wall_ns": 33042,
+          "work_native": {
+            "column_part_inserts": 17,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1321,
+            "pivot_inversion_steps": 442,
+            "row_build_modr_adds": 51,
+            "row_build_modr_muls": 34,
+            "row_build_words": 935,
+            "row_key_mixes": 34
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 17,
+        "rows": 17,
+        "work": 210,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 551,
+      "rho_s": 2.3435514087742737,
+      "s": 263371.3945185492,
+      "s_over_rho": 112381.31731716436,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20706718,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 18542917.357332118,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 9,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 833
+      },
+      "wall_seconds": 0.877874125
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 19639204.896246657,
+          "group_ops": {
+            "adds": 423,
+            "doubles": 393,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 16,
+            "pkm_grid_fp_mults_uncharged": 22886,
+            "pkm_system_fp_mults_uncharged": 2160,
+            "pkm_system_specialisations": 120,
+            "pkm_system_terms": 1916,
+            "relations": 16,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 120,
+            "solver_ops": 477091839,
+            "sqrt_solves": 0,
+            "target_guard_probes": 122,
+            "trials": 122,
+            "unliftable_systems": 0,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 66,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 119
+          },
+          "wall_ns": 929623538,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 119,
+            "walk_modr_adds": 242
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 816.0,
+        "hit_rate": 0.13114754098360656,
+        "name": "pkm-semaev",
+        "relations_found": 16,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19042
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 120,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 29437,
+            "max_rows_max": 821,
+            "refutations": 104,
+            "staircase_stops": 0,
+            "steps": 1504
+          },
+          "gae": 19638388.896246657,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9425193311680187,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 477091839,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 600,
+          "wall_ns": 926760120
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 122
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 68917,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.8267621116202686,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 16,
+            "repeated_column_rows": 0,
+            "row_ops": 160,
+            "rows": 16,
+            "single_column_rows": 0,
+            "two_column_rows": 16
+          },
+          "wall_ns": 32545,
+          "work_native": {
+            "column_part_inserts": 16,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1223,
+            "pivot_inversion_steps": 416,
+            "row_build_modr_adds": 48,
+            "row_build_modr_muls": 32,
+            "row_build_words": 880,
+            "row_key_mixes": 32
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 16,
+        "rows": 16,
+        "work": 160,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1406,
+      "rho_s": 2.3435514087742737,
+      "s": 278958.85724910285,
+      "s_over_rho": 119032.53165459858,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20747221,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 19640367.723008767,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1250
+      },
+      "wall_seconds": 0.929768084
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 20748064.276984613,
+          "group_ops": {
+            "adds": 430,
+            "doubles": 403,
+            "scalar_mults": 40
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 13,
+            "pkm_grid_fp_mults_uncharged": 20908,
+            "pkm_system_fp_mults_uncharged": 2304,
+            "pkm_system_specialisations": 128,
+            "pkm_system_terms": 2048,
+            "relations": 13,
+            "repeated_targets_skipped": 3,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 128,
+            "solver_ops": 509948065,
+            "sqrt_solves": 0,
+            "target_guard_probes": 131,
+            "trials": 131,
+            "unliftable_systems": 0,
+            "walk_jumps": 19,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 3,
+            "walk_pool_ops": 94,
+            "walk_pool_restarts": 3,
+            "walk_restarts": 4,
+            "walk_steps": 127
+          },
+          "wall_ns": 981958497,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 79,
+            "walk_mix_hashes": 127,
+            "walk_modr_adds": 260
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 833.0,
+        "hit_rate": 0.09923664122137404,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18250
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 128,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 47326,
+            "max_rows_max": 821,
+            "refutations": 115,
+            "staircase_stops": 0,
+            "steps": 1588
+          },
+          "gae": 20747231.276984613,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.919975474365218,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 509948065,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 640,
+          "wall_ns": 979087778
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 131
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 67208,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.0140680045294417,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 114,
+            "rows": 13,
+            "single_column_rows": 1,
+            "two_column_rows": 12
+          },
+          "wall_ns": 24753,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 955,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 25
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 114,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2261,
+      "rho_s": 2.3435514087742737,
+      "s": 294708.34037467366,
+      "s_over_rho": 125752.88055183405,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20787724,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 20749225.291052617,
+      "verified": true,
+      "verify": {
+        "gae": 16.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1208
+      },
+      "wall_seconds": 0.982093292
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 12905119.699467594,
+          "group_ops": {
+            "adds": 301,
+            "doubles": 337,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 10,
+            "pkm_grid_fp_mults_uncharged": 15313,
+            "pkm_system_fp_mults_uncharged": 1422,
+            "pkm_system_specialisations": 79,
+            "pkm_system_terms": 1264,
+            "relations": 10,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 79,
+            "solver_ops": 314012471,
+            "sqrt_solves": 0,
+            "target_guard_probes": 79,
+            "trials": 79,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 78
+          },
+          "wall_ns": 610851044,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 78,
+            "walk_modr_adds": 156
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 638.0,
+        "hit_rate": 0.12658227848101267,
+        "name": "pkm-semaev",
+        "relations_found": 10,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 19375
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 79,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 30282,
+            "max_rows_max": 821,
+            "refutations": 69,
+            "staircase_stops": 0,
+            "steps": 988
+          },
+          "gae": 12904481.699467594,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9393453389308222,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 314012471,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 395,
+          "wall_ns": 608978622
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 79
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 71500,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.590053687786401,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 10,
+            "repeated_column_rows": 0,
+            "row_ops": 90,
+            "rows": 10,
+            "single_column_rows": 1,
+            "two_column_rows": 9
+          },
+          "wall_ns": 20123,
+          "work_native": {
+            "column_part_inserts": 10,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 693,
+            "pivot_inversion_steps": 260,
+            "row_build_modr_adds": 30,
+            "row_build_modr_muls": 20,
+            "row_build_words": 550,
+            "row_key_mixes": 19
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 10,
+        "rows": 10,
+        "work": 90,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3116,
+      "rho_s": 2.3435514087742737,
+      "s": 183312.29703631412,
+      "s_over_rho": 78219.87448194716,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20828227,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 12906279.28952128,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 958
+      },
+      "wall_seconds": 0.610987333
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 17183289.855163828,
+          "group_ops": {
+            "adds": 360,
+            "doubles": 374,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 0,
+            "pkm_consistent_systems": 12,
+            "pkm_grid_fp_mults_uncharged": 21168,
+            "pkm_system_fp_mults_uncharged": 1908,
+            "pkm_system_specialisations": 106,
+            "pkm_system_terms": 1696,
+            "relations": 12,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 106,
+            "solver_ops": 421663767,
+            "sqrt_solves": 0,
+            "target_guard_probes": 108,
+            "trials": 108,
+            "unliftable_systems": 0,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 63,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 105
+          },
+          "wall_ns": 813329832,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 105,
+            "walk_modr_adds": 214
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on the base's Vélu 2-isogeny tower (PKM isogeny form) (PKM), m = 2, t = 5, mode chain, engine f4",
+        "gae_before_solver": 734.0,
+        "hit_rate": 0.1111111111111111,
+        "name": "pkm-semaev",
+        "relations_found": 12,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 18875
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 106,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 583,
+            "max_nnz_max": 31862,
+            "max_rows_max": 821,
+            "refutations": 94,
+            "staircase_stops": 0,
+            "steps": 1319
+          },
+          "gae": 17182555.855163828,
+          "name": "f4-fp-tower",
+          "ns_per_op": 1.9230162808842906,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 421663767,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 5,
+          "solving_degree_mean": 5.0,
+          "solving_degree_sum": 530,
+          "wall_ns": 810866289
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 11,
+          "n_vars": 10,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 108
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 1143.0,
+          "group_ops": {
+            "adds": 511,
+            "doubles": 632,
+            "scalar_mults": 91
+          },
+          "native": {
+            "aux_bsgs_table_entries": 116,
+            "aux_count_gae": 144,
+            "aux_curves_filtered_out": 31,
+            "aux_curves_singular": 0,
+            "aux_curves_tried": 34,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 98,
+            "aux_orders_computed": 3,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 824,
+            "aux_sqrt_solves": 55,
+            "aux_tower_build_gae": 319,
+            "aux_two_sylow_rejected": 2,
+            "legendre_symbols": 130,
+            "sqrt_solves": 73,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 69000,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 108,
+            "index_point_negations": 36,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched auxiliary curve, the zeros of a chain of t Vélu 2-isogeny x-maps, t = 5, seed = 5; the search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-isogeny[aux=ordinary,seed=5,t=5] + pkm-semaev[degree=8,engine=f4,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.332078742086722,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 12,
+            "repeated_column_rows": 0,
+            "row_ops": 132,
+            "rows": 12,
+            "single_column_rows": 0,
+            "two_column_rows": 12
+          },
+          "wall_ns": 23209,
+          "work_native": {
+            "column_part_inserts": 12,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 884,
+            "pivot_inversion_steps": 312,
+            "row_build_modr_adds": 36,
+            "row_build_modr_muls": 24,
+            "row_build_words": 660,
+            "row_key_mixes": 24
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 12,
+        "rows": 12,
+        "work": 132,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3971,
+      "rho_s": 2.3435514087742737,
+      "s": 244076.6492874332,
+      "s_over_rho": 104148.1950741974,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "seed": "5",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "degree": "8",
+          "engine": "f4",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20868730,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 17184452.18724257,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 6,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1167
+      },
+      "wall_seconds": 0.813464583
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "b449282386818d154e1039f7e9c1bdd5d90bcbb40bca8d845a44317bedefeee4",
+    "git_commit": "cc7d6141f26bc02ae02876bc094b6a7783990947",
+    "git_commit_source": "CRYPTO_BUILD_GIT_COMMIT",
+    "git_dirty": false,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

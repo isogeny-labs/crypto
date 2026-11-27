@@ -39,16 +39,9 @@ fn invmod(a: u64) -> Option<u64> {
     if a == 0 {
         return None;
     }
-    // Fermat: a^(p-2)
-    let (mut r, mut b, mut e) = (1u64, a, MODULUS - 2);
-    while e > 0 {
-        if e & 1 == 1 {
-            r = mulmod(r, b);
-        }
-        b = mulmod(b, b);
-        e >>= 1;
-    }
-    Some(r)
+    // MODULUS is prime: the old Fermat power `a^(p-2)` is the inverse of a
+    // unit, and a non-zero multiple of MODULUS gave `Some(0)`, kept here.
+    Some(crypto_lib::gcd::int::inv_mod_u64(a, MODULUS).unwrap_or(0))
 }
 
 type Row = (Vec<(u32, u64)>, u64);

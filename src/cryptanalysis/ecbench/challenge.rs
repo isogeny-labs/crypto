@@ -50,7 +50,8 @@ use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{
-    plan, ArmSpec, CurvePolicy, Level, Measurement, Order, Role, Spec, WorkloadPlan, SPEC_SCHEMA,
+    plan, ArmSpec, CurvePolicy, Level, Measurement, Order, Role, Spec, WorkloadPlan,
+    LEGACY_SPEC_SCHEMA, SPEC_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::stats::{bootstrap_ci, cluster_bootstrap_ci, mean};
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind};
@@ -1086,7 +1087,12 @@ pub fn verdict(inputs: &VerdictInputs) -> Result<VerdictOutput, String> {
         }
         plan(spec_for_committed(ch, &written, c, beacon)?)?
     } else {
-        plan(spec_for(ch, &written, inputs.epoch))?
+        let mut expected = spec_for(ch, &written, inputs.epoch);
+        if spec.schema == LEGACY_SPEC_SCHEMA {
+            expected.schema = LEGACY_SPEC_SCHEMA.into();
+            expected.curve_policy = CurvePolicy::Legacy;
+        }
+        plan(expected)?
     };
     let spec_matches = expected.spec_id == session.spec_id;
     if !spec_matches {

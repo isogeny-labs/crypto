@@ -1,0 +1,42 @@
+{
+  "schema": "validation-gate/v1",
+  "_status": "SKELETON - NOT VALID. Do not reference from any leaderboard/benchmarks row. Every null below needs a lab (isolab-eks + S3) artifact.",
+  "rows": [],
+  "row_digest": null,
+  "replay_certificate": {
+    "path": null,
+    "sha256": null,
+    "_needs": "independent replay of recorded runs (isolab), signed; absent"
+  },
+  "validator_report": {
+    "path": null,
+    "sha256": null,
+    "_needs": "independent recompute of headline numbers from raw data in repo; absent"
+  },
+  "rho_reference": {
+    "kind": null,
+    "protocol": null,
+    "unit": null,
+    "binary_or_process": null,
+    "matches_protocol": null,
+    "strongest_available": null,
+    "same_unit": null,
+    "same_binary_or_process": null,
+    "gae_band": {
+      "0": {
+        "ic": null,
+        "rho": null
+      },
+      "0.1": {
+        "ic": null,
+        "rho": null
+      },
+      "1": {
+        "ic": null,
+        "rho": null
+      }
+    },
+    "order_holds_across_band": null,
+    "_needs": "matched negation-map rho in the same unit/process; NOT meaningful for a kernel microbenchmark: this change speeds a sub-step, no complete DLP was solved"
+  }
+}

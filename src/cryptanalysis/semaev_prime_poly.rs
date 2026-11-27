@@ -125,7 +125,7 @@ impl Curve {
     }
 
     /// `S₃(u, v, X)` as coefficients in `X`, lowest first.
-    fn s3_in_last(&self, u: u64, v: u64) -> [u64; 3] {
+    pub(crate) fn s3_in_last(&self, u: u64, v: u64) -> [u64; 3] {
         let f = self.f;
         let d = f.sub(u, v);
         let s = f.add(u, v);

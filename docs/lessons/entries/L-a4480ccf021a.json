@@ -1,0 +1,14 @@
+{
+  "action": "compute the yield mu at the optimal beta first; if mu >= 1 (beta = 1/(m-1) when s > l) the attempt is a satisfiable whole solve, so refutation-degree/PC-size targets and refutation-regime measurements do not bound it; demand a per-regime target (refutation bar s < m/2-1, satisfiable bar s < (m-1)/2)",
+  "created": "2026-11-25T18:38:28Z",
+  "evidence": [
+    "research/degree_slope_two_block_20261124/REDTEAM.md F1; research/pkm_cost_rules_20261115/out/rules.out (m=8 finite exact optimisation)"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "reviewing an IC closure/KILL target (degree, refutation size, d_F) derived from the floored attempt-count cost rule (pkm_cost_rules E(beta))",
+  "why": "THEORY_ATTEMPT T_M1 paired the satisfiable-regime bar H^-1((m-1)/(2m)) with a refutation-degree quantity; rules.out itself shows attempts=1.0 with ~2^24.7 roots per attempt at log2 r=64"
+}

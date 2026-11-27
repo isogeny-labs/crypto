@@ -1,0 +1,23 @@
+default(parisize,268435456);
+default(parisizemax,536870912);
+checksub(d) = {
+  my(L,F,B,P,R,V,C);
+  L=concat([],polsubcyclo(917,d));
+  L=select(f->polsturm(f)==d,L);
+  if(#L!=1,error("real subfield is not unique")); F=L[1];
+  print("BEGIN degree=",d,"; polynomial=",F);
+  B=bnfinit(F,1);
+  if(B.sign!=[d,0],error("signature"));
+  P=idealprimedec(B,263)[1];
+  if(idealnorm(B,P)!=263,error("prime is not degree1"));
+  print("degree=",d,"; disc=",B.disc,"; ordinary_class_number=",B.no,"; prime=",P);
+  print("ordinary_class_vector=",bnfisprincipal(B,P,0));
+  R=bnrinit(B,[1,vector(d,j,1)],0);
+  V=bnrisprincipal(R,P,0);
+  print("narrow_class_number=",R.no,"; narrow_class_vector=",V);
+  C=bnfcertify(B);
+  if(C!=1,error("uncertified class group"));
+  print("bnfcertify=",C,"; narrow_zero=",V==0*V);
+};
+iferr(for(j=1,5,checksub([2,5,10,13,26][j])),E,print("PARI_ERROR=",E);quit(2));
+quit;

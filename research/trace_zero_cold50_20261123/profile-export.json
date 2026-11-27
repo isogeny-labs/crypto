@@ -1,0 +1,186 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "TZ50-20261123-incumbent-profile",
+  "created": "2026-11-23T23:17:47Z",
+  "protocol": {
+    "path": "profile.protocol.json",
+    "sha256": "bc91207a8f8501d11eac06fd0e160fa57151c4c3f00f0258be4d2927f38c205c",
+    "protocol_id": "TZ50-20261123-incumbent-profile",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": "codex-ecc2k-cold50-20261123",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "ad5f91c4b439eb758b63d2c7d0088d7e8f2d9915",
+    "dirty": false
+  },
+  "backend": "manual",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "binary_sha256": "504a9c6a6ae668a0488b1e24efab7f443331c083f84f3aaee3186af24e35cef7",
+      "commit": "8d3905a93a5197ee0c19117f4052468bf6846c47"
+    },
+    {
+      "id": "baseline-aa",
+      "role": "control_aa",
+      "binary_sha256": "504a9c6a6ae668a0488b1e24efab7f443331c083f84f3aaee3186af24e35cef7",
+      "commit": "8d3905a93a5197ee0c19117f4052468bf6846c47"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "row-0",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 34987635
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-1",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 34987635
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "profile-rows.jsonl",
+      "sha256": "3e310f4f31755a642f5ab830ca4381105b55454a9e8fa15e4d9a902093f31c62",
+      "bytes": 355,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../tools/profile.sh",
+      "sha256": "42a7c0dee60712fb3a767647043136d154b5c5713cda76930c027c2571ac5375",
+      "bytes": 59862,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "profiles/baseline-cold/hotspots.json",
+        "sha256": "9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+        "bytes": 6409,
+        "kind": "summary"
+      },
+      {
+        "path": "profiles/baseline-aa-cold/hotspots.json",
+        "sha256": "9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+        "bytes": 6409,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Absolute incumbent profile. Verification refers to producer output checks, not signed independent admission. No gain or50% result.",
+      "by": "codex-ecc2k-cold50-20261123"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

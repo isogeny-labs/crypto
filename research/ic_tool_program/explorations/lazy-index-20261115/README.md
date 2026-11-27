@@ -6,7 +6,7 @@
 
 Temporary sub-step timers priced `RelationCollector` construction at
 8–13 ms of collect-setup's 10–17 ms:
-- `FrobeniusFactorBase::shared_index_map` took 8.1 ms at k0n53: a
+- `FrobeniusFactorBase::shared_index_map` took 8.1 ms at icv1-f2m53-tm56619371-dac20a85: a
   `HashMap<(BigUint, BigUint), usize>` over every point;
 - `m_can_decompose` took 2.0 ms;
 - `FieldStructure::new` took 0.3 ms.
@@ -28,8 +28,8 @@ decomposition paths without a pair table.
 
 | row | collect-setup | descent-setup | set-up |
 |:--|:--|:--|:--|
-| k0n53 | **2.80** [2.70, 2.90], established (10.4 → 3.7 ms) | **1.49** [1.45, 1.55], established | 1.034, not established |
-| k0n61 | **3.03** [2.83, 3.09], established (15.6 → 5.2 ms) | **1.60** [1.55, 1.62], established | 1.014, not established |
+| icv1-f2m53-tm56619371-dac20a85 | **2.80** [2.70, 2.90], established (10.4 → 3.7 ms) | **1.49** [1.45, 1.55], established | 1.034, not established |
+| icv1-f2m61-t158598901-ab42b6c5 | **3.03** [2.83, 3.09], established (15.6 → 5.2 ms) | **1.60** [1.55, 1.62], established | 1.014, not established |
 
 - **Identity:** zero mismatches.
 - **Exploration:** 3 rounds an arm, in [`explore/`](explore/).

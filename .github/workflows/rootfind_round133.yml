@@ -2,12 +2,13 @@ name: Rootfind Round 133 Tonelli-Shanks source-exact A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round133-tonelli-shanks-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round133/**
       - .github/workflows/rootfind_round133.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -25,7 +26,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --no-tags --depth=1 origin automation/rootfind-round132-direct-low-degree-20261123
+          # Historical round 132 baseline from merged PR #4999.
+          git fetch --no-tags --depth=1 origin 8dfe01df240040ee7f55f087adcbe2633c234cd6
           mkdir -p /tmp/rootfind_round133
           git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round133/baseline.rs
           cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round133/optimized.rs

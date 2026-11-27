@@ -339,33 +339,42 @@ fn pmonic(f: &F, a: &P) -> P {
     }
     psc(f, a, f.inv(*a.last().unwrap()))
 }
-fn pgcd(f: &F, a: &P, b: &P) -> P {
-    let (mut x, mut y) = (a.clone(), b.clone());
-    while !y.is_empty() {
-        let r = pmod(f, &x, &y);
-        x = y;
-        y = r;
+/// `GF(q^n)` (log/Zech tables; `0` is zero, `1` is one) as a
+/// [`crate::gcd::poly::PolyField`].
+impl crate::gcd::poly::PolyField for F {
+    type E = u32;
+    fn zero(&self) -> u32 {
+        0
     }
-    pmonic(f, &x)
+    fn one(&self) -> u32 {
+        1
+    }
+    fn add(&self, a: u32, b: u32) -> u32 {
+        F::add(self, a, b)
+    }
+    fn sub(&self, a: u32, b: u32) -> u32 {
+        F::sub(self, a, b)
+    }
+    fn mul(&self, a: u32, b: u32) -> u32 {
+        F::mul(self, a, b)
+    }
+    fn inv(&self, a: u32) -> u32 {
+        F::inv(self, a)
+    }
+    fn neg(&self, a: u32) -> u32 {
+        F::neg(self, a)
+    }
 }
+/// Monic `gcd(a, b)`, by `crate::gcd::poly::gcd`.
+fn pgcd(f: &F, a: &P, b: &P) -> P {
+    crate::gcd::poly::gcd(f, a, b)
+}
+/// `s a + t b = g`, `g` monic, by `crate::gcd::poly::xgcd` (the classical
+/// cofactors).  Panics, as before, when `a = b = 0`.
 fn pxgcd(f: &F, a: &P, b: &P) -> (P, P, P) {
-    // s a + t b = g, g monic
-    let (mut r0, mut r1) = (a.clone(), b.clone());
-    let (mut s0, mut s1) = (vec![1u32], vec![]);
-    let (mut t0, mut t1) = (vec![], vec![1u32]);
-    while !r1.is_empty() {
-        let (qq, r) = pdivrem(f, &r0, &r1);
-        r0 = r1;
-        r1 = r;
-        let s2 = psub(f, &s0, &pmul(f, &qq, &s1));
-        s0 = s1;
-        s1 = s2;
-        let t2 = psub(f, &t0, &pmul(f, &qq, &t1));
-        t0 = t1;
-        t1 = t2;
-    }
-    let li = f.inv(*r0.last().unwrap());
-    (psc(f, &r0, li), psc(f, &s0, li), psc(f, &t0, li))
+    let (g, s, t) = crate::gcd::poly::xgcd(f, a, b);
+    assert!(!g.is_empty(), "pxgcd of two zero polynomials");
+    (g, s, t)
 }
 fn pev(f: &F, a: &P, x: u32) -> u32 {
     let mut r = 0;

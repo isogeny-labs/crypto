@@ -1,0 +1,31 @@
+error: linking with `cc` failed: exit status: 1
+  |
+  = note:  "cc" "-m64" "<scratch-path>" "<10 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,libcfg_if-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*,liblibc-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-Wl,-Bdynamic" "-lgcc_s" "-lutil" "-lrt" "-lpthread" "-lm" "-ldl" "-lc" "-L" "<scratch-path>" "-B<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld" "-fuse-ld=lld" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib" "-o" "cayley-chord-check" "-Wl,--gc-sections" "-pie" "-Wl,-z,relro,-z,now" "-Wl,-O1" "-nodefaultlibs"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: terminate called after throwing an instance of 'std::system_error'
+            what():  Resource temporarily unavailable
+          PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+          Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+          0  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df573cfa llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 42
+          1  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df57467d
+          2  libc.so.6                           0x00007f22d904bd70
+          3  libc.so.6                           0x00007f22d90a069c
+          4  libc.so.6                           0x00007f22d904bc42 gsignal + 18
+          5  libc.so.6                           0x00007f22d90344ac abort + 34
+          6  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df40c295 __gnu_cxx::__verbose_terminate_handler() + 245
+          7  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df40b9f6 __cxxabiv1::__terminate(void (*)()) + 6
+          8  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df40ba61
+          9  libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df40bbb5
+          10 libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df48ad8e std::__throw_system_error(int) + 129
+          11 libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df48b0c9
+          12 libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df51a2fc
+          13 libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df519f0f
+          14 libLLVM.so.23.1-rust-1.100.0-stable 0x00007f22df48ae30
+          15 libc.so.6                           0x00007f22d909e8bb
+          16 libc.so.6                           0x00007f22d911c778
+          collect2: fatal error: ld terminated with signal 6 [Aborted]
+          compilation terminated.
+          
+
+error: aborting due to 1 previous error
+

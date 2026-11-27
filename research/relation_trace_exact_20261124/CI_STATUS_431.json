@@ -1,0 +1,64 @@
+{
+  "schema": "relation-ci-source-status/v1",
+  "scientific_head": "17e329c770bdb23fa6bcc9a3ee2564176014c386",
+  "canonical_comparison_base": "9ef955b17dc3b0eb1d1ac49985cf1cdb0dbf4598",
+  "observed_pr_state": "OPEN",
+  "observed_draft": false,
+  "auto_merge_method": "MERGE",
+  "observed_merge_state": "BLOCKED",
+  "failures": [
+    {
+      "job": 138214848663,
+      "name": "migrate",
+      "cause": "HeadObject403 for complete and partial scan archive keys; absent-key403 vs missing permission cannot be distinguished from this log",
+      "affected_sha256": [
+        "aa13e062592209ba8ba50ee1db098eefe86be7128cea7654bc557a573c059e84",
+        "9acbf195e594bb331b4fa2b41a4f21d336bebc7eb506811a49c312368591ecbc"
+      ]
+    },
+    {
+      "job": 138214866465,
+      "name": "native-rust-quadratics",
+      "cause": "round123 Python pre-compilation source-shape assertion frozen.count(old)==1 fails",
+      "source_unchanged_from_base": true
+    },
+    {
+      "job": 138214866099,
+      "name": "native-rust-trace-field",
+      "cause": "round124 Python pre-compilation assertion requiring reciprocal_64 and let quotient fails",
+      "source_unchanged_from_base": true
+    }
+  ],
+  "unchanged_base_files": {
+    "research/amm_digit_perf_20261118/round123_quad_ab.py": {
+      "base_git_blob": "920a0519653658e680527f56ef5b715d4dcd07b9",
+      "head_git_blob": "920a0519653658e680527f56ef5b715d4dcd07b9",
+      "unchanged": true
+    },
+    "research/amm_digit_perf_20261118/round124_native_trace_ab.py": {
+      "base_git_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2",
+      "head_git_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2",
+      "unchanged": true
+    },
+    "src/cryptanalysis/prime_radical_root.rs": {
+      "base_git_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654",
+      "head_git_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654",
+      "unchanged": true
+    },
+    "src/cryptanalysis/prime_root_trace.rs": {
+      "base_git_blob": "27be9d2730fc0f75c68c615376ca596ccd365122",
+      "head_git_blob": "27be9d2730fc0f75c68c615376ca596ccd365122",
+      "unchanged": true
+    }
+  },
+  "raw_ci_logs": {
+    "ci-job-138214866099-431.log": "d7128ead15a31864cb5bca64db86fcca073e1dde9a4ba93b07cd920589c6bd79",
+    "ci-job-138214848663-431.log": "aa0f9eecb399dd1820f236ba121deac306cf9963e9c031b75159a76f839767ba",
+    "ci-job-138214866465-431.log": "4cba667c8e4afba1deb8b15d9d55e061541f708b68bd533227f6c0d1341f77e0"
+  },
+  "no_benchmark_rerun": true,
+  "no_credentials_requested": true,
+  "no_gate_override": true,
+  "signed_verdict": null,
+  "original15x_goal_status": "active;not achieved"
+}

@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-26T06:16:39Z",
+ "id": "PCC-20261126-1f48aa",
+ "kind": "speedup",
+ "producer": {
+  "commit": "970114502704a9506e3207c54991a577feceda19",
+  "model": "Codex Rust producer; independent CI verdict pending",
+  "session": "codex/norm-one-torus-rust-batch-mitm"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+      "path": "research/norm_one_torus_rust_mitm_20261126/development/pcc-validator-report.json",
+      "sha256": "d213956b1b43e0916e01aae1fb16e714a7cbef3ac7011b8b20223ec5307ba606"
+  },
+  {
+   "kind": "replay",
+      "path": "research/norm_one_torus_rust_mitm_20261126/development/pcc-replay-certificate.json",
+      "sha256": "1a96ca6833d3e9f3cdf33aff6baeb6b3377bbfe339c2dece574a7aac4072681b"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/norm_one_torus_rust_mitm_20261126; curve icv1-fp31-tm3989-ae9db972; Dickson t=6, lo=0, c_top=0; arity m=5; Rust producer evidence",
+ "statement": "On the frozen Prime31 norm-one-torus m=5 generic 2+3 decomposition component, the batch-inversion plus signed-quotient candidate recorded local non-isolated producer medians of 9.629 ms versus 47.289 ms for individual affine normalization (4.911x), while setup inversions fell from 57052 to 2; all 40 held-out hit/miss decisions and all 8 returned witnesses passed the retained affine verifier. This is unisolated component evidence, not a full ECDLP or rho comparison, and has no independent signed standing yet."
+}

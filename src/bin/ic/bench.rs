@@ -22,19 +22,23 @@ use crypto_lib::cryptanalysis::ic_framework::archive::{
 };
 use serde_json::{json, Value};
 
+#[path = "prime_workload.rs"]
+mod prime_workload;
+
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
     curve25519_family_instance, find_prime_order_curve, fp_p31_subexp_mersenne_instance,
-    generic_floor_ops, koblitz_floor_instance,
-    koblitz_instance, random_binary_instance, rho_reference, rho_reference_negation,
-    roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
-    CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
+    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
+    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
+    RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::genroot::GenRootOracle;
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
+use crypto_lib::cryptanalysis::ic_framework::indexed_resultant::IndexedResultantOracle;
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
-use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
+use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::{PkmSemaevOracle, PrimeIntervalBase};
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, ChainedXOracle, CmMultiplierBase,
@@ -58,6 +62,18 @@ use crypto_lib::cryptanalysis::ic_framework::{
 
 #[derive(Args, Clone)]
 pub struct BenchArgs {
+    /// Immutable prime curve and known-answer scalar/point panel. Replaces curve
+    /// generation and repeat count; IC and rho both use these exact targets.
+    #[arg(long, conflicts_with_all = ["bits", "char2_degree", "koblitz_degree", "archive_store", "archive_manifest", "efd_model", "sweep", "auto", "repeats", "family"])]
+    pub prime_workload: Option<std::path::PathBuf>,
+    #[arg(skip)]
+    pub workload_scalars: Vec<u64>,
+    #[arg(skip)]
+    pub workload_instance: Option<PrimeInstance>,
+    #[arg(skip)]
+    pub workload_sha256: Option<String>,
+    #[arg(skip)]
+    pub workload_curve_validation: Option<Value>,
     /// Print what can be plugged in at each stage, with the parameters
     /// each plug-in reads, and exit.
     #[arg(long)]
@@ -410,6 +426,9 @@ fn listing() -> Value {
                                     {"name": "left", "means": "sources in the target-independent table, 1..m-1; default ceil(m/2)"},
                                     {"name": "max_table", "means": "left-table record cap, default 4000000"}],
                      "needs": "the generalized root-finder's exact S3 chain (tools/generalized-rootfinder); fiber root-finding is counted, not priced, so S is marked partial"},
+                    {"name": "indexed-s3", "summands": 5, "regimes": ["prime"],
+                     "parameters": [{"name": "m", "means": "summands, fixed at 5 (default)"}],
+                     "needs": "a finite prime-field factor base; indexes quadratic S3 roots once and probes them with signed triples"},
                     {"name": "pkm-semaev", "summands": "2 or 3", "regimes": ["prime"],
                      "parameters": [
                         {"name": "m", "means": "summands, 2 or 3"},
@@ -516,7 +535,7 @@ fn sample_prime_points(
 
 /// The logarithm a configuration's `rep`-th repeat plants.
 fn planted_log(seed: u64, rep: usize, r: u64) -> u64 {
-    1 + (seed.wrapping_add(rep as u64 * 0x9E37)) % (r - 1)
+    prime_workload::scalar_for(&[], seed, rep, r)
 }
 
 /// One counted rho run.
@@ -555,6 +574,7 @@ struct RhoReference {
 /// logarithms.  `walk(target, planted, seed, max_steps)` runs one; the
 /// seeds and targets are the same for every walk, so two references on
 /// one instance are paired.
+#[allow(clippy::too_many_arguments)]
 fn rho_reference_for<G: CountedGroup>(
     g: &G,
     generator: G::Elt,
@@ -562,6 +582,7 @@ fn rho_reference_for<G: CountedGroup>(
     seed: u64,
     repeats: usize,
     runs: usize,
+    frozen_scalars: &[u64],
     mut walk: impl FnMut(G::Elt, u64, u64, u64) -> RhoResult,
 ) -> Option<RhoReference> {
     if runs == 0 || r < 3 {
@@ -571,7 +592,7 @@ fn rho_reference_for<G: CountedGroup>(
     let mut per_run = Vec::with_capacity(runs);
     let (mut method, mut automorphisms) = (String::new(), 1);
     for k in 0..runs {
-        let planted = planted_log(seed, k % repeats.max(1), r);
+        let planted = prime_workload::scalar_for(frozen_scalars, seed, k % repeats.max(1), r);
         let mut ops = GroupOps::default();
         let target = g.mul(&mut ops, generator, planted);
         let run_seed = seed ^ (0x5248_4F00 + k as u64);
@@ -623,17 +644,37 @@ struct RhoReferences {
 /// `S`, because on toy subgroups the signed walk's set-up (thirty-two
 /// parallel walks started by scalar multiplications) outweighs what
 /// the Frobenius saves.  The plain walk rides along as the before mark.
-fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> RhoReferences {
+fn matched_rho(
+    instance: &Instance,
+    seed: u64,
+    repeats: usize,
+    runs: usize,
+    frozen_scalars: &[u64],
+) -> RhoReferences {
     match instance {
         Instance::Prime(i) => {
             let (g, gen, r) = (&i.curve, i.generator_point(), i.r);
             RhoReferences {
-                matched: rho_reference_for(g, gen, r, seed, repeats, runs, |t, _, s, cap| {
-                    rho_reference_negation(g, gen, t, r, s, cap)
-                }),
-                plain: rho_reference_for(g, gen, r, seed, repeats, runs, |t, _, s, cap| {
-                    rho_reference(g, gen, t, r, s, cap)
-                }),
+                matched: rho_reference_for(
+                    g,
+                    gen,
+                    r,
+                    seed,
+                    repeats,
+                    runs,
+                    frozen_scalars,
+                    |t, _, s, cap| rho_reference_negation(g, gen, t, r, s, cap),
+                ),
+                plain: rho_reference_for(
+                    g,
+                    gen,
+                    r,
+                    seed,
+                    repeats,
+                    runs,
+                    frozen_scalars,
+                    |t, _, s, cap| rho_reference(g, gen, t, r, s, cap),
+                ),
                 candidates: Vec::new(),
                 rule: "negation map (A = 2): the only eligible automorphism of this curve",
             }
@@ -647,10 +688,11 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
         Instance::Binary(i) => {
             let bg = BinaryGroup(&i.fast);
             let (gen, r) = (i.generator, i.r);
-            let negation = rho_reference_for(&bg, gen, r, seed, repeats, runs, |t, _, s, cap| {
-                rho_reference_negation(&bg, gen, t, r, s, cap)
-            });
-            let plain = rho_reference_for(&bg, gen, r, seed, repeats, runs, |t, _, s, cap| {
+            let negation =
+                rho_reference_for(&bg, gen, r, seed, repeats, runs, &[], |t, _, s, cap| {
+                    rho_reference_negation(&bg, gen, t, r, s, cap)
+                });
+            let plain = rho_reference_for(&bg, gen, r, seed, repeats, runs, &[], |t, _, s, cap| {
                 rho_reference(&bg, gen, t, r, s, cap)
             });
             if i.koblitz.is_none() {
@@ -661,10 +703,11 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
                     rule: "negation map (A = 2): the only eligible automorphism of this curve",
                 };
             }
-            let signed = rho_reference_for(&bg, gen, r, seed, repeats, runs, |t, planted, s, _| {
-                signed_frobenius_rho(i, t, planted, s)
-                    .expect("a Koblitz instance carries its curve")
-            });
+            let signed =
+                rho_reference_for(&bg, gen, r, seed, repeats, runs, &[], |t, planted, s, _| {
+                    signed_frobenius_rho(i, t, planted, s)
+                        .expect("a Koblitz instance carries its curve")
+                });
             let mut candidates: Vec<RhoReference> = signed.into_iter().chain(negation).collect();
             // The cheaper of the eligible walks, among those that verified.
             let best = candidates
@@ -732,6 +775,7 @@ fn run_prime(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let abscissa = PrimeAbscissaBase { instance: inst };
+    let interval = PrimeIntervalBase { instance: inst };
     let orbit = GlvOrbitBase { instance: inst };
     let archive = PrimeArchiveBase { instance: inst };
     let known_log = KnownLogBase;
@@ -742,6 +786,7 @@ fn run_prime(
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
+        "prime-interval" => &interval,
         "glv-orbit" => &orbit,
         "known-log" => &known_log,
         "cm-multiplier" => &multiplier,
@@ -750,7 +795,7 @@ fn run_prime(
         "prime-isogeny" => &isogeny,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, prime-interval, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
             ))
         }
     };
@@ -758,7 +803,7 @@ fn run_prime(
     for rep in 0..args.repeats.max(1) {
         let mut ops = GroupOps::default();
         let g = inst.generator_point();
-        let planted = planted_log(spec.seed, rep, inst.r);
+        let planted = prime_workload::scalar_for(&args.workload_scalars, spec.seed, rep, inst.r);
         let q = inst.curve.mul(&mut ops, g, planted);
         let ctx = InstanceCtx {
             group: &inst.curve,
@@ -778,36 +823,47 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
-        let mut rootfind_floor = RootfindFloorOracle::new(m, inst);
-        let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(m, inst);
+        let mut rootfind_floor = if or_name == "rootfind-floor-batch-v1" {
+            RootfindFloorOracle::new_batch_v1(m, inst)
+        } else {
+            RootfindFloorOracle::new(m, inst)
+        };
+        let mut rootfind_kmitm = if or_name == "rootfind-kmitm-batch-v1" {
+            RootfindKMitmOracle::new_prime_batch_v1(m, inst)
+        } else {
+            RootfindKMitmOracle::new_prime(m, inst)
+        };
         let mut rootfind_gpu =
             crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
                 m, inst,
             );
         let mut hashed = HashedTensorOracle::new();
         let mut genroot = GenRootOracle::new(m);
+        let mut indexed_s3 = IndexedResultantOracle::default();
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
             "pkm-semaev" => Some(PkmSemaevOracle::from_spec(m, &spec, inst)?),
             _ => None,
         };
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
+            "indexed-s3" => &mut indexed_s3,
             "pkm-semaev" => pkm.as_mut().expect("built above"),
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
-            "rootfind-floor" => &mut rootfind_floor,
-            "rootfind-kmitm" => &mut rootfind_kmitm,
+            "rootfind-floor" | "rootfind-floor-batch-v1" => &mut rootfind_floor,
+            "rootfind-kmitm" | "rootfind-kmitm-batch-v1" => &mut rootfind_kmitm,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             "genroot" => &mut genroot,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
-                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
-                     hashed-tensor, genroot or pkm-semaev"
+                     mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-floor, \
+                     rootfind-floor-batch-v1, rootfind-kmitm, rootfind-kmitm-batch-v1, \
+                     rootfind-subtract-gpu, hashed-tensor, genroot, indexed-s3 or pkm-semaev"
                 ))
             }
         };
@@ -1278,7 +1334,76 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
     })
 }
 
-pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
+pub fn run(mut args: BenchArgs, json_only: bool) -> Result<Value, String> {
+    if let Some(path) = &args.prime_workload {
+        // Also check programmatic callers, which do not pass through clap.
+        if args.bits.is_some()
+            || args.char2_degree.is_some()
+            || args.koblitz_degree.is_some()
+            || args.archive_store.is_some()
+            || args.archive_manifest.is_some()
+            || args.efd_model.is_some()
+            || args.sweep.is_some()
+            || args.auto
+        {
+            return Err("--prime-workload requires an exclusive fixed prime curve source".into());
+        }
+        let validated = prime_workload::load(path)?;
+        let curve = &validated.curve;
+        let word = |s: &str| -> Result<u64, String> {
+            use num_traits::ToPrimitive;
+            factor_base::arithmetic::parse(s)
+                .map_err(|e| e.to_string())?
+                .to_u64()
+                .ok_or_else(|| "workload integer exceeds u64".into())
+        };
+        let factor_base::arithmetic::FieldSpec::Prime { modulus } = &curve.spec.field else {
+            return Err("prime workload has a nonprime field".into());
+        };
+        let mut inst = PrimeInstance {
+            name: String::new(),
+            curve: crypto_lib::cryptanalysis::ic_boundary::PrimeCurve {
+                p: word(modulus)?,
+                a: word(&curve.spec.a)?,
+                b: word(&curve.spec.b)?,
+            },
+            group_order: word(&curve.spec.group_order)?,
+            r: word(&curve.spec.subgroup_order)?,
+            cofactor: word(&curve.spec.cofactor)?,
+            generator: (
+                word(&curve.spec.generator.x)?,
+                word(&curve.spec.generator.y)?,
+            ),
+            representation: None,
+        };
+        inst.name = inst.curve_id().slug;
+        // Cross-check the loaded target points through the actual solver backend.
+        for target in &validated.document.targets {
+            let mut ops = GroupOps::default();
+            let point = inst
+                .curve
+                .mul(&mut ops, inst.generator_point(), target.scalar);
+            if point.x != word(&target.point.x)? || point.y != word(&target.point.y)? {
+                return Err("workload target differs between factory and solver arithmetic".into());
+            }
+        }
+        args.workload_scalars = validated
+            .document
+            .targets
+            .iter()
+            .map(|t| t.scalar)
+            .collect();
+        args.repeats = args.workload_scalars.len();
+        if args.rho_runs != 0 && args.rho_runs != args.repeats {
+            return Err(format!(
+                "fixed workloads require --rho-runs 0 or {} to cover every target",
+                args.repeats
+            ));
+        }
+        args.workload_instance = Some(inst);
+        args.workload_curve_validation = Some(validated.curve.validation);
+        args.workload_sha256 = Some(validated.sha256);
+    }
     if args.auto && args.archive_manifest.is_some() {
         return Err("--auto cannot be combined with an archive source".into());
     }
@@ -1338,7 +1463,9 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = if args.efd_model.is_some() {
+            let (regime, degree) = if let Some(inst) = &args.workload_instance {
+                ("prime".to_string(), u64::BITS - inst.r.leading_zeros())
+            } else if args.efd_model.is_some() {
                 let p = parse_efd_u64(
                     args.efd_p
                         .as_deref()
@@ -1482,7 +1609,10 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     let (mut regime, degree) = instance_spec;
     let instance = match early_instance {
         Some(i) => i,
-        None => build_instance(&regime, degree, &args)?,
+        None => match &args.workload_instance {
+            Some(i) => Instance::Prime(i.clone()),
+            None => build_instance(&regime, degree, &args)?,
+        },
     };
 
     if let Instance::Wide255 = &instance {
@@ -1508,7 +1638,13 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     let started = std::time::Instant::now();
     // The method boundary on this instance, before any configuration:
     // every row's `vs rho` is its S over the matched reference's mean.
-    let references = matched_rho(&instance, args.seed, args.repeats, args.rho_runs);
+    let references = matched_rho(
+        &instance,
+        args.seed,
+        args.repeats,
+        args.rho_runs,
+        &args.workload_scalars,
+    );
     let rho = &references.matched;
     let rho_s = rho.as_ref().filter(|r| r.all_verified).map(|r| r.mean_s);
     if !json_only {
@@ -1595,6 +1731,9 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             "not a claim about any deployed curve"
         ],
         "instance": instance.name(),
+        "prime_workload_sha256": args.workload_sha256,
+        "prime_workload_curve_validation": args.workload_curve_validation,
+        "frozen_target_scalars": args.workload_scalars,
         "regime": regime,
         // The conversion every non-addition unit was priced at, so a
         // frozen report re-derives its own GAE: nanoseconds per unit on
@@ -1633,6 +1772,71 @@ mod tests {
 
     fn bench_args(flags: &[&str]) -> BenchArgs {
         Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    #[test]
+    fn frozen_prime_workload_rejects_alternate_curve_and_repeat_flags() {
+        for extra in [
+            vec!["--bits", "14"],
+            vec!["--repeats", "2"],
+            vec!["--family", "j0"],
+            vec!["--auto"],
+        ] {
+            let mut flags = vec!["ic-bench", "--prime-workload", "fixture.json"];
+            flags.extend(extra);
+            assert!(Cli::try_parse_from(flags).is_err());
+        }
+    }
+
+    #[test]
+    fn frozen_prime_workload_pairs_actual_ic_and_rho_targets() {
+        let fixture: prime_workload::Workload = serde_json::from_str(include_str!(
+            "../../../research/pkm_larger_scale_20261123/native/fixtures/toy-workload.json"
+        ))
+        .unwrap();
+        let path =
+            std::env::temp_dir().join(format!("ic-frozen-panel-{}.json", std::process::id()));
+        let sha = fixture.write_new(&path).unwrap();
+        let mut outputs = Vec::new();
+        for seed in ["1", "98765"] {
+            let args = bench_args(&[
+                "--prime-workload",
+                path.to_str().unwrap(),
+                "--seed",
+                seed,
+                "--factor-base",
+                "known-log:size=2",
+                "--oracle",
+                "subtract",
+                "--max-trials",
+                "1000",
+                "--rho-runs",
+                "8",
+            ]);
+            outputs.push(run(args, true).unwrap());
+        }
+        std::fs::remove_file(path).unwrap();
+        let scalars: Vec<u64> = fixture.targets.iter().map(|t| t.scalar).collect();
+        for output in &outputs {
+            assert_eq!(output["prime_workload_sha256"], sha);
+            assert_eq!(output["frozen_target_scalars"], json!(scalars));
+            let rows = output["rows"].as_array().unwrap();
+            assert_eq!(rows.len(), scalars.len());
+            for (row, scalar) in rows.iter().zip(&scalars) {
+                assert_eq!(row["recovered"], *scalar);
+                assert_eq!(row["verified"], true);
+            }
+            for reference in ["rho_reference", "rho_reference_plain"] {
+                let runs = output[reference]["per_run"].as_array().unwrap();
+                assert_eq!(
+                    runs.iter()
+                        .map(|r| r["planted"].as_u64().unwrap())
+                        .collect::<Vec<_>>(),
+                    scalars
+                );
+            }
+        }
+        assert_eq!(outputs[0]["instance"], outputs[1]["instance"]);
     }
 
     #[test]

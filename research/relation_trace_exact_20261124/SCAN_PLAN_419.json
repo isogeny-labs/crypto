@@ -1,0 +1,49 @@
+{
+  "schema": "fixed-degree-correctness-plan/v1",
+  "declared_utc": "2026-11-24T03:52:07.992793+00:00",
+  "recorded_before_calls": true,
+  "source": "SOURCE_419.json",
+  "frozen_executable_pre_call_manifest": "PRECALL_419.json",
+  "fixed_inputs": "FIXED_INPUTS_412.json",
+  "fixed_inputs_manifest_sha256": "2841090b27eb6be89eafdb2230bdbb878d72a5a146f2c7826bbf591e7d050711",
+  "originals": "exact six seed7 LAST-star bytes; no seed expansion",
+  "degrees": [
+    2,
+    3,
+    4
+  ],
+  "presentations": "base, every cheap-consequence single, all, every leave-one-out",
+  "spaces": [
+    "raw W_D",
+    "multiplication-closed V_D"
+  ],
+  "limits": "degree_space::Limits::default exactly as source-pinned; all budgets and censors retained",
+  "native_output_data_budget_bytes": 125829120,
+  "native_output_metadata_reserve_bytes": 4194304,
+  "per_call_wall_limit_seconds": 1200,
+  "per_call_address_space_bytes": 2147483648,
+  "cpu": 0,
+  "numerical_threads": 1,
+  "cloud_cost": 0,
+  "performance_experiment": false,
+  "f4_solving_degree": null,
+  "intrinsic_regularity": null,
+  "boundary_speedup": null,
+  "reference_basis_oracle": false,
+  "existing_directory_control": "existing sentinel must remain byte-identical and scan must refuse; main fresh-directory scan still runs",
+  "positive_control": "native replayer checks every record, original membership, bounded derivation, independent row-space completeness, full roster, gains, summary and null/admission fields",
+  "semantic_negative_controls": [
+    "tamper-summary",
+    "tamper-proof",
+    "tamper-degree",
+    "tamper-roster",
+    "tamper-inputhash"
+  ],
+  "canary_data": "native hardlink copies with atomic replacement of only changed inode; native indexes recomputed before replay",
+  "canary_selection": "fixed p2147483647-n3-d3-single-0 except summary-admission; all five must refuse",
+  "label_demos": "LABEL_PLAN_415.json, abstract equations only; no invented group rows for original fixtures",
+  "failure_policy": "no retry on unchanged failure; retain all case errors, partial files, stdout/stderr and censored ranks; null gain if either closure incomplete; external timeout does not certify unattempted cases",
+  "publication": "original raw artifact archive plus native indexes, all transcripts/outcomes, source, report/PDF; semantic canary mutation bytes or missing-file metadata retained separately; no canonical speed graph promotion",
+  "output_filesystem": "local /dev/shm tmpfs,120MiB data+4MiB reserved metadata; host RAM charged, no cloud",
+  "predecessor_failure": "POSTCALL_418.json preserved; same inputs/family after OS ENOSPC; changed serialization/storage/cap only"
+}

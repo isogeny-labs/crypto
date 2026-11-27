@@ -439,6 +439,14 @@ pub fn admits_setup_descriptors(r: &crate::cryptanalysis::ecbench::record::Recor
     listed(&SETUP_DESCRIPTOR_BINARIES, r)
 }
 
+/// The frozen prime20 producer predates the diagnostic count of
+/// materialised jumps. Their group operations are already in the ledger.
+pub fn admits_pre_walk_jump_descriptor(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    r.method.id == "ic.pipeline"
+        && r.binary_sha256.as_deref()
+            == Some("fa6778a792c06162b0c63ff1f3e63c7ae43a383bb8fd3f27d388f3401e3026b9")
+}
+
 /// Whether `r` may be replayed under [`pre_endomorphism_a1`]: it names a
 /// binary on [`PRE_ENDOMORPHISM_A1_BINARIES`] (the record must also lack
 /// the counter amendment A1 added, which the function checks).

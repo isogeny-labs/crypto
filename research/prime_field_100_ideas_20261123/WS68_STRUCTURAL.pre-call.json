@@ -1,0 +1,13 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T05:11:17Z",
+  "admission":"local-only under user-authorized parallel work and prior local bypass; checkpoint remains unqualified (prior HTTP 403, current missing .resume)",
+  "worktree_commit":"163dfb9b567f90873e99aa25adbcb3ae7bf077af",
+  "inputs":{"ec_v2_gp_stdout_sha256":"1a2f0f09992538dd789f38fda43a5bd20765580f952dba7181e3e99b81e59f83","ec_v2_native_verifier":"WS68_EC_GRAPH_V2_VERIFY.post-call.json","ef17_native_control":"WS68_FILTER_REPLAY.attempt2.post-call.json"},
+  "source":{"path":"WS68_STRUCTURAL.rs","sha256":"3d4d929b893cfec7201048be62796ec52d56fc8cc29519e47c33574c4d33cbfa"},
+  "immutable_qualifier":{"path":"WS68_STRUCTURAL.qualifier.rs","sha256":"3d4d929b893cfec7201048be62796ec52d56fc8cc29519e47c33574c4d33cbfa"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_STRUCTURAL","WS68_STRUCTURAL.qualifier.rs","-o","WS68_STRUCTURAL.bin"],
+  "expected":{"same_support":true,"same_squared_coefficients":true,"max_cut":2,"rank_A":3,"rank_B":2,"diagonal_integer_det":1013,"diagonal_mod_rank":2,"embedding_degree":9},
+  "claim_boundary":"exact structural counterexamples only, not a general algorithm or performance result"
+}

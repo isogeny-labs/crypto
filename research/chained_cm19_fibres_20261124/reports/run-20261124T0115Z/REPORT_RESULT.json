@@ -1,0 +1,36 @@
+{
+  "schema": "inspected-scientific-report/v1",
+  "final": {
+    "path": "/dev/shm/chained-cm19-fibres24/research/chained_cm19_fibres_20261124/reports/run-20261124T0115Z/REPORT.pdf",
+    "bytes": 184571,
+    "sha256": "5fc04bc5fcf7df4cddacdb470b70f4afa226738a2a17853f45b6a5e3b49d925c"
+  },
+  "pages": 2,
+  "pipeline": [
+    "dot -Tsvg proof.dot -o proof.svg",
+    "inkscape proof.svg --export-type=pdf --export-filename=proof.pdf",
+    "pdflatex -interaction=nonstopmode -halt-on-error -output-directory /dev/shm/ct24-fibres-report-render-v2 REPORT.tex (two passes)",
+    "pdftoppm -scale-to 1550 -png /dev/shm/ct24-fibres-report-render-v2/REPORT.pdf /dev/shm/ct24-fibres-report-render-v2/page"
+  ],
+  "environment": {
+    "XDG_CACHE_HOME": "/dev/shm/ct23-report-font-cache",
+    "XDG_CONFIG_HOME": "/dev/shm/ct23-report-config",
+    "SOURCE_DATE_EPOCH": "1795442400"
+  },
+  "final_log": "No Overfull/Underfull/Warning/Error matches",
+  "QA": "Both final v2 pages individually visually inspected at1550; formula/proof/graph/table/source/count/custody/limits readable, no clipping or overlap.",
+  "raster_originals": [
+    {
+      "path": "/dev/shm/ct24-fibres-report-render-v2/page-1.png",
+      "bytes": 231139,
+      "sha256": "78d86029e16a7dfb9089f6a70a1590c98c2c18f449ddb58ac86f5b0590b0e163"
+    },
+    {
+      "path": "/dev/shm/ct24-fibres-report-render-v2/page-2.png",
+      "bytes": 342859,
+      "sha256": "590cb5abe732bae94e92392d93a4cf0a5d0f0fdf5e73ebcb5553964c993a0ff2"
+    }
+  ],
+  "first_v1_preserved": "render-v1-notation: whole first PDF/source/logs; ambiguous O_C(4/6) shorthand expanded to two genuine spaces and inline spacing improved; no scientific rerun.",
+  "standing": "All scientific claims unsigned; E/F native exact correctness, G partial no-axiom Int leaves, written actual geometry separate; no performance claim."
+}

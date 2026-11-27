@@ -1201,26 +1201,38 @@ fn square_mod(gf: &Gf2, p: &[u64], f: &[u64]) -> Vec<u64> {
     rem(gf, &sq, f)
 }
 
-/// Monic `gcd(a, b)`; the zero polynomial is empty.
+/// `F_{2^n}` (a [`Gf2`]) as a [`crate::gcd::poly::PolyField`].
+struct Coeffs<'a>(&'a Gf2);
+
+impl crate::gcd::poly::PolyField for Coeffs<'_> {
+    type E = u64;
+    fn zero(&self) -> u64 {
+        0
+    }
+    fn one(&self) -> u64 {
+        1
+    }
+    fn add(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.0.inv(a)
+    }
+    fn neg(&self, a: u64) -> u64 {
+        a
+    }
+}
+
+/// Monic `gcd(a, b)`; the zero polynomial is empty.  By
+/// `crate::gcd::poly::gcd`.
 fn gcd(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    trim(&mut a);
-    trim(&mut b);
-    while !b.is_empty() {
-        monic(gf, &mut b);
-        let r = if b.len() == 1 {
-            Vec::new()
-        } else {
-            rem(gf, &a, &b)
-        };
-        a = b;
-        b = r;
-    }
-    if !a.is_empty() {
-        monic(gf, &mut a);
-    }
-    a
+    crate::gcd::poly::gcd(&Coeffs(gf), a, b)
 }
 
 /// Split a monic polynomial known to be a product of distinct linear

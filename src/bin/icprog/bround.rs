@@ -275,11 +275,8 @@ pub(crate) fn is_prime(n: u64) -> bool {
     true
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 /// A nontrivial factor of an odd composite, by Brent's variant of
@@ -350,15 +347,9 @@ pub(crate) fn clmul_mod(a: u64, b: u64, f: u64, n: u32) -> u64 {
     p as u64
 }
 
-fn poly_gcd(mut a: u64, mut b: u64) -> u64 {
-    let deg = |x: u64| 63 - x.leading_zeros();
-    while b != 0 {
-        while a != 0 && deg(a) >= deg(b) {
-            a ^= b << (deg(a) - deg(b));
-        }
-        (a, b) = (b, a);
-    }
-    a
+fn poly_gcd(a: u64, b: u64) -> u64 {
+    // GF(2)[x] gcd (shared implementation).
+    crypto_lib::gcd::gf2::gcd_word(a, b)
 }
 
 /// Rabin's test over GF(2), as `curve_id.is_irreducible_f2`.

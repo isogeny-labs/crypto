@@ -59,3 +59,7 @@ Over F5, E:y²=x³+1 is nonsingular (p=5 is the smallest admissible odd p>3). Ba
 
     PYTHONPATH=. python -m summation_split.harness --samples 50 --timeout 4 --out summation_split
     PYTHONPATH=. python -m unittest -q summation_split.test_split
+
+## Follow-up, 2026-11-23
+
+See [VERONESE_FINDINGS.md](VERONESE_FINDINGS.md) for a compact cubic projective chain, exact affine-slice gates, a bounded local first-fall invariant, and a negative matched lex diagnostic. Actual F4 solving degree and a speed advantage remain unmeasured. [pcc:unverified]

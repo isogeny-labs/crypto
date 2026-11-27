@@ -1,0 +1,212 @@
+﻿2026-11-23T23:56:26.9496392Z Current runner version: '2.338.2'
+2026-11-23T23:56:26.9515542Z ##[group]Runner Image Provisioner
+2026-11-23T23:56:26.9516333Z Hosted Compute Agent
+2026-11-23T23:56:26.9516783Z Version: 20261111.635
+2026-11-23T23:56:26.9517359Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-23T23:56:26.9517877Z Build Date: 2026-11-11T01:49:01Z
+2026-11-23T23:56:26.9518339Z Worker ID: {c2f52959-02b9-40a4-9353-6c479c5580d0}
+2026-11-23T23:56:26.9520110Z Region: centralus
+2026-11-23T23:56:26.9520693Z Cloud: Azure
+2026-11-23T23:56:26.9521296Z ##[endgroup]
+2026-11-23T23:56:26.9523453Z ##[group]Operating System
+2026-11-23T23:56:26.9523894Z Ubuntu
+2026-11-23T23:56:26.9524259Z 24.04.5
+2026-11-23T23:56:26.9524630Z LTS
+2026-11-23T23:56:26.9525018Z ##[endgroup]
+2026-11-23T23:56:26.9525411Z ##[group]Runner Image
+2026-11-23T23:56:26.9525830Z Image: ubuntu-24.04
+2026-11-23T23:56:26.9526221Z Version: 20261116.376.1
+2026-11-23T23:56:26.9527104Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261116.376/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-23T23:56:26.9528209Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261116.376
+2026-11-23T23:56:26.9528860Z ##[endgroup]
+2026-11-23T23:56:26.9529653Z ##[group]GITHUB_TOKEN Permissions
+2026-11-23T23:56:26.9531828Z Contents: read
+2026-11-23T23:56:26.9532235Z Metadata: read
+2026-11-23T23:56:26.9532820Z ##[endgroup]
+2026-11-23T23:56:26.9534602Z Secret source: Actions
+2026-11-23T23:56:26.9535230Z Cache mode: write
+2026-11-23T23:56:26.9535962Z Prepare workflow directory
+2026-11-23T23:56:26.9770711Z Prepare all required actions
+2026-11-23T23:56:26.9805681Z Getting action download info
+2026-11-23T23:56:27.2010209Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-23T23:56:27.3334246Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-23T23:56:27.5809943Z Complete job name: certificate-and-coefficients
+2026-11-23T23:56:27.6359155Z ##[group]Run actions/checkout@v4
+2026-11-23T23:56:27.6359786Z with:
+2026-11-23T23:56:27.6360164Z   sparse-checkout-cone-mode: false
+2026-11-23T23:56:27.6362374Z   sparse-checkout: /AGENTS.md
+/.artifacts/config.json
+/.gitignore
+/.gitattributes
+/pcc/keyring.json
+/pcc/claims/PCC-20261123-d60e2c.json
+/pcc/claims/PCC-20261123-b17001.json
+/pcc/claims/PCC-20261123-6e2253.json
+/pcc/claims/PCC-20261123-f85757.json
+/pcc/claims/PCC-20261123-ac68db.json
+/pcc/claims/PCC-20261123-c1adb4.json
+/research/chained_cm19_univariate_audit_20261123/
+
+2026-11-23T23:56:27.6364652Z   repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:27.6367632Z   token: ***
+2026-11-23T23:56:27.6368038Z   ssh-strict: true
+2026-11-23T23:56:27.6368395Z   ssh-user: git
+2026-11-23T23:56:27.6368794Z   persist-credentials: true
+2026-11-23T23:56:27.6369173Z   clean: true
+2026-11-23T23:56:27.6369523Z   fetch-depth: 1
+2026-11-23T23:56:27.6369895Z   fetch-tags: false
+2026-11-23T23:56:27.6370250Z   show-progress: true
+2026-11-23T23:56:27.6370703Z   lfs: false
+2026-11-23T23:56:27.6371281Z   submodules: false
+2026-11-23T23:56:27.6371721Z   set-safe-directory: true
+2026-11-23T23:56:27.6372129Z   allow-unsafe-pr-checkout: false
+2026-11-23T23:56:27.6373000Z ##[endgroup]
+2026-11-23T23:56:27.8602048Z Syncing repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:27.8603676Z ##[group]Getting Git version info
+2026-11-23T23:56:27.8604723Z Working directory is '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:27.8605931Z [command]/usr/bin/git version
+2026-11-23T23:56:27.8683552Z git version 2.56.1
+2026-11-23T23:56:27.8702844Z ##[endgroup]
+2026-11-23T23:56:27.8717014Z Temporarily overriding HOME='/home/runner/work/_temp/2d3ff0dc-a265-415a-83f0-903c3d4dcbdd' before making global git config changes
+2026-11-23T23:56:27.8718654Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:56:27.8720286Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:27.8757790Z Deleting the contents of '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:27.8760179Z ##[group]Initializing the repository
+2026-11-23T23:56:27.8762874Z [command]/usr/bin/git init /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:27.8849962Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-23T23:56:27.8851992Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-23T23:56:27.8853610Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-23T23:56:27.8854850Z hint: call:
+2026-11-23T23:56:27.8855567Z hint:
+2026-11-23T23:56:27.8856410Z hint: 	git config --global init.defaultBranch <name>
+2026-11-23T23:56:27.8857564Z hint:
+2026-11-23T23:56:27.8858724Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-23T23:56:27.8860000Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-23T23:56:27.8861919Z hint:
+2026-11-23T23:56:27.8863052Z hint: 	git branch -m <name>
+2026-11-23T23:56:27.8863910Z hint:
+2026-11-23T23:56:27.8864825Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-23T23:56:27.8866961Z Initialized empty Git repository in /home/runner/work/cryptanalysis/cryptanalysis/.git/
+2026-11-23T23:56:27.8869646Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:56:27.8901254Z ##[endgroup]
+2026-11-23T23:56:27.8902325Z ##[group]Disabling automatic garbage collection
+2026-11-23T23:56:27.8904191Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-23T23:56:27.8925888Z ##[endgroup]
+2026-11-23T23:56:27.8926779Z ##[group]Setting up auth
+2026-11-23T23:56:27.8931129Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:56:27.8969870Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:56:27.9255585Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:56:27.9304369Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:56:27.9456536Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:56:27.9480069Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:56:27.9621378Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-23T23:56:27.9655654Z ##[endgroup]
+2026-11-23T23:56:27.9657363Z ##[group]Fetching the repository
+2026-11-23T23:56:27.9667003Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +203c588a4a4b0129409db76293fc50c0a01861eb:refs/remotes/pull/1961/merge
+2026-11-23T23:56:28.5671950Z From https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.5674148Z  * [new ref]         203c588a4a4b0129409db76293fc50c0a01861eb -> pull/1961/merge
+2026-11-23T23:56:28.5678961Z ##[endgroup]
+2026-11-23T23:56:28.5680879Z ##[group]Determining the checkout info
+2026-11-23T23:56:28.5683275Z ##[endgroup]
+2026-11-23T23:56:28.5685161Z ##[group]Setting up sparse checkout
+2026-11-23T23:56:28.5686781Z [command]/usr/bin/git config core.sparseCheckout true
+2026-11-23T23:56:28.5711492Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+2026-11-23T23:56:28.5727481Z .git/info/sparse-checkout
+2026-11-23T23:56:28.5732923Z ##[endgroup]
+2026-11-23T23:56:28.5735919Z ##[group]Checking out the ref
+2026-11-23T23:56:28.5737094Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1961/merge
+2026-11-23T23:56:29.3374879Z Note: switching to 'refs/remotes/pull/1961/merge'.
+2026-11-23T23:56:29.3375944Z 
+2026-11-23T23:56:29.3376192Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-23T23:56:29.3376674Z changes and commit them, and you can discard any commits you make in this
+2026-11-23T23:56:29.3377205Z state without impacting any branches by switching back to a branch.
+2026-11-23T23:56:29.3377480Z 
+2026-11-23T23:56:29.3377694Z If you want to create a new branch to retain commits you create, you may
+2026-11-23T23:56:29.3378138Z do so (now or later) by using -c with the switch command. Example:
+2026-11-23T23:56:29.3378361Z 
+2026-11-23T23:56:29.3378487Z   git switch -c <new-branch-name>
+2026-11-23T23:56:29.3378626Z 
+2026-11-23T23:56:29.3378760Z Or undo this operation with:
+2026-11-23T23:56:29.3378969Z 
+2026-11-23T23:56:29.3379126Z   git switch -
+2026-11-23T23:56:29.3379320Z 
+2026-11-23T23:56:29.3379523Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-23T23:56:29.3379752Z 
+2026-11-23T23:56:29.3380041Z HEAD is now at 203c588 Merge ae67853ede5b0f35e13b4d34d67b1c3b524943d3 into 5005bedbe4fd4f1a43456918dd255fd2cbc4a5d1
+2026-11-23T23:56:29.3390345Z ##[endgroup]
+2026-11-23T23:56:29.3419655Z [command]/usr/bin/git log -1 --format=%H
+2026-11-23T23:56:29.3437834Z 203c588a4a4b0129409db76293fc50c0a01861eb
+2026-11-23T23:56:29.3603232Z ##[group]Run rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+2026-11-23T23:56:29.3603858Z [36;1mrustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy[0m
+2026-11-23T23:56:29.3619731Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-23T23:56:29.3620065Z ##[endgroup]
+2026-11-23T23:56:29.4059345Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-23T23:56:29.6101673Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-23T23:56:29.6102299Z info: downloading 5 components
+2026-11-23T23:56:37.7233036Z 
+2026-11-23T23:56:37.7284469Z   1.99.1-x86_64-unknown-linux-gnu installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-23T23:56:37.7284836Z 
+2026-11-23T23:56:37.7384467Z ##[group]Run set -euo pipefail
+2026-11-23T23:56:37.7384791Z [36;1mset -euo pipefail[0m
+2026-11-23T23:56:37.7385377Z [36;1mcurl --fail --location --retry 2 https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst --output "$RUNNER_TEMP/lean-4.35.0-linux.tar.zst"[0m
+2026-11-23T23:56:37.7386055Z [36;1mtar --zstd -xf "$RUNNER_TEMP/lean-4.35.0-linux.tar.zst" -C "$RUNNER_TEMP"[0m
+2026-11-23T23:56:37.7386441Z [36;1mecho "LEAN_TOOLCHAIN_DIR=$RUNNER_TEMP/lean-4.35.0-linux" >> "$GITHUB_ENV"[0m
+2026-11-23T23:56:37.7398280Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-23T23:56:37.7398644Z ##[endgroup]
+2026-11-23T23:56:37.7484426Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2026-11-23T23:56:37.7485113Z                                  Dload  Upload   Total   Spent    Left  Speed
+2026-11-23T23:56:37.7485445Z 
+2026-11-23T23:56:37.8424721Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-23T23:56:37.8425163Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-23T23:56:37.8805732Z 
+2026-11-23T23:56:38.8754183Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2026-11-23T23:56:39.5542091Z  55  566M   55  317M    0     0   281M      0  0:00:02  0:00:01  0:00:01  318M
+2026-11-23T23:56:50.7708731Z 100  566M  100  566M    0     0   313M      0  0:00:01  0:00:01 --:--:--  338M
+2026-11-23T23:56:51.0185036Z ##[group]Run bash research/chained_cm19_univariate_audit_20261123/run_ci_C.sh "$RUNNER_TEMP/cm19-audit-ci"
+2026-11-23T23:56:51.0185736Z [36;1mbash research/chained_cm19_univariate_audit_20261123/run_ci_C.sh "$RUNNER_TEMP/cm19-audit-ci"[0m
+2026-11-23T23:56:51.0197850Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-23T23:56:51.0198154Z env:
+2026-11-23T23:56:51.0198418Z   LEAN_TOOLCHAIN_DIR: /home/runner/work/_temp/lean-4.35.0-linux
+2026-11-23T23:56:51.0199168Z ##[endgroup]
+2026-11-23T23:56:54.5913882Z ##[group]Run actions/upload-artifact@v4
+2026-11-23T23:56:54.5914173Z with:
+2026-11-23T23:56:54.5914513Z   name: cm19-complete-packet-core-203c588a4a4b0129409db76293fc50c0a01861eb-1
+2026-11-23T23:56:54.5914887Z   path: /home/runner/work/_temp/cm19-audit-ci
+2026-11-23T23:56:54.5915180Z   if-no-files-found: warn
+2026-11-23T23:56:54.5915424Z   retention-days: 14
+2026-11-23T23:56:54.5915646Z   compression-level: 6
+2026-11-23T23:56:54.5915853Z   overwrite: false
+2026-11-23T23:56:54.5916099Z   include-hidden-files: false
+2026-11-23T23:56:54.5916394Z env:
+2026-11-23T23:56:54.5916645Z   LEAN_TOOLCHAIN_DIR: /home/runner/work/_temp/lean-4.35.0-linux
+2026-11-23T23:56:54.5916946Z ##[endgroup]
+2026-11-23T23:56:54.7342972Z (node:2301) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-23T23:56:54.7343661Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-23T23:56:54.7470906Z With the provided path, there will be 106 files uploaded
+2026-11-23T23:56:54.7472041Z Artifact name is valid!
+2026-11-23T23:56:54.7472467Z Root directory input is valid!
+2026-11-23T23:56:55.0647132Z Beginning upload of artifact content to blob storage
+2026-11-23T23:56:55.3687111Z (node:2301) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-23T23:56:55.8242511Z Uploaded bytes 2722970
+2026-11-23T23:56:55.8650795Z Finished uploading artifact content to blob storage!
+2026-11-23T23:56:55.8651466Z SHA256 digest of uploaded artifact zip is f018318df7f5d38fc656e547c8d5ee2708c5a7cff524942717a74b8f93c432f8
+2026-11-23T23:56:55.8652997Z Finalizing artifact upload
+2026-11-23T23:56:56.2344881Z Artifact cm19-complete-packet-core-203c588a4a4b0129409db76293fc50c0a01861eb-1.zip successfully finalized. Artifact ID 14874124985
+2026-11-23T23:56:56.2346229Z Artifact cm19-complete-packet-core-203c588a4a4b0129409db76293fc50c0a01861eb-1 has been successfully uploaded! Final size is 2722970 bytes. Artifact ID is 14874124985
+2026-11-23T23:56:56.2349527Z Artifact download URL: https://github.com/isogeny-labs/cryptanalysis/actions/runs/45293020710/artifacts/14874124985
+2026-11-23T23:56:56.2607348Z Post job cleanup.
+2026-11-23T23:56:56.3251745Z [command]/usr/bin/git version
+2026-11-23T23:56:56.3280069Z git version 2.56.1
+2026-11-23T23:56:56.3303888Z Temporarily overriding HOME='/home/runner/work/_temp/bf6d9e71-9be6-4510-a916-1aede57bff42' before making global git config changes
+2026-11-23T23:56:56.3304992Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:56:56.3307304Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:56.3334630Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:56:56.3358615Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:56:56.3701686Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:56:56.3723729Z http.https://github.com/.extraheader
+2026-11-23T23:56:56.3733357Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-23T23:56:56.3760186Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:56:56.4055845Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:56:56.4078583Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:56:56.4491665Z Cleaning up orphan processes
+2026-11-23T23:56:56.4733901Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

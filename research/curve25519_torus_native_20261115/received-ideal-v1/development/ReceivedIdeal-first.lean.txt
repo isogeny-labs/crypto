@@ -1,0 +1,33 @@
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Algebra.Polynomial.Div
+
+namespace ReceivedIdeal
+
+/- Instance obligation for the displayed received-symbol polynomial.
+   No field/cardinality/compiler/decoder/cost theorem is asserted. -/
+theorem received_quartic {R : Type*} [CommRing R] (A b u v w : R)
+    (hu : u^2 + A*u + b = 0)
+    (hv : v^2 = u^3 + A*u^2 + u) (hw : w = -u*v) :
+    w^4 + A*(1-b)*(A^2-3*b)*w^2 + b^3*(1-b)^2 = 0 := by
+  have hlin : w^2 = (1-b)*((A^2-b)*u + A*b) := by
+    rw [hw]
+    linear_combination u^2 * hv + (u^3 + (1-b)*(u-A)) * hu
+  linear_combination
+    (w^2 + (1-b)*((A^2-b)*u + A*b) + A*(1-b)*(A^2-3*b)) * hlin +
+      ((1-b)*(A^2-b))^2 * hu
+
+theorem cleared_quartic {R : Type*} [CommRing R] (A b J B w : R)
+    (hb : J*b = B)
+    (hf : w^4 + A*(1-b)*(A^2-3*b)*w^2 + b^3*(1-b)^2 = 0) :
+    J^5*w^4 + A*J^3*(J-B)*(A^2*J-3*B)*w^2 + B^3*(J-B)^2 = 0 := by
+  rw [← hb]
+  calc
+    J^5*w^4 + A*J^3*(J-J*b)*(A^2*J-3*(J*b))*w^2 +
+        (J*b)^3*(J-J*b)^2 =
+        J^5*(w^4 + A*(1-b)*(A^2-3*b)*w^2 + b^3*(1-b)^2) := by ring
+    _ = 0 := by rw [hf, mul_zero]
+
+#print axioms received_quartic
+#print axioms cleared_quartic
+
+end ReceivedIdeal

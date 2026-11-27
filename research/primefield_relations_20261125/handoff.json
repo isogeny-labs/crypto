@@ -1,0 +1,131 @@
+{
+  "schema": "isogeny.primefield-research-handoff/v1",
+  "date": "2026-11-25",
+  "checkpoint": "interactive continuation after the first completed hourly one-fiber run",
+  "objective": "Discover a useful and fully charged relation-finding mechanism for ordinary prime-field ECDLP, building on PKM and APS without repeating their known encodings.",
+  "study_directory": "research/primefield_relations_20261125",
+  "read_first": [
+    "README.md",
+    "notes/adaptive-chain-proof.md",
+    "notes/selector-tag-bridge.md",
+    "shared-terminal-gate/README.md"
+  ],
+  "canonical_fixture": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "r": 2147446831,
+    "G": [
+      625037715,
+      2100627251
+    ],
+    "Q": [
+      1477799919,
+      824532935
+    ]
+  },
+  "completed_evidence": {
+    "adaptive_shared_chain_count": "A_s=sum p^(2j), with reduced nonconstant rational maps and final-output Mobius quotient",
+    "stirling_capture_bound": "A_s*C(N,h)*sum S(h,j)*((D-1)/(M-h+1))^(h-j), j=1..t",
+    "support_bound": "A_s*C(N,h)*C(h,t)*(b-t)_(h-t)/(M-t)_(h-t)",
+    "capacity_checker": {
+      "tests_passed": 4,
+      "exact_rational_certificates": 62,
+      "source": "capacity-checker/frozen/exact_bounds.rs",
+      "results": "capacity-checker/evidence/certificates.json",
+      "raw_table": "capacity-checker/evidence/bounds.tsv"
+    },
+    "shared_terminal_gate": {
+      "tests_passed": 2,
+      "assertion_entries": 47,
+      "distinct_check_names": 31,
+      "depth": 3,
+      "terminals": 6,
+      "selector_roots": 29,
+      "rational_abscissae": 17,
+      "signed_lifts": 34,
+      "original_labeled_columns": 3,
+      "result": "shared-terminal-gate/results/attempt-001/result.json",
+      "result_sha256": "1538f5e862f998d5f3a125db39d2b14182a8740391177d7b47b6a11a140dd2d3"
+    },
+    "historical_relation_replay": {
+      "source_population": 4608,
+      "new_search_calls": 0,
+      "alpha": 1144570523,
+      "beta": 2011873483,
+      "replayed_scalar": 1038579171,
+      "standing": "archived verifier fixture; never report as newly discovered or use archived indices/scalar as a blinded candidate input"
+    },
+    "positive_control": "h_A(R)=x(R-[1/2]A) has the complete tagged pair {R,A-R}; verified on E. The built-in pair identity has alpha=beta=0 and is correctly rejected.",
+    "formalization": "General theorems are hand-proved with independent agent review. Lean/Lake unavailable; no kernel proof claimed. Exact Rust certificates evaluate formulas, not the full theorem."
+  },
+  "interpretation": {
+    "sampling_scope": "Uniform distinct negation-class pools only. All inspected points count toward N; adaptive chain/fiber fitting is included. Correlated sources need separate analysis.",
+    "support_scope": "b is total admitted subgroup support; b-h is not actual contamination when more than h labels are captured. Symbolic tail correction is in the proof note, with no additional native threshold search claimed.",
+    "critical_distinction": "A field root, a curve point, and an original publicly tagged APS column are different objects. Ordinary PKM index calculus may use unknown factor-base columns and eliminate them later; the APS label barrier is not a rejection of that whole route.",
+    "no_performance_result": "No new extractor, relation yield comparison, LFD measurement, cold speedup, or exponent improvement was established."
+  },
+  "next_action": {
+    "primary": "Choose and implement one genuinely constructive step: jointly generate a richer tagged source/selector and a class-skipping extractor, or build a class-skipping extractor for the ordinary PKM factor base while explicitly retaining and eliminating unknown columns. Do not spend another cycle only reproducing these bounds or checking tools.",
+    "concrete_candidate": "Adaptive involution synthesis: (a*x+b)/(c*x-a) folds x,y iff c*x*y-a*(x+y)-b=0 with a^2+b*c != 0. Seek a compressed/output-sensitive high-incidence method and preserve witness/tag/sign provenance. This is a proposed primitive, not a discovered speedup.",
+    "synthesis_gate": "A depth>=2 family with more than two tagged eligible roots per relevant fiber, exact support and complete-or-masked semantics. Four-point interpolation or known pair identities are only controls; require a new ingredient for growth or extraction.",
+    "extraction_gate": "Produce a verifiable exclusion or solve certificate for whole candidate classes, without materializing the same complete pair table. A newly found APS row must have beta != 0; an ordinary IC row must pass signed lifting and useful-rank accounting.",
+    "cost_gate": "Charge source generation, all inspected pairs/maps, inversions/roots, construction, scans, failed attempts, witness recovery, and elimination. Compare any claimed gain to the strongest owned matched collector and negation rho with equal resources.",
+    "cheap_kill_conditions": [
+      "Do not generate all 536854528 pair-lines from N=32768 for an unpriced fit.",
+      "Two distinct fixed elliptic reflections generate the whole prime subgroup when fully closed; do not claim exponential support from their repeated words.",
+      "A compact bit/progression encoding is known generic interval/knapsack structure; novelty must lie in extraction.",
+      "A polynomial's formal degree is not its rational fiber size. At M31, x^(2^s) has only two nonzero rational preimages; the p+1 Dickson construction is different."
+    ]
+  },
+  "execution": {
+    "language": "Rust; reuse existing arithmetic and collectors",
+    "compiler_observed": "/workspace/scratch/998688543c6d/toolchain/rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "compiler_version": "1.100.0 (0ef1bc386 2026-11-09)",
+    "compiler_note": "Availability was verified in this interactive cycle after the first hourly run reported none. Do not repeat the old unavailable-tool conclusion without checking current resources.",
+    "immutable_sources": "Copies and pins included in shared-terminal-gate/sources and the frozen attempt; do not compile concurrently edited external working-tree files.",
+    "new_experiment_rule": "Freeze a prospective manifest before new randomized or comparative work; preserve the automation's exact experiment-seeds instructions and separate build/pre/post records. The historical seed remains replay provenance.",
+    "missing_services": "No callable research-KB or Conductor was found in this cycle; use bounded current repo/ACTIVE/session-log/PR checks and do not claim exclusive ownership.",
+    "permissions": "Publication and integration of this completed study are authorized, subject to required repository checks. No paid run is authorized by this task."
+  },
+  "ownership_to_recheck": [
+    {
+      "pr": 5188,
+      "scope": "PairProjection actual-library useful-rank comparison"
+    },
+    {
+      "pr": 5091,
+      "scope": "APS partials/recursive joins/shared targets/partitions; explicit no-merge hold"
+    },
+    {
+      "pr": 5116,
+      "scope": "subfield-coset and related projection work"
+    },
+    {
+      "pr": 4311,
+      "scope": "merged selector/fixed-slope/interval barriers; do not reopen as new"
+    },
+    {
+      "pr": 5153,
+      "scope": "active H016 work in /workspace/scratch/998688543c6d/crypto; do not edit its dirty working tree"
+    }
+  ],
+  "impact_score": 3,
+  "impact_reason": "A compiled exact bound and a reusable M31 construction/relation gate; no new relation-finding speedup yet.",
+  "publication": {
+    "tracking_pr": 5206,
+    "tracking_url": "https://github.com/isogeny-labs/crypto/pull/5206",
+    "tracking_pr_scope": "Merged task card only; implementation is in the follow-up branch.",
+    "repository": "isogeny-labs/crypto",
+    "path": "research/primefield_relations_20261125",
+    "branch": "lane/m31-shared-selector-integration-20261125",
+    "branch_url": "https://github.com/isogeny-labs/crypto/tree/lane/m31-shared-selector-integration-20261125",
+    "authorization": "2026-11-25 user explicitly requested PR publication and then integration of this study",
+    "merge_authorized": true,
+    "paid_runs_authorized": false,
+    "pcc": "No new ledger IDs: archived replay does not satisfy exhaustive coordinate-input and matched-cost claim admission; unsigned producer evidence only.",
+    "pr": 5213,
+    "url": "https://github.com/isogeny-labs/crypto/pull/5213",
+    "implementation_commit": "a886ea91a25a090cc0de497d7314d5f55870b1f6"
+  }
+}

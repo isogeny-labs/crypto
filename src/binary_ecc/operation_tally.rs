@@ -15,6 +15,7 @@ thread_local! {
     static TALLIES: RefCell<Vec<BTreeMap<String,u64>>> = const { RefCell::new(Vec::new()) };
 }
 
+#[inline(always)]
 pub(crate) fn tick_n(m: u32, operation: &str, count: u64) {
     if count == 0 {
         return;
@@ -22,6 +23,14 @@ pub(crate) fn tick_n(m: u32, operation: &str, count: u64) {
     if ACTIVE.load(Ordering::Relaxed) == 0 {
         return;
     }
+    record_active(m, operation, count);
+}
+
+// Keep formatting, allocation and TLS borrowing off the inactive path, while
+// consulting the original global/thread-local scope state for every event.
+#[cold]
+#[inline(never)]
+fn record_active(m: u32, operation: &str, count: u64) {
     TALLIES.with(|stack| {
         if let Some(tally) = stack.borrow_mut().last_mut() {
             *tally.entry(format!("f2m{m}_{operation}")).or_default() += count;
@@ -29,6 +38,7 @@ pub(crate) fn tick_n(m: u32, operation: &str, count: u64) {
     });
 }
 
+#[inline(always)]
 pub(crate) fn tick(m: u32, operation: &str) {
     tick_n(m, operation, 1);
 }
@@ -106,6 +116,30 @@ mod bounded_field_tally_guard_tests {
             assert!(stack.borrow().is_empty());
         });
     }
+    #[test]
+    fn nested_scopes_zero_counts_and_dropped_scope_preserve_parent() {
+        tick(131, "mul");
+        let outer = OperationTally::begin();
+        tick_n(131, "mul", 3);
+        tick_n(83, "square", 0);
+        let inner = OperationTally::begin();
+        tick(83, "square");
+        assert_eq!(
+            inner.finish(),
+            BTreeMap::from([("f2m83_square".to_string(), 1)])
+        );
+        {
+            let _dropped = OperationTally::begin();
+            tick_n(131, "add", 17);
+        }
+        tick(131, "mul");
+        assert_eq!(
+            outer.finish(),
+            BTreeMap::from([("f2m131_mul".to_string(), 4)])
+        );
+        assert!(!current_thread_active_or_borrowed());
+    }
+
     #[test]
     fn active_tally_probe_preserves_existing_entries() {
         let tally = OperationTally::begin();

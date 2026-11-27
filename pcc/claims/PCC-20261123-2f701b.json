@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:24:05Z",
+ "id": "PCC-20261123-2f701b",
+ "kind": "statement",
+ "producer": {
+  "commit": "d96c3718d5aa154b55924630d720414d09e464ff",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/SIGNED_WORD_PROTOCOL.md",
+    "sha256": "314ee58eda3585a7e6526fb1a60ad66a71789ebfa1dd81d6d8a4c57352b978c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/signed_words.cpp",
+    "sha256": "df750b4e0d700e5c61941906be345437dcd80646d49ddb3176d67e01c809f4fa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/target_signed.cpp",
+    "sha256": "982cc60af0719514aed72bc422bf06e571bc93322c6919ba33879a2a1a57a283"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v2/result.json",
+    "sha256": "926cb2041735f43c420b6e10fee4d9338ae46b98ca7a4734874a9bc58ac2bba5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v2/target-result.json",
+    "sha256": "eba0b64133093895c38dd775911c8361b5b2c6cdb90df96a894a5417974f9786"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/signed-v2/pre-call-manifest.sha256",
+    "sha256": "e8db9b958786d7499eef6f818f17484e6b175eb6003fa91b7195eda89bd05086"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-recorded-pool",
+ "statement": "Frozen signed-v2 audit exhausts101926 unordered pairs on O and both signs of225 recorded base images. OpenSSL and direct-GMP full streams and grouped/sorted joins agree. All25425 collision aliases cancel formally;no nonzero L1<=4 row remains. Separate G/2G known answer retains one nonzero row;five controls pass. Canonical halftrace from independent known-scalar arithmetic has no recorded-base alias. Union rank stays6. Actual target encoder checks all six old signed principal rows and rejects a mutated row. New curve points0;producer unsigned;finite scope only."
+}

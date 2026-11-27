@@ -1,0 +1,335 @@
+{
+  "schema": "m31-projective-native-development-qualification/v1",
+  "date": "2026-11-23",
+  "timezone": "America/Los_Angeles",
+  "standing": "producer-local-unsigned",
+  "repository": "isogeny-labs/crypto",
+  "pull_request": 5087,
+  "branch": "automation/semaev-veronese-projective-20261123",
+  "source_baseline": "76998f1c0b15255bb26ea60427e35c52b968776e",
+  "source_provenance": "Final immutable frozen-02 source, pre-build and pre-call hashes, copied executables, post-call equality; source publication follows qualification.",
+  "field": 2147483647,
+  "curve": {
+    "a": 2147483644,
+    "b": 21
+  },
+  "section": [
+    "t*(t-1)",
+    "u*(u-1)"
+  ],
+  "factor_base_map_changed": false,
+  "smaller_field_used": false,
+  "source_hashes": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "3a45d376b947562d261351907251ce6cb26086201518b52498b6fe45c0314220"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "778364002832638e4ad6a429d27d31f649e3e115de5c28802b57487c695a00f4"
+    },
+    {
+      "path": "src/f4.rs",
+      "sha256": "719674626bb56a4d6de05c75be0710306380accf089f2b3795bd66567243f022"
+    },
+    {
+      "path": "src/lib.rs",
+      "sha256": "0caff58469679480c2a2e5ee4e728d023a5a0cebec2ce0d991d49275a1ebd66e"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "ae059042b0850e29b1fa1c157bf1af4d55797404bcbb58633990552f300d5a90"
+    },
+    {
+      "path": "src/multiplicity.rs",
+      "sha256": "90a17e795ff6abede0205ae11071cd6607756aa801f27f99824a9f34ddc29748"
+    },
+    {
+      "path": "src/quotient.rs",
+      "sha256": "d41a89b61a9f16b121e572298f50805a9973ef7ccb0d43e659f4222192231d59"
+    },
+    {
+      "path": "src/system_certificate_tests.rs",
+      "sha256": "a3023b7366fa1ed5dc0999be2ba5672f2642ed2f9df1e43aa082e5db53195500"
+    },
+    {
+      "path": "src/systems.rs",
+      "sha256": "75d78abfad65358ef0e29d46dbf92ad43717a45fffd9c6f1ebcb2e206c9be619"
+    }
+  ],
+  "qualification": {
+    "library_tests_passed": 27,
+    "cli_tests_passed": 2,
+    "failures": 0,
+    "ignored": 0,
+    "library_exit": 0,
+    "cli_exit": 0,
+    "pre_post_source_binary_hashes_equal": true,
+    "live_source_matches_frozen_snapshot": true,
+    "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "logs": [
+      "qualification-02/tests-lib-02.log",
+      "qualification-02/tests-cli-02.log"
+    ]
+  },
+  "multiplicity": {
+    "specialized_fibers": 500,
+    "rational_roots_checked": 3240,
+    "finite_signed_branches": 4630,
+    "infinity_signed_branches": 90,
+    "full_gradient_checks": 750,
+    "coefficient_mutations_rejected": 500,
+    "pure_sector_simple_root_cases": 300,
+    "full_receipt": "qualification-02/specialized-multiplicity-gate.json",
+    "scope": "specialized fiber coefficients, roots and multiplicities; not full Groebner extractions"
+  },
+  "projective_witnesses": {
+    "cells": [
+      {
+        "m": "3",
+        "arm": "preclosed_sequential",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "3",
+        "arm": "preclosed_sequential",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "3",
+        "arm": "preclosed_balanced",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "3",
+        "arm": "preclosed_balanced",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "3",
+        "arm": "multiplicity_balanced",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "3",
+        "arm": "multiplicity_balanced",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "16",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "preclosed_sequential",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "preclosed_sequential",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "preclosed_balanced",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "preclosed_balanced",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "multiplicity_balanced",
+        "mode": "Geometric",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      },
+      {
+        "m": "4",
+        "arm": "multiplicity_balanced",
+        "mode": "ExplicitFp2",
+        "fixtures": "50",
+        "certificates": "66",
+        "infinity_nodes": "16",
+        "extension_nodes": "32",
+        "corrupted_leaf_rejections": "66"
+      }
+    ],
+    "certificates": 792,
+    "corrupted_leaf_rejections": 792,
+    "fixtures_per_cell": 50,
+    "scope": "all generated equations on independent signed-point witnesses; not projected-output completeness"
+  },
+  "monolithic": {
+    "arities": [
+      3,
+      4
+    ],
+    "planes_per_arity": 50,
+    "section_points_per_plane": 4,
+    "exact_value_comparisons": 400
+  },
+  "coupled_f4": {
+    "unique_complete_semaev_instances": 1,
+    "fixture": {
+      "summands": 3,
+      "case": 0,
+      "arm": "preclosed_sequential",
+      "mode": "geometric"
+    },
+    "recorded_producer_executions_same_fixture": 5,
+    "execution_accounting": "three recorded targeted attempts plus qualification-01 and qualification-02 replays; all one unique fixture",
+    "status": "Complete",
+    "nonfixed_basis_polynomials": 30,
+    "processed_pairs": 561,
+    "scheduled_pairs": 561,
+    "matrix_batches": 10,
+    "max_raw_product_degree": 6,
+    "max_actual_post_nf_matrix_column_degree": 6,
+    "ordinary_checker": {
+      "status": "Verified-local-algorithm",
+      "candidate_s_pairs": 561,
+      "original_buchberger_pairs": 528,
+      "original_generators_checked": 11,
+      "reverse_memberships": 30,
+      "original_basis_polynomials": 33
+    },
+    "scope": "bounded development correctness; no projected-root extraction, general solving-degree theorem, or comparative runtime/RSS claim"
+  },
+  "prepared_inputs": {
+    "modes": [
+      {
+        "mode": "geometric",
+        "input_files": 400,
+        "cases_per_cell": 50,
+        "cells": {
+          "m3/monolithic": 50,
+          "m3/preclosed_sequential": 50,
+          "m3/preclosed_balanced": 50,
+          "m3/multiplicity_balanced": 50,
+          "m4/monolithic": 50,
+          "m4/preclosed_sequential": 50,
+          "m4/preclosed_balanced": 50,
+          "m4/multiplicity_balanced": 50
+        },
+        "manifest_sha256": "e980c90107d85d74d9b8d3bd28ed5d98703a2174a110264d3de507bb178c4583",
+        "input_hash_manifest_sha256": "8b4752af9e001f59d75a11e590726258498b798ee8166a48ccb616d128b1a460"
+      },
+      {
+        "mode": "fp2",
+        "input_files": 400,
+        "cases_per_cell": 50,
+        "cells": {
+          "m3/monolithic": 50,
+          "m3/preclosed_sequential": 50,
+          "m3/preclosed_balanced": 50,
+          "m3/multiplicity_balanced": 50,
+          "m4/monolithic": 50,
+          "m4/preclosed_sequential": 50,
+          "m4/preclosed_balanced": 50,
+          "m4/multiplicity_balanced": 50
+        },
+        "manifest_sha256": "423d908640911657dc2303ba14a166da005401bdb9ca21ee23ff7622d572fa10",
+        "input_hash_manifest_sha256": "ee486eee4bbb78d230e516366787f2d6730e1d2a3988430722cae2bb66070236"
+      }
+    ],
+    "total_input_files": 800,
+    "monolithic_inputs_duplicated_across_modes": true,
+    "batch_solver_executions": 0,
+    "archive": "prepared-inputs-m3-m4.tar.gz",
+    "archive_sha256": "a61cf6887d76c675608f5d4f5b2e71aebf9cbb556c6ce7abd797adbde81cd800",
+    "all_800_input_hashes_checked": true,
+    "geometric_decomposed_variable_order": "chart blocks, leaf squares, t,u; identical to quotient adapter"
+  },
+  "superseded_qualification": {
+    "directory": "qualification-01",
+    "tests_passed": 29,
+    "reason": "test-only exceptional leaf permutations and geometric export order were unified before final qualification; no batch solve consumed earlier inputs",
+    "source_archive": "qualification-01/frozen-source.tar.gz"
+  },
+  "broader_root_library_gate": {
+    "status": "incomplete-before-tests",
+    "attempts": [
+      {
+        "cap_seconds": 45,
+        "exit": 124,
+        "log": "root-library/root-library-01.log"
+      },
+      {
+        "cap_seconds": 180,
+        "exit": 124,
+        "log": "root-library/root-library-02.log"
+      }
+    ],
+    "inference": "No library pass, test failure, compiler defect or OOM is inferred."
+  },
+  "pending": [
+    "50 complete projected solver outputs per configuration",
+    "matched runtime and per-process peak RSS",
+    "full natural-factor-base workload",
+    "shared coordination, authenticated supported runner admission and checkpoint custody",
+    "completed broader root-library test gate",
+    "independent signed PCC standing"
+  ],
+  "historical_counts": {
+    "previous": 8424950,
+    "horner": 6420200,
+    "with_common_gcd_ratios": [
+      1.006,
+      1.022,
+      1.056
+    ],
+    "status": "historical, not measured in this continuation"
+  }
+}

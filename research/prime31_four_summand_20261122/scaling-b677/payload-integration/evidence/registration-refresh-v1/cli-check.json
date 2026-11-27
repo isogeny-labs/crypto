@@ -1,0 +1,86 @@
+{
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "e1552f1e0942690228900cc86eb6b0c8b4de88c1"
+      ],
+      "expected_returncode": 0,
+      "matched_expected_returncode": true,
+      "name": "ledger-verify",
+      "returncode": 0,
+      "started_at": "2026-11-24T00:27:51.832244+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/ledger-verify.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 15433,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/ledger-verify.stdout",
+        "sha256": "dc5a8674692a94d3467864f22c9427a0d97513b4caa4524605d56a88df26c62b"
+      }
+    },
+    {
+      "claim_sha256": "661b14ff1aef9118b7edaa86b2d6c222265c2710c6167ce83e1aad6ccc8a9c93",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "standing",
+        "PCC-20261124-21920c",
+        "--json"
+      ],
+      "expected_returncode": 2,
+      "matched_expected_returncode": true,
+      "name": "standing-21920c",
+      "returncode": 2,
+      "standing": "unverified",
+      "started_at": "2026-11-24T00:27:53.592050+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/standing-21920c.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 162,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/standing-21920c.stdout",
+        "sha256": "5bb5c62565bfe8702151a3009ecb7ba775909f5325fef8b38c2690847a885e5a"
+      }
+    },
+    {
+      "claim_sha256": "d7a0a4986555647f4e60cf6b3ef7976ec3afd2e7b62b40cab3d543a2e152aeaf",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "standing",
+        "PCC-20261124-daf86c",
+        "--json"
+      ],
+      "expected_returncode": 2,
+      "matched_expected_returncode": true,
+      "name": "standing-daf86c",
+      "returncode": 2,
+      "standing": "unverified",
+      "started_at": "2026-11-24T00:27:53.745250+00:00",
+      "stderr": {
+        "bytes": 0,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/standing-daf86c.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 162,
+        "path": "research/prime31_four_summand_20261122/scaling-b677/payload-integration/evidence/registration-refresh-v1/standing-daf86c.stdout",
+        "sha256": "9266ee3eff71bb500a683aefcdeadad7ca92200ccfb87f872d0fa5be534a10de"
+      }
+    }
+  ],
+  "metadata_only": true,
+  "schema": "rr5.unpublished-registration-cli-check/v1",
+  "scientific_payload_executed": false,
+  "signed_pcc_verdict": false,
+  "status": "pass"
+}

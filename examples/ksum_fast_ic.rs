@@ -1563,7 +1563,7 @@ mod avx {
         exc: &mut Vec<usize>,
         xs: &mut [u64],
     ) {
-        debug_assert!(wx.len() == NW && x.len() % GROUP == 0);
+        debug_assert!(wx.len() == NW && x.len().is_multiple_of(GROUP));
         debug_assert!(wd.iter().all(|&d| d == 1), "steps W_j = Q + c_j G");
         let c = C {
             p: _mm512_set1_epi64(f.p as i64),
@@ -1936,7 +1936,7 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     let cap: u64 = if probe { u64::MAX } else { 300_000 };
     let mut zero = vec![false; lanes];
     let mut exc: Vec<usize> = Vec::new();
-    assert!(lanes % 32 == 0, "lanes must be a multiple of 32");
+    assert!(lanes.is_multiple_of(32), "lanes must be a multiple of 32");
     while !done.load(Ordering::Relaxed) && st.steps < cap {
         for _ in 0..64 {
             // Probe the current points, then step every lane once.

@@ -75,10 +75,6 @@ fn prime_factors(mut n: u64) -> Vec<u64> {
     out
 }
 
-fn inv_mod_p(a: u32, p: u32) -> u32 {
-    powmod(a as u64, p as u64 - 2, p as u64) as u32
-}
-
 fn poly_trim(a: &mut Vec<u32>) {
     while a.last() == Some(&0) {
         a.pop();
@@ -125,42 +121,15 @@ fn poly_powmod(a: &[u32], mut e: u64, f: &[u32], p: u32) -> Vec<u32> {
     r
 }
 
-fn poly_rem(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut r = a.to_vec();
-    poly_trim(&mut r);
-    let db = b.len() - 1;
-    let inv = inv_mod_p(b[db], p);
-    while r.len() > db {
-        let k = r.len() - 1;
-        let c = r[k] * inv % p;
-        if c != 0 {
-            for i in 0..=db {
-                r[k - db + i] = (r[k - db + i] + p - (c * b[i]) % p) % p;
-            }
-        }
-        r.pop();
-        poly_trim(&mut r);
-    }
-    r
-}
-
 fn poly_gcd(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    poly_trim(&mut a);
-    poly_trim(&mut b);
-    while !b.is_empty() {
-        let r = poly_rem(&a, &b, p);
-        a = b;
-        b = r;
-    }
-    if let Some(&lc) = a.last() {
-        let inv = inv_mod_p(lc, p);
-        for c in a.iter_mut() {
-            *c = *c * inv % p;
-        }
-    }
-    a
+    // Monic gcd through the shared module (zero polynomial = empty).
+    let f = crypto_lib::gcd::poly::Fp64::new(p as u64);
+    let a: Vec<u64> = a.iter().map(|&c| c as u64 % p as u64).collect();
+    let b: Vec<u64> = b.iter().map(|&c| c as u64 % p as u64).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
+        .into_iter()
+        .map(|c| c as u32)
+        .collect()
 }
 
 fn poly_sub(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {

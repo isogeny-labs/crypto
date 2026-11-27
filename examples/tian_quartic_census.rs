@@ -782,36 +782,11 @@ fn smooth_once(f2: &Fld, fm: &Form) -> bool {
 }
 
 fn poly_gcd_poly(q: u64, a: &[u64], b: &[u64]) -> Vec<u64> {
-    fn trim(v: &mut Vec<u64>) {
-        while let Some(&l) = v.last() {
-            if l == 0 {
-                v.pop();
-            } else {
-                break;
-            }
-        }
-    }
-    let mut p = a.to_vec();
-    let mut s = b.to_vec();
-    trim(&mut p);
-    trim(&mut s);
-    while !s.is_empty() {
-        let li = powmod(*s.last().unwrap(), q - 2, q);
-        let sd = s.len() - 1;
-        let mut rem = p.clone();
-        while rem.len() > sd {
-            let c = rem.last().unwrap() * li % q;
-            let sh = rem.len() - 1 - sd;
-            for i in 0..=sd {
-                rem[sh + i] = (rem[sh + i] + q * q - c * s[i] % q) % q;
-            }
-            rem.pop();
-        }
-        trim(&mut rem);
-        p = s;
-        s = rem;
-    }
-    p
+    // Shared gcd (monic; the caller only reads its degree).
+    let f = crypto_lib::gcd::poly::Fp64::new(q);
+    let a: Vec<u64> = a.iter().map(|&c| c % q).collect();
+    let b: Vec<u64> = b.iter().map(|&c| c % q).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
 }
 
 /// Smoothness certificate: sound (never certifies a singular curve); a smooth curve

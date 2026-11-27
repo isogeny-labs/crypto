@@ -1458,9 +1458,15 @@ fn support(k: u32, form: &str, t: u32) -> Value {
         }
         "isogeny" => {
             let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
-            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, crypto_lib::cryptanalysis::ic_framework::prime_tower::AuxFamily::Any, &mut ops)
-                .expect("isogeny tower")
-                .v
+            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(
+                p,
+                t,
+                0,
+                crypto_lib::cryptanalysis::ic_framework::prime_tower::AuxFamily::Any,
+                &mut ops,
+            )
+            .expect("isogeny tower")
+            .v
         }
         "kummer" => {
             if (p - 1) % span != 0 {
@@ -1553,7 +1559,7 @@ fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
     use crypto_lib::cryptanalysis::ic_boundary::{
         CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint,
     };
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{AuxFamily, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
     use crypto_lib::cryptanalysis::ic_framework::stages::{FactorBaseBuilder, InstanceCtx, Params};
     let m = build_miniature(k);
     let inst = PrimeInstance {
@@ -1877,7 +1883,9 @@ fn f4cost_m(
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
     };
     use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, AuxFamily, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{
+        isogeny_tower, AuxFamily, PrimeIsogenyBase,
+    };
     use crypto_lib::cryptanalysis::ic_framework::stages::{
         DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
     };
@@ -2006,7 +2014,8 @@ fn f4cost_m(
             let fb = PrimeIsogenyBase { instance: &inst }
                 .build(&ctx, &params, &mut GroupOps::default())
                 .expect("isogeny base");
-            let tower = isogeny_tower(m.p, t, t0_lo, AuxFamily::Any, &mut GroupOps::default()).expect("tower");
+            let tower = isogeny_tower(m.p, t, t0_lo, AuxFamily::Any, &mut GroupOps::default())
+                .expect("tower");
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
@@ -2040,6 +2049,8 @@ fn f4cost_m(
     let started = std::time::Instant::now();
     let mut st = seed;
     let (mut done, mut hits, mut verified, mut exact) = (0u64, 0u64, 0u64, 0u64);
+    let trace_targets = std::env::var("F4COST_TARGET_TRACE").as_deref() == Ok("1");
+    let mut target_trace = Vec::new();
     for _ in 0..targets {
         if started.elapsed().as_secs() >= cap_s {
             break;
@@ -2053,13 +2064,18 @@ fn f4cost_m(
         if target.infinity {
             continue;
         }
+        let solver_before = trace_targets.then(|| oracle.solver_totals().unwrap_or_default());
+        let native_before = trace_targets.then(|| oracle.relation_counters());
         let mut ctr = OracleCounters::default();
+        let (mut hit_this, mut exact_this, mut verified_this) = (false, false, false);
         if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
             hits += 1;
+            hit_this = true;
             let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
                 inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
             });
-            exact += u64::from(s == target);
+            exact_this = s == target;
+            exact += u64::from(exact_this);
             // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
             // is accepted when the projected sums agree; without lifts the
             // sum must be R itself.
@@ -2072,12 +2088,42 @@ fn f4cost_m(
             };
             if ok {
                 verified += 1;
+                verified_this = true;
             }
+        }
+        if let (Some(before), Some(native_before)) = (solver_before, native_before) {
+            let after = oracle.solver_totals().unwrap_or_default();
+            let native_after = oracle.relation_counters();
+            let native_delta: std::collections::BTreeMap<String, u64> = native_after
+                .iter()
+                .filter_map(|(key, &value)| {
+                    let prior = native_before.get(key).copied().unwrap_or(0);
+                    (value != prior).then(|| (key.clone(), value - prior))
+                })
+                .collect();
+            target_trace.push(json!({
+                "target_index": done,
+                "scalar": a,
+                "target_x": target.x,
+                "target_y": target.y,
+                "f4_calls": after.calls - before.calls,
+                "f4_muladds": after.ops - before.ops,
+                "f4_wall_ns": after.wall_ns - before.wall_ns,
+                "budget_exceeded": after.budget_exceeded - before.budget_exceeded,
+                "hit": hit_this,
+                "exact": exact_this,
+                "verified": verified_this,
+                "group_adds": ops.adds,
+                "group_doubles": ops.doubles,
+                "lift_failures": ctr.lift_failures,
+                "unliftable_systems": ctr.unliftable_systems,
+                "native": native_delta,
+            }));
         }
         done += 1;
     }
     let tot = oracle.solver_totals().unwrap_or_default();
-    let native = oracle.relation_counters();
+    let native_random = oracle.relation_counters();
     let per_target = tot.ops as f64 / done.max(1) as f64;
     let learn_muladds = oracle
         .setup_native()
@@ -2124,6 +2170,7 @@ fn f4cost_m(
         p_done += 1;
     }
     let p_ops = oracle.solver_totals().map_or(0, |t| t.ops) - p_ops0;
+    let native_including_planted = oracle.relation_counters();
     // Exact coverage of the base at this m: the fraction of the subgroup that
     // is a sum of m base points (the hit rate an ideal oracle would see).
     let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
@@ -2199,11 +2246,12 @@ fn f4cost_m(
         "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "setup_group_ops": setup_ops.adds + setup_ops.doubles,
         "setup_native": oracle.setup_native(),
-        "poly_terms_per_specialisation": native.get("pkm_system_terms").copied().unwrap_or(0) as f64
-            / native.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
+        "poly_terms_per_specialisation": native_random.get("pkm_system_terms").copied().unwrap_or(0) as f64
+            / native_random.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
         "hits": hits, "hits_verified": verified,
         "hit_rate": hits as f64 / done.max(1) as f64, "max_nnz_cap": max_nnz,
-        "native": native,
+        "native": native_random,
+        "native_including_planted": native_including_planted,
     });
     out["solver_extra"] = json!(tot.extra);
     out["covered_projected_points"] = json!(covered_projected);
@@ -2214,6 +2262,9 @@ fn f4cost_m(
     out["planted_hits"] = json!(p_hits);
     out["planted_exact"] = json!(p_exact);
     out["planted_muladds"] = json!(p_ops);
+    if trace_targets {
+        out["target_trace"] = json!(target_trace);
+    }
     out
 }
 

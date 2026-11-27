@@ -1,0 +1,13 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T05:07:58Z",
+  "admission":"local-only under user's run-in-parallel instruction and prior Run locally with bypass; current checkpoint missing .resume, prior S3 HTTP 403; neither gate represented as passing",
+  "worktree_commit":"c0f6885005f713e0fe56087584f8fbd8bdbcca5b",
+  "input":{"producer":"EC_GRAPH_RANK_GP_V2.stdout.txt","producer_sha256":"1a2f0f09992538dd789f38fda43a5bd20765580f952dba7181e3e99b81e59f83","independent_verifier":"WS68_EC_GRAPH_V2_VERIFY.post-call.json","curve":"E/F_1009: y^2=x^3+x+14","group_order":1013},
+  "source":{"path":"WS68_SUPPORT_RANK.rs","sha256":"5bbaa469101bbd8587546ee8a7a9ec75fa9abcd697589f09f7f210a4e213ff99"},
+  "immutable_qualifier":{"path":"WS68_SUPPORT_RANK.qualifier.rs","sha256":"5bbaa469101bbd8587546ee8a7a9ec75fa9abcd697589f09f7f210a4e213ff99"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_SUPPORT_RANK","WS68_SUPPORT_RANK.qualifier.rs","-o","WS68_SUPPORT_RANK.bin"],
+  "expected":{"same_support":true,"nonzero_per_column":[2,2,2],"matching_A":3,"matching_B":3,"rank_A":3,"rank_B":2,"invalid_rows_after_column_drop":2},
+  "claim_boundary":"exact support-only controls on verified EC relation rows; no performance or broad algorithm claim"
+}

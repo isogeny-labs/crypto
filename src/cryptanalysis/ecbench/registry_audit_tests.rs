@@ -542,9 +542,13 @@ const CASES: &[(&str, Fx, P)] = &[
     ),
 ];
 
-/// Ids that are not run, each with why.  Only an external backend or the
-/// lack of any instance small enough for a unit test belongs here.
+/// Ids that are not run here. Each entry identifies the missing fixture,
+/// an incompatible workload contract, or the dedicated coverage.
 const SKIPS: &[(&str, &str)] = &[
+    ("bsgs.prime_mont4_v1", "four-limb explicit fixture and exact replay covered by prime_mont4_dispatch_and_refusals"),
+    ("ic.diem_kgrow", "generates its own extension-field cell and planted logarithm independently of the supplied workload"),
+    ("ic.growing_arity", "generates its own field-size study cell and planted logarithm independently of the supplied workload"),
+    ("ic.aux_tower_solver", "generates its own auxiliary-tower study cell and planted logarithm independently of the supplied workload"),
     ("rho.curve25519_bounded", "fixed 253-bit subgroup: bounded arbitrary-target runs are censoring controls, independently covered by curve25519_bounded_tests"),
     ("ic.curve25519_pair_v1", "fixed full-width curve: the generic planted target is not guaranteed to decompose in a bounded pair base; independent high-scalar positive and refusal controls run in curve25519_pair_dispatch_tests"),
     ("ic.cm_folded_native_v1", "needs the external native backend binary"),

@@ -1,0 +1,285 @@
+{
+ "schema": "ic-descent-window-sweep/v1",
+ "runs": 50,
+ "rounds": 5,
+ "contended_runs": 0,
+ "recovered_digests": [
+  "c5d3445282285920"
+ ],
+ "arms": [
+  {
+   "arm": "w16",
+   "window": 16,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    59034
+   ],
+   "summands_scanned": 944544,
+   "descent_ms_median": 49.256296999999996,
+   "descent_ms_min": 37.100927999999996,
+   "descent_ms_max": 55.645803
+  },
+  {
+   "arm": "w32",
+   "window": 32,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    24789
+   ],
+   "summands_scanned": 793248,
+   "descent_ms_median": 22.098433,
+   "descent_ms_min": 20.995943999999998,
+   "descent_ms_max": 26.401824
+  },
+  {
+   "arm": "w64",
+   "window": 64,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    11993
+   ],
+   "summands_scanned": 767552,
+   "descent_ms_median": 14.414663,
+   "descent_ms_min": 14.020654,
+   "descent_ms_max": 15.523004
+  },
+  {
+   "arm": "w128",
+   "window": 128,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    6309
+   ],
+   "summands_scanned": 807552,
+   "descent_ms_median": 11.760430000000001,
+   "descent_ms_min": 10.729553,
+   "descent_ms_max": 12.768690000000001
+  },
+  {
+   "arm": "w207",
+   "window": 207,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    2908
+   ],
+   "summands_scanned": 601956,
+   "descent_ms_median": 8.904492999999999,
+   "descent_ms_min": 8.519947,
+   "descent_ms_max": 11.267446
+  },
+  {
+   "arm": "unset",
+   "window": 207,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    2908
+   ],
+   "summands_scanned": 601956,
+   "descent_ms_median": 8.962446,
+   "descent_ms_min": 8.40799,
+   "descent_ms_max": 11.654295
+  },
+  {
+   "arm": "w414",
+   "window": 414,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    1652
+   ],
+   "summands_scanned": 683928,
+   "descent_ms_median": 10.642472,
+   "descent_ms_min": 8.720636,
+   "descent_ms_max": 16.357063
+  },
+  {
+   "arm": "w828",
+   "window": 828,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    832
+   ],
+   "summands_scanned": 688896,
+   "descent_ms_median": 8.111101000000001,
+   "descent_ms_min": 7.8772210000000005,
+   "descent_ms_max": 11.782514
+  },
+  {
+   "arm": "d3",
+   "window": 2187,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    453
+   ],
+   "summands_scanned": 990711,
+   "descent_ms_median": 12.359436,
+   "descent_ms_min": 9.947126,
+   "descent_ms_max": 13.608421
+  },
+  {
+   "arm": "full",
+   "window": 6560,
+   "runs": 5,
+   "verified": [
+    32,
+    32,
+    32,
+    32,
+    32
+   ],
+   "targets": 32,
+   "descent_trials": [
+    346
+   ],
+   "summands_scanned": 2269760,
+   "descent_ms_median": 24.257323,
+   "descent_ms_min": 23.787722000000002,
+   "descent_ms_max": 28.443191
+  }
+ ],
+ "paired_ratios": [
+  {
+   "num": "full",
+   "den": "unset",
+   "per_round": [
+    2.1661224467031253,
+    2.658795601111571,
+    2.6996222003770316,
+    2.81330386118286,
+    3.3828764068463446
+   ],
+   "median": 2.6996222003770316
+  },
+  {
+   "num": "unset",
+   "den": "w207",
+   "per_round": [
+    0.7504309317302252,
+    0.9442412948159992,
+    1.0130953178945532,
+    1.0546369595961103,
+    1.1499424204639181
+   ],
+   "median": 1.0130953178945532
+  },
+  {
+   "num": "w828",
+   "den": "unset",
+   "per_round": [
+    0.7876725275960493,
+    0.8789141937368437,
+    0.8958140220229347,
+    0.9646896582893176,
+    1.393483248654121
+   ],
+   "median": 0.8958140220229347
+  },
+  {
+   "num": "d3",
+   "den": "unset",
+   "per_round": [
+    1.1268299798486308,
+    1.1830563547292516,
+    1.248787644404076,
+    1.3754942295050074,
+    1.5183824817466123
+   ],
+   "median": 1.248787644404076
+  },
+  {
+   "num": "w414",
+   "den": "unset",
+   "per_round": [
+    0.7482765795786017,
+    0.998045511236553,
+    1.184411555969756,
+    1.396332302044601,
+    1.9454189407932216
+   ],
+   "median": 1.184411555969756
+  },
+  {
+   "num": "w128",
+   "den": "unset",
+   "per_round": [
+    1.0091069429768167,
+    1.1971679383061273,
+    1.3339930293983016,
+    1.3574569744448544,
+    1.5186376292074562
+   ],
+   "median": 1.3339930293983016
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+digraph audit {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#EDF3F8",color="#34516B",fontname="Helvetica",fontsize=11,margin="0.13,0.10"];
+ edge [color="#34516B",arrowsize=0.7];
+ support [label="Original toy base\n44 signed geometric positions\n6 supplied-section matches"];
+ premise [label="Explicit premises\nB=mN+r; r<m\nam <= T; s <= m"];
+ guards [label="Standard dimension/root guards\nNL < (D+1)(s+1)+h\nD+h < aL; h >= 2"];
+ bound [label="Core Lean implication\nN < a(s+1)\nB < T(T+1)",fillcolor="#DCEDE8"];
+ scope [label="T=6: requires B<42\nCertificate incompatible at B>=42\nOther decoding methods remain open",fillcolor="#F8EEDC"];
+ support -> premise [label="finite native bridge",fontname="Helvetica",fontsize=9];
+ premise -> bound; guards -> bound; bound -> scope;
+}

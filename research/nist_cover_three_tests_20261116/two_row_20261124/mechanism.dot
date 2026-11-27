@@ -1,0 +1,15 @@
+digraph tangent_closure {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", label="Frozen P-192 split tangents: necessary two-row closure tests", labelloc=t, fontsize=17, nodesep=0.3, ranksep=0.4];
+  node [shape=box, style="rounded,filled", fillcolor="#EDF2F7", color="#41556B", fontname="Helvetica", fontsize=12, margin="0.15,0.12"];
+  edge [color="#52677B", arrowsize=0.7];
+  traces [label="102 selected residual traces\nTi = kappa - 2 f(Pi)\nFrozen data only; no new point collection"];
+  aa [label="Ti +/- Tj in A+A ?\n10,302 queries; 0 witnesses", fillcolor="#DDEFE5"];
+  ab [label="2Ti +/- Tj in 2A ?\n20,604 queries; 0 witnesses", fillcolor="#DDEFE5"];
+  result [label="Conditional finite exclusion:\nno one-row or two-row closure\nProducer-unverified", fillcolor="#FFF0CD"];
+  cycles [label="H-J, proposed:\nshared-image cycles using >=3 rows", style="rounded,dashed", fillcolor="white"];
+  paths [label="H-K, proposed:\npaths with old-column endpoints", style="rounded,dashed", fillcolor="white"];
+  {rank=same; aa; ab;}
+  {rank=same; cycles; paths;}
+  traces -> aa; traces -> ab; aa -> result; ab -> result;
+  result -> cycles [style=dashed]; result -> paths [style=dashed];
+}

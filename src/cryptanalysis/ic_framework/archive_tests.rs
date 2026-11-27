@@ -537,7 +537,7 @@ fn binary_archive_runs_and_replays_useful_rank() {
         &ctx,
         &spec,
         &builder,
-        &mut SubtractOracle::default(),
+        &mut SubtractOracle,
         planted,
         &Calibration::default(),
         Some(1.0),

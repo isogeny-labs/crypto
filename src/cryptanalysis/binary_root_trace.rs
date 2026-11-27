@@ -654,17 +654,8 @@ fn vpow(mut a: u64, mut exponent: u64, field: FieldSpec) -> u64 {
     }
     value
 }
-fn bit_remainder(mut a: u64, b: u64) -> u64 {
-    while a != 0 && a.leading_zeros() <= b.leading_zeros() {
-        a ^= b << (b.leading_zeros() - a.leading_zeros());
-    }
-    a
-}
-fn bit_gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, bit_remainder(a, b));
-    }
-    a
+fn bit_gcd(a: u64, b: u64) -> u64 {
+    crate::gcd::gf2::gcd_word(a, b)
 }
 fn irreducible(field: FieldSpec) -> bool {
     let mut x = 2u64;
@@ -705,19 +696,38 @@ fn vremainder(a: &[u64], b: &[u64], field: FieldSpec) -> Vec<u64> {
     }
     r
 }
-fn vgcd(mut a: Vec<u64>, mut b: Vec<u64>, field: FieldSpec) -> Vec<u64> {
-    while !b.is_empty() {
-        let r = vremainder(&a, &b, field);
-        a = b;
-        b = r;
+/// The verifier's field (`vmul`, Fermat inverse by `vpow`) as a
+/// [`crate::gcd::poly::PolyField`].
+struct VerifierField(FieldSpec);
+
+impl crate::gcd::poly::PolyField for VerifierField {
+    type E = u64;
+    fn zero(&self) -> u64 {
+        0
     }
-    if let Some(&leading) = a.last() {
-        let inverse = vpow(leading, field.order() - 2, field);
-        for coefficient in &mut a {
-            *coefficient = vmul(*coefficient, inverse, field);
-        }
+    fn one(&self) -> u64 {
+        1
     }
-    a
+    fn add(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        vmul(a, b, self.0)
+    }
+    fn inv(&self, a: u64) -> u64 {
+        vpow(a, self.0.order() - 2, self.0)
+    }
+    fn neg(&self, a: u64) -> u64 {
+        a
+    }
+}
+
+/// Monic `gcd(a, b)` by `crate::gcd::poly::gcd` over the verifier's field.
+fn vgcd(a: Vec<u64>, b: Vec<u64>, field: FieldSpec) -> Vec<u64> {
+    crate::gcd::poly::gcd(&VerifierField(field), &a, &b)
 }
 fn veval(f: &[u64], x: u64, field: FieldSpec) -> u64 {
     f.iter()

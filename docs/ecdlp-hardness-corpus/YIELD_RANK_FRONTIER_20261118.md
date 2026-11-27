@@ -55,6 +55,7 @@ Editable source:
 - `THEOREM-YIELD-CONSERVATION` and `THM-RP-YIELD-SUM-COUNT` fix the
   total/mean representation count for a finite domain. They do not determine
   variance, zero mass, tails, target uniformity or solver visibility.
+  [pcc:unverified]
 - `MEAS-PF-YIELD-CENSUS` gives exhaustive small-prime, arity-two counts and the
   ordered/unordered pairing correction. It is not an asymptotic law for natural
   higher-arity families.
@@ -105,8 +106,10 @@ bridge is supplied.
    chart, multiplicity, rationality or verification mismatch.
 3. **Finish kernel-mode classification.** The first 11-claim census is
    [recorded](../../research/ic_yield_rank_frontier_20261118/KERNEL_MODE_CENSUS_20261118.md).
-   Resolve Theriault from the primary text, then formalize the graph-cycle and
-   reusable/right-rank branches that remain load-bearing.
+   Theriault's primary text and the deterministic graph-cycle algebra are now
+   resolved.  The next graph task is a complete-stream estimate of the first
+   useful balanced circuit with nonzero target projection; the reusable/right-
+   rank branches remain separate obligations.
 4. **Produce one admitted immutable population.** Only after custody and
    experiment admission, retain every registered target, failure, witness,
    normalized row and rank/support prefix. Do not reuse the held historical
@@ -146,7 +149,7 @@ reported separately for the single-target and reusable-table modes.
 
 ## Non-implications
 
-- A conserved mean is not a Poisson law.
+- A conserved mean is not a Poisson law. [pcc:unverified]
 - An exhaustive toy census is not an asymptotic theorem.
 - A solver success rate is not mathematical decomposition yield unless the
   witness correspondence is checked.

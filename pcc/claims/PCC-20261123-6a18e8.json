@@ -1,0 +1,78 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:19:35Z",
+ "id": "PCC-20261123-6a18e8",
+ "kind": "theorem",
+ "producer": {
+  "commit": "668dbe229ed6bcfe369e8622d7177f6907f1a2e1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "bdb1e597016979dbe398e6bef41a90793200356ae02fb90123ad392364805dd7",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean/FoldingRank.lean",
+   "theorem": "FoldingRank.root_budget_degree_bound"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean/FoldingRank.lean",
+    "sha256": "f048b29d191bc310fa9898947ec7afcfbca23673d6a7471d621ce2151162c9e7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean/lakefile.toml",
+    "sha256": "d35356da22664571df2d7effa17526369057e65c32d070e5a084baf1aa663a68"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean/lake-manifest.json",
+    "sha256": "3beb416a506812c8ad7572bc9280a3b6a11936cfd27d7380cfee8a7280a65f4f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/DECLARATION_BINDING.json",
+    "sha256": "813f96b8e6f0043620670c1fcd7f6bf504bad2c05f57541920c5155d7fec4c67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean-gate/research_curve25519_torus_native_20261115_folding-rank-v1_lean/build.log",
+    "sha256": "3f3dee408cca8fcc44fbf2df4f0b73f51e24936334b9a0ee389cd37b024c123e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean-gate/research_curve25519_torus_native_20261115_folding-rank-v1_lean/source-build.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/folding-rank-v1/lean-gate/research_curve25519_torus_native_20261115_folding-rank-v1_lean/status",
+    "sha256": "aee75ba23d4a6e003ea91857cb38117fc2577c06138d765018217c49bcff5ab1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Core Lean integer implication only; no geometry, native rank, code applicability, decoder or cost theorem.",
+ "statement": "Conditional integer root-budget implication: L<=m, a*m<=6, D+4<a*L imply D<=1."
+}

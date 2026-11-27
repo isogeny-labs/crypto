@@ -626,14 +626,19 @@ pub fn materialize_complete_relations(
         if witness.sources.len() > max_sources || !witness_cancels_lp(index, witness) {
             return None;
         }
+        let mut sources: Vec<_> = witness
+            .sources
+            .iter()
+            .map(|&(i, a)| (index.row_ids[i], a))
+            .collect();
+        // Witness terms are ordered by input position. Original source IDs
+        // need not share that order, while replay returns ID-sorted sources.
+        // Move each coefficient with its ID; do not merge duplicate terms.
+        sources.sort_unstable_by_key(|&(id, _)| id);
         let proposed = CompleteRelation {
             small: Vec::new(),
             rhs: 0,
-            sources: witness
-                .sources
-                .iter()
-                .map(|&(i, a)| (index.row_ids[i], a))
-                .collect(),
+            sources,
         };
         // The existing replay kernel recomputes from canonicalized partial
         // rows, including independently checking complete LP cancellation.

@@ -1,0 +1,23 @@
+    Updating crates.io index
+     Locking 37 packages to highest compatible versions
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+      Adding sha2 v0.10.9 (available: v0.11.1)
+   Compiling torus-folding-rank v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-folding-rank)
+error[E0282]: type annotations needed for `&_`
+   --> src/lib.rs:173:25
+    |
+173 |                     let expected=positive_det.as_ref().ok_or("positive determinant missing")?;
+    |                         ^^^^^^^^
+174 |                     let expected=if ss*(d+1)%2==1 {expected.neg(&f)} else {expected.clone()};
+    |                                                    -------- type must be known at this point
+    |
+help: consider giving `expected` an explicit type, where the type for type parameter `T` is specified
+    |
+173 |                     let expected: &T=positive_det.as_ref().ok_or("positive determinant missing")?;
+    |                                 ++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `torus-folding-rank` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-folding-rank` (lib test) due to 1 previous error

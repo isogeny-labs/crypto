@@ -1,0 +1,1 @@
+jq -ser $'\n  [.[] | select(.reason == "compiler-artifact" and .target.name == "prime31_b677_capture"\n                and .profile.test == false and .executable != null)]\n  | if length == 1 then .[0].executable else error("expected exactly one converter executable") end\n' /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/converter-build.stdout 

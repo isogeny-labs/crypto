@@ -1,0 +1,94 @@
+{
+  "schema": "curve25519.projective-split-current-main/v1",
+  "timestamp_utc": "2026-11-25T20:39:43Z",
+  "status": "pass_current_main_correctness_panels",
+  "source": {
+    "branch_head": "defc983dfb51dd0151de5011ab0680ff41324d8d",
+    "main_base": "53df0c3ddc22de8774d83f6ec3a6c00fffcfd1ee",
+    "historical_source_commit": "fcfa0556673cbbf45dec4a9d1906bd8f1e068fba",
+    "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "environment": {
+    "cgroup_memory_max_bytes": 17179869184,
+    "rayon_threads_for_descent_smoke": 1
+  },
+  "release_test_build": {
+    "command": "cargo test --release --lib cryptanalysis::ic_framework::pkm_semaev::tests::projective_chain_keeps_identity_and_rejects_zero_coordinates -- --nocapture",
+    "result": "exit 0",
+    "duration": "19m49s",
+    "test_binary_sha256": "6792b1d18c42c7dfd6ac7619f6e1abfe016abe6ea526a7cb34ae9618ac845402",
+    "filtered_tests": 8130
+  },
+  "projective_tests": [
+    {
+      "name": "cryptanalysis::ic_framework::pkm_semaev::tests::projective_chain_keeps_identity_and_rejects_zero_coordinates",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "seconds": 0.36
+    },
+    {
+      "name": "cryptanalysis::ic_framework::pkm_semaev::tests::planted_m3_decompositions_are_found",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "seconds": 2.38,
+      "scope": "six planted targets per affine-chain, projective-chain, full-S4, and exhaustive presentation"
+    },
+    {
+      "name": "cryptanalysis::ic_framework::pkm_semaev::tests::f4_agrees_with_grid_on_random_targets",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "seconds": 5.35,
+      "scope": "40 deterministic random/planted targets; projective, affine, full-S4, exhaustive-grid, and exact decomposable-set verdicts agree"
+    }
+  ],
+  "exact_model_tests": {
+    "command": "cargo test --release --lib curve25519_ic::tests -- --nocapture",
+    "exit": 0,
+    "passed": 9,
+    "failed": 0,
+    "filtered": 8122
+  },
+  "lean_gate": {
+    "command": "tools/lean/proof-gate.sh --out /workspace/curve25519-lean-receipt research/curve25519_index_calculus_20261102/lean",
+    "toolchain": "Lean 4.35.0",
+    "status": "PASS",
+    "theorems_audited": 5,
+    "failing": 0,
+    "trusted_native_decide": 0
+  },
+  "certificate_replay": {
+    "command": "curve25519_ic_artifact replay research/curve25519_index_calculus_20261102/montgomery-translation.identity.json",
+    "binary_sha256": "4acd6faa3ad26bb7e2643b473d05a54a38d39f6bd522b6669e3ccc5d2e7b7ee3",
+    "certificate_id": "IDC1h32739202ad9d0c15",
+    "accepted_points": 32,
+    "accepted_extra_points": 32,
+    "false_accept_log2": -3802.562399953846,
+    "verdict": "accept"
+  },
+  "descent_smoke": {
+    "claim_boundary": "one planted path-correctness check, not a performance cell or estimator",
+    "command": "RAYON_NUM_THREADS=1 F4COST_PLANTED=1 F4COST_TARGET_TRACE=1 curve25519_family f4cost 20 bits 4 0 0 20261118 120 3 'projective,trace=0' 0 - 0",
+    "binary_sha256": "372cee804554a76fe96c9f42fa1c954a61b4593565b679730b51ab59043e2bd9",
+    "trace": false,
+    "planted_done": 1,
+    "planted_hits": 1,
+    "planted_exact": 1,
+    "planted_f4_muladds": 44400671897,
+    "wall_seconds": 15.013652226
+  },
+  "decision": {
+    "frozen_m3_performance_grid_run": false,
+    "m4_stage_opened": false,
+    "reason": "Current solving-degree closure work records reachable m<=4 measurements as non-decisive for the exponent bar; the high-value remaining question is a theorem about satisfiable-solve cost/degree growth."
+  },
+  "excluded": [
+    "No paired projective-versus-affine performance grid was run.",
+    "The frozen eight-planted-per-measured-cell gate remains pending.",
+    "No cost slope or exponent was estimated.",
+    "No subexponential Curve25519 ECDLP claim is made."
+  ]
+}

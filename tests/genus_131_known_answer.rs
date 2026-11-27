@@ -54,7 +54,7 @@ fn genus_131_prime_order_jacobian_known_answer() {
     // Eliminating R gives [130^2 + 133^2]P = 0. The next trial divisor
     // after 185 exceeds sqrt(ORDER), so these checks prove exact order.
     assert_eq!(ORDER, 130 * 130 + 133 * 133);
-    assert!((2..=185).all(|divisor| ORDER % divisor != 0));
+    assert!((2..=185).all(|divisor| !ORDER.is_multiple_of(divisor)));
     assert!(!generator.is_identity());
     assert!(multiply(&generator, ORDER).is_identity());
     assert_eq!((130 + 133 * SECOND_POINT_LOG) % ORDER, 0);

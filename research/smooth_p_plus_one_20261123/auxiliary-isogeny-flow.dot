@@ -1,0 +1,12 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", ranksep="0.33", nodesep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#355a7a", fontname="Helvetica", fontsize=11];
+  edge [color="#52616b", arrowsize=0.7];
+  source [label="Auxiliary E': y^2 = x^3 + x\nFull-order rational generator"];
+  steps [label="Degree-two chain\nTrack translated kernel at every step\nF31: next kernel x = 2"];
+  low [label="Chained x evaluation\nExplicit poles / infinity"];
+  dense [label="Dense rational map N / D\nF31 depth 3: degrees 8 / 7"];
+  fiber [label="Regular coset fiber: N - chi D\nReject infinity / two-torsion image\nF31 unit control: 8 distinct roots", fillcolor="#e7f3e7"];
+  lift [label="Lift roots onto target curve\nFilter nonsquares and two-torsion\nCanonical y sign", fillcolor="#fff2d7"];
+  source -> steps; steps -> low; steps -> dense; low -> fiber; dense -> fiber; fiber -> lift;
+}

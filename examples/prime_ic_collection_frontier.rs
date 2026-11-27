@@ -156,6 +156,9 @@ fn main() {
             }
             let m = fb.len();
             let needed = m + args.extra;
+            let support = fb
+                .support_profile(&fc, &[Some(g), Some(q)])
+                .expect("valid shared signed factor-base support");
 
             // ── sweep (no pair table) ───────────────────────────────────
             let ((sweep_rels, sweep_stats), sweep_collect_s) = secs(|| {
@@ -197,6 +200,8 @@ fn main() {
             out.push(json!({
                 "bits": bits, "curve": fc.name, "p": fc.f.p, "n": fc.n,
                 "B": b, "needed": needed,
+                "B_convention": "stored-negation-orbit-columns",
+                "support_profile": support,
                 "sweep_targets": sweep_stats.targets, "table_targets": table_stats.targets,
                 "sweep_collect_s": sweep_collect_s, "sweep_la_s": sweep_la_s,
                 "table_build_s": table_build_s, "table_collect_s": table_collect_s, "table_la_s": table_la_s,

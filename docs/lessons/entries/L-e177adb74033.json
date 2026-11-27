@@ -1,0 +1,15 @@
+{
+  "action": "Read one fixed native get-value response from the pinned release before qualifying a full run; parse its actual dialect strictly, checking the expected modulus and canonical range.",
+  "created": "2026-11-23T20:29:24Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/spectrum-compiler-v1/development/scalar-interface.stdout",
+    "research/curve25519_torus_native_20261115/spectrum-compiler-v1/development/source-before-backend-format-fix.tar.xz"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "Introducing a native finite-field solver model parser",
+  "why": "cvc5 documentation uses as-ff input terms while the pinned native1.4.2 get-value prints compact #fVALUE mMODULUS tokens; the draft parser would refuse valid output. The source and exact interface response are retained before correction."
+}

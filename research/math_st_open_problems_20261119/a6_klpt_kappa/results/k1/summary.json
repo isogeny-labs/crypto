@@ -1,0 +1,30 @@
+{
+  "experiment": "A6 KLPT CVP with e1 headroom kappa",
+  "seed": 20261123,
+  "runs_per_instance": 5,
+  "kappa": 1,
+  "control1": {"rows": 108, "svp_matches_unconstrained_norm": 108, "left_closed": 108, "seconds": 0.180},
+  "usable_rows": 105,
+  "klpt_runs": 1050,
+  "klpt_failures": 0,
+  "control_failures": {"total": 0, "beta_not_in_I": 0, "norm_not_ell_e": 0, "equivalent_ideal_bad": 0},
+  "nonprimitive_outputs": 0,
+  "bands": [
+    {"p_bits": 12, "ell": 2, "n_runs": 180, "log_p_ell_e": {"median": 3.5324, "q1": 3.3725, "q3": 3.6254, "iqr": 0.2529}, "log_p_ratio": {"median": 2.8431, "q1": 2.5763, "q3": 2.9763, "iqr": 0.4000}, "median_log_p_N": 0.5584, "median_log_p_ell_e0": 0.7588, "median_log_p_ell_e1": 2.7941, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false},
+    {"p_bits": 12, "ell": 3, "n_runs": 180, "log_p_ell_e": {"median": 3.5680, "q1": 3.4598, "q3": 3.6502, "iqr": 0.1904}, "log_p_ratio": {"median": 2.8676, "q1": 2.6726, "q3": 3.0773, "iqr": 0.4047}, "median_log_p_N": 0.5612, "median_log_p_ell_e0": 0.8087, "median_log_p_ell_e1": 2.8079, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false},
+    {"p_bits": 20, "ell": 2, "n_runs": 175, "log_p_ell_e": {"median": 3.3516, "q1": 3.2637, "q3": 3.4219, "iqr": 0.1582}, "log_p_ratio": {"median": 2.5183, "q1": 2.4231, "q3": 2.6211, "iqr": 0.1980}, "median_log_p_N": 0.5285, "median_log_p_ell_e0": 0.7045, "median_log_p_ell_e1": 2.6670, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false},
+    {"p_bits": 20, "ell": 3, "n_runs": 175, "log_p_ell_e": {"median": 3.4031, "q1": 3.3138, "q3": 3.4513, "iqr": 0.1375}, "log_p_ratio": {"median": 2.5864, "q1": 2.4901, "q3": 2.7117, "iqr": 0.2216}, "median_log_p_N": 0.5255, "median_log_p_ell_e0": 0.7274, "median_log_p_ell_e1": 2.6672, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false},
+    {"p_bits": 28, "ell": 2, "n_runs": 170, "log_p_ell_e": {"median": 3.2798, "q1": 3.2295, "q3": 3.3468, "iqr": 0.1173}, "log_p_ratio": {"median": 2.4344, "q1": 2.3672, "q3": 2.5109, "iqr": 0.1437}, "median_log_p_N": 0.5177, "median_log_p_ell_e0": 0.6554, "median_log_p_ell_e1": 2.6195, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false},
+    {"p_bits": 28, "ell": 3, "n_runs": 170, "log_p_ell_e": {"median": 3.3133, "q1": 3.2720, "q3": 3.3704, "iqr": 0.0984}, "log_p_ratio": {"median": 2.4559, "q1": 2.3969, "q3": 2.5138, "iqr": 0.1169}, "median_log_p_N": 0.5195, "median_log_p_ell_e0": 0.6825, "median_log_p_ell_e1": 2.6405, "h4_in_3.0_3.7": true, "lead_median_below_2.5": false}
+  ],
+  "slopes_vs_log2_p": [
+    {"ell": 2, "n": 525, "log2_ratio_slope": 2.1887, "log2_ratio_intercept": 6.9117, "log2_ell_e_slope": 3.1391, "log2_ell_e_intercept": 4.0686, "lead_ratio_slope_below_2": false, "total_retries": 1546},
+    {"ell": 3, "n": 525, "log2_ratio_slope": 2.1578, "log2_ratio_intercept": 8.3488, "log2_ell_e_slope": 3.1507, "log2_ell_e_intercept": 4.6036, "lead_ratio_slope_below_2": false, "total_retries": 1112}
+  ],
+  "retry_totals": [
+    {"ell": 2, "runs": 525, "runs_with_any_retry": 462, "runs_with_e_above_rule": 352, "max_e_minus_rule": 6, "retries": 1546, "gamma_pairs_tried": 5964, "rej_l2_parity": 336, "rej_gamma_nonprimitive": 287, "rej_no_cd": 0, "rej_cd_isotropic": 4, "rej_residuosity": 282, "rej_e1_cap": 1, "e0_bumps": 4, "e1_bumps": 340, "e1_parity_bumps": 292, "nonprimitive_beta_rejects": 0, "sa_candidates": 4874, "sa_parity_skips": 2510, "sa_no_sos": 1839, "delta_box_gt1": 55},
+    {"ell": 3, "runs": 525, "runs_with_any_retry": 422, "runs_with_e_above_rule": 325, "max_e_minus_rule": 4, "retries": 1112, "gamma_pairs_tried": 6165, "rej_l2_parity": 0, "rej_gamma_nonprimitive": 152, "rej_no_cd": 0, "rej_cd_isotropic": 1, "rej_residuosity": 232, "rej_e1_cap": 0, "e0_bumps": 33, "e1_bumps": 237, "e1_parity_bumps": 202, "nonprimitive_beta_rejects": 255, "sa_candidates": 4578, "sa_parity_skips": 0, "sa_no_sos": 3798, "delta_box_gt1": 55}
+  ],
+  "max_run_seconds": 0.0068,
+  "total_seconds": 0.351
+}

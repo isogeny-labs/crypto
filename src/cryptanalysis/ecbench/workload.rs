@@ -382,6 +382,17 @@ impl CurveSpec {
                         "panel cell `{cell}` recursively names a panel cell"
                     ));
                 }
+                if let CurveSpec::Koblitz { a, n } = resolved {
+                    if (64..=127).contains(&n) {
+                        let uid = super::panel::cell(cell)?
+                            .1
+                            .identity
+                            .curve_uid
+                            .as_deref()
+                            .ok_or_else(|| format!("panel cell `{cell}` has no curve UID"))?;
+                        return panel_wide_koblitz(a, n, uid);
+                    }
+                }
                 resolved.build()
             }
             CurveSpec::PanelDestination { ref cell } => {
@@ -1048,14 +1059,18 @@ pub struct BigInstance {
     pub rho: BigStrongRho,
 }
 
-/// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
-pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let entry = registry_curves().iter().find(|c| {
+fn registry_koblitz_entry(a: u8, n: u32) -> Option<&'static Value> {
+    registry_curves().iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
             && p.and_then(|p| p.get("n")).and_then(Value::as_u64) == Some(u64::from(n))
-    })?;
+    })
+}
+
+/// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
+pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
+    let entry = registry_koblitz_entry(a, n)?;
     let hex = entry.get("params")?.get("modulus")?.as_str()?;
     let bits = num_bigint::BigUint::parse_bytes(hex.trim_start_matches("0x").as_bytes(), 16)?;
     if bits.bits() != u64::from(n) + 1 {
@@ -1066,6 +1081,29 @@ pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
         degree: n,
         low_terms,
     })
+}
+
+fn panel_wide_koblitz(a: u8, n: u32, uid: &str) -> Result<Instance, String> {
+    let find_subgroup = || {
+        let representations = registry_koblitz_entry(a, n)?.get("representations")?.as_array()?;
+        let curve = representations
+            .iter()
+            .find(|rep| rep.get("curve_uid").and_then(Value::as_str) == Some(uid))?
+            .get("curve")?;
+        let r = curve.get("subgroup_order")?.as_str()?.parse().ok()?;
+        let generator = curve.get("generator")?.as_array()?;
+        let coord = |value: &Value| {
+            u128::from_str_radix(value.as_str()?.trim_start_matches("0x"), 16).ok()
+        };
+        Some((r, (coord(generator.first()?)?, coord(generator.get(1)?)?)))
+    };
+    let (r, generator) = find_subgroup()
+        .ok_or_else(|| format!("curve UID `{uid}` has no usable registered subgroup"))?;
+    let irr = registry_koblitz_modulus(a, n)
+        .ok_or_else(|| format!("curve UID `{uid}` has no usable registered modulus"))?;
+    let kc = WideKoblitz::with_generator(a, &irr, r, generator)?;
+    let rho = kc.strong_rho();
+    Ok(Instance::Wide(Box::new(WideInstance { kc, rho })))
 }
 
 /// The facts about a built curve every record carries.

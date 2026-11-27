@@ -217,7 +217,7 @@ impl ModMatrix32 {
         {
             return Err(MatrixError::InvalidLimits);
         }
-        if !(3..1u64 << 32).contains(&p) || p % 2 == 0 || !is_prime_u64(p) {
+        if !(3..1u64 << 32).contains(&p) || p.is_multiple_of(2) || !is_prime_u64(p) {
             return Err(MatrixError::InvalidModulus(p));
         }
         Ok(Self {
@@ -658,7 +658,7 @@ mod tests {
         // The reciprocal estimate rounds to one quotient too high for this
         // pair, giving pre-correction r=-1. The add-p branch must restore p-1.
         let a = p - 2;
-        let b = (p + 1) / 2;
+        let b = p.div_ceil(2);
         let h = f64::from(a) * f64::from(b);
         let q = (h * field.reciprocal).floor();
         let before_correction = (-q).mul_add(field.pd, h) + f64::from(a).mul_add(f64::from(b), -h);

@@ -1,0 +1,15 @@
+{
+  "action": "compare with git ls-remote origin <branch> instead of git fetch --depth=1 of your own branch; a depth-1 fetch of your own branch makes its tip a shallow root, hides the branch history, and makes merge-base with main fail ('refusing to merge unrelated histories'). If it happened, re-fetch the branch at a depth that reaches its base",
+  "created": "2026-11-25T18:43:32Z",
+  "evidence": [
+    "docs/session-logs/2026-11-25.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ic",
+    "git"
+  ],
+  "trigger": "verifying a push or checking a remote branch in a shallow/partial clone",
+  "why": "2026-11-25: merge-base with main returned none until the branch was re-fetched at depth 30"
+}

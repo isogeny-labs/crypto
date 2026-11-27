@@ -1,0 +1,31 @@
+{
+  "date_utc": "2026-11-24",
+  "pr": 5064,
+  "parent": "9259dc59d472f5a84fe9d73152050a7bd86c4596",
+  "standing": "pcc:unverified; same-coordinator symbolic arithmetic and written proof",
+  "inputs": {
+    "swap_note_blob": "2af393d391b192265a0e9cf294e18663b0f8d616",
+    "geometry_receipt_blob": "0d0924c1c1abc0b7ea5238b3b6afbadeab2778e0"
+  },
+  "commands": [
+    "command -v rustc; command -v cargo (no executable returned)",
+    "python SymPy: expand N.subs({s:x+y,u:x*y})-f(x)*f(y); expand (A-r*Delta)**2-4*N-Delta*F; factor Delta.subs(u,U); degree and LC of N.subs(u,U).cancel() and F.subs(u,U).cancel()"
+  ],
+  "results": {
+    "norm_residual": 0,
+    "s3_norm_residual": 0,
+    "diagonal_factor": "(d-2)*(s**2-4*d-8)/(d+2)",
+    "sextic_degree": 6,
+    "sextic_lc": "(d+2)**(-3)",
+    "quartic_degree": 4,
+    "quartic_lc": "(d+2)**(-2)"
+  },
+  "native_workers": 0,
+  "rust_runs": 0,
+  "cryptographic_benchmarks": 0,
+  "independent_signatures": 0,
+  "scope": "math-only; no production, shared STATE, report, ledger or workflow edits",
+  "journal": "main Nov24 and Nov23 logs read; lane Nov24 absent; lane Nov23 contains prior conflict markers; retain disjoint dated handoff rather than overwrite shared journal",
+  "space": "prior uncertain update not replayed",
+  "next": "implicit coupled midpoint selector, not further explicit offset enumeration"
+}

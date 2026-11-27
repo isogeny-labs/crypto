@@ -347,13 +347,10 @@ fn poly_rem(mut a: BigUint, b: &BigUint) -> BigUint {
     }
     a
 }
-fn poly_gcd(mut a: BigUint, mut b: BigUint) -> BigUint {
-    while !b.is_zero() {
-        let r = poly_rem(a, &b);
-        a = b;
-        b = r;
-    }
-    a
+fn poly_gcd(a: BigUint, b: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crypto_lib::gcd::gf2::gcd(&a.to_u64_digits(), &b.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 fn irreducible(m: u32, terms: &[u32]) -> Result<IrreduciblePoly, String> {
     let mut seen = std::collections::BTreeSet::new();

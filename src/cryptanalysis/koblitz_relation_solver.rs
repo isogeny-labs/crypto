@@ -144,17 +144,7 @@ impl Scalar {
 /// the cofactors, bounded by `m` in absolute value, need a signed type
 /// wider than a word.
 fn invmod(a: u64, m: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a, m);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q as i128 * s);
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(m as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 /// Export for the factor-base-logs precompute, which tracks coefficient

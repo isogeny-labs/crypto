@@ -1,0 +1,18 @@
+digraph audit {
+  graph [rankdir=LR, bgcolor="white", pad=0.15, nodesep=0.25, ranksep=0.35];
+  node [shape=box, fontname="Helvetica", fontsize=11, margin=0.10];
+  edge [fontname="Helvetica", fontsize=10];
+  input [label="Frozen elliptic P\nO,G,-G,2G,Q,-2G"];
+  arithmetic [label="New OpenSSL field + Cantor\ncompute 3 pi*(P)", color="#246842", penwidth=1.5];
+  recorded [label="Recorded source dual\nexact Mumford pair"];
+  equality [label="Compare classes\nall six fixtures", color="#246842", penwidth=1.5];
+  producer [label="Producer phi / transpose\nindependent reconstruction open", style=dashed, color="#777777"];
+  cycle [label="Recorded forward cycle"];
+  incidence [label="New full-algebra quartic check\nincidence only", color="#246842", penwidth=1.5];
+  input -> arithmetic -> equality;
+  input -> producer [style=dashed];
+  producer -> recorded [style=dashed];
+  recorded -> equality;
+  producer -> cycle [style=dashed];
+  cycle -> incidence;
+}

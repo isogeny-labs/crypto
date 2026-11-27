@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:17:43Z",
+ "id": "PCC-20261124-16712e",
+ "kind": "execution",
+ "producer": {
+  "commit": "ba24f2f5deda5b5fa11ef3db7da8a17f375b997d",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/degree7-tests.log",
+    "sha256": "e216b0c52920329832f244d353efb4cd2d63d6a27e8ad6747e26e468edc2414b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/degree7-clippy.log",
+    "sha256": "b221f824dae0278f28ca10ccce2b1995cc508b7cfc36090cb6427218aeac8dc3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/degree7-source-and-binary.sha256",
+    "sha256": "2e9dbadd72eb73f44143ad021ebcb7b58ca2a054f978d06e2e5b8c79ae729147"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The exact H2 degree-7 successor source passes twelve native release controls, including early refusal of a bound below the required minimal-leading degree; release build and strict all-target no-deps Clippy D warnings pass. Old eleven controls are preserved. Read-only worker/source pins are frozen before the distinct saved-case probe; no full-root build, template sufficiency or performance assertion."
+}

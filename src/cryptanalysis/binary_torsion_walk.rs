@@ -100,24 +100,6 @@ fn padd(a: &[u64], b: &[u64]) -> Vec<u64> {
     out
 }
 
-fn pmul(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
-    let (Some(da), Some(db)) = (deg(a), deg(b)) else {
-        return vec![0];
-    };
-    let mut out = vec![0u64; da + db + 1];
-    for i in 0..=da {
-        if a[i] == 0 {
-            continue;
-        }
-        for j in 0..=db {
-            if b[j] != 0 {
-                out[i + j] ^= gf.mul(a[i], b[j]);
-            }
-        }
-    }
-    out
-}
-
 /// `a mod f`, for any nonzero `f`.
 fn pmod(gf: &Gf2, a: &[u64], f: &[u64]) -> Vec<u64> {
     let df = deg(f).expect("nonzero modulus");
@@ -140,60 +122,45 @@ fn pmod(gf: &Gf2, a: &[u64], f: &[u64]) -> Vec<u64> {
     r
 }
 
-fn pgcd(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    trim(&mut a);
-    trim(&mut b);
-    while deg(&b).is_some() {
-        let r = pmod(gf, &a, &b);
-        a = b;
-        b = r;
+/// `F_q` (a [`Gf2`]) as a [`crate::gcd::poly::PolyField`].
+struct Coeffs<'a>(&'a Gf2);
+
+impl crate::gcd::poly::PolyField for Coeffs<'_> {
+    type E = u64;
+    fn zero(&self) -> u64 {
+        0
     }
-    a
+    fn one(&self) -> u64 {
+        1
+    }
+    fn add(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        a ^ b
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.0.inv(a)
+    }
+    fn neg(&self, a: u64) -> u64 {
+        a
+    }
 }
 
-/// `a⁻¹ mod f` by the extended Euclidean algorithm, or `None` if not a unit.
+/// `gcd(a, b)` (monic; `[0]` for the zero polynomial), by
+/// `crate::gcd::poly::gcd`.  Callers read only its degree.
+fn pgcd(gf: &Gf2, a: &[u64], b: &[u64]) -> Vec<u64> {
+    let mut g = crate::gcd::poly::gcd(&Coeffs(gf), a, b);
+    trim(&mut g);
+    g
+}
+
+/// `a⁻¹ mod f` by `crate::gcd::poly::inv_mod`, or `None` if not a unit.
 fn pinv(gf: &Gf2, a: &[u64], f: &[u64]) -> Option<Vec<u64>> {
-    // Invariants: s_i · a ≡ r_i (mod f).
-    let mut r0 = f.to_vec();
-    let mut r1 = pmod(gf, a, f);
-    let mut s0: Vec<u64> = vec![0];
-    let mut s1: Vec<u64> = vec![1];
-    while let Some(d1) = deg(&r1) {
-        // one division step r0 = q·r1 + r
-        let lead_inv = gf.inv(r1[d1]);
-        let mut rem = r0.clone();
-        trim(&mut rem);
-        let mut quo = vec![0u64; rem.len().max(1)];
-        while let Some(dr) = deg(&rem) {
-            if dr < d1 {
-                break;
-            }
-            let c = gf.mul(rem[dr], lead_inv);
-            let sh = dr - d1;
-            quo[sh] ^= c;
-            for j in 0..=d1 {
-                if r1[j] != 0 {
-                    rem[sh + j] ^= gf.mul(c, r1[j]);
-                }
-            }
-        }
-        trim(&mut rem);
-        trim(&mut quo);
-        let s2 = padd(&s0, &pmul(gf, &quo, &s1));
-        r0 = r1;
-        r1 = rem;
-        s0 = s1;
-        s1 = s2;
-    }
-    // r0 = gcd; unit iff degree 0
-    if deg(&r0) != Some(0) {
-        return None;
-    }
-    let c = gf.inv(r0[0]);
-    let mut out: Vec<u64> = s0.iter().map(|&x| gf.mul(x, c)).collect();
-    let mut out = pmod(gf, &std::mem::take(&mut out), f);
+    let mut out = crate::gcd::poly::inv_mod(&Coeffs(gf), a, f)?;
     trim(&mut out);
     Some(out)
 }

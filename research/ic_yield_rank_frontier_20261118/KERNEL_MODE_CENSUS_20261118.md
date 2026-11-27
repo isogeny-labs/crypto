@@ -25,7 +25,7 @@ large-prime or transfer hypotheses have been discharged.
 |---|---|---|---|
 | `ALG-SPARSE-LINEAR-ALGEBRA` | mode-parametric | split the node statement; left-kernel existence is proved, reusable rank remains heuristic | concrete cost still depends on sparsity and implementation |
 | `ALG-WD-GAUDRY-2000` | target-dependent left kernel is admissible | no longer inherits reusable-rank support | its relation-count statement remains conditional; primary paper was unavailable |
-| `ALG-WD-THERIAULT-2003` | unresolved | remove only the transitive graph contamination | primary paper was unavailable, so no independent kernel-mode claim is made |
+| `ALG-WD-THERIAULT-2003` | source resolved; runtime chain still conditional | remove only the transitive graph contamination | the 18-page primary was read and hashed; an exact finite countermodel invalidates the printed Theorem 1 lower-bound constant but does not refute the Theorem 3 exponent, so a repaired collision lemma remains required |
 | `THM-WD-GTTD-THM1` | target-dependent left-kernel theorem chain | supported through the mode-parametric sparse step | only the simplified algorithm is rigorous; the full variant remains heuristic |
 | `THM-WD-DIEM-SMALL-GENUS` | target-dependent left-kernel theorem chain | supported through GTTD and the mode-parametric sparse step | its stated fixed-genus/model hypotheses remain |
 | `ATTACK-GHS-WEIL-DESCENT` | no direct relation matrix | remove transitive rank contamination | its transfer-kernel condition remains explicit |
@@ -33,12 +33,12 @@ large-prime or transfer hypotheses have been discharged.
 | `COND-WD-JV-COVER-DECOMP` | reusable table/right rank appears load-bearing | keep conditional | direct journal source was unavailable; author/ePrint material was read previously |
 | `COND-WD-KMPS-INEFFECTIVE` | no direct relation matrix | remove transitive rank contamination | it compares asymptotic algorithms and retains its optimistic Hess premise |
 | `COND-HASHED-ECDL-TENSOR-BOUND` | reusable right/full-rank certificate | keep the direct rank condition | the complete typed tensor/rank composition is still open |
-| `COND-RP-TWO-SUMMAND-FAMILY-LAW` | graph-cycle alternative | replace the generic rank edge with `GAP-RP-CYCLE-CLOSURE-LAW` | the random-edge first-cycle law is still heuristic |
+| `COND-RP-TWO-SUMMAND-FAMILY-LAW` | balanced-circuit alternative | keep `GAP-RP-CYCLE-CLOSURE-LAW`, now narrowed to the stopping law | incidence algebra is resolved: a lone odd cycle is independent over odd scalar fields, while even/balanced and parallel-edge circuits close; useful-circuit arrival and nonzero target projection remain open |
 
 ## Formal boundary checks
 
 `KernelModeCountermodels.unused_column_gives_nonzero_right_kernel` proves that
-an unused column supplies a nonzero right-kernel vector.
+an unused column supplies a nonzero right-kernel vector. [pcc:unverified]
 `surplus_can_have_both_nonzero_kernels` applies the existing
 `LeftKernel.exists_left_kernel` theorem to a `(B+1) × B` zero matrix while
 exhibiting a nonzero right-kernel vector.  Therefore row surplus is sufficient

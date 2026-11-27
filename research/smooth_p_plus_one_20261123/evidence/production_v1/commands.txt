@@ -1,0 +1,10 @@
+# Frozen executable: /workspace/scratch/dickson-production-v1
+# Source: 8be878c873 (full hash in pre_call.txt); exact production closure in production_source_manifest.json
+# Each call: RAYON_NUM_THREADS=1; whole-process ulimit -v 2097152 KiB;
+# timeout --kill-after=5s 60; three-second cooperative query deadline.
+# msolve argument is retained by the common CLI but never invoked by cofactor mode.
+dickson-production-v1 127 4 /workspace/scratch/msolve/root/usr/bin/msolve cofactor
+dickson-production-v1 8191 4 /workspace/scratch/msolve/root/usr/bin/msolve cofactor
+dickson-production-v1 8191 5 /workspace/scratch/msolve/root/usr/bin/msolve cofactor
+# Live native JSONL is also appended by the existing local capture hook.
+# No Cloudflare receiver is configured; no external data delivery occurs.

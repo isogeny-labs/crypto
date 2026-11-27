@@ -33,10 +33,8 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::fp_backend::{FpP192, PrimeField};
 use crypto_lib::cryptanalysis::two_sylow_search::{
-    big_double, certify, p192, Arm, Family, Halver, SplitMix,
+    certify, find_p192_supersingular_point, p192, Arm, Family, Halver,
 };
-use num_bigint::BigUint;
-use num_traits::{One, Zero};
 use serde_json::{json, Value};
 
 struct Args {
@@ -141,88 +139,39 @@ fn write_json(path: &str, v: &Value) -> std::io::Result<()> {
     std::fs::rename(tmp, path)
 }
 
-/// Affine addition over `BigUint` on `y² = x³ + ax + b` (`None` = O).
-fn big_add(
-    p: &BigUint,
-    a: &BigUint,
-    p1: &Option<(BigUint, BigUint)>,
-    p2: &Option<(BigUint, BigUint)>,
-) -> Option<(BigUint, BigUint)> {
-    let (Some((x1, y1)), Some((x2, y2))) = (p1, p2) else {
-        return if p1.is_none() { p2.clone() } else { p1.clone() };
-    };
-    if x1 == x2 {
-        if ((y1 + y2) % p).is_zero() {
-            return None;
-        }
-        return big_double(p, a, p1);
-    }
-    let inv = |v: &BigUint| v.modpow(&(p - 2u32), p);
-    let l = (((y2 + p - y1) % p) * inv(&((x2 + p - x1) % p))) % p;
-    let x3 = ((&l * &l) % p + 2u32 * p - x1 - x2) % p;
-    let y3 = ((&l * ((x1 + p - &x3) % p)) % p + p - y1) % p;
-    Some((x3, y3))
-}
-
 fn supersingular(a: &Args) -> ExitCode {
     let p = p192();
-    let one = BigUint::one();
-    let (ca, cb) = (one.clone(), BigUint::zero());
-    let cof = (&p + 1u32) >> a.t;
     let start = Instant::now();
-    for seed in a.lo..a.hi {
-        let mut rng = SplitMix(seed ^ 0x5355_5045_5253_494E);
-        let w = [rng.next_u64(), rng.next_u64(), rng.next_u64()];
-        let x = ((BigUint::from(w[2]) << 128u32) + (BigUint::from(w[1]) << 64u32) + w[0]) % &p;
-        let rhs = (&x * &x * &x + &x) % &p;
-        let y = rhs.modpow(&((&p + 1u32) >> 2u32), &p);
-        if (&y * &y) % &p != rhs {
-            continue;
-        }
-        // Q = [cof]P by double-and-add.
-        let mut q: Option<(BigUint, BigUint)> = None;
-        let base = Some((x, y));
-        for i in (0..cof.bits()).rev() {
-            q = big_double(&p, &ca, &q);
-            if cof.bit(i) {
-                q = big_add(&p, &ca, &q, &base);
+    match find_p192_supersingular_point(a.t, a.lo, a.hi) {
+        Ok(Some(point)) => {
+            let art = json!({
+                "p": p.to_string(), "a": "1", "b": "0",
+                "Qx": point.qx.to_string(), "Qy": point.qy.to_string(), "t": point.t,
+                "family": "supersingular-j1728", "seed": point.seed,
+                "draws": point.draws, "cpu_seconds": start.elapsed().as_secs_f64(),
+            });
+            if let Some(out) = &a.out {
+                if let Some(dir) = std::path::Path::new(out).parent() {
+                    let _ = std::fs::create_dir_all(dir);
+                }
+                write_json(out, &art).expect("write artifact");
             }
-        }
-        let Some((qx, qy)) = q else { continue };
-        // Order exactly 2^t, checked by doublings.
-        let mut r = Some((qx.clone(), qy.clone()));
-        let mut ok = true;
-        for _ in 1..a.t {
-            r = big_double(&p, &ca, &r);
-            if r.is_none() {
-                ok = false;
-                break;
-            }
-        }
-        if !ok || big_double(&p, &ca, &r).is_some() {
-            continue;
-        }
-        let art = json!({
-            "p": p.to_string(), "a": ca.to_string(), "b": cb.to_string(),
-            "Qx": qx.to_string(), "Qy": qy.to_string(), "t": a.t,
-            "family": "supersingular-j1728", "seed": seed,
-            "draws": seed - a.lo + 1, "cpu_seconds": start.elapsed().as_secs_f64(),
-        });
-        if let Some(out) = &a.out {
-            if let Some(dir) = std::path::Path::new(out).parent() {
-                let _ = std::fs::create_dir_all(dir);
-            }
-            write_json(out, &art).expect("write artifact");
-        }
-        println!(
-            "{}",
-            json!({"found": true, "t": a.t, "seed": seed, "draws": seed - a.lo + 1,
+            println!(
+                "{}",
+                json!({"found": true, "t": point.t, "seed": point.seed, "draws": point.draws,
                               "elapsed_s": start.elapsed().as_secs_f64()})
-        );
-        return ExitCode::SUCCESS;
+            );
+            ExitCode::SUCCESS
+        }
+        Ok(None) => {
+            println!("{}", json!({"found": false, "t": a.t}));
+            ExitCode::from(3)
+        }
+        Err(e) => {
+            eprintln!("pkm-aux-search: {e}");
+            ExitCode::from(2)
+        }
     }
-    println!("{}", json!({"found": false, "t": a.t}));
-    ExitCode::from(3)
 }
 
 fn main() -> ExitCode {

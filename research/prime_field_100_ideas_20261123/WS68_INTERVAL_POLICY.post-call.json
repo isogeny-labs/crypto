@@ -1,0 +1,16 @@
+{
+  "record_type": "post_call",
+  "created_utc": "2026-11-25T05:58:08Z",
+  "pre_call": "WS68_INTERVAL_POLICY.pre-call.json",
+  "conductor_task": "T-12362",
+  "compile_exit_code": 0,
+  "run_exit_code": 0,
+  "source_sha256_after": "2db0051aef82985a04b0346351fff74489d556286996b75ae670ba7da59c49ce",
+  "qualifier_sha256_after": "2db0051aef82985a04b0346351fff74489d556286996b75ae670ba7da59c49ce",
+  "binary": {"path": "WS68_INTERVAL_POLICY.bin", "sha256": "d728f1e355888a19949ba16dc3f1f2704def40f9b41bfb59271b70cbba4ed815", "custody": "local_only_not_staged"},
+  "stdout": {"path": "WS68_INTERVAL_POLICY.stdout", "bytes": 173772, "sha256": "c4dca6d76edabc364e6c51e7d85587adc8113a28a128dc3b65dcbc686614f22d"},
+  "stderr": {"path": "WS68_INTERVAL_POLICY.stderr", "bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed": {"frozen_candidate_lines": 4096, "targets": 8, "policies_per_target": 3, "arms": 24, "pinned_correct": 24, "censored": 0, "pid_strictly_fewer_counted_group_adds_than_best_fixed": 2, "pid_equal_best_fixed": 0, "pid_more_than_best_fixed": 6, "total_group_adds": {"fixed8": 2104, "fixed32": 2200, "pid": 2114}, "total_rank_checks": {"fixed8": 128, "fixed32": 35, "pid": 134}, "pair_table_entries": 129, "pair_table_setup_adds_per_arm": 136},
+  "cost_scope": "Group additions count pair table construction and consumed scalar-candidate transitions; relation lookups, interval dispatches, rank checks and PID updates reported separately per arm in raw output. Frozen-stream construction and validation, target generation, modular elimination field operations and wall time are outside per-arm totals.",
+  "limits": "The action is contiguous scalar interval scheduling over a sound EC pair-sum collector. It is not a Semaev or smoothness sieve interval, so this is a partial #97 control only. Same frozen 512-candidate stream per target; local bypass [pcc:unverified]."
+}

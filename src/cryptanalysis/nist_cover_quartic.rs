@@ -564,22 +564,9 @@ pub mod wide {
     }
 
     fn pgcd(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-        let mut a = a.to_vec();
-        let mut b = b.to_vec();
-        while pdeg(&b) >= 0 {
-            let db = pdeg(&b) as usize;
-            let ib = sp::inv_mod(b[db], p);
-            while pdeg(&a) >= db as isize {
-                let da = pdeg(&a) as usize;
-                let f = mm(a[da], ib, p);
-                for i in 0..=db {
-                    a[da - db + i] = sb(a[da - db + i], mm(f, b[i], p), p);
-                }
-            }
-            std::mem::swap(&mut a, &mut b);
-        }
-        a.truncate((pdeg(&a) + 1).max(0) as usize);
-        a
+        // Shared gcd (monic; the caller only reads its degree).
+        let red = |v: &[u64]| -> Vec<u64> { v.iter().map(|&c| c % p).collect() };
+        crate::gcd::poly::gcd(&crate::gcd::poly::Fp64::new(p), &red(a), &red(b))
     }
 
     /// Coefficients (ascending, length `n`) of the polynomial of degree `< n`

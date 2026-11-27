@@ -70,7 +70,6 @@
 
 use crate::utils::{mod_inverse, mod_pow};
 use num_bigint::{BigUint, RandBigInt};
-use num_integer::Integer;
 use num_traits::One;
 use rand::rngs::OsRng;
 
@@ -259,13 +258,12 @@ pub fn elgamal_rerandomise(pk: &ElGamalPublicKey, c: &ElGamalCiphertext) -> ElGa
     }
 }
 
-// `Integer::gcd` is available via the `num_integer` import in the
-// dependency graph; we don't currently use it here but keep the
-// import path live by silencing dead-code lints if the compiler ever
-// folds it out.
+// Unused GCD link kept for its name; routed through the shared
+// `crate::gcd` module (it used to keep the `num_integer::Integer`
+// import live).
 #[allow(dead_code)]
 fn _gcd_link(a: &BigUint, b: &BigUint) -> BigUint {
-    a.gcd(b)
+    crate::gcd::int::gcd_big(a, b)
 }
 
 #[cfg(test)]

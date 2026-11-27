@@ -1,0 +1,98 @@
+name: independent relation pool-128 paired panel
+
+on:
+  push:
+    branches: [codex/independent-relations-per-second]
+    paths:
+      - '.github/workflows/independent-relation-p128-panel.yml'
+      - 'research/independent_relation_throughput_20261124/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: independent-relation-p128-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  paired-panel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ecbench
+      - name: Freeze and analyzer checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/independent_relation_throughput_20261124
+          freeze="$study/P128_FREEZE.json"
+          frozen="$(jq -r .source_commit "$freeze")"
+          git merge-base --is-ancestor "$frozen" HEAD
+          git diff --exit-code "$frozen" -- \
+            Cargo.toml Cargo.lock src/bin/ecbench.rs src/cryptanalysis/ecbench \
+            src/cryptanalysis/ic_boundary.rs src/cryptanalysis/ic_framework
+          test "$(sha256sum "$study/P128_PROTOCOL.md" | cut -d' ' -f1)" = \
+            "$(jq -r .protocol_sha256 "$freeze")"
+          test "$(sha256sum "$study/p128-panel-spec.json" | cut -d' ' -f1)" = \
+            "$(jq -r .spec_sha256 "$freeze")"
+          test "$(sha256sum "$study/analyze_p128_panel.py" | cut -d' ' -f1)" = \
+            "$(jq -r .analyzer_sha256 "$freeze")"
+          python3 "$study/analyze_p128_panel.py" --self-test
+          python3 -m json.tool "$study/p128-panel-spec.json" >/dev/null
+      - name: Build and plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/independent_relation_throughput_20261124
+          cargo build --release --bin ecbench
+          target/release/ecbench plan --spec "$study/p128-panel-spec.json" --doc > "$RUNNER_TEMP/plan.json"
+          test "$(jq '.workloads | length' "$RUNNER_TEMP/plan.json")" -eq 16
+          test "$(jq '.executions | length' "$RUNNER_TEMP/plan.json")" -eq 384
+      - name: Run, replay, and decide
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/independent_relation_throughput_20261124
+          out="$RUNNER_TEMP/p128-panel"
+          mkdir -p "$out"
+          {
+            git rev-parse HEAD
+            git status --short
+            rustc -Vv
+            cargo -V
+            uname -a
+            lscpu
+            sha256sum target/release/ecbench Cargo.lock "$study/p128-panel-spec.json"
+          } > "$out/PROVENANCE.txt"
+          cp "$RUNNER_TEMP/plan.json" "$out/PLAN.json"
+          target/release/ecbench host > "$out/HOST.txt"
+          target/release/ecbench run \
+            --spec "$study/p128-panel-spec.json" \
+            --out "$out/session" --cpus auto --settle 2 --quiet \
+            > "$out/RUN.stdout" 2> "$out/RUN.stderr"
+          target/release/ecbench verify --dir "$out/session" --replay-all \
+            --out "$out/AUDIT.json" > "$out/AUDIT.stdout" 2> "$out/AUDIT.stderr"
+          jq -e '.ok == true and .records == 384 and .verified_records == 384
+            and (.replays | length) == 288 and all(.replays[]; .reproduced)' \
+            "$out/AUDIT.json" >/dev/null
+          python3 "$study/analyze_p128_panel.py" "$out/session" --out "$out/DECISION.json" \
+            > "$out/DECISION.stdout"
+          (
+            cd "$out"
+            find session -type f -print0 | sort -z | xargs -0 sha256sum
+            sha256sum PROVENANCE.txt PLAN.json HOST.txt AUDIT.json DECISION.json
+          ) > "$out/SHA256SUMS"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: independent-relation-p128-panel
+          path: ${{ runner.temp }}/p128-panel
+          if-no-files-found: error

@@ -1,0 +1,8 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",fontname="DejaVu Sans"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#52738c",fillcolor="#edf4f7"];
+ edge [fontname="DejaVu Sans",fontsize=11,color="#007f73",penwidth=2];
+ r1 [label="R1 (coefficient -1)\nU=x²+115x+684"];
+ r2 [label="R2 (coefficient +1)\nU=x²+967x+973"];
+ r1 -> r2 [label="Checked composite at parameter10\nsum small - R1 + R2 = 0\nDeferred: no anchored endpoint in this stream"];
+}

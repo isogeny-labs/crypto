@@ -1,0 +1,49 @@
+{
+  "schema": "fixed-degree-post-call/v1",
+  "plan": "SCAN_PLAN_417.json",
+  "pre_call": "PRECALL_417.json",
+  "worker_unchanged": true,
+  "sources_unchanged": true,
+  "outcome": "incomplete; OS ENOSPC during first-prime n6 leave-one-out; no complete summary or exact fullmatrix conclusion",
+  "case_coverage": "partial artifacts only; do not claim six attempted cases",
+  "native_call_statuses": [
+    {
+      "name": "existing-417",
+      "exit_code": 1
+    },
+    {
+      "name": "scan-417",
+      "exit_code": 1
+    },
+    {
+      "name": "labels-2147483647-417",
+      "exit_code": 0
+    },
+    {
+      "name": "labels-replay-2147483647-417",
+      "exit_code": 0
+    },
+    {
+      "name": "labels-9007199254740881-417",
+      "exit_code": 0
+    },
+    {
+      "name": "labels-replay-9007199254740881-417",
+      "exit_code": 0
+    }
+  ],
+  "labels_scope": "abstract scalar equations only; both native audit/replay calls exit0",
+  "partial_index": "PARTIAL_INDEX_418.json, reconstructed post-call from every retained byte including incomplete JSON",
+  "partial_archive": "partial-scan-417.tar.gz",
+  "partial_archive_sha256": "aa13e062592209ba8ba50ee1db098eefe86be7128cea7654bc557a573c059e84",
+  "performance_experiment": false,
+  "full_matrix_admitted": false,
+  "15x_admitted": false,
+  "resource_failure": {
+    "cause": "broad git diff triggered promisor lazy-fetch; orphan fetch/index-pack filled disk",
+    "unfinished_pack_bytes_removed": 1158586367,
+    "temporary_pack_path": "crypto-leads/.git/objects/pack/tmp_pack_n7C6OG",
+    "owned_build_cache_cleaned": "relation-diagnostic-build-412, frozen test executables and native417 worker preserved",
+    "not_mathematical_failure": true
+  }
+}

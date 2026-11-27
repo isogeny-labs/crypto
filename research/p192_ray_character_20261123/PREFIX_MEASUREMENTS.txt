@@ -1,0 +1,116 @@
+P-192 coset prefix runner, 2026-11-25, macOS 27.2, arm64 Apple M4 Pro.
+Initial build, before adding independent Q=[7]G and subgroup-order assertions and rustfmt:
+Source SHA-256: 1cb54fd094dfd8ae8a69239d0d0dfba55d8e0e900612cfe48d21837df5d974ea
+Release binary SHA-256: 484bfca9e7d10a599bcf5cc74de0fceaa5cb3e06a1064a5cd9bf21fd1bc9ee67
+Build: RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc CARGO_TARGET_DIR=/Volumes/SSD990-2/crypto/target rustup run 1.99.1 cargo run --release --no-default-features --bin p192_coset_orbit -- 16
+Repeat command: /Volumes/SSD990-2/crypto/target/release/p192_coset_orbit 10000
+The fixed target is Q=[7]G. Each repeat times two 10,000-factor prefixes and 4,060,000 full-Jacobian additions on the same backend. The control verifies final points by textbook BigUint scalar multiplication and the first 16 projective product signs by affine y products. This is component timing, not a full-coset run.
+
+Initial 16-factor control:
+count=16 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=-1
+setup_wall_ns=117500 setup_cpu_ns=118000
+pair_wall_ns=1392375 pair_cpu_ns=1392000
+full_add_count=6496 full_add_wall_ns=2002792 full_add_cpu_ns=2002000
+orbit_to_full_add_wall_ratio=141.129046 orbit_to_full_add_cpu_ratio=141.146853
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 1:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=729708 setup_cpu_ns=224000
+pair_wall_ns=2080475542 pair_cpu_ns=980397000
+full_add_count=4060000 full_add_wall_ns=1516074958 full_add_cpu_ns=1307710000
+orbit_to_full_add_wall_ratio=278.572331 orbit_to_full_add_cpu_ratio=152.190158
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 2:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=45292 setup_cpu_ns=45000
+pair_wall_ns=982057125 pair_cpu_ns=934958000
+full_add_count=4060000 full_add_wall_ns=1426974834 full_add_cpu_ns=1319806000
+orbit_to_full_add_wall_ratio=139.706456 orbit_to_full_add_cpu_ratio=143.806343
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 3:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=59000 setup_cpu_ns=54000
+pair_wall_ns=957473875 pair_cpu_ns=920750000
+full_add_count=4060000 full_add_wall_ns=1335310875 full_add_cpu_ns=1283977000
+orbit_to_full_add_wall_ratio=145.559510 orbit_to_full_add_cpu_ratio=145.572896
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 4:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=42375 setup_cpu_ns=43000
+pair_wall_ns=967116042 pair_cpu_ns=934669000
+full_add_count=4060000 full_add_wall_ns=1347029667 full_add_cpu_ns=1292144000
+orbit_to_full_add_wall_ratio=145.746275 orbit_to_full_add_cpu_ratio=146.839522
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 5:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=43000 setup_cpu_ns=43000
+pair_wall_ns=998979417 pair_cpu_ns=959900000
+full_add_count=4060000 full_add_wall_ns=1307115709 full_add_cpu_ns=1275297000
+orbit_to_full_add_wall_ratio=155.145272 orbit_to_full_add_cpu_ratio=152.795545
+validation=point_and_projective_sign_prefix_passed
+
+Repeat 6:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=39750 setup_cpu_ns=40000
+pair_wall_ns=936060708 pair_cpu_ns=922563000
+full_add_count=4060000 full_add_wall_ns=1369999875 full_add_cpu_ns=1307634000
+orbit_to_full_add_wall_ratio=138.700979 orbit_to_full_add_cpu_ratio=143.220725
+validation=point_and_projective_sign_prefix_passed
+
+Final source and binary build, with the additional assertions:
+Source SHA-256: 89215f77f545296a763bf68aa8589099305eeeb4ed67c362d946753cacbc47e4
+Release binary SHA-256: a00e46b66bc95d8bdd6ee53462e9d827e11229e1be8e0226939cdc62a7dfdc2c
+Repeat command: /Volumes/SSD990-2/crypto/target/release/p192_coset_orbit 10000
+
+Final repeat 1:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=1211250 setup_cpu_ns=460000
+pair_wall_ns=999907375 pair_cpu_ns=949750000
+full_add_count=4060000 full_add_wall_ns=1320972500 full_add_cpu_ns=1265044000
+orbit_to_full_add_wall_ratio=153.660426 orbit_to_full_add_cpu_ratio=152.405173
+validation=point_and_projective_sign_prefix_passed
+
+Final repeat 2:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=125583 setup_cpu_ns=125000
+pair_wall_ns=983178666 pair_cpu_ns=946217000
+full_add_count=4060000 full_add_wall_ns=1329275167 full_add_cpu_ns=1288535000
+orbit_to_full_add_wall_ratio=150.145940 orbit_to_full_add_cpu_ratio=149.070108
+validation=point_and_projective_sign_prefix_passed
+
+Final repeat 3:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=98625 setup_cpu_ns=98000
+pair_wall_ns=1044392750 pair_cpu_ns=951933000
+full_add_count=4060000 full_add_wall_ns=1314454000 full_add_cpu_ns=1274509000
+orbit_to_full_add_wall_ratio=161.292619 orbit_to_full_add_cpu_ratio=151.621055
+validation=point_and_projective_sign_prefix_passed
+
+Final repeat 4:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=98458 setup_cpu_ns=99000
+pair_wall_ns=1016035334 pair_cpu_ns=951463000
+full_add_count=4060000 full_add_wall_ns=1519855291 full_add_cpu_ns=1345239000
+orbit_to_full_add_wall_ratio=135.707112 orbit_to_full_add_cpu_ratio=143.578196
+validation=point_and_projective_sign_prefix_passed
+
+Final repeat 5:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=98291 setup_cpu_ns=99000
+pair_wall_ns=1012336125 pair_cpu_ns=945082000
+full_add_count=4060000 full_add_wall_ns=1398679000 full_add_cpu_ns=1309166000
+orbit_to_full_add_wall_ratio=146.927375 orbit_to_full_add_cpu_ratio=146.544935
+validation=point_and_projective_sign_prefix_passed
+
+Final repeat 6:
+count=10000 target_scalar=7 width=5 step_scalar=6716193708113405591269066791027723138604200469306871 prefix_ratio=1
+setup_wall_ns=97667 setup_cpu_ns=98000
+pair_wall_ns=985860209 pair_cpu_ns=944630000
+full_add_count=4060000 full_add_wall_ns=1433493125 full_add_cpu_ns=1315333000
+orbit_to_full_add_wall_ratio=139.609754 orbit_to_full_add_cpu_ratio=145.788093
+validation=point_and_projective_sign_prefix_passed

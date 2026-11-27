@@ -164,17 +164,8 @@ impl Zp2 {
 }
 
 fn inv_mod(a: &BigUint, m: &BigUint) -> Option<BigUint> {
-    // Extended Euclid on BigUint via BigInt.
-    use num_bigint::BigInt;
-    use num_integer::Integer;
-    let a = BigInt::from(a.clone());
-    let m_i = BigInt::from(m.clone());
-    let e = a.extended_gcd(&m_i);
-    if !e.gcd.is_one() {
-        return None;
-    }
-    let x = ((e.x % &m_i) + &m_i) % &m_i;
-    x.to_biguint()
+    // Shared inverse in [0, m); `None` unless gcd(a, m) = 1.
+    crate::gcd::int::modinv_big(a, m)
 }
 
 /// Hensel-lift `(x, y) ∈ E(F_p)` to `Ẽ : y² = x³ + ãx + b̃` modulo `p²`,

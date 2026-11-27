@@ -1,0 +1,78 @@
+{
+  "standing": "producer-unverified",
+  "scope": "recorded local development process diagnostics; metadata copy only",
+  "created_at": "2026-11-24T01:24:27.222018+00:00",
+  "stages": [
+    {
+      "stage": "failed_strict_build",
+      "cost_file": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/build-cost.json",
+      "recorded_cost": {
+        "wall_seconds": 1.557,
+        "user_seconds": 1.055,
+        "system_seconds": 0.503
+      },
+      "exit_code": 1
+    },
+    {
+      "stage": "corrected_strict_build",
+      "cost_file": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/build-cost.json",
+      "recorded_cost": {
+        "wall_seconds": 6.105,
+        "user_seconds": 5.822,
+        "system_seconds": 0.275
+      },
+      "exit_code": 0
+    },
+    {
+      "stage": "frozen_audit",
+      "cost_file": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/cost.json",
+      "recorded_cost": {
+        "wall_seconds": 1.737,
+        "user_seconds": 1.691,
+        "system_seconds": 0.04
+      },
+      "exit_code": 0
+    },
+    {
+      "stage": "collision",
+      "cost_file": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/collision-cost.json",
+      "recorded_cost": {
+        "wall_seconds": 0.005,
+        "user_seconds": 0.002,
+        "system_seconds": 0.003
+      },
+      "exit_code": 1
+    },
+    {
+      "stage": "unknown_cli",
+      "cost_file": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/unknown-cost.json",
+      "recorded_cost": {
+        "wall_seconds": 0.004,
+        "user_seconds": 0.001,
+        "system_seconds": 0.003
+      },
+      "exit_code": 1
+    }
+  ],
+  "preparation_failure": {
+    "exit_code": 1,
+    "cost": "not recorded",
+    "record": "evidence/preparation-v1"
+  },
+  "excluded_costs": [
+    "metadata preparation",
+    "input staging and pin checks outside native worker",
+    "publication and report rendering",
+    "original map synthesis and setup",
+    "admitted production collection and independent signing"
+  ],
+  "flow": {
+    "planned_fixed_native_audit": 1,
+    "attempted_fixed_native_audit": 1,
+    "completed_fixed_native_audit": 1,
+    "new_curve_points": 0,
+    "residual_root_calls": 0,
+    "production_collector_calls": 0
+  },
+  "performance_claim": false
+}

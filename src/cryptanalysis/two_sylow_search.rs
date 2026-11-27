@@ -803,6 +803,105 @@ pub fn big_double(
     Some((x3, y3))
 }
 
+/// A deterministic exact-order point on the supersingular P-192 auxiliary
+/// curve `y² = x³ + x`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct P192SupersingularPoint {
+    pub qx: BigUint,
+    pub qy: BigUint,
+    pub t: u32,
+    pub seed: u64,
+    pub draws: u64,
+}
+
+/// Find a point of exact order `2^t` on `y² = x³ + x` over the NIST
+/// P-192 field, using the same deterministic seed-to-point map as
+/// `pkm-aux-search`.
+///
+/// Here `#E(F_p) = p + 1 = 2^64 (2^128 - 1)`.  A random curve point is
+/// projected into the `2^t` subgroup by multiplication by `(p + 1)/2^t`,
+/// then its order is checked by repeated doubling.  Each seed succeeds with
+/// probability one half; no auxiliary-curve search or point counting is
+/// needed.
+pub fn find_p192_supersingular_point(
+    t: u32,
+    seed_lo: u64,
+    seed_hi: u64,
+) -> Result<Option<P192SupersingularPoint>, String> {
+    if !(1..=64).contains(&t) {
+        return Err("supersingular P-192 requires 1 <= t <= 64".into());
+    }
+    if seed_lo >= seed_hi {
+        return Err("seed_lo must be below seed_hi".into());
+    }
+
+    let p = p192();
+    let a = BigUint::one();
+    let cofactor = (&p + 1u32) >> t;
+    let add = |p1: &Option<(BigUint, BigUint)>,
+               p2: &Option<(BigUint, BigUint)>|
+     -> Option<(BigUint, BigUint)> {
+        let (Some((x1, y1)), Some((x2, y2))) = (p1, p2) else {
+            return if p1.is_none() { p2.clone() } else { p1.clone() };
+        };
+        if x1 == x2 {
+            if ((y1 + y2) % &p).is_zero() {
+                return None;
+            }
+            return big_double(&p, &a, p1);
+        }
+        let inv = |v: &BigUint| v.modpow(&(&p - 2u32), &p);
+        let lambda = (((y2 + &p - y1) % &p) * inv(&((x2 + &p - x1) % &p))) % &p;
+        let x3 = ((&lambda * &lambda) % &p + 2u32 * &p - x1 - x2) % &p;
+        let y3 = ((&lambda * ((x1 + &p - &x3) % &p)) % &p + &p - y1) % &p;
+        Some((x3, y3))
+    };
+
+    for seed in seed_lo..seed_hi {
+        let mut rng = SplitMix(seed ^ 0x5355_5045_5253_494E);
+        let words = [rng.next_u64(), rng.next_u64(), rng.next_u64()];
+        let x =
+            ((BigUint::from(words[2]) << 128u32) + (BigUint::from(words[1]) << 64u32) + words[0])
+                % &p;
+        let rhs = (&x * &x * &x + &x) % &p;
+        let y = rhs.modpow(&((&p + 1u32) >> 2u32), &p);
+        if (&y * &y) % &p != rhs {
+            continue;
+        }
+
+        let base = Some((x, y));
+        let mut q = None;
+        for i in (0..cofactor.bits()).rev() {
+            q = big_double(&p, &a, &q);
+            if cofactor.bit(i) {
+                q = add(&q, &base);
+            }
+        }
+        let Some((qx, qy)) = q else { continue };
+
+        let mut check = Some((qx.clone(), qy.clone()));
+        let mut exact = true;
+        for _ in 1..t {
+            check = big_double(&p, &a, &check);
+            if check.is_none() {
+                exact = false;
+                break;
+            }
+        }
+        if !exact || big_double(&p, &a, &check).is_some() {
+            continue;
+        }
+        return Ok(Some(P192SupersingularPoint {
+            qx,
+            qy,
+            t,
+            seed,
+            draws: seed - seed_lo + 1,
+        }));
+    }
+    Ok(None)
+}
+
 /// An artifact for `backlog_check_aux2t`: `(a, b, Qx, Qy)` on the short
 /// Weierstrass model, after checking over `BigUint` that `Q` is on it,
 /// `[2^(t−1)]Q ≠ O` and `[2^t]Q = O`.

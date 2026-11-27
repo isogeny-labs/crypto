@@ -19,7 +19,7 @@ Sources read:
   incumbent paths around it (`StrideGenerator`, `ladder_mul`, `RecoveryCheck`, `FrobeniusPairTable::
   build_layout_with` and `probe_x`, the compact-orbit-scan key loop), `ecbench/band.rs` (pricing,
   `FIELD_ARITHMETIC_COUNTERS`) and the `compare.rs` interval definition;
-- AGENTS.md "Success criterion", §5a, and `docs/ic/calibration.json` (row `koblitz/K_0 / GF(2^37)`);
+- AGENTS.md "Success criterion", §5a, and `docs/ic/calibration.json` (row `koblitz/icv1-f2m37-tm534059-32aad96b`);
 - the three raw sessions named by the README, through byte-identical validator copies, and the
   `koblitz_lean_sib_confirm_20261118` raw session n37-r1 (cross-binary replay).
 
@@ -254,7 +254,7 @@ sharing nothing with the producer:
     byte for byte.
 - **Independent Python** (no producer code).
   - Pricing: `priced = G − C + w(U + n_C)`, with C and n_C from `PRICED_NATIVE` and the pinned
-    `K_0 / GF(2^37)` calibration row. U is `cost.unpriced` without `NON_OPERATION_COUNTERS`, plus table and
+    `icv1-f2m37-tm534059-32aad96b` calibration row. U is `cost.unpriced` without `NON_OPERATION_COUNTERS`, plus table and
     sibling work behind their markers.
   - Pairing is by (session, round, target), with workloads as clusters.
   - Point ratios agree within 9.7e-15 (relative), and the log-scale linearised-t ends within 4.4e-15, using

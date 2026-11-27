@@ -279,7 +279,7 @@ fn find_uni(basis: &[Poly], a: &[Option<u64>; 3], f: Fp) -> Result<Option<(usize
         if d.len() == 1 && d[0] != 0 {
             return Err(());
         }
-        if d.len() > 1 && best.as_ref().map_or(true, |(_, old)| d.len() < old.len()) {
+        if d.len() > 1 && best.as_ref().is_none_or(|(_, old)| d.len() < old.len()) {
             best = Some((i, d));
         }
     }

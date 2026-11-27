@@ -11,6 +11,12 @@
 - **Standing:** mathematics and a model computation. No algorithm with polynomial decay is
   claimed. The results are a precise statement of the target, unconditional and conditional
   limits on it, and a correction to §5f of the review note.
+- **Correction (2026-11-25):** §0 item 3, §2.2 and §6 first gave the reach of polynomial decay as
+  $2^{\tilde O(n^{1-\beta/2})}$ ($2^{\tilde O(\sqrt n)}$ at $\beta=1$). That figure omits Theorem A's
+  $(\lambda+B)^{C_0K^2}$ overhead. Under it the reach is $2^{\tilde O(n^{2/(2+\beta)})}$
+  ($2^{\tilde O(n^{2/3})}$ at $\beta=1$); $\sqrt n$ needs an overhead of $2^{o(K^2)}$. Found
+  independently by two agents of the workspace P vs NP fleet
+  (`workspace:docs/notes/p-vs-np-20261124/04-eps0-calculation.md`); see §2.2.
 
 ---
 
@@ -24,9 +30,11 @@
 2. **$\beta\le1$ and $C\ge1$ unconditionally** (§2.1): the tables must be read. The
    "hypothetical $\beta=1$, $C=1$" column of §5f is therefore the absolute optimum of the whole
    approach, not a moderate hypothesis.
-3. **$\beta=1$ would give bounded-occurrence #3-SAT in $2^{\tilde O(\sqrt n)}$** (§2.2), i.e. every
-   sparse formula as easy as a planar one, far beyond the ETH refutation itself
-   ($2^{n/\sqrt{\log n}}$). Generally $e\asymp K^{-\beta}$ gives $2^{\tilde O(n^{1-\beta/2})}$.
+3. **$\beta=1$ would give bounded-occurrence #3-SAT in $2^{\tilde O(n^{2/3})}$** (§2.2), far beyond
+   the ETH refutation itself ($2^{n/\sqrt{\log n}}$). Generally $e\asymp K^{-\beta}$ gives
+   $2^{\tilde O(n^{2/(2+\beta)})}$ under Theorem A's $(\lambda+B)^{C_0K^2}$ overhead. Only with an
+   overhead of $2^{o(K^2)}$ would $\beta=1$ reach $2^{\tilde O(\sqrt n)}$, every sparse formula as
+   easy as a planar one. *(Corrected 2026-11-25; the first version claimed $\sqrt n$.)*
 4. **Even the optimum reaches a target only if its network has fewer than $G^2$ edge bits**,
    where $G$ is the attack budget in bits per counting call (§3). ECDLP-256 and Ring-LWE-1024 fail
    this for information-theoretic reasons (their witnesses alone are too large); AES-128 is
@@ -87,7 +95,7 @@ $$e(K)\ \ge\ \frac{K-1}{K^2}\ \approx\ \frac1K .$$
 Hence $\beta\le1$, and $\beta=1$ forces $C\ge1$. The recursion's merged tables are given exactly
 this way (as procedures), so the bound applies to every algorithm in the framework.
 
-### 2.2 $e\asymp K^{-\beta}$ gives bounded-occurrence #3-SAT in $2^{\tilde O(n^{1-\beta/2})}$
+### 2.2 $e\asymp K^{-\beta}$ gives bounded-occurrence #3-SAT in $2^{\tilde O(n^{2/(2+\beta)})}$
 
 Let $F$ be a 3-CNF on $n$ variables in which every variable occurs in at most $\Delta$ clauses.
 Split the variables into $K$ groups of $n/K$ at random and assign each clause to the group of
@@ -103,16 +111,33 @@ product of [the outgoing strings agree with the assignment] and [the clauses ass
 read with the incoming strings]. The clique sum then equals $\#F$. Tables have
 $2^{2(K-1)\lambda}$ entries, each computed in $2^{n/K}\mathrm{poly}(n)$ time.
 
-With $e(K)\le CK^{-\beta}$ the clique sum costs $2^{O(CK^{2-\beta}\lambda)}$. At $K=\sqrt n$,
-$\lambda=O(\log n)$, and the total is
+With $e(K)\le CK^{-\beta}$ the exponent part of the clique sum is $2^{O(CK^{2-\beta}\lambda)}$, but
+Theorem A also charges $(\lambda+B)^{C_0K^2}=2^{O(K^2\log n)}$, which at $K=\sqrt n$ alone is
+$2^{\Theta(n\log n)}$. So $K$ must be chosen to balance the two. With
+$K^2\lambda=O(\Delta n+K^2\log n)$ the cost is
 
-$$2^{O(C\,n^{1-\beta/2}\log n)}+2^{O(\sqrt n\log n)} .$$
+$$\log_2T=\min_K\Bigl[O\bigl(Cn\,K^{-\beta}\bigr)+O\bigl(C_0K^2\log n\bigr)+n/K\Bigr],$$
 
-For $\beta=1$: $2^{\tilde O(\sqrt n)}$. For comparison, planar #3-SAT is $2^{O(\sqrt n)}$ by
-separators, and the claimed ETH refutations give $2^{O(n\log\log n/\sqrt{\log n})}$; the reduction
-with $e(K)\asymp(\log K)^{-1/2}$ reproduces the latter, which checks it. No standard hypothesis
-other than ETH excludes $2^{\tilde O(\sqrt n)}$, but it is a far stronger statement than the
-refutation.
+the last term being the $2^{n/K}$ table build. The minimum is at $K^{2+\beta}\asymp n/\log n$, giving
+
+$$T=2^{\tilde O(n^{2/(2+\beta)})},\qquad \beta=1:\ 2^{\tilde O(n^{2/3})}.$$
+
+(Numerically, minimising this expression over $K$ fits exponents $0.676$ at $\beta=1$ and $0.806$
+at $\beta=1/2$, against $2/3$ and $0.8$; `workspace:docs/notes/p-vs-np-20261124/eps0_calc.py`
+gives $0.6748$ and $0.8049$ for the same model on $S$ wire bits.) Only if the overhead were
+$2^{o(K^2)}$, for example polynomial in $K$, could $K$ go to $\sqrt n$ and give
+$2^{\tilde O(n^{1-\beta/2})}$, i.e. $2^{\tilde O(\sqrt n)}$ at $\beta=1$: dropping the overhead from
+the same minimisation fits $0.53$, falling toward $1/2$. *(The first version of this section took
+$K=\sqrt n$ with the overhead omitted and stated $2^{\tilde O(\sqrt n)}$ unconditionally; corrected
+2026-11-25.)*
+
+For comparison, planar #3-SAT is $2^{O(\sqrt n)}$ by separators, and the claimed ETH refutations
+give $2^{O(n\log\log n/\sqrt{\log n})}$; the reduction with $e(K)\asymp(\log K)^{-1/2}$ reproduces
+the latter, which checks it. Even $2^{\tilde O(n^{2/3})}$ is a far stronger statement than the
+refutation, and no standard hypothesis other than ETH excludes it.
+
+The information bound of §3 is not affected: its cost $2^{\max(U,K^2)/K}$ is a lower bound on the
+best case, and Theorem A's overhead can only raise it.
 
 ### 2.3 The $k$-clique reduction gives at most $e(K)\gtrsim\omega/(3K)$, and that hypothesis is now claimed refuted
 
@@ -244,7 +269,8 @@ and gets constant savings, consistent with the obstacle being constant growth.
 
 - The target is well defined (a constant-growth level), its optimum is pinned ($\beta=1$, $C\ge1$),
   and its strength is calibrated: at $\beta=1$ it would make bounded-occurrence #3-SAT
-  $2^{\tilde O(\sqrt n)}$.
+  $2^{\tilde O(n^{2/3})}$ under Theorem A's overhead, and $2^{\tilde O(\sqrt n)}$ only with an
+  overhead of $2^{o(K^2)}$ (corrected 2026-11-25).
 - **Even the optimum does not reach ECDLP-256 or Ring-LWE-1024**, for information-theoretic reasons
   that no algorithm in the clique-sum framework can avoid. Finding polynomial decay would be a major
   complexity result, but it is not a route to those targets. AES-scale symmetric targets are the only

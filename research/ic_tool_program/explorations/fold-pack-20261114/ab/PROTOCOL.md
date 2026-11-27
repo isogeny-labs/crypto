@@ -39,7 +39,7 @@ pushing pairs into the partition streams is the build's largest step, at
 
 The same as the filter-layout A/B's
 ([`../../filter-layout-20261113/ab/PROTOCOL.md`](../../filter-layout-20261113/ab/PROTOCOL.md)):
-- **Rows:** `M1-T01` at `k0n53` and `k0n61`.
+- **Rows:** `M1-T01` at `icv1-f2m53-tm56619371-dac20a85` and `icv1-f2m61-t158598901-ab42b6c5`.
 - **Isolation:** `isolated_bench run --wait --cpus 2` with
   `RAYON_NUM_THREADS=1`.
 - **Schedule:** 42 rounds cycled over the six orders of `a q p`.
@@ -66,8 +66,8 @@ Medians `a / p`:
 
 | row | build | set-up | collect |
 |:--|:--|:--|:--|
-| k0n53 | [1.08, 1.25] | [1.00, 1.07] | [0.97, 1.03] |
-| k0n61 | [1.08, 1.25] | [1.00, 1.04] | [0.97, 1.03] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.08, 1.25] | [1.00, 1.07] | [0.97, 1.03] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.08, 1.25] | [1.00, 1.04] | [0.97, 1.03] |
 
 ## Identity
 

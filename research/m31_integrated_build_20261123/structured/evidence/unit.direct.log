@@ -1,0 +1,88 @@
+     Locking 45 packages to highest compatible versions
+      Adding zerocopy-derive v0.8.60 (available: v0.8.64)
+   Compiling zmij v1.0.23
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_json v1.0.151
+   Compiling cfg-if v1.0.5
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.190
+   Compiling crossbeam-utils v0.8.23
+   Compiling memchr v2.8.3
+   Compiling serde_core v1.0.229
+   Compiling itoa v1.0.18
+   Compiling zerocopy v0.8.60
+   Compiling generic-array v0.14.7
+   Compiling crossbeam-epoch v0.9.21
+   Compiling autocfg v1.5.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling serde v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.6
+   Compiling rayon-core v1.13.0
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling cpufeatures v0.2.17
+   Compiling either v1.18.0
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling hex v0.4.3
+   Compiling num-integer v0.1.47
+   Compiling getrandom v0.2.17
+   Compiling rayon v1.12.0
+   Compiling rand_core v0.6.4
+   Compiling serde_derive v1.0.229
+   Compiling rr5-original-f4-closure v0.1.0 (/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/f4-source)
+   Compiling ppv-lite86 v0.2.21
+error: failed to run custom build command for `rr5-original-f4-closure v0.1.0 (/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/f4-source)`
+
+Caused by:
+  process didn't exit successfully: `/workspace/scratch/5e8abb017b93/crypto-build/research/m31_integrated_build_20261123/structured/target/debug/build/rr5-original-f4-closure/a098796bcb24a991/out/build_script_build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/reuse.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/pair_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/certified.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/challenge_ladder.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/glv_invariant_base.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/groebner_f4.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/ic_boundary.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/pq_groebner_f2.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/prime_fast.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/residual_walk.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/semaev_prime_poly.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/prime_hyperelliptic/ops.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/identity_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/hash/sha256.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/reuse.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/pair_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/f4_fp/certified.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/fx_hash.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/jv_bitops.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/jv_bitops_uniform.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/bitops.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/src/cryptanalysis/ic_measurement.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/examples/prime31_rr5_quartic.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/Cargo.toml
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/Cargo.lock
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/lib.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/build.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/extractor.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/relation_adapter.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/main.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/independent_tests.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/b677_fixture.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/b677_controls.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/selector_circuit.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/b677_gate.rs
+  cargo:rerun-if-changed=/workspace/scratch/5e8abb017b93/crypto-build/research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv
+
+  --- stderr
+
+  thread 'main' (824) panicked at /workspace/scratch/5e8abb017b93/crypto-build/research/prime31_four_summand_20261122/native/f4-source/build.rs:23:44:
+  cannot read /workspace/scratch/5e8abb017b93/crypto-build/research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv: No such file or directory (os error 2)
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

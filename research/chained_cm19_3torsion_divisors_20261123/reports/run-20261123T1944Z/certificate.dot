@@ -1,0 +1,13 @@
+digraph Certificate {
+ graph [rankdir=LR,bgcolor="white",nodesep=0.5,ranksep=0.55];
+ node [shape=box,style="rounded,filled",fillcolor="#e7f0f5",color="#26465c",fontname="DejaVu Sans",fontsize=13,margin="0.15,0.12"];
+ edge [color="#38536e",fontname="DejaVu Sans",fontsize=11];
+ native [label="Actual C7 / E7\nFixed field F7^4\nAll 9 torsion points; 16 conic cells"];
+ minus [label="Sign -1: 8 / 8 certificates\nCommon divisor degree 3\nFull geometric E[3] basis",fillcolor="#e0f2e7"];
+ plus [label="Sign +1: 0 / 8 certificates\nCommon divisor degree 0\nAll attempts retained",fillcolor="#fff0d8"];
+ basis [label="Written kernel descent\ng = (phi0 - phi1 - phi3*pi) / 3\nActual beta basis, det H = 1",fillcolor="#e0f2e7"];
+ {rank=same;minus;plus}
+ native -> minus [label="fibres, jets, units\nrank minors / nullspaces"];
+ native -> plus;
+ minus -> basis [label="standard Jacobian /\ngroup-scheme identities"];
+}

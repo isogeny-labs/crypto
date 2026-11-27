@@ -704,6 +704,7 @@ fn signed_witness_check(fixture: &FamilyFixture) -> Result<Value, String> {
     )
 }
 
+#[allow(clippy::large_enum_variant)]
 enum RecoveryPreparation {
     Original,
     Fresh(FreshMacaulay),

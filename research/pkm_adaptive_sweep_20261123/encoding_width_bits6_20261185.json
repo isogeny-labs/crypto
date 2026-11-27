@@ -1,0 +1,3627 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 45.68375,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 43.02958,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 0.8015947265625,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.260935546875,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_word_xor"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 16,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 377.4584785,
+  "instance": "icv1-fp13-tm13-9e2d11f6",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.212 | 66 | 14 | 14 | 7.0 | — | 5130848.298 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.127 | 102 | 13 | 13 | 7.0 | — | 7257960.564 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.164 | 73 | 12 | 12 | 7.0 | — | 5295665.378 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.139 | 101 | 14 | 14 | 7.0 | — | 7337781.016 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.168 | 113 | 19 | 19 | 7.0 | — | 8145876.061 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.143 | 105 | 15 | 15 | 7.0 | — | 7686177.278 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.096 | 178 | 17 | 17 | 7.0 | — | 12011433.642 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.099 | 162 | 16 | 16 | 7.0 | — | 10926333.240 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.111 | 99 | 11 | 11 | 7.0 | — | 6791144.751 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.118 | 68 | 8 | 8 | 7.0 | — | 4799768.352 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.144 | 97 | 14 | 14 | 7.0 | — | 7050749.332 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.100 | 100 | 10 | 10 | 7.0 | — | 6869005.422 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.234 | 64 | 15 | 15 | 7.0 | — | 4644322.137 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.129 | 101 | 13 | 13 | 7.0 | — | 6965873.705 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.121 | 107 | 13 | 13 | 7.0 | — | 7571002.937 | — | yes |\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 36 | 18 | 2.0 | 0.115 | 130 | 15 | 15 | 7.0 | — | 8787470.296 | — | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": null,
+  "rho_reference_candidates": [],
+  "rho_reference_plain": null,
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 361242314.02881217,
+          "group_ops": {
+            "adds": 335,
+            "doubles": 378,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 31,
+            "lookups": 0,
+            "pkm_consistent_systems": 41,
+            "pkm_grid_fp_mults_uncharged": 223170,
+            "pkm_system_fp_mults_uncharged": 20085,
+            "pkm_system_specialisations": 65,
+            "pkm_system_terms": 31460,
+            "relations": 14,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 65,
+            "solver_ops": 130229433670,
+            "sqrt_solves": 0,
+            "target_guard_probes": 66,
+            "trials": 66,
+            "unliftable_systems": 27,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 32,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 64
+          },
+          "wall_ns": 16516776622,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 64,
+            "walk_modr_adds": 130
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 713.0,
+        "hit_rate": 0.21212121212121213,
+        "name": "pkm-semaev",
+        "relations_found": 14,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 539166
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 65,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2462626,
+            "max_rows_max": 5544,
+            "refutations": 24,
+            "staircase_stops": 0,
+            "steps": 1457
+          },
+          "gae": 361241601.02881217,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1267215139153419,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 130229433670,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 455,
+          "wall_ns": 16502870991
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 66
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 24791,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.053109309587654,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 14,
+            "repeated_column_rows": 0,
+            "row_ops": 174,
+            "rows": 14,
+            "single_column_rows": 0,
+            "two_column_rows": 14
+          },
+          "wall_ns": 30669,
+          "work_native": {
+            "column_part_inserts": 14,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1075,
+            "pivot_inversion_steps": 364,
+            "row_build_modr_adds": 42,
+            "row_build_modr_muls": 28,
+            "row_build_words": 770,
+            "row_key_mixes": 28
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 14,
+        "rows": 14,
+        "work": 174,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1058,
+      "rho_s": null,
+      "s": 5130848.298356587,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20261185,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 361242329.08192146,
+      "verified": true,
+      "verify": {
+        "gae": 12.0,
+        "group_ops": {
+          "adds": 2,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 917
+      },
+      "wall_seconds": 16.517422292
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 511003703.44091165,
+          "group_ops": {
+            "adds": 393,
+            "doubles": 372,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 42,
+            "lookups": 0,
+            "pkm_consistent_systems": 45,
+            "pkm_grid_fp_mults_uncharged": 224302,
+            "pkm_system_fp_mults_uncharged": 31209,
+            "pkm_system_specialisations": 101,
+            "pkm_system_terms": 48883,
+            "relations": 13,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 101,
+            "solver_ops": 199362290985,
+            "sqrt_solves": 0,
+            "target_guard_probes": 102,
+            "trials": 102,
+            "unliftable_systems": 32,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 33,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 100
+          },
+          "wall_ns": 23359594709,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 100,
+            "walk_modr_adds": 202
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 765.0,
+        "hit_rate": 0.12745098039215685,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 504958
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 101,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2810509,
+            "max_rows_max": 6037,
+            "refutations": 56,
+            "staircase_stops": 0,
+            "steps": 2131
+          },
+          "gae": 511002938.44091165,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11709601837770033,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 199362290985,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 707,
+          "wall_ns": 23344530489
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 102
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11291,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.7897537332065558,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 102,
+            "rows": 13,
+            "single_column_rows": 1,
+            "two_column_rows": 12
+          },
+          "wall_ns": 27041,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 936,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 25
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 102,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1913,
+      "rho_s": null,
+      "s": 7257960.564379233,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20301688,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 511003722.2306654,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1125
+      },
+      "wall_seconds": 23.360163042
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 372846417.85260075,
+          "group_ops": {
+            "adds": 333,
+            "doubles": 364,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 28,
+            "lookups": 0,
+            "pkm_consistent_systems": 37,
+            "pkm_grid_fp_mults_uncharged": 171124,
+            "pkm_system_fp_mults_uncharged": 22248,
+            "pkm_system_specialisations": 72,
+            "pkm_system_terms": 34848,
+            "relations": 12,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 72,
+            "solver_ops": 142102532121,
+            "sqrt_solves": 0,
+            "target_guard_probes": 73,
+            "trials": 73,
+            "unliftable_systems": 25,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 34,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 71
+          },
+          "wall_ns": 17043972121,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 71,
+            "walk_modr_adds": 144
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 697.0,
+        "hit_rate": 0.1643835616438356,
+        "name": "pkm-semaev",
+        "relations_found": 12,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 515583
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 72,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2464104,
+            "max_rows_max": 5544,
+            "refutations": 35,
+            "staircase_stops": 0,
+            "steps": 1555
+          },
+          "gae": 372845720.85260075,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11986409000436703,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 142102532121,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 504,
+          "wall_ns": 17032990700
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 73
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11125,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.895033364571647,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 12,
+            "repeated_column_rows": 0,
+            "row_ops": 108,
+            "rows": 12,
+            "single_column_rows": 0,
+            "two_column_rows": 12
+          },
+          "wall_ns": 26420,
+          "work_native": {
+            "column_part_inserts": 12,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 859,
+            "pivot_inversion_steps": 312,
+            "row_build_modr_adds": 36,
+            "row_build_modr_muls": 24,
+            "row_build_words": 660,
+            "row_key_mixes": 24
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 12,
+        "rows": 12,
+        "work": 108,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2768,
+      "rho_s": null,
+      "s": 5295665.37823808,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20342191,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 372846434.7476341,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1084
+      },
+      "wall_seconds": 17.044552166
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 516623538.48373324,
+          "group_ops": {
+            "adds": 339,
+            "doubles": 356,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 42,
+            "lookups": 0,
+            "pkm_consistent_systems": 49,
+            "pkm_grid_fp_mults_uncharged": 230565,
+            "pkm_system_fp_mults_uncharged": 31209,
+            "pkm_system_specialisations": 101,
+            "pkm_system_terms": 48880,
+            "relations": 14,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 101,
+            "solver_ops": 198374656398,
+            "sqrt_solves": 0,
+            "target_guard_probes": 101,
+            "trials": 101,
+            "unliftable_systems": 35,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 100
+          },
+          "wall_ns": 23616325375,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 100,
+            "walk_modr_adds": 200
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 695.0,
+        "hit_rate": 0.13861386138613863,
+        "name": "pkm-semaev",
+        "relations_found": 14,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 517583
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 101,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3374,
+            "max_nnz_max": 2460966,
+            "max_rows_max": 5544,
+            "refutations": 52,
+            "staircase_stops": 0,
+            "steps": 2161
+          },
+          "gae": 516622843.48373324,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11897320582448125,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 198374656398,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 707,
+          "wall_ns": 23601268826
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 101
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 10709,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.7548170207198943,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 14,
+            "repeated_column_rows": 0,
+            "row_ops": 157,
+            "rows": 14,
+            "single_column_rows": 0,
+            "two_column_rows": 14
+          },
+          "wall_ns": 30084,
+          "work_native": {
+            "column_part_inserts": 14,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1106,
+            "pivot_inversion_steps": 364,
+            "row_build_modr_adds": 42,
+            "row_build_modr_muls": 28,
+            "row_build_words": 770,
+            "row_key_mixes": 28
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 14,
+        "rows": 14,
+        "work": 157,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3623,
+      "rho_s": null,
+      "s": 7337781.016460197,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20382694,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 516623558.23855025,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 6,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1208
+      },
+      "wall_seconds": 23.616911584
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 573518247.203163,
+          "group_ops": {
+            "adds": 367,
+            "doubles": 355,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 35,
+            "lookups": 0,
+            "pkm_consistent_systems": 48,
+            "pkm_grid_fp_mults_uncharged": 248958,
+            "pkm_system_fp_mults_uncharged": 34917,
+            "pkm_system_specialisations": 113,
+            "pkm_system_terms": 54692,
+            "relations": 19,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 113,
+            "solver_ops": 220218177540,
+            "sqrt_solves": 0,
+            "target_guard_probes": 113,
+            "trials": 113,
+            "unliftable_systems": 29,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 112
+          },
+          "wall_ns": 26217490666,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 112,
+            "walk_modr_adds": 224
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 722.0,
+        "hit_rate": 0.168141592920354,
+        "name": "pkm-semaev",
+        "relations_found": 19,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 601125
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 113,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3572,
+            "max_nnz_max": 2468390,
+            "max_rows_max": 5545,
+            "refutations": 65,
+            "staircase_stops": 0,
+            "steps": 2370
+          },
+          "gae": 573517525.203163,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1189748799789291,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 220218177540,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 791,
+          "wall_ns": 26200431242
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 113
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 10834,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.983079386645962,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 19,
+            "repeated_column_rows": 0,
+            "row_ops": 227,
+            "rows": 19,
+            "single_column_rows": 2,
+            "two_column_rows": 17
+          },
+          "wall_ns": 44333,
+          "work_native": {
+            "column_part_inserts": 19,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1577,
+            "pivot_inversion_steps": 494,
+            "row_build_modr_adds": 57,
+            "row_build_modr_muls": 38,
+            "row_build_words": 1045,
+            "row_key_mixes": 36
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 19,
+        "rows": 19,
+        "work": 227,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 4478,
+      "rho_s": null,
+      "s": 8145876.060925776,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20423197,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 573518270.1862425,
+      "verified": true,
+      "verify": {
+        "gae": 19.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 12,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1334
+      },
+      "wall_seconds": 26.218170834
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 541152717.4598736,
+          "group_ops": {
+            "adds": 349,
+            "doubles": 349,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 55,
+            "lookups": 0,
+            "pkm_consistent_systems": 55,
+            "pkm_grid_fp_mults_uncharged": 280040,
+            "pkm_system_fp_mults_uncharged": 32445,
+            "pkm_system_specialisations": 105,
+            "pkm_system_terms": 50820,
+            "relations": 15,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 105,
+            "solver_ops": 207155350923,
+            "sqrt_solves": 0,
+            "target_guard_probes": 105,
+            "trials": 105,
+            "unliftable_systems": 40,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 104
+          },
+          "wall_ns": 24738262208,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 104,
+            "walk_modr_adds": 208
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 698.0,
+        "hit_rate": 0.14285714285714285,
+        "name": "pkm-semaev",
+        "relations_found": 15,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 501250
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 105,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3538,
+            "max_nnz_max": 2461576,
+            "max_rows_max": 5550,
+            "refutations": 50,
+            "staircase_stops": 0,
+            "steps": 2275
+          },
+          "gae": 541152019.4598736,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11933968134952573,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 207155350923,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 735,
+          "wall_ns": 24721853569
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 105
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11459,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 3.0355627043601388,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 15,
+            "repeated_column_rows": 0,
+            "row_ops": 173,
+            "rows": 15,
+            "single_column_rows": 1,
+            "two_column_rows": 14
+          },
+          "wall_ns": 31543,
+          "work_native": {
+            "column_part_inserts": 15,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1110,
+            "pivot_inversion_steps": 390,
+            "row_build_modr_adds": 45,
+            "row_build_modr_muls": 30,
+            "row_build_words": 825,
+            "row_key_mixes": 29
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 15,
+        "rows": 15,
+        "work": 173,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 377,
+      "rho_s": null,
+      "s": 7686177.278456235,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20463700,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 541152733.4954363,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 8,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 916
+      },
+      "wall_seconds": 24.738834292
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 845676567.2851944,
+          "group_ops": {
+            "adds": 553,
+            "doubles": 523,
+            "scalar_mults": 50
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 59,
+            "lookups": 0,
+            "pkm_consistent_systems": 64,
+            "pkm_grid_fp_mults_uncharged": 302467,
+            "pkm_system_fp_mults_uncharged": 52530,
+            "pkm_system_specialisations": 170,
+            "pkm_system_terms": 82250,
+            "relations": 17,
+            "repeated_targets_skipped": 8,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 170,
+            "solver_ops": 331111485089,
+            "sqrt_solves": 0,
+            "target_guard_probes": 178,
+            "trials": 178,
+            "unliftable_systems": 47,
+            "walk_jumps": 24,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 8,
+            "walk_pool_ops": 271,
+            "walk_pool_restarts": 8,
+            "walk_restarts": 9,
+            "walk_steps": 169
+          },
+          "wall_ns": 38657710876,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 154,
+            "walk_mix_hashes": 169,
+            "walk_modr_adds": 354
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 1076.0,
+        "hit_rate": 0.09550561797752809,
+        "name": "pkm-semaev",
+        "relations_found": 17,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 496833
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 170,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3414,
+            "max_nnz_max": 2810509,
+            "max_rows_max": 6037,
+            "refutations": 106,
+            "staircase_stops": 0,
+            "steps": 3506
+          },
+          "gae": 845675491.2851944,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11667860966712043,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 331111485089,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 1190,
+          "wall_ns": 38633627725
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 178
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11875,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 4.193638649376146,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 17,
+            "repeated_column_rows": 0,
+            "row_ops": 239,
+            "rows": 17,
+            "single_column_rows": 0,
+            "two_column_rows": 17
+          },
+          "wall_ns": 38749,
+          "work_native": {
+            "column_part_inserts": 17,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1354,
+            "pivot_inversion_steps": 442,
+            "row_build_modr_adds": 51,
+            "row_build_modr_muls": 34,
+            "row_build_words": 935,
+            "row_key_mixes": 34
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 17,
+        "rows": 17,
+        "work": 239,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1232,
+      "rho_s": null,
+      "s": 12011433.641956275,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20504203,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 845676584.4788331,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 3,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 875
+      },
+      "wall_seconds": 38.6582815
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 769279025.0861903,
+          "group_ops": {
+            "adds": 453,
+            "doubles": 422,
+            "scalar_mults": 42
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 60,
+            "lookups": 0,
+            "pkm_consistent_systems": 62,
+            "pkm_grid_fp_mults_uncharged": 289395,
+            "pkm_system_fp_mults_uncharged": 48822,
+            "pkm_system_specialisations": 158,
+            "pkm_system_terms": 76472,
+            "relations": 16,
+            "repeated_targets_skipped": 4,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 158,
+            "solver_ops": 306337355127,
+            "sqrt_solves": 0,
+            "target_guard_probes": 162,
+            "trials": 162,
+            "unliftable_systems": 46,
+            "walk_jumps": 20,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 4,
+            "walk_pool_ops": 120,
+            "walk_pool_restarts": 4,
+            "walk_restarts": 5,
+            "walk_steps": 157
+          },
+          "wall_ns": 35166298377,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 94,
+            "walk_mix_hashes": 157,
+            "walk_modr_adds": 322
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 875.0,
+        "hit_rate": 0.09876543209876543,
+        "name": "pkm-semaev",
+        "relations_found": 16,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 491750
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 158,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3381,
+            "max_nnz_max": 2461483,
+            "max_rows_max": 5543,
+            "refutations": 96,
+            "staircase_stops": 0,
+            "steps": 3278
+          },
+          "gae": 769278150.0861903,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11472159728750794,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 306337355127,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 1106,
+          "wall_ns": 35143510689
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 162
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11041,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.7548170207198943,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 16,
+            "repeated_column_rows": 0,
+            "row_ops": 157,
+            "rows": 16,
+            "single_column_rows": 0,
+            "two_column_rows": 16
+          },
+          "wall_ns": 35706,
+          "work_native": {
+            "column_part_inserts": 16,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1231,
+            "pivot_inversion_steps": 416,
+            "row_build_modr_adds": 48,
+            "row_build_modr_muls": 32,
+            "row_build_words": 880,
+            "row_key_mixes": 32
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 16,
+        "rows": 16,
+        "work": 157,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2087,
+      "rho_s": null,
+      "s": 10926333.239942834,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20544706,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 769279042.8410074,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1042
+      },
+      "wall_seconds": 35.166862542
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 478137083.55219305,
+          "group_ops": {
+            "adds": 349,
+            "doubles": 357,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 33,
+            "lookups": 0,
+            "pkm_consistent_systems": 39,
+            "pkm_grid_fp_mults_uncharged": 183029,
+            "pkm_system_fp_mults_uncharged": 30282,
+            "pkm_system_specialisations": 98,
+            "pkm_system_terms": 47432,
+            "relations": 11,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 98,
+            "solver_ops": 190075041691,
+            "sqrt_solves": 0,
+            "target_guard_probes": 99,
+            "trials": 99,
+            "unliftable_systems": 28,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 28,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 97
+          },
+          "wall_ns": 21857036961,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 97,
+            "walk_modr_adds": 196
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 706.0,
+        "hit_rate": 0.1111111111111111,
+        "name": "pkm-semaev",
+        "relations_found": 11,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 494791
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 98,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3381,
+            "max_nnz_max": 2461483,
+            "max_rows_max": 5551,
+            "refutations": 59,
+            "staircase_stops": 0,
+            "steps": 2037
+          },
+          "gae": 478136377.55219305,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11491810047060094,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 190075041691,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 686,
+          "wall_ns": 21843062738
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 99
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 10833,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.5616478652488577,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 11,
+            "repeated_column_rows": 0,
+            "row_ops": 89,
+            "rows": 11,
+            "single_column_rows": 1,
+            "two_column_rows": 10
+          },
+          "wall_ns": 23081,
+          "work_native": {
+            "column_part_inserts": 11,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 710,
+            "pivot_inversion_steps": 286,
+            "row_build_modr_adds": 33,
+            "row_build_modr_muls": 22,
+            "row_build_words": 605,
+            "row_key_mixes": 21
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 11,
+        "rows": 11,
+        "work": 89,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2942,
+      "rho_s": null,
+      "s": 6791144.751110567,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20585209,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 478137104.11384094,
+      "verified": true,
+      "verify": {
+        "gae": 19.0,
+        "group_ops": {
+          "adds": 8,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1375
+      },
+      "wall_seconds": 21.857593958
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 337932306.63209015,
+          "group_ops": {
+            "adds": 326,
+            "doubles": 363,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 27,
+            "lookups": 0,
+            "pkm_consistent_systems": 32,
+            "pkm_grid_fp_mults_uncharged": 159582,
+            "pkm_system_fp_mults_uncharged": 20703,
+            "pkm_system_specialisations": 67,
+            "pkm_system_terms": 32428,
+            "relations": 8,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 67,
+            "solver_ops": 131447524885,
+            "sqrt_solves": 0,
+            "target_guard_probes": 68,
+            "trials": 68,
+            "unliftable_systems": 24,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 34,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 66
+          },
+          "wall_ns": 15448205625,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 66,
+            "walk_modr_adds": 134
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 689.0,
+        "hit_rate": 0.11764705882352941,
+        "name": "pkm-semaev",
+        "relations_found": 8,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 500750
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 67,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2464058,
+            "max_rows_max": 5544,
+            "refutations": 35,
+            "staircase_stops": 0,
+            "steps": 1430
+          },
+          "gae": 337931617.63209015,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11744598120433448,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 131447524885,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 469,
+          "wall_ns": 15437983537
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 68
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11750,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.1229827345609762,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 8,
+            "repeated_column_rows": 0,
+            "row_ops": 64,
+            "rows": 8,
+            "single_column_rows": 0,
+            "two_column_rows": 8
+          },
+          "wall_ns": 16542,
+          "work_native": {
+            "column_part_inserts": 8,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 547,
+            "pivot_inversion_steps": 208,
+            "row_build_modr_adds": 24,
+            "row_build_modr_muls": 16,
+            "row_build_words": 440,
+            "row_key_mixes": 16
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 8,
+        "rows": 8,
+        "work": 64,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3797,
+      "rho_s": null,
+      "s": 4799768.3520828355,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20625712,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 337932325.7550729,
+      "verified": true,
+      "verify": {
+        "gae": 18.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1167
+      },
+      "wall_seconds": 15.44875875
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 496414796.7011519,
+          "group_ops": {
+            "adds": 326,
+            "doubles": 345,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 46,
+            "lookups": 0,
+            "pkm_consistent_systems": 49,
+            "pkm_grid_fp_mults_uncharged": 259615,
+            "pkm_system_fp_mults_uncharged": 29973,
+            "pkm_system_specialisations": 97,
+            "pkm_system_terms": 46948,
+            "relations": 14,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 97,
+            "solver_ops": 191135180523,
+            "sqrt_solves": 0,
+            "target_guard_probes": 97,
+            "trials": 97,
+            "unliftable_systems": 35,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 96
+          },
+          "wall_ns": 22693226418,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 96,
+            "walk_modr_adds": 192
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 671.0,
+        "hit_rate": 0.14432989690721648,
+        "name": "pkm-semaev",
+        "relations_found": 14,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 502459
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 97,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3538,
+            "max_nnz_max": 2462909,
+            "max_rows_max": 5541,
+            "refutations": 48,
+            "staircase_stops": 0,
+            "steps": 2089
+          },
+          "gae": 496414125.7011519,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1186493180007281,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 191135180523,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 679,
+          "wall_ns": 22678058815
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 97
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11084,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.5968975736722575,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 14,
+            "repeated_column_rows": 0,
+            "row_ops": 148,
+            "rows": 14,
+            "single_column_rows": 1,
+            "two_column_rows": 13
+          },
+          "wall_ns": 30916,
+          "work_native": {
+            "column_part_inserts": 14,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1028,
+            "pivot_inversion_steps": 364,
+            "row_build_modr_adds": 42,
+            "row_build_modr_muls": 28,
+            "row_build_words": 770,
+            "row_key_mixes": 27
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 14,
+        "rows": 14,
+        "work": 148,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 4652,
+      "rho_s": null,
+      "s": 7050749.331685848,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20666215,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 496414815.2980495,
+      "verified": true,
+      "verify": {
+        "gae": 16.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 12,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1250
+      },
+      "wall_seconds": 22.693796958
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 483618945.2347661,
+          "group_ops": {
+            "adds": 335,
+            "doubles": 350,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 37,
+            "lookups": 0,
+            "pkm_consistent_systems": 38,
+            "pkm_grid_fp_mults_uncharged": 191294,
+            "pkm_system_fp_mults_uncharged": 30900,
+            "pkm_system_specialisations": 100,
+            "pkm_system_terms": 48400,
+            "relations": 10,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 100,
+            "solver_ops": 193474593335,
+            "sqrt_solves": 0,
+            "target_guard_probes": 100,
+            "trials": 100,
+            "unliftable_systems": 28,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 99
+          },
+          "wall_ns": 22107829418,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 99,
+            "walk_modr_adds": 198
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 685.0,
+        "hit_rate": 0.1,
+        "name": "pkm-semaev",
+        "relations_found": 10,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 502625
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 100,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3381,
+            "max_nnz_max": 2461758,
+            "max_rows_max": 5549,
+            "refutations": 62,
+            "staircase_stops": 0,
+            "steps": 2066
+          },
+          "gae": 483618260.2347661,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1141932659744386,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 193474593335,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 700,
+          "wall_ns": 22093495696
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 100
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 12000,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.596741075703888,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 10,
+            "repeated_column_rows": 0,
+            "row_ops": 91,
+            "rows": 10,
+            "single_column_rows": 1,
+            "two_column_rows": 9
+          },
+          "wall_ns": 20374,
+          "work_native": {
+            "column_part_inserts": 10,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 701,
+            "pivot_inversion_steps": 260,
+            "row_build_modr_adds": 30,
+            "row_build_modr_muls": 20,
+            "row_build_words": 550,
+            "row_key_mixes": 19
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 10,
+        "rows": 10,
+        "work": 91,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 551,
+      "rho_s": null,
+      "s": 6869005.421958046,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20706718,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 483618959.8315072,
+      "verified": true,
+      "verify": {
+        "gae": 13.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 9,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1000
+      },
+      "wall_seconds": 22.108390459
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 326987965.47897226,
+          "group_ops": {
+            "adds": 333,
+            "doubles": 347,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 27,
+            "lookups": 0,
+            "pkm_consistent_systems": 33,
+            "pkm_grid_fp_mults_uncharged": 199296,
+            "pkm_system_fp_mults_uncharged": 19776,
+            "pkm_system_specialisations": 64,
+            "pkm_system_terms": 30946,
+            "relations": 15,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 64,
+            "solver_ops": 126119850045,
+            "sqrt_solves": 0,
+            "target_guard_probes": 64,
+            "trials": 64,
+            "unliftable_systems": 18,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 63
+          },
+          "wall_ns": 14948638000,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 63,
+            "walk_modr_adds": 126
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 680.0,
+        "hit_rate": 0.234375,
+        "name": "pkm-semaev",
+        "relations_found": 15,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 516500
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 64,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3629,
+            "max_nnz_max": 2464794,
+            "max_rows_max": 5548,
+            "refutations": 31,
+            "staircase_stops": 0,
+            "steps": 1383
+          },
+          "gae": 326987285.47897226,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11844293660094005,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 126119850045,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 448,
+          "wall_ns": 14938005403
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 64
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 10916,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.4214315213971047,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 15,
+            "repeated_column_rows": 0,
+            "row_ops": 138,
+            "rows": 15,
+            "single_column_rows": 0,
+            "two_column_rows": 15
+          },
+          "wall_ns": 30375,
+          "work_native": {
+            "column_part_inserts": 15,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1102,
+            "pivot_inversion_steps": 390,
+            "row_build_modr_adds": 45,
+            "row_build_modr_muls": 30,
+            "row_build_words": 825,
+            "row_key_mixes": 30
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 15,
+        "rows": 15,
+        "work": 138,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1406,
+      "rho_s": null,
+      "s": 4644322.137367287,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20747221,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 326987984.9004038,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 7,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 916
+      },
+      "wall_seconds": 14.949221
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 490439047.21662515,
+          "group_ops": {
+            "adds": 376,
+            "doubles": 382,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 39,
+            "lookups": 0,
+            "pkm_consistent_systems": 43,
+            "pkm_grid_fp_mults_uncharged": 215850,
+            "pkm_system_fp_mults_uncharged": 30591,
+            "pkm_system_specialisations": 99,
+            "pkm_system_terms": 47916,
+            "relations": 13,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 99,
+            "solver_ops": 193322460673,
+            "sqrt_solves": 0,
+            "target_guard_probes": 101,
+            "trials": 101,
+            "unliftable_systems": 30,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 63,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 98
+          },
+          "wall_ns": 22419842083,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 98,
+            "walk_modr_adds": 200
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 758.0,
+        "hit_rate": 0.12871287128712872,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 480583
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 99,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2462233,
+            "max_rows_max": 5544,
+            "refutations": 56,
+            "staircase_stops": 0,
+            "steps": 2083
+          },
+          "gae": 490438289.21662515,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11589476006565831,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 193322460673,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 693,
+          "wall_ns": 22405060195
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 101
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 10375,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 1.6493808913864336,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 94,
+            "rows": 13,
+            "single_column_rows": 0,
+            "two_column_rows": 13
+          },
+          "wall_ns": 27626,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 880,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 26
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 94,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 2261,
+      "rho_s": null,
+      "s": 6965873.705361611,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20787724,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 490439064.866006,
+      "verified": true,
+      "verify": {
+        "gae": 16.0,
+        "group_ops": {
+          "adds": 5,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1125
+      },
+      "wall_seconds": 22.420386584
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 533043755.183134,
+          "group_ops": {
+            "adds": 337,
+            "doubles": 337,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 44,
+            "lookups": 0,
+            "pkm_consistent_systems": 47,
+            "pkm_grid_fp_mults_uncharged": 229256,
+            "pkm_system_fp_mults_uncharged": 33063,
+            "pkm_system_specialisations": 107,
+            "pkm_system_terms": 51786,
+            "relations": 13,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 107,
+            "solver_ops": 209061002387,
+            "sqrt_solves": 0,
+            "target_guard_probes": 107,
+            "trials": 107,
+            "unliftable_systems": 34,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 106
+          },
+          "wall_ns": 24367465376,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 106,
+            "walk_modr_adds": 212
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 674.0,
+        "hit_rate": 0.12149532710280374,
+        "name": "pkm-semaev",
+        "relations_found": 13,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 476083
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 107,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2464104,
+            "max_rows_max": 5545,
+            "refutations": 60,
+            "staircase_stops": 0,
+            "steps": 2255
+          },
+          "gae": 533043081.183134,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1164799105618095,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 209061002387,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 749,
+          "wall_ns": 24351406860
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 107
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 13625,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.561804363217227,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 13,
+            "repeated_column_rows": 0,
+            "row_ops": 146,
+            "rows": 13,
+            "single_column_rows": 0,
+            "two_column_rows": 13
+          },
+          "wall_ns": 26750,
+          "work_native": {
+            "column_part_inserts": 13,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 928,
+            "pivot_inversion_steps": 338,
+            "row_build_modr_adds": 39,
+            "row_build_modr_muls": 26,
+            "row_build_words": 715,
+            "row_key_mixes": 26
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 13,
+        "rows": 13,
+        "work": 146,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3116,
+      "rho_s": null,
+      "s": 7571002.93669548,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20828227,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 533043772.7449384,
+      "verified": true,
+      "verify": {
+        "gae": 15.0,
+        "group_ops": {
+          "adds": 4,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1083
+      },
+      "wall_seconds": 24.36800775
+    },
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 618690312.3958738,
+          "group_ops": {
+            "adds": 382,
+            "doubles": 374,
+            "scalar_mults": 38
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 39,
+            "lookups": 0,
+            "pkm_consistent_systems": 48,
+            "pkm_grid_fp_mults_uncharged": 226091,
+            "pkm_system_fp_mults_uncharged": 39552,
+            "pkm_system_specialisations": 128,
+            "pkm_system_terms": 61951,
+            "relations": 15,
+            "repeated_targets_skipped": 2,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 128,
+            "solver_ops": 249481948842,
+            "sqrt_solves": 0,
+            "target_guard_probes": 130,
+            "trials": 130,
+            "unliftable_systems": 33,
+            "walk_jumps": 18,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 2,
+            "walk_pool_ops": 63,
+            "walk_pool_restarts": 2,
+            "walk_restarts": 3,
+            "walk_steps": 127
+          },
+          "wall_ns": 28290296210,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 64,
+            "walk_mix_hashes": 127,
+            "walk_modr_adds": 258
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 756.0,
+        "hit_rate": 0.11538461538461539,
+        "name": "pkm-semaev",
+        "relations_found": 15,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 535542
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 128,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3381,
+            "max_nnz_max": 2810509,
+            "max_rows_max": 6037,
+            "refutations": 80,
+            "staircase_stops": 0,
+            "steps": 2639
+          },
+          "gae": 618689556.3958738,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.11329099821927388,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 249481948842,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 896,
+          "wall_ns": 28264059022
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 130
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 18,
+        "columns": 18,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 29,
+            "legendre_symbols": 29,
+            "sqrt_solves": 18
+          },
+          "wall_ns": 11042,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 54,
+            "index_point_negations": 18,
+            "index_sort_word_ops": 108
+          }
+        },
+        "description": "every abscissa in [1, 32) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 36
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=32] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.43897812662462,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 19,
+            "pinned_by_repeated_row": 0,
+            "rank": 15,
+            "repeated_column_rows": 0,
+            "row_ops": 139,
+            "rows": 15,
+            "single_column_rows": 1,
+            "two_column_rows": 14
+          },
+          "wall_ns": 32040,
+          "work_native": {
+            "column_part_inserts": 15,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1211,
+            "pivot_inversion_steps": 390,
+            "row_build_modr_adds": 45,
+            "row_build_modr_muls": 30,
+            "row_build_words": 825,
+            "row_key_mixes": 29
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 15,
+        "rows": 15,
+        "work": 139,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 3971,
+      "rho_s": null,
+      "s": 8787470.29555509,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "32"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20868730,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 618690331.8348519,
+      "verified": true,
+      "verify": {
+        "gae": 17.0,
+        "group_ops": {
+          "adds": 6,
+          "doubles": 11,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 875
+      },
+      "wall_seconds": 28.290899125
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "b449282386818d154e1039f7e9c1bdd5d90bcbb40bca8d845a44317bedefeee4",
+    "git_commit": "cc7d6141f26bc02ae02876bc094b6a7783990947",
+    "git_commit_source": "CRYPTO_BUILD_GIT_COMMIT",
+    "git_dirty": false,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

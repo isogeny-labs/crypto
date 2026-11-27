@@ -189,13 +189,76 @@ pub enum BwError {
 }
 
 /// A nonzero `w` with `A w = 0`, verified exactly before it is returned.
-// Column operations index two columns of the same matrix; iterators would alias.
-#[allow(clippy::needless_range_loop)]
 pub fn kernel_vector(
     a: &SparseMatrix,
     p: u64,
     params: BwParams,
 ) -> Result<(Vec<u64>, BwStats), BwError> {
+    kernel_vector_impl(a, p, params, false)
+}
+
+/// [`kernel_vector`] with the `n` products of each Krylov round, the
+/// `m · n` projections and the σ-basis column eliminations run on the
+/// current rayon pool.  Every parallel step is a pure function of data
+/// fixed before it (the pivot column is copied first), so the result and
+/// every count in [`BwStats`] are identical to the serial path; only wall
+/// time changes.
+pub fn kernel_vector_parallel(
+    a: &SparseMatrix,
+    p: u64,
+    params: BwParams,
+) -> Result<(Vec<u64>, BwStats), BwError> {
+    kernel_vector_impl(a, p, params, true)
+}
+
+fn dot(x: &[u64], v: &[u64], p: u64) -> u64 {
+    x.iter()
+        .zip(v)
+        .fold(0u64, |acc, (&s, &t)| add(acc, mul(s, t, p), p))
+}
+
+/// `col_j -= c · col_piv` on the residual (from index `k`) and the basis
+/// polynomials, with `c = res_j[r][k] / res_piv[r][k]`.
+#[allow(clippy::too_many_arguments)]
+fn eliminate_column(
+    res_j: &mut [Vec<u64>],
+    poly_j: &mut [Vec<u64>],
+    piv_res: &[Vec<u64>],
+    piv_poly: &[Vec<u64>],
+    r: usize,
+    k: usize,
+    pinv: u64,
+    p: u64,
+) {
+    let c = mul(res_j[r][k], pinv, p);
+    for (dst, src) in res_j.iter_mut().zip(piv_res) {
+        for (d, &t) in dst[k..].iter_mut().zip(&src[k..]) {
+            if t != 0 {
+                *d = sub(*d, mul(c, t, p), p);
+            }
+        }
+    }
+    for (dst, src) in poly_j.iter_mut().zip(piv_poly) {
+        if dst.len() < src.len() {
+            dst.resize(src.len(), 0);
+        }
+        for (d, &t) in dst.iter_mut().zip(src) {
+            if t != 0 {
+                *d = sub(*d, mul(c, t, p), p);
+            }
+        }
+    }
+}
+
+// Pivot search and the shift loop index several parallel arrays.
+#[allow(clippy::needless_range_loop)]
+fn kernel_vector_impl(
+    a: &SparseMatrix,
+    p: u64,
+    params: BwParams,
+    parallel: bool,
+) -> Result<(Vec<u64>, BwStats), BwError> {
+    use rayon::prelude::*;
     if !valid_modulus(p) {
         return Err(BwError::InvalidModulus);
     }
@@ -222,21 +285,31 @@ pub fn kernel_vector(
     stats.sequence_length = big_l;
 
     // Block sequence a_i[r][c] = x_r · A^i (A y_c).
-    let mut v: Vec<Vec<u64>> = y.iter().map(|c| a.mul_vec(c, p)).collect();
+    let products = |v: &[Vec<u64>]| -> Vec<Vec<u64>> {
+        if parallel {
+            v.par_iter().map(|c| a.mul_vec(c, p)).collect()
+        } else {
+            v.iter().map(|c| a.mul_vec(c, p)).collect()
+        }
+    };
+    let mut v: Vec<Vec<u64>> = products(&y);
     stats.spmv += n as u64;
     let mut seq = vec![vec![vec![0u64; big_l]; n]; m]; // seq[r][c][i]
     for i in 0..big_l {
-        for (r, xr) in x.iter().enumerate() {
-            for (c, vc) in v.iter().enumerate() {
-                seq[r][c][i] = xr
-                    .iter()
-                    .zip(vc)
-                    .fold(0u64, |acc, (&s, &t)| add(acc, mul(s, t, p), p));
-            }
+        let entries: Vec<u64> = if parallel {
+            (0..m * n)
+                .into_par_iter()
+                .map(|k| dot(&x[k / n], &v[k % n], p))
+                .collect()
+        } else {
+            (0..m * n).map(|k| dot(&x[k / n], &v[k % n], p)).collect()
+        };
+        for (k, e) in entries.into_iter().enumerate() {
+            seq[k / n][k % n][i] = e;
         }
         stats.projection_mults += (m * n * big_n) as u64;
         if i + 1 < big_l {
-            v = v.iter().map(|c| a.mul_vec(c, p)).collect();
+            v = products(&v);
             stats.spmv += n as u64;
         }
     }
@@ -278,34 +351,32 @@ pub fn kernel_vector(
             };
             used[piv] = true;
             let pinv = inv(res[piv][r][k], p).ok_or(BwError::InvalidModulus)?;
-            for j in 0..s {
-                if used[j] || res[j][r][k] == 0 {
-                    continue;
+            // Columns to clear in row r; the pivot has minimal δ among them.
+            let targets: Vec<bool> = (0..s).map(|j| !used[j] && res[j][r][k] != 0).collect();
+            let count = targets.iter().filter(|&&t| t).count();
+            if count == 0 {
+                continue;
+            }
+            debug_assert!((0..s).all(|j| !targets[j] || delta[piv] <= delta[j]));
+            stats.generator_mults += (count * (m * (big_l - k) + s * (delta[piv] + 1))) as u64;
+            // column j -= c · column piv (residual from k on; basis polynomials).
+            let piv_res = res[piv].clone();
+            let piv_poly = poly[piv].clone();
+            let step = |(j, (res_j, poly_j)): (usize, (&mut Vec<Vec<u64>>, &mut Vec<Vec<u64>>))| {
+                if targets[j] {
+                    eliminate_column(res_j, poly_j, &piv_res, &piv_poly, r, k, pinv, p);
                 }
-                debug_assert!(delta[piv] <= delta[j]);
-                let c = mul(res[j][r][k], pinv, p);
-                // column j -= c · column piv (residual from k on; basis polynomials).
-                for rr in 0..m {
-                    for i in k..big_l {
-                        let t = res[piv][rr][i];
-                        if t != 0 {
-                            res[j][rr][i] = sub(res[j][rr][i], mul(c, t, p), p);
-                        }
-                    }
-                }
-                for row in 0..s {
-                    let src = poly[piv][row].clone();
-                    let dst = &mut poly[j][row];
-                    if dst.len() < src.len() {
-                        dst.resize(src.len(), 0);
-                    }
-                    for (d, &t) in dst.iter_mut().zip(&src) {
-                        if t != 0 {
-                            *d = sub(*d, mul(c, t, p), p);
-                        }
-                    }
-                }
-                stats.generator_mults += (m * (big_l - k) + s * (delta[piv] + 1)) as u64;
+            };
+            if parallel {
+                res.par_iter_mut()
+                    .zip(poly.par_iter_mut())
+                    .enumerate()
+                    .for_each(step);
+            } else {
+                res.iter_mut()
+                    .zip(poly.iter_mut())
+                    .enumerate()
+                    .for_each(step);
             }
         }
         // Multiply pivots by x.

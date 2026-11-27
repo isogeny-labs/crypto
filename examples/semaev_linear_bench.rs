@@ -26,9 +26,6 @@ use crypto_lib::cryptanalysis::semaev_decomp::{eval_s4_general, Gf2, SubspaceOra
 use crypto_lib::cryptanalysis::semaev_linear::{LinearDecomposer, Pt};
 use std::time::Instant;
 
-fn poly_deg(a: u64) -> i32 {
-    63 - a.leading_zeros() as i32
-}
 fn poly_mulmod(mut a: u64, mut b: u64, f: u64, n: u32) -> u64 {
     let mut r = 0u64;
     while b != 0 {
@@ -43,15 +40,9 @@ fn poly_mulmod(mut a: u64, mut b: u64, f: u64, n: u32) -> u64 {
     }
     r
 }
-fn poly_gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let db = poly_deg(b);
-        while a != 0 && poly_deg(a) >= db {
-            a ^= b << (poly_deg(a) - db);
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a
+fn poly_gcd(a: u64, b: u64) -> u64 {
+    // GF(2)[x] gcd of single-word polynomials (shared implementation).
+    crypto_lib::gcd::gf2::gcd_word(a, b)
 }
 fn prime_factors(mut n: u32) -> Vec<u32> {
     let mut out = Vec::new();

@@ -131,15 +131,9 @@ fn mulmod(a: u64, b: u64, r: u64) -> u64 {
 }
 
 fn invmod(a: u64, r: u64) -> u64 {
-    let (mut e, mut base, mut acc) = (r - 2, a % r, 1u64);
-    while e != 0 {
-        if e & 1 == 1 {
-            acc = mulmod(acc, base, r);
-        }
-        base = mulmod(base, base, r);
-        e >>= 1;
-    }
-    acc
+    // `r` is prime: the old Fermat power `a^(r-2)` is the inverse of a unit,
+    // and for `a ≡ 0` it was `0^(r-2)` (0, or 1 when r = 2), kept here.
+    crypto_lib::gcd::int::inv_mod_u64(a, r).unwrap_or(u64::from(r == 2))
 }
 
 /// Solve `Σ u_k cols[k] = rhs` over F2 (vectors and combinations as u64

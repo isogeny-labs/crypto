@@ -1,0 +1,86 @@
+
+== A. m=3 join at |F| ~ p^(1/3): p = 12289, #E = 12421, p^(1/3)=23.16 ==
+tower       t  |V|  |F| B/Bid  |F+F|   |F+F+F|  rel/tgt  ops/rel   tot(j2)   tot(j1)     E3  meas×
+interval    0   28   22  0.95    243      1702    0.163    135.0      3223     34158   0.97  1.09
+kummer      4   16   12  0.52     73       286    0.029    409.5      4992     31940   1.03  1.12
+isogeny     4   16   20  0.86    201      1336    0.124    161.3      3436     33875   0.94  1.00
+kummer      5   32   30  1.30    451      4043    0.399     75.1      2719     34934   0.99  1.00
+isogeny     5   32   30  1.30    445      3864    0.399     75.1      2719     34934   1.04  0.91
+
+== A. m=3 join at |F| ~ p^(1/3): p = 16381, #E = 16529, p^(1/3)=25.47 ==
+tower       t  |V|  |F| B/Bid  |F+F|   |F+F+F|  rel/tgt  ops/rel   tot(j2)   tot(j1)     E3  meas×
+interval    0   22   24  0.94    289      2144    0.157    152.6      3962     45773   1.01  1.01
+isogeny     4   16   12  0.47     73       294    0.022    544.9      6617     42503   1.02  1.15
+
+== B. relations needed for a full-rank relation matrix ==
+   rows: one random relation.  columns: the |F| base points.
+   m      |F| mean R_full  R_full/n coupon (n/m)(ln n+g) P(FULL RANK)
+   2       16        27.2      1.70               26.8 40/40
+   3       16        20.2      1.26               17.9 40/40
+   2       24        41.8      1.74               45.1 40/40
+   3       24        34.9      1.45               30.0 40/40
+   2       32        65.8      2.05               64.7 40/40
+   3       32        46.6      1.46               43.1 40/40
+   2       48        96.8      2.02              106.8 40/40
+   3       48        77.0      1.60               71.2 40/40
+   m=2 defect, 200 trials at n=24 with 24 relations:
+      rank = n - #bip comps (isolated vertices count as trivial components): 200/200
+      111/200 graphs have a non-trivial bipartite component (>=2 columns); on it the +-1 sign vector is in the left kernel in 111 of them; 1^T is in none (200/200 rows sum to 2)
+      -> m=2 kernel = a bipartition sign vector on a bipartite component, never 1^T
+
+== C. the two m=3 cost terms at B = p^(1/3) ==
+   p=12289 #E=12421 |V|=28 |F|=22 (B/p^(1/3)=0.95)  rel/target=0.163  targets=135
+   3-sum coverage |F+F+F|/N = 1702/12421 = 0.137
+   join A (pair table 253 + scan 2970)          =    3223 ops =  6.01 p^(2/3) =  23.1 x rho
+   join B (algebraic, Route-1 target 2^T=22.0)  =    2970 ops =  5.54 p^(2/3) =  21.3 x rho
+   join B (algebraic, measured F4 1.34e+10 MA/call)  = 1.81e+12 ops = 1.3e+10 x rho
+   join C (random triple + target list, |F|=22)     =    2159 ops =  4.03 p^(2/3) =  15.5 x rho
+   best m=3 join at this p (join C at |F|=11)     =     764 ops =  1.42 p^(2/3) =   5.5 x rho
+   single-point exponent ln(ops)/ln(p): table 0.857, Route1 0.848, F4 2.994
+   (asymptotic laws: table c*p^(2/3) with c=6.01; Route1 c*p^(2/3) with c=5.54; F4 p^{2.6})
+
+== D. m=3: three joins vs base size, and the best exponent ==
+   p       |F| |F|/Bid   j1 enum  j2 table j3 rndtriple
+   1009      8   0.80      2422       574       187
+   1009     16   1.60      2691       453       836
+   1009     24   2.39      2794       524      2609
+   1009     32   3.19      2849       701      5989
+   1009     48   4.79      2906      1295     19602
+   1009     64   6.38      2935      2170     45761
+   minima over |F|=4..64: j1 2018@4  j2 453@16  j3 164@6
+   4099      8   0.50      9818      2218       393
+   4099     16   1.00     10909      1419       896
+   4099     24   1.50     11329      1206      2638
+   4099     32   2.00     11551      1228      6006
+   4099     48   3.00     11782      1657     19610
+   4099     64   4.00     11901      2446     45766
+   minima over |F|=4..64: j1 8182@4  j2 1195@26  j3 393@8
+   12289     8   0.35     29810      6661       948
+   12289    16   0.69     33123      4033      1060
+   12289    24   1.04     34397      3052      2715
+   12289    32   1.38     35071      2654      6050
+   12289    48   2.07     35772      2636     19630
+   12289    64   2.76     36134      3192     45777
+   minima over |F|=4..64: j1 24842@4  j2 2551@40  j3 773@12
+   fitted exponent of each minimum, p=1009..12289: j1 1.004, j2 0.692, j3 0.620
+   the same closed forms at larger N (model projection):
+   N           |F|*       j2/p       j3/p   j3 N-exp
+   1e+03          6       0.45      0.163
+   1e+04         11       0.22     0.0671
+   1e+05         18      0.105     0.0272
+   1e+06         29     0.0491     0.0109
+   1e+08         74     0.0106    0.00176
+   1e+10        188     0.0023    0.00028
+   1e+12        473    0.00151   4.44e-05
+   projected exponent of the m=3 best (j3) join over N=1e3..1e12: 0.603 (law 3/5 = 0.600)
+
+== E. m=2 vs m=3 at the same base (p=12289) ==
+    |V|  |F|   m=2 table   m=3 table    m3/m2
+     16   12        2148        4992     2.32
+     19   16        1689        4033     2.39
+     27   20        1452        3436     2.37
+     29   24        1335        3052     2.29
+     39   32        1304        2654     2.03
+
+total wall 5.5 s
+wrote route2_m3_results.json and route2_m3_relations.jsonl (454 records)

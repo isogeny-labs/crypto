@@ -188,15 +188,7 @@ fn boxed(n: usize, side: i32) -> Vec<Exp> {
 // ------------------------------------------- exact gain over Z/p^t ------
 
 fn inv_mod(a: u128, m: u128) -> u128 {
-    let (mut r0, mut r1) = (m as i128, a as i128);
-    let (mut s0, mut s1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (s0, s1) = (s1, s0 - q * s1);
-    }
-    assert_eq!(r0, 1, "unit expected");
-    s0.rem_euclid(m as i128) as u128
+    crypto_lib::gcd::int::inv_mod_u128(a, m).expect("unit expected")
 }
 
 fn val(mut x: u128, p: u128, t: u32) -> u32 {

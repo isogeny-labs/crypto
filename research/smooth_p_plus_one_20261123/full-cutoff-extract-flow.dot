@@ -1,0 +1,13 @@
+digraph fullcutoff {
+  graph [rankdir=TB, bgcolor="white", pad="0.1", nodesep="0.3", ranksep="0.3"];
+  node [shape=box, style="rounded,filled", fillcolor="#e6f2ee", fontname="Helvetica", fontsize=10];
+  edge [color="#4d665f", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+  catalog [label="Complete multiset catalog\n36 / 18 / 119 charts"];
+  chart [label="RR5 chart + fixed forms\none shared 3-second deadline"];
+  exact [label="All charts complete\ncompare whole union with Direct"];
+  failure [label="Any refusal or deadline\nundetermined; preserve prefix", fillcolor="#f8e9dd"];
+  {rank=same; catalog; chart; exact;}
+  catalog -> chart;
+  chart -> exact [label="all required outputs"];
+  chart -> failure [label="any missing output"];
+}

@@ -87,11 +87,8 @@ pub struct Law<P> {
     kernel: Vec<P>,
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 // Explicit small-order scope; no probable-prime flag or imported certificate is trusted.

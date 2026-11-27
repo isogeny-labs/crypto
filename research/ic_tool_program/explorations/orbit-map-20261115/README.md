@@ -3,8 +3,8 @@
 - **Status:** an exploration on this session's container, 2026-11-15, three
   isolated rounds an arm. This is a record, not rounds, and supports no
   claim. The change is reverted from code.
-- **Why:** `select_projection` costs 4–7 ms at k0n53 and 6–10 ms at
-  k0n61. Its single-word map hashes every point twice, into a seen set
+- **Why:** `select_projection` costs 4–7 ms at icv1-f2m53-tm56619371-dac20a85 and 6–10 ms at
+  icv1-f2m61-t158598901-ab42b6c5. Its single-word map hashes every point twice, into a seen set
   and a location map, and then looks each point up.
 - **The change tried:** walk each factor-base orbit's projection once,
   take its least signed member as the canonical point, and place the
@@ -20,12 +20,12 @@
 
   | row | hashed | by orbit |
   |:--|:--|:--|
-  | k0n53 | 5.0–6.7 / 4.3–4.9 / 3.8–3.9 | 4.5–7.0 / 3.8–4.0 / 3.4–3.7 |
-  | k0n61 | 8.2–10.6 / 7.0–7.4 / 6.6–7.2 | 7.2–9.2 / 6.2–6.7 / 6.0–7.3 |
+  | icv1-f2m53-tm56619371-dac20a85 | 5.0–6.7 / 4.3–4.9 / 3.8–3.9 | 4.5–7.0 / 3.8–4.0 / 3.4–3.7 |
+  | icv1-f2m61-t158598901-ab42b6c5 | 8.2–10.6 / 7.0–7.4 / 6.6–7.2 | 7.2–9.2 / 6.2–6.7 / 6.0–7.3 |
 
   - Certificates and counts were identical in all 12 processes.
 - **Reading:**
-  - About 0.4 ms at k0n53, about 0.1% of set-up, so the hash passes were
+  - About 0.4 ms at icv1-f2m53-tm56619371-dac20a85, about 0.1% of set-up, so the hash passes were
     not where the phase's time goes.
   - The first repetition is always the slowest, which points to one-time
     warm-up in the phase.

@@ -1,0 +1,22 @@
+    Checking torus-received-ideal v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-received-ideal)
+error: useless use of `vec!`
+   --> src/lib.rs:122:22
+    |
+122 |     let b = scale(f, &vec![f.sub(&z(), &one()), z(), one()], &f.square(a));
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: you can use a slice directly: `&[f.sub(&z(), &one()), z(), one()]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#useless_vec
+    = note: `-D clippy::useless-vec` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::useless_vec)]`
+
+error: useless use of `vec!`
+   --> src/lib.rs:149:35
+    |
+149 |                 &mul(f, &power(f, &vec![e, f.sub(&z(), &one())], 3), &c),
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: you can use a slice directly: `&[e, f.sub(&z(), &one())]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#useless_vec
+
+error: could not compile `torus-received-ideal` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-received-ideal` (lib test) due to 2 previous errors

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:24:27Z",
+ "id": "PCC-20261124-82e3a6",
+ "kind": "statement",
+ "producer": {
+  "commit": "50253a4c3c1f4a13a3c4fa0465504851f9393af0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/accounting.json",
+    "sha256": "23320951d1cf9042e0487be3823436badc5d93744625e9d676f17570a6092213"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/build-cost.json",
+    "sha256": "5f5df28f3cfcdb5f26f70847c84729a7809b45ab4cdaf957f4dc6fad68d6a7fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/collision-cost.json",
+    "sha256": "a17c9824883d0cdab42e6d5ae5f25ae980b6282b9a24f4782a191dc3459cdbdc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v2/unknown-cost.json",
+    "sha256": "75bef97300cda7747805b70a39114f9292321f530b36e49608df3a1f0be0e79c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "metadata copy of local P192 two-row audit diagnostics and failed attempts",
+ "statement": "Accounting receipt copies the retained build, worker and rejecting-control process costs and exits, preserves the initial preparation failure without a process clock, and identifies excluded setup/publication/admitted-run costs. These are local development diagnostics only; no complete-cost, timing comparison or independently signed claim is made."
+}

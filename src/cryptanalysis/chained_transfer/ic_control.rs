@@ -358,14 +358,8 @@ pub(crate) struct CubicOracle {
 }
 
 fn inv_mod_u64(a: u64, m: u64) -> Option<u64> {
-    let (mut r0, mut r1) = (m as i128, (a % m) as i128);
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 - q * t1);
-    }
-    (r0 == 1).then(|| t0.rem_euclid(m as i128) as u64)
+    assert!(m != 0, "inv_mod_u64: zero modulus");
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 impl CubicOracle {

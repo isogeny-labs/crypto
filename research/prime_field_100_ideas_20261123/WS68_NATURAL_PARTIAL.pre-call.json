@@ -1,0 +1,17 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T21:31:25Z",
+  "admission":"user-authorized bounded local E(F_p) run; prior S3 HTTP 403 and missing .resume gates remain unqualified; no cloud spend",
+  "conductor_endpoint":"https://127.0.0.1:8443",
+  "conductor_task":"T-58",
+  "worktree_commit":"50eac39e88a1834f477b58d84933159a604e8f8f",
+  "source":{"path":"WS68_NATURAL_PARTIAL.rs","sha256":"affeeec36573dc381392296dbb27616a18b3eb496ec6c925a6ffabd2027bd4f6"},
+  "immutable_qualifier":{"path":"WS68_NATURAL_PARTIAL.qualifier.rs","sha256":"affeeec36573dc381392296dbb27616a18b3eb496ec6c925a6ffabd2027bd4f6"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_NATURAL_PARTIAL","WS68_NATURAL_PARTIAL.qualifier.rs","-o","WS68_NATURAL_PARTIAL.bin"],
+  "input":{"curve":"E/F_1009: y^2=x^3+x+14","generator":[0,425],"order":1013,"target_scalar_for_post_check_only":701,"collector_receives_target_point_only":true,"seed":128737889095973,"cap":512,"candidate_rule":"seeded xorshift a in 0..1012 and b in 1..1012, R=aG+bQ","small_base":"first 8 x-ordered canonical E(F_1009) points","large_domain":"next 16 x-ordered canonical points"},
+  "arms":{"full_only":"first F+F representation for each candidate","partial_filter":"priority F+F, then F+L, then L+L representation for each candidate, eliminate all large columns with source coefficient witnesses"},
+  "controls":"Same exact 512 candidate points in both arms; source identities checked; every completed row replayed from its original source IDs and in the EC group; anchor log_G(G)=1; exact modular base/augmented rank and target pin; independent-row greedy retention.",
+  "expected":"Preserve all accepted source records and completed-row summaries, failures/censoring, setup/candidate/verification group additions, lookups, modular filter/replay/rank operations and phase wall time. No positive outcome or performance win required.",
+  "limits":"The base and large domain are tiny public curve components. This tests natural point decomposition under bounded enumeration, not a general prime-field index-calculus asymptotic. Group-add field arithmetic and memory allocation are not priced into one scalar cost; no speedup conclusion."
+}

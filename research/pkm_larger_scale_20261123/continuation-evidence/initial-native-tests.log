@@ -1,0 +1,72 @@
+    Updating crates.io index
+     Locking 28 packages to highest compatible versions
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding sha2 v0.10.9 (available: v0.11.1)
+ Downloading crates ...
+  Downloaded version_check v0.9.5
+  Downloaded generic-array v0.14.7
+  Downloaded crypto-common v0.1.7
+  Downloaded block-buffer v0.10.4
+  Downloaded cpufeatures v0.2.17
+  Downloaded itoa v1.0.19
+  Downloaded cfg-if v1.0.5
+  Downloaded num-integer v0.1.47
+  Downloaded zmij v1.0.23
+  Downloaded autocfg v1.5.1
+  Downloaded quote v1.0.47
+  Downloaded digest v0.10.7
+  Downloaded sha2 v0.10.9
+  Downloaded unicode-ident v1.0.27
+  Downloaded anyhow v1.0.105
+  Downloaded proc-macro2 v1.0.107
+  Downloaded serde_derive v1.0.229
+  Downloaded serde_core v1.0.229
+  Downloaded num-traits v0.2.19
+  Downloaded memchr v2.8.3
+  Downloaded base64 v0.22.1
+  Downloaded num-bigint v0.4.8
+  Downloaded serde v1.0.229
+  Downloaded typenum v1.20.1
+  Downloaded serde_json v1.0.154
+  Downloaded syn v3.0.10
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling generic-array v0.14.7
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.10
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling anyhow v1.0.105
+   Compiling serde_json v1.0.154
+   Compiling digest v0.10.7
+   Compiling num-integer v0.1.47
+   Compiling cpufeatures v0.2.17
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.19
+   Compiling sha2 v0.10.9
+   Compiling base64 v0.22.1
+   Compiling serde_derive v1.0.229
+   Compiling num-bigint v0.4.8
+   Compiling factor-base v0.1.0 (/workspace/crypto-scale/tools/factor-base)
+   Compiling pkm-prime-workload v0.1.0 (/workspace/crypto-scale/research/pkm_larger_scale_20261123/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.05s
+     Running unittests src/main.rs (research/pkm_larger_scale_20261123/native/target/debug/deps/pkm_prime_workload-f108fd3d96886038)
+
+running 6 tests
+test workload::tests::frozen_targets_ignore_solver_seed_and_preserve_legacy_formula ... ok
+test workload::tests::reject_invalid_curve_and_unknown_json_fields ... ok
+test workload::tests::seed_changes_targets_without_changing_curve ... ok
+test workload::tests::create_new_and_byte_digest_are_enforced ... ok
+test workload::tests::deterministic_unique_complete_population ... ok
+test workload::tests::reject_changed_point_duplicate_and_out_of_range_scalar ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -73,7 +73,7 @@ fn is_prime(n: u64) -> bool {
         return false;
     }
     for q in [2u64, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             return n == q;
         }
     }
@@ -268,7 +268,7 @@ fn main() {
         (3, 31, 64, 4),
     ];
     println!(
-        "{:>2} {:>4} {:>6} {:>4} | {:>14} {:>14} {:>7} | {:>14} {:>9} | {:>9} {:>9} {:>7} | {}",
+        "{:>2} {:>4} {:>6} {:>4} | {:>14} {:>14} {:>7} | {:>14} {:>9} | {:>9} {:>9} {:>7} | auto/scan wall",
         "m",
         "bits",
         "|D|",
@@ -281,7 +281,6 @@ fn main() {
         "wall scan",
         "wall frob",
         "ratio",
-        "auto/scan wall"
     );
     for &(m, bits, size, targets) in configs {
         let p = prime_below(bits);

@@ -1,0 +1,14 @@
+{
+  "record_type": "immutable_pre_call_attempt_2",
+  "created_utc": "2026-11-25T04:37:06Z",
+  "worktree_commit": "c0f6885005f713e0fe56087584f8fbd8bdbcca5b",
+  "prior_failure": "WS68_FILTER_REPLAY.post-call.json",
+  "gate": {"required_s3_checkpoint": "HTTP 403", "admission": "user authorized local bypass after disclosure; parent relayed override"},
+  "source": {"path": "WS68_FILTER_REPLAY.rs", "sha256": "db5eced2d18572173ff67f93630e4cf0ef164928f89685a36e157a65e77c1671"},
+  "separate_immutable_qualifier": {"path": "WS68_FILTER_REPLAY.qualifier.rs", "sha256": "db5eced2d18572173ff67f93630e4cf0ef164928f89685a36e157a65e77c1671"},
+  "compiler": {"path": "/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc", "version": "rustc 1.99.1 (58cf8f9c3 2026-10-13)", "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv": ["rustc", "-O", "--edition", "2021", "--crate-name", "WS68_FILTER_REPLAY_qualifier", "WS68_FILTER_REPLAY.qualifier.rs", "-o", "WS68_FILTER_REPLAY.attempt2.bin"],
+  "run_argv": ["./WS68_FILTER_REPLAY.attempt2.bin"],
+  "input": {"curve": "y^2=x^3+2x+2 over F_17", "generator": [5,1], "subgroup_order": 19, "source_rows": 3, "expected_target_log": 12},
+  "claim_boundary": "local exactness and rank control; no performance claim"
+}

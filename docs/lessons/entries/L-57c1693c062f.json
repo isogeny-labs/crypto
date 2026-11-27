@@ -1,0 +1,15 @@
+{
+  "action": "Execute the unchanged verifier under the pinned project lake env and retain both configured and bare outcomes; at creation consider an explicit project binding, never rewrite frozen proofs to hide imports.",
+  "created": "2026-11-24T00:30:28Z",
+  "evidence": [
+    "research/curve25519_torus_native_20261115/received-ideal-v1/LOCAL_LEAN_VERIFY.json",
+    "research/curve25519_torus_native_20261115/received-ideal-v1/development/lean-verify-without-lake-env.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "lean-instance-gate"
+  ],
+  "trigger": "A PCC Lean proof binds a source file importing Mathlib and bare verifier execution lacks that pinned Lake search path",
+  "why": "Bare imports failed while the same four hash-bound declarations passed under the pinned dependency environment."
+}

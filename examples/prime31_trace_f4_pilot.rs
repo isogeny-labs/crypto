@@ -40,7 +40,7 @@ fn var(n: usize, i: usize) -> Mpoly {
 }
 
 fn scale(f: Fp, a: &Mpoly, k: u64) -> Mpoly {
-    if k % f.p == 0 {
+    if k.is_multiple_of(f.p) {
         return Mpoly::new();
     }
     a.iter()
@@ -118,7 +118,11 @@ fn moment_system(f: Fp, h: &[u64], m: usize) -> (Vec<Mpoly>, Vec<Mpoly>) {
             next = add(f, &next, &shift);
         }
         if k <= m {
-            let coef = if k % 2 == 0 { f.neg(k as u64) } else { k as u64 };
+            let coef = if k % 2 == 0 {
+                f.neg(k as u64)
+            } else {
+                k as u64
+            };
             next = add(f, &next, &scale(f, &var(m, k - 1), coef));
         }
         ps.push(next);
@@ -142,8 +146,11 @@ fn moment_system(f: Fp, h: &[u64], m: usize) -> (Vec<Mpoly>, Vec<Mpoly>) {
     }
     for (j, p) in reduced.iter().enumerate() {
         let degree = max_degree(p);
-        assert!(degree <= (h.len() - 1) as u32,
-                "G_{j} degree {degree} exceeds B={}", h.len() - 1);
+        assert!(
+            degree <= (h.len() - 1) as u32,
+            "G_{j} degree {degree} exceeds B={}",
+            h.len() - 1
+        );
     }
     (raw, reduced)
 }
@@ -156,37 +163,45 @@ fn moment_system(f: Fp, h: &[u64], m: usize) -> (Vec<Mpoly>, Vec<Mpoly>) {
 /// This trades dense G(e) expansion for B extra unknowns; not necessarily
 /// faster for F4, and the setup/LA bill must count the extra dimensions.
 fn moment_circuit(f: Fp, h: &[u64], m: usize) -> Vec<Mpoly> {
-    assert!(m>0 && (m as u64)<f.p && h.len()>=2);
-    let b=h.len()-1;
-    let max_p=b+m-1;
-    let n=m+max_p;
-    let p_k=|k:usize| -> Mpoly {
-        if k==0 { constant(n,m as u64) } else { var(n,m+k-1) }
+    assert!(m > 0 && (m as u64) < f.p && h.len() >= 2);
+    let b = h.len() - 1;
+    let max_p = b + m - 1;
+    let n = m + max_p;
+    let p_k = |k: usize| -> Mpoly {
+        if k == 0 {
+            constant(n, m as u64)
+        } else {
+            var(n, m + k - 1)
+        }
     };
-    let mut equations=Vec::new();
+    let mut equations = Vec::new();
     for k in 1..=max_p {
-        let mut eq=p_k(k);
+        let mut eq = p_k(k);
         for i in 1..=m.min(k.saturating_sub(1)) {
-            let product=mul(f,&var(n,i-1),&p_k(k-i));
-            if i%2==1 {
-                eq=sub(f,&eq,&product);
+            let product = mul(f, &var(n, i - 1), &p_k(k - i));
+            if i % 2 == 1 {
+                eq = sub(f, &eq, &product);
             } else {
-                eq=add(f,&eq,&product);
+                eq = add(f, &eq, &product);
             }
         }
-        if k<=m {
-            let coef=if k%2==1 {k as u64} else {f.neg(k as u64)};
-            eq=sub(f,&eq,&scale(f,&var(n,k-1),coef));
+        if k <= m {
+            let coef = if k % 2 == 1 {
+                k as u64
+            } else {
+                f.neg(k as u64)
+            };
+            eq = sub(f, &eq, &scale(f, &var(n, k - 1), coef));
         }
-        assert!(max_degree(&eq)<=2);
+        assert!(max_degree(&eq) <= 2);
         equations.push(eq);
     }
     for j in 0..m {
-        let mut eq=Mpoly::new();
-        for (k,&coef) in h.iter().enumerate() {
-            eq=add(f,&eq,&scale(f,&p_k(j+k),coef));
+        let mut eq = Mpoly::new();
+        for (k, &coef) in h.iter().enumerate() {
+            eq = add(f, &eq, &scale(f, &p_k(j + k), coef));
         }
-        assert!(max_degree(&eq)<=1);
+        assert!(max_degree(&eq) <= 1);
         equations.push(eq);
     }
     equations
@@ -218,10 +233,22 @@ fn evaluate(f: Fp, p: &Mpoly, values: &[u64]) -> u64 {
 fn s3_symmetric_expr(f: Fp, e1: &Mpoly, e2: &Mpoly, z: &Mpoly) -> Mpoly {
     let n = e1.keys().next().expect("nonzero e1 variable").len();
     let d = sub(f, &mul(f, e1, e1), &scale(f, e2, 4));
-    let mid = add(f, &mul(f, e1, &add(f, e2, &constant(n, A))), &constant(n, f.mul(2, B)));
+    let mid = add(
+        f,
+        &mul(f, e1, &add(f, e2, &constant(n, A))),
+        &constant(n, f.mul(2, B)),
+    );
     let c = sub(f, e2, &constant(n, A));
     let c0 = sub(f, &mul(f, &c, &c), &scale(f, e1, f.mul(4, B)));
-    add(f, &sub(f, &mul(f, &d, &mul(f, z, z)), &scale(f, &mul(f, &mid, z), 2)), &c0)
+    add(
+        f,
+        &sub(
+            f,
+            &mul(f, &d, &mul(f, z, z)),
+            &scale(f, &mul(f, &mid, z), 2),
+        ),
+        &c0,
+    )
 }
 
 /// For fixed z, S3 is quadratic in pair invariants e1,e2, whereas
@@ -304,28 +331,58 @@ fn run_m2(f: Fp, base: &[u64], budget: Duration, include_circuit: bool) {
     assert_eq!(max_degree(&ordered[0]), 4);
     let arm_h = vec![sym_s3.clone(), raw[0].clone(), raw[1].clone()];
     let arm_g = vec![sym_s3, reduced[0].clone(), reduced[1].clone()];
-    println!("m2 planted relation x(G)={GX}, x(2G)={X2G}, x(3G)={X3G}, B={}",base.len());
-    run_arm(f, "ordered-plus-S3", &ordered, budget, (base.len()*2+6) as u32);
-    run_arm(f, "sym-raw-H-plus-S3", &arm_h, budget, (base.len()*2+6) as u32);
-    run_arm(f, "sym-degreeB-G-plus-S3", &arm_g, budget, (base.len()*2+6) as u32);
+    println!(
+        "m2 planted relation x(G)={GX}, x(2G)={X2G}, x(3G)={X3G}, B={}",
+        base.len()
+    );
+    run_arm(
+        f,
+        "ordered-plus-S3",
+        &ordered,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
+    run_arm(
+        f,
+        "sym-raw-H-plus-S3",
+        &arm_h,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
+    run_arm(
+        f,
+        "sym-degreeB-G-plus-S3",
+        &arm_g,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
     if include_circuit {
-        let mut circuit=moment_circuit(f,&h,2);
-        let n=2+(base.len()+2-1);
-        let eq_s3=s3_symmetric(f,&var(n,0),&var(n,1),X3G);
+        let mut circuit = moment_circuit(f, &h, 2);
+        let n = 2 + (base.len() + 2 - 1);
+        let eq_s3 = s3_symmetric(f, &var(n, 0), &var(n, 1), X3G);
         circuit.push(eq_s3);
-        let xcoords=[GX,X2G];
-        let mut pows=Vec::new();
-        for k in 1..=base.len()+1 {
-            pows.push(f.add(f.pow(xcoords[0],k as u64),f.pow(xcoords[1],k as u64)));
+        let xcoords = [GX, X2G];
+        let mut pows = Vec::new();
+        for k in 1..=base.len() + 1 {
+            pows.push(f.add(f.pow(xcoords[0], k as u64), f.pow(xcoords[1], k as u64)));
         }
-        let mut vals=vec![s,t];
+        let mut vals = vec![s, t];
         vals.extend(pows);
-        assert_eq!(vals.len(),n);
+        assert_eq!(vals.len(), n);
         for eq in &circuit {
-            assert_eq!(evaluate(f,eq,&vals),0,"quadratic power-circuit planted witness");
+            assert_eq!(
+                evaluate(f, eq, &vals),
+                0,
+                "quadratic power-circuit planted witness"
+            );
         }
-        run_arm(f, "sym-quadratic-Newton-circuit-plus-S3", &circuit,budget,
-                (base.len()*2+6) as u32);
+        run_arm(
+            f,
+            "sym-quadratic-Newton-circuit-plus-S3",
+            &circuit,
+            budget,
+            (base.len() * 2 + 6) as u32,
+        );
     }
 }
 
@@ -338,29 +395,54 @@ fn run_m4_membership(f: Fp, base: &[u64], budget: Duration) {
     let e1 = f.add(f.add(xs[0], xs[1]), f.add(xs[2], xs[3]));
     let mut es = vec![0; 4];
     for (i, &x) in xs.iter().enumerate() {
-        for j in (1..=i).rev() {es[j]=f.add(es[j],f.mul(x,es[j-1]));}
-        es[0]=f.add(es[0],x);
+        for j in (1..=i).rev() {
+            es[j] = f.add(es[j], f.mul(x, es[j - 1]));
+        }
+        es[0] = f.add(es[0], x);
     }
-    assert_eq!(es[0],e1);
-    for p in raw.iter().chain(reduced.iter()) {assert_eq!(evaluate(f,p,&es),0);}
+    assert_eq!(es[0], e1);
+    for p in raw.iter().chain(reduced.iter()) {
+        assert_eq!(evaluate(f, p, &es), 0);
+    }
     let ordered: Vec<Mpoly> = (0..4).map(|i| membership(f, base, 4, i)).collect();
-    println!("m4 membership-only, NOT an S5 relation solve; B={}",base.len());
-    run_arm(f, "m4-ordered-membership", &ordered, budget, (base.len()*2+6) as u32);
-    run_arm(f, "m4-sym-raw-H-membership", &raw, budget, (base.len()*2+6) as u32);
-    run_arm(f, "m4-sym-degreeB-G-membership", &reduced, budget, (base.len()*2+6) as u32);
+    println!(
+        "m4 membership-only, NOT an S5 relation solve; B={}",
+        base.len()
+    );
+    run_arm(
+        f,
+        "m4-ordered-membership",
+        &ordered,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
+    run_arm(
+        f,
+        "m4-sym-raw-H-membership",
+        &raw,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
+    run_arm(
+        f,
+        "m4-sym-degreeB-G-membership",
+        &reduced,
+        budget,
+        (base.len() * 2 + 6) as u32,
+    );
 }
 
 /// Reindex a two-variable symmetric membership equation into one
 /// of two independent pair-invariant slots in the six-variable S3 chain.
 fn pair_embed(p: &Mpoly, n: usize, start: usize) -> Mpoly {
-    assert!(start+2<=n);
+    assert!(start + 2 <= n);
     let mut out = Mpoly::new();
     for (ex, &c) in p {
-        assert_eq!(ex.len(),2);
-        let mut dest=vec![0;n];
-        dest[start]=ex[0];
-        dest[start+1]=ex[1];
-        out.insert(dest,c);
+        assert_eq!(ex.len(), 2);
+        let mut dest = vec![0; n];
+        dest[start] = ex[0];
+        dest[start + 1] = ex[1];
+        out.insert(dest, c);
     }
     out
 }
@@ -371,58 +453,66 @@ fn pair_embed(p: &Mpoly, n: usize, start: usize) -> Mpoly {
 /// symmetric raw/reduced equations, same actual source curve and target.
 /// Kept optional because every native F4 arm has an independent time budget.
 fn run_m4_s3_relation(f: Fp, budget: Duration) {
-    const X4G:u64 = 1_731_809_510;
-    const X7G:u64 = 864_723_287;
-    const X10G:u64 = 1_344_580_913;
-    let base=[GX,X2G,X3G,X4G];
-    let h=poly_from_roots(f,&base);
-    let (raw,reduced)=moment_system(f,&h,2);
-    let x:Vec<Mpoly>=(0..6).map(|i|var(6,i)).collect();
+    const X4G: u64 = 1_731_809_510;
+    const X7G: u64 = 864_723_287;
+    const X10G: u64 = 1_344_580_913;
+    let base = [GX, X2G, X3G, X4G];
+    let h = poly_from_roots(f, &base);
+    let (raw, reduced) = moment_system(f, &h, 2);
+    let x: Vec<Mpoly> = (0..6).map(|i| var(6, i)).collect();
     let ordered = {
-        let mut r=vec![
-            s3_ordered_expr(f,&x[0],&x[1],&x[4]),
-            s3_ordered_expr(f,&x[2],&x[3],&x[5]),
-            s3_ordered(f,&x[4],&x[5],X10G),
+        let mut r = vec![
+            s3_ordered_expr(f, &x[0], &x[1], &x[4]),
+            s3_ordered_expr(f, &x[2], &x[3], &x[5]),
+            s3_ordered(f, &x[4], &x[5], X10G),
         ];
-        for i in 0..4 { r.push(membership(f,&base,6,i)); }
+        for i in 0..4 {
+            r.push(membership(f, &base, 6, i));
+        }
         r
     };
-    let s12=f.add(GX,X2G);
-    let t12=f.mul(GX,X2G);
-    let s34=f.add(X3G,X4G);
-    let t34=f.mul(X3G,X4G);
-    let symvals=[s12,t12,s34,t34,X3G,X7G];
-    let ordvals=[GX,X2G,X3G,X4G,X3G,X7G];
-    let base_chain=[
-        s3_symmetric_expr(f,&x[0],&x[1],&x[4]),
-        s3_symmetric_expr(f,&x[2],&x[3],&x[5]),
-        s3_ordered(f,&x[4],&x[5],X10G),
+    let s12 = f.add(GX, X2G);
+    let t12 = f.mul(GX, X2G);
+    let s34 = f.add(X3G, X4G);
+    let t34 = f.mul(X3G, X4G);
+    let symvals = [s12, t12, s34, t34, X3G, X7G];
+    let ordvals = [GX, X2G, X3G, X4G, X3G, X7G];
+    let base_chain = [
+        s3_symmetric_expr(f, &x[0], &x[1], &x[4]),
+        s3_symmetric_expr(f, &x[2], &x[3], &x[5]),
+        s3_ordered(f, &x[4], &x[5], X10G),
     ];
-    let mut raw_arm=base_chain.to_vec();
-    let mut red_arm=base_chain.to_vec();
-    for start in [0,2] {
+    let mut raw_arm = base_chain.to_vec();
+    let mut red_arm = base_chain.to_vec();
+    for start in [0, 2] {
         for j in 0..2 {
-            raw_arm.push(pair_embed(&raw[j],6,start));
-            red_arm.push(pair_embed(&reduced[j],6,start));
+            raw_arm.push(pair_embed(&raw[j], 6, start));
+            red_arm.push(pair_embed(&reduced[j], 6, start));
         }
     }
-    for eq in &ordered { assert_eq!(evaluate(f,eq,&ordvals),0,"ordered planted S3 identity"); }
+    for eq in &ordered {
+        assert_eq!(evaluate(f, eq, &ordvals), 0, "ordered planted S3 identity");
+    }
     for eq in raw_arm.iter().chain(red_arm.iter()) {
-        assert_eq!(evaluate(f,eq,&symvals),0,"symmetric planted S3 identity");
+        assert_eq!(
+            evaluate(f, eq, &symvals),
+            0,
+            "symmetric planted S3 identity"
+        );
     }
     println!("m4 chained genuine relation G+2G+3G+4G=10G; u=x(3G), v=x(7G); B=4, 6 variables");
-    run_arm(f,"m4-S3-ordered", &ordered,budget,14);
-    run_arm(f,"m4-S3-sym-raw-H", &raw_arm,budget,14);
-    run_arm(f,"m4-S3-sym-degreeB-G", &red_arm,budget,14);
+    run_arm(f, "m4-S3-ordered", &ordered, budget, 14);
+    run_arm(f, "m4-S3-sym-raw-H", &raw_arm, budget, 14);
+    run_arm(f, "m4-S3-sym-degreeB-G", &red_arm, budget, 14);
 }
 
 fn main() {
     let f = Fp::new(P);
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let m4 = args.iter().any(|x| x=="--m4");
-    let m4_s3 = args.iter().any(|x| x=="--m4-s3");
-    let circuit = args.iter().any(|x| x=="--circuit");
-    let sweep = args.iter().any(|x| x=="--sweep");
+    let m4 = args.iter().any(|x| x == "--m4");
+    let m4_s3 = args.iter().any(|x| x == "--m4-s3");
+    let circuit = args.iter().any(|x| x == "--circuit");
+    let sweep = args.iter().any(|x| x == "--sweep");
     let budget = Duration::from_secs(15);
     // Sweep is a fixed-prime, fixed-planted-target *component scaling* diagnostic.
     // It is not an asymptotic exponent or unknown-index relation-yield experiment.
@@ -436,10 +526,16 @@ fn main() {
     for &size in sizes {
         let base = prime31_base(f, size);
         run_m2(f, &base, budget, circuit && size <= 4);
-        if m4 && size <= 4 { run_m4_membership(f, &base, budget); }
+        if m4 && size <= 4 {
+            run_m4_membership(f, &base, budget);
+        }
     }
-    if m4_s3 { run_m4_s3_relation(f,budget); }
-    println!("No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted.");
+    if m4_s3 {
+        run_m4_s3_relation(f, budget);
+    }
+    println!(
+        "No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted."
+    );
 }
 
 #[cfg(test)]
@@ -448,33 +544,38 @@ mod tests {
 
     #[test]
     fn symbolic_degree_and_exact_planted_s3_equivalence() {
-        let f=Fp::new(P);
-        for size in [2,3,4,6,8] {
-            let base=prime31_base(f,size);
-            let h=poly_from_roots(f,&base);
-            for m in [2usize,3,4] {
-                let (raw, reduced)=moment_system(f,&h,m);
+        let f = Fp::new(P);
+        for size in [2, 3, 4, 6, 8] {
+            let base = prime31_base(f, size);
+            let h = poly_from_roots(f, &base);
+            for m in [2usize, 3, 4] {
+                let (raw, reduced) = moment_system(f, &h, m);
                 for j in 0..m {
-                    assert_eq!(max_degree(&raw[j]),(size+j) as u32);
-                    assert_eq!(max_degree(&reduced[j]),size as u32);
+                    assert_eq!(max_degree(&raw[j]), (size + j) as u32);
+                    assert_eq!(max_degree(&reduced[j]), size as u32);
                 }
-                let roots=vec![GX;m];
-                let mut es=vec![0u64;m];
-                for (i,&x) in roots.iter().enumerate() {
-                    for j in (1..=i).rev() { es[j]=f.add(es[j],f.mul(x,es[j-1])); }
-                    es[0]=f.add(es[0],x);
+                let roots = vec![GX; m];
+                let mut es = vec![0u64; m];
+                for (i, &x) in roots.iter().enumerate() {
+                    for j in (1..=i).rev() {
+                        es[j] = f.add(es[j], f.mul(x, es[j - 1]));
+                    }
+                    es[0] = f.add(es[0], x);
                 }
                 for p in raw.iter().chain(reduced.iter()) {
-                    assert_eq!(evaluate(f,p,&es),0);
+                    assert_eq!(evaluate(f, p, &es), 0);
                 }
             }
         }
-        let base=prime31_base(f,3);
-        let h=poly_from_roots(f,&base);
-        let (_,g)=moment_system(f,&h,2);
-        let s=f.add(GX,X2G);
-        let t=f.mul(GX,X2G);
-        assert_eq!(evaluate(f,&s3_symmetric(f,&var(2,0),&var(2,1),X3G),&[s,t]),0);
-        assert!(g.iter().all(|p| evaluate(f,p,&[s,t])==0));
+        let base = prime31_base(f, 3);
+        let h = poly_from_roots(f, &base);
+        let (_, g) = moment_system(f, &h, 2);
+        let s = f.add(GX, X2G);
+        let t = f.mul(GX, X2G);
+        assert_eq!(
+            evaluate(f, &s3_symmetric(f, &var(2, 0), &var(2, 1), X3G), &[s, t]),
+            0
+        );
+        assert!(g.iter().all(|p| evaluate(f, p, &[s, t]) == 0));
     }
 }

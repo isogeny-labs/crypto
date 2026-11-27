@@ -1,0 +1,141 @@
+diff --git a/docs/ACTIVE.md b/docs/ACTIVE.md
+index 9f77d220..00ab280d 100644
+--- a/docs/ACTIVE.md
++++ b/docs/ACTIVE.md
+@@ -16,7 +16,7 @@ Develop and independently validate a Rust index-calculus method exploiting chain
+ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
+ 
+ ## Active items
+-- [ ] Graph-IC ordinary Prime31 group-admission bridge for captured two-LP equations (ChatGPT, 2026-11-23, draft PR #5076; exact source `b4b87e65`, native run #45258713611 PASS: 7/7 admission and 41/41 graph tests, exact CLI exports, five atomic refusals, planted forest/pivot/MST useful rank 2 with zero replay failures; natural capture, full-root qualification, durable full-artifact custody and full cold cost pending; existing collector caps admit at most 0.003906317 expected rows under the documented uniform-query model; no paid compute/no merge; [pcc:unverified]).
++- [ ] Graph-IC ordinary Prime31 group-admission bridge for captured two-LP equations (ChatGPT, 2026-11-23, draft PR #5076; exact source `b4b87e65`, native run #45258713611 PASS: 7/7 admission and 41/41 graph tests, exact CLI exports, five atomic refusals, planted forest/pivot/MST useful rank 2 with zero replay failures; natural capture, full-root qualification, durable full-artifact custody and full cold cost pending; existing collector caps admit at most 0.003906317 expected rows under the documented uniform-query model; unsigned PCC-20261123-c7e76b; no paid compute/no merge; [pcc:unverified]).
+ - [ ] CT342: exact F103 bielliptic odd-primary inverse and 2-primary cokernel/cyclic scalar-lift qualification (ChatGPT automation, started 2026-11-23, branch automation/ct342-f103-primary-structure-20261123, draft PR #5060; follows merged #5045; self-contained Node: E+=Z2×Z46, E-=Z2×Z50, 192 point orders, 16000 sampled associativity triples, 3 real mutation rejects; all [pcc:unverified]; independent Rust/PCC and original 695/701 cold timing reserved).
+ - [x] Graph IC minimum-payload native original-module qualification receipt and terminal PR custody (ChatGPT automation, completed 2026-11-23, branch automation/graph-ic-minpayload-validation-receipt-20261123; draft PR #5059, **41/41 Rust tests PASS** source-exact #45241866240 at 650d0fb; frozen provenance/handoff and temporary branch-only CI trigger retired; original #5043 merged by separate event despite this lane's no-merge constraint; successor explicitly **no merge/no paid compute**; independent PCC/full-root/native Prime31 still open).
+ - [ ] Semaev-only Frobenius-sector complete polynomial charts: implement all identity/chord/tangent/inverse and two-torsion branches with degree <=4 and quadratic Fp-membership lifts; 50-case exact gates and actual unspecialized GB work still open (ChatGPT automation, started 2026-11-23, branch automation/semaev-complete-charts-20261123; [pcc:unverified]).
+diff --git a/docs/session-logs/2026-11-23-graph-prime31-group-admission.md b/docs/session-logs/2026-11-23-graph-prime31-group-admission.md
+index 873c6db0..7480c3ea 100644
+--- a/docs/session-logs/2026-11-23-graph-prime31-group-admission.md
++++ b/docs/session-logs/2026-11-23-graph-prime31-group-admission.md
+@@ -53,3 +53,17 @@ Natural fixed-Prime31 capture and a viable charged collection/query budget remai
+ 
+ ### Errors (what went wrong, how it was handled)
+ No native test or CLI gate failed. Local Rust/Cargo, AWS CLI, AWS/S3 environment configuration and default AWS credential/config files are absent; retain exact downloadable CI artifact and small raw records, disclose missing durable full-archive custody, and do not fabricate a successful storage upload. Initial unsupported workflow-list endpoint was replaced by the connector's exact-commit workflow API; no repeated CI execution or completed-run polling. Whole-repository checks remain outside this focused qualification.
++
++## 2026-11-23 — frozen evidence and unsigned metadata
++
++### What was done (commands, files, features)
++Committed exact small raw records, all125-file inventory, receipt and visually inspected three-page PDF/editable sources at90522ccbf6c70e9c0a7a5b51c14b6a7a6c7a6a9f. Reviewed native writer preview and registered PCC-20261123-c7e76b against the already committed README receipt, SHAfa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889. All1827 existing ledger entries were hash checked; one entry was appended with the old bytes unchanged. Kept full receipt output in PCC_PRIME31_ADMISSION_20261123.json.
++
++### Decisions made (and why)
++Use an unsigned kind=statement/claim_type=data attestation, not a scientific verdict. Freeze exact raw paths as required by their manifests; keep the over-limit executable/oversized-control bytes in the existing full Actions artifact pending durable custody. Prepare evidence and metadata commits locally and publish together to avoid separate intermediate branch pushes. This does not change tested Rust source or the preregistration.
++
++### Open threads
++The natural-stream, whole-root, durable-archive, complete-cost and signed-PCC dependencies above remain open. PR5076 stays draft and unmerged; no paid compute or new collector run.
++
++### Errors (what went wrong, how it was handled)
++No native metadata guard failed. No existing ledger entry, claim, keyring or verdict was rewritten. No scientific verifier or signing command was executed; standing remains [pcc:unverified].
+diff --git a/pcc/claims/PCC-20261123-c7e76b.json b/pcc/claims/PCC-20261123-c7e76b.json
+new file mode 100644
+index 00000000..2678a2ce
+--- /dev/null
++++ b/pcc/claims/PCC-20261123-c7e76b.json
+@@ -0,0 +1,23 @@
++{
++  "schema": "pcc.claim/v1",
++  "id": "PCC-20261123-c7e76b",
++  "kind": "statement",
++  "claim_type": "data",
++  "statement": "At source b4b87e654950ad57d264e518ec6bb190efd88bba, the fixed planted-control Prime31 group-admission development qualification passed 7 native admission tests, 41 source-exact graph tests, both exact CLI exports and five atomic invalid-input refusals. Forest, pivot and MST each reported useful and augmented rank 2 with zero source replay failures on the same five planted rows. The committed receipt pins source and raw evidence, dependency provenance and incomplete full-archive custody. Unsigned producer data only; no natural capture, full-root pass, performance gain or complete-cost claim. [pcc:unverified]",
++  "scope": "Unsigned producer development records for Prime31 graph-admission qualification. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
++  "proofs": [
++    {
++      "kind": "attestation",
++      "subject": {
++        "path": "research/lp_graph_algorithms_20261123/evidence/native-admission-20261123/README.md",
++        "sha256": "fa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889"
++      }
++    }
++  ],
++  "producer": {
++    "commit": "90522ccbf6c70e9c0a7a5b51c14b6a7a6c7a6a9f",
++    "session": "graph-ic-prime31-group-admission-20261123",
++    "model": "GPT-6 Astra Pro"
++  },
++  "created_at": "2026-11-23T20:35:37Z"
++}
+diff --git a/pcc/ledger.jsonl b/pcc/ledger.jsonl
+index 7ede6dc4..4ed5ba8c 100644
+--- a/pcc/ledger.jsonl
++++ b/pcc/ledger.jsonl
+@@ -1825,3 +1825,4 @@
+ {"at":"2026-11-23T18:33:06Z","body":{"claim_id":"PCC-20261123-186804","claim_sha256":"6b38a7f5271215ff7a0ed2be98bbfb674fbd81353b223a0a8a3ee50c7f22b8e8","path":"pcc/claims/PCC-20261123-186804.json"},"hash":"73699aa42fc4c2d4fe51bc992ffbae65c1a613867904680dbadd84ebe73fd618","prev":"e30ad671ddf62f68d1320934307a50bc8b4736ae9b4acf1e80f3846ee97c53a6","schema":"pcc.ledger-entry/v1","seq":1824,"type":"claim"}
+ {"at":"2026-11-23T18:36:18Z","body":{"claim_id":"PCC-20261123-61246e","claim_sha256":"1ed3031c0910764c04535466764d517049490e94d14878d2142b830b8591360e","path":"pcc/claims/PCC-20261123-61246e.json"},"hash":"9e1028b4fa9ce2d386a2e25dc4e723beba7093a948c3e443efa8529c08b3efdf","prev":"73699aa42fc4c2d4fe51bc992ffbae65c1a613867904680dbadd84ebe73fd618","schema":"pcc.ledger-entry/v1","seq":1825,"type":"claim"}
+ {"at":"2026-11-23T18:46:33Z","body":{"claim_id":"PCC-20261123-abe1fa","claim_sha256":"d0399e80218662e1bedc3f3133a646f82f917bce77ac3f6eb69c88fc00634851","path":"pcc/claims/PCC-20261123-abe1fa.json"},"hash":"8aa9d5f9b3b5607066439e473e6427fe3b1edf25bbe86533e7ef679ce9c61c1c","prev":"9e1028b4fa9ce2d386a2e25dc4e723beba7093a948c3e443efa8529c08b3efdf","schema":"pcc.ledger-entry/v1","seq":1826,"type":"claim"}
++{"at":"2026-11-23T20:35:37Z","body":{"claim_id":"PCC-20261123-c7e76b","claim_sha256":"02e3f0d36ec28ff216df2d14c54ea65e6451a4c46f14785228a983ea1722e64b","path":"pcc/claims/PCC-20261123-c7e76b.json"},"hash":"5272bea204c9017326df5f3bf5fd2ac6c6dc193e4c390c17857274ffe699e21a","prev":"8aa9d5f9b3b5607066439e473e6427fe3b1edf25bbe86533e7ef679ce9c61c1c","schema":"pcc.ledger-entry/v1","seq":1827,"type":"claim"}
+diff --git a/research/lp_graph_algorithms_20261123/GRAPH_IC_HANDOFF_20261123.md b/research/lp_graph_algorithms_20261123/GRAPH_IC_HANDOFF_20261123.md
+index 69029332..764f6e88 100644
+--- a/research/lp_graph_algorithms_20261123/GRAPH_IC_HANDOFF_20261123.md
++++ b/research/lp_graph_algorithms_20261123/GRAPH_IC_HANDOFF_20261123.md
+@@ -118,3 +118,5 @@ Source, executable, toolchain, input-control and generated-lock before/after man
+ **Custody and scope:** the full ZIP is downloaded and hash checked, but its GitHub artifact expires `2026-12-07T20:25:09Z`; durable artifact-store upload remains unavailable in this runtime (no AWS CLI, configured AWS/S3 environment or default AWS credential/config files). Do not treat the receipt as proof of a successful S3 archival write. Native focused development qualification does not qualify the entire root crate, a natural collector stream, a complete cold recovery, a performance gain or signed PCC. Team source review is not an independent signed scientific verdict.
+ 
+ **Next scientific gate:** obtain collector-custodied fixed-Prime31 rows with complete accepted/rejected attempt trace, original public-instance and point-table bindings, seeds, collector source/binary identities and cost counters. The existing generic-decomposition producer's 4096-query and 32-residual-column caps are quantitatively inadequate for the planned 256/1024/4096-row comparison under the stated uniform-query model. Resolve the collector/query mechanism and its charged budget before running that panel. Keep eager/lazy forest, pivot and MST on identical admitted streams; charge materialization, exact useful-rank audit, verification and retained payload. No merge, paid compute, new collection or benchmark was launched.
++
++**Unsigned receipt registration:** evidence/report commit `90522ccbf6c70e9c0a7a5b51c14b6a7a6c7a6a9f` freezes the receipt. `PCC-20261123-c7e76b` records it as a data statement, attestation SHA256 `fa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889`. The native metadata writer preview was reviewed, then appended exactly one ledger row after validating all 1,827 prior entries and preserving their byte prefix. Claim digest `02e3f0d36ec28ff216df2d14c54ea65e6451a4c46f14785228a983ea1722e64b`; ledger entry `5272bea204c9017326df5f3bf5fd2ac6c6dc193e4c390c17857274ffe699e21a`. [Registration receipt](PCC_PRIME31_ADMISSION_20261123.json). No scientific verifier, signing, keyring update or standing upgrade occurred; [pcc:unverified].
+diff --git a/research/lp_graph_algorithms_20261123/PCC_PRIME31_ADMISSION_20261123.json b/research/lp_graph_algorithms_20261123/PCC_PRIME31_ADMISSION_20261123.json
+new file mode 100644
+index 00000000..66222233
+--- /dev/null
++++ b/research/lp_graph_algorithms_20261123/PCC_PRIME31_ADMISSION_20261123.json
+@@ -0,0 +1,52 @@
++{
++  "schema": "graph-ic.pcc-registration/v1",
++  "mode": "append",
++  "claim_path": "pcc/claims/PCC-20261123-c7e76b.json",
++  "claim_sha256": "02e3f0d36ec28ff216df2d14c54ea65e6451a4c46f14785228a983ea1722e64b",
++  "entry_sha256": "5272bea204c9017326df5f3bf5fd2ac6c6dc193e4c390c17857274ffe699e21a",
++  "receipt_sha256": "fa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889",
++  "contract_source_sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb",
++  "base_entries_hash_checked": 1827,
++  "appended_entries": 1,
++  "standing": "unverified",
++  "standing_source": "unsigned metadata only; no standing verifier executed",
++  "verifier_run": false,
++  "signature_created": false,
++  "python_executed": false,
++  "claim": {
++    "schema": "pcc.claim/v1",
++    "id": "PCC-20261123-c7e76b",
++    "kind": "statement",
++    "claim_type": "data",
++    "statement": "At source b4b87e654950ad57d264e518ec6bb190efd88bba, the fixed planted-control Prime31 group-admission development qualification passed 7 native admission tests, 41 source-exact graph tests, both exact CLI exports and five atomic invalid-input refusals. Forest, pivot and MST each reported useful and augmented rank 2 with zero source replay failures on the same five planted rows. The committed receipt pins source and raw evidence, dependency provenance and incomplete full-archive custody. Unsigned producer data only; no natural capture, full-root pass, performance gain or complete-cost claim. [pcc:unverified]",
++    "scope": "Unsigned producer development records for Prime31 graph-admission qualification. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
++    "proofs": [
++      {
++        "kind": "attestation",
++        "subject": {
++          "path": "research/lp_graph_algorithms_20261123/evidence/native-admission-20261123/README.md",
++          "sha256": "fa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889"
++        }
++      }
++    ],
++    "producer": {
++      "commit": "90522ccbf6c70e9c0a7a5b51c14b6a7a6c7a6a9f",
++      "session": "graph-ic-prime31-group-admission-20261123",
++      "model": "GPT-6 Astra Pro"
++    },
++    "created_at": "2026-11-23T20:35:37Z"
++  },
++  "ledger_entry": {
++    "at": "2026-11-23T20:35:37Z",
++    "body": {
++      "claim_id": "PCC-20261123-c7e76b",
++      "claim_sha256": "02e3f0d36ec28ff216df2d14c54ea65e6451a4c46f14785228a983ea1722e64b",
++      "path": "pcc/claims/PCC-20261123-c7e76b.json"
++    },
++    "hash": "5272bea204c9017326df5f3bf5fd2ac6c6dc193e4c390c17857274ffe699e21a",
++    "prev": "8aa9d5f9b3b5607066439e473e6427fe3b1edf25bbe86533e7ef679ce9c61c1c",
++    "schema": "pcc.ledger-entry/v1",
++    "seq": 1827,
++    "type": "claim"
++  }
++}

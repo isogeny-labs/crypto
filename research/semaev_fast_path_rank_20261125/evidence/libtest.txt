@@ -1,0 +1,17 @@
+$ CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0 CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 cargo test --lib semaev_projection
+# rustc: rustc 1.97.0 (2d8144b78 2026-07-07)
+# an earlier --release attempt was SIGKILLed (out of memory) while compiling crypto_lib in test mode
+running 12 tests
+test cryptanalysis::ic_framework::semaev_projection_oracle::tests::recovers_planted_three_sum_on_control_curve ... ok
+test cryptanalysis::semaev_projection::tests::fast_path_matches_generic_small ... ok
+test cryptanalysis::semaev_projection::tests::both_constructor_caches_keep_reference_query_answers ... ok
+test cryptanalysis::semaev_projection::tests::multi_limb_biguint_rational_batched_zero_mismatches ... ok
+test cryptanalysis::semaev_projection::tests::projection_matches_signed_group_control ... ok
+test cryptanalysis::semaev_projection::tests::quadratic_coefficients_match_s3 ... ok
+test cryptanalysis::semaev_projection::tests::rational_batched_zero_mismatches_across_primes_and_edge_cases ... ok
+test cryptanalysis::semaev_projection::tests::rejects_non_point_factor_base_entries ... ok
+test cryptanalysis::semaev_projection::tests::root_keys_are_exact ... ok
+test cryptanalysis::semaev_projection::tests::prime31_opcount_old_vs_new ... ok
+test cryptanalysis::semaev_projection::tests::first_blockwise_matches_full_scan_first_witness ... ok
+test cryptanalysis::semaev_projection::tests::pair_projection_build_and_queries_match_reference_and_cut_fp_ops ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 8120 filtered out; finished in 4.97s

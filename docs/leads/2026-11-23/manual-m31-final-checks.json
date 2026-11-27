@@ -1,0 +1,237 @@
+{
+  "schema": "manual-m31.final-documentation-checks/v1",
+  "checked_at_utc": "2026-11-24T02:31:33.898647+00:00",
+  "repository": "isogeny-labs/crypto",
+  "public_pr": 5115,
+  "source_commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "scope": "Public documentation staging, initial final-check snapshot. No scientific execution, remote mutation, full benchmark gate, or hosted CI result.",
+  "official_source_identities": [
+    {
+      "path": "tools/pcc/pcc.py",
+      "sha": "66e1c71ce94edd434804912e78c3858a9b24d007",
+      "url": "https://github.com/isogeny-labs/crypto/blob/ceba74bb64854027c4dd16f00428bf676383bfdb/tools/pcc/pcc.py",
+      "ref": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+      "bytes": 107248,
+      "sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb",
+      "git_blob_matches": true
+    },
+    {
+      "path": "tools/artifacts/artifacts.py",
+      "sha": "fb3c5cafcf97f93cab2d36bc109b32b71fa7cfba",
+      "url": "https://github.com/isogeny-labs/crypto/blob/ceba74bb64854027c4dd16f00428bf676383bfdb/tools/artifacts/artifacts.py",
+      "ref": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+      "bytes": 42335,
+      "sha256": "93bec2944d358cc45c8fd3322095f1b5256dd73aa1888abab744b0a5aa5d4e37",
+      "git_blob_matches": true
+    },
+    {
+      "path": ".artifacts/config.json",
+      "sha": "1987fd52fead84a2f7d38b8b12e24ad34d92a36f",
+      "url": "https://github.com/isogeny-labs/crypto/blob/ceba74bb64854027c4dd16f00428bf676383bfdb/.artifacts/config.json",
+      "ref": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+      "bytes": 6109,
+      "sha256": "4e71a9ede165f46d73f9fbd9902f914fad8115f0a422089c5c501caf7e6d3052",
+      "git_blob_matches": true
+    },
+    {
+      "path": "pcc/keyring.json",
+      "sha": "f20337486470f138c0e1c890957ce1a6cffdbde2",
+      "url": "https://github.com/isogeny-labs/crypto/blob/ceba74bb64854027c4dd16f00428bf676383bfdb/pcc/keyring.json",
+      "ref": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+      "bytes": 473,
+      "sha256": "21929cc6389f58d0f847912af7f3fbf44e91ca90725965780085353c1322031c",
+      "git_blob_matches": true
+    }
+  ],
+  "command_path_convention": "PUBLIC_SOURCE denotes an isolated, exact public-source reconstruction; displayed paths below are repository-relative. No absolute execution paths are published.",
+  "prose_lint": {
+    "command_display": "python3 tools/pcc/pcc.py --repo PUBLIC_SOURCE --keyring-ref HEAD lint-prose docs/leads/2026-11-23/manual-m31-{report,weekly-plan,algebra-audit,solver-audit,validation}.md NEW_JOURNAL_ENTRY",
+    "new_report_file_count": 5,
+    "new_journal_entry_only": true,
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  },
+  "pr_body_lint": {
+    "command_display": "python3 tools/pcc/pcc.py --repo PUBLIC_SOURCE --keyring-ref HEAD lint-prose --stdin",
+    "input_sha256": "7e14867b2e6a4202f24374bafdd34d138d05912923e10660c7d0d63cfe9b5db5",
+    "input_bytes": 1916,
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  },
+  "focused_validation_lint": {
+    "command_display": "python3 tools/pcc/pcc.py --repo PUBLIC_SOURCE --keyring-ref HEAD lint-prose docs/leads/2026-11-23/manual-m31-validation.md",
+    "reason": "Final validation text records both the follow-up validation lint and the changed algebra-paragraph lint.",
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  },
+  "journal_preservation": {
+    "path": "docs/session-logs/2026-11-24.md",
+    "base_blob": "80e16960c96bf88005a812bbbf4d9537391e36ad",
+    "base_bytes": 39104,
+    "base_sha256": "aae8a138b130e20b01c242bea6cbbf445de857bfffb3ca76f8260a34f35a13a6",
+    "base_is_exact_prefix": true,
+    "new_entry_bytes": 2348,
+    "new_entry_sha256": "deb1208bb07cfba0412723f847d7fc65894e8b9c1057a3372161957b07819b3e"
+  },
+  "administrative_preflight_custody": {
+    "claim_id": "PCC-20261124-afb0db",
+    "claim_type": "data",
+    "kind": "execution",
+    "proof_kind": "attestation",
+    "claim_verify_exit": 2,
+    "claim_verify_verdict": "not_covered",
+    "standing_exit": 2,
+    "standing": "unverified",
+    "staged_claim_proof_and_ledger_match_prepared_bytes": true,
+    "base_ledger_bytes_preserved": 1022465,
+    "ledger_rows_before": 1849,
+    "ledger_rows_after": 1850,
+    "complete_historical_claim_gate": false
+  },
+  "artifact_selector": {
+    "method": "Exact official artifacts.Config.load and artifacts.belongs_in_store for each staged repository-relative path, using actual UTF-8/binary file size.",
+    "checked_file_count_including_this_receipt": 14,
+    "selected_paths": [],
+    "files": [
+      {
+        "path": "docs/ACTIVE.md",
+        "bytes": 129914,
+        "sha256": "56dac39375b4017bf2000bee4b002fc7d0c9a8fa276b1ee45731d34ff1a0ac34",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-algebra-audit.md",
+        "bytes": 9710,
+        "sha256": "92bb752e341df7dd0076ddd33204372af81e0b7735a3a2f54efb14d1c80a03b4",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-ci-snapshot.json",
+        "bytes": 891509,
+        "sha256": "2cb02971340b298ebf764a2f5d0a8d12c7853dc70fb9b2921f34511bf5a61335",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-pr-inventory.json",
+        "bytes": 30180,
+        "sha256": "087d069d7e53de5e8d052b1bab9715a6a9244c35842bf19bb2889d53429c8e64",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-proof-evidence.json",
+        "bytes": 7159,
+        "sha256": "f49d8617192d80143538ba448f516178c2eefcd28171aa62fca9ccee388319e1",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-publication-preflight.json",
+        "bytes": 8338,
+        "sha256": "33b6e92a71209d35ee2d5e192413888a96ff5cb5b23c76c273fafcc402ed65b3",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-report.md",
+        "bytes": 15385,
+        "sha256": "f68ad32935e581093371008998f759b1a66a405f41067ed22237add631708ddf",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-solver-audit.md",
+        "bytes": 8364,
+        "sha256": "a930921cc7f4c18399a6c6ecf1a6a9ff246d1e419159250e4050cfb269cec741",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-validation.md",
+        "bytes": 4256,
+        "sha256": "13a0509af5ea5443f446bd1dcd0edbaa5f1e8d5bec7baa0ecd5c67dc067c7eb8",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/leads/2026-11-23/manual-m31-weekly-plan.md",
+        "bytes": 8128,
+        "sha256": "e699338b4f7fa1a73c6bb729a1f1a6d573b2737546cf2020680c2d9c508c0288",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "docs/session-logs/2026-11-24.md",
+        "bytes": 41452,
+        "sha256": "c70c066459bb7cf75ad902682fee87654a897248689860aafcdbc4f6640946f6",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "pcc/claims/PCC-20261124-afb0db.json",
+        "bytes": 1152,
+        "sha256": "2da51049d5ee8ccb69c7641cc52667d9ce93fda149b73576e0e44670bf4416d8",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": []
+      },
+      {
+        "path": "pcc/ledger.jsonl",
+        "bytes": 1022869,
+        "sha256": "c89ba29573bc305bc70eec9ab8536cd1578c67fc9e8836898647695763598e38",
+        "selected_by_official_policy": false,
+        "matched_keep_globs": [
+          "pcc/ledger.jsonl"
+        ]
+      }
+    ],
+    "this_receipt": {
+      "path": "docs/leads/2026-11-23/manual-m31-final-checks.json",
+      "selected_by_official_policy": false,
+      "own_hash_omitted_to_avoid_self_reference": true
+    },
+    "full_git_diff_workflow_executed": false
+  },
+  "excluded_root_log": {
+    "path": "leads.log",
+    "changed_in_staging": false,
+    "source_bytes": 73956,
+    "source_blob": "862858fb9af88bfb7263c41d403cfe782eda4cfe",
+    "source_sha256": "96193af9735727ab958a2d42eeb33725b4852b2e67dcab862f2fc242775e90b7",
+    "data_suffix": ".log",
+    "data_threshold_bytes": 65536,
+    "matching_keep_globs": [],
+    "would_be_selected_if_modified": true,
+    "exception_label_added": false,
+    "policy_changed": false,
+    "migrated_or_uploaded": false
+  },
+  "pdf": {
+    "present_in_selector_snapshot": false,
+    "rendering_and_visual_review": "Separate root-agent publication step; not attested by this record.",
+    "existing_keep_glob": "*.pdf"
+  },
+  "limitations": [
+    "All checks apply to the exact recorded staging bytes. Later changes require the affected checks to run again.",
+    "The official partial-source benchrec attempt exited 1 with missing progress files and zero materialized records; the public repository has 403 records. No complete gate success or baseline failure is claimed.",
+    "PCC historical claim payloads and schema-rejection dependencies are not materialized; source-ledger chain/prefix success is narrower than the complete PCC workflow.",
+    "Normal hosted checks and review remain applicable.",
+    "The administrative preflight evidence is unsigned producer attestation and does not authenticate scientific results."
+  ],
+  "impact_score": 2,
+  "impact_reason": "Document custody and publication-policy checks passed within the recorded scope; no cryptanalytic improvement is claimed.",
+  "focused_algebra_paragraph_lint": {
+    "command_display": "python3 tools/pcc/pcc.py --repo PUBLIC_SOURCE --keyring-ref HEAD lint-prose --stdin",
+    "path": "docs/leads/2026-11-23/manual-m31-algebra-audit.md",
+    "reason": "The new ghost-example paragraph now explicitly requires f(r)!=0; no historical text changed.",
+    "input_sha256": "d67da79a9c07c8571ed4d09104e019422c3e46d6ffe2f1c177b03b7ed91ec0c2",
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  }
+}

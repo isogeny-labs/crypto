@@ -28,19 +28,12 @@ use crate::cryptopals::Report;
 use crate::ecc::curve::CurveParams;
 use crate::ecc::point::Point;
 use crate::hash::sha256::sha256;
-use num_bigint::{BigInt, BigUint, RandBigInt, ToBigInt};
-use num_integer::Integer;
+use num_bigint::{BigUint, RandBigInt};
 use num_traits::{One, Zero};
 use rand::{Rng, SeedableRng};
 
 fn mod_inv(a: &BigUint, n: &BigUint) -> Option<BigUint> {
-    let a_i = a.to_bigint().unwrap();
-    let n_i = n.to_bigint().unwrap();
-    let g = a_i.extended_gcd(&n_i);
-    if g.gcd != BigInt::one() {
-        return None;
-    }
-    Some((((g.x % &n_i) + &n_i) % &n_i).to_biguint().unwrap())
+    crate::gcd::int::modinv_big(a, n)
 }
 
 /// ── Part 1: ECDSA DSKS ───────────────────────────────────────────

@@ -819,11 +819,8 @@ fn distinct_prime_factors(mut n: u64) -> Vec<u64> {
     out
 }
 
-fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd_u64(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 /// Some `k ∈ [lo, hi]` with `[k]P = O`, by baby-step giant-step, or `None`.
@@ -1147,29 +1144,9 @@ fn upoly_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     upoly_trim(r)
 }
 
-/// `a mod b` (`b` non-zero).
-fn upoly_rem(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
-    let mut r = upoly_trim(a.to_vec());
-    let lead = invm(*b.last().expect("non-zero divisor"), p);
-    while r.len() >= b.len() {
-        let q = mulm(*r.last().unwrap(), lead, p);
-        let shift = r.len() - b.len();
-        for (i, &y) in b.iter().enumerate() {
-            r[shift + i] = subm(r[shift + i], mulm(q, y, p), p);
-        }
-        r = upoly_trim(r);
-    }
-    r
-}
-
 fn upoly_gcd_degree(a: &[u64], b: &[u64], p: u64) -> usize {
-    let (mut x, mut y) = (upoly_trim(a.to_vec()), upoly_trim(b.to_vec()));
-    while !y.is_empty() {
-        let r = upoly_rem(&x, &y, p);
-        x = y;
-        y = r;
-    }
-    x.len().saturating_sub(1)
+    let g = crypto_lib::gcd::poly::gcd(&crypto_lib::gcd::poly::Fp64::new(p), a, b);
+    g.len().saturating_sub(1)
 }
 
 impl CoverMap {

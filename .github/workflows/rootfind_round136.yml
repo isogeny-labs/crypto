@@ -2,12 +2,13 @@ name: Rootfind Round 136 source-exact Rust A/B
 on:
   push:
     branches:
+      - main
       - automation/rootfind-round136-cipolla-p3guard-20261123
-  pull_request:
     paths:
       - src/cryptanalysis/ecbench/isogeny.rs
       - research/rootfind_round136/**
       - .github/workflows/rootfind_round136.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
@@ -27,7 +28,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --no-tags --depth=1 origin automation/rootfind-round135-atkin-p5mod8-20261123
+          # Historical round 135 baseline from merged PR #5008.
+          git fetch --no-tags --depth=1 origin 03a450a3ee567386c9ad82869334b1b8f35d2545
           mkdir -p /tmp/rootfind_round136
           git show FETCH_HEAD:src/cryptanalysis/ecbench/isogeny.rs > /tmp/rootfind_round136/baseline.rs
           cp src/cryptanalysis/ecbench/isogeny.rs /tmp/rootfind_round136/optimized.rs

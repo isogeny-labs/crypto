@@ -49,13 +49,8 @@ fn hexadecimal(value: &str) -> BigUint {
     BigUint::parse_bytes(value.as_bytes(), 16).expect("hard-coded hexadecimal integer")
 }
 
-fn gcd(mut left: BigUint, mut right: BigUint) -> BigUint {
-    while !right.is_zero() {
-        let remainder = &left % &right;
-        left = right;
-        right = remainder;
-    }
-    left
+fn gcd(left: BigUint, right: BigUint) -> BigUint {
+    crate::gcd::int::gcd_big(&left, &right)
 }
 
 fn mul_mod_u64(left: u64, right: u64, modulus: u64) -> u64 {
@@ -802,7 +797,8 @@ fn p59_control() -> P59ControlOutcome {
     const P: u64 = 59;
     const ORDER: u64 = 60;
     fn inverse(value: u64) -> u64 {
-        pow_mod_u64(value, P - 2, P)
+        // Was Fermat value^(P-2) for the prime P = 59 (0 for value ≡ 0).
+        crate::gcd::int::inv_mod_u64(value, P).unwrap_or(0)
     }
     fn compose(left: (u64, u64), right: (u64, u64)) -> (u64, u64) {
         (

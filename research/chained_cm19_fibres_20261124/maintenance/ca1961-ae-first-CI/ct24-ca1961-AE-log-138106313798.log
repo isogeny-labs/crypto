@@ -1,0 +1,280 @@
+﻿2026-11-23T23:56:27.5402782Z Current runner version: '2.338.2'
+2026-11-23T23:56:27.5428378Z ##[group]Runner Image Provisioner
+2026-11-23T23:56:27.5429349Z Hosted Compute Agent
+2026-11-23T23:56:27.5429970Z Version: 20261111.635
+2026-11-23T23:56:27.5430608Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-23T23:56:27.5431480Z Build Date: 2026-11-11T01:49:01Z
+2026-11-23T23:56:27.5432193Z Worker ID: {e2cfb182-86b4-4b40-a384-b883cde171eb}
+2026-11-23T23:56:27.5432958Z Region: westus
+2026-11-23T23:56:27.5433536Z Cloud: Azure
+2026-11-23T23:56:27.5434104Z ##[endgroup]
+2026-11-23T23:56:27.5436078Z ##[group]Operating System
+2026-11-23T23:56:27.5436759Z Ubuntu
+2026-11-23T23:56:27.5437365Z 26.04.1
+2026-11-23T23:56:27.5437912Z LTS
+2026-11-23T23:56:27.5438434Z ##[endgroup]
+2026-11-23T23:56:27.5439087Z ##[group]Runner Image
+2026-11-23T23:56:27.5439703Z Image: ubuntu-26.04
+2026-11-23T23:56:27.5440266Z Version: 20261116.202.1
+2026-11-23T23:56:27.5441630Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-23T23:56:27.5443330Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+2026-11-23T23:56:27.5444326Z ##[endgroup]
+2026-11-23T23:56:27.5445772Z ##[group]GITHUB_TOKEN Permissions
+2026-11-23T23:56:27.5447698Z Contents: read
+2026-11-23T23:56:27.5448476Z Metadata: read
+2026-11-23T23:56:27.5449076Z ##[endgroup]
+2026-11-23T23:56:27.5451776Z Secret source: Actions
+2026-11-23T23:56:27.5452837Z Cache mode: write
+2026-11-23T23:56:27.5453795Z Prepare workflow directory
+2026-11-23T23:56:27.5843402Z Prepare all required actions
+2026-11-23T23:56:27.5897887Z Getting action download info
+2026-11-23T23:56:27.9142292Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-23T23:56:28.1193426Z Complete job name: parity
+2026-11-23T23:56:28.2079991Z ##[group]Run actions/checkout@v7
+2026-11-23T23:56:28.2080892Z with:
+2026-11-23T23:56:28.2081367Z   repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.2085578Z   token: ***
+2026-11-23T23:56:28.2086026Z   ssh-strict: true
+2026-11-23T23:56:28.2086473Z   ssh-user: git
+2026-11-23T23:56:28.2086925Z   persist-credentials: true
+2026-11-23T23:56:28.2087425Z   clean: true
+2026-11-23T23:56:28.2087877Z   sparse-checkout-cone-mode: true
+2026-11-23T23:56:28.2088416Z   fetch-depth: 1
+2026-11-23T23:56:28.2088864Z   fetch-tags: false
+2026-11-23T23:56:28.2089314Z   show-progress: true
+2026-11-23T23:56:28.2089767Z   lfs: false
+2026-11-23T23:56:28.2090188Z   submodules: false
+2026-11-23T23:56:28.2090638Z   set-safe-directory: true
+2026-11-23T23:56:28.2091149Z   allow-unsafe-pr-checkout: false
+2026-11-23T23:56:28.2091936Z ##[endgroup]
+2026-11-23T23:56:28.5404281Z Syncing repository: isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.5407939Z ##[group]Getting Git version info
+2026-11-23T23:56:28.5409700Z Working directory is '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:28.5412126Z [command]/usr/bin/git version
+2026-11-23T23:56:28.5413435Z git version 2.56.1
+2026-11-23T23:56:28.5433293Z ##[endgroup]
+2026-11-23T23:56:28.5445353Z Temporarily overriding HOME='/home/runner/work/_temp/1bc8501c-47ff-4167-8865-400bd4d5cc1a' before making global git config changes
+2026-11-23T23:56:28.5447382Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:56:28.5450903Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:28.5521622Z Deleting the contents of '/home/runner/work/cryptanalysis/cryptanalysis'
+2026-11-23T23:56:28.5525276Z ##[group]Determining repository object format
+2026-11-23T23:56:28.5532447Z ##[endgroup]
+2026-11-23T23:56:28.5545173Z ##[group]Initializing the repository
+2026-11-23T23:56:28.5546937Z [command]/usr/bin/git init /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:56:28.5667516Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-23T23:56:28.5669562Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-23T23:56:28.5671852Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-23T23:56:28.5673344Z hint: call:
+2026-11-23T23:56:28.5674179Z hint:
+2026-11-23T23:56:28.5675404Z hint: 	git config --global init.defaultBranch <name>
+2026-11-23T23:56:28.5676671Z hint:
+2026-11-23T23:56:28.5677883Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-23T23:56:28.5679839Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-23T23:56:28.5681354Z hint:
+2026-11-23T23:56:28.5682253Z hint: 	git branch -m <name>
+2026-11-23T23:56:28.5683271Z hint:
+2026-11-23T23:56:28.5684560Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-23T23:56:28.5686910Z Initialized empty Git repository in /home/runner/work/cryptanalysis/cryptanalysis/.git/
+2026-11-23T23:56:28.5691582Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:56:28.5751850Z ##[endgroup]
+2026-11-23T23:56:28.5753627Z ##[group]Disabling automatic garbage collection
+2026-11-23T23:56:28.5755245Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-23T23:56:28.5793138Z ##[endgroup]
+2026-11-23T23:56:28.5795117Z ##[group]Setting up auth
+2026-11-23T23:56:28.5796452Z Removing SSH command configuration
+2026-11-23T23:56:28.5798836Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:56:28.5837998Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:56:28.6377432Z Removing HTTP extra header
+2026-11-23T23:56:28.6380483Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:56:28.6454940Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:56:28.6758024Z Removing includeIf entries pointing to credentials config files
+2026-11-23T23:56:28.6766459Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:56:28.6798443Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:56:28.7083611Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-23T23:56:28.7126838Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path /home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:56:28.7158539Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:56:28.7195502Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:56:28.7228581Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:56:28.7258927Z ##[endgroup]
+2026-11-23T23:56:28.7260409Z ##[group]Fetching the repository
+2026-11-23T23:56:28.7265235Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +203c588a4a4b0129409db76293fc50c0a01861eb:refs/remotes/pull/1961/merge
+2026-11-23T23:59:07.5335381Z From https://github.com/isogeny-labs/cryptanalysis
+2026-11-23T23:59:07.5336652Z  * [new ref]             203c588a4a4b0129409db76293fc50c0a01861eb -> pull/1961/merge
+2026-11-23T23:59:07.5340515Z ##[endgroup]
+2026-11-23T23:59:07.5341837Z ##[group]Determining the checkout info
+2026-11-23T23:59:07.5346484Z ##[endgroup]
+2026-11-23T23:59:07.5347309Z [command]/usr/bin/git sparse-checkout disable
+2026-11-23T23:59:07.5403435Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-23T23:59:07.5437551Z ##[group]Checking out the ref
+2026-11-23T23:59:07.5446126Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1961/merge
+2026-11-23T23:59:08.6540013Z Updating files:  16% (21849/131166)
+2026-11-23T23:59:08.7014960Z Updating files:  17% (22299/131166)
+2026-11-23T23:59:08.7457658Z Updating files:  18% (23610/131166)
+2026-11-23T23:59:08.8055377Z Updating files:  19% (24922/131166)
+2026-11-23T23:59:08.8606097Z Updating files:  20% (26234/131166)
+2026-11-23T23:59:08.9167094Z Updating files:  21% (27545/131166)
+2026-11-23T23:59:08.9767298Z Updating files:  22% (28857/131166)
+2026-11-23T23:59:09.0317976Z Updating files:  23% (30169/131166)
+2026-11-23T23:59:09.0983926Z Updating files:  24% (31480/131166)
+2026-11-23T23:59:09.1871414Z Updating files:  25% (32792/131166)
+2026-11-23T23:59:09.2693828Z Updating files:  26% (34104/131166)
+2026-11-23T23:59:09.3881939Z Updating files:  27% (35415/131166)
+2026-11-23T23:59:09.4689083Z Updating files:  28% (36727/131166)
+2026-11-23T23:59:09.5477393Z Updating files:  29% (38039/131166)
+2026-11-23T23:59:09.6400206Z Updating files:  30% (39350/131166)
+2026-11-23T23:59:09.6827052Z Updating files:  30% (40117/131166)
+2026-11-23T23:59:10.6397877Z Updating files:  31% (40662/131166)
+2026-11-23T23:59:11.6316092Z Updating files:  31% (41580/131166)
+2026-11-23T23:59:11.6414984Z Updating files:  32% (41974/131166)
+2026-11-23T23:59:12.6389668Z Updating files:  32% (42012/131166)
+2026-11-23T23:59:13.0194581Z Updating files:  32% (42826/131166)
+2026-11-23T23:59:13.6400474Z Updating files:  33% (43285/131166)
+2026-11-23T23:59:14.1387057Z Updating files:  33% (44176/131166)
+2026-11-23T23:59:14.6781186Z Updating files:  34% (44597/131166)
+2026-11-23T23:59:15.7214699Z Updating files:  34% (44953/131166)
+2026-11-23T23:59:16.2640656Z Updating files:  34% (45683/131166)
+2026-11-23T23:59:16.6579807Z Updating files:  35% (45909/131166)
+2026-11-23T23:59:17.6419512Z Updating files:  35% (46027/131166)
+2026-11-23T23:59:17.6583385Z Updating files:  35% (47177/131166)
+2026-11-23T23:59:18.0238846Z Updating files:  36% (47220/131166)
+2026-11-23T23:59:18.3904414Z Updating files:  37% (48532/131166)
+2026-11-23T23:59:18.6403169Z Updating files:  38% (49844/131166)
+2026-11-23T23:59:19.1191330Z Updating files:  38% (49989/131166)
+2026-11-23T23:59:19.8359150Z Updating files:  39% (51155/131166)
+2026-11-23T23:59:20.0341753Z Updating files:  39% (51771/131166)
+2026-11-23T23:59:20.5968044Z Updating files:  40% (52467/131166)
+2026-11-23T23:59:20.6431375Z Updating files:  41% (53779/131166)
+2026-11-23T23:59:20.7841801Z Updating files:  41% (54261/131166)
+2026-11-23T23:59:20.9866351Z Updating files:  42% (55090/131166)
+2026-11-23T23:59:21.5987727Z Updating files:  43% (56402/131166)
+2026-11-23T23:59:21.6536640Z Updating files:  44% (57714/131166)
+2026-11-23T23:59:21.7916932Z Updating files:  44% (57935/131166)
+2026-11-23T23:59:21.8557502Z Updating files:  45% (59025/131166)
+2026-11-23T23:59:21.9067475Z Updating files:  46% (60337/131166)
+2026-11-23T23:59:21.9630912Z Updating files:  47% (61649/131166)
+2026-11-23T23:59:22.0351005Z Updating files:  48% (62960/131166)
+2026-11-23T23:59:22.1106827Z Updating files:  49% (64272/131166)
+2026-11-23T23:59:22.1866597Z Updating files:  50% (65583/131166)
+2026-11-23T23:59:22.3003291Z Updating files:  51% (66895/131166)
+2026-11-23T23:59:22.4242928Z Updating files:  52% (68207/131166)
+2026-11-23T23:59:22.4862188Z Updating files:  53% (69518/131166)
+2026-11-23T23:59:22.5378602Z Updating files:  54% (70830/131166)
+2026-11-23T23:59:22.6033292Z Updating files:  55% (72142/131166)
+2026-11-23T23:59:22.6383932Z Updating files:  56% (73453/131166)
+2026-11-23T23:59:22.6846641Z Updating files:  56% (74023/131166)
+2026-11-23T23:59:22.7765218Z Updating files:  57% (74765/131166)
+2026-11-23T23:59:22.8785927Z Updating files:  58% (76077/131166)
+2026-11-23T23:59:22.9816969Z Updating files:  59% (77388/131166)
+2026-11-23T23:59:23.0677027Z Updating files:  60% (78700/131166)
+2026-11-23T23:59:23.1533696Z Updating files:  61% (80012/131166)
+2026-11-23T23:59:23.2261684Z Updating files:  62% (81323/131166)
+2026-11-23T23:59:23.3113759Z Updating files:  63% (82635/131166)
+2026-11-23T23:59:23.3887093Z Updating files:  64% (83947/131166)
+2026-11-23T23:59:23.4687642Z Updating files:  65% (85258/131166)
+2026-11-23T23:59:23.5511416Z Updating files:  66% (86570/131166)
+2026-11-23T23:59:23.6363779Z Updating files:  67% (87882/131166)
+2026-11-23T23:59:23.6397478Z Updating files:  68% (89193/131166)
+2026-11-23T23:59:23.7177057Z Updating files:  68% (89209/131166)
+2026-11-23T23:59:23.7998413Z Updating files:  69% (90505/131166)
+2026-11-23T23:59:23.8748644Z Updating files:  70% (91817/131166)
+2026-11-23T23:59:23.9658288Z Updating files:  71% (93128/131166)
+2026-11-23T23:59:24.0339696Z Updating files:  72% (94440/131166)
+2026-11-23T23:59:24.0874144Z Updating files:  73% (95752/131166)
+2026-11-23T23:59:24.1440759Z Updating files:  74% (97063/131166)
+2026-11-23T23:59:24.1999404Z Updating files:  75% (98375/131166)
+2026-11-23T23:59:24.2532633Z Updating files:  76% (99687/131166)
+2026-11-23T23:59:24.3239963Z Updating files:  77% (100998/131166)
+2026-11-23T23:59:24.4000661Z Updating files:  78% (102310/131166)
+2026-11-23T23:59:24.5335950Z Updating files:  79% (103622/131166)
+2026-11-23T23:59:24.6389795Z Updating files:  80% (104933/131166)
+2026-11-23T23:59:24.6690822Z Updating files:  80% (105993/131166)
+2026-11-23T23:59:24.8135757Z Updating files:  81% (106245/131166)
+2026-11-23T23:59:24.9510246Z Updating files:  82% (107557/131166)
+2026-11-23T23:59:25.0451047Z Updating files:  83% (108868/131166)
+2026-11-23T23:59:25.1052794Z Updating files:  84% (110180/131166)
+2026-11-23T23:59:25.1696400Z Updating files:  85% (111492/131166)
+2026-11-23T23:59:25.3093747Z Updating files:  86% (112803/131166)
+2026-11-23T23:59:25.4429911Z Updating files:  87% (114115/131166)
+2026-11-23T23:59:25.5109986Z Updating files:  88% (115427/131166)
+2026-11-23T23:59:25.6366538Z Updating files:  89% (116738/131166)
+2026-11-23T23:59:25.6382113Z Updating files:  90% (118050/131166)
+2026-11-23T23:59:25.7009115Z Updating files:  90% (118078/131166)
+2026-11-23T23:59:25.7756806Z Updating files:  91% (119362/131166)
+2026-11-23T23:59:25.8529287Z Updating files:  92% (120673/131166)
+2026-11-23T23:59:25.9690397Z Updating files:  93% (121985/131166)
+2026-11-23T23:59:26.1403452Z Updating files:  94% (123297/131166)
+2026-11-23T23:59:26.2259404Z Updating files:  95% (124608/131166)
+2026-11-23T23:59:26.3080513Z Updating files:  96% (125920/131166)
+2026-11-23T23:59:26.3773259Z Updating files:  97% (127232/131166)
+2026-11-23T23:59:26.5281375Z Updating files:  98% (128543/131166)
+2026-11-23T23:59:26.6391672Z Updating files:  99% (129855/131166)
+2026-11-23T23:59:26.6843273Z Updating files:  99% (130656/131166)
+2026-11-23T23:59:26.6843845Z Updating files: 100% (131166/131166)
+2026-11-23T23:59:26.6850100Z Updating files: 100% (131166/131166), done.
+2026-11-23T23:59:26.8236846Z Note: switching to 'refs/remotes/pull/1961/merge'.
+2026-11-23T23:59:26.8237718Z 
+2026-11-23T23:59:26.8238274Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-23T23:59:26.8239248Z changes and commit them, and you can discard any commits you make in this
+2026-11-23T23:59:26.8240335Z state without impacting any branches by switching back to a branch.
+2026-11-23T23:59:26.8250273Z 
+2026-11-23T23:59:26.8250923Z If you want to create a new branch to retain commits you create, you may
+2026-11-23T23:59:26.8251911Z do so (now or later) by using -c with the switch command. Example:
+2026-11-23T23:59:26.8252539Z 
+2026-11-23T23:59:26.8252877Z   git switch -c <new-branch-name>
+2026-11-23T23:59:26.8253367Z 
+2026-11-23T23:59:26.8253685Z Or undo this operation with:
+2026-11-23T23:59:26.8254103Z 
+2026-11-23T23:59:26.8254403Z   git switch -
+2026-11-23T23:59:26.8254982Z 
+2026-11-23T23:59:26.8255955Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-23T23:59:26.8256669Z 
+2026-11-23T23:59:26.8257451Z HEAD is now at 203c588a4 Merge ae67853ede5b0f35e13b4d34d67b1c3b524943d3 into 5005bedbe4fd4f1a43456918dd255fd2cbc4a5d1
+2026-11-23T23:59:26.8672927Z ##[endgroup]
+2026-11-23T23:59:26.8726871Z [command]/usr/bin/git log -1 --format=%H
+2026-11-23T23:59:26.8759126Z 203c588a4a4b0129409db76293fc50c0a01861eb
+2026-11-23T23:59:27.0329268Z ##[group]Run python3 tools/check_skills_parity.py
+2026-11-23T23:59:27.0329782Z [36;1mpython3 tools/check_skills_parity.py[0m
+2026-11-23T23:59:27.0367990Z shell: /usr/bin/bash -e {0}
+2026-11-23T23:59:27.0368275Z ##[endgroup]
+2026-11-23T23:59:27.1226083Z skills-parity: OK (0 skill(s) on both surfaces)
+2026-11-23T23:59:27.1933389Z ##[group]Run python3 tools/check_lab_parity.py --repo cryptanalysis
+2026-11-23T23:59:27.1934134Z [36;1mpython3 tools/check_lab_parity.py --repo cryptanalysis[0m
+2026-11-23T23:59:27.1967722Z shell: /usr/bin/bash -e {0}
+2026-11-23T23:59:27.1968007Z ##[endgroup]
+2026-11-23T23:59:27.2820229Z lab-parity: tools/pcc/pcc.py: sha256 5673d442694d… != lock a4e5ce5076e2… (owner: crypto)
+2026-11-23T23:59:27.2821183Z lab-parity: tools/pcc/test_pcc.py: sha256 d880932ee5c5… != lock 0dec048df881… (owner: crypto)
+2026-11-23T23:59:27.2821832Z lab-parity: 2 problem(s) for cryptanalysis
+2026-11-23T23:59:27.2897382Z ##[error]Process completed with exit code 1.
+2026-11-23T23:59:27.3369317Z Post job cleanup.
+2026-11-23T23:59:27.4320827Z [command]/usr/bin/git version
+2026-11-23T23:59:27.4367843Z git version 2.56.1
+2026-11-23T23:59:27.4413028Z Temporarily overriding HOME='/home/runner/work/_temp/648f6343-5b7c-4d5a-ae39-7492d353e79a' before making global git config changes
+2026-11-23T23:59:27.4414409Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-23T23:59:27.4420003Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/cryptanalysis/cryptanalysis
+2026-11-23T23:59:27.4911540Z Removing SSH command configuration
+2026-11-23T23:59:27.4912676Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-23T23:59:27.4947210Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-23T23:59:27.5479688Z Removing HTTP extra header
+2026-11-23T23:59:27.5485614Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-23T23:59:27.5525462Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-23T23:59:27.6034073Z Removing includeIf entries pointing to credentials config files
+2026-11-23T23:59:27.6041763Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-23T23:59:27.6076091Z includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path
+2026-11-23T23:59:27.6077117Z includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path
+2026-11-23T23:59:27.6077955Z includeif.gitdir:/github/workspace/.git.path
+2026-11-23T23:59:27.6078586Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-23T23:59:27.6086362Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path
+2026-11-23T23:59:27.6116004Z /home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:59:27.6127764Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-e4ae3e5f\-d946\-44dc\-8cb7\-88d249a4e6a3\.config
+2026-11-23T23:59:27.6170856Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path
+2026-11-23T23:59:27.6205984Z /home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:59:27.6214160Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/cryptanalysis/cryptanalysis/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-e4ae3e5f\-d946\-44dc\-8cb7\-88d249a4e6a3\.config
+2026-11-23T23:59:27.6309099Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-23T23:59:27.6337072Z /github/runner_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:59:27.6347002Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-e4ae3e5f\-d946\-44dc\-8cb7\-88d249a4e6a3\.config
+2026-11-23T23:59:27.6386396Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-23T23:59:27.6414190Z /github/runner_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config
+2026-11-23T23:59:27.6426930Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-e4ae3e5f\-d946\-44dc\-8cb7\-88d249a4e6a3\.config
+2026-11-23T23:59:27.6464247Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-23T23:59:27.7029866Z Removing credentials config '/home/runner/work/_temp/git-credentials-e4ae3e5f-d946-44dc-8cb7-88d249a4e6a3.config'
+2026-11-23T23:59:27.7241673Z Cleaning up orphan processes

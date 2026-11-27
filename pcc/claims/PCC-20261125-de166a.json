@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T01:15:12Z",
+ "id": "PCC-20261125-de166a",
+ "kind": "statement",
+ "producer": {
+  "commit": "bc25c877f22ddb0c4aaf1bda3374a07b3faf023d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/feature_tests.txt",
+    "sha256": "4e7e21febb25cc031521c1da8a7d653c00929e342028aea3780d1254a928262a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/default_tests.txt",
+    "sha256": "b8a508344fbc6607f1a8c3e1e361ff678af82cfccae7f2439656a5fb37064957"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/factorwise_v1/build.txt",
+    "sha256": "317f17294de9de6c1751628c3f64300ec9fd86bc41c30943885b650d8f5c0bb5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-factorwise",
+ "statement": "The factorwise construction source passes 42 feature tests and 15 default tests and builds in release mode. New controls reject malformed charts, compare scalar remainder values across partition shapes, and check a repeated-image witness plus coordinate mutations. These are producer-local source controls, not a solver-completion or cost result."
+}

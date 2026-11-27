@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:27:59Z",
+ "id": "PCC-20261124-4993a9",
+ "kind": "execution",
+ "producer": {
+  "commit": "db413dd28c3327427b263839c5fbbb511efde90f",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/geometry-source-commit.txt",
+    "sha256": "fc418710dfa03edc91d0c84825008d168825a99f1f9fec757ca5d4c030f76bb6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/source-worker-input.sha256",
+    "sha256": "c9a8e4c3966ad7c2252da931b794bf21b1923ec551078e73266036b286c559c3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/validation/h6-geometry-tests-final.log",
+    "sha256": "7b99722ab5cddebb3dfced9a1285f168754b9a07cf36e6487fd72e484da0cd78"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/validation/h6-geometry-clippy.log",
+    "sha256": "5198e73247505baed15dbf9c108e4a1517b72c17f180f95ab5fcb6fc9758b057"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/fixture/public.json",
+    "sha256": "37554399c543d282fcfe6e58021b2fdf8f329178cade0aea19944259523a939a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/launch-geometry.sh",
+    "sha256": "5ee1535e0652549c4c3a9eeff752a2049be20d73aebac333cb5410ee5e971d1e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Final H6 constructor/geometry source qualifies before retained-point execution: six native controls pass, strict Clippy and optimized worker build pass; quadratic-field omega is bound as well as p. Fixture extraction selects source1 as the first retained two-quadratic principal row, captures only its public function and support, and performs no F4/root/DLP call. Source/worker/input pins and exact source commit are retained. The one geometry call is bounded to8GiB/120s and no fiber solve is enabled."
+}

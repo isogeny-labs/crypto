@@ -1,0 +1,53 @@
+    Checking typenum v1.20.1
+    Checking cfg-if v1.0.5
+    Checking serde_core v1.0.229
+    Checking num-traits v0.2.19
+    Checking zmij v1.0.23
+    Checking itoa v1.0.19
+    Checking cpufeatures v0.2.17
+    Checking memchr v2.8.3
+    Checking num-integer v0.1.47
+    Checking generic-array v0.14.7
+    Checking simd-adler32 v0.3.10
+    Checking num-bigint v0.4.8
+    Checking adler2 v2.0.1
+    Checking miniz_oxide v0.9.1
+    Checking block-buffer v0.10.4
+    Checking crypto-common v0.1.7
+    Checking crc32fast v1.5.5
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking hex v0.4.3
+    Checking flate2 v1.1.11
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking torus-s4 v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-s4)
+    Checking torus-s4-tree v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-s4-tree)
+    Checking torus-section-operator v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-section-operator)
+    Checking torus-coset-circuit v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-coset-circuit)
+    Checking torus-quotient-query v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-quotient-query)
+    Checking torus-section-radical v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-section-radical)
+    Checking torus-spectrum-compiler v0.1.0 (/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/tools/torus-spectrum-compiler)
+error: manual implementation of `.is_multiple_of()`
+  --> src/lib.rs:85:27
+   |
+85 |             dp[mask] = if (row + pos) % 2 == 0 {
+   |                           ^^^^^^^^^^^^^^^^^^^^ help: replace with: `(row + pos).is_multiple_of(2)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: useless use of `vec!`
+   --> src/lib.rs:221:18
+    |
+221 |     let mut cs = vec![0; 6];
+    |                  ^^^^^^^^^^ help: you can use an array directly: `[0; 6]`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#useless_vec
+    = note: `-D clippy::useless-vec` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::useless_vec)]`
+
+error: could not compile `torus-spectrum-compiler` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-spectrum-compiler` (lib) due to 2 previous errors

@@ -1,0 +1,14 @@
+digraph adapter {
+  graph [rankdir=TB, bgcolor="white", pad=0.2, nodesep=0.35, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#365a7a", fillcolor="#edf3fa"];
+  edge [color="#526573", arrowsize=0.7];
+  fiber [label="Auxiliary chain and regular fiber\nF31 unit fixture: degree 8"];
+  base [label="Lift onto target; exclude y = 0\nSort points and assign signed labels", fillcolor="#e9f3e7"];
+  native [label="Exact ordered points\nUnchanged native RR5 preparation\nEquations only; no solver"];
+  low [label="Chained leaf equations\nQuadratic maps + target curve"];
+  dense [label="Dense leaf equations\nActual-base polynomial H + target curve"];
+  check [label="Fp assignment parity controls\nNot equality of algebraic-closure ideals", fillcolor="#fff2dd"];
+  fiber -> base; base -> native; fiber -> low; base -> dense;
+  low -> check; dense -> check;
+  {rank=same; native; dense; low;}
+}

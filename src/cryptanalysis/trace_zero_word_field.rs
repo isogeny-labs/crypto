@@ -3,7 +3,7 @@
 //! reductions reuse the production word kernels; exact maps are prepared once.
 use crate::binary_ecc::{
     curve::{point_add, point_neg},
-    f2m::{mul_words_into, reduce_words, spread32},
+    f2m::{compact_mod131_hw_available, mul_words_into, reduce_words, spread32, CompactLinearMaps},
     operation_tally, BinaryCurve, BinaryPoint, F2mElement, IrreduciblePoly,
 };
 pub type Element = [u64; 3];
@@ -42,9 +42,9 @@ pub struct WordField {
     nw: usize,
     irr: IrreduciblePoly,
     trace_mask: Element,
-    half: Vec<Element>,
-    nbytes: usize,
+    linear_maps: CompactLinearMaps,
     reduction: u8,
+    hardware131: bool,
     tail: Element,
 }
 impl WordField {
@@ -53,16 +53,8 @@ impl WordField {
             c.m <= 192 && c.m >= 3 && c.m % 2 == 1 && c.a.is_zero() && c.b == F2mElement::one(c.m)
         );
         let n = c.m as usize;
-        let mut trace_mask = [0; 3];
-        let mut halves = Vec::new();
-        for bit in 0..n {
-            let e = F2mElement::from_bit_positions(&[bit as u32], c.m);
-            if e.trace(&c.irreducible) != 0 {
-                trace_mask[bit / 64] |= 1u64 << (bit % 64);
-            }
-            halves.push(element(&e.half_trace(&c.irreducible).unwrap()));
-        }
-        let nbytes = n.div_ceil(8);
+        let linear_maps = CompactLinearMaps::new(&c.irreducible);
+        let trace_mask = linear_maps.trace_mask();
         let mut tail = [0; 3];
         for &t in &c.irreducible.low_terms {
             tail[t as usize / 64] |= 1u64 << (t % 64);
@@ -75,27 +67,14 @@ impl WordField {
         } else {
             0
         };
-        let mut half = vec![[0; 3]; nbytes * 256];
-        for byte in 0..nbytes {
-            for value in 1..256usize {
-                let bit = value.trailing_zeros() as usize;
-                let prev = half[byte * 256 + (value & (value - 1))];
-                let column = halves.get(byte * 8 + bit).copied().unwrap_or([0; 3]);
-                half[byte * 256 + value] = [
-                    prev[0] ^ column[0],
-                    prev[1] ^ column[1],
-                    prev[2] ^ column[2],
-                ];
-            }
-        }
         Self {
             m: c.m,
             nw: n.div_ceil(64),
             irr: c.irreducible.clone(),
             trace_mask,
-            half,
-            nbytes,
+            linear_maps,
             reduction,
+            hardware131: reduction == 131 && compact_mod131_hw_available(),
             tail,
         }
     }
@@ -104,16 +83,26 @@ impl WordField {
         operation_tally::tick(self.m, "add");
         [a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2]]
     }
-    #[inline]
+    #[inline(always)]
     pub fn mul(&self, a: Element, b: Element) -> Element {
         operation_tally::tick(self.m, "mul");
+        #[cfg(target_arch = "x86_64")]
+        if self.hardware131 {
+            // SAFETY: private bit set only after full-modulus and ISA checks.
+            return unsafe { crate::binary_ecc::f2m::mul_mod131_hw(&a, &b) };
+        }
         let mut out = [0u64; 7];
         mul_words_into(&a[..self.nw], &b[..self.nw], &mut out);
         self.reduce(out)
     }
-    #[inline]
+    #[inline(always)]
     pub fn square(&self, a: Element) -> Element {
         operation_tally::tick(self.m, "square");
+        #[cfg(target_arch = "x86_64")]
+        if self.hardware131 {
+            // SAFETY: the same private full-modulus/ISA dispatch guarantee.
+            return unsafe { crate::binary_ecc::f2m::square_mod131_hw(&a) };
+        }
         let mut out = [0u64; 7];
         for (i, &w) in a[..self.nw].iter().enumerate() {
             out[2 * i] = spread32(w);
@@ -121,7 +110,7 @@ impl WordField {
         }
         self.reduce(out)
     }
-    #[inline]
+    #[inline(always)]
     fn reduce(&self, mut p: [u64; 7]) -> Element {
         match self.reduction {
             83 => {
@@ -209,15 +198,7 @@ impl WordField {
     }
     #[inline]
     pub fn half(&self, a: Element) -> Element {
-        let mut out = [0; 3];
-        for byte in 0..self.nbytes {
-            let value = ((a[byte / 8] >> (8 * (byte % 8))) & 255) as usize;
-            let h = self.half[byte * 256 + value];
-            out[0] ^= h[0];
-            out[1] ^= h[1];
-            out[2] ^= h[2];
-        }
-        out
+        self.linear_maps.half(a)
     }
     pub fn admit(&self, p: &BinaryPoint) -> bool {
         let BinaryPoint::Affine { x, y } = p else {
@@ -253,8 +234,22 @@ impl WordField {
             match WordPoint::from_point(p) {
                 WordPoint::Affine { x, y } if x != tx => {
                     let den = self.add(tx, x);
-                    ordinary.push((i, product, den, self.add(ty, self.add(y, x))));
-                    product = self.mul(product, den);
+                    // Consecutive equal abscissas have the same nonzero
+                    // denominator. Keep each ordinate/index but invert it once.
+                    let prefix = if let Some((_, prefix, previous_den, _)) = ordinary.last() {
+                        if *previous_den == den {
+                            *prefix
+                        } else {
+                            let prefix = product;
+                            product = self.mul(product, den);
+                            prefix
+                        }
+                    } else {
+                        let prefix = product;
+                        product = self.mul(product, den);
+                        prefix
+                    };
+                    ordinary.push((i, prefix, den, self.add(ty, self.add(y, x))));
                 }
                 _ => out[i] = WordPoint::from_point(&point_add(c, target, &point_neg(p))),
             }
@@ -263,9 +258,14 @@ impl WordField {
             return out;
         }
         let mut inverse = self.inv(product).unwrap();
+        let mut previous_den = [0; 3];
+        let mut inv = [0; 3];
         for (i, prefix, den, num) in ordinary.into_iter().rev() {
-            let inv = self.mul(inverse, prefix);
-            inverse = self.mul(inverse, den);
+            if den != previous_den {
+                inv = self.mul(inverse, prefix);
+                inverse = self.mul(inverse, den);
+                previous_den = den;
+            }
             let lambda = self.mul(num, inv);
             let x = self.add(self.add(self.square(lambda), lambda), den);
             let y = self.add(self.add(self.mul(lambda, self.add(tx, x)), x), ty);

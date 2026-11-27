@@ -19,6 +19,7 @@ use serde_json::{json, Value};
 use std::collections::HashSet;
 
 #[path = "jv_large_prime_rank_bound.rs"]
+#[allow(clippy::duplicate_mod)]
 mod structural_rank_bound;
 use structural_rank_bound::{BoundSnapshot, StructuralRankBound};
 

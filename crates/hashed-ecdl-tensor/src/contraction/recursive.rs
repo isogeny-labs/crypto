@@ -23,8 +23,16 @@ mod coupled_controls;
 mod dimension_controls;
 
 #[cfg(test)]
+#[path = "factorization_certificate.rs"]
+mod factorization_certificate;
+
+#[cfg(test)]
 #[path = "port_mass_controls.rs"]
 mod port_mass_controls;
+
+#[cfg(test)]
+#[path = "symmetric_child_controls.rs"]
+mod symmetric_child_controls;
 
 #[derive(Clone, Debug)]
 pub(super) struct Parameters {
@@ -570,52 +578,318 @@ mod tests {
     }
 
     #[test]
-    fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
-        let mut meter = Meter::new(Limits::default());
-        let modes: Vec<_> = [1usize, 2, 3]
-            .iter()
-            .map(|&weight| Mode {
-                packet: 0,
-                source: 1,
-                target: 0,
-                weight,
-                rows: vec![],
-                columns: vec![],
-            })
-            .collect();
-        let mut beta = vec![0; 3];
-        let mut usage = vec![0; 2];
-        let bounds = [2, 0];
-        let mut weight = 0;
-        let mut actual = BTreeSet::new();
-        loop {
-            assert!(actual.insert(beta.clone()));
-            if !next_tuple(
-                &mut beta,
-                &modes,
-                &mut usage,
-                &bounds,
-                &mut weight,
-                5,
-                2,
-                &mut meter,
-            )
-            .unwrap()
-            {
-                break;
+    fn multi_taper_hermite_recovers_extension_polynomials_across_precisions() {
+        let mut meter = Meter::new(Limits {
+            steps: 10_000_000_000,
+            ..Limits::default()
+        });
+        let cases = [
+            (
+                Parameters {
+                    radix: 2,
+                    u: 2,
+                    a: 2,
+                    length: 4,
+                    array: 16,
+                },
+                2usize,
+                4usize,
+                vec![3usize, 5, 7],
+            ),
+            (
+                Parameters {
+                    radix: 2,
+                    u: 3,
+                    a: 3,
+                    length: 8,
+                    array: 64,
+                },
+                3usize,
+                6usize,
+                vec![5usize],
+            ),
+        ];
+        for (parameters, edges, extension_degree, precisions) in cases {
+            let samples = edges * (2 * parameters.length - 1) + 1;
+            let residue_points = 1usize << extension_degree;
+            for precision in precisions {
+                let ring = Ring::new(extension_degree, precision, &mut meter).unwrap();
+                let scalar: Vec<_> = (0..samples)
+                    .map(|i| ring.integer(&BigUint::from(5 * i + 3)))
+                    .collect();
+                let extension: Vec<_> = (0..samples)
+                    .map(|i| {
+                        let point = ring
+                            .point(&BigUint::from((3 * i + 1) % residue_points))
+                            .unwrap();
+                        ring.add(&point, &ring.integer(&BigUint::from(7 * i + 2)), &mut meter)
+                            .unwrap()
+                    })
+                    .collect();
+                for coefficients in [scalar, extension] {
+                    let mut jets = Vec::new();
+                    for t in deformation::grid(&parameters, &mut meter).unwrap() {
+                        let qt = multiplicity(edges, &parameters, t).unwrap();
+                        if qt == 0 {
+                            continue;
+                        }
+                        let local = ring
+                            .at_precision(
+                                child_precision(edges, &parameters, t, precision).unwrap(),
+                                &meter,
+                            )
+                            .unwrap();
+                        let nodes: Vec<_> = (0..samples)
+                            .map(|j| local.point(&BigUint::from(j)).unwrap())
+                            .collect();
+                        let lifted: Vec<_> = coefficients
+                            .iter()
+                            .map(|coefficient| local.lift(coefficient).unwrap())
+                            .collect();
+                        let values: Vec<_> = nodes
+                            .iter()
+                            .map(|z| {
+                                let shifted = local.shift(z, parameters.a + 1).unwrap();
+                                let argument = local
+                                    .add(&local.signed(&BigInt::from(t)), &shifted, &mut meter)
+                                    .unwrap();
+                                polynomial_value(&lifted, &argument, &local, &mut meter).unwrap()
+                            })
+                            .collect();
+                        let mut jet = interpolate(&nodes, &values, &local, &mut meter).unwrap();
+                        jet.truncate(qt);
+                        jets.push(Jet {
+                            t,
+                            ring: local,
+                            coefficients: jet,
+                        });
+                    }
+                    assert_eq!(
+                        recover(&jets, edges, &parameters, &ring, &mut meter).unwrap(),
+                        coefficients[0],
+                        "u={}, precision={precision}",
+                        parameters.u
+                    );
+                }
             }
         }
-        let mut expected = BTreeSet::new();
-        for a in 0..=2 {
-            for b in 0..=2 {
-                for c in 0..=2 {
-                    if a + b + c <= 2 && a + 2 * b + 3 * c < 5 {
-                        expected.insert(vec![a, b, c]);
+    }
+
+    #[test]
+    fn root_precision_jets_are_insufficient_for_tapered_hermite_recovery() {
+        let mut meter = Meter::new(Limits {
+            steps: 10_000_000_000,
+            ..Limits::default()
+        });
+        let parameters = Parameters {
+            radix: 2,
+            u: 2,
+            a: 2,
+            length: 4,
+            array: 16,
+        };
+        let edges = 2usize;
+        let precision = 5usize;
+        let degree = 4usize;
+        let samples = edges * (2 * parameters.length - 1) + 1;
+        let ring = Ring::new(degree, precision, &mut meter).unwrap();
+        let coefficients: Vec<_> = (0..samples)
+            .map(|i| ring.integer(&BigUint::from(5 * i + 3)))
+            .collect();
+        let low = ring.at_precision(precision, &meter).unwrap();
+        let nodes: Vec<_> = (0..samples)
+            .map(|j| low.point(&BigUint::from(j)).unwrap())
+            .collect();
+        let lifted: Vec<_> = coefficients
+            .iter()
+            .map(|coefficient| low.lift(coefficient).unwrap())
+            .collect();
+        let mut jets = Vec::new();
+        for t in deformation::grid(&parameters, &mut meter).unwrap() {
+            let qt = multiplicity(edges, &parameters, t).unwrap();
+            if qt == 0 {
+                continue;
+            }
+            let values: Vec<_> = nodes
+                .iter()
+                .map(|z| {
+                    let shifted = low.shift(z, parameters.a + 1).unwrap();
+                    let argument = low
+                        .add(&low.signed(&BigInt::from(t)), &shifted, &mut meter)
+                        .unwrap();
+                    polynomial_value(&lifted, &argument, &low, &mut meter).unwrap()
+                })
+                .collect();
+            let mut jet = interpolate(&nodes, &values, &low, &mut meter).unwrap();
+            jet.truncate(qt);
+            let local = ring
+                .at_precision(
+                    child_precision(edges, &parameters, t, precision).unwrap(),
+                    &meter,
+                )
+                .unwrap();
+            jets.push(Jet {
+                t,
+                coefficients: jet
+                    .iter()
+                    .map(|coefficient| local.lift(coefficient).unwrap())
+                    .collect(),
+                ring: local,
+            });
+        }
+        let recovered = recover(&jets, edges, &parameters, &ring, &mut meter).unwrap();
+        assert_eq!(recovered, ring.integer(&BigUint::from(7u8)));
+        assert_ne!(recovered, coefficients[0]);
+    }
+
+    #[test]
+    fn weighted_enumeration_has_no_missing_or_repeated_monomials() {
+        fn production(
+            modes: &[Mode],
+            bounds: &[usize],
+            precision: usize,
+            radix: usize,
+            meter: &mut Meter,
+        ) -> BTreeSet<Vec<usize>> {
+            let mut beta = vec![0; modes.len()];
+            let mut usage = vec![0; bounds.len()];
+            let mut weight = 0;
+            let mut actual = BTreeSet::new();
+            loop {
+                assert!(actual.insert(beta.clone()));
+                if !next_tuple(
+                    &mut beta,
+                    modes,
+                    &mut usage,
+                    bounds,
+                    &mut weight,
+                    precision,
+                    radix,
+                    meter,
+                )
+                .unwrap()
+                {
+                    return actual;
+                }
+            }
+        }
+
+        fn independent(
+            modes: &[Mode],
+            bounds: &[usize],
+            precision: usize,
+            radix: usize,
+        ) -> BTreeSet<Vec<usize>> {
+            fn visit(
+                index: usize,
+                modes: &[Mode],
+                bounds: &[usize],
+                precision: usize,
+                radix: usize,
+                beta: &mut [usize],
+                usage: &mut [usize],
+                weight: usize,
+                out: &mut BTreeSet<Vec<usize>>,
+            ) {
+                if index == modes.len() {
+                    out.insert(beta.to_vec());
+                    return;
+                }
+                let mode = &modes[index];
+                let group = mode.packet * radix + mode.target;
+                let capacity = bounds[group] - usage[group];
+                let weight_capacity = (precision - 1 - weight) / mode.weight;
+                for exponent in 0..=capacity.min(weight_capacity) {
+                    beta[index] = exponent;
+                    usage[group] += exponent;
+                    visit(
+                        index + 1,
+                        modes,
+                        bounds,
+                        precision,
+                        radix,
+                        beta,
+                        usage,
+                        weight + exponent * mode.weight,
+                        out,
+                    );
+                    usage[group] -= exponent;
+                }
+                beta[index] = 0;
+            }
+
+            let mut out = BTreeSet::new();
+            let mut beta = vec![0; modes.len()];
+            let mut usage = vec![0; bounds.len()];
+            visit(
+                0, modes, bounds, precision, radix, &mut beta, &mut usage, 0, &mut out,
+            );
+            out
+        }
+
+        let mut meter = Meter::new(Limits::default());
+        for mode_count in 0..=4usize {
+            let descriptions = 6usize.pow(mode_count as u32);
+            for description in 0..descriptions {
+                let mut remaining = description;
+                let mut modes = Vec::new();
+                for _ in 0..mode_count {
+                    let digit = remaining % 6;
+                    remaining /= 6;
+                    let target = digit / 3;
+                    modes.push(Mode {
+                        packet: 0,
+                        source: target ^ 1,
+                        target,
+                        weight: digit % 3 + 1,
+                        rows: vec![],
+                        columns: vec![],
+                    });
+                }
+                for bound_0 in 0..=2 {
+                    for bound_1 in 0..=2 {
+                        let bounds = [bound_0, bound_1];
+                        for precision in 1..=6 {
+                            assert_eq!(
+                                production(&modes, &bounds, precision, 2, &mut meter),
+                                independent(&modes, &bounds, precision, 2),
+                                "mode_count={mode_count}, description={description}, bounds={bounds:?}, precision={precision}",
+                            );
+                        }
                     }
                 }
             }
         }
-        assert_eq!(actual, expected);
+
+        let cases = [
+            (
+                vec![(0, 0, 1), (0, 1, 2), (1, 0, 1), (1, 0, 3)],
+                vec![1, 2, 2, 0],
+                6,
+            ),
+            (
+                vec![(0, 1, 1), (0, 1, 1), (1, 1, 2), (1, 0, 3), (1, 0, 1)],
+                vec![1, 3, 2, 1],
+                7,
+            ),
+        ];
+        for (descriptions, bounds, precision) in cases {
+            let modes: Vec<_> = descriptions
+                .into_iter()
+                .map(|(packet, target, weight)| Mode {
+                    packet,
+                    source: target ^ 1,
+                    target,
+                    weight,
+                    rows: vec![],
+                    columns: vec![],
+                })
+                .collect();
+            assert_eq!(
+                production(&modes, &bounds, precision, 2, &mut meter),
+                independent(&modes, &bounds, precision, 2),
+            );
+        }
     }
 
     #[test]
@@ -682,5 +956,25 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn usize_backend_cannot_enter_the_strict_source_branch() {
+        // Every representable edge count has lambda<=usize::BITS, whereas the
+        // source schedule needs floor(lambda/(128*1024))>=1. Check the largest
+        // possible edge count through the production Setup path as a witness
+        // to that representation boundary; smaller inputs have no larger u.
+        assert!((usize::BITS as usize) < 128 * 1024);
+        let mut meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            ..Limits::default()
+        });
+        let setup = Setup::new(usize::MAX, 0, &mut meter).unwrap();
+        assert_eq!(setup.lambda, usize::BITS as usize);
+        assert!(setup.parameters(usize::MAX, 0).unwrap().is_none());
+        assert!(setup
+            .parameters(usize::MAX, usize::BITS as usize)
+            .unwrap()
+            .is_none());
     }
 }

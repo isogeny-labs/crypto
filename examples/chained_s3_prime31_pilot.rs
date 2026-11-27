@@ -62,6 +62,7 @@ struct Stats {
 /// An infinity key is the missing affine group-law branch P +/- Q = O.
 /// The two roots have abscissae x(P+Q), x(P-Q); the S3 polynomial
 /// by itself does NOT encode the infinity branch.
+#[allow(dead_code)]
 fn s3_roots(
     c: &PrimeCurve,
     sem: &SemaevCurve,
@@ -541,6 +542,7 @@ fn small_field_panel(arm: &str, m: usize, size: usize) {
     );
 }
 
+#[allow(dead_code)]
 fn recover_from_signed_rows(
     c: &PrimeCurve,
     generator: PrimePoint,

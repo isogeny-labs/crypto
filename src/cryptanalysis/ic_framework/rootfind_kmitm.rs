@@ -183,6 +183,8 @@ impl<P> RightSum<P> {
 /// Meet-in-the-middle k-sum root finding for `m = 3..=12`.
 pub struct RootfindKMitmOracle<'i> {
     m: u32,
+    /// Versioned production identity that requires lane target scheduling.
+    batch_v1: bool,
     /// Optional prime instance: enables `sib=1` on the left table when set.
     instance: Option<&'i PrimeInstance>,
     left_k: u32,
@@ -258,6 +260,7 @@ impl<'i> RootfindKMitmOracle<'i> {
         let (left_k, right_k) = split_arity(m, false);
         Self {
             m,
+            batch_v1: false,
             instance: None,
             left_k,
             right_k,
@@ -308,6 +311,15 @@ impl<'i> RootfindKMitmOracle<'i> {
         let mut s = Self::new(m);
         s.instance = Some(instance);
         s
+    }
+
+    /// The production lane-batched identity. Unlike [`Self::new_prime`],
+    /// this is rejected by the pipeline unless its target source supplies
+    /// lanes.
+    pub fn new_prime_batch_v1(m: u32, instance: &'i PrimeInstance) -> Self {
+        let mut oracle = Self::new_prime(m, instance);
+        oracle.batch_v1 = true;
+        oracle
     }
 
     /// Left-half table entry count after [`DecompositionOracle::prepare`].
@@ -463,6 +475,7 @@ impl<'i> RootfindKMitmOracle<'i> {
         let n = self.diffs.len().max(1);
         Self {
             m: self.m,
+            batch_v1: self.batch_v1,
             instance: self.instance,
             left_k: self.left_k,
             right_k: self.right_k,
@@ -674,7 +687,11 @@ fn collect_right_rec<G: CountedGroup>(
 
 impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
     fn name(&self) -> &str {
-        "rootfind-kmitm"
+        if self.batch_v1 {
+            "rootfind-kmitm-batch-v1"
+        } else {
+            "rootfind-kmitm"
+        }
     }
 
     fn summands(&self) -> u32 {
@@ -707,6 +724,31 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             ),
             ("prune", "1: skip dead-end partials in the left k-sum build (default 1)"),
         ]
+    }
+
+    fn preferred_batch_size(&self) -> usize {
+        if self.batch_v1 {
+            8
+        } else {
+            1
+        }
+    }
+
+    fn decompose_batch(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        points: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        assert_eq!(
+            points.len(),
+            out.len(),
+            "decompose_batch requires one output slot per point"
+        );
+        self.decompose_lanes(ctx, fb, ops, counters, points, out);
     }
 
     fn prepare(
@@ -988,6 +1030,63 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
     }
 }
 
+enum FoldedHit {
+    Hit(Vec<usize>),
+    Overlap,
+    Mismatch,
+}
+
+/// Recover the sign of a left-table witness returned by an abscissa-only
+/// lookup.  The table folds `L` and `-L` onto one key, while the right half
+/// is already signed by the sibling candidate.  Recompute `R = target -
+/// right`, orient only the left indices to `R`, and then enforce the usual
+/// cross-half disjointness rule.
+///
+/// This costs exactly `(right.len() - 1) + 1 + (left.len() - 1) = m - 1`
+/// additions, the same charge as re-adding the old combined witness.
+fn orient_folded_left<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    ops: &mut GroupOps,
+    target: G::Elt,
+    mut left: Vec<usize>,
+    right: &[usize],
+) -> FoldedHit {
+    let Some((&right_first, right_rest)) = right.split_first() else {
+        return FoldedHit::Mismatch;
+    };
+    let Some((&left_first, left_rest)) = left.split_first() else {
+        return FoldedHit::Mismatch;
+    };
+
+    let mut right_sum = fb.points[right_first];
+    for &i in right_rest {
+        right_sum = g.add(ops, right_sum, fb.points[i]);
+    }
+    let needed_left = g.add(ops, target, g.neg(right_sum));
+
+    let mut left_sum = fb.points[left_first];
+    for &i in left_rest {
+        left_sum = g.add(ops, left_sum, fb.points[i]);
+    }
+    if left_sum == needed_left {
+        // The stored orientation is already the one selected by this
+        // signed right-half candidate.
+    } else if left_sum == g.neg(needed_left) {
+        for i in &mut left {
+            *i = fb.neg_index[*i];
+        }
+    } else {
+        return FoldedHit::Mismatch;
+    }
+
+    if left.iter().any(|i| right.contains(i)) {
+        return FoldedHit::Overlap;
+    }
+    left.extend_from_slice(right);
+    FoldedHit::Hit(left)
+}
+
 impl RootfindKMitmOracle<'_> {
     fn finish_hit_prime(
         &mut self,
@@ -999,29 +1098,18 @@ impl RootfindKMitmOracle<'_> {
         left: Vec<usize>,
         right: &[usize],
     ) -> Option<Vec<usize>> {
-        let overlap = left.iter().any(|&i| right.contains(&i));
-        if overlap {
-            self.overlaps_rejected += 1;
-            return None;
-        }
-        let mut out = left;
-        out.extend_from_slice(right);
-        let mut acc = fb.points[out[0]];
-        for &i in &out[1..] {
-            acc = g.add(ops, acc, fb.points[i]);
-        }
-        if acc == target {
-            return Some(out);
-        }
-        if acc == g.neg(target) {
-            for i in &mut out {
-                *i = fb.neg_index[*i];
+        match orient_folded_left(g, fb, ops, target, left, right) {
+            FoldedHit::Hit(out) => Some(out),
+            FoldedHit::Overlap => {
+                self.overlaps_rejected += 1;
+                None
             }
-            return Some(out);
+            FoldedHit::Mismatch => {
+                self.mismatches += 1;
+                counters.frobfold_mismatches += 1;
+                None
+            }
         }
-        self.mismatches += 1;
-        counters.frobfold_mismatches += 1;
-        None
     }
 
     fn probe_right1_prime(
@@ -2053,29 +2141,18 @@ impl RootfindKMitmOracle<'_> {
         left: Vec<usize>,
         right: &[usize],
     ) -> Option<Vec<usize>> {
-        for &i in &left {
-            if right.contains(&i) {
+        match orient_folded_left(g, fb, ops, target, left, right) {
+            FoldedHit::Hit(out) => Some(out),
+            FoldedHit::Overlap => {
                 self.overlaps_rejected += 1;
-                return None;
+                None
+            }
+            FoldedHit::Mismatch => {
+                self.mismatches += 1;
+                counters.frobfold_mismatches += 1;
+                None
             }
         }
-        let mut out = left;
-        out.extend_from_slice(right);
-        let mut acc = fb.points[out[0]];
-        for &i in &out[1..] {
-            acc = g.add(ops, acc, fb.points[i]);
-        }
-        if acc == target || acc == g.neg(target) {
-            if acc == g.neg(target) {
-                for i in &mut out {
-                    *i = fb.neg_index[*i];
-                }
-            }
-            return Some(out);
-        }
-        self.mismatches += 1;
-        counters.frobfold_mismatches += 1;
-        None
     }
 
     fn probe_right1_bin(

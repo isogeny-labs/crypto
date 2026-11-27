@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-27T01:29:32Z",
+ "id": "PCC-20261127-7eb250",
+ "kind": "statement",
+ "producer": {
+  "commit": "e791ac91f7535cdc7bcd2c0ee09aa3c1af523621",
+  "model": "codex",
+  "session": "aps-integration-maintenance-20261127"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_collection_architectures_20261123/integration_20261127/validation.json",
+    "sha256": "f9f282f32be83cd16eae3508b2a6e3bd36a8e30bc9da61904b55f0fe669c3b41"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/aps_collection_architectures_20261123/integration_20261127",
+ "statement": "PR5091 integration candidate with prior head ea4a60f and incoming main c0a2387 preserves package/dependency compile inputs (9 plus22 public blobs) and passes the existing 10library+2CLI regressions on Rust1.98/1.99 plus strict1.98Clippy. This is producer-only maintenance validation of unchanged historical fixtures, not new M31 research, signed validation or a full-root pass."
+}

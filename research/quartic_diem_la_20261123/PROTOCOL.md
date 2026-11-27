@@ -1,9 +1,8 @@
 # Protocol (DRAFT, NOT FROZEN): cheaper linear algebra for Diem 2LP IC on prime-order plane quartics
 
-Status: **DRAFT. Not frozen. No measured data exists.** Freezing (writing `frozen.sha256` over
-this file, `analyze.py` and `run_*.sh`) is blocked until the library compiles again (main's
-`src/cryptanalysis/prime_root_trace.rs` has a bad merge, 24d422e6ee7; owner decision pending)
-and the development step of section 4 has fixed the three parameters marked TBD. Every number
+Status: **FROZEN 2026-11-24** (`frozen.sha256` over this file, `analyze.py`, `run_*.sh`), after the
+library build was repaired (4faca82a6f0) and the section-4 development grid fixed W, FILL, EXCESS.
+No grid-prime data existed at freeze. Every number
 this study produces is `[pcc:unverified]`.
 
 Parent: `research/quartic_diem_ladder_20261121/` (arm `2lp-sfb`: `la_add` is 85% of all native
@@ -40,7 +39,7 @@ also reproduce the ladder's rows exactly (check C0).
   falls back, fully counted, to `2lp-sfb`'s own solve of the whole core with the very same draws, so
   the arm never certifies less often. Row selection is charged one addition per entry visited,
   one per row, and `m ceil(log2 m)` additions for the ordering; SGE is charged as in `sge_reduce`.
-- Parameters W, FILL, EXCESS: **TBD by section 4**, then written here before freezing.
+- Parameters (section 4): **W = 8, FILL = 1.5, EXCESS = 64** (`--quartic-sge 8,1.5,64`).
 
 ## 4. Development (before freezing; not in any fit)
 
@@ -48,7 +47,19 @@ Curves of the ladder at p = 32771 (curve seeds 32, 163, 217, 221, 229; that prim
 measured grid) and the ladder's dev curves at 4093 and 8191, seeds 1 and 2. Grid: W in {4, 8},
 FILL in {1.5, 3}, EXCESS in {8, 16, 64}. Choose the setting with the lowest geometric-mean
 `la_add + la_mul` at 32771 among settings with zero `la_fallbacks`; ties to the smaller EXCESS.
-Record the dev rows in `dev/`. Tests `cargo test --release --lib quartic_ladder` must pass,
+Record the dev rows in `dev/`.
+
+**Amendment before freezing (development data only, 2026-11-24).** The development grid ran
+(`dev/run_dev.sh`, binary sha256 in `dev/binary.sha256`, selection `dev/choose.py` ->
+`dev/choice.json`). Every one of the 12 settings had exactly 4 `la_fallbacks`, all on the 4
+(curve, seed) pairs where `2lp-sfb` itself needed a second attempt (4093/89/2, 8191/106/2,
+32771/217/1, 32771/217/2): the first attempt's system has no solution for either arm, so the
+fallback re-runs a solve that also fails. The zero-fallback condition is therefore unreachable
+by any parameter, and it is replaced by: *no fallback on a (curve, seed) where `2lp-sfb` certified
+in its first attempt* (all 12 settings meet it). FILL had no effect on any counted field (the
+two FILL values give identical rows), so ties also go to the smaller FILL. Pick: lowest geometric
+mean at 32771 is W = 8, EXCESS = 64 (12,532,140 vs 12,700,356 at EXCESS 16), FILL = 1.5. The
+arm design (fully counted fallback) is not changed, which can only count against `2lp-sfb-sge`. Tests `cargo test --release --lib quartic_ladder` must pass,
 including `sfb_sge_same_logs_as_sfb`, `coord_square_and_row_selection`,
 `wiedemann_split_equals_reference`.
 

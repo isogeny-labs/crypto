@@ -366,26 +366,15 @@ fn pmonic(k: &Fp, a: &[u64]) -> Poly {
     }
 }
 
-/// `(d, s, t)` with `d = s·a + t·b` and `d` monic (or zero).
+/// `(d, s, t)` with `d = s·a + t·b` and `d` monic (or zero): classical
+/// extended Euclid's cofactors, by the shared `crate::gcd::poly::xgcd`.
 fn pxgcd(k: &Fp, a: &[u64], b: &[u64]) -> (Poly, Poly, Poly) {
-    let (mut r0, mut r1) = (trim(a.to_vec()), trim(b.to_vec()));
-    let (mut s0, mut s1): (Poly, Poly) = (vec![1], Vec::new());
-    let (mut t0, mut t1): (Poly, Poly) = (Vec::new(), vec![1]);
-    while !r1.is_empty() {
-        let (q, r) = pdivrem(k, &r0, &r1);
-        let s = psub(k, &s0, &pmul(k, &q, &s1));
-        let t = psub(k, &t0, &pmul(k, &q, &t1));
-        r0 = std::mem::replace(&mut r1, r);
-        s0 = std::mem::replace(&mut s1, s);
-        t0 = std::mem::replace(&mut t1, t);
+    let (a, b) = (trim(a.to_vec()), trim(b.to_vec()));
+    if a.is_empty() && b.is_empty() {
+        // Old convention for gcd(0, 0): s = 1.
+        return (Vec::new(), vec![1], Vec::new());
     }
-    match r0.last() {
-        None => (r0, s0, t0),
-        Some(&lc) => {
-            let i = k.inv(lc);
-            (pscale(k, &r0, i), pscale(k, &s0, i), pscale(k, &t0, i))
-        }
-    }
+    crate::gcd::poly::xgcd(&crate::gcd::poly::Fp64::new(k.p), &a, &b)
 }
 
 fn peval(k: &Fp, a: &[u64], x: u64) -> u64 {

@@ -230,30 +230,16 @@ fn prem(a: &[u64], b: &[u64], p: u64) -> Poly {
     pdivrem(a, b, p).1
 }
 
-/// `(g, s, t)` with `g = s a + t b` monic (`g = 0` only if `a = b = 0`).
+/// `(g, s, t)` with `g = s a + t b` monic (`g = 0` only if `a = b = 0`),
+/// by `crate::gcd::poly::xgcd` (the classical cofactors).  For
+/// `a = b = 0` it keeps the old `(0, 1, 0)`.
 fn pxgcd(a: &[u64], b: &[u64], p: u64) -> (Poly, Poly, Poly) {
-    let (mut r0, mut r1) = (a.to_vec(), b.to_vec());
-    trim(&mut r0);
-    trim(&mut r1);
-    let (mut s0, mut s1): (Poly, Poly) = (vec![1], Vec::new());
-    let (mut t0, mut t1): (Poly, Poly) = (Vec::new(), vec![1]);
-    while !r1.is_empty() {
-        let (q, r) = pdivrem(&r0, &r1, p);
-        let s2 = psub(&s0, &pmul(&q, &s1, p), p);
-        let t2 = psub(&t0, &pmul(&q, &t1, p), p);
-        r0 = r1;
-        r1 = r;
-        s0 = s1;
-        s1 = s2;
-        t0 = t1;
-        t1 = t2;
+    let fp = crate::gcd::poly::Fp64::new(p);
+    let (g, s, t) = crate::gcd::poly::xgcd(&fp, a, b);
+    if g.is_empty() {
+        return (Vec::new(), vec![1], Vec::new());
     }
-    if let Some(&l) = r0.last() {
-        let il = inv_mod(l, p);
-        (pscale(&r0, il, p), pscale(&s0, il, p), pscale(&t0, il, p))
-    } else {
-        (r0, s0, t0)
-    }
+    (g, s, t)
 }
 
 /// The roots in `F_p` of a nonzero polynomial, with multiplicity collapsed

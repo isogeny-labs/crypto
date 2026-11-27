@@ -280,13 +280,10 @@ fn bit_rem(mut value: BigUint, modulus: &BigUint) -> BigUint {
     value
 }
 
-fn bit_gcd(mut left: BigUint, mut right: BigUint) -> BigUint {
-    while !right.is_zero() {
-        let remainder = bit_rem(left, &right);
-        left = right;
-        right = remainder;
-    }
-    left
+fn bit_gcd(left: BigUint, right: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crate::gcd::gf2::gcd(&left.to_u64_digits(), &right.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 
 fn modulus_bits(irr: &IrreduciblePoly) -> BigUint {

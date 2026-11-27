@@ -1,0 +1,48 @@
+# Fixed-offset signed pair cover: genus 11 and degree 8; two-offset geometric gate
+
+2026-11-23 UTC, PR #5064, parent 0976a5fe42352b0129a87d71d4190f5e95bf139e. [pcc:unverified] Written mathematics, no native execution or benchmark. The preceding batched selector (blob e3f29ee36613a52fb42964719cf1bd3d4abe6a8b) was published using an expected-head guarded fast-forward. This follow-up concerns the geometry before the midpoint selectors, not a new ECDLP algorithm.
+
+## 1. Fixed-offset conic and its signed lift
+
+Let p>3, E: y^2=f(x)=x^3+ax+b nonsingular with #E(Fp) odd (not merely an odd-order subgroup). Let gamma be the supplied primitive Nth root in the norm-one torus, N=2^k>=4, 4N | p+1. A nonendpoint offset delta=gamma^d+gamma^(-d), 0<d<N/2, satisfies delta != +-2. The identities in OFFSET_PARITY_QUARTIC_NORM.md (blob 06a1ebe8d25aad25f340c85c563a429a6a2e3609) imply
+
+    C_delta: x_1^2+x_2^2-delta*x_1*x_2+delta^2-4=0.
+
+The homogenization is a smooth conic since delta^2-4 !=0; over K=algebraic closure of Fp it is P^1. Both projections x_i have degree two, with simple poles at the same two distinct infinity points. The quadratic discriminant for x_2 given x_1 is (delta^2-4)(x_1^2-4); the two branch values of x_1 are +-2, and likewise for x_2. The ordered signed pair lift X_delta is the normalization of this conic in K(C_delta)(sqrt(f(x_1)),sqrt(f(x_2))). We prove this is a field of degree four, so the projective lift is geometrically irreducible.
+
+## 2. No overlap of the private zeros for ANY nonendpoint 2-power offset
+
+Odd #E(Fp) implies the cubic f has no Fp root (a root would give a rational point of order two); hence f is irreducible, squarefree and has three roots alpha,beta,eta cyclically permuted by Frobenius. Each f(x_i) has six simple zeros because f(+-2)!=0. Suppose the zero divisors share a point. Its coordinates are two roots of f.
+
+If they coincide, substituting x_1=x_2=alpha gives (2-delta)(alpha^2-delta-2)=0, so alpha^2=delta+2 in Fp. This contradicts degree three of alpha. If they are distinct, Frobenius and symmetry of the conic give all three unordered root pairs. Subtract the equations for (alpha,beta) and (alpha,eta):
+
+    (beta-eta)(beta+eta-delta*alpha)=0.
+
+The cubic has root sum zero and alpha!=0, hence delta=-1. But a trace -1 would make gamma^d a primitive third root of unity, impossible in a 2-power group. Thus no overlap. This proof uses rational delta, all of E(Fp) odd, and the 2-power order; do not extend it to arbitrary offsets or odd-order subgroups on even-order curves.
+
+Consequently the two radicands have distinct private simple zeros, proving independence in K(C_delta)^*/K(C_delta)^{*2}. At either common infinity pole both radicands have valuation -3. Over the algebraically closed residue field all local units have square roots (char !=2), so their ratio is a local square and the inertia order is exactly 2, not 4. At each of the twelve private simple zeros inertia is 2 as well. There is no other branch point. Thus there are fourteen branch points of the conic, each with two points above and tame index two. Riemann-Hurwitz gives
+
+    2g(X_delta)-2=4*(-2)+14*2=20, hence g(X_delta)=11.
+
+All nonendpoint offsets have this genus, not just a generic parameter. This does not imply the genus of a quotient by swap is 11.
+
+## 3. Exact degree of the oriented sum morphism
+
+The coordinate maps lift to morphisms P_1,P_2:X_delta -> E (the infinity points map to O). The sum morphism s_delta=P_1+P_2 has exactly eight simple preimages of O:
+
+* At finite points, P_2=-P_1 requires x_1=x_2. The conic then gives x_1^2=delta+2, two distinct roots since delta!=-2; neither is a root of f by Section 2. Each admits two choices of y_1 and y_2=-y_1, giving four points. The diagonal meets the conic transversely (the restricted equation has simple roots), and the lift is unramified there. Pullback of the invariant differential dx/(2y) under addition is dx_1/(2y_1)+dx_2/(2y_2)=(dx_1-dx_2)/(2y_1), nonzero at those points. Hence multiplicity one.
+* Above the two infinity points are two points each. Both P_i=O and each parameter t_i=-x_i/y_i has valuation one: x_i has order -2 after the ramified lift and y_i order -3. The leading ratio x_2/x_1 is one of the roots rho of rho^2-delta*rho+1, neither equal to 1. Since x_i~t_i^{-2}, the leading ratio (t_1/t_2)^2 equals rho; in particular t_2/t_1 is not -1. The formal addition law t(P_1+P_2)=t_1+t_2+terms of total degree >=2 therefore has valuation one. Four further simple preimages.
+
+There are no other preimages, since at any pole both x_i are poles and elsewhere P_2=-P_1 forces the diagonal. The morphism is nonconstant by these simple zeros and finite surjective between smooth projective curves. Its degree is exactly 8; separability follows from the unramified fibre. This is an oriented ordered pair-cover degree, not a count of rational eligible pairs. It is consistent with the previous quartic in the midpoint trace (at most four midpoint values, each with at most two leaf orders for a generic oriented target). Diagonal and antipodal offsets are excluded and must be handled separately.
+
+## 4. Consequence for four-leaf elimination
+
+Fix any two nonendpoint offsets delta,epsilon and any target R in E(K). The equation s_delta(P)+s_epsilon(Q)=R defines the fibre product of X_delta and X_epsilon over E, with the second map translated and negated. Each map is finite flat of degree eight (nonconstant morphisms of smooth curves, torsion-free over the DVRs), generically separable. The product is finite flat of degree 64 over the intermediate E coordinate and is one-dimensional, with a dense open of 64 geometric sheets over that intermediate. It is nonempty for EVERY R, including nonidentity targets. Removing the finitely many infinity points, zero subtotals or other fixed exceptional points on either pair chart cannot change existence over K: choose an intermediate point avoiding their finite images and their translated counterparts. Thus target-only geometric elimination of the two fixed-offset low-degree systems without the two midpoint selectors gives no nontrivial emptiness condition on E. A constant-degree quartic for each pair at a fixed intermediate does not eliminate the free intermediate for two pairs.
+
+The two actual Dickson midpoint constraints, rationality and actual-M signed membership are indispensable. With one midpoint selector imposed, there are O(N) geometric candidate ordered first pairs (at most N unordered pairs per fixed d by the full-fibre chart; each lifts with at most four signs). For each fixed first signed pair and nonzero remaining subtotal, the second degree-eight cover has at most eight geometric preimages; apply the other midpoint selector, actual-M/subgroup checks, rationality, and signed replay. This bounds candidate output O(N) per nonendpoint offset pair; it is not a sublinear algorithm for finding them. Zero remaining subtotal is handled by the established zero-pair/diagonal branch. Direct enumeration over all offset pairs is already Theta(N^2), even if the geometry is stored at constant degree; enumeration of a midpoint adds another factor. The existing signed pair-spectrum scan with charged setup O(B^2) and expected O(D) group lookup per miss remains the control. No general lower bound for implicit algorithms follows. For N=64 there are 31 nonendpoint offsets, all genus 11 under the inherited odd-order hypothesis, giving 961 ordered pairs of such offsets; all 961 have the geometric one-dimensional obstruction (not a rational support census). The two endpoints retain their previous guards. Growing N uses precisely the same proof, no new assumption about availability or rank/yield.
+
+## 5. Source and validation boundary
+
+Pinned input: prior offset notes and iteration9/PAIR_SPECTRUM_RESULTANT.md blob e2348e91dc08141a663c5adb9798b6ca8f09424e; iteration7/FIXED_CURVE_FIBRE_DENSITY.md blob 5816cc0b657b0e941d41e26120c82ebf45726ed0; iteration10/S3_PENCIL_CONTRACTION.md blob da12c7a459405f4fdea44118cc03ade721d5eb90; problems/prime31-exact-pair-spectrum-query.md blob 2c98ef25c8ae6fb815776720571800587889dad5. Semaev 2015 https://arxiv.org/abs/1504.01175 section 2 defines the algebraic-closure summation criterion; Stacks Project https://stacks.math.columbia.edu/tag/0C1B gives tame Riemann-Hurwitz and separability. These standard facts are used, not claimed novel. No exhaustive novelty determination; KB and Conductor unavailable in this runtime.
+
+Coordinator challenge: the common poles do not give inertia 4; the root-sharing argument needs irreducibility of the cubic and the rationality of delta; the finite diagonal points are transverse and at infinity cancellation would force rho=1; geometric points do not imply rational points. For later original-Rust validation, exhaust the actual rational chart for each offset, verify both signs and identity fibres, check the degree-eight bound for nonidentity subtotal on the full signed ordered chart, deduplicate and compare exact augmented rank to the maintained baseline. A finite-field point census cannot by itself prove the geometric genus or degree. No native workers or Rust compiler were available; no production edits, resource reservations, signed validation or benchmarks. The shared daily log returned empty content despite a nonempty blob SHA (also with a bounded line request); no unsafe overwrite. This is a disjoint dated handoff. No shared STATE, ledger or reserved report mutation. Next step: investigate a coupled midpoint selector or implicit index; do not replace it by a constant-size geometric resultant that vanishes for every target. [pcc:unverified]

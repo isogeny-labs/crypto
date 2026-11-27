@@ -145,7 +145,14 @@ fn main() {
     let mut hilbert: Option<usize> = Some(16);
     let mut margin = 1.25f64;
     let mut m_override = 0usize;
-    let mut trace = false;
+    // F4 trace replay: on by default since 2026-11-25 wherever the run has a
+    // stop rule (the default Hilbert rule included).  Counted S on dlp p = 53
+    // falls from 392 to 286 with identical relations (research/
+    // f4_round4_leads_20261121, f4_round5_finish_20261124), and the counted
+    // cost is the same on every run.  `--no-trace` turns it off; a run without
+    // a stop rule (`--stop full`) is never traced, since a replay cannot skip
+    // the pairs that certify its basis.
+    let mut trace: Option<bool> = None;
     let mut dp_bits = 16u32;
     let mut threads = 4usize;
     let mut run_idx = 0u64;
@@ -197,7 +204,8 @@ fn main() {
             }
             "--margin" => margin = next(&mut i).parse().expect("--margin"),
             "--m" => m_override = next(&mut i).parse().expect("--m"),
-            "--trace" => trace = true,
+            "--trace" => trace = Some(true),
+            "--no-trace" => trace = Some(false),
             "--dp-bits" => dp_bits = next(&mut i).parse().expect("--dp-bits"),
             "--run" => run_idx = next(&mut i).parse().expect("--run"),
             "--neg" => neg = next(&mut i) != "0",
@@ -260,7 +268,7 @@ fn main() {
                         budget,
                         oracle_base,
                         mode,
-                        trace,
+                        trace.unwrap_or(!matches!(mode, StopMode::Full)),
                     );
                     println!(
                         "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped; hilbert {} applied, {} fallbacks) trace {} ({} replayed, {} mismatches) | random {} decomposable {} (1/720 = {:.5}) | planted {}/{} | oracle {} mismatches {} unverified {} incomplete {} timed out {} | C_cov {:.3e} [{:.2e}, {:.2e}] = weil {:.0} + f4 {:.3e} + lin {:.3e} + post {:.0} | delta {:.0} F4 degree {:.1} rows {:.0} cols {:.0} {:.1} ms + lin {:.1} ms = {:.1} ms | decomposable C_cov {:.3e} | {:.0} s",
@@ -286,7 +294,7 @@ fn main() {
                         check_every,
                         rho_ref,
                         dlp_mode,
-                        trace,
+                        trace.unwrap_or(!matches!(dlp_mode, StopMode::Full)),
                     );
                     println!(
                         "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped) trace {} ({} replayed, {} mismatches) | residuals {} decomposable {} ({:.5} vs 1/720 {:.5}) relations {} (floor {:.0}, ratio {:.2}) | incomplete {} timed out {} cross-checked {} mismatches {} | C_cov {:.3e} | unknowns {} (filtered {}) phi {:.2} row {:.1} LA attempts {} ops {} ({:.1}·u²) | solved {} correct {} | S {:.3e} | rho S {:.3} ± {:.3} ({} runs) | S/rho {:.3} = relation {:.3} + la {:.4} (last {:.4}) | predicted {:.3} | {:.0} s",
@@ -314,7 +322,7 @@ fn main() {
                             (stop > 0).then_some(stop),
                             margin,
                             (m_override > 0).then_some(m_override),
-                            trace,
+                            trace.unwrap_or(stop > 0),
                         ),
                         _ => run_cover_sieve_dlp(
                             p,
@@ -324,7 +332,7 @@ fn main() {
                             (stop > 0).then_some(stop),
                             margin,
                             (m_override > 0).then_some(m_override),
-                            trace,
+                            trace.unwrap_or(stop > 0),
                         ),
                     };
                     println!(

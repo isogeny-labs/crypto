@@ -1,0 +1,51 @@
+{
+  "schema": "isogeny-labs/norm-one-torus-mitm-validator-report/v1",
+  "status": "pass",
+  "raw_data": [
+    {
+      "path": "results.csv",
+      "sha256": "389166a9c7ca06c8e682ef9228d9a71d0cc63a93e363d48dab95cf68fe3be284"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "f63b7b534c62037c6f8834c2129367c167e4351f1c9b0afb9a2c52e7f6613c71"
+    },
+    {
+      "path": "certificates.json",
+      "sha256": "58b4b1de58c0e85801d500c82fc4f4fd0b13540d57216b157a60ceef83a3f448"
+    }
+  ],
+  "headline": [
+    {
+      "name": "individual_total_median_ms",
+      "claimed": 48.356,
+      "recomputed": 48.356,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "batch_quotient_total_median_ms",
+      "claimed": 10.355,
+      "recomputed": 10.355,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "local_nonisolated_total_ratio",
+      "claimed": 4.669821,
+      "recomputed": 4.669821,
+      "rel_tol": 1e-6
+    },
+    {
+      "name": "individual_setup_inversions",
+      "claimed": 57052,
+      "recomputed": 57052,
+      "rel_tol": 0
+    },
+    {
+      "name": "batch_quotient_setup_inversions",
+      "claimed": 2,
+      "recomputed": 2,
+      "rel_tol": 0
+    }
+  ],
+  "producer_note": "Raw pins and arithmetic are retained, but this report has no independent keyring signature and therefore remains not-covered by PCC."
+}

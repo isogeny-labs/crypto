@@ -1,0 +1,14 @@
+check.cpp: In function ‘int main(int, char**)’:
+check.cpp:41:7: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   41 |       if(line.empty()||line[0]=='#')continue;auto f=fields(line);
+      |       ^~
+check.cpp:41:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   41 |       if(line.empty()||line[0]=='#')continue;auto f=fields(line);
+      |                                              ^~~~
+check.cpp:51:7: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   51 |       if(line.empty()||line[0]=='#')continue;auto f=fields(line);need(f.size()==5,"point schema");
+      |       ^~
+check.cpp:51:46: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   51 |       if(line.empty()||line[0]=='#')continue;auto f=fields(line);need(f.size()==5,"point schema");
+      |                                              ^~~~
+cc1plus: all warnings being treated as errors

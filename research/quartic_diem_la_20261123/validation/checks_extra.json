@@ -1,0 +1,574 @@
+{
+ "schema": "validator-checks-extra/v1",
+ "validated_commit": "23384701f18747d4ab225143549b574ca731a789",
+ "manifests": {
+  "frozen.sha256": {
+   "PROTOCOL.md": true,
+   "analyze.py": true,
+   "run_main.sh": true,
+   "run_131101.sh": true
+  },
+  "data.sha256": {
+   "raw/run.jsonl": true,
+   "raw/run131101.jsonl": true
+  },
+  "source.sha256 (vs Git blobs at 4faca82a6f0, 612f8dee20e, validated)": {
+   "src/cryptanalysis/quartic_ladder.rs": {
+    "4faca82a6f0": true,
+    "612f8dee20e": true,
+    "23384701f18747d4ab225143549b574ca731a789": true
+   },
+   "src/cryptanalysis/genus_ladder.rs": {
+    "4faca82a6f0": true,
+    "612f8dee20e": true,
+    "23384701f18747d4ab225143549b574ca731a789": true
+   },
+   "src/bin/genus_ladder.rs": {
+    "4faca82a6f0": true,
+    "612f8dee20e": true,
+    "23384701f18747d4ab225143549b574ca731a789": true
+   }
+  },
+  "binary": {
+   "recorded": "adddfbfa0bf2cdfd115a1fff510fa29753411c60c940dc0b5ca916b0e5d6d1f6",
+   "dev_recorded": "adddfbfa0bf2cdfd115a1fff510fa29753411c60c940dc0b5ca916b0e5d6d1f6",
+   "dispatch_copy": "adddfbfa0bf2cdfd115a1fff510fa29753411c60c940dc0b5ca916b0e5d6d1f6",
+   "matches": true
+  }
+ },
+ "timing": {
+  "freeze_commit": "612f8dee20e",
+  "freeze_commit_time": "2026-11-24T07:19:09+00:00",
+  "raw_start_stamps": {
+   "main_start.txt": "2026-11-24T07:19:22Z",
+   "main_end.txt": "2026-11-24T07:23:33Z",
+   "r131101_start.txt": "2026-11-24T07:23:33Z",
+   "r131101_end.txt": "2026-11-24T07:39:04Z"
+  },
+  "dev_start": "2026-11-24T06:54:21Z",
+  "freeze_before_main_start": true,
+  "freeze_before_131101_start": true,
+  "seconds_freeze_to_first_grid_start": 13.0,
+  "done_wall_s": {
+   "run.jsonl": 250.879240519,
+   "run131101.jsonl": 930.791433833
+  },
+  "main_end_predicted_minus_stamp_s": -0.12075948715209961,
+  "r131101_end_predicted_minus_stamp_s": -0.20856618881225586,
+  "commits_touching_raw": [
+   "23384701f18747d4ab225143549b574ca731a789 2026-11-24T07:42:18+00:00"
+  ],
+  "first_commit_with_raw_after_freeze": true,
+  "analyze_py_sha_by_commit": {
+   "5299e594a29": "3166cc75ecbc1103e6cac3d05c9329851606a9cb17897d0f3e73062eb1cc1b32",
+   "9781704897b": "3166cc75ecbc1103e6cac3d05c9329851606a9cb17897d0f3e73062eb1cc1b32",
+   "612f8dee20e": "3166cc75ecbc1103e6cac3d05c9329851606a9cb17897d0f3e73062eb1cc1b32"
+  },
+  "analyze_py_unchanged_since_draft": true,
+  "protocol_section6_unchanged_by_freeze": true,
+  "note": "times are self-reported by the producer's host (commit dates, stamp files); they are mutually consistent but not tamper-proof"
+ },
+ "dev_amendment": {
+  "settings": {
+   "4,1.5,16": {
+    "W": 4,
+    "FILL": 1.5,
+    "EXCESS": 16,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12933320.602571482
+   },
+   "4,1.5,64": {
+    "W": 4,
+    "FILL": 1.5,
+    "EXCESS": 64,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 13104064.412763147
+   },
+   "4,1.5,8": {
+    "W": 4,
+    "FILL": 1.5,
+    "EXCESS": 8,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12946679.504525587
+   },
+   "4,3,16": {
+    "W": 4,
+    "FILL": 3.0,
+    "EXCESS": 16,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12933320.602571482
+   },
+   "4,3,64": {
+    "W": 4,
+    "FILL": 3.0,
+    "EXCESS": 64,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 13104064.412763147
+   },
+   "4,3,8": {
+    "W": 4,
+    "FILL": 3.0,
+    "EXCESS": 8,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12946679.504525587
+   },
+   "8,1.5,16": {
+    "W": 8,
+    "FILL": 1.5,
+    "EXCESS": 16,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12700356.207503872
+   },
+   "8,1.5,64": {
+    "W": 8,
+    "FILL": 1.5,
+    "EXCESS": 64,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12532139.744199136
+   },
+   "8,1.5,8": {
+    "W": 8,
+    "FILL": 1.5,
+    "EXCESS": 8,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12801788.341122406
+   },
+   "8,3,16": {
+    "W": 8,
+    "FILL": 3.0,
+    "EXCESS": 16,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12700356.207503872
+   },
+   "8,3,64": {
+    "W": 8,
+    "FILL": 3.0,
+    "EXCESS": 64,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12532139.744199136
+   },
+   "8,3,8": {
+    "W": 8,
+    "FILL": 3.0,
+    "EXCESS": 8,
+    "pairs": 18,
+    "n_32771": 10,
+    "la_fallbacks": 4,
+    "fallback_pairs": [
+     [
+      4093,
+      89,
+      2
+     ],
+     [
+      8191,
+      106,
+      2
+     ],
+     [
+      32771,
+      217,
+      1
+     ],
+     [
+      32771,
+      217,
+      2
+     ]
+    ],
+    "fallbacks_equal_sfb_multi_attempt_pairs": true,
+    "all_certified_correct": true,
+    "same_log": true,
+    "gm_la_32771": 12801788.341122406
+   }
+  },
+  "every_setting_has_4_fallbacks": true,
+  "every_fallback_on_sfb_multi_attempt_pair": true,
+  "fill_has_no_effect_on_any_field_except_wall_ns": true,
+  "fill_invariance_by_W_E": {
+   "W4_E8": true,
+   "W4_E16": true,
+   "W4_E64": true,
+   "W8_E8": true,
+   "W8_E16": true,
+   "W8_E64": true
+  },
+  "amended_rule_eligible": 12,
+  "pick_by_amended_rule": "8,1.5,64",
+  "pick_matches_protocol": true,
+  "ranking_by_gm_la_32771": [
+   [
+    "8,1.5,64",
+    12532139.744199136
+   ],
+   [
+    "8,3,64",
+    12532139.744199136
+   ],
+   [
+    "8,1.5,16",
+    12700356.207503872
+   ],
+   [
+    "8,3,16",
+    12700356.207503872
+   ],
+   [
+    "8,1.5,8",
+    12801788.341122406
+   ],
+   [
+    "8,3,8",
+    12801788.341122406
+   ],
+   [
+    "4,1.5,16",
+    12933320.602571482
+   ],
+   [
+    "4,3,16",
+    12933320.602571482
+   ],
+   [
+    "4,1.5,8",
+    12946679.504525587
+   ],
+   [
+    "4,3,8",
+    12946679.504525587
+   ],
+   [
+    "4,1.5,64",
+    13104064.412763147
+   ],
+   [
+    "4,3,64",
+    13104064.412763147
+   ]
+  ],
+  "choice_json_pick_under_original_rule": null,
+  "measured_grid_disjoint_from_dev_primes": true
+ },
+ "analyze_reproduction": {
+  "rerun_sha256": "aa8fade57ee2efc2083a93d600a06ccc2eda8403bb0f9b81e9922d9d1f7dd70b",
+  "committed_sha256": "aa8fade57ee2efc2083a93d600a06ccc2eda8403bb0f9b81e9922d9d1f7dd70b",
+  "byte_identical": true,
+  "python": "3.13.18"
+ },
+ "stress_trim_sge_charge": {
+  "x1_w0.1": 0.3717578063990076,
+  "x1_w1.0": 0.37143894684049666,
+  "x10_w0.1": 0.3916392001360745,
+  "x10_w1.0": 0.3913378300460466,
+  "x100_w0.1": 0.5805212832641506,
+  "x100_w1.0": 0.580353079854548
+ },
+ "structural": {
+  "sge_single_attempt_runs": 32,
+  "sge_spmv_add_equals_(2N+2)*sq_nnz": 32,
+  "sge_trim_rows_in_equals_min(core_rows, core_cols+64)": 32,
+  "sge_sq_dim_equals_sge_cols_out": 32,
+  "sfb_single_attempt_runs": 32,
+  "sfb_spmv_add_over_2nnz(3c+2)_range": [
+   0.9988943733675683,
+   0.999778171543063
+  ]
+ }
+}

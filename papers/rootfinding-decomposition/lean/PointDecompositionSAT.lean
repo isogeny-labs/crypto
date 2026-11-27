@@ -13,6 +13,9 @@ exactly when the underlying finite-domain problem has a valid tuple.
 `decomposition_satisfiable_iff` instantiates the checker with equality between
 a finite sum of abstract points and a target. Signed factor-base points can be
 represented directly by the finite candidate type.
+`decomposition_satisfiable_iff_direct_subtraction` then splits one head
+candidate from that sum and expresses the remaining tuple against the
+subtracted target.
 
 This is a semantic encoding theorem. It does not claim correctness of a
 particular CNF/Tseitin/XOR compiler or SAT solver.
@@ -146,5 +149,51 @@ theorem decomposition_satisfiable_iff [Fintype Choice] [DecidableEq Choice]
   simp [Valid, decompositionProblem]
 
 end Additive
+
+section DirectSubtraction
+
+variable {G : Type v} [AddCommGroup G] [DecidableEq G]
+
+/-- The semantic direct-subtraction contract: choose one head candidate, then
+decompose the target minus that head into `remaining` candidates. -/
+def DirectSubtractionSpec (remaining : Nat) (base : Choice → G) (target : G) : Prop :=
+  ∃ head : Choice, ∃ tail : Fin remaining → Choice,
+    (∑ i, base (tail i)) = target - base head
+
+/-- Splitting off one candidate preserves the exact SAT/decomposition
+semantics. This is the abstract refinement used by a direct-subtraction
+oracle; it does not describe or verify any particular implementation. -/
+theorem decomposition_satisfiable_iff_direct_subtraction
+    [Fintype Choice] [DecidableEq Choice]
+    (remaining : Nat) (base : Choice → G) (target : G) :
+    Satisfiable (decompositionProblem (remaining + 1) base target) ↔
+      DirectSubtractionSpec remaining base target := by
+  rw [decomposition_satisfiable_iff]
+  constructor
+  · rintro ⟨xs, hxs⟩
+    refine ⟨xs 0, fun i => xs i.succ, ?_⟩
+    rw [eq_sub_iff_add_eq]
+    simpa [Fin.sum_univ_succ, add_comm] using hxs
+  · rintro ⟨head, tail, htail⟩
+    refine ⟨Fin.cases head tail, ?_⟩
+    rw [Fin.sum_univ_succ]
+    simpa [add_comm] using (eq_sub_iff_add_eq.mp htail)
+
+/-- For two summands, direct subtraction reduces the remaining decomposition
+to one exact factor-base lookup. -/
+theorem decomposition_two_satisfiable_iff_direct_lookup
+    [Fintype Choice] [DecidableEq Choice]
+    (base : Choice → G) (target : G) :
+    Satisfiable (decompositionProblem 2 base target) ↔
+      ∃ head tail : Choice, base tail = target - base head := by
+  rw [decomposition_satisfiable_iff_direct_subtraction (remaining := 1)]
+  constructor
+  · rintro ⟨head, tail, htail⟩
+    exact ⟨head, tail 0, by simpa [Fin.sum_univ_succ] using htail⟩
+  · rintro ⟨head, tail, htail⟩
+    refine ⟨head, fun _ => tail, ?_⟩
+    simpa [Fin.sum_univ_succ] using htail
+
+end DirectSubtraction
 
 end PointDecompositionSAT

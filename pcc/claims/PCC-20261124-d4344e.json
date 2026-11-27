@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:31:18Z",
+ "id": "PCC-20261124-d4344e",
+ "kind": "statement",
+ "producer": {
+  "commit": "7498c5ef298e690b6e847a67882ea3eb4f81b187",
+  "model": "",
+  "session": "codex-ecc2k-cold10m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/checks/focused-tests.txt",
+    "sha256": "c9e7aabb1ec42778450b8a88d4ca3cd229b84634ce1b12741e41aa1a7f15e3d8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/checks/focused-tests.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "First sub10M implementation candidate passes68 focused release tests, including packed SIMD/scalar arbitrary-matrix and field-system parity, exact half-combination lookup and optional tally scope semantics. No new instruction gain is yet measured."
+}

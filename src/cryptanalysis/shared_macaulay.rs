@@ -1440,7 +1440,7 @@ mod tests {
             17,
             1,
             2,
-            &[a.clone()],
+            std::slice::from_ref(&a),
             &[],
             Limits::default(),
             Backend::Integer,

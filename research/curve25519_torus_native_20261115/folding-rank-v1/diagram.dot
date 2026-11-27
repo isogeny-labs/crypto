@@ -1,0 +1,11 @@
+digraph audit {
+ graph [rankdir=LR,bgcolor="white",pad="0.15",nodesep="0.3",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#EDF3F8",color="#34516B",fontname="Helvetica",fontsize=11,margin="0.13,0.10"];
+ edge [color="#34516B",arrowsize=0.7];
+ original [label="Original actual-q coset\nj=1; t=0..107\n216 signed member replays"];
+ matrix [label="Natural aligned rows\n42 spaces; two sign checks\n6..18 unknown coefficients"];
+ rank [label="Selected original minors\nGaussian + Bareiss replay\n84 full-column-rank cases",fillcolor="#DCEDE8"];
+ scope [label="Specified low-degree template\nNo nonzero prefix interpolant\nOther representations remain open",fillcolor="#F8EEDC"];
+ degree [label="Separate core Lean gate\nL<=m; am<=6; D+4<aL\nimply D<=1"];
+ original -> matrix; matrix -> rank; rank -> scope; degree -> matrix;
+}

@@ -165,13 +165,10 @@ impl F2Poly {
         r
     }
     pub fn gcd(&self, o: &Self) -> Self {
-        let (mut a, mut b) = (self.clone(), o.clone());
-        while !b.is_zero() {
-            let r = a.rem(&b);
-            a = b;
-            b = r;
+        // Shared bit-packed GF(2)[x] gcd (same word layout; result trimmed).
+        F2Poly {
+            w: crate::gcd::gf2::gcd(&self.w, &o.w),
         }
-        a
     }
     pub fn derivative(&self) -> Self {
         let mut w = vec![0u64; self.w.len()];

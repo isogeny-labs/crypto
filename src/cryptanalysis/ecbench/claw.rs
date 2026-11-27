@@ -94,11 +94,8 @@ impl ClawOutcome {
     }
 }
 
-fn gcd(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u64, b: u64) -> u64 {
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 /// A fixed permutation of `[0, d)`: `i ↦ (a·i + b) mod d` with

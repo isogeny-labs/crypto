@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:13:11Z",
+ "id": "PCC-20261124-8f3d8b",
+ "kind": "measurement",
+ "producer": {
+  "commit": "5c306fadb079cd4b832b6945abcd4c4a2136f026",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/saved-reference-shape.json",
+    "sha256": "c7554579a4bc8ece02d95c8a267b42dc4f2f4eb22a6561b7729fb21c2e2c3c95"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/shape-analysis.log",
+    "sha256": "421bcc947f0dc2146cc4d41217939f525f8d88f3cc713861e705862109e095f4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-h2-20261123/validation/shape-source-binary.sha256",
+    "sha256": "51622c235f3cb4bddf63c1d917419f040d9f1473db5853409c3d04d08f824a56"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Read-only Rust inspection of the hash-pinned captured references finds forty minimal grevlex leading monomials in each of saved cases 0 and 1, with degree histogram 2:6,3:9,4:10,5:9,6:5,7:1. The degree-7 minimal generator is x5^7. Therefore the prior degree-5/6 full-basis templates cannot supply the required minimal degree-7 leading generator; they are inadequate-degree negative controls, not evidence against degree-7 or general compiled templates. No new solve or timing was run for this analysis."
+}

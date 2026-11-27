@@ -1,0 +1,186 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "TZH-20261123-profile",
+  "created": "2026-11-23T19:03:53Z",
+  "protocol": {
+    "path": "profile.protocol.json",
+    "sha256": "847466a9abff07ef1a0cbf87e95446d5c4af57a68504dfb483cadb941d64416a",
+    "protocol_id": "TZH-20261123-baseline-profile",
+    "version": 1
+  },
+  "producer": {
+    "runtime": null,
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "065176db5621",
+    "dirty": false
+  },
+  "backend": "manual",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "binary_sha256": "7a1ffd3115e52049472f432a88be40e7815d1cb0bfc54dec925cb68644624825",
+      "commit": "68a0dece3c745cea3980bf0a2d383abf0f8d24fb"
+    },
+    {
+      "id": "baseline-aa",
+      "role": "control_aa",
+      "binary_sha256": "7a1ffd3115e52049472f432a88be40e7815d1cb0bfc54dec925cb68644624825",
+      "commit": "68a0dece3c745cea3980bf0a2d383abf0f8d24fb"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "row-0",
+      "arm": "baseline",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 44038405
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    },
+    {
+      "run_id": "row-1",
+      "arm": "baseline-aa",
+      "instance_id": "scale-n131-d12-uniform",
+      "seed": 202611164222,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "instructions": 44038405
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": null,
+        "contended": null,
+        "blockers": []
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": null
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": null,
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "profile-rows.jsonl",
+      "sha256": "a69c4e79cc381a47e263ec91f971b193759c9518db3c45da1992eccf2ce061a4",
+      "bytes": 389,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../tools/profile.sh",
+      "sha256": "42a7c0dee60712fb3a767647043136d154b5c5713cda76930c027c2571ac5375",
+      "bytes": 59862,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "profiles/baseline-cold/hotspots.json",
+        "sha256": "b5fdb850ae37582038ae85e7e01197177038a9704839508bff65aa48c8d669a8",
+        "bytes": 7273,
+        "kind": "summary"
+      },
+      {
+        "path": "profiles/baseline-aa-cold/hotspots.json",
+        "sha256": "b5fdb850ae37582038ae85e7e01197177038a9704839508bff65aa48c8d669a8",
+        "bytes": 7273,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Absolute source-bound diagnostic. Verification fields refer only to producer checks; PCC profile claim467720 is unsigned. No gain or native-clock comparison.",
+      "by": "codex-ecc2k-halftrace-20261123"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

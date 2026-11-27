@@ -1,0 +1,46 @@
+{
+  "schema": "relation-idea-canonical-update/v1",
+  "canonical_main": "e07e257b17805a68877e2c4bd7aa18776f321bf0",
+  "old_base": "3dd555c5d9b54c5bc0f3507eb6a917a5cf64e1f6",
+  "stash_checkpoint": "e32b70a7d24efb25fd293fd87c3f34cd449fb42c",
+  "only_unpublished_claims_reappended": [
+    "PCC-20261123-19dd11",
+    "PCC-20261123-ba7d3a"
+  ],
+  "original_unpublished_entries": [
+    {
+      "at": "2026-11-23T23:53:02Z",
+      "body": {
+        "claim_id": "PCC-20261123-19dd11",
+        "claim_sha256": "400b387a6a78b8b455c72a181c65c9bc1859725d0d3aeef0c7c698543a082305",
+        "path": "pcc/claims/PCC-20261123-19dd11.json"
+      },
+      "hash": "d2142436415f509a4197da41b2159a2d4d36485a9271de511d699310d5f4df0a",
+      "prev": "8aa9d5f9b3b5607066439e473e6427fe3b1edf25bbe86533e7ef679ce9c61c1c",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1827,
+      "type": "claim"
+    },
+    {
+      "at": "2026-11-23T23:58:10Z",
+      "body": {
+        "claim_id": "PCC-20261123-ba7d3a",
+        "claim_sha256": "f883d2d2ec42f87937ea88e9b626365e2ace178ef58e68c6d0896907fe2835fe",
+        "path": "pcc/claims/PCC-20261123-ba7d3a.json"
+      },
+      "hash": "ac32d4a01d9b2adeddbb6f9150c6e60178d96eef73fccf7c0321ba8e4edc3c11",
+      "prev": "d2142436415f509a4197da41b2159a2d4d36485a9271de511d699310d5f4df0a",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1828,
+      "type": "claim"
+    }
+  ],
+  "maintained_append_api": "tools/pcc/pcc.py append_entry",
+  "canonical_ledger_prefix_byte_preserved": true,
+  "all_study_payloads_byte_preserved": true,
+  "journal_new_blocks_retained_as_multiset": 4,
+  "journal_blocks_sorted_by_timestamp": true,
+  "published_claims_replayed": 0,
+  "frozen_claim_or_gate_or_key_rewritten": false,
+  "initial_metadata_error": "Expected4ourlogblocksbutactual3; stoppedbeforejournalwriteandappend. Shellcontinuedfinalreaderregistration; one validnewreaderentry preserved, thenoldunpublishedsubjects appended. No claimpayload/ledgerentry rewritten."
+}

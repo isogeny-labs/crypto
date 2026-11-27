@@ -295,10 +295,7 @@ fn mod_mul(a: u16, b: u16) -> u16 {
 }
 
 fn mod_inverse(value: u16) -> Option<u16> {
-    if value == 0 {
-        return None;
-    }
-    (1..R).find(|candidate| mod_mul(value, *candidate) == 1)
+    crypto_lib::gcd::int::inv_mod_u64(value as u64, R as u64).map(|v| v as u16)
 }
 
 fn build_subgroup(

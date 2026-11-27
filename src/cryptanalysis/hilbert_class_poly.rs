@@ -187,14 +187,7 @@ pub fn class_number_brute_force(d: i64) -> Option<u32> {
 }
 
 fn gcd_i64(a: i64, b: i64) -> i64 {
-    let mut a = a.abs();
-    let mut b = b.abs();
-    while b != 0 {
-        let r = a % b;
-        a = b;
-        b = r;
-    }
-    a
+    crate::gcd::int::gcd_i64(a, b) as i64
 }
 
 /// **Brauer-Siegel estimate for class number scaling.**

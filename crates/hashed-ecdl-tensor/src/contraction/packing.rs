@@ -4,6 +4,7 @@ use super::recursive::Parameters;
 use super::Bipartite;
 use crate::{integrity, invalid, overflow, BigUint, Meter, Result};
 use num_traits::Zero;
+use std::collections::BTreeMap;
 
 #[derive(Clone)]
 pub(super) struct Packet {
@@ -22,7 +23,8 @@ pub(super) fn digit(label: usize, coordinate: usize, radix: usize) -> usize {
 
 // R^2 times E[sum_gamma X_gamma^2], a nonnegative integer. The omitted
 // constant -M^2/R^2 does not affect conditional-expectation minimization.
-fn objective(
+#[cfg(test)]
+fn reference_objective(
     graph: &Bipartite,
     rows: &[Option<usize>],
     columns: &[Option<usize>],
@@ -64,7 +66,8 @@ fn objective(
     Ok(total)
 }
 
-fn conditional_labels(
+#[cfg(test)]
+fn reference_conditional_labels(
     graph: &Bipartite,
     labels: usize,
     meter: &mut Meter,
@@ -98,7 +101,7 @@ fn conditional_labels(
                 } else {
                     rows[vertex] = Some(label);
                 }
-                let value = objective(graph, &rows, &columns, labels, meter)?;
+                let value = reference_objective(graph, &rows, &columns, labels, meter)?;
                 if best.as_ref().map_or(true, |(score, _)| value < *score) {
                     best = Some((value, label));
                 }
@@ -115,6 +118,112 @@ fn conditional_labels(
         rows.into_iter().map(Option::unwrap).collect(),
         columns.into_iter().map(Option::unwrap).collect(),
     ))
+}
+
+fn first_minimum(scores: &[BigUint], meter: &mut Meter) -> Result<usize> {
+    let mut best = None;
+    for (label, score) in scores.iter().enumerate() {
+        meter.charge(1, "conditional expectation candidate")?;
+        if best.map_or(true, |old| score < &scores[old]) {
+            best = Some(label);
+        }
+    }
+    best.ok_or_else(|| invalid("empty label alphabet"))
+}
+
+/// Select the same first-minimum labels as the quadratic reference objective.
+///
+/// During the row phase, the candidate-dependent contribution between the
+/// current vertex `v` and an earlier vertex `w` is, up to a positive common
+/// factor,
+///
+/// `deg(v) deg(w) + (labels-1) sum_r m(v,r)m(w,r)`.
+///
+/// During the column phase it is the dot product of the two incidence profiles
+/// after grouping row endpoints by their fixed row labels. Candidate-independent
+/// edge pairs and the common ordered-pair factor do not affect first-minimum
+/// tie breaking.
+pub(super) fn conditional_labels(
+    graph: &Bipartite,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(Vec<usize>, Vec<usize>)> {
+    meter.vector(labels, "vertex label alphabet")?;
+    if labels == 0 {
+        return Err(invalid("empty label alphabet"));
+    }
+
+    // For each right vertex, retain the number of ports contributed by earlier
+    // row vertices in each selected label bucket.
+    meter.vector(graph.right.len(), "conditional row incidence buckets")?;
+    let mut right_bucket_ports = vec![BTreeMap::<usize, usize>::new(); graph.right.len()];
+    let mut bucket_degrees = vec![0usize; labels];
+    let overlap_multiplier = BigUint::from(labels - 1);
+    let mut rows = Vec::with_capacity(graph.left.len());
+    for vertex in &graph.left {
+        if vertex.edges.is_empty() {
+            rows.push(0);
+            continue;
+        }
+        let degree = BigUint::from(vertex.edges.len());
+        let mut scores: Vec<BigUint> = bucket_degrees
+            .iter()
+            .map(|&old_degree| &degree * BigUint::from(old_degree))
+            .collect();
+        for &edge in &vertex.edges {
+            let right = graph.edges[edge].right.0;
+            for (&label, &ports) in &right_bucket_ports[right] {
+                meter.charge(1, "conditional expectation row overlap")?;
+                scores[label] += &overlap_multiplier * BigUint::from(ports);
+            }
+        }
+        let selected = first_minimum(&scores, meter)?;
+        bucket_degrees[selected] = bucket_degrees[selected]
+            .checked_add(vertex.edges.len())
+            .ok_or_else(|| overflow("conditional row bucket degree"))?;
+        for &edge in &vertex.edges {
+            meter.charge(1, "conditional expectation row incidence")?;
+            let right = graph.edges[edge].right.0;
+            let ports = right_bucket_ports[right].entry(selected).or_default();
+            *ports = ports
+                .checked_add(1)
+                .ok_or_else(|| overflow("conditional row incidence"))?;
+        }
+        rows.push(selected);
+    }
+
+    // Transpose the accumulated profile: for each fixed row label, map a
+    // previously selected column label to its port count. This makes each new
+    // column score a sparse profile dot product.
+    let mut row_label_column_ports = vec![BTreeMap::<usize, usize>::new(); labels];
+    let mut columns = Vec::with_capacity(graph.right.len());
+    for vertex in &graph.right {
+        if vertex.edges.is_empty() {
+            columns.push(0);
+            continue;
+        }
+        let mut scores = vec![BigUint::zero(); labels];
+        for &edge in &vertex.edges {
+            let row_label = rows[graph.edges[edge].left.0];
+            for (&column_label, &ports) in &row_label_column_ports[row_label] {
+                meter.charge(1, "conditional expectation column overlap")?;
+                scores[column_label] += BigUint::from(ports);
+            }
+        }
+        let selected = first_minimum(&scores, meter)?;
+        for &edge in &vertex.edges {
+            meter.charge(1, "conditional expectation column incidence")?;
+            let row_label = rows[graph.edges[edge].left.0];
+            let ports = row_label_column_ports[row_label]
+                .entry(selected)
+                .or_default();
+            *ports = ports
+                .checked_add(1)
+                .ok_or_else(|| overflow("conditional column incidence"))?;
+        }
+        columns.push(selected);
+    }
+    Ok((rows, columns))
 }
 
 pub(super) fn pack(
@@ -280,6 +389,74 @@ mod tests {
     use crate::network::FnPredicate;
     use crate::Limits;
     use std::sync::Arc;
+
+    fn three_by_three_graph(edges: usize, mut description: usize) -> Bipartite {
+        let mut left_ports = vec![Vec::new(); 3];
+        let mut right_ports = vec![Vec::new(); 3];
+        let mut graph_edges = Vec::new();
+        for edge in 0..edges {
+            let pair = description % 9;
+            description /= 9;
+            let left = pair % 3;
+            let right = pair / 3;
+            let left_port = left_ports[left].len();
+            let right_port = right_ports[right].len();
+            left_ports[left].push(edge);
+            right_ports[right].push(edge);
+            graph_edges.push(Edge {
+                left: (left, left_port),
+                right: (right, right_port),
+            });
+        }
+        let vertices = |ports: Vec<Vec<usize>>| {
+            ports
+                .into_iter()
+                .map(|edges| TensorVertex {
+                    tensor: Arc::new(Tensor {
+                        kind: TensorKind::Boolean(Arc::new(FnPredicate::new(
+                            edges.len(),
+                            |_, _| Ok(true),
+                        ))),
+                        creation_precision: 3,
+                    }),
+                    edges,
+                })
+                .collect()
+        };
+        let graph = Bipartite {
+            left: vertices(left_ports),
+            right: vertices(right_ports),
+            edges: graph_edges,
+        };
+        graph.validate().unwrap();
+        graph
+    }
+
+    #[test]
+    fn incidence_gram_labels_match_quadratic_objective() {
+        let mut reference_meter = Meter::new(Limits {
+            steps: 1_000_000_000,
+            ..Limits::default()
+        });
+        let mut optimized_meter = reference_meter.clone();
+        let mut cases = 0usize;
+        for edges in 0..=3usize {
+            for description in 0..9usize.pow(edges as u32) {
+                let graph = three_by_three_graph(edges, description);
+                for labels in 1..=4 {
+                    assert_eq!(
+                        conditional_labels(&graph, labels, &mut optimized_meter).unwrap(),
+                        reference_conditional_labels(&graph, labels, &mut reference_meter).unwrap(),
+                        "edges={edges}, description={description}, labels={labels}",
+                    );
+                    cases += 1;
+                }
+            }
+        }
+        assert_eq!(cases, 3_280);
+        assert!(optimized_meter.used < reference_meter.used);
+    }
+
     #[test]
     fn conditional_expectations_do_not_assume_disjoint_ports() {
         let tensor = Arc::new(Tensor {

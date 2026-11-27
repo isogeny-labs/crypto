@@ -1,0 +1,1 @@
+jq -e $'\n  .schema == "prime31-lp-capture/v1" and .target == [976979610,1228979761]\n  and (.small_points | length) == 509 and (.large_points | length) == 168\n  and (.rows | length) == 613\n' /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/derived/capture.json 

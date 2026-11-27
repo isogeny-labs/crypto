@@ -5,6 +5,8 @@ on:
     branches: [research/prime31-aps-linear-chord-20261117]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
       - research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
       - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-linear-chord.yml
@@ -12,6 +14,8 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
+      - research/prime31_ic_20261115/native/Cargo.toml
+      - research/prime31_ic_20261115/native/Cargo.lock
       - research/prime31_ic_20261115/native/APS_LINEAR_CHORD_PROTOCOL_20261117.md
       - .github/workflows/prime31-aps-linear-chord.yml
   workflow_dispatch:
@@ -35,6 +39,8 @@ jobs:
           sparse-checkout: |
             research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
             research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+            research/prime31_ic_20261115/native/Cargo.toml
+            research/prime31_ic_20261115/native/Cargo.lock
           sparse-checkout-cone-mode: false
       - name: Checkout immutable Rust baseline with complete native dependencies
         uses: actions/checkout@v4
@@ -47,13 +53,16 @@ jobs:
             src/cryptanalysis/f4_fp_tower.rs
             src/cryptanalysis/sig_fp_tower.rs
           sparse-checkout-cone-mode: false
-      - name: Overlay only candidate Rust source on immutable exact-scientific baseline
+      - name: Overlay candidate Rust source and locked dependency metadata
         run: |
           set -euo pipefail
           src=research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs
           cp "$src" "aps-pinned/$src"
           cp research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs aps-pinned/research/prime31_ic_20261115/native/examples/prime31_linear_chord_audit.rs
+          cp research/prime31_ic_20261115/native/Cargo.toml aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cp research/prime31_ic_20261115/native/Cargo.lock aps-pinned/research/prime31_ic_20261115/native/Cargo.lock
           sha256sum "$src" "aps-pinned/$src" > prime31-linear-chord-source-hashes.txt
+          sha256sum research/prime31_ic_20261115/native/Cargo.toml research/prime31_ic_20261115/native/Cargo.lock aps-pinned/research/prime31_ic_20261115/native/Cargo.toml aps-pinned/research/prime31_ic_20261115/native/Cargo.lock >> prime31-linear-chord-source-hashes.txt
           test "$(sha256sum "$src" | cut -d' ' -f1)" = "$(sha256sum "aps-pinned/$src" | cut -d' ' -f1)"
       - name: Install pinned Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal

@@ -131,7 +131,12 @@ pub fn solve_boolean_polynomials(
     if roots.windows(2).any(|w| w[0] == w[1])
         || roots
             .iter()
-            .any(|&x| x >> n != 0 || equations.iter().any(|p| p.eval(x) != 0))
+            .any(|&x| {
+                x >> n != 0
+                    || equations.iter().any(|p| {
+                        p.eval(crypto_lib::cryptanalysis::pq_groebner_f2::mask_from64(x)) != 0
+                    })
+            })
     {
         return Err("original typed Boolean root verification failed".into());
     }
@@ -294,7 +299,11 @@ pub fn search(
                 let terms = merged
                     .iter()
                     .filter(|(_, c)| c.bit(bit))
-                    .map(|(&m, _)| F2BoolMono::from_mask(m))
+                    .map(|(&m, _)| {
+                        F2BoolMono::from_mask(
+                            crypto_lib::cryptanalysis::pq_groebner_f2::mask_from64(m),
+                        )
+                    })
                     .collect::<Vec<_>>();
                 if !terms.is_empty() {
                     binary.push(F2BoolPoly::from_monos(terms, n));

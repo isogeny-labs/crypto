@@ -4835,11 +4835,7 @@ pub fn run_e29_kill(p: u64, seed: u64) -> Result<E29Kill, String> {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 /// E29 Stage R: order-6 and order-24 walks on one canonical model.

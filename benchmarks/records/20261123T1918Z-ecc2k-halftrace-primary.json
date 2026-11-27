@@ -1,0 +1,153 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T19:34:58+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_halftrace_elimination_20261123/checks/run-primary.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T19:19:25+00:00",
+      "wall_s": 50.2
+    }
+  ],
+  "commit": "8453eb6263d6a9e50f21e657228c877b7520487a",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T19:18:25+00:00",
+  "curve_uid": "icv1-f2m131-tm22283658519494248867-115e0dc5",
+  "entries": [
+    "benchmarks/20261123-ecc2k-halftrace-elimination"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T1918Z-ecc2k-halftrace-primary",
+  "metrics": [
+    {
+      "baseline": 44023404.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_cold_ir",
+      "note": "Fixed d12 query, Callgrind Ir, unsigned producer evidence; oracle increase retained; no warmed-throughput claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        34999782.0,
+        34999782.0
+      ],
+      "unit": "ir",
+      "value": 34999782.0
+    },
+    {
+      "baseline": 25028806.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_setup_ir",
+      "note": "Fixed d12 query, Callgrind Ir, unsigned producer evidence; oracle increase retained; no warmed-throughput claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        15966306.0,
+        15966306.0
+      ],
+      "unit": "ir",
+      "value": 15966306.0
+    },
+    {
+      "baseline": 18068794.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_oracle_ir",
+      "note": "Fixed d12 query, Callgrind Ir, unsigned producer evidence; oracle increase retained; no warmed-throughput claim.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        18107673.0,
+        18107673.0
+      ],
+      "unit": "ir",
+      "value": 18107673.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-halftrace-setup",
+  "raw": [
+    {
+      "bytes": 106200,
+      "path": "research/trace_zero_halftrace_elimination_20261123/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d7947e47d86dcb0e326ca8820d0ac3c9eff8472796898d8a365c0d3c3ffa7b1e",
+      "sha256": "d7947e47d86dcb0e326ca8820d0ac3c9eff8472796898d8a365c0d3c3ffa7b1e",
+      "uploaded": false
+    },
+    {
+      "bytes": 20943,
+      "path": "research/trace_zero_halftrace_elimination_20261123/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/4770e32a65e1bfcd7274952baa2e115e30e3fd60215496ba9accb0557ad4bf0e",
+      "sha256": "4770e32a65e1bfcd7274952baa2e115e30e3fd60215496ba9accb0557ad4bf0e",
+      "uploaded": false
+    },
+    {
+      "bytes": 2793,
+      "path": "research/trace_zero_halftrace_elimination_20261123/grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/86351fc0fa7b67a1c918346a5aa5e0b85c87b4d0309ceb25c4b693e549399511",
+      "sha256": "86351fc0fa7b67a1c918346a5aa5e0b85c87b4d0309ceb25c4b693e549399511",
+      "uploaded": false
+    },
+    {
+      "bytes": 3713,
+      "path": "research/trace_zero_halftrace_elimination_20261123/polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/64/6452873154b4b76f590cb75035c665819f9662c0866bf638e2de498d1fa43932",
+      "sha256": "6452873154b4b76f590cb75035c665819f9662c0866bf638e2de498d1fa43932",
+      "uploaded": false
+    },
+    {
+      "bytes": 109586,
+      "path": "research/trace_zero_halftrace_elimination_20261123/export.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/61/61140b961269287fec4d2babd0d4b5b1b149b192ff1a7815ef620b09c1d26f47",
+      "sha256": "61140b961269287fec4d2babd0d4b5b1b149b192ff1a7815ef620b09c1d26f47",
+      "uploaded": false
+    },
+    {
+      "bytes": 527228,
+      "path": "research/trace_zero_halftrace_elimination_20261123/RAW-QUERIES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/ac1af1c8635a8f0cb8a79f2d57b4f2f30f775beae50d62b5b5494eb274faf839",
+      "sha256": "ac1af1c8635a8f0cb8a79f2d57b4f2f30f775beae50d62b5b5494eb274faf839",
+      "uploaded": false
+    },
+    {
+      "bytes": 4250340,
+      "path": "research/trace_zero_halftrace_elimination_20261123/FROZEN-BINARIES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/25/259f460c75ce943490fd852004e6d4cabd48e04bbd654b17d8aaceec8afff59c",
+      "sha256": "259f460c75ce943490fd852004e6d4cabd48e04bbd654b17d8aaceec8afff59c",
+      "uploaded": false
+    },
+    {
+      "bytes": 244062,
+      "path": "research/trace_zero_halftrace_elimination_20261123/raw-tree-manifest.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/521ea856af2a2d425e04d74405c81d7db67df98c5a76f40999a36b818635dc94",
+      "sha256": "521ea856af2a2d425e04d74405c81d7db67df98c5a76f40999a36b818635dc94",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261123-ecc2k-halftrace-elimination/report.pdf",
+    "png": [
+      "benchmarks/20261123-ecc2k-halftrace-elimination/instructions.png"
+    ],
+    "svg": [
+      "benchmarks/20261123-ecc2k-halftrace-elimination/instructions.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-halftrace-primary",
+  "status": "measured",
+  "summary": "Fixed d12 ECC2K uniform cold Ir falls20.4973%, degree83 falls15.7793%; oracle increases0.2152%/0.1057%.90 outputs agree, no exclusions/retries. Producer unsigned, independent admission and broad integration pending.",
+  "validation": null
+}

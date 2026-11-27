@@ -180,7 +180,11 @@ fn recover_ratio_mod_p(num: &ZpInt, denom: &ZpInt, p: &BigInt) -> Option<BigInt>
 fn mod_inverse_bigint(a: &BigInt, m: &BigInt) -> Option<BigInt> {
     let a_u = a.to_biguint()?;
     let m_u = m.to_biguint()?;
-    let inv_u = crate::utils::mod_inverse(&a_u, &m_u)?;
+    // Same contract as the old `utils::mod_inverse` call: None for a = 0.
+    if a_u.is_zero() {
+        return None;
+    }
+    let inv_u = crate::gcd::int::modinv_big(&a_u, &m_u)?;
     Some(BigInt::from(inv_u))
 }
 
@@ -253,20 +257,7 @@ fn mod_inv_i128(a: i128, p: i128) -> Option<i128> {
     if a_pos == 0 {
         return None;
     }
-    let (mut old_r, mut r) = (a_pos, p);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        let (nr, ns) = (old_r - q * r, old_s - q * s);
-        old_r = r;
-        r = nr;
-        old_s = s;
-        s = ns;
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(((old_s % p) + p) % p)
+    crate::gcd::int::inv_mod_i128(a_pos, p)
 }
 
 /// Brute-force: count points on `E: y² = x³ + ax + b` over `F_p`.

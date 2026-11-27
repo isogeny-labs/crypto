@@ -1,0 +1,31 @@
+{
+  "arm": "isogeny",
+  "command": [
+    "/Volumes/SSD990-2/crypto/target/release/ic",
+    "bench",
+    "--bits",
+    "10",
+    "--family",
+    "generic",
+    "--max-trials",
+    "100",
+    "--rho-runs",
+    "1",
+    "--repeats",
+    "1",
+    "--seed",
+    "20261123",
+    "--targets",
+    "walk",
+    "--solver-budget-seconds",
+    "5",
+    "--json",
+    "--factor-base",
+    "prime-isogeny:t=3,seed=1,aux=ordinary",
+    "--oracle",
+    "pkm-semaev:m=2,engine=f4,degree=8,mode=chain"
+  ],
+  "exit_code": 1,
+  "wall_s": 0.18692879100035498,
+  "child_cpu_s": 0.9892880000000002
+}

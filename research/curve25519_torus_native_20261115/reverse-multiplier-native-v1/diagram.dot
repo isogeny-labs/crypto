@@ -1,0 +1,12 @@
+digraph query {
+  graph [rankdir=LR, bgcolor="transparent", nodesep=0.18, ranksep=0.23, pad=0.04];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fa", color="#28658d", fontname="Helvetica", fontsize=10, margin="0.10,0.08"];
+  edge [color="#476377", arrowsize=0.6];
+  input [label="Public Spec, raw R, cap\ninternal templates h, h²"];
+  poly [label="Four Cayley pair branches\ndegree ≤ 8"];
+  roots [label="Fp support + full splitting\nseparate infinity chart"];
+  lift [label="Raw / relative-index / [8] replay\nadapted base S_sigma"];
+  rows [label="Retain all multiplier provenance\nnormalize geometric signed row"];
+  gap [label="OPEN: coherent columns\ntarget-tag kernel / recovery", style="rounded,dashed", fillcolor="white", color="#a66b28"];
+  input -> poly -> roots -> lift -> rows -> gap;
+}

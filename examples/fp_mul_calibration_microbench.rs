@@ -5,7 +5,7 @@
 
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_group, calibrate_row_ops, fp_p31_subexp_mersenne_instance, roster_prime_instance,
-    Calibration, GroupOps, PrimeInstance, PrimePoint,
+    Calibration, CountedGroup, GroupOps, PrimeInstance, PrimePoint,
 };
 use serde_json::json;
 use std::time::Instant;
@@ -31,9 +31,7 @@ fn bench_fp_mul(inst: &PrimeInstance, samples: u64, seed: u64) -> f64 {
 fn sample_points(inst: &PrimeInstance) -> Vec<PrimePoint> {
     let g = inst.generator_point();
     let mut ops = GroupOps::default();
-    (1..=8u64)
-        .map(|k| inst.curve.mul(&mut ops, g, k))
-        .collect()
+    (1..=8u64).map(|k| inst.curve.mul(&mut ops, g, k)).collect()
 }
 
 fn main() {
@@ -69,7 +67,7 @@ fn main() {
 
     let mut ratios = Vec::new();
     for seed in 1..=reps {
-        let ns_per_mul = bench_fp_mul(&inst, samples, seed);
+        let ns_per_mul = bench_fp_mul(&inst, samples, u64::from(seed));
         ratios.push(ns_per_mul / ns_per_add);
     }
     let mut sorted = ratios.clone();

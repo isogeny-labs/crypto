@@ -1,0 +1,11 @@
+error[E0382]: borrow of moved value: `x.row`
+  --> WS68_NATURAL_PARTIAL.qualifier.rs:38:551
+   |
+38 | ...et mut x=Combined{row:s.row,w};let mut placed=false;for j in 0..LARGE{let col=SMALL+j;if x.row[col]==0{continue}if let Some(p)=&pivots[j]{let z=x.row[col];combine(&mut x,p,z,c);merges+=1}else{let z=mi(x.row[col],c);for v in &mut x.row{*v=mm(*v,z,c)}for v in &mut x.w{*v=mm(*v,z,c)}pivots[j]=Some(x);placed=true;break}}if !placed{assert!(x.row[SM...
+   |       ----- --------------------- this reinitialization might get skipped                                                                                                                                                                                                                                  - value moved here                       ^^^^^ value borrowed here after move
+   |       |
+   |       move occurs because `x` has type `Combined`, which does not implement the `Copy` trait
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0382`.

@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T23:38:57Z",
+ "id": "PCC-20261124-b2543e",
+ "kind": "statement",
+ "producer": {
+  "commit": "da258b6de6de9d215dae4a9f77d5dcd3aeb2efd0",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/original.jsonl",
+    "sha256": "7c2cdf31a9fd430f2bcead4bec858d22ce101a5fa1492c7f86cafafd538f0a3a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/lookup.jsonl",
+    "sha256": "0b803cfdc83985cf4d31ae42421ba2c965b424ad88d8d58de48a75d3a9f8219e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/full.jsonl",
+    "sha256": "1274320b94538fff9e0d8e7fd3514e89a144c9e4f029e3bd61f0542139a8a3c0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/full_lookup.jsonl",
+    "sha256": "29940c3e519e08a98a8be82c44598cd338745022e4f4bf6e7765ef87e8cb516c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/source_identity.json",
+    "sha256": "f73c3420d78052a8078d544f47694b89006e0784037ccf58ec514c7f670088d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/history_check.sh",
+    "sha256": "7e1c98f2a1a7a5039680faa30a6777f76b91dbb20b7648d8723bf2169f99efab"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/history.diff",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_output_v1/history.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-full-output",
+ "statement": "All four frozen F127 policy suites at source 77c465a6d1 finish with twelve valid process receipts, successful final replay and scalar 69 in each arm. First-row Direct/Refined/cofactor use 9/10/12 calls without lookup and 4/4/4 with lookup. Full-output uses 2/7/5 calls without lookup and 1/4/1 with lookup. Both original policy histories match all 54 prior attempt records, and full-output-plus-lookup Direct/cofactor match all three mask/output/consumer histories. All suite exits are zero and all stderr files are empty. The initial failed test remains retained. These are unsigned local software/count results, not an admitted cost comparison or new map."
+}

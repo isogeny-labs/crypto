@@ -43,7 +43,7 @@ pub struct WideKoblitz {
     /// `φ(Q) = [λ]Q` on `⟨G⟩`.
     pub lambda: u128,
     pub generator: (u128, u128),
-    /// The `x` the generator rule stopped at (its `P` gave `G = [h]P`).
+    /// The `x` the generator rule stopped at, or zero for a supplied generator.
     pub generator_seed_x: u128,
 }
 
@@ -151,6 +151,23 @@ pub fn koblitz_order(a: u8, n: u32) -> BigUint {
 impl WideKoblitz {
     /// Build `K_a` over the field of `irr` (`64 ≤ n ≤ 127`).
     pub fn new(a: u8, irr: &IrreduciblePoly) -> Result<Self, String> {
+        Self::build(a, irr, None)
+    }
+
+    pub(crate) fn with_generator(
+        a: u8,
+        irr: &IrreduciblePoly,
+        r: u128,
+        generator: (u128, u128),
+    ) -> Result<Self, String> {
+        Self::build(a, irr, Some((r, generator)))
+    }
+
+    fn build(
+        a: u8,
+        irr: &IrreduciblePoly,
+        subgroup: Option<(u128, (u128, u128))>,
+    ) -> Result<Self, String> {
         let n = irr.degree;
         if a > 1 || !(64..=127).contains(&n) {
             return Err(format!(
@@ -161,14 +178,15 @@ impl WideKoblitz {
         let order = koblitz_order(a, n)
             .to_u128()
             .ok_or("the group order does not fit a u128")?;
-        let cofactor: u128 = if a == 0 { 4 } else { 2 };
-        if order % cofactor != 0 {
-            return Err(format!("#E(F_2) = {cofactor} does not divide #E = {order}"));
+        let base_order = if a == 0 { 4 } else { 2 };
+        if order % base_order != 0 {
+            return Err(format!("#E(F_2) = {base_order} does not divide #E = {order}"));
         }
-        let r = order / cofactor;
-        if r >= 1u128 << 127 || !is_probable_prime(r) {
-            return Err(format!("#E / {cofactor} = {r} is not a usable prime"));
+        let r = subgroup.map_or(order / base_order, |(r, _)| r);
+        if !(3..(1u128 << 127)).contains(&r) || !is_probable_prime(r) || order % r != 0 {
+            return Err(format!("{r} is not a usable prime subgroup order for #E = {order}"));
         }
+        let cofactor = order / r;
         let trace: i64 = if a == 0 { -1 } else { 1 };
         // λ: roots of λ² − tλ + 2 mod r.
         let t_mod = if trace < 0 { r - 1 } else { 1 };
@@ -180,49 +198,44 @@ impl WideKoblitz {
             mulm((t_mod + r - root) % r, inv2, r),
         ];
 
-        let mut out = Self {
-            a,
-            n,
-            irreducible: irr.clone(),
-            trace,
-            group_order: order,
-            r,
-            cofactor,
-            lambda: 0,
-            generator: (0, 0),
-            generator_seed_x: 0,
+        let a_field = u128::from(a);
+        let ops =
+            WideStrongRho::from_parts_unchecked(field.clone(), a_field, r, RawPointG::Infinity);
+        let (g, generator_seed_x) = if let Some((_, (x, y))) = subgroup {
+            if x >> n != 0 || y >> n != 0 {
+                return Err("the supplied generator coordinates exceed the field width".into());
+            }
+            let lhs = field.sqr(y) ^ field.mul(x, y);
+            let rhs = field.mul(x ^ a_field, field.sqr(x)) ^ 1;
+            if lhs != rhs {
+                return Err("the supplied generator is off the curve".into());
+            }
+            (RawPointG::Affine { x, y }, 0)
+        } else {
+            let mut x = 0u128;
+            loop {
+                x += 1;
+                if x > 1 << 20 {
+                    return Err("no generator in 2^20 abscissae".into());
+                }
+                let xi = field.inv(x);
+                let c = x ^ a_field ^ field.sqr(xi);
+                let Some(z) = field.solve_quadratic(c) else {
+                    continue;
+                };
+                let p = RawPointG::Affine {
+                    x,
+                    y: field.mul(x, z),
+                };
+                let projected = ops.scalar_mul(p, cofactor);
+                if projected != RawPointG::Infinity {
+                    break (projected, x);
+                }
+            }
         };
-        let ops = WideStrongRho::from_parts_unchecked(
-            field.clone(),
-            u128::from(a),
-            r,
-            RawPointG::Infinity,
-        );
-        // The generator rule.
-        let mut x = 0u128;
-        let g = loop {
-            x += 1;
-            if x > 1 << 20 {
-                return Err("no generator in 2^20 abscissae".into());
-            }
-            let xi = field.inv(x);
-            let c = x ^ u128::from(a) ^ field.sqr(xi);
-            let Some(z) = field.solve_quadratic(c) else {
-                continue;
-            };
-            let p = RawPointG::Affine {
-                x,
-                y: field.mul(x, z),
-            };
-            let g = ops.scalar_mul(p, cofactor);
-            if g == RawPointG::Infinity {
-                continue;
-            }
-            if ops.scalar_mul(g, r) != RawPointG::Infinity {
-                return Err("[r][h]P is not the identity: the order is wrong".into());
-            }
-            break g;
-        };
+        if ops.scalar_mul(g, r) != RawPointG::Infinity {
+            return Err("[r]G is not the identity: the subgroup order is wrong".into());
+        }
         let RawPointG::Affine { x: gx, y: gy } = g else {
             unreachable!()
         };
@@ -234,10 +247,18 @@ impl WideKoblitz {
             .into_iter()
             .find(|&l| ops.scalar_mul(g, l) == frob)
             .ok_or("neither root of λ² − tλ + 2 is the Frobenius eigenvalue on ⟨G⟩")?;
-        out.lambda = lambda;
-        out.generator = (gx, gy);
-        out.generator_seed_x = x;
-        Ok(out)
+        Ok(Self {
+            a,
+            n,
+            irreducible: irr.clone(),
+            trace,
+            group_order: order,
+            r,
+            cofactor,
+            lambda,
+            generator: (gx, gy),
+            generator_seed_x,
+        })
     }
 
     pub fn field(&self) -> WideGf2 {
@@ -336,6 +357,19 @@ mod tests {
             };
             RawPointG::Affine { x, y: y ^ x }
         });
+    }
+
+    #[test]
+    fn supplied_generator_must_be_canonical_and_in_the_subgroup() {
+        let irr = m83();
+        let original = WideKoblitz::new(0, &irr).unwrap();
+        let rebuilt = WideKoblitz::with_generator(0, &irr, original.r, original.generator).unwrap();
+        assert_eq!(rebuilt.generator, original.generator);
+        assert_eq!(rebuilt.lambda, original.lambda);
+        assert!(WideKoblitz::with_generator(0, &irr, 3, original.generator).is_err());
+        assert!(WideKoblitz::with_generator(0, &irr, original.r, (1 << 83, 0)).is_err());
+        assert!(WideKoblitz::with_generator(0, &irr, original.r, (0, 0)).is_err());
+        assert!(WideKoblitz::with_generator(0, &irr, original.r, (0, 1)).is_err());
     }
 
     #[test]

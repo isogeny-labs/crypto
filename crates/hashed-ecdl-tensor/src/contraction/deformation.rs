@@ -549,6 +549,128 @@ mod tests {
     use crate::Limits;
     use num_traits::One;
 
+    fn independent_packet_entry(
+        tensor: &PacketTensor,
+        bits: &[bool],
+        meter: &mut Meter,
+    ) -> Element {
+        let rows = tensor.local.len();
+        let mut constants = Vec::new();
+        let mut incoming = vec![Vec::new(); tensor.incoming.len()];
+        for row in 0..rows {
+            let mut local = tensor.ring.zero();
+            for column in 0..tensor.column_count {
+                if bits[rows + column] {
+                    local = tensor
+                        .ring
+                        .add(&local, &tensor.local[row][column], meter)
+                        .unwrap();
+                }
+            }
+            constants.push(if bits[row] {
+                local
+            } else {
+                tensor.ring.sub(&tensor.ring.one(), &local, meter).unwrap()
+            });
+            for (mode, description) in tensor.incoming.iter().enumerate() {
+                incoming[mode].push(if bits[row] {
+                    description.coefficients[row].clone()
+                } else {
+                    tensor
+                        .ring
+                        .sub(&tensor.ring.zero(), &description.coefficients[row], meter)
+                        .unwrap()
+                });
+            }
+        }
+        let radix = tensor.incoming.len() + 1;
+        let assignments = radix.pow(u32::try_from(rows).unwrap());
+        let mut coefficient = tensor.ring.zero();
+        for mut code in 0..assignments {
+            let mut counts = vec![0usize; tensor.incoming.len()];
+            let mut product = tensor.ring.one();
+            for (row, constant) in constants.iter().enumerate() {
+                let choice = code % radix;
+                code /= radix;
+                let factor = if choice == 0 {
+                    constant
+                } else {
+                    counts[choice - 1] += 1;
+                    &incoming[choice - 1][row]
+                };
+                product = tensor.ring.mul(&product, factor, meter).unwrap();
+            }
+            if tensor
+                .incoming
+                .iter()
+                .zip(&counts)
+                .all(|(mode, &count)| mode.exponent == count)
+            {
+                coefficient = tensor.ring.add(&coefficient, &product, meter).unwrap();
+            }
+        }
+        for mode in &tensor.outgoing {
+            let mut value = BigUint::zero();
+            for &(column, ref scalar) in &mode.terms {
+                if bits[rows + column] {
+                    value = (value + scalar) % tensor.ring.modulus();
+                }
+            }
+            let power = tensor
+                .ring
+                .pow(&tensor.ring.integer(&value), mode.exponent, meter)
+                .unwrap();
+            coefficient = tensor.ring.mul(&coefficient, &power, meter).unwrap();
+        }
+        coefficient
+    }
+
+    #[test]
+    fn packet_entry_matches_exhaustive_multimode_coefficient_oracle() {
+        let mut meter = Meter::new(Limits::default());
+        let ring = Ring::new(3, 5, &mut meter).unwrap();
+        let integer = |value| ring.integer(&BigUint::from(value));
+        let packet = PacketTensor {
+            ring: ring.clone(),
+            local: vec![
+                vec![integer(1u8), integer(2u8)],
+                vec![integer(3u8), integer(1u8)],
+                vec![integer(2u8), integer(4u8)],
+                vec![integer(5u8), integer(3u8)],
+            ],
+            column_count: 2,
+            incoming: vec![
+                Incoming {
+                    exponent: 1,
+                    coefficients: [1u8, 2, 3, 4].into_iter().map(integer).collect(),
+                },
+                Incoming {
+                    exponent: 2,
+                    coefficients: [2u8, 5, 1, 3].into_iter().map(integer).collect(),
+                },
+            ],
+            outgoing: vec![
+                Outgoing {
+                    exponent: 1,
+                    terms: vec![(0, 1u8.into()), (1, 2u8.into())],
+                },
+                Outgoing {
+                    exponent: 2,
+                    terms: vec![(0, 3u8.into()), (1, 1u8.into())],
+                },
+            ],
+        };
+        let mut nonzero = 0usize;
+        for mask in 0usize..1usize << 6 {
+            let bits: Vec<_> = (0..6).map(|bit| mask & (1 << bit) != 0).collect();
+            let expected = independent_packet_entry(&packet, &bits, &mut meter);
+            let actual = packet.entry(&bits, &mut meter).unwrap();
+            nonzero += usize::from(!expected.is_zero());
+            assert_eq!(actual, expected, "mask={mask}");
+        }
+        assert!(nonzero > 0);
+    }
+
     #[test]
     fn packet_entry_mutations_change_load_bearing_coefficients() {
         let mut meter = Meter::new(Limits::default());
@@ -642,55 +764,80 @@ mod tests {
             steps: 500_000_000,
             ..Limits::default()
         });
-        let p = Parameters {
-            radix: 2,
-            u: 1,
-            a: 2,
-            length: 4,
-            array: 16,
-        };
-        let ring = Ring::new(4, 19, &mut meter).unwrap();
-        let zero = Cauchy::new(&p, 0, &ring.zero(), &ring, &mut meter).unwrap();
-        for x in 0..4 {
-            for y in 0..4 {
-                assert_eq!(
-                    zero.weight(x, y, &mut meter).unwrap(),
-                    if x == y { ring.one() } else { ring.zero() }
-                );
+        let cases = [
+            (
+                Parameters {
+                    radix: 2,
+                    u: 1,
+                    a: 2,
+                    length: 4,
+                    array: 16,
+                },
+                5usize,
+            ),
+            (
+                Parameters {
+                    radix: 2,
+                    u: 2,
+                    a: 4,
+                    length: 16,
+                    array: 256,
+                },
+                7usize,
+            ),
+        ];
+        for (parameters, precision) in cases {
+            let ring = Ring::new(4, precision, &mut meter).unwrap();
+            let zero = Cauchy::new(&parameters, 0, &ring.zero(), &ring, &mut meter).unwrap();
+            for x in 0..parameters.length {
+                for y in 0..parameters.length {
+                    assert_eq!(
+                        zero.weight(x, y, &mut meter).unwrap(),
+                        if x == y { ring.one() } else { ring.zero() }
+                    );
+                }
             }
-        }
-        for t in [-3i64, -2, -1, 1, 2, 3] {
-            let i = valuation(t);
-            for z in [ring.one(), ring.point(&BigUint::from(2u8)).unwrap()] {
-                let kernel = Cauchy::new(&p, t, &z, &ring, &mut meter).unwrap();
-                let tiles = 1usize << (i + 1);
-                for x in 0..4 {
-                    for y0 in 0..tiles {
-                        if ((x >> i) & 1) != ((y0 >> i) & 1) {
-                            continue;
-                        }
-                        for y in (y0..4).step_by(tiles) {
-                            let j = (y - y0) / tiles;
-                            let mut sum = ring.zero();
-                            for b in 0..ring.precision() - 1 {
-                                let coefficient =
-                                    kernel.mode_coefficient(x, y0, i, b, &mut meter).unwrap();
-                                assert!(coefficient
-                                    .coordinates()
-                                    .iter()
-                                    .all(|c| (c & ((BigUint::one() << (b + 1)) - BigUint::one()))
-                                        .is_zero()));
-                                let scalar = ring.integer(
-                                    &BigUint::from(j).modpow(&BigUint::from(b), ring.modulus()),
-                                );
-                                let term = ring.mul(&coefficient, &scalar, &mut meter).unwrap();
-                                sum = ring.add(&sum, &term, &mut meter).unwrap();
+            for t in grid(&parameters, &meter)
+                .unwrap()
+                .into_iter()
+                .filter(|&t| t != 0 && valuation(t) < parameters.u)
+            {
+                let i = valuation(t);
+                for z in [ring.one(), ring.point(&BigUint::from(2u8)).unwrap()] {
+                    let kernel = Cauchy::new(&parameters, t, &z, &ring, &mut meter).unwrap();
+                    let tiles = 1usize << (i + 1);
+                    for x in 0..parameters.length {
+                        for y0 in 0..tiles {
+                            if ((x >> i) & 1) != ((y0 >> i) & 1) {
+                                continue;
                             }
-                            assert_eq!(
-                                sum,
-                                kernel.weight(x, y, &mut meter).unwrap(),
-                                "t={t},x={x},y={y}"
-                            );
+                            for y in (y0..parameters.length).step_by(tiles) {
+                                let j = (y - y0) / tiles;
+                                let mut sum = ring.zero();
+                                for b in 0..ring.precision() - 1 {
+                                    let coefficient =
+                                        kernel.mode_coefficient(x, y0, i, b, &mut meter).unwrap();
+                                    assert!(coefficient.coordinates().iter().all(|c| {
+                                        (c & ((BigUint::one() << (b + 1)) - BigUint::one()))
+                                            .is_zero()
+                                    }));
+                                    let scalar = ring.integer(
+                                        &BigUint::from(j).modpow(&BigUint::from(b), ring.modulus()),
+                                    );
+                                    let term = ring.mul(&coefficient, &scalar, &mut meter).unwrap();
+                                    sum = ring.add(&sum, &term, &mut meter).unwrap();
+                                }
+                                assert!(kernel
+                                    .mode_coefficient(x, y0, i, ring.precision() - 1, &mut meter,)
+                                    .unwrap()
+                                    .is_zero());
+                                assert_eq!(
+                                    sum,
+                                    kernel.weight(x, y, &mut meter).unwrap(),
+                                    "u={},t={t},x={x},y={y}",
+                                    parameters.u
+                                );
+                            }
                         }
                     }
                 }

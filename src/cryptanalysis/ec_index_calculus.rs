@@ -459,10 +459,7 @@ pub fn semaev_s4_poly4fp(x1: u64, x2: u64, x3: u64, a: u64, b: u64, p: u64) -> P
     let pr = mul(x1, x2, p);
     let dx12 = sub(x1, x2, p);
     let alpha2 = mul(dx12, dx12, p);
-    let alpha1 = neg(
-        sm(2, add(mul(s, add(pr, a, p), p), sm(2, b, p), p), p),
-        p,
-    );
+    let alpha1 = neg(sm(2, add(mul(s, add(pr, a, p), p), sm(2, b, p), p), p), p);
     let alpha0 = sub(
         mul(sub(pr, a, p), sub(pr, a, p), p),
         sm(4, mul(b, s, p), p),
@@ -750,20 +747,36 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
         let t = (a as u128) * (b as u128);
         let m = (t as u64).wrapping_mul(neg_pinv);
         let u = ((t + (m as u128) * (p as u128)) >> 64) as u64;
-        if u >= p { u - p } else { u }
+        if u >= p {
+            u - p
+        } else {
+            u
+        }
     }
     #[inline(always)]
     fn madd(a: u64, b: u64, p: u64) -> u64 {
         let s = a + b;
-        if s >= p { s - p } else { s }
+        if s >= p {
+            s - p
+        } else {
+            s
+        }
     }
     #[inline(always)]
     fn msub(a: u64, b: u64, p: u64) -> u64 {
-        if a >= b { a - b } else { a + (p - b) }
+        if a >= b {
+            a - b
+        } else {
+            a + (p - b)
+        }
     }
     #[inline(always)]
     fn mneg(a: u64, p: u64) -> u64 {
-        if a == 0 { 0 } else { p - a }
+        if a == 0 {
+            0
+        } else {
+            p - a
+        }
     }
     #[inline]
     fn mpow(mut base: u64, mut exp: u64, p: u64, neg_pinv: u64, one_m: u64) -> u64 {
@@ -785,21 +798,7 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
             return None;
         }
         let a_can = mmul(a_mont, 1, p, neg_pinv);
-        let (mut old_r, mut r) = (a_can, p);
-        let (mut old_s, mut s) = (1i64, 0i64);
-        while r != 0 {
-            let q = old_r / r;
-            (old_r, r) = (r, old_r - q * r);
-            (old_s, s) = (s, old_s - (q as i64) * s);
-        }
-        if old_r != 1 {
-            return None;
-        }
-        let inv_can = if old_s < 0 {
-            (old_s + p as i64) as u64
-        } else {
-            old_s as u64
-        };
+        let inv_can = crate::gcd::int::inv_mod_u64(a_can, p)?;
         Some(mmul(inv_can, r2, p, neg_pinv))
     }
 
@@ -971,7 +970,7 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
 
     let mut f = StackPoly {
         c: [0; 9],
-        len: coeffs.len(),
+        len: coeffs.len().max(1),
     };
     for (idx, fe) in coeffs.iter().enumerate() {
         let v = if fe.value.is_zero() {
@@ -2031,16 +2030,15 @@ pub fn find_one_relation_s4_counted(
     } else {
         None
     };
-    let x_to_idx_u64: Option<std::collections::HashMap<u64, usize>> =
-        if fast_u64 && !fb_probe {
-            let mut m = std::collections::HashMap::with_capacity(factor_base.len());
-            for &(xu, idx) in fb_xs_u64.as_ref().expect("word fb") {
-                m.insert(xu, idx);
-            }
-            Some(m)
-        } else {
-            None
-        };
+    let x_to_idx_u64: Option<std::collections::HashMap<u64, usize>> = if fast_u64 && !fb_probe {
+        let mut m = std::collections::HashMap::with_capacity(factor_base.len());
+        for &(xu, idx) in fb_xs_u64.as_ref().expect("word fb") {
+            m.insert(xu, idx);
+        }
+        Some(m)
+    } else {
+        None
+    };
 
     for trial in 1..=max_trials {
         let a = random_scalar(&curve.n);
@@ -2310,19 +2308,11 @@ fn mul_mod_u64(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }
 
-/// Extended-Euclid inverse modulo a prime `p` (no exponentiation).
+/// Extended-Euclid inverse modulo a prime `p` (no exponentiation), by the
+/// shared `crate::gcd::int::inv_mod_u64`.
 fn inv_prime_u64(a: u64, p: u64) -> u64 {
-    let (mut t, mut newt) = (0i128, 1i128);
-    let (mut r, mut newr) = (p as i128, (a % p) as i128);
-    while newr != 0 {
-        let q = r / newr;
-        let (t2, r2) = (t - q * newt, r - q * newr);
-        t = newt;
-        newt = t2;
-        r = newr;
-        newr = r2;
-    }
-    (t.rem_euclid(p as i128)) as u64
+    // As before: 0 for a ≡ 0 (unchecked).
+    crate::gcd::int::inv_mod_u64(a, p).unwrap_or(0)
 }
 
 /// Montgomery batch inversion over a prime `p`: one extended-Euclid inverse
@@ -2424,7 +2414,10 @@ impl WordPairSumTable {
 }
 
 /// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
-pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> WordPairSumTable {
+pub fn build_word_pair_sum_table(
+    curve: &CurveParams,
+    factor_base: &[FactorBaseEntry],
+) -> WordPairSumTable {
     let a_fe = curve.a_fe();
     let n = factor_base.len();
     let p_u64 = if curve.p.bits() <= 63 {
@@ -2511,7 +2504,7 @@ pub fn build_word_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseE
 ///
 /// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
 /// `≈ p/B²` probes after the `B²` table is built; `B` relations then cost
-/// `≈ B² + p/B` — balanced at `B ≈ p^{1/4}` for `≈ p^{3/4}` total, against
+/// `≈ B² + p/B` — balanced at `B ≈ p^{1/3}` for `≈ p^{2/3}` total, against
 /// the `≈ p` of every enumeration sweep.  The decided relation family is
 /// identical (three signed factor-base points summing to `R`), so the
 /// yield per draw is unchanged and correctness is checked by the same
@@ -2566,31 +2559,21 @@ pub fn find_one_relation_s4_via_mitm_counted(
                             let mut cand = [0u64; 2];
                             let mut nc = 0usize;
                             if raw[k] == 0 {
-                                if let Some((cx, _)) = add_point_u64(
-                                    p,
-                                    a_u64,
-                                    rx,
-                                    ry,
-                                    fx,
-                                    sub_mod_u64(p, fy, p),
-                                ) {
+                                if let Some((cx, _)) =
+                                    add_point_u64(p, a_u64, rx, ry, fx, sub_mod_u64(p, fy, p))
+                                {
                                     cand[nc] = cx;
                                     nc += 1;
                                 }
-                                if let Some((cx, _)) =
-                                    add_point_u64(p, a_u64, rx, ry, fx, fy)
-                                {
+                                if let Some((cx, _)) = add_point_u64(p, a_u64, rx, ry, fx, fy) {
                                     cand[nc] = cx;
                                     nc += 1;
                                 }
                             } else {
                                 let inv = invs[k];
                                 let lam_p = mul_mod_u64(sub_mod_u64(fy, ry, p), inv, p);
-                                let lam_m = mul_mod_u64(
-                                    sub_mod_u64(sub_mod_u64(0, fy, p), ry, p),
-                                    inv,
-                                    p,
-                                );
+                                let lam_m =
+                                    mul_mod_u64(sub_mod_u64(sub_mod_u64(0, fy, p), ry, p), inv, p);
                                 cand[0] = sub_mod_u64(
                                     sub_mod_u64(mul_mod_u64(lam_m, lam_m, p), rx, p),
                                     fx,
@@ -2949,11 +2932,11 @@ pub fn sparse_gaussian_eliminate_mod_n(
             if deg == 0 {
                 continue;
             }
-            if best.map_or(true, |(d, _, _)| deg < d) {
+            if best.is_none_or(|(d, _, _)| deg < d) {
                 let mut pick: Option<(usize, usize)> = None;
                 for &c in rows[r].keys() {
                     let cdeg = col_rows[c].len();
-                    if pick.map_or(true, |(d2, _)| cdeg < d2) {
+                    if pick.is_none_or(|(d2, _)| cdeg < d2) {
                         pick = Some((cdeg, c));
                     }
                 }
@@ -3240,20 +3223,10 @@ fn gaussian_eliminate_mod_u64(
     (!failed).then_some(pivot_rows)
 }
 
-/// `a^{-1} mod n` by the extended Euclidean algorithm, `None` when
-/// `gcd(a, n) ≠ 1`.
+/// `a^{-1} mod n` in `[0, n)` by the shared `crate::gcd::int::inv_mod_u64`,
+/// `None` when `gcd(a, n) ≠ 1`.
 fn inv_mod_u64(a: u64, n: u64) -> Option<u64> {
-    let (mut old_r, mut r) = (a as i128, n as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q * s);
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(n as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, n)
 }
 
 // ── Incremental elimination across rank-deficient retries ───────────────
@@ -4005,7 +3978,10 @@ impl CompactPairSumTable {
     }
 }
 
-pub fn build_compact_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> CompactPairSumTable {
+pub fn build_compact_pair_sum_table(
+    curve: &CurveParams,
+    factor_base: &[FactorBaseEntry],
+) -> CompactPairSumTable {
     assert!(
         factor_base.len() <= PAIR_SUM_TABLE_MAX_FB,
         "compact pair-sum table indexes at most {PAIR_SUM_TABLE_MAX_FB} factor-base points"
@@ -5747,7 +5723,8 @@ mod tests {
         assert!(hits > 0, "no pair sum was hit");
         let packed = CompactPairSumTable::pack(11, -1, 7, 1);
         assert_eq!(CompactPairSumTable::unpack(packed), (11, -1, 7, 1));
-        let top = CompactPairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
+        let top =
+            CompactPairSumTable::pack(PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1);
         assert_eq!(
             CompactPairSumTable::unpack(top),
             (PAIR_SUM_TABLE_MAX_FB - 1, -1, PAIR_SUM_TABLE_MAX_FB - 1, -1)
@@ -6423,7 +6400,13 @@ mod tests {
     fn poly4fp_matches_heap_s4_on_tiny_curve() {
         let curve = tiny_curve();
         let p = curve.p.to_u64_digits()[0];
-        let a = curve.a_fe().value.to_u64_digits().first().copied().unwrap_or(0);
+        let a = curve
+            .a_fe()
+            .value
+            .to_u64_digits()
+            .first()
+            .copied()
+            .unwrap_or(0);
         let b = curve.b.to_u64_digits().first().copied().unwrap_or(0);
         let a_fe = curve.a_fe();
         let b_fe = curve.fe(curve.b.clone());

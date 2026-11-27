@@ -565,7 +565,7 @@ mod independent {
             let mut packed = 0u128;
             for (position, (place, multiplicity)) in pairs.into_iter().enumerate() {
                 assert!(multiplicity <= MAX_POLE as u8);
-                let slot = u16::from(place) + 1 | (u16::from(multiplicity) << 8);
+                let slot = (u16::from(place) + 1) | (u16::from(multiplicity) << 8);
                 packed |= u128::from(slot) << (12 * position);
             }
             Self(packed)
@@ -631,7 +631,7 @@ mod independent {
                     }
                 }
                 assert!(output_position < MAX_POLE);
-                let slot = u16::from(least) + 1 | (u16::from(multiplicity) << 8);
+                let slot = (u16::from(least) + 1) | (u16::from(multiplicity) << 8);
                 packed |= u128::from(slot) << (12 * output_position);
                 output_position += 1;
             }

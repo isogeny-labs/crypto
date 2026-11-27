@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:10:35Z",
+ "id": "PCC-20261124-c4fb88",
+ "kind": "statement",
+ "producer": {
+  "commit": "55af90e81d46163b6b470faeb2def3d2368e8abb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "certificate",
+   "path": "research/relation_trace_exact_20261124/CHECKER_PLAN_423.json",
+   "sha256": "69f1ef7fbe6328b3dfbd6e0f1e52f76b1410161b95c8e4d53b3b87cd218669a3"
+  },
+  {
+   "kind": "certificate",
+   "path": "research/relation_trace_exact_20261124/CHECKER_OUTCOME_423.json",
+   "sha256": "236bab107b2c307acb2dacf06bf2b1feb2da0f5f5201628c8ccf3d2fe9ac9f96"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "unchanged-relation-checker-regression",
+ "statement": "Maintained relation-replay-checker source from canonicalceba compiles and passes its entire14-test lib target, zero failures/ignored/filtered, on CPU0 one numerical thread. Source and separately frozen executable match pre-call hashes. This is an unchanged checker-format regression, not an independently authored trusted verifier for the new degree-space or label APIs and not full-root/performance qualification."
+}

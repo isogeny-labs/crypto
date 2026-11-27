@@ -27,7 +27,9 @@ run_cmd do
       `PointDecompositionSAT.sound,
       `PointDecompositionSAT.complete,
       `PointDecompositionSAT.satisfiable_iff_valid,
-      `PointDecompositionSAT.decomposition_satisfiable_iff] do
+      `PointDecompositionSAT.decomposition_satisfiable_iff,
+      `PointDecompositionSAT.decomposition_satisfiable_iff_direct_subtraction,
+      `PointDecompositionSAT.decomposition_two_satisfiable_iff_direct_lookup] do
     let axioms ← Lean.collectAxioms name
     let forbidden := axioms.filter fun ax => !allowed.contains ax
     unless forbidden.isEmpty do
@@ -45,3 +47,5 @@ run_cmd do
 #print axioms PointDecompositionSAT.complete
 #print axioms PointDecompositionSAT.satisfiable_iff_valid
 #print axioms PointDecompositionSAT.decomposition_satisfiable_iff
+#print axioms PointDecompositionSAT.decomposition_satisfiable_iff_direct_subtraction
+#print axioms PointDecompositionSAT.decomposition_two_satisfiable_iff_direct_lookup

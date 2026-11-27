@@ -1,0 +1,11 @@
+error: unexpected end of macro invocation
+  --> WS68_NATURAL_PARTIAL.qualifier.rs:36:396
+   |
+36 | ...;assert_eq!(ca(cm(a,g,verify),cm(b,q,verify),r));let id=out.len();out.push(Source{id,a,b,r,row,kind:d.kind});println!("source id=...
+   |                                                   ^ missing tokens in macro arguments
+   |
+note: while trying to match `,`
+  --> /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/macros/mod.rs:44:15
+
+error: aborting due to 1 previous error
+

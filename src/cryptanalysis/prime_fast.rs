@@ -175,6 +175,7 @@ impl Fp64 {
     /// Because `a <= p - 1` and `m <= 2^64 - 1`, `a + m·p <= 2^64·p - 1`,
     /// so `(a + m·p) >> 64 <= p - 1` without a final conditional subtract.
     #[inline(always)]
+    #[allow(clippy::wrong_self_convention)]
     fn from_mont_reduced(&self, a: u64) -> u64 {
         debug_assert!(a < self.p);
         let m = a.wrapping_mul(self.n_inv);
@@ -1186,13 +1187,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
             }
             continue;
         }
-        pt_buf.resize(
-            jac_buf.len(),
-            Pt {
-                x: 0,
-                y: 0,
-            },
-        );
+        pt_buf.resize(jac_buf.len(), Pt { x: 0, y: 0 });
         curve.jac_to_affine_many(&jac_buf, &mut pt_buf, &mut z_buf, &mut inv_scratch);
         for (i, &pt) in pt_buf.iter().enumerate() {
             let (u, v) = uv_buf[i];
@@ -1714,6 +1709,58 @@ impl FastFactorBase {
 
     pub fn is_empty(&self) -> bool {
         self.pts.is_empty()
+    }
+
+    /// Materialize the signed point support represented by these columns.
+    ///
+    /// The collector stores one point per x-coordinate but uses both signs.
+    /// A self-inverse point is emitted once. Invalid or repeated orbits are
+    /// rejected rather than silently changing the realized support size.
+    /// This is an audit API; it does not alter the collector's dense index.
+    pub fn signed_support(
+        &self,
+        curve: &FastCurve,
+    ) -> Result<Vec<Option<Pt>>, super::prime_factor_base_controls::Error> {
+        super::prime_factor_base_controls::expand_signed_support(curve, &self.pts)
+    }
+
+    /// Describe the actual signed support and membership of public anchors.
+    pub fn support_profile(
+        &self,
+        curve: &FastCurve,
+        anchors: &[Option<Pt>],
+    ) -> Result<
+        super::prime_factor_base_controls::SupportProfile,
+        super::prime_factor_base_controls::Error,
+    > {
+        use super::prime_factor_base_controls::{support_profile, IdentityPolicy, Representation};
+        support_profile(
+            curve,
+            &self.signed_support(curve)?,
+            anchors,
+            Representation::NegationClosedPoints,
+            IdentityPolicy::Exclude,
+        )
+    }
+
+    /// Count raw unordered triples from the represented signed point set.
+    ///
+    /// Identity sums and repeated target queries are retained. These are raw
+    /// decompositions, not deduplicated signed rows or independent rank; use
+    /// the existing collector and solver for those downstream quantities.
+    pub fn triple_counts(
+        &self,
+        curve: &FastCurve,
+        targets: &[Option<Pt>],
+    ) -> Result<
+        super::prime_factor_base_controls::TripleCounts,
+        super::prime_factor_base_controls::Error,
+    > {
+        super::prime_factor_base_controls::triple_counts(
+            curve,
+            &self.signed_support(curve)?,
+            targets,
+        )
     }
 
     #[inline(always)]

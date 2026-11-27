@@ -127,20 +127,7 @@ fn negmod(a: u64, m: u64) -> u64 {
 /// Modular inverse by the extended Euclidean algorithm; `None` when
 /// `a` and `m` are not coprime (impossible for prime `m` and `a ≠ 0`).
 fn invmod(a: u64, m: u64) -> Option<u64> {
-    // The remainders never go negative, so they and the quotients stay
-    // in `u64`: a hardware division per step instead of the `i128`
-    // library call (`__divti3`), which filtering pays once per pivot.
-    let (mut old_r, mut r) = (a, m);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let q = old_r / r;
-        (old_r, r) = (r, old_r - q * r);
-        (old_s, s) = (s, old_s - q as i128 * s);
-    }
-    if old_r != 1 {
-        return None;
-    }
-    Some(old_s.rem_euclid(m as i128) as u64)
+    crate::gcd::int::inv_mod_u64(a, m)
 }
 
 fn to_u64_mod(v: &BigUint, m: u64) -> u64 {
@@ -896,8 +883,7 @@ impl<const L: usize> ModWord for Wide<L> {
         m.mont_mul(&m.mont_mul(&self, &m.r2), &b)
     }
     fn inv(self, m: &WideModulus<L>) -> Option<Self> {
-        self.to_biguint()
-            .modinv(&m.to_biguint())
+        crate::gcd::int::modinv_big(&self.to_biguint(), &m.to_biguint())
             .map(|v| Self::from_biguint_unchecked(&v))
     }
     fn random<R: Rng + ?Sized>(rng: &mut R, m: &WideModulus<L>) -> Self {
@@ -2912,10 +2898,7 @@ fn minimal_approximant_basis<W: ModWord>(
             } else {
                 f_slice.chunks(n).map(|ch| ch.to_vec()).collect()
             };
-            BasisColumn {
-                f,
-                delta: c.delta,
-            }
+            BasisColumn { f, delta: c.delta }
         })
         .collect()
 }

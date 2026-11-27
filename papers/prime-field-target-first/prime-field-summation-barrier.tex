@@ -1,0 +1,460 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,microtype}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={A square-root barrier for explicit elimination in prime-field summation-polynomial index calculus}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\Fp}{\mathbb F_p}
+\newcommand{\kb}{\overline{\mathbb F}_p}
+\newcommand{\OO}{\mathcal O}
+\newcommand{\A}{\mathcal A}
+\newcommand{\Pj}{\mathbb P}
+\newcommand{\EE}{\mathbb E}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\supp}{\operatorname{supp}}
+
+\title{A square-root barrier for explicit elimination\\in prime-field summation-polynomial index calculus}
+\author{Anonymous}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+For elliptic-curve relation finding over a prime field, we prove a square-root lower bound in two explicit representation models. Any target-independent eliminant, table, or finite algebra materialized before matching must pay for its target support. Matching against independent uniform targets then requires expected work \(\Omega(\sqrt N)\), where \(N\) is the target group order. The bound is sharp. A solver that constructs the full factor-base tuple algebra anew for each target requires \(\Omega(N)\) work to obtain a first relation, even after quotienting by permutation. The proof separates the degree of the full lift from the degree of a fixed-target fiber. We compute both the length of a projective \(S_3\) split tree before imposing the target and the rank of a fixed-target multiplication matrix. For a four-digit radix base, every target is covered and each specialized half-pair fiber has bounded length for sufficiently large radix. Target-first norms still meet the square-root barrier when their half supports are explicit. We also prove it for opaque affine search and a hybrid model with degree-bounded coordinate tests. Arbitrary succinct coordinate circuits remain open.
+\end{abstract}
+
+\section{Setting and relation probability}
+
+Let \(p>3\), let \(E/\Fp\) be the smooth projective completion of
+\(y^2=x^3+ax+b\), and write \(x(\OO)=\infty\). Throughout, \(G=\langle P\rangle\subseteq E(\Fp)\) has order \(N\), \(Q\in G\), and \(m\ge 2\). For discrete-logarithm comparisons one normally applies the analysis to a prime-order component. The exponent \(1/2\) in \(p\) requires \(N=p^{1+o(1)}\). Nonsupersingularity and nonanomalousness alone do not imply that condition for a prime-order component.
+
+For a given \(F\subseteq\Fp\) replace \(F\) by its usable part \(F_G=x(G\setminus\{\OO\})\cap F\) whenever computing relation probability. Put
+\[
+s=|F|,\qquad f=|F_G|,\qquad
+\A=\{U\in G\setminus\{\OO\}:x(U)\in F_G\},\qquad r=|\A|.
+\]
+Thus \(f\le r\le 2f\), with equality \(r=2f\) in odd-order \(G\). The target \(R\) is uniform in \(G\setminus\{\OO\}\). This distribution is obtained by drawing independent \(a_0,b_0\) modulo \(N\), forming \(R=a_0P+b_0Q\), and resampling if \(R=\OO\). Taking \(a_0\) uniform also works with any independent distribution for \(b_0\). For the full uniform distribution on \(G\) the same proofs use \(N\) in place of \(N-1\) and count \(\OO\) separately.
+
+Write \(m\A=\{U_1+\cdots+U_m:U_i\in\A\}\), \(J=|m\A\setminus\{\OO\}|\), and
+\[
+P_{\rm rel}=\frac{J}{N-1},\qquad
+K=\binom{r+m-1}{m},\qquad
+P_{\rm rel}\le \min\!\left(1,\frac{K}{N-1}\right).
+\tag{1}
+\]
+The bound counts multisets of signed curve points, with repetitions allowed. Summed over all \(R\in G\), their representation counts total exactly \(K\). The count of successful targets can be smaller because of collisions and the identity. The sign of the target introduces no loss since \(\A=-\A\). If factor-base points are allowed in all of \(E(\Fp)\) while targets are taken in \(G\), use every rational leaf abscissa and replace \(J\) by \(|m\A\cap(G\setminus\{\OO\})|\). The counting and materialization bounds still hold. The linear-algebra statements below use factor-base points in \(G\).
+
+For \(r>0\),
+\[
+\log K=m\log r-\log(m!)
+          +\sum_{j=0}^{m-1}\log(1+j/r),
+\qquad
+0\le\sum_{j=0}^{m-1}\log(1+j/r)\le \frac{m(m-1)}{2r}.
+\tag{2}
+\]
+If \(f=p^{\alpha+o(1)}\), \(N=p^{\nu+o(1)}\), and \(m\) is fixed, (1) gives \(P_{\rm rel}\le\min(1,p^{m\alpha-\nu+o(1)})\). When \(m\) grows, (2) retains the factorial, signs, and collision-free counting bound without an error of unspecified size in \(m\). The commonly used approximation \(s^m/(m!p)\) additionally assumes enough rational lifts and a sufficiently spread out sum distribution. It is a heuristic for the probability, while (1) is exact.
+
+\subsection*{Work balance}
+
+Let one attempt include target generation, formation and solution of the polynomial system, and verification and extraction of a row. Let \(C\) be its total cost and let \(\eta\) be the probability that the solver returns a verified row given that a decomposition exists. The probability of acceptance is \(\pi=P_{\rm rel}\eta\). A complete solver has \(\eta=1\). Write \(C_+=\EE[C\mid\text{accepted}]\) and \(C_-=\EE[C\mid\text{rejected}]\) for events of positive probability. Then \(T_{\rm solve}=\EE[C]=\pi C_++(1-\pi)C_-\). For independent identically distributed attempts and a fixed requirement of \(k\) accepted rows,
+\[
+\EE[T_{\rm total}]
+ =T_{\rm base}+\frac{k\,T_{\rm solve}}{P_{\rm rel}\eta}
+   +\EE[T_{\rm linalg}].
+\tag{3}
+\]
+Here \(T_{\rm base}\) is any one-time preprocessing cost. The formula follows by summing \(\EE[C_i\mathbf 1_{\{\tau\ge i\}}]\) over attempts, since starting attempt \(i\) is independent of its cost. For rank-based stopping at an integrable stopping time \(\tau\), the middle term is \(T_{\rm solve}\EE[\tau]\). The required rank and distribution of useful rows must be established separately. The single-relation formula in the question is the special case \(k=1,\eta=1,T_{\rm base}=0\), or a convention that charges \(k\) attempts' worth of solving in the numerator. Amortized preprocessing and batches require their own accounting.
+
+For example, taking one sign representative per usable abscissa gives \(f\) unknown factor-base logarithms modulo prime \(N\), plus the logarithm of \(Q\). Rows from \(m\)-term decompositions have at most \(m+2\) nonzero entries if the constant column is included. The linear-algebra term depends on the row count, rank, and solver. Dense Gaussian elimination on \(k\) rows and \(f+1\) unknowns costs \(O(k(f+1)^2)\) field operations, for example. For fixed \(m\), if \(T_{\rm solve}=p^{\sigma+o(1)}\), acceptance is \(p^{-\beta+o(1)}\), and \(k=p^{\kappa+o(1)}\), the middle exponent in (3) is \(\kappa+\sigma+\beta\), with \(\beta\ge\max(0,\nu-m\alpha)\). Field elements and group coordinates are counted in words of \(O(\log p)\) bits. The upper bounds in this paper suppress factors polynomial in \(\log p\) where specified.
+
+\section{Summation and split-tree geometry}
+
+The projective closure of the summation hypersurface in \((\Pj^1)^n\) is the image of
+\[
+(U_1,\ldots,U_{n-1})\longmapsto
+\bigl(x(U_1),\ldots,x(U_{n-1}),x(-U_1-\cdots-U_{n-1})\bigr)
+\]
+from \(E^{n-1}\). The image is closed and irreducible, has dimension \(n-1\) by finite coordinate projection onto the first \(n-1\) abscissas, and restricts to \(S_n=0\) on the affine chart. For generic values of the first \(n-1\) abscissas, the sign choices give \(2^{n-2}\) distinct last abscissas, with simultaneous negation identifying pairs. Indeed, an extra generic coincidence would force two distinct signed sums to agree up to sign, yielding an identity with a coefficient \(\pm2\) in at least one independently varying curve point. Those generic points are separable because the \(x\)-map is a separable double cover in odd characteristic. By symmetry the degree in each variable is \(2^{n-2}\). Thus the separate degree in \(S_{m+1}\) is \(d_m=2^{m-1}\). The degree \(2^{m-2}\) applies to \(S_m\). After fixing a finite target, the total affine degree is exactly \(m d_m\). Indeed the evaluation of the projective equation with every leaf at infinity is nonzero for a finite target, since every leaf point would be \(\OO\). This evaluation is the coefficient of \(\prod_i X_i^{d_m}\) after dehomogenization. \cite{semaev}
+
+The basic affine incidence is
+\[
+S_3(u,v,w)=(u-v)^2w^2-2\bigl[(u+v)(uv+a)+2b\bigr]w
+ +(uv-a)^2-4b(u+v).
+\tag{4}
+\]
+This is quadratic in each coordinate and has total degree four. Its multihomogenization in \((\Pj^1)^3\) gives the complete \(x\)-addition incidence. Finite \(u,v\) lift to \(U,V\) over \(\kb\), and its two roots in projective \(w\), counted with multiplicity, are \(x(U+V),x(U-V)\). This follows from the chord formula for distinct \(u,v\) and specialization. At \(u=v\), either the coefficient of \(w\) is nonzero or \(u^3+au+b=0\), in which case the constant term is \((3u^2+a)^2\ne0\) by smoothness. At \(u=\infty\), the two roots coincide at \(v\), including \(v=\infty\). In particular every parent fiber has length two. The point-addition graph, with full signed points at each vertex, has one parent per pair.
+
+Use a binary tree with \(m\) leaves and \(m-1\) incidences (4). There are \(m-2\) intermediate abscissas besides the root. Any compatible \(x\)-assignment over \(\kb\) lifts to point assignments with coherent signs. Inductively one can negate every point in either child subtree to get the signs specified by the parent incidence. Every actual sum gives an assignment in the other direction. If all leaves come from \(F_G\), coherent leaf lifts lie in \(G\) and hence all projective intermediate abscissas and root abscissas are rational. An affine-only tree can lose relations with intermediate \(\OO\). If only \(F\subseteq\Fp\) is imposed, a leaf with nonsquare \(x^3+ax+b\) has two nonrational lifts. For instance a pair of opposing nonrational points can cancel in an algebraic-closure relation. Rational abscissas alone do not certify a rational point decomposition. Restricting leaves to \(F_G\), or checking actual rational point lifts and subgroup membership, resolves this distinction.
+
+\begin{lemma}[Dimension and length of a split tree]
+With unrestricted leaves the support of the tree is the image of \(E^m\) under the map recording the abscissas of all leaf points and their prescribed partial sums. Fixing the root abscissa to \(x(R)\) gives a support of dimension \(m-1\). If each leaf is restricted to \(F_G\) by its monic squarefree separator, the tree with variable root has scheme length \(f^m2^{m-1}\). The system of leaf constraints and nonroot incidences has length \(f^m2^{m-2}\) in the variables excluding the fixed root. Imposing the root equation specializes that latter finite scheme.
+\end{lemma}
+\begin{proof}
+Coherent signs give the support description. The map is finite onto its image, since the full map is proper and its fibers inject into the fibers of the finite leaf-abscissa map. Addition \(E^m\to E\) has fibers isomorphic to \(E^{m-1}\) by solving for the last point. Fixing the root abscissa takes one or two such fibers. For length, work over \(\kb\) after the leaf restriction. Start with the reduced leaf grid of length \(f^m\). At a new internal node, each fiber of the projective quadratic over the current finite base is nonzero. Choose one chart omitting a point outside the parent support above the entire finite base. In that chart the leading coefficient is a unit and the equation is monic after dividing by the unit. The new algebra is free of rank two over the old one. Induction over the present internal nodes gives both lengths. The root equation cuts out a quotient, possibly the zero ring.
+\end{proof}
+
+The exact lengths count multiplicities, repeated branches, and ordered leaves. For distinct signed curve points a point-addition tree is functional, and its equations have no independently chosen auxiliary solutions once the leaves are fixed. For an \(x\)-tree, different partial sums for the same leaf abscissas reflect actual sign choices. Ramification at coinciding parent values can add scheme multiplicities. A reduced algebra or a deduplicated list removes those multiplicities. Permuting leaves need not preserve the recorded intermediate values of a fixed tree. Permutation quotienting applies to the signed input tuples before recording the intermediates, or to signed multiset witnesses for the final sum.
+
+\section{Degree, rank, and the cost of explicit solving}
+
+Let \(g(X)=\prod_{c\in F_G}(X-c)\). If \(f>0\), the product-grid algebra is
+\[
+C=\Fp[X_1,\ldots,X_m]/(g(X_1),\ldots,g(X_m))\simeq \Fp^{F_G^m}.
+\]
+The leading monomials \(X_i^f\) are pairwise coprime, so the standard monomials have each exponent less than \(f\). Its degree-filtered affine Hilbert function is the cumulative coefficient sum of \((1+t+\cdots+t^{f-1})^m\), and stabilizes at \(f^m\) in degree \(\rho=m(f-1)\). For the directly specialized polynomial \(L=S_{m+1}(\boldsymbol X,x(R))\), multiplication on \(C\) is diagonal under the evaluation isomorphism. Thus
+\[
+\dim_{\Fp} C/(L)=h_R,\qquad
+\rank M_L=f^m-h_R,\qquad
+h_R=\#\{\boldsymbol c\in F_G^m:L(\boldsymbol c)=0\}.
+\tag{5}
+\]
+The fiber is reduced because \(C\) is a product of fields. By the rational-leaf verification, \(h_R\) counts exactly the usable ordered abscissa tuples, with signs to be reconstructed to obtain a row. The same quotient argument applies to a reduced explicit lifted algebra. In a nonreduced lift, vector-space length replaces the number of support points in (5).
+
+Here is an explicit degree certificate for the normal-form calculation. Put \(d=\deg L\), taking \(d=0\) if \(L=0\). For each standard monomial \(v\), reduce \(vL\) by the \(g(X_i)\). The division uses only multiples of degree at most \(\rho+d\), since each univariate monic reduction lowers degree. The reductions span the image of \(M_L\). Thus Macaulay relations and grid reductions through degree \(\max(f,\rho+d)\) suffice to determine all relations among the grid normal forms. This is a certificate for this explicit representation, independent of a generic regularity or first-fall estimate.
+
+More generally, for affine polynomials \(H_i\) of total degree \(d_i\) in \(n\) variables, the full degree-\(D\) Macaulay array, using rows \(X^\gamma H_i\) with \(|\gamma|+d_i\le D\), has
+\[
+M_D=\binom{n+D}{n}\quad\text{columns},\qquad
+U_D=\sum_{i:d_i\le D}\binom{n+D-d_i}{n}\quad\text{rows}.
+\tag{6}
+\]
+If the actual rank is \(r_D\), dense construction and elimination take \(O(U_DM_D(1+r_D))\) operations by pivoting at most \(r_D\) times. Sparse or structured algorithms can use different costs. An independently justified solving degree, or a certificate such as the grid reduction above, is needed to use (6) for solving. Root extraction and witness verification add to this arithmetic. A direct solver can enumerate the \(f^m\) grid tuples and test all sign patterns using \(O(m\,2^m f^m)\) group operations once the point representatives are available. That gives an elementary upper bound on explicit solving, independent of regularity.
+
+For fixed \(m\), \(f=p^{\alpha+o(1)}\) with \(\alpha>0\), (6) at the grid certificate degree has \(\Theta_m(f^m)\) columns. The product-grid dimension is exactly \(f^m\), even if the specialized fiber dimension is zero or one. If a different method actually required degree \(2^{\Theta(m)}\) in \(\Theta(m)\) variables, (6) would give \(2^{\Theta(m^2)}\) monomials. This follows from \((1+D/n)^n\le M_D\le (e(1+D/n))^n\). That scale is conditional on the solving degree and says nothing by itself about a lower bound. Neither the separate degree of \(S_{m+1}\) nor the small input degrees of the split tree specify that degree.
+
+\section{What factor-base encodings preserve}
+
+\begin{lemma}[Finite support and representation size]
+If a finite scheme over \(\Fp\) with coordinate algebra \(B\) maps to an affine abscissa with at least \(f\) distinct geometric values, then \(\dim_{\Fp}B\ge f\). If the geometric image is exactly \(F_G\), its reduced elimination ideal in \(\Fp[X]\) is \((g)\). With independently chosen witnesses for \(m\) leaves, the product length is \((\dim_{\Fp}B)^m\ge f^m\). For a zero-dimensional affine presentation by equations of degrees \(d_i\), the affine B\'ezout bound gives a length bound \(\prod_i d_i\) for a square complete intersection. In a general affine presentation, the number of geometric points in a finite solution set is at most \(\prod_i\max(1,d_i)\).
+\end{lemma}
+\begin{proof}
+Over \(\kb\) every geometric point contributes at least one to the length. A function vanishing on the finite projection vanishes at its distinct coordinates, which gives their monic product. Tensor products multiply vector-space dimensions. For the general B\'ezout bound, intersect successively with the hypersurfaces. A component contained in the next hypersurface keeps its degree, while the sum of degrees of the sections of every other component is at most its degree times the hypersurface degree, by projective hypersurface B\'ezout and restriction to the affine chart. The square complete-intersection length bound is the zero-dimensional multiplicity version of the same theorem.
+\end{proof}
+
+In particular, an exact geometric finite encoding with \(t\) equations of degrees bounded by \(d_0>1\) has \(t\log d_0\ge\log f\). For a single presentation of the full ordered grid, this bound becomes \(t\log d_0\ge m\log f\). The all-finite affine split tree with variable root uses \(2m-1\) variables and equations, with the simple B\'ezout upper bound \(f^m4^{m-1}\); it can miss infinity branches. Its complete projective version has the exact length of Lemma 1. This estimate constrains the presentation. Computing the finite set or deciding a membership query can cost less than its cardinality if the encoding is kept implicit.
+
+\paragraph{Prime-field descent, substitutions, and intervals.}
+Restriction of scalars from \(\Fp\) to itself leaves one equation. Encoding a field element as \(\sum_j c_j u_j\) gives an affine linear map. With unrestricted field variables it gives a positive-dimensional fiber if there is more than one variable. Exact interval constraints on \(u_j\) require separators of degrees equal to their respective interval lengths in a one-variable encoding. An equivalent bit encoding gives degree-two constraints and the product of the bit-domain sizes, with any extra invalid encodings requiring a range restriction. For \(F=\{0,\ldots,s-1\}\), the exact separator has degree \(s\). If interval membership is imposed only after solving, the unrestricted fixed-target hypersurface still has dimension \(m-1\). Introducing integer carry variables to enforce an integer congruence gives no new constraint over \(\Fp\) without the integer domain restrictions. Arithmetic over the integers using those restrictions would require a separate complexity proof.
+
+For a scalar polynomial substitution of degree \(d_1\ge1\) in a separate block, the top degree in that block multiplies by \(d_1\) when the leading coefficient survives the other specializations. Introducing the graph of the substitution can keep equations small. The unrestricted graph preserves the parameter dimension, and an exact finite-domain graph preserves its domain length. Adding \(X^p-X\) does make the affine solution coordinates rational and allows exponent reductions, but its full one-variable quotient still has dimension \(p\). For the filtered grid the identity \(g\mid X^p-X\) replaces it with a relation of degree \(f\). Neither identity implies a lower bound for testing an individual target.
+
+\paragraph{Small-height rational reconstruction.}
+Take \(1\le u\le U\), \(1\le v\le V\), and \(UV<p\). The equation \(vx-u=0\) is bilinear and \(v\) is a unit on the domain. The full graph after adjoining the two interval separators is a product of \(UV\) copies of \(\Fp\). Distinct reduced positive fractions have distinct residues, since equality modulo \(p\) forces the integer determinant \(uv'-u'v\) of absolute value less than \(p\) to vanish. The number of coprime pairs is at least
+\[
+UV\left(1-\sum_{d=2}^{\infty}d^{-2}\right)=(2-\zeta(2))UV,
+\]
+by counting pairs divisible by a common integer \(d\ge2\). Thus the projection has \(\Theta(UV)\) values, before filtering for rational curve lifts. Repeated rational representations can be removed by taking primitive pairs. The remaining witness algebra still has length of order \(UV\). Without the interval equations, the map from \(v\ne0\) is dominant with one-dimensional fibers, so the substituted unrestricted fixed-target system has dimension \(2m-1\). An explicit construction retains the \(UV\) scale even when the substitution itself is bilinear.
+
+\paragraph{Multiplicative cosets and sparse polynomial images.}
+For \(H\subseteq\Fp^\times\) of order \(h\mid p-1\), \(cH\) has the split, squarefree separator \(X^h-c^h\). Membership takes \(O(\log h)\) field operations by powering. Replacing the powering operation by its graph uses \(O(\log h)\) quadratic or linear equations with unique auxiliary coordinates for each root. The resulting exact algebra still has length \(h\). Parameterizing \(H\) by \(t^{(p-1)/h}\) with \(t\in\Fp^\times\) gives \(p-1\) parameter points and \((p-1)/h\) points above each output. Without the rational domain, the power map is dominant on the geometric torus. Cyclotomic factors with rational roots are subject to the same reduced support bound.
+
+For \(c\in\Fp^\times\), consider the image of \(t+c/t\) for \(t\in H\). Its size is between \(h/2\) and \(h\), since \(t\) satisfies \(t^2-xt+c=0\). It lies among the roots of \(D_h(X,c)-(1+c^h)\), where \(D_0=2,\ D_1=X,\ D_{j+1}=XD_j-cD_{j-1}\). The recurrence gives \(D_h(t+c/t,c)=t^h+(c/t)^h\). To obtain the actual image, the lifted system \(t^h=1,\ tx=t^2+c\) enforces \(t\in H\) and has length \(h\). Roots of the projected polynomial should be checked for such a lift. Sparse equations alone therefore give no smaller explicit support. Finally, over \(\Fp\) a linearized polynomial \(\sum_j a_jX^{p^j}\) evaluates as \((\sum_j a_j)X\). Its affine fibers on \(\Fp\) have size \(0,1\), or \(p\), and the additive group of \(\Fp\) has no proper nonzero subgroup.
+
+\paragraph{Torsion and isogeny fibers.}
+A nonconstant isogeny \(\phi:E'\to E\) of degree \(d\) has geometric fibers of length \(d\), including inseparable multiplicity. Restricting to \(b_1\) fibers therefore provides length \(b_1d\) and at most \(b_1d\) distinct abscissas, also after a translation or projection. Rationality of the selected lifts must be checked even when the fiber labels are rational. Alternatively the rational image group has size \(\#E'(\Fp)/|\ker(\phi)(\Fp)|\ge (p+1-2\sqrt p)/d\) by the homomorphism property and Hasse's bound. Thus a translated image group with \(p^{\alpha+o(1)}\) abscissas must have \(d\ge p^{1-\alpha-o(1)}\). Small equations for a chain of isogenies do not alter the length of its fibers.
+
+For a group coset \(T+H_0\subseteq G\), take the abscissas of its nonidentity points. The signed point base lies in \((T+H_0)\cup(-T+H_0)\), so \(m\A\) lies in at most \(m+1\) cosets \((m-2j)T+H_0\), \(0\le j\le m\). In particular \(J\le(m+1)|H_0|\), a much stronger restriction than the multiset bound for many parameters. Sparsity of this type can concentrate the sums rather than spreading them across the target group.
+
+\paragraph{Unrestricted rational parameters.}
+Suppose \(\phi=A/B\) is a nonconstant rational function on affine \(k\)-space over \(\Fp\), with \(\max(\deg A,\deg B)=d_1\). For every \(c\in\Fp\), \(A-cB\) is nonzero, and its zero set has at most \(d_1p^{k-1}\) rational points. The same bound applies to the excluded zero set of \(B\). These are the usual polynomial root bounds on a product of finite sets, proved by induction on variables using the leading coefficient in the last variable. If the rational image has size \(s\), coverage of the domain therefore gives
+\[
+  s\,d_1 p^{k-1}\ \ge\ p^k-d_1p^{k-1},
+  \qquad d_1\ \ge\ \frac{p}{s+1}.
+\tag{7}
+\]
+Thus an unrestricted affine map with output size \(s=p^{\alpha+o(1)}\), \(\alpha<1\), requires degree at least \(p^{1-\alpha-o(1)}\). This bound concerns the image before curve-lift filtering. On \(\Pj^1\), pulling back the summation hypersurface by degree-\(d_1\) maps in independent leaf blocks gives multidegree \(d_1d_m\) in each unspecialized block, with multiplicity, by substituting homogeneous pairs of degree \(d_1\). For rational graphs impose denominator invertibility, for example with \(Bw=1\), to avoid admitting solutions created by clearing denominators. A finite geometric image on a positive-dimensional parameter domain can only come from separately constant images of its irreducible components. A finite rational image alone allows positive-dimensional geometric components.
+
+\section{Unconditional barriers in explicit representation models}
+
+\paragraph{Model I. Full tuple algebra for each target.}
+A solver in this model explicitly constructs, afresh for each independent target, a basis, a full evaluation table, or one record per point of the finite algebra for all independent signed leaf assignments before using the target equation. It may first identify permutations of the signed tuples. It may change parameterizations and use auxiliary variables. The \(x\)-only variant instead charges the full ordered abscissa grid. Constructing a representation with \(D\) slots costs at least \(D\) word operations.
+
+\begin{theorem}[Full tuple expansion]
+In Model I, expected work for a first verified relation is \(\Omega(N)\) for all \(m\) and usable factor-base sizes with \(P_{\rm rel}>0\). If the solver instead constructs the full ordered \(x\)-grid for each trial, the same conclusion holds uniformly for \(f\ge2\) and \(m\ge2\).
+\end{theorem}
+\begin{proof}
+The algebra of functions on the signed tuple set is \(\Fp^{\A^m}\). Its permutation invariants are exactly the functions constant on orbits, of dimension \(K\), even if \(p\) divides \(m!\). A lift covering every orbit has length at least \(K\) by the finite-support lemma. The solver therefore spends \(\Omega(K)\) per trial. Acceptance is at most \(K/(N-1)\), which proves the first assertion by (3). For the \(x\)-grid, define \(v_m=\binom{2f+m-1}{m}/f^m\). Then
+\[
+  v_{m+1}/v_m=(2f+m)/(f(m+1))\le1\quad(m,f\ge2).
+\]
+Hence \(K\le v_2 f^m=(2+1/f)f^m\le(5/2)f^m\). The charged work per trial is \(\Omega(f^m)\), which again gives \(\Omega(N)\) using (1).
+\end{proof}
+
+For fixed \(m\), \(f=p^{\alpha+o(1)}\), and \(N=p^{\nu+o(1)}\), a fresh full grid costs at least \(p^{m\alpha+o(1)}\) per trial and the relation stage has exponent at least \(\max(m\alpha,\nu)\) for \(f\ge2\). The same estimate holds for a full split-tree expansion, with exact length factors as above. For growing \(m\), (2) and the exact grid and tree lengths retain the factorial, sign, and tree contributions. An algorithm which first imposes the target and computes only a basis of the final quotient is outside Model I. In the reduced grid the final dimension is \(h_R\) in (5).
+
+\paragraph{Model II. Target-independent explicit support with batched matching.}
+A batch has \(B\) independent uniform targets in \(G\setminus\{\OO\}\). Matching uses target support prepared without seeing these targets. The preprocessed data can be any collection of explicit candidate abscissas, coefficient arrays of nonzero univariate eliminants in the target abscissa, or explicitly materialized bases of finite algebras whose projection covers the candidate support. It can also use rational arithmetic formulas over \(\Fp\) defining candidate zeros, with formulas charged for occurrences of the input symbol and without shared gates or exponentiation primitives. A formula specifying candidate zeros must represent a nonzero rational function. Write \(D\) for the sum of the number of listed candidates, the expanded eliminant degrees, the algebra dimensions and the number of input occurrences in such formulas, as applicable. Processing each target costs at least one word operation. Successful rows must have \(x(R)\) in the covered support. Online matching may use arbitrary calculations, including multipoint evaluation and extra witness checks.
+
+\begin{theorem}[Explicit support and batching]
+In Model II the expected number of matched trials is at most \(2BD/(N-1)\). Constant probability of a first success requires work \(\Omega(\sqrt N)\). If the batch must yield \(k\) accepted trials with probability at least \(\gamma>0\), its work is \(\Omega(\sqrt{\gamma kN})\). The exponent \(1/2\) for a first relation is sharp, including for \(m=3,4,5\).
+\end{theorem}
+\begin{proof}
+A list covers at most its length, a nonzero polynomial covers at most its degree, and an explicit algebra covers at most its dimension. In a rational formula with \(L\) input occurrences both numerator and denominator have degree at most \(L\): induction uses degree addition at multiplication, division, or common-denominator addition. The defined zeros of a nonzero formula are therefore at most \(L\). The union covers at most \(D\) abscissas, each with at most two group targets. Conditioning on the preprocessing and summing target indicators gives the expectation bound. On the desired event the number of matched trials is at least \(k\), so \(BD\ge\gamma k(N-1)/2\). Work is \(\Omega(B+D)\), which gives the result.
+\end{proof}
+
+The one-hit bound also allows an interleaved schedule with a target-independent stream of explicit data and an independent target stream. Conditional on its random seed the preprocessing stream is fixed. Before a work cap \(W\), the support of completed records in its first \(W\) charged words has size \(O(W)\), and at most \(W\) targets can be processed. A match by the cap occurs between these prefixes, with probability \(O(W^2/N)\) by the union bound. Truncation at a sufficiently large constant times expected work preserves positive constant success probability by Markov's inequality. This gives the expected-work bound with adaptive stopping. The data-generating stream must be independent of the target stream. In particular this proof does not cover generating new formulas that encode the numeric values of earlier targets.
+
+For fixed support budget \(D\) the bound gives
+\[
+  T_{\rm matching}\ \ge\ \Omega\!\left(D+\frac{N}{D}\right)
+\tag{8}
+\]
+for a first hit with constant probability. With \(D=p^{\delta+o(1)}\) the exponent is at least \(\max(\delta,\nu-\delta)\). The expression \(p^\alpha+p^{1-\alpha}\) follows when \(N=p^{1+o(1)}\) and the explicit support has \(p^{\alpha+o(1)}\) elements. The support exponent need not equal the factor-base exponent. For example, materializing a forward eliminant via the full ordered split tree requires at least \(f^m2^{m-1}\) slots if the full nonreduced algebra is kept, while the radical target eliminant may have smaller degree.
+
+To see sharpness, take \(N\) prime, \(m\) fixed and \(H=\lfloor\sqrt N\rfloor\). Use \(F=\{x(iP):1\le i\le H\}\), with known point logarithms. Put \(C_0=(m-1)P\). A table of the \(H\) distinct sums \(C_0+iP\) contains valid \(m\)-term decompositions and takes \(O(H)\) group operations. For sufficiently large \(N\) it contains only nonidentity points. Matching against \(B=\Theta(N/H)\) independent targets gives positive constant success probability, since the hit probability per trial for the signed table is \(H/(N-1)\). This uses \(\widetilde O(\sqrt N)\) work including generation and matching. Taking \(b_0\) independently and uniformly nonzero modulo \(N\) leaves the same target distribution, and a hit yields \(\log_PQ=(m-1+i-a_0)/b_0\bmod N\). This establishes sharpness in the model by a group enumeration with known logarithms.
+
+Large relation probability can likewise be arranged independently of efficient solving. For fixed \(m\) and large prime \(N\), set \(b_2=\lceil N^{1/m}\rceil\) and allow all abscissas of \(d\,b_2^jP\) for \(1\le d\le b_2,\ 0\le j<m\). The factor base has between \(b_2\) and \(mb_2\) abscissas. Using one positive digit per place produces a consecutive interval of \(b_2^m\) group scalars modulo \(N\), so \(P_{\rm rel}=1\). A base of the same size made of consecutive multiples \(iP\) has sum support at most \(2mf+1\). Solving decompositions for the digit base would directly solve the discrete logarithm of an input target since the digit-point logarithms are prescribed.
+
+\paragraph{Fixed-split lookup.}
+A related obstruction covers a split tree whose two sides are combined by explicit membership queries of the form \(R-C\) in a precomputed set. Let the stored signed partial-sum list have \(L\) distinct elements. On one target, scan a fixed order of \(U\) complementary sums and stop at the first match or after the scan. For uniform nonidentity \(R\), the \(j\)-th lookup is reached with probability at least \(1-(j-1)L/(N-1)\), and the trial succeeds with probability at most \(\min(1,UL/(N-1))\). If \(U\le(N-1)/(2L)\), the expected trial costs at least \(U/2\) lookups. Otherwise it costs \(\Omega((N-1)/L)\) lookups, by examining the first \(\lceil(N-1)/(2L)\rceil\) tests. Formula (3) yields expected work \(\Omega(L+N/L)\) with the preprocessing list charged. The same union bound covers batches with a target-independent query schedule on the all-failure path: each queried shift covers at most \(L\) possible target points. A fixed offset and a list of size \(f\) give the special case \(f+N/f\). Scanning every ordered complementary tuple instead of distinct sums incurs a larger cost. With a balanced split and \(f=p^{\alpha+o(1)}\), \(m\) fixed and \(N=p^{1+o(1)}\), fully scanning \(f^{\lceil m/2\rceil}\) tuples on every trial gives exponent at least
+\[
+\max\bigl(\lceil m/2\rceil\alpha,\,1-\lfloor m/2\rfloor\alpha\bigr).
+\]
+Its minimum over \(\alpha\) is \(\lceil m/2\rceil/m\). This calculation assumes an exhaustive scan without early stopping.
+
+\paragraph{Amortized resultants.}
+For \(Y=x(m\A\setminus\{\OO\})\), the exact radical target eliminant is
+\[
+  H_Y(T)=\prod_{y\in Y}(T-y),\qquad \deg H_Y=|Y|.
+\]
+One can produce a polynomial with this support by first retaining the finite-root portion of a complete forward tree and taking the norm of \(T-x(\mathrm{root})\) in its finite algebra. In a split reduced algebra this norm is the product over geometric points with their recorded values. In a nonreduced algebra the characteristic polynomial of multiplication records each value with its local length. Taking the radical leaves precisely \(H_Y\). Fast evaluation of this expanded polynomial at many targets can lower the cost of evaluations. The bound (8) already grants arbitrary matching at unit cost per trial. A different idea is to adjoin \(\prod_{j=1}^B(T-x(R_j))=0\) before eliminating. The resulting quotient can have small or zero length. If the solver still materializes the full target-independent tuple algebra, that cost is charged by Model II even if the eliminant in \(T\) is never expanded. A batch solver that works only with the specialized quotient is outside both models.
+
+\subsection*{The \(f+1\)-row collection policy}
+
+There is a rank guarantee when \(N\) is prime and witness selection depends only on the target point. With sign representatives \(B_j\), let \(u\) be the vector of their unknown logarithms and let \(d_Q=\log_P Q\). An accepted trial gives \(e\cdot u-b_0d_Q=a_0\), where \(e\) is the signed multiplicity vector of its witness. If \(a_0,b_0\) are sampled independently and uniformly modulo \(N\), the parameter \(b_0\) is uniform independently of the target \(R\). This independence is preserved by rejecting \(\OO\), selecting rows using only the targets, and stopping at a fixed number of successes. Given \(k\) such rows, the matrix \(E_0\) with rows \(e\) is independent of the uniform vector of the sampled \(b_0\)'s. If its left nullspace has dimension \(\lambda\), the chance that every vector in that nullspace annihilates the \(b_0\)-column is \(N^{-\lambda}\). A left dependence that does not annihilate that column gives \(d_Q\) directly. For \(k=f+1\), \(\lambda\ge1\), so the failure probability is at most \(1/N\). This policy needs no heuristic full-rank hypothesis and uses at most \(O(f^3)\) field operations for dense linear algebra. It is a sufficient row policy. Fewer rows can suffice, for example if some base logarithms are known.
+
+Suppose \(N=p^{1+o(1)}\), \(m\ge3\) is fixed, and Model II credits at most one row per sampled target. For this policy, the number of abscissas that can give actual rows is at most \(\min(N,K)=O_m(\min(N,f^m))\). For an explicit support budget \(D=p^{\delta+o(1)}\) and \(f=p^{\alpha+o(1)}\), the hit-count bound gives work exponent at least
+\[
+ \max\bigl(\delta,1+\alpha-\min(\delta,m\alpha,1)\bigr).
+\]
+Over \(\alpha,\delta\ge0\), the minimum is \(m/(2m-1)\). Indeed the expression is at least both \((1+\alpha)/2\) and \(1-(m-1)\alpha\), which coincide at \(\alpha=1/(2m-1)\), \(\delta=m\alpha\).
+
+The exponent is attained for this policy on prime-order groups. In the digit construction above instead take \(b_2=\lceil N^{1/(2m-1)}\rceil\). The positive digit sums give an interval of \(b_2^m<N\) distinct scalars and \(f=\Theta_m(b_2)\). Enumerate all signed ordered sums and store witnesses in \(\widetilde O_m(f^m)\) work. The per-target acceptance probability is \(\Theta_m(f^m/N)\), using the digit interval for a lower bound and (1) for the upper bound. Obtaining \(f+1\) rows takes \(\widetilde O_m(Nf/f^m)\) expected work, or that order of work for positive constant success probability by a sufficiently large cap. The dense linear algebra costs \(O(f^3)\), which stays within the bound for \(m\ge3\). Thus the stated exponent is sharp for the collection policy, while the first-hit lower bound has exponent \(1/2\). The construction deliberately obeys the \(f+1\)-row policy even though the base logarithms are known.
+
+\section{Checks for \texorpdfstring{\(m=3,4,5\)}{m=3,4,5}}
+
+The following structural counts use ordered leaves and lengths with multiplicity. The fixed-target degree refers to a finite \(x(R)\).
+\begin{center}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+& \(m=3\) & \(m=4\) & \(m=5\)\\
+\midrule
+Separate leaf degree of \(S_{m+1}\) & \(4\) & \(8\) & \(16\)\\
+Total degree after target substitution & \(12\) & \(32\) & \(80\)\\
+Intermediate variables other than the root & \(1\) & \(2\) & \(3\)\\
+Number of \(S_3\) incidences & \(2\) & \(3\) & \(4\)\\
+Tree length with root check omitted & \(2f^3\) & \(4f^4\) & \(8f^5\)\\
+Tree length with root variable & \(4f^3\) & \(8f^4\) & \(16f^5\)\\
+Full complementary-tuple scan exponent & \(2/3\) & \(1/2\) & \(3/5\)\\
+Explicit \(f+1\)-row policy exponent & \(3/5\) & \(4/7\) & \(5/9\)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For a small exact example, take \(E/\mathbb F_{101}\) given by
+\(y^2=x^3+6x+9\), \(P=(0,3)\), and \(F=\{0,1,3\}\).
+The discriminant factor \(4\cdot6^3+27\cdot9^2\) is \(21\) modulo \(101\). The chord-and-tangent law gives
+\[
+\begin{array}{c|rrrrrrrr}
+j&2&4&8&16&19&24&32&64\\ \hline
+x(jP)&1&4&37&98&20&3&30&20\\
+y(jP)&97&20&92&60&7&16&90&94
+\end{array}
+\]
+so \(64P=-19P\). Since \(83\) is prime, it is the order of \(P\), and Hasse's bound forces \(\#E(\mathbb F_{101})=83\). Its trace is \(19\). The signed base scalars are \(A_0=\{\pm 1,\pm 2,\pm 24\}\) modulo \(83\).
+
+For reproducibility, define \(B_0=\{0\}\) and compute \(B_{j+1}=\{u+a\bmod 83:u\in B_j,\ a\in A_0\}\). Each set below contains \(0\) and is sign-symmetric. Its positive representatives in \(\{1,\dots,41\}\) are
+\[
+\begin{array}{c|l}
+j & \text{positive representatives}\\ \hline
+3 & 1\text{--}6,\ 11,\ 20\text{--}28,\ 33\text{--}34,\ 36\text{--}37\\
+4 & 1\text{--}10,\ 12\text{--}13,\ 18\text{--}39\\
+5 & 1\text{--}41 .
+\end{array}
+\]
+The exact nonidentity relation probabilities are \(20/41,34/41,1\), respectively. For the target \(P\), one can compute \(h_P\) in (5) by enumerating the \(3^m\) ordered tuples from \(\{1,2,24\}\), accepting a tuple if any signed sum is \(1\) modulo \(83\). The counts for \(m=3,4,5\) are \(7,20,61\), and the multiplication-matrix ranks are \(20,61,182\). These are smaller fixed-target quotients of the same leaf grid used in the length computations.
+
+\section{Scope of the obstruction}
+
+The two barriers apply regardless of the equations used to describe an explicit support or full tuple algebra. They therefore cover the finite interval, rational-height, coset, Dickson, and isogeny lifts above when the solver pays to materialize their full representation. Their common restriction is where the computation pays for the unspecialized support. A degree-\(h\) polynomial such as \(X^h-1\) tests membership with \(O(\log h)\) field operations using shared powers. For an elliptic-curve example, with every nonidentity group abscissa in the factor base and \(m=2\), choose any nonidentity point other than \(R\) and subtract it from \(R\). That retrieves a relation in constant group work despite a quadratic-size ordered grid. Precomputed degree, B\'ezout length, and Macaulay array size cannot by themselves give an operation lower bound for implicit circuits or target-dependent solving. Even a very large pretarget algebra can have a tiny target fiber, as (5) shows. A target-first method would need an independently justified running time, along with rational root extraction and enough useful rows, to establish a speedup.
+
+For \(N=p^{1+o(1)}\), the model bounds exclude \(p^{1/2-\epsilon}\) for any fixed \(\epsilon>0\). Equivalently they exclude \(L_p[1,c]=p^{c+o(1)}\) with \(c<1/2\), as well as genuinely subexponential \(L_p[\theta,c]\) bounds with \(\theta<1\). The bound in \(N\) remains valid for smaller subgroups. Shoup's square-root lower bound applies to opaque generic group encodings and supplies a different model boundary. It gives no additional lower bound on algebraic use of prime-field coordinates. Diem's extension-field result concerns a growing extension degree, and Yokoyama et al.\ give complexity bounds for a naive Gr\"obner-basis method under statistical assumptions on the summation polynomials. The square-root obstruction here is specifically for explicit support and tuple materialization, including the batched variants described above. \cite{shoup,diem,yokoyama}
+
+\section{Target-first elimination on four radix blocks}
+
+We now impose the target before eliminating. Work in a prime-order subgroup \(G=\langle P\rangle\) of order \(N\). Write \(b_*=\lceil N^{1/4}\rceil\) for the radix, to distinguish it from the Weierstrass coefficient \(b\). Define
+\[
+ D_*=\{-b_*,\ldots,-1,1,\ldots,b_*\},\qquad
+ A_j=\{d b_*^jP:d\in D_*\},\qquad j=0,1,2,3.
+\]
+There is one leaf per prescribed block \(x(A_j)\). Positive digits already suffice: their integer sums run once over the consecutive interval
+\[
+  c_*+[0,b_*^4-1],\qquad c_*=1+b_*+b_*^2+b_*^3.
+\tag{9}
+\]
+Since \(b_*^4\ge N\), every target admits a decomposition. Conversely, any verified signed witness gives the target logarithm by summing its four known scalars modulo \(N\). The digit blocks with signed point and scalar labels can be generated in \(O(b_*+\log N)\) group operations by four running progressions. Given the logarithm \(r\), the converse witness procedure takes the base-\(b_*\) digits of \((r-c_*)\bmod N\), using the representative in \([0,N-1]\), and adds one to each digit. Thus finding a witness on this base and finding the logarithm are equivalent up to block preparation and elementary integer arithmetic. Randomly shifting a fixed input by \(aP\) gives a uniform target, with a known correction \(a\). Independent shifts have the same property for a batch, and any witness for any shifted target suffices for the original input.
+
+\subsection*{Projected supports and specialized fiber size}
+
+Let \(H_L=A_0+A_1,\ H_R=A_2+A_3\) be signed point supports and let \(U=x(H_L)\), \(V=x(H_R)\) be the projective abscissa supports. Write \(M=b_*(b_*+1)\). For \(b_*\ge2\), the integer sum \(D_*+b_*D_*\) is exactly \([-M,M]\cap\mathbb Z\). The intervals for successive positive high digits cover \([0,M]\); each missing center is filled using the preceding or following high digit and a first digit of \(b_*\) or \(-b_*\). Reflection supplies the negative half. The positive pairs alone already give \(b_*^2\) distinct consecutive integer sums. For \(b_*\ge8\), \(2M<(b_*-1)^4<N\), so the signed interval gives \(2M+1\) distinct group points. The second half is its unit multiple \(b_*^2\) modulo \(N\). Both projective abscissa supports therefore have size \(M+1\), including the identity, and \(n_U=n_V=M\) on the affine chart. Constructing either full separator, root table, or ambient univariate quotient basis therefore costs \(\Omega(b_*^2)\) in the explicit word model, even if the target is imposed before any remaining elimination. This charge alone is the meet-in-the-middle exponent. The usual lookup upper bound constructs the two lists in \(O(b_*^2)\) group operations, keeps a digit witness for each point, and tests \(R-H_L\) against \(H_R\).
+
+The specialized fiber, by comparison, is uniformly small.
+\begin{lemma}[Constant specialized fibers]
+For \(b_*\ge8\), each \(R\in G\), including \(\OO\), has at most \(12\) distinct signed half-point pairs \((L,H)\in H_L\times H_R\) with \(L+H=R\). The corresponding projective \(S_3\) quotient on \(U\times V\) has length at most \(12\). There are at most \(48\) signed four-digit witnesses for \(R\).
+\end{lemma}
+\begin{proof}
+Set \(M=b_*(b_*+1)\) and let \(r\in[0,N-1]\) represent the target scalar. Each half scalar has the form \(u=d_0+b_*d_1\) or \(b_*^2 v=b_*^2(d_2+b_*d_3)\), with \(u,v\in[-M,M]\). Consequently \(u+b_*^2v=r+kN\) for an integer \(k\). Its left-hand side lies in \([-M(1+b_*^2),M(1+b_*^2)]\). For \(b_*\ge8\), \(M(1+b_*^2)<2(b_*-1)^4<2N\); expanding gives \(2(b_*-1)^4-M(1+b_*^2)=b_*^3(b_*-9)+11b_*^2-9b_*+2>0\) for \(b_*\ge9\) and direct substitution handles \(b_*=8\). Hence there are at most four possible \(k\). For each \(k\), the integer \(u\) has a prescribed residue modulo \(b_*^2\), and the interval for \(u\) has length \(2M<3b_*^2\). It gives at most three choices for \(u\), and \(v\) is determined. Each such integer pair gives at most one signed half-point pair. Each \(u\) or \(v\) has at most two signed digit lifts because the first digit has a prescribed residue modulo \(b_*\), each residue has two choices in \(D_*\), and the second digit is then determined. This proves the bounds on signed points and digit tuples. Every projective solution projects from a signed pair for the actual \(R\), by the complete \(S_3\) incidence and simultaneous negation. The abscissa grid is a product of fields and its quotient is reduced, so its length is this count of projective solutions.
+\end{proof}
+
+For most targets the fiber size can be computed exactly. For each of the two integer representatives \(s=r,r-N\), the possible \(v\)'s are the integers in \([(s-M)/b_*^2,(s+M)/b_*^2]\). This interval is contained in \([-M,M]\), since \(|s|\le N\le b_*^4\le(b_*^2-1)M\), and has length greater than two. Each representative therefore contributes at least two half pairs. The average number of signed half pairs is exactly \((2M+1)^2/N=4+O(1/b_*)\). Since the minimum is four, all but \(O(b_*^3)\) targets have exactly four. Each integer in the half interval has one or two signed digit representations, and exactly \(2(2M+1)-(2b_*)^2=4b_*+2\) integers have only one. Pairs incident to such an integer yield at most \(O(b_*^3)\) additional exceptional targets. Thus all but \(O(b_*^3)\) targets have exactly sixteen signed digit witnesses.
+
+\begin{figure}[htbp]
+\centering
+\[
+\begin{gathered}
+ \underbrace{(x(A_0),x(A_1))\longrightarrow U}_{|U|=b_*^2+b_*+1}
+ \qquad
+ \underbrace{(x(A_2),x(A_3))\longrightarrow V}_{|V|=b_*^2+b_*+1}
+ \\[4pt]
+ (U,V)\ \xrightarrow[\text{fix }x(R)]{\,S_3\,}\
+ \underbrace{\{(u,v): S_3(u,v,x(R))=0\}}_{\text{at most 12 projective pairs for }b_*\ge8}
+\end{gathered}
+\]
+\caption{The two projected supports and the specialized fiber. The counts follow from the signed half intervals and the constant-fiber lemma.}
+\end{figure}
+
+\subsection*{Fixed-target norm and witness recovery}
+
+First suppose the target has finite abscissa \(t\). Deal separately with \(u=\infty\) or \(v=\infty\): \(S_3(\infty,v,t)=0\) precisely when \(v=t\), and \(S_3(u,\infty,t)=0\) precisely when \(u=t\). When the target is \(\OO\), compatibility is \(u=v\), including \(u=v=\infty\). These rules follow by specializing the projective incidence, and one can try the identity branches before expanding any half support. In this radix example, the identity branches can also be tested by scanning the at most \(4b_*^2\) candidates from a single half. The finite branch uses \(U^\circ=U\setminus\{\infty\}\), \(V^\circ=V\setminus\{\infty\}\), their monic squarefree separators \(h_U,h_V\), and the split algebra \(C=\Fp[X]/(h_U)\).
+
+Write \(s(X,Y,t)=S_3(X,Y,t)\). The norm of \(s\) from \(C[Y]/(h_V)\) to \(C\) is
+\[
+  M_t(X)=\prod_{v\in V^\circ} s(X,v,t)\pmod{h_U}.
+\tag{10}
+\]
+Indeed the extension splits as one copy of \(C\) for each \(v\), so its multiplication matrix is diagonal in those coordinates. A root \(u\) of \(\gcd(h_U,M_t)\) is precisely an abscissa with some compatible right half, regardless of how many \(v\)'s give it. One may scan the stored \(U^\circ\) or factor the gcd to find such a root. For each selected \(u\), take either stored orientation of its signed left point \(L\), and test \(R-L\) and \(R+L\) against the signed right table. Compatibility guarantees a match. This recovers a digit witness without constructing the full \(U^\circ\times V^\circ\) table. Chart specializations exclude no valid solutions because the infinity cases were handled explicitly. All roots retained by (10) belong to the rational half supports. Deduplicating abscissas merges opposite points and alternate digit lifts. Storing one witness for a sign representative and allowing its simultaneous negation in the corresponding two leaves suffices to recover one verified row.
+
+Here is a direct cost bound for (10) when root tables are already expanded. Write \(n_U=|U^\circ|,\ n_V=|V^\circ|\). At a fixed \(t\), each factor in the product is a polynomial of degree at most two in \(X\). An update of a dense remainder in \(C\) takes \(O(n_U)\) field operations by multiplying by that factor and reducing at most two high coefficients. The entire product and classical gcd cost \(O(n_Un_V+n_U^2)=O(b_*^4)\) operations. A product tree on the known quadratics, fast polynomial remainder and fast gcd also give a quasi-linear field-operation bound in \(n_U+n_V\) with fast polynomial arithmetic. That restores the meet-in-the-middle exponent and still needs the half supports. Expanding \(h_U\) by successive linear factors costs \(O(n_U^2)\) with the same arithmetic model; a first witness can be recovered by scanning in at most that order as well. This is an upper bound for the elementary norm implementation and can be worse than direct lookup. Faster product arithmetic does not remove the \(\Omega(b_*^2)\) representation cost of the full half support. The lemma on small fibers shows that the eventual gcd degree cannot supply this lower bound: it is at most \(12\) for \(b_*\ge8\).
+
+\subsection*{Imposing the batch before elimination}
+
+For a batch, keep distinct finite target abscissas \(t_1,\ldots,t_D\), separately keeping the mapping from each abscissa to the original signed targets. Identity targets and the infinity half cases obey the same branch rules. Set
+\[
+ g_W(T)=\prod_{i=1}^{D}(T-t_i),\qquad
+ C_W=\Fp[X,T]/(h_U(X),g_W(T)).
+\]
+With the batch equation already imposed, compute
+\[
+ M_W=\operatorname{Norm}_{C_W[Y]/(h_V)\,/\,C_W} s(X,Y,T).
+\tag{11}
+\]
+The algebra \(C_W\) is a product of fields indexed by \((u,t_i)\). Thus the quotient by \(M_W\) is exactly the compatible \((u,t_i)\) projection. It has length at most \(12D\) for \(b_*\ge8\). The full triple quotient with \(Y\) retained is also reduced, with length at most \(12D\) by the same lemma. When there are repeated target abscissas, their separate identities are kept outside the algebra. Opposite targets have opposite witnesses, so treating the abscissa once loses no valid signed output.
+
+One implementation of (11) uses the CRT evaluations for \(T\) from the start, running all factors in (10) componentwise. With explicit half supports the total field work is \(O(n_U^2+D(n_Un_V+n_U^2))\) using the same dense arithmetic, plus the group work for the lists and orientation checks. This really imposes the target batch before taking the norm. It does not create a forward eliminant in the free variable \(T\). An alternative stores the coefficient array in \(C_W\) and updates it with factors of bidegree at most \((2,2)\). Each update can cost \(O(Dn_U)\) field operations by bounded-degree multiplication and reductions in the two axes. That array has \(Dn_U\) ambient slots before the target-compatibility quotient. Using CRT for target specialization avoids treating \(\Fp[T]/(g_W)\) as a field: a coefficient may vanish in some components while remaining nonzero in others, so unconditional field division or a Euclidean gcd using untested pivots there is invalid. The \(O(D)\) specialized output length offers no bound on the work needed to compute it implicitly.
+
+\subsection*{An obstruction for opaque target-first operations}
+
+The explicit half-support bound applies to (10) and (11) even with numeric field arithmetic. The following separate model permits skipping both half supports and choosing candidates adaptively. Access to target-dependent points is through formal affine group operations and equality tests, including equality of abscissas, which is equality of points up to sign. In this model numeric coordinates are opaque. Input includes \(P,Q,\OO\), where \(q=\log_PQ\) is uniform modulo \(N\). A solver may introduce any handle \(uP+vQ\) with known scalars, and may form batches of shifted targets \(a_jP+c_jQ\) with \(c_j\ne0\). All choices can depend on previous results and internal random coins. Charge at least one operation per materialized handle, even when the coefficients encode many scalar operations. Success means outputting one indexed, oriented four-digit witness for one of these targets. If an equality-only oracle tests a fixed-arity summation incidence, charge the corresponding constant number of affine handles: for \(S_3\), for example, compare up to sign the sums and differences of the first two points with the third.
+
+\begin{theorem}[Opaque target-first barrier]
+An algorithm in this model that has positive constant probability of returning a witness uses \(\Omega(\sqrt N)=\Omega(b_*^2)\) expected work. The bound holds for adaptive batches and adaptive choice of the output target.
+\end{theorem}
+\begin{proof}
+Fix the algorithm's coins and run a hypothetical simulation with symbolic pairs \((u,v)\) in place of point values. Answer equalities by formal identity and answer equality up to sign by formal identity up to sign. Under a cap of \(W\) new handles there are at most \(W+3\) pairs including the inputs. A real execution can first deviate from the simulation only if two formally distinct affine forms agree up to an allowed sign \(\sigma\). This requires
+\[
+     u_i-\sigma u_j+(v_i-\sigma v_j)q=0
+     \qquad\text{in }\mathbb F_N .
+\]
+Each equation that is not a formal identity has at most one root in \(q\), since \(N\) is prime. A union bound over symbolic pairs and signs gives \(O((W+3)^2/N)\) probability of any deviation. Random opaque labels, if provided, can be assigned using the same lazy labeling on the formal path and the real path until such a deviation. If there is no deviation, a returned target index and its digit tuple are fixed by the simulation. Correctness forces \(a_j+c_jq\) to equal the known sum of its digit scalars. Since \(c_j\ne0\), the guessed witness succeeds for at most one \(q\), adding at most \(1/N\). If the output is only up to overall sign, this last term is at most \(2/N\), and an oriented verification resolves the sign. Averaging over coins proves the capped bound. A cap at a sufficiently large constant times the expected work preserves positive constant success probability by Markov's inequality, proving the claim.
+\end{proof}
+
+The lookup algorithm above attains the exponent in this model; it only needs point comparisons, or generic labels with a dictionary. Numeric use of the coordinates and polynomial coefficients is outside the opaque model. In particular the proof does not apply to computing a norm or gcd through a circuit that never generates explicit candidate points. The remaining single-target problem is to compute one compatible pair or a nontrivial factor of the gcd in (10) from the four \(O(b_*)\)-size digit blocks in \(O(b_*^{2-\epsilon})\) work, without representing a full half support. The batched problem is to extract a compatible pair for a target with an unknown logarithm from the specialized projection in (11) within the same total budget, including target generation. The constant-size fiber bound ensures that output size poses no obstacle to either question. It leaves the arithmetic of the implicit elimination unresolved.
+
+\subsection*{A degree bound for numeric coordinate tests}
+
+The opaque result extends to a hybrid that allows actual coordinate arithmetic. Regard the secret point \(Q\) as a variable \(Z\) on the curve. On each fixed branch, an input coordinate of an affine target, or a value computed from such coordinates, represents a rational function in \(\Fp(E)\). Use \(\deg_\infty f\) for the degree of its pole divisor, with constants assigned degree zero. For this model, scalar coefficients in opaque handles, target indices, and any other discrete control decisions can depend on earlier equality or pole tests and random coins. Numeric coordinates can be used in field arithmetic and in those tests. Access to coordinate bits, using numeric field values as table addresses, and silently reinterpreting such a value as an opaque scalar are outside the model. To output a witness the solver can evaluate up to four field functions and interpret the results as signed digits in \(D_*\). For large \(N\), those digits are distinct modulo \(p\).
+
+Under a hard work cap \(W\), allow at most \(W\) opaque handles and at most \(W\) numeric predicates. Each predicate on its branch tests a rational function for a zero or for a pole. An exceptional intermediate evaluation, such as division by zero or reading an affine coordinate at \(\OO\), is counted as a predicate guarding the operation. For some \(D\), impose \(\deg_\infty f\le D\) on the functions used in predicates and on the output digit functions. This budget can include arithmetic formulas (trees with no shared gates) of size \(O(W)\) on \(x(Z),y(Z)\), or on translations of \(Z\). Indeed those coordinate functions have pole degrees two and three. Pole degrees of sums and products are at most the sum of the pole degrees of the inputs. For a quotient, the numerator's poles and the denominator's zeros give the same inequality, since zeros and poles of a nonzero function have equal total degree. Thus a formula satisfies a degree bound linear in its number of coordinate leaves. Degree-proven circuits can also be used. The size of a shared circuit alone supplies no such linear budget.
+
+\begin{theorem}[Hybrid coordinate barrier]
+In the hybrid model, on a uniform secret \(Q\in G\), the capped probability of returning a valid indexed witness is at most
+\[
+ O\!\left(\frac{(W+3)^2+WD+b_*D+1}{N}\right).
+\tag{12}
+\]
+Consequently if \(D=O(W+1)\), constant success requires \(\Omega(b_*^2)\) work, even with adaptive, correlated batches of affine targets.
+\end{theorem}
+\begin{proof}
+Simulate opaque operations using formal affine pairs, as before. For numeric predicates follow the generic path in \(\Fp(E)\): a nonzero rational function is generically neither zero nor at a pole. A first departure due to a numeric predicate is a zero or pole of one of the functions on this path. A nonzero function has at most \(D\) zeros and \(D\) poles, counting geometric points without multiplicity. Since \(Q\) is uniform on the \(N\) group points, all numeric departures together cost at most \(2WD/N\) in probability. Opaque departures cost \(O((W+3)^2/N)\) by the affine collision argument.
+
+With no departure, the target label \(a_jP+c_jZ\), \(c_j\ne0\bmod N\), and four rational digit functions are fixed by the simulation. If a digit function \(f\) is nonconstant, the condition \(f(Z)\in D_*\) is a union of \(2b_*\) zero sets of \(f-d\), each of degree at most \(D\). That accounts for \(2b_*D/N\) probability. If all digits are constant, the witness gives a fixed point, and the affine target ranges bijectively over \(G\). The match costs at most \(1/N\) for oriented output, or \(2/N\) up to sign. These bounds prove (12). For \(D=O(W+1)\) and \(b_*=\Theta(N^{1/4})\), the right-hand side goes to zero if \(W=o(\sqrt N)\). The result also holds in expected work when the same degree budget applies to the capped executions, by truncation as before.
+\end{proof}
+
+For an equality-driven solver within this model and a subquadratic cap \(W=o(b_*^2)\), constant success in (12) requires \(D=\Omega(N/(W+b_*))\). When \(W\) is of order \(b_*^{2-\epsilon}\) with \(0<\epsilon\le1\), this is \(D=\Omega(b_*^{2+\epsilon})\). Extra access to the numeric representation changes the model. The large degrees in such a budget need not be written down: repeated squaring or multiplication-by-a-scalar maps can have large degree with small descriptions. For example, \(x([2^k]Z)\) has pole degree \(2\cdot4^k\) and is evaluated on a point by \(k\) doublings. The theorem does not rule out those mechanisms. It identifies where this extension beyond opaque group operations stops.
+
+\subsection*{Independent targets and total formula cost}
+
+The preceding theorem treats correlated batches built from one unknown point. An analogous result for independently sampled targets follows from a weighted zero bound on a product of curves. Independence must hold conditional on any supplied sampling coefficients. Affine shifts of one secret with known offsets use the preceding theorem. Assume that the input points \(Z_1,\ldots,Z_k\) are independent and uniform in \(G\setminus\{\OO\}\). A batch algorithm may branch on affine group comparisons and on numeric equality or pole tests. For the latter, use polynomials in the affine coordinates \((x_i,y_i)\) of \(Z_i\), reduced by \(y_i^2=x_i^3+ax_i+b\), and weight every \(x_i\) by two and every \(y_i\) by three. Reduction does not increase the weighted degree. A rational predicate is represented by a numerator and a nonzero denominator. Its degree budget is the maximum of their weighted degrees. All exceptional evaluations and changes of chart must be included in the tested conditions. In the expanded-formula model, every intermediate division guard is charged separately with its own expanded numerator and denominator.
+
+\begin{lemma}[Weighted zeros on independent curve points]
+Let \(F\) be a nonzero reduced polynomial in the affine coordinates of \(E^k\) of total weighted degree at most \(D\). Then
+\[
+   \Pr[F(Z_1,\ldots,Z_k)=0]\le \frac{D}{N-1}.
+\]
+\end{lemma}
+\begin{proof}
+Expand in the final pair of coordinates using the basis \(x_k^i\) and \(x_k^i y_k\) for \(i\ge0\). Their pole orders at \(\OO\) are distinct, namely \(2i\) and \(2i+3\). Let \(d\) be the largest such order with a nonzero coefficient. This coefficient is a reduced polynomial of weighted degree at most \(D-d\) in the preceding variables, and vanishes with probability at most \((D-d)/(N-1)\) by induction. Otherwise the specialized function of \(Z_k\) has pole order exactly \(d\) at \(\OO\) and no other poles, so it has at most \(d\) zeros. Independence then bounds the additional probability by \(d/(N-1)\). The case of a nonzero constant starts the induction.
+\end{proof}
+
+\begin{theorem}[Independent-batch coordinate barrier]
+Permit at most \(W_g\) opaque affine handles, each of the form \(uP+\sum_i c_iZ_i\), including the input handles used in comparisons. Numeric predicates and output functions may depend on all batch coordinates under the same discrete-control restrictions as in the hybrid model. On every execution branch, let the sum of the degrees of the numeric predicates be at most \(L\), and let each of the four output digit functions have degree at most \(D_o\). The algorithm can return a digit witness for any selected target affine form with at least one nonzero \(c_i\). Its success probability is at most
+\[
+  O\!\left(\frac{(W_g+2)^2+L+b_* D_o+1}{N-1}\right).
+\tag{13}
+\]
+If the solver uses only numeric predicates and charges separately for every coordinate leaf of all expanded rational guard and output formulas, constant success requires \(\Omega(N/b_*)=\Omega(b_*^3)\) leaves. If it instead admits affine comparisons and its degree bound per predicate and per output is \(O(W+1)\), where \(W\) is the total work cap, constant success still requires \(\Omega(b_*^2)\) work.
+\end{theorem}
+\begin{proof}
+Fix the random coins and simulate equality and pole predicates in the function field of \(E^k\) and affine comparisons on formal coefficient vectors. The generic path and all its tests are then fixed independently of the inputs. Each accidental group comparison forces a nontrivial affine linear equation in independent subgroup scalars, whose probability is at most \(1/(N-1)\) by conditioning on all but a scalar with a nonzero coefficient. A union bound over the opaque handles gives the first term in (13). A numeric predicate can differ from its generic answer only when a nonzero numerator or denominator vanishes. The weighted zero bound and a union bound over the path give at most \(2L/(N-1)\).
+
+On the generic path, if an output digit function \(A/B\) is nonconstant, each \(A-dB\) for \(d\in D_*\) is a nonzero polynomial of weighted degree at most \(D_o\) after reduction. The chance that the digit is in its allowed set is at most \(2b_*D_o/(N-1)\). If all output digits are constant, a match with their known sum forces a nontrivial affine scalar equation for the selected target, with probability at most \(1/(N-1)\), or twice that if an overall sign is allowed. Adding these events proves (13).
+
+In an expanded rational formula the weighted degrees of its numerator and denominator are at most three times the number of coordinate leaves. This follows by induction using common denominators for sums, the product rule for numerators and denominators at a multiplication, and exchanging numerator and denominator at an inversion. For a formula-only algorithm with budget \(W\), \(L+D_o=O(W)\) and there are no opaque comparisons. Thus the right-hand side is \(O((b_*W+1)/(N-1))\). In the hybrid with work cap \(W\), at most \(W\) predicates of degree \(O(W+1)\) give \(L=O(W(W+1))\). Substitution gives the square-root bound. Both capped bounds extend to expected work by truncation, provided the representation budget holds for capped runs.
+\end{proof}
+
+The formula-only lower bound charges the expanded formulas separately, including intermediate division guards even when a later simplification would cancel the denominator. It does not apply to reusing intermediate values across formulas or obtaining an evaluated coordinate of a group operation as a unit-cost primitive. Group operations on several input points can introduce poles along diagonals in \(E^k\); their coordinate formulas must satisfy the stated polynomial numerator and denominator budget to use this theorem. The bound covers predicates formed after specializing all batch inputs and thus supplies a distinct obstruction beyond the cost of writing a half-support separator.
+
+\subsection*{Reproducible checks}
+
+The companion Python experiment in \texttt{evidence/reproduce.py} uses only the standard library. It enumerates all signed digit witnesses by scalar sums, checks them against target-first signed half matching by the group law, and independently checks sampled targets by taking a polynomial gcd in the right abscissa after fixing the left abscissa and target. That order of projection is the transpose of (10) and isolates the same compatibility relation. The code also computes (11) in the evaluation basis on the sampled target components and checks its zero projection against group-law matching. The projective infinity test uses the leading homogeneous coefficient, and both orientations are checked after recovering roots. The experiment groups target abscissas before summing the reduced quotient dimensions, so \(R\) and \(-R\) contribute just once to that total. By default the sampled gcd checks include the identity and both orientations of small scalars, and include a miss when one exists. Running with \texttt{--field 101 --all-gcd-targets} checks the gcd at every target of both \(\mathbb F_{101}\) cases.
+
+\begin{center}
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+\(p\)&\(N\)&\(b_*\)&
+\shortstack{Signed points\\per half}&
+\shortstack{Maximum half\\pairs at one target}&
+\shortstack{Maximum signed\\digit witnesses}\\
+\midrule
+101 & 83   & 2 & 13 & 4  & 6\\
+101 & 83   & 4 & 41 & 22 & 52\\
+509 & 479  & 5 & 61 & 11 & 24\\
+1009& 1069 & 6 & 85 & 8  & 22\\
+5003& 5011 & 9 & 181 & 8 & 24\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The \(b_*=2\) row is a deliberately undersized radix and has misses. The \(b_*=4\) row is the required radix at a small order where the large-radix fiber bound does not apply. In the \(b_*=9\) row, the maximum reduced single-target abscissa quotient has length eight. The seven checked target points reduce to five distinct projective abscissas with batch quotient length \(31\). The retained output is in \texttt{evidence/replay.txt}. The experiment measures finite support and checks witness recovery. The asymptotic bounds above follow from the integer and degree arguments.
+
+\begin{thebibliography}{9}
+\bibitem{semaev}
+I. Semaev, \emph{Summation polynomials and the discrete logarithm problem on elliptic curves}, IACR ePrint 2004/031. \url{https://eprint.iacr.org/2004/031}
+\bibitem{shoup}
+V. Shoup, \emph{Lower bounds for discrete logarithms and related problems}, EUROCRYPT 1997. \url{https://www.shoup.net/papers/dlbounds1.pdf}
+\bibitem{diem}
+C. Diem, \emph{On the discrete logarithm problem in elliptic curves}, Compositio Mathematica 147 (2011), 75--104. \url{https://doi.org/10.1112/S0010437X10005075}
+\bibitem{yokoyama}
+K. Yokoyama, M. Yasuda, Y. Takahashi, and J. Kogure, \emph{Complexity bounds on Semaev's naive index calculus method for ECDLP}, Journal of Mathematical Cryptology 14 (2020), 460--485. \href{https://www.degruyterbrill.com/document/doi/10.1515/jmc-2019-0029/html}{Publisher's article}
+\end{thebibliography}
+\end{document}

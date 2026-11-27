@@ -38,7 +38,6 @@ fn main() {
             trial_budget: 2_000_000,
             seed: 2,
             oracle: "semaev".into(),
-            ..CellRequest::default()
         },
     ];
 

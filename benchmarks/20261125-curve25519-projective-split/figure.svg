@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="640" viewBox="0 0 1000 640">
+<rect width="1000" height="640" fill="#fbfaf7"/>
+<style>
+text{font-family:Inter,DejaVu Sans,sans-serif;fill:#20252b}.title{font-size:25px;font-weight:700}.sub{font-size:14px;fill:#56606a}.axis{font-size:13px}.grid{stroke:#d7dbdf;stroke-width:1}.base{stroke:#20639b;fill:#20639b}.cand{stroke:#d1495b;fill:#d1495b}.line{fill:none;stroke-width:2.5}.status{font-size:12px;font-weight:600}.note{font-size:14px;font-weight:650;fill:#8d2432}</style>
+<text class="title" x="52" y="42">Projective split does not lower relation-finding cost</text>
+<text class="sub" x="52" y="66">Curve25519-like k=20 miniature; frozen m=3 qualification; F4 multiply-adds per random target</text>
+<line class="grid" x1="108" x2="900" y1="347.4" y2="347.4"/><text class="axis" x="96" y="352.4" text-anchor="end">10^8</text>
+<line class="grid" x1="108" x2="900" y1="262.3" y2="262.3"/><text class="axis" x="96" y="267.3" text-anchor="end">10^9</text>
+<line class="grid" x1="108" x2="900" y1="177.1" y2="177.1"/><text class="axis" x="96" y="182.1" text-anchor="end">10^10</text>
+<line class="grid" x1="108" x2="900" y1="92.0" y2="92.0"/><text class="axis" x="96" y="97.0" text-anchor="end">10^11</text>
+<line stroke="#20252b" x1="108" x2="900" y1="390" y2="390"/><line stroke="#20252b" x1="108" x2="108" y1="92" y2="390"/>
+<line stroke="#20252b" x1="108.0" x2="108.0" y1="390" y2="396"/><text class="axis" x="108.0" y="414" text-anchor="middle">t=3</text>
+<line stroke="#20252b" x1="372.0" x2="372.0" y1="390" y2="396"/><text class="axis" x="372.0" y="414" text-anchor="middle">t=4</text>
+<line stroke="#20252b" x1="636.0" x2="636.0" y1="390" y2="396"/><text class="axis" x="636.0" y="414" text-anchor="middle">t=5</text>
+<line stroke="#20252b" x1="900.0" x2="900.0" y1="390" y2="396"/><text class="axis" x="900.0" y="414" text-anchor="middle">t=6</text>
+<text class="axis" transform="translate(25 255) rotate(-90)" text-anchor="middle">mean F4 multiply-adds (log scale)</text>
+<polyline class="base line" points="103.0,343.3 367.0,147.6"/>
+<circle class="base" cx="103.0" cy="343.3" r="6"/><title>chain, t=3: 111785088.281 multiply-adds/target</title>
+<circle class="base" cx="367.0" cy="147.6" r="6"/><title>chain, t=4: 22255293450.656 multiply-adds/target</title>
+<polyline class="cand line" points="113.0,343.3 377.0,147.5"/>
+<circle class="cand" cx="113.0" cy="343.3" r="6"/><title>projective, t=3: 111909801.281 multiply-adds/target</title>
+<circle class="cand" cx="377.0" cy="147.5" r="6"/><title>projective, t=4: 22265619555.656 multiply-adds/target</title>
+<line class="base line" x1="657" x2="691" y1="103" y2="103"/><circle class="base" cx="674" cy="103" r="5"/><text class="axis" x="700" y="108">affine chain baseline</text>
+<line class="cand line" x1="657" x2="691" y1="128" y2="128"/><circle class="cand" cx="674" cy="128" r="5"/><text class="axis" x="700" y="133">projective candidate</text>
+<text class="sub" x="108" y="448">Completion status (32 random + 8 planted requested per arm)</text>
+<rect x="33.0" y="466" width="150" height="38" rx="7" fill="#31733c" opacity="0.14"/><text class="status" x="108.0" y="490" text-anchor="middle" fill="#31733c">complete</text>
+<rect x="297.0" y="466" width="150" height="38" rx="7" fill="#31733c" opacity="0.14"/><text class="status" x="372.0" y="490" text-anchor="middle" fill="#31733c">complete</text>
+<rect x="561.0" y="466" width="150" height="38" rx="7" fill="#9a6816" opacity="0.14"/><text class="status" x="636.0" y="490" text-anchor="middle" fill="#9a6816">timeout</text>
+<rect x="825.0" y="466" width="150" height="38" rx="7" fill="#8d2432" opacity="0.14"/><text class="status" x="900.0" y="490" text-anchor="middle" fill="#8d2432">memory kill</text>
+<rect x="52" y="535" width="896" height="68" rx="9" fill="#f5e6e8" stroke="#d1495b"/>
+<text class="note" x="72" y="563">NOT QUALIFIED FOR m=4</text>
+<text class="sub" x="72" y="586">Observed t=4 ratio 1.000464 (candidate/baseline); frozen upper-95% target &lt; 0.80. No four-point slope is estimable.</text>
+</svg>

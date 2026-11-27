@@ -106,13 +106,17 @@ fn pdivmod(a: &[u128], b: &[u128], p: u128) -> (Poly, Poly) {
     (trim(q), a)
 }
 
+/// gcd through the shared module (`p < 2^63` prime, coefficients reduced).
+/// The result is monic where the old Euclid left it unnormalised; the only
+/// caller reads its length.
 fn pgcd(a: &[u128], b: &[u128], p: u128) -> Poly {
-    let (mut a, mut b) = (trim(a.to_vec()), trim(b.to_vec()));
-    while !b.is_empty() {
-        let r = pdivmod(&a, &b, p).1;
-        (a, b) = (b, r);
-    }
-    a
+    let f = crypto_lib::gcd::poly::Fp64::new(p as u64);
+    let a: Vec<u64> = a.iter().map(|&c| (c % p) as u64).collect();
+    let b: Vec<u64> = b.iter().map(|&c| (c % p) as u64).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
+        .into_iter()
+        .map(u128::from)
+        .collect()
 }
 
 /// Rabin's test for the monic `t^k + c_{k-1} t^{k-1} + ... + c_0`
@@ -459,11 +463,8 @@ enum Multiples {
     Set(BTreeSet<u128>),
 }
 
-fn gcd(mut a: u128, mut b: u128) -> u128 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd(a: u128, b: u128) -> u128 {
+    crypto_lib::gcd::int::gcd_u128(a, b)
 }
 
 impl Multiples {

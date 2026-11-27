@@ -1,0 +1,32 @@
+{
+  "schema": "composite-point-source/v1",
+  "source_commit": "1df51369fee60f3d36bd9871975166185a2223d6",
+  "source_publication": "edaf7badaf6a59d0e3b0ba5db31903fcbe7a1943",
+  "source_inputs": 95,
+  "unchanged_context_inputs": 85,
+  "new_inputs": 10,
+  "prior_constituents": [
+    {
+      "path": "research/curve25519_torus_native_20261115/spectrum-compiler-v1/source-v1.tar.xz",
+      "bytes": 80408,
+      "sha256": "073091adec34dad4801539518e5caf14248ddf3269c6e19b206b09fc43082810"
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/model-solver-v1/source-v1-delta.tar.xz",
+      "bytes": 10268,
+      "sha256": "52fbb26feb5a11ef068e2937dc6a2ec8c4d0c5d57c296c6debe69c67290f5bd8"
+    }
+  ],
+  "new_delta_bytes": 62324,
+  "new_delta_sha256": "0dae4e37907cfab03ba2aefac3caebdf61a4f32903821b269571357fcf3a5a61",
+  "all_three_archives_roundtrip": true,
+  "monolithic_archive": false,
+  "binary": "/workspace/curve25519-native-binaries/point-solver-control-v1",
+  "binary_bytes": 1710256,
+  "binary_sha256": "e5120cceea4fc95d2391c7ab60b4c23fd6adfb0d3ac2aa0a7988e458b610740f",
+  "standing": "producer unsigned/unverified",
+  "timestamp_utc": "2026-11-23T21:18:53.646395+00:00",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "build_command": "cargo build --locked --release --bin torus-point-solver --manifest-path tools/torus-point-solver/Cargo.toml; CARGO_INCREMENTAL=0,CARGO_PROFILE_RELEASE_DEBUG=0,task target directory",
+  "exit": 0
+}

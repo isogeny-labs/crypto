@@ -1,0 +1,99 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded block-buffer v0.10.4
+  Downloaded generic-array v0.14.7
+  Downloaded serde_derive v1.0.229
+  Downloaded typenum v1.20.1
+  Downloaded cfg-if v1.0.5
+  Downloaded crypto-common v0.1.7
+  Downloaded num-integer v0.1.47
+  Downloaded hex v0.4.3
+  Downloaded itoa v1.0.18
+  Downloaded cpufeatures v0.2.17
+  Downloaded either v1.18.0
+  Downloaded rand_chacha v0.3.1
+  Downloaded rand_core v0.6.4
+  Downloaded version_check v0.9.5
+  Downloaded crossbeam-deque v0.8.8
+  Downloaded digest v0.10.7
+  Downloaded ppv-lite86 v0.2.21
+  Downloaded quote v1.0.47
+  Downloaded zmij v1.0.23
+  Downloaded serde_json v1.0.151
+  Downloaded autocfg v1.5.1
+  Downloaded crossbeam-utils v0.8.23
+  Downloaded sha2 v0.10.9
+  Downloaded unicode-ident v1.0.26
+  Downloaded crossbeam-epoch v0.9.21
+  Downloaded num-traits v0.2.19
+  Downloaded proc-macro2 v1.0.107
+  Downloaded getrandom v0.2.17
+  Downloaded serde_core v1.0.229
+  Downloaded serde v1.0.229
+  Downloaded rayon-core v1.13.0
+  Downloaded memchr v2.8.3
+  Downloaded rand v0.8.8
+  Downloaded num-bigint v0.4.8
+  Downloaded rayon v1.12.0
+  Downloaded syn v3.0.6
+  Downloaded zerocopy v0.8.60
+  Downloaded libc v0.2.190
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling proc-macro2 v1.0.107
+   Compiling version_check v0.9.5
+   Compiling generic-array v0.14.7
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.190
+   Compiling typenum v1.20.1
+   Compiling crossbeam-utils v0.8.23
+   Compiling zerocopy v0.8.60
+   Compiling crossbeam-epoch v0.9.21
+   Compiling syn v3.0.6
+   Compiling crossbeam-deque v0.8.8
+   Compiling autocfg v1.5.1
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling getrandom v0.2.17
+   Compiling num-traits v0.2.19
+   Compiling serde_derive v1.0.229
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling rayon-core v1.13.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling digest v0.10.7
+   Compiling rand_core v0.6.4
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling rand_chacha v0.3.1
+   Compiling either v1.18.0
+   Compiling rayon v1.12.0
+   Compiling num-integer v0.1.47
+   Compiling rr5-original-f4-closure v0.1.0 (/workspace/scratch/cdbe94c88979/crypto/research/prime31_four_summand_20261122/native/f4-source)
+   Compiling rand v0.8.8
+error: failed to run custom build command for `rr5-original-f4-closure v0.1.0 (/workspace/scratch/cdbe94c88979/crypto/research/prime31_four_summand_20261122/native/f4-source)`
+
+Caused by:
+  process didn't exit successfully: `/workspace/scratch/cdbe94c88979/crypto/research/prime31_four_summand_20261122/native/target/release/build/rr5-original-f4-closure-3018bf981ea905d6/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/reuse.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/pair_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/f4_fp/certified.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/challenge_ladder.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/glv_invariant_base.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/groebner_f4.rs
+  cargo:rerun-if-changed=/workspace/scratch/cdbe94c88979/crypto/src/cryptanalysis/ic_boundary.rs
+
+  --- stderr
+
+  thread 'main' (1239) panicked at f4-source/build.rs:52:5:
+  assertion `left == right` failed: production source changed: src/cryptanalysis/ic_boundary.rs; review the dependency closure before deliberately updating its pinned hash
+    left: "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311"
+   right: "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce"
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

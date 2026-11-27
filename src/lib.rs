@@ -34,6 +34,7 @@ pub mod ct_bignum;
 pub mod ecc;
 pub mod ecc_safety;
 pub mod encoding;
+pub mod gcd;
 pub mod hash;
 pub mod isogeny;
 pub mod kdf;

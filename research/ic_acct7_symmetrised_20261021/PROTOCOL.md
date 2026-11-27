@@ -17,11 +17,11 @@ does every `ic.pipeline_full` record with `oracle=symmetrised` price with
 `complete: true` — nothing in `unpriced`, nothing in `known_uncounted` —
 under `ecbench work --counted`?
 
-**Spec.** `specs/koblitz-symmetrised-n17.json`: one curve, `K_1 / F_{2^17}`
+**Spec.** `specs/koblitz-symmetrised-n17.json`: one curve, `icv1-f2m17-tm101-00378d4e`
 (the smallest Koblitz size in the repository's roster whose `x^n − 1` has a
 proper Frobenius-invariant subspace containing 1: `n = 13` and `n = 19`
 have `2` primitive, so their only invariant subspaces containing 1 are
-`F_2` and the whole field; `K_0 / F_{2^17}` has no prime-order subgroup in
+`F_2` and the whole field; `icv1-f2m17-t101-e6c4b64d` has no prime-order subgroup in
 the constructor). Divisor `0;1` gives `V` of dimension 9, as in the
 library's own symmetrised pipeline test.
 

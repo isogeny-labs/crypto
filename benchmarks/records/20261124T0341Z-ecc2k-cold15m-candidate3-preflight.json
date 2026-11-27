@@ -1,0 +1,61 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-24T03:44:19+00:00",
+  "commands": [
+    {
+      "argv": [
+        "timeout",
+        "600",
+        "bash",
+        "research/trace_zero_cold15m_20261124/candidate3/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 101,
+      "started_utc": "2026-11-24T03:42:05+00:00",
+      "wall_s": 0.018
+    }
+  ],
+  "commit": "1861f64e1445caab75b8bc0babe27411b180217a",
+  "commit_dirty": true,
+  "created_utc": "2026-11-24T03:41:58+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261124T0341Z-ecc2k-cold15m-candidate3-preflight",
+  "metrics": [],
+  "problem": "ecc2k130-index-calculus-cold-query",
+  "raw": [
+    {
+      "bytes": 238,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/launch-failure/misdirected-calibration.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b2/b2b4186ebcbbd29b1e7102e304a67264ade587ae107344dd6187474a0da95c35",
+      "sha256": "b2b4186ebcbbd29b1e7102e304a67264ade587ae107344dd6187474a0da95c35",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/launch-failure/misdirected-calibration.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold15m-candidate3-preflight",
+  "status": "invalid",
+  "summary": "Configuration path named prior candidate and create_new refused existing directories before any child. Wrong metadata bytes/runner retained, originals restored exactly. Corrected separately before data, original600second epoch retained; no numeric counter retry.",
+  "validation": null
+}

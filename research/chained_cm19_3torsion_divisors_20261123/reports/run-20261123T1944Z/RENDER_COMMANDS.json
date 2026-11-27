@@ -1,0 +1,54 @@
+{
+  "cwd": "/dev/shm/chained-cm19-3torsion23/research/chained_cm19_3torsion_divisors_20261123/reports/run-20261123T1944Z",
+  "environment": {
+    "XDG_CACHE_HOME": "/dev/shm/ct23-report-font-cache",
+    "XDG_CONFIG_HOME": "/dev/shm/ct23-report-config",
+    "SOURCE_DATE_EPOCH": "1795442400"
+  },
+  "argv": [
+    [
+      "dot",
+      "-Tsvg",
+      "certificate.dot",
+      "-o",
+      "certificate.svg"
+    ],
+    [
+      "inkscape",
+      "certificate.svg",
+      "--export-type=pdf",
+      "--export-filename=certificate.pdf"
+    ],
+    [
+      "pdflatex",
+      "-interaction=nonstopmode",
+      "-halt-on-error",
+      "-output-directory",
+      "/dev/shm/ct23-torsion-report-render-v1",
+      "REPORT.tex"
+    ],
+    [
+      "pdflatex",
+      "-interaction=nonstopmode",
+      "-halt-on-error",
+      "-output-directory",
+      "/dev/shm/ct23-torsion-report-render-v2",
+      "REPORT.tex"
+    ],
+    [
+      "pdftoppm",
+      "-scale-to",
+      "1550",
+      "-png",
+      "/dev/shm/ct23-torsion-report-render-v2/REPORT.pdf",
+      "/dev/shm/ct23-torsion-report-render-v2/page"
+    ]
+  ],
+  "scientific_reexecution": false,
+  "inspected_pages": [
+    1,
+    2
+  ],
+  "inspection_scale": 1550,
+  "first_v1_error_preserved": true
+}

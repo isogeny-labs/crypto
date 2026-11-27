@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:52:11Z",
+ "id": "PCC-20261124-2b81de",
+ "kind": "statement",
+ "producer": {
+  "commit": "435d04b3fbc979b3f4bea49568dc376fa2896b9a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/local-cost.json",
+    "sha256": "8163d63e848e8b05e218886fba572bd24de1a8c25c52228f84d88e5d55d50eca"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/pipeline-cost.json",
+    "sha256": "84fcc7ac9631d8cd4340d3d25fc81d9228fc9dba8e98d117f3cae9faa992b7e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/collector-cost.json",
+    "sha256": "0200180329e0a26a4832de7dc13c2289c323bdffca96a965703c59502eaa56b1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/checker-cost.json",
+    "sha256": "66a680385a18697dd4b72116c1376c0c3aa6e9e006ca5c66498ef2bbd21f1818"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/baseline-cost.json",
+    "sha256": "3a73b5c9bbf91222e3d2591003f3b485d57d6e59bf4b3bbc8e4f6ed91b718976"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/preflight-cost.json",
+    "sha256": "8174e7ab35ebc63897101cbb9e2d446b433b7eae2c5d26d0443af9c12f809a20"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/selected-cpu.txt",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/LOCAL_ENVELOPE.json",
+    "sha256": "0aaa7fda9b0b74e9dfd76d05f58561e548135e81d03b77d28113be2543acb906"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "complete local wrapper and prepared pipeline process clocks; excludes original map synthesis",
+ "statement": "The authorized one-CPU local wrapper finishes with exit0 and records119.375 wall seconds,116.085 user seconds and3.055 system seconds. Its prepared pipeline records119.365 wall seconds; actual collector31.086 wall seconds and separate checker0.690 wall seconds. Stage build, qualification, baseline and preflight records are retained. These are local diagnostic costs including those executed stages, not a performance comparison or a price for original map synthesis, which remains excluded. Peak RSS was not measured."
+}

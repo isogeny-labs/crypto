@@ -62,7 +62,7 @@ does not satisfy these controller acceptance criteria.
 ## Bounded memory envelope
 
 Requests may set `"memory":"8Gi"` when that per-run envelope is authorized.
-Only `4Gi` and `8Gi` are accepted. Omission selects the historical `4Gi`;
+Only `4Gi`, `8Gi` and `14Gi` are accepted. Omission selects the historical `4Gi`;
 explicit `4Gi` canonicalizes to omission, preserving existing request bytes,
 hashes and persisted state identities. Selecting `8Gi` changes the immutable
 request hash and cannot change the envelope of an existing logical run.
@@ -72,6 +72,14 @@ computation container and its separate fresh L2 job. CPU, storage, deadlines,
 restore limits, retries, placement and authorization do not change. New pencil
 requests requiring 8 GiB must explicitly set the field; old requests remain
 at 4 GiB. This source change does not deploy a controller or publish a runtime.
+
+The explicit `14Gi` option accommodates the photographed-volcano pilot's
+previously recorded request: its unchanged table payload alone is
+9,566,497,092 bytes, larger than 8 GiB, and its application cap is 12 GiB.
+This value binds a new request identity and reaches both computation and
+fresh-epoch memory requests/limits. It changes no CPU, placement, pool quota,
+cost ceiling or existing 4Gi/8Gi request identity. It is a source-level option;
+neither a new runtime deployment nor a collector restore is implied.
 
 Validation and limitations are in `validation/20261029-memory-envelope/README.md`.
 

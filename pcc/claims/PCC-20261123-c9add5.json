@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T19:03:52Z",
+ "id": "PCC-20261123-c9add5",
+ "kind": "statement",
+ "producer": {
+  "commit": "065176db5621a0cfc5d94a1be0551e158e6e0fa1",
+  "model": "",
+  "session": "codex-ecc2k-halftrace-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/checks/focused-tests-02.txt",
+    "sha256": "b2d0ce41251724773dd302139651920070b545e2790ffaef895e24c17673b89d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR5057 exact half-trace constructor for complete83/131 moduli, with unchanged scalar fallback; no comparative performance claim yet.",
+ "statement": "The current-source focused suite passes44 tests after correcting a NIST131-vs-ECC2K131 dispatch fixture. New tests compare every half-trace basis image and byte-table entry with scalar chains, retain the exact H(1) normalization, reject the alternate131-bit polynomial and handle a singular reducible input conservatively. This is unsigned producer development evidence, not independent admission."
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:26:39Z",
+ "id": "PCC-20261123-cd44ee",
+ "kind": "statement",
+ "producer": {
+  "commit": "d96c3718d5aa154b55924630d720414d09e464ff",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/IDENTITY_TANGENT_PROTOCOL.md",
+    "sha256": "72ae6e36c6f264dec5c5cc2fe5367a86ae987bf736a4130de402f24968654383"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/identity_tangent.cpp",
+    "sha256": "81d29deb50780422de0e6c17755cbab4bc71bb4d412936e31996cb400b363af7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/tangent-v1/result.json",
+    "sha256": "8be11f2116db9f7aabf43d5039b4ad59482f29cdb46dc3bdf0cb49cce85a1f25"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/recorded_pool_20261123/evidence/tangent-v1/pre-call-manifest.sha256",
+    "sha256": "6c0be20988869b2dda465689df44a8688b89e1866cee67def9cf7560590e0296"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-recorded-pool",
+ "statement": "Frozen identity-tangent diagnostic builds and executes with exit0 and exact double-root/product reconstruction at the sole recorded identity-image quartic point. The residual has its recorded degree/discriminant/Euler category, with GMP and OpenSSL agreeing. Both changed-polynomial/root controls reject. No residual roots extracted and no new curve points. Producer unsigned;see raw result for exact category."
+}

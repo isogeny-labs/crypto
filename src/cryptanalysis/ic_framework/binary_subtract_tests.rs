@@ -175,7 +175,7 @@ fn native_fields_and_preparation_reuse_keep_scalar_answers() {
                         &mut OracleCounters::default(),
                         target,
                     );
-                    let want = SubtractOracle::default().decompose(
+                    let want = SubtractOracle.decompose(
                         &context,
                         &base,
                         &mut GroupOps::default(),
@@ -301,7 +301,7 @@ fn composed_pipeline_recovers_the_same_public_known_answer() {
         &context,
         &spec,
         &base,
-        &mut SubtractOracle::default(),
+        &mut SubtractOracle,
         planted,
         &Calibration::default(),
         None,

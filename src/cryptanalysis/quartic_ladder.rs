@@ -1514,6 +1514,13 @@ pub struct QIcResult {
     /// [`QLinAlg::SgeCoord`]: attempts whose square solve did not certify
     /// and fell back (counted) to the baseline solve of the full core.
     pub la_fallbacks: u32,
+    /// [`QLinAlg::SgeCoord`] with `fallback == false`: attempts whose
+    /// square solve did not certify and whose full-core fallback was
+    /// skipped (no work counted for it).
+    pub la_fallbacks_skipped: u32,
+    /// [`QLinAlg::SgeCoord`] with the fallback: attempts the full-core
+    /// fallback certified, i.e. the attempts a skipping arm would give up.
+    pub la_fallback_rescues: u32,
     /// [`QLinAlg::SgeCoord`]: size and non-zeros of the square system of
     /// the last attempt (0 when none was formed).
     pub sq_dim: usize,
@@ -1639,7 +1646,16 @@ pub enum QLinAlg {
     /// by `[t]G = T`; if it fails, the attempt falls back (fully counted) to
     /// [`QLinAlg::Wiedemann`] on the whole core with the very draws the
     /// frozen solve would use, so the arm never certifies less often.
-    SgeCoord { sge: SgeParams, excess: usize },
+    /// With `fallback == false` (arm `2lp-sfb-sge-nofb`) a failed square
+    /// solve skips that full-core solve and the loop goes straight on to
+    /// the next attempt; the main RNG advances exactly as with the
+    /// fallback (the fallback only ever draws from a clone), so every later
+    /// draw is unchanged and the two arms stay paired.
+    SgeCoord {
+        sge: SgeParams,
+        excess: usize,
+        fallback: bool,
+    },
 }
 
 /// When the relation loop asks for a counted linear-algebra attempt.
@@ -2254,6 +2270,8 @@ fn run_diem_inner(
                 let cand: Option<u64>;
                 // the square solve's answer, already certified (no second check)
                 let mut pre_cert = false;
+                // the answer came from the full-core fallback
+                let mut fallback_cand = false;
                 match opts.la {
                     QLinAlg::Wiedemann => {
                         cand = wiedemann_split(&core, cc, r, &mut rng, dense, sp)
@@ -2267,7 +2285,11 @@ fn run_diem_inner(
                         cand = wiedemann_split(&red, rcc, r, &mut wrng, dense, sp)
                             .map(|xs| xs[rct as usize]);
                     }
-                    QLinAlg::SgeCoord { sge: sgp, excess } => {
+                    QLinAlg::SgeCoord {
+                        sge: sgp,
+                        excess,
+                        fallback,
+                    } => {
                         // the frozen solve's draws, kept for the fallback
                         let mut wrng = rng.clone();
                         skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
@@ -2290,10 +2312,14 @@ fn run_diem_inner(
                         if ok1 {
                             cand = t1;
                             pre_cert = true;
-                        } else {
+                        } else if fallback {
                             res.la_fallbacks += 1;
                             cand = wiedemann_split(&core, cc, r, &mut wrng, dense, sp)
                                 .map(|xs| xs[ct as usize]);
+                            fallback_cand = true;
+                        } else {
+                            res.la_fallbacks_skipped += 1;
+                            cand = None;
                         }
                     }
                 }
@@ -2301,6 +2327,9 @@ fn run_diem_inner(
                     let good = pre_cert || cmul(&pq, &mut ops, &g, t) == tgt;
                     dg.outcome = 2;
                     if good {
+                        if fallback_cand {
+                            res.la_fallback_rescues += 1;
+                        }
                         res.recovered = Some(t);
                         res.certified = true;
                         solved = true;
@@ -2760,7 +2789,8 @@ fn sort_charge(m: usize) -> u64 {
 /// singular choice).  Counted: one addition per entry for the column
 /// weights, one per row for the anchor test and the length, [`sort_charge`]
 /// for the ordering, and one addition per entry of every row examined.
-/// Returns the kept rows in original order.
+/// Returns the kept rows in original order. If the anchors alone exceed
+/// `keep`, returns all anchors.
 fn select_rows(rows: &[Row], ncols: usize, ct: u32, keep: usize, nat: &mut Nat) -> Vec<Row> {
     if rows.len() <= keep {
         return rows.to_vec();
@@ -3166,6 +3196,7 @@ mod tests {
             la: QLinAlg::SgeCoord {
                 sge: SgeParams { w_max, fill_max },
                 excess,
+                fallback: true,
             },
             ..new_opts(QFactorBase::Sampled)
         }
@@ -3216,50 +3247,36 @@ mod tests {
     #[test]
     fn coord_square_and_row_selection() {
         let r = 1_000_000_007u64;
-        let mut g = StdRng::seed_from_u64(17);
         let n = 30usize;
-        // x random; rows random sparse plus a diagonal (nonsingular)
-        let x: Vec<u64> = (0..n).map(|_| g.gen_range(0..r)).collect();
-        let mut rows: Vec<Row> = Vec::new();
-        for i in 0..n + 12 {
-            let mut t: Vec<(u32, u64)> = vec![((i % n) as u32, g.gen_range(1..r))];
-            for c in 0..n as u32 {
-                if c as usize != i % n && g.gen_range(0..6) == 0 {
-                    t.push((c, if g.gen_bool(0.5) { 1 } else { g.gen_range(2..r) }));
-                }
+        let x: Vec<u64> = (1..=n as u64).collect();
+        let mut rows: Vec<Row> = Vec::with_capacity(n + 12);
+        // The first n rows form a nonsingular triangular system and have nonzero RHS.
+        for i in 0..n {
+            let mut t = Vec::new();
+            let mut b = x[i];
+            if i > 0 {
+                t.push(((i - 1) as u32, 1));
+                b = addm(b, x[i - 1], r);
             }
-            t.sort_unstable_by_key(|e| e.0);
-            let b = t.iter().fold(0u64, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+            t.push((i as u32, 1));
             rows.push((t, b));
+        }
+        for i in 0..12 {
+            rows.push((vec![(i as u32, x[i + 1]), ((i + 1) as u32, r - x[i])], 0));
         }
         let ct = (n - 1) as u32;
         let mut nat = Nat::default();
         let sq = select_rows(&rows, n, ct, n, &mut nat);
-        assert_eq!(sq.len(), n);
+        assert_eq!(sq, rows[..n]);
         assert!(nat.add > 0);
-        // every anchor (nonzero rhs or a t entry) kept when they fit
-        let anchors = rows.iter().filter(|(t, b)| *b != 0 || t.last().is_some_and(|e| e.0 == ct)).count();
-        if anchors <= n {
-            for row in &rows {
-                if row.1 != 0 || row.0.last().is_some_and(|e| e.0 == ct) {
-                    assert!(sq.contains(row));
-                }
-            }
-        }
-        let mut w = vec![0usize; n];
-        for (t, _) in &sq {
-            for &(c, _) in t {
-                w[c as usize] += 1;
-            }
-        }
-        assert!(w.iter().all(|&k| k > 0), "a column lost all its rows");
         let mut sp = QLaSplit::default();
-        // the chosen square system holds x; Wiedemann finds x[ct] unless singular
-        if let Some(v) = coord_square_split(&sq, n, ct as usize, r, &mut sp) {
-            assert_eq!(v, x[ct as usize]);
-        }
+        assert_eq!(
+            coord_square_split(&sq, n, ct as usize, r, &mut sp),
+            Some(x[ct as usize])
+        );
         assert!(sp.spmv.add > 0 && sp.bm.mul > 0);
         assert_eq!(coord_square_split(&sq[1..], n, 0, r, &mut sp), None);
+        assert_eq!(select_rows(&rows, n, ct, n - 1, &mut nat), sq);
     }
 
     /// `2lp-sfb-sge` against `2lp-sfb` on the same instances and seeds: the
@@ -3313,6 +3330,72 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// `2lp-sfb-sge-nofb` is `2lp-sfb-sge` without the full-core fallback.
+    /// The fallback draws only from a clone of the RNG, so the two arms see
+    /// the same relations and attempts unless the fallback certified an
+    /// attempt (a rescue, counted in `la_fallback_rescues`); then the
+    /// skipping arm needs a later attempt. Without a rescue the skipping arm
+    /// does exactly the same work minus the fallbacks: equal linear algebra
+    /// when no fallback happened, strictly less when one did.
+    #[test]
+    fn sfb_sge_nofb_pairs_with_sge() {
+        let (mut fallbacks, mut rescues) = (0u32, 0u32);
+        for q in [101u32, 251, 1031, 2053] {
+            let inst = instance(q);
+            for seed in 1..=6u64 {
+                let prm = QIcParams {
+                    arm: QArm::DoubleLp,
+                    nb: (3.0 * f64::from(q).sqrt()).ceil() as usize,
+                    seed,
+                    max_lines: 1 << 24,
+                    verify_relations: false,
+                };
+                let a = run_diem_with(&inst, prm, sge_opts(8, 1.5, 64));
+                let mut nofb = sge_opts(8, 1.5, 64);
+                nofb.la = QLinAlg::SgeCoord {
+                    sge: SgeParams {
+                        w_max: 8,
+                        fill_max: 1.5,
+                    },
+                    excess: 64,
+                    fallback: false,
+                };
+                let b = run_diem_with(&inst, prm, nofb);
+                eprintln!(
+                    "q={q} seed={seed}: sge att {} fb {} rescue {} la {:?} | nofb att {} skipped {} la {:?}",
+                    a.attempts, a.la_fallbacks, a.la_fallback_rescues, a.la,
+                    b.attempts, b.la_fallbacks_skipped, b.la
+                );
+                for o in [&a, &b] {
+                    assert!(o.certified, "q={q} seed={seed}: {o:?}");
+                    assert_eq!(o.recovered, Some(inst.t_secret));
+                    assert_eq!(o.la, o.la_split.total());
+                }
+                assert_eq!((b.la_fallbacks, b.la_fallback_rescues), (0, 0));
+                assert_eq!(a.la_fallbacks_skipped, 0);
+                fallbacks += a.la_fallbacks;
+                rescues += a.la_fallback_rescues;
+                if a.la_fallback_rescues == 0 {
+                    assert_eq!(a.attempts, b.attempts, "q={q} seed={seed}");
+                    assert_eq!(b.la_fallbacks_skipped, a.la_fallbacks);
+                    assert_eq!(
+                        (a.relations, a.decomp_trials, a.lines_tried),
+                        (b.relations, b.decomp_trials, b.lines_tried)
+                    );
+                    assert_eq!(a.rel, b.rel);
+                    assert!(b.la.add <= a.la.add && b.la.mul <= a.la.mul);
+                    assert!(b.group_ops <= a.group_ops);
+                    if a.la_fallbacks == 0 {
+                        assert_eq!((a.la, a.group_ops), (b.la, b.group_ops));
+                    } else {
+                        assert!(b.la.add + b.la.mul < a.la.add + a.la.mul);
+                    }
+                }
+            }
+        }
+        eprintln!("sfb_sge_nofb_pairs_with_sge: {fallbacks} fallbacks, {rescues} rescues");
     }
 
     /// The sampled-factor-base arm run on the enumerated arm's own base

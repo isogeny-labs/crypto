@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T23:53:33Z",
+ "id": "PCC-20261124-2b5ba8",
+ "kind": "statement",
+ "producer": {
+  "commit": "cc212402b48641a798bba025abd04cee56c9d858",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/unit_tests_initial.txt",
+    "sha256": "ea375ed448a309114799bd2edcc5ce95f679e91466620f4d1f3193419a1cd88f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/default_tests.txt",
+    "sha256": "af03dd510aa9739f862acd9510b4cd4a00b791e9efd84a7511519d6ef797e96c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/larger_full_output_v1/build.txt",
+    "sha256": "3812f110ef60d07c9be3070ae530d5d3627a7d326c81ae69e12b7378271d167d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-recorded-replay",
+ "statement": "The post-run full-output replay source passes 33 feature tests and six default tests and builds successfully. Tests compare all completed answers and production-consumer receipts from both retained F127 full-output suites, reject six altered records including a lost unconsumed row whose counts remain structurally consistent, and preserve failed-oracle/skipped-draw incomplete outcomes. This is unsigned local software qualification using shared fixture/reference/consumer source, not independent signed validation."
+}

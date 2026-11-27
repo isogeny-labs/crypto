@@ -401,30 +401,61 @@ mod tests {
     #[test]
     fn units_and_interpolation_over_nonfields() {
         let mut meter = Meter::new(Limits::default());
-        for degree in [1, 4, 8] {
-            let ring = Ring::new(degree, 17, &mut meter).unwrap();
-            for value in 1..(1usize << degree).min(25) {
-                let a = ring.point(&BigUint::from(value)).unwrap();
-                let inverse = ring.inverse(&a, &mut meter).unwrap();
-                assert_eq!(ring.mul(&a, &inverse, &mut meter).unwrap(), ring.one());
+        for degree in [1, 3, 4, 8] {
+            for precision in [1, 3, 17] {
+                let ring = Ring::new(degree, precision, &mut meter).unwrap();
+                let count = (1usize << degree).min(9);
+                let points: Vec<_> = (0..count)
+                    .map(|value| ring.point(&BigUint::from(value)).unwrap())
+                    .collect();
+                for i in 0..points.len() {
+                    for j in 0..i {
+                        let difference = ring.sub(&points[i], &points[j], &mut meter).unwrap();
+                        let inverse = ring.inverse(&difference, &mut meter).unwrap();
+                        assert_eq!(
+                            ring.mul(&difference, &inverse, &mut meter).unwrap(),
+                            ring.one()
+                        );
+                    }
+                }
+                for length in 1..=count {
+                    let coefficients: Vec<_> = (0..length)
+                        .map(|i| {
+                            let residue = ring
+                                .point(&BigUint::from((3 * i + 1) % (1usize << degree)))
+                                .unwrap();
+                            ring.add(
+                                &residue,
+                                &ring.integer(&BigUint::from(5 * i + 2)),
+                                &mut meter,
+                            )
+                            .unwrap()
+                        })
+                        .collect();
+                    let values: Vec<_> = points[..length]
+                        .iter()
+                        .map(|x| polynomial_value(&coefficients, x, &ring, &mut meter).unwrap())
+                        .collect();
+                    assert_eq!(
+                        interpolate(&points[..length], &values, &ring, &mut meter).unwrap(),
+                        coefficients
+                    );
+                }
+                if points.len() >= 2 {
+                    assert!(interpolate(
+                        &[points[0].clone(), points[0].clone()],
+                        &[ring.zero(), ring.one()],
+                        &ring,
+                        &mut meter,
+                    )
+                    .is_err());
+                }
             }
+            let ring = Ring::new(degree, 17, &mut meter).unwrap();
             assert!(ring
-                .inverse(&ring.integer(&BigUint::from(2u8)), &mut meter)
+                .inverse(&ring.integer(&2u8.into()), &mut meter)
                 .is_err());
         }
-        let ring = Ring::new(4, 24, &mut meter).unwrap();
-        let coefficients: Vec<_> = (0..7u8)
-            .map(|i| ring.signed(&BigInt::from(i as i64 - 3)))
-            .collect();
-        let points: Vec<_> = (0..7u8).map(|i| ring.point(&i.into()).unwrap()).collect();
-        let values: Vec<_> = points
-            .iter()
-            .map(|x| polynomial_value(&coefficients, x, &ring, &mut meter).unwrap())
-            .collect();
-        assert_eq!(
-            interpolate(&points, &values, &ring, &mut meter).unwrap(),
-            coefficients
-        );
     }
     #[test]
     fn creation_precision_lifts_are_not_silently_ring_homomorphisms() {

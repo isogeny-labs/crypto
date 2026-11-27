@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="440" font-family="sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="260" y="25" text-anchor="middle" font-size="14" font-weight="bold">m=2 solver cost per call vs tower height t (16-bit curve)</text>
+<line x1="70" y1="380" x2="450" y2="380" stroke="#000"/><line x1="70" y1="50" x2="70" y2="380" stroke="#000"/>
+<line x1="93.75" y1="380" x2="93.75" y2="385" stroke="#000"/><text x="93.75" y="398" text-anchor="middle">5</text>
+<line x1="141.25" y1="380" x2="141.25" y2="385" stroke="#000"/><text x="141.25" y="398" text-anchor="middle">6</text>
+<line x1="188.75" y1="380" x2="188.75" y2="385" stroke="#000"/><text x="188.75" y="398" text-anchor="middle">7</text>
+<line x1="236.25" y1="380" x2="236.25" y2="385" stroke="#000"/><text x="236.25" y="398" text-anchor="middle">8</text>
+<line x1="283.75" y1="380" x2="283.75" y2="385" stroke="#000"/><text x="283.75" y="398" text-anchor="middle">9</text>
+<line x1="331.25" y1="380" x2="331.25" y2="385" stroke="#000"/><text x="331.25" y="398" text-anchor="middle">10</text>
+<line x1="378.75" y1="380" x2="378.75" y2="385" stroke="#000"/><text x="378.75" y="398" text-anchor="middle">11</text>
+<line x1="426.25" y1="380" x2="426.25" y2="385" stroke="#000"/><text x="426.25" y="398" text-anchor="middle">12</text>
+<line x1="65" y1="380" x2="450" y2="380" stroke="#e5e7eb"/><text x="60" y="384" text-anchor="end">1e3</text>
+<line x1="65" y1="329.231" x2="450" y2="329.231" stroke="#e5e7eb"/><text x="60" y="333.231" text-anchor="end">1e4</text>
+<line x1="65" y1="278.462" x2="450" y2="278.462" stroke="#e5e7eb"/><text x="60" y="282.462" text-anchor="end">1e5</text>
+<line x1="65" y1="227.692" x2="450" y2="227.692" stroke="#e5e7eb"/><text x="60" y="231.692" text-anchor="end">1e6</text>
+<line x1="65" y1="176.923" x2="450" y2="176.923" stroke="#e5e7eb"/><text x="60" y="180.923" text-anchor="end">1e7</text>
+<line x1="65" y1="126.154" x2="450" y2="126.154" stroke="#e5e7eb"/><text x="60" y="130.154" text-anchor="end">1e8</text>
+<line x1="65" y1="75.3846" x2="450" y2="75.3846" stroke="#e5e7eb"/><text x="60" y="79.3846" text-anchor="end">1e9</text>
+<text x="260" y="420" text-anchor="middle">t  (|V| = 2^t)</text><text x="18" y="215" transform="rotate(-90 18 215)" text-anchor="middle">F_p ops per solver call</text>
+<polyline fill="none" stroke-width="2" stroke="#c2410c" points="93.8,198.1 141.2,139.3 188.8,81.9 "/>
+<circle cx="93.8" cy="198.1" r="3" fill="#c2410c"/>
+<circle cx="141.2" cy="139.3" r="3" fill="#c2410c"/>
+<circle cx="188.8" cy="81.9" r="3" fill="#c2410c"/>
+<rect x="300" y="51" width="12" height="3" fill="#c2410c"/><text x="318" y="60">F4, Vélu base</text>
+<polyline fill="none" stroke-width="2" stroke="#1d4ed8" points="93.8,341.1 141.2,314.8 188.8,287.6 236.2,259.6 283.8,230.9 331.2,201.8 378.8,172.2 426.2,142.3 "/>
+<circle cx="93.8" cy="341.1" r="3" fill="#1d4ed8"/>
+<circle cx="141.2" cy="314.8" r="3" fill="#1d4ed8"/>
+<circle cx="188.8" cy="287.6" r="3" fill="#1d4ed8"/>
+<circle cx="236.2" cy="259.6" r="3" fill="#1d4ed8"/>
+<circle cx="283.8" cy="230.9" r="3" fill="#1d4ed8"/>
+<circle cx="331.2" cy="201.8" r="3" fill="#1d4ed8"/>
+<circle cx="378.8" cy="172.2" r="3" fill="#1d4ed8"/>
+<circle cx="426.2" cy="142.3" r="3" fill="#1d4ed8"/>
+<rect x="300" y="67" width="12" height="3" fill="#1d4ed8"/><text x="318" y="76">resgcd, Vélu base (identical, hidden)</text>
+<polyline fill="none" stroke-width="2" stroke="#6b7280" points="93.8,375.1 141.2,346.6 188.8,317.2 236.2,287.2 283.8,256.9 331.2,226.5 378.8,196.0 426.2,165.5 "/>
+<circle cx="93.8" cy="375.1" r="3" fill="#6b7280"/>
+<circle cx="141.2" cy="346.6" r="3" fill="#6b7280"/>
+<circle cx="188.8" cy="317.2" r="3" fill="#6b7280"/>
+<circle cx="236.2" cy="287.2" r="3" fill="#6b7280"/>
+<circle cx="283.8" cy="256.9" r="3" fill="#6b7280"/>
+<circle cx="331.2" cy="226.5" r="3" fill="#6b7280"/>
+<circle cx="378.8" cy="196.0" r="3" fill="#6b7280"/>
+<circle cx="426.2" cy="165.5" r="3" fill="#6b7280"/>
+<rect x="300" y="83" width="12" height="3" fill="#6b7280"/><text x="318" y="92">grid (|V|²/2)</text>
+<polyline fill="none" stroke-width="2" stroke="#7c2d12" points="93.8,120.8 141.2,63.9 "/>
+<circle cx="93.8" cy="120.8" r="3" fill="#7c2d12"/>
+<circle cx="141.2" cy="63.9" r="3" fill="#7c2d12"/>
+<rect x="300" y="99" width="12" height="3" fill="#7c2d12"/><text x="318" y="108">F4, interval base</text>
+<polyline fill="none" stroke-width="2" stroke="#15803d" points="93.8,366.4 141.2,351.7 188.8,336.5 236.2,320.2 283.8,305.6 331.2,290.1 378.8,274.8 426.2,259.4 "/>
+<circle cx="93.8" cy="366.4" r="3" fill="#15803d"/>
+<circle cx="141.2" cy="351.7" r="3" fill="#15803d"/>
+<circle cx="188.8" cy="336.5" r="3" fill="#15803d"/>
+<circle cx="236.2" cy="320.2" r="3" fill="#15803d"/>
+<circle cx="283.8" cy="305.6" r="3" fill="#15803d"/>
+<circle cx="331.2" cy="290.1" r="3" fill="#15803d"/>
+<circle cx="378.8" cy="274.8" r="3" fill="#15803d"/>
+<circle cx="426.2" cy="259.4" r="3" fill="#15803d"/>
+<rect x="300" y="115" width="12" height="3" fill="#15803d"/><text x="318" y="124">scan (O(|V|))</text>
+<polyline fill="none" stroke-width="2" stroke="#60a5fa" points="93.8,341.1 141.2,314.8 188.8,287.6 236.2,259.6 283.8,230.9 331.2,201.8 378.8,172.2 426.2,142.3 "/>
+<circle cx="93.8" cy="341.1" r="3" fill="#60a5fa"/>
+<circle cx="141.2" cy="314.8" r="3" fill="#60a5fa"/>
+<circle cx="188.8" cy="287.6" r="3" fill="#60a5fa"/>
+<circle cx="236.2" cy="259.6" r="3" fill="#60a5fa"/>
+<circle cx="283.8" cy="230.9" r="3" fill="#60a5fa"/>
+<circle cx="331.2" cy="201.8" r="3" fill="#60a5fa"/>
+<circle cx="378.8" cy="172.2" r="3" fill="#60a5fa"/>
+<circle cx="426.2" cy="142.3" r="3" fill="#60a5fa"/>
+<rect x="300" y="131" width="12" height="3" fill="#60a5fa"/><text x="318" y="140">resgcd, interval base</text>
+<text x="755" y="25" text-anchor="middle" font-size="14" font-weight="bold">F4 closed pipeline, t=5: slope over 13–16 bits</text>
+<line x1="560" y1="380" x2="950" y2="380" stroke="#000"/><line x1="560" y1="50" x2="560" y2="380" stroke="#000"/>
+<line x1="608.75" y1="380" x2="608.75" y2="385" stroke="#000"/><text x="608.75" y="398" text-anchor="middle">13</text>
+<line x1="706.25" y1="380" x2="706.25" y2="385" stroke="#000"/><text x="706.25" y="398" text-anchor="middle">14</text>
+<line x1="803.75" y1="380" x2="803.75" y2="385" stroke="#000"/><text x="803.75" y="398" text-anchor="middle">15</text>
+<line x1="901.25" y1="380" x2="901.25" y2="385" stroke="#000"/><text x="901.25" y="398" text-anchor="middle">16</text>
+<line x1="555" y1="380" x2="950" y2="380" stroke="#e5e7eb"/><text x="552" y="384" text-anchor="end">1e-2</text>
+<line x1="555" y1="351.304" x2="950" y2="351.304" stroke="#e5e7eb"/><text x="552" y="355.304" text-anchor="end">1e-1</text>
+<line x1="555" y1="322.609" x2="950" y2="322.609" stroke="#e5e7eb"/><text x="552" y="326.609" text-anchor="end">1e0</text>
+<line x1="555" y1="293.913" x2="950" y2="293.913" stroke="#e5e7eb"/><text x="552" y="297.913" text-anchor="end">1e1</text>
+<line x1="555" y1="265.217" x2="950" y2="265.217" stroke="#e5e7eb"/><text x="552" y="269.217" text-anchor="end">1e2</text>
+<line x1="555" y1="236.522" x2="950" y2="236.522" stroke="#e5e7eb"/><text x="552" y="240.522" text-anchor="end">1e3</text>
+<line x1="555" y1="207.826" x2="950" y2="207.826" stroke="#e5e7eb"/><text x="552" y="211.826" text-anchor="end">1e4</text>
+<line x1="555" y1="179.13" x2="950" y2="179.13" stroke="#e5e7eb"/><text x="552" y="183.13" text-anchor="end">1e5</text>
+<line x1="555" y1="150.435" x2="950" y2="150.435" stroke="#e5e7eb"/><text x="552" y="154.435" text-anchor="end">1e6</text>
+<line x1="555" y1="121.739" x2="950" y2="121.739" stroke="#e5e7eb"/><text x="552" y="125.739" text-anchor="end">1e7</text>
+<line x1="555" y1="93.0435" x2="950" y2="93.0435" stroke="#e5e7eb"/><text x="552" y="97.0435" text-anchor="end">1e8</text>
+<line x1="555" y1="64.3478" x2="950" y2="64.3478" stroke="#e5e7eb"/><text x="552" y="68.3478" text-anchor="end">1e9</text>
+<text x="755" y="420" text-anchor="middle">field bits</text>
+<circle cx="901.25" cy="365.321" r="4" fill="#7c3aed"/>
+<circle cx="901.25" cy="109.806" r="4" fill="#c2410c"/>
+<circle cx="901.25" cy="67.6344" r="4" fill="#7c2d12"/>
+<circle cx="700.25" cy="366.562" r="4" fill="#7c3aed"/>
+<circle cx="700.25" cy="128.68" r="4" fill="#c2410c"/>
+<circle cx="700.25" cy="84.65" r="4" fill="#7c2d12"/>
+<circle cx="602.75" cy="365.535" r="4" fill="#7c3aed"/>
+<circle cx="602.75" cy="128.26" r="4" fill="#c2410c"/>
+<circle cx="602.75" cy="84.4583" r="4" fill="#7c2d12"/>
+<circle cx="809.75" cy="366.073" r="4" fill="#7c3aed"/>
+<circle cx="809.75" cy="115.267" r="4" fill="#c2410c"/>
+<circle cx="809.75" cy="70.3724" r="4" fill="#7c2d12"/>
+<circle cx="895.25" cy="364.317" r="4" fill="#7c3aed"/>
+<circle cx="895.25" cy="107.152" r="4" fill="#c2410c"/>
+<circle cx="895.25" cy="66.2783" r="4" fill="#7c2d12"/>
+<circle cx="803.75" cy="362.656" r="4" fill="#7c3aed"/>
+<circle cx="803.75" cy="113.104" r="4" fill="#c2410c"/>
+<circle cx="803.75" cy="72.9011" r="4" fill="#7c2d12"/>
+<circle cx="797.75" cy="365.984" r="4" fill="#7c3aed"/>
+<circle cx="797.75" cy="110.231" r="4" fill="#c2410c"/>
+<circle cx="797.75" cy="66.7437" r="4" fill="#7c2d12"/>
+<circle cx="907.25" cy="366.074" r="4" fill="#7c3aed"/>
+<circle cx="907.25" cy="115.961" r="4" fill="#c2410c"/>
+<circle cx="907.25" cy="71.4554" r="4" fill="#7c2d12"/>
+<circle cx="614.75" cy="367.325" r="4" fill="#7c3aed"/>
+<circle cx="614.75" cy="120.828" r="4" fill="#c2410c"/>
+<circle cx="614.75" cy="76.784" r="4" fill="#7c2d12"/>
+<circle cx="608.75" cy="367.298" r="4" fill="#7c3aed"/>
+<circle cx="608.75" cy="128.021" r="4" fill="#c2410c"/>
+<circle cx="608.75" cy="79.6705" r="4" fill="#7c2d12"/>
+<line x1="560" y1="322.609" x2="950" y2="322.609" stroke="#111" stroke-dasharray="5 4"/><text x="946" y="317.609" text-anchor="end">rho (s/rho = 1)</text>
+<circle cx="580" cy="262" r="4" fill="#c2410c"/><text x="590" y="266">s_ops/rho, Vélu base (slope +0.64 bits/bit)</text>
+<circle cx="580" cy="280" r="4" fill="#7c2d12"/><text x="590" y="284">s_ops/rho, interval base (slope +0.52)</text>
+<circle cx="580" cy="298" r="4" fill="#7c3aed"/><text x="590" y="302">F4 multiply-add ratio Vélu/interval (slope +0.07)</text>
+</svg>

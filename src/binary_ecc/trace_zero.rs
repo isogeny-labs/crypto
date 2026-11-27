@@ -133,7 +133,8 @@ pub struct TraceZeroVariety {
     trace_bits: Vec<bool>,
     /// Quadratic/linear monomials of Tr(x H(x)) in the raw x bits.
     q: Arc<OnceLock<TraceZeroPolynomial>>,
-    reductions: Arc<Vec<Vec<usize>>>,
+    /// Polynomial-basis product reductions are used only by symbolic models.
+    reductions: Arc<OnceLock<Vec<Vec<usize>>>>,
     order: BigUint,
 }
 
@@ -314,19 +315,11 @@ impl TraceZeroVariety {
         if !trace_bits[0] {
             return Err(TraceZeroError::InvalidField);
         }
-        let z = F2mElement::from_bit_positions(&[1], n);
-        let mut power = F2mElement::one(n);
-        let mut reductions = Vec::new();
-        for _ in 0..2 * n - 1 {
-            let b = power.to_biguint();
-            reductions.push((0..n as usize).filter(|&i| b.bit(i as u64)).collect());
-            power = power.mul(&z, &curve.irreducible);
-        }
         Ok(Self {
             curve: curve.clone(),
             trace_bits,
             q: Arc::new(OnceLock::new()),
-            reductions: Arc::new(reductions),
+            reductions: Arc::new(OnceLock::new()),
             order,
         })
     }
@@ -340,6 +333,22 @@ impl TraceZeroVariety {
     /// can request eager preparation explicitly for predictable setup costs.
     pub fn prepare_symbolic_models(&self) {
         self.symbolic_quadratic();
+        self.symbolic_reductions();
+    }
+
+    fn symbolic_reductions(&self) -> &[Vec<usize>] {
+        self.reductions.get_or_init(|| {
+            let n = self.curve.m;
+            let z = F2mElement::from_bit_positions(&[1], n);
+            let mut power = F2mElement::one(n);
+            let mut reductions = Vec::new();
+            for _ in 0..2 * n - 1 {
+                let b = power.to_biguint();
+                reductions.push((0..n as usize).filter(|&i| b.bit(i as u64)).collect());
+                power = power.mul(&z, &self.curve.irreducible);
+            }
+            reductions
+        })
     }
 
     fn symbolic_quadratic(&self) -> &TraceZeroPolynomial {
@@ -640,8 +649,9 @@ impl TraceZeroVariety {
         cap: usize,
     ) -> Result<Vec<TraceZeroPolynomial>, TraceZeroError> {
         let mut out = vec![TraceZeroPolynomial::default(); self.curve.m as usize];
+        let reductions = self.symbolic_reductions();
         for (i, p) in x.iter().enumerate() {
-            for &j in &self.reductions[2 * i] {
+            for &j in &reductions[2 * i] {
                 out[j].xor(p, cap)?;
             }
         }
@@ -654,13 +664,14 @@ impl TraceZeroVariety {
         cap: usize,
     ) -> Result<Vec<TraceZeroPolynomial>, TraceZeroError> {
         let mut out = vec![TraceZeroPolynomial::default(); self.curve.m as usize];
+        let reductions = self.symbolic_reductions();
         for (i, a) in x.iter().enumerate() {
             for (j, b) in y.iter().enumerate() {
                 if a.terms.is_empty() || b.terms.is_empty() {
                     continue;
                 }
                 let product = a.product(b, cap)?;
-                for &k in &self.reductions[i + j] {
+                for &k in &reductions[i + j] {
                     out[k].xor(&product, cap)?;
                 }
             }
@@ -1300,6 +1311,54 @@ impl TraceZeroAffineSystem {
 mod lazy_symbolic_tests {
     use super::*;
     #[test]
+    fn deferred_symbolic_products_match_every_small_field_input_pair() {
+        let c = BinaryCurve {
+            m: 5,
+            irreducible: super::super::IrreduciblePoly {
+                degree: 5,
+                low_terms: vec![0, 2],
+            },
+            a: F2mElement::zero(5),
+            b: F2mElement::one(5),
+            generator: BinaryPoint::Infinity,
+            order: 11u32.into(),
+            cofactor: 4u32.into(),
+        };
+        let v = TraceZeroVariety::new(&c).unwrap();
+        assert!(v.reductions.get().is_none());
+        let clone = v.clone();
+        let x: Vec<_> = (0..5).map(TraceZeroPolynomial::variable).collect();
+        let y: Vec<_> = (5..10).map(TraceZeroPolynomial::variable).collect();
+        let product = clone.multiply(&x, &y, 1000).unwrap();
+        let square = clone.square(&x, 1000).unwrap();
+        assert!(v.reductions.get().is_some());
+        assert!(v.q.get().is_none());
+        for a in 0..32u32 {
+            for b in 0..32u32 {
+                let bits: Vec<_> = (0..10)
+                    .map(|i| {
+                        if i < 5 {
+                            a >> i & 1 != 0
+                        } else {
+                            b >> (i - 5) & 1 != 0
+                        }
+                    })
+                    .collect();
+                let fa = F2mElement::from_biguint(&a.into(), 5);
+                let fb = F2mElement::from_biguint(&b.into(), 5);
+                let expected = fa.mul(&fb, &c.irreducible).to_biguint();
+                let expected_square = fa.square(&c.irreducible).to_biguint();
+                for i in 0..5 {
+                    assert_eq!(product[i].evaluate(&bits), Some(expected.bit(i as u64)));
+                    assert_eq!(
+                        square[i].evaluate(&bits),
+                        Some(expected_square.bit(i as u64))
+                    );
+                }
+            }
+        }
+    }
+    #[test]
     fn numeric_queries_defer_symbolic_quadratic_and_clones_share_exact_materialization() {
         let c = BinaryCurve {
             m: 5,
@@ -1315,14 +1374,18 @@ mod lazy_symbolic_tests {
         };
         let v = TraceZeroVariety::new(&c).unwrap();
         assert!(v.q.get().is_none());
+        assert!(v.reductions.get().is_none());
         assert!(v.contains(&BinaryPoint::Infinity));
         assert!(v.q.get().is_none());
+        assert!(v.reductions.get().is_none());
         let clone = v.clone();
         assert!(Arc::ptr_eq(&v.q, &clone.q));
+        assert!(Arc::ptr_eq(&v.reductions, &clone.reductions));
         std::thread::spawn(move || clone.prepare_symbolic_models())
             .join()
             .unwrap();
         let q = v.q.get().expect("shared materialization");
+        assert!(v.reductions.get().is_some());
         for code in 0..32u32 {
             let x = F2mElement::from_biguint(&code.into(), 5);
             let bits: Vec<_> = (0..5).map(|i| code >> i & 1 != 0).collect();

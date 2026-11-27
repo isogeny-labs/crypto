@@ -1,0 +1,21 @@
+[package]
+name = "auxiliary-rr5-collector"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+auxiliary-rr5-adapter = { path = "../auxiliary-rr5" }
+prime31-algebraic-ic = { path = "../../prime31_four_summand_20261122/native/original-native" }
+prime31-four-summand = { path = "../../prime31_four_summand_20261122/native" }
+crypto_lib = { package = "rr5-original-f4-closure", path = "../../prime31_four_summand_20261122/native/f4-source" }
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+auxiliary-two-isogeny = { path = "../auxiliary-isogeny" }
+
+[profile.release.package.rr5-original-f4-closure]
+opt-level = 0
+codegen-units = 256
