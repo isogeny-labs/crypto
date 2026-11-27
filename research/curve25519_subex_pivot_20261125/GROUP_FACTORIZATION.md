@@ -264,9 +264,10 @@ For arbitrary fixed widths, the packed natural representation now decodes to a
 `GF(2)` polynomial coefficientwise. Native XOR is proved to decode as
 polynomial addition, power-of-two multiplication moves coefficients by the
 same shift with zero coefficients below it, and the complete native
-carryless-product fold is transported to a polynomial-addition fold. The
-remaining bridge is to identify the transported fold with ordinary polynomial
-multiplication under explicit support bounds, then refine packed remainder.
+carryless-product fold is transported to a polynomial-addition fold. Stable
+width extension and a whole-polynomial shift identity now identify that fold
+with ordinary polynomial multiplication under an explicit left-width bound;
+the remaining packed arithmetic bridge is remainder refinement.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

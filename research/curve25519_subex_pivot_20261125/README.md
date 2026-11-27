@@ -543,8 +543,11 @@ coefficients are its native `testBit` values; packed XOR becomes polynomial
 addition over `GF(2)`; multiplication by `2^s` moves the represented
 coefficients by `s` and leaves lower coefficients zero; and the complete native
 carryless-product fold decodes to the same fold with XOR replaced by polynomial
-addition. This does not yet identify that fold with ordinary polynomial
-multiplication or prove packed remainder correctness. `[pcc:unverified]`
+addition. Width-extension stability and a whole-polynomial shift theorem then
+identify that fold with ordinary polynomial multiplication whenever the left
+packed value satisfies its explicit bit-width bound; the right width is the
+native `log2(right)+1` loop bound. Packed remainder correctness remains open.
+`[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape

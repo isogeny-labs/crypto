@@ -1219,6 +1219,74 @@ theorem packedGF2Polynomial_shifted_low_coeff
   rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
   simp [lowIndex, index.isLt]
 
+/-- Once a packed value fits in `width` bits, decoding more high bits does not
+change its polynomial. -/
+theorem packedGF2Polynomial_extend (width extra value : ℕ)
+    (hvalue : value < 2 ^ width) :
+    packedGF2Polynomial (width + extra) value =
+      packedGF2Polynomial width value := by
+  rw [packedGF2Polynomial, Fin.sum_univ_add, packedGF2Polynomial]
+  have hhigh :
+      (∑ index : Fin extra,
+        if value.testBit (Fin.natAdd width index) then
+          monomial (Fin.natAdd width index : ℕ) (1 : ZMod 2)
+        else 0) = 0 := by
+    apply Finset.sum_eq_zero
+    intro index _
+    have hpow : 2 ^ width ≤ 2 ^ (Fin.natAdd width index : ℕ) :=
+      Nat.pow_le_pow_right (by decide) (by simp)
+    have hbit := Nat.testBit_eq_false_of_lt (lt_of_lt_of_le hvalue hpow)
+    change value.testBit (width + (index : ℕ)) = false at hbit
+    simp [hbit]
+  rw [hhigh, add_zero]
+  rfl
+
+/-- Truncated packed decoding commutes exactly with multiplication by a power
+of two: shifting the bit window is multiplication by the matching monomial. -/
+theorem packedGF2Polynomial_shift (width value shift : ℕ) :
+    packedGF2Polynomial (shift + width) (value * 2 ^ shift) =
+      X ^ shift * packedGF2Polynomial width value := by
+  rw [packedGF2Polynomial, Fin.sum_univ_add]
+  have hlow :
+      (∑ index : Fin shift,
+        if (value * 2 ^ shift).testBit (Fin.castAdd width index) then
+          monomial (Fin.castAdd width index : ℕ) (1 : ZMod 2)
+        else 0) = 0 := by
+    apply Finset.sum_eq_zero
+    intro index _
+    rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
+    simp [index.isLt]
+  simp only [hlow, zero_add]
+  rw [packedGF2Polynomial, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro index _
+  rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
+  by_cases hbit : value.testBit index
+  · simp [hbit, monomial_one_right_eq_X_pow]
+    rw [pow_add]
+  · simp [hbit]
+
+/-- A shifted value inside a larger product window is exactly the corresponding
+monomial multiple when the source value fits its declared width. -/
+theorem packedGF2Polynomial_shift_of_bound
+    (leftWidth rightWidth left index : ℕ)
+    (hindex : index < rightWidth) (hleft : left < 2 ^ leftWidth) :
+    packedGF2Polynomial (leftWidth + rightWidth) (left * 2 ^ index) =
+      X ^ index * packedGF2Polynomial leftWidth left := by
+  calc
+    packedGF2Polynomial (leftWidth + rightWidth) (left * 2 ^ index) =
+        packedGF2Polynomial
+          (index + (leftWidth + (rightWidth - index)))
+          (left * 2 ^ index) := by
+      apply congrArg (fun width =>
+        packedGF2Polynomial width (left * 2 ^ index))
+      omega
+    _ = X ^ index *
+        packedGF2Polynomial (leftWidth + (rightWidth - index)) left :=
+      packedGF2Polynomial_shift (leftWidth + (rightWidth - index)) left index
+    _ = X ^ index * packedGF2Polynomial leftWidth left := by
+      rw [packedGF2Polynomial_extend leftWidth (rightWidth - index) left hleft]
+
 /-- Fuel-bounded polynomial remainder over `GF(2)`, using packed coefficient
 bits exactly as the native ring search does. -/
 def gf2PackedRemainderFuel : ℕ → ℕ → ℕ → ℕ
@@ -1284,6 +1352,64 @@ theorem packedGF2Polynomial_rawProduct_fold (width left right : ℕ) :
           exact ih initial
   rw [hfold 0]
   simp [packedGF2Polynomial]
+
+/-- With an explicit source-width bound, the complete native carryless product
+decodes to ordinary polynomial multiplication over `GF(2)`. The right width is
+the exact native loop bound `log2 right + 1`. -/
+theorem packedGF2Polynomial_rawProduct_eq_mul
+    (leftWidth left right : ℕ) (hleft : left < 2 ^ leftWidth) :
+    packedGF2Polynomial (leftWidth + (Nat.log2 right + 1))
+        (gf2PackedRawProduct left right) =
+      packedGF2Polynomial leftWidth left *
+        packedGF2Polynomial (Nat.log2 right + 1) right := by
+  rw [packedGF2Polynomial_rawProduct_fold]
+  let rightWidth := Nat.log2 right + 1
+  have hfoldAux : ∀ count : ℕ,
+      (List.range count).foldl
+          (fun product index =>
+            if right.testBit index then
+              product + packedGF2Polynomial (leftWidth + rightWidth)
+                (left * 2 ^ index)
+            else product)
+          0 =
+        ∑ index ∈ Finset.range count,
+          if right.testBit index then
+            packedGF2Polynomial (leftWidth + rightWidth) (left * 2 ^ index)
+          else 0 := by
+    intro count
+    induction count with
+    | zero => simp
+    | succ width ih =>
+        rw [List.range_succ, List.foldl_append, ih, Finset.sum_range_succ]
+        by_cases hbit : right.testBit width <;> simp [hbit]
+  have hfold := hfoldAux rightWidth
+  change (List.range rightWidth).foldl
+      (fun product index =>
+        if right.testBit index then
+          product + packedGF2Polynomial (leftWidth + rightWidth)
+            (left * 2 ^ index)
+        else product)
+      0 = _
+  rw [hfold]
+  change (∑ index ∈ Finset.range rightWidth,
+      if right.testBit index then
+        packedGF2Polynomial (leftWidth + rightWidth) (left * 2 ^ index)
+      else 0) =
+    packedGF2Polynomial leftWidth left *
+      (∑ index : Fin rightWidth,
+        if right.testBit index then monomial (index : ℕ) 1 else 0)
+  rw [Fin.sum_univ_eq_sum_range
+    (fun index : ℕ =>
+      if right.testBit index then monomial index (1 : ZMod 2) else 0)
+    rightWidth, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro index hindex
+  have hindex' : index < rightWidth := Finset.mem_range.mp hindex
+  rw [packedGF2Polynomial_shift_of_bound
+    leftWidth rightWidth left index hindex' hleft]
+  by_cases hbit : right.testBit index
+  · simp [hbit, monomial_one_right_eq_X_pow, mul_comm]
+  · simp [hbit]
 
 /-- Carryless product reduced by a packed modulus. -/
 def gf2PackedProduct (left right modulus : ℕ) : ℕ :=

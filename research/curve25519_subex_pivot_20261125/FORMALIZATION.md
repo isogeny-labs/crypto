@@ -607,8 +607,12 @@ The first arbitrary-width packed-to-polynomial layer is also formalized.
 polynomial addition, and multiplication by a power of two has the expected
 shifted and zero-low coefficient behavior. The source-shaped carryless-product
 fold then decodes exactly to a polynomial-addition fold of those shifted packed
-values. Ordinary polynomial multiplication and the remainder loop remain the
-next semantic refinements. `[pcc:unverified]`
+values. A width-extension theorem and a complete shift identity compose this
+with finite-sum multiplication: if the left packed value is below
+`2^leftWidth`, the native raw product decodes exactly to ordinary polynomial
+multiplication, with the right decoder using the native `log2(right)+1` bound.
+The packed remainder loop remains the next semantic refinement.
+`[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in
 83,970 exhaustive small-state configurations, plus two multi-packet fixtures.

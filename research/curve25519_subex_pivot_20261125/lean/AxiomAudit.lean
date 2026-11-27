@@ -109,7 +109,11 @@ open Curve25519ExtensionRingModel
 #print axioms packedGF2Polynomial_xor
 #print axioms packedGF2Polynomial_shifted_coeff
 #print axioms packedGF2Polynomial_shifted_low_coeff
+#print axioms packedGF2Polynomial_extend
+#print axioms packedGF2Polynomial_shift
+#print axioms packedGF2Polynomial_shift_of_bound
 #print axioms packedGF2Polynomial_rawProduct_fold
+#print axioms packedGF2Polynomial_rawProduct_eq_mul
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible
