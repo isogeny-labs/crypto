@@ -1,0 +1,29 @@
+{
+  "schema": "joint-pruning-first-obstruction/v1",
+  "source": "PRUNING_V2_SOURCE.sha256",
+  "original_partial_run": {
+    "exit": 143,
+    "complete_matrix": false,
+    "archive": "pruning-partial-v1.tar.gz",
+    "termination": "deliberate stop of identified owned worker, not observed output-budget failure"
+  },
+  "inputs": "PRUNING_INPUTS.json",
+  "fixed_roster_unchanged": true,
+  "caps": [
+    2,
+    3,
+    4
+  ],
+  "complete_accepted_checks": "every declared cap and augmented scalar-label span",
+  "rejected_checks": "stop at independently replayed first label/cap obstruction; later caps explicitly uncomputed",
+  "unit_tests": 12,
+  "unit_scope": "six optimized-pruner functions, four frozen full-cap-control functions, one matched-decision comparison, one non-faked-EOF budget test",
+  "codec": "gzip streaming, plaintext<=512MiB/compressed<=128MiB percase; semantic report unchanged except checked-cap prefix",
+  "cpu": 0,
+  "threads": 1,
+  "wall_seconds_each": 1200,
+  "address_space_bytes": 2147483648,
+  "signed_verdict": false,
+  "benchmark": false,
+  "15x_admitted": false
+}
