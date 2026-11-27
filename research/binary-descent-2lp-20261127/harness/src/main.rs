@@ -261,6 +261,8 @@ fn main() {
         Some("pilot") => pilot(&args[2], args[3].parse().unwrap(), args[4..].iter().map(|s| s.parse().unwrap()).collect()),
         Some("rho-pilot") => rho_pilot(&args[2], args[3].parse().unwrap(), args[4..].iter().map(|s| s.parse().unwrap()).collect()),
         Some("run") => run(&args[2], &args[3], args.get(4).map(|s| s.parse().unwrap()).unwrap_or(1)),
+        Some("pilot-summary") => analysis::pilot_summary(&args[2], &args[3]),
+        Some("predict-summary") => analysis::predict_summary(&args[2], &args[3]),
         Some("analyze") => analysis::analyze(&args[2], &args[3], &args[4], &args[5]),
         _ => eprintln!("usage: see source header"),
     }
