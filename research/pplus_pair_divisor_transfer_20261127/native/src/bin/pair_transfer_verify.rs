@@ -405,7 +405,7 @@ fn parse_candidate(text: &str) -> Result<ParsedCandidate, String> {
         .first()
         .copied()
         .unwrap_or("")
-        .starts_with("HEADER schema=pplus-pair-divisor-transfer-candidate-v1")
+        .starts_with("HEADER schema=pplus-pair-divisor-transfer-candidate-v")
     {
         return Err("candidate header missing".into());
     }
@@ -689,28 +689,57 @@ fn main() {
     let (candidate_polynomials, dags) = match parse_candidate(&text) {
         Ok(value) => value,
         Err(error) => {
-            println!("VERIFY schema=pplus-pair-divisor-transfer-verify-v1 exactness_ok=0 errors=1 detail={error:?}");
+            println!("VERIFY schema=pplus-pair-divisor-transfer-verify-v3 exactness_ok=0 errors=1 detail={error:?}");
             std::process::exit(1);
         }
     };
 
     let mut expected_cells = BTreeMap::new();
     match expected_h() {
-        Ok(mut expected) => {
-            expected_cells.insert(("h".to_owned(), 0), expected.clone());
-            for depth in 1..=6 {
-                if !candidate_polynomials.contains_key(&("second_pair_norm".to_owned(), depth)) {
-                    break;
-                }
-                match expected_norm(&expected) {
-                    Ok(next) => {
-                        expected = next;
-                        expected_cells
-                            .insert(("second_pair_norm".to_owned(), depth), expected.clone());
+        Ok(formal) => {
+            for (prefix, target) in [
+                ("", None),
+                ("g1", Some(1_391_443_431)),
+                ("g17", Some(1_960_828_035)),
+            ] {
+                let h_label = if prefix.is_empty() {
+                    "h".to_owned()
+                } else {
+                    format!("{prefix}_h")
+                };
+                let norm_label = if prefix.is_empty() {
+                    "second_pair_norm".to_owned()
+                } else {
+                    format!("{prefix}_second_pair_norm")
+                };
+                let mut expected = if let Some(value) = target {
+                    match formal.compose(R, &Polynomial::constant(value)) {
+                        Ok(specialized) => specialized,
+                        Err(error) => {
+                            errors.push(format!("independent specialization {prefix}: {error}"));
+                            continue;
+                        }
                     }
-                    Err(error) => {
-                        errors.push(format!("independent norm depth {depth}: {error}"));
+                } else {
+                    formal.clone()
+                };
+                if candidate_polynomials.contains_key(&(h_label.clone(), 0)) {
+                    expected_cells.insert((h_label, 0), expected.clone());
+                }
+                for depth in 1..=6 {
+                    if !candidate_polynomials.contains_key(&(norm_label.clone(), depth)) {
                         break;
+                    }
+                    match expected_norm(&expected) {
+                        Ok(next) => {
+                            expected = next;
+                            expected_cells.insert((norm_label.clone(), depth), expected.clone());
+                        }
+                        Err(error) => {
+                            errors
+                                .push(format!("independent norm {prefix} depth {depth}: {error}"));
+                            break;
+                        }
                     }
                 }
             }
@@ -759,11 +788,24 @@ fn main() {
         .map(|cell| ((cell.label.clone(), cell.depth), cell))
         .collect();
     let mut dag_norm_checks = 0usize;
-    for current in dags.iter().filter(|cell| cell.label == "second_pair_norm") {
+    for current in dags
+        .iter()
+        .filter(|cell| cell.label.ends_with("second_pair_norm"))
+    {
         let previous_key = if current.depth == 1 {
-            ("h".to_owned(), 0)
+            let prefix = current
+                .label
+                .strip_suffix("second_pair_norm")
+                .unwrap_or_default()
+                .trim_end_matches('_');
+            let label = if prefix.is_empty() {
+                "h".to_owned()
+            } else {
+                format!("{prefix}_h")
+            };
+            (label, 0)
         } else {
-            ("second_pair_norm".to_owned(), current.depth - 1)
+            (current.label.clone(), current.depth - 1)
         };
         let Some(previous) = dag_index.get(&previous_key) else {
             errors.push(format!(
@@ -788,7 +830,7 @@ fn main() {
 
     let exactness_ok = usize::from(errors.is_empty());
     println!(
-        "VERIFY schema=pplus-pair-divisor-transfer-verify-v2 exactness_ok={exactness_ok} poly_cells={} dag_cells={} dag_eval_checks={} dag_norm_checks={} errors={}",
+        "VERIFY schema=pplus-pair-divisor-transfer-verify-v3 exactness_ok={exactness_ok} poly_cells={} dag_cells={} dag_eval_checks={} dag_norm_checks={} errors={}",
         expected_cells.len(), dags.len(), dag_eval_checks, dag_norm_checks, errors.len()
     );
     for error in &errors {

@@ -4,6 +4,7 @@ use std::fs;
 #[derive(Clone, Debug)]
 struct Cell {
     kind: &'static str,
+    series: String,
     depth: usize,
     state: u64,
     arithmetic: u64,
@@ -51,10 +52,11 @@ fn main() {
 
     let mut cells = Vec::new();
     let mut parse_errors = Vec::new();
-    let mut poly_stop = "none".to_owned();
-    let mut dag_stop = "none".to_owned();
+    let mut poly_stops = Vec::new();
+    let mut dag_stops = Vec::new();
     for line in candidate.lines() {
-        if line.starts_with("POLY_BEGIN label=second_pair_norm") {
+        let label = field(line, "label").unwrap_or_default();
+        if line.starts_with("POLY_BEGIN ") && label.ends_with("second_pair_norm") {
             match (
                 parse_u64(line, "depth"),
                 parse_u64(line, "slots"),
@@ -63,13 +65,14 @@ fn main() {
             ) {
                 (Ok(depth), Ok(state), Ok(add), Ok(mul)) => cells.push(Cell {
                     kind: "poly",
+                    series: label.to_owned(),
                     depth: depth as usize,
                     state,
                     arithmetic: add.saturating_add(mul),
                 }),
                 _ => parse_errors.push("invalid polynomial summary"),
             }
-        } else if line.starts_with("DAG_BEGIN label=second_pair_norm") {
+        } else if line.starts_with("DAG_BEGIN ") && label.ends_with("second_pair_norm") {
             match (
                 parse_u64(line, "depth"),
                 parse_u64(line, "nodes"),
@@ -79,29 +82,42 @@ fn main() {
             ) {
                 (Ok(depth), Ok(state), Ok(add), Ok(mul), Ok(neg)) => cells.push(Cell {
                     kind: "dag",
+                    series: label.to_owned(),
                     depth: depth as usize,
                     state,
                     arithmetic: add.saturating_add(mul).saturating_add(neg),
                 }),
                 _ => parse_errors.push("invalid DAG summary"),
             }
-        } else if line.starts_with("POLY_STOP label=second_pair_norm") {
-            poly_stop = line.to_owned();
-        } else if line.starts_with("DAG_STOP label=second_pair_norm") {
-            dag_stop = line.to_owned();
+        } else if line.starts_with("POLY_STOP ") && label.ends_with("second_pair_norm") {
+            poly_stops.push(line.to_owned());
+        } else if line.starts_with("DAG_STOP ") && label.ends_with("second_pair_norm") {
+            dag_stops.push(line.to_owned());
         }
     }
 
-    cells.sort_by_key(|cell| (cell.kind, cell.depth));
+    cells.sort_by_key(|cell| (cell.kind, cell.series.clone(), cell.depth));
     for kind in ["poly", "dag"] {
-        let selected: Vec<_> = cells.iter().filter(|cell| cell.kind == kind).collect();
-        for window in selected.windows(2) {
-            let state_ratio = window[1].state as f64 / window[0].state as f64;
-            let arithmetic_ratio = window[1].arithmetic as f64 / window[0].arithmetic as f64;
-            println!(
-                "RATIO kind={kind} from_depth={} to_depth={} state={state_ratio:.9} arithmetic={arithmetic_ratio:.9}",
-                window[0].depth, window[1].depth
-            );
+        let mut series: Vec<_> = cells
+            .iter()
+            .filter(|cell| cell.kind == kind)
+            .map(|cell| cell.series.as_str())
+            .collect();
+        series.sort_unstable();
+        series.dedup();
+        for name in series {
+            let selected: Vec<_> = cells
+                .iter()
+                .filter(|cell| cell.kind == kind && cell.series == name)
+                .collect();
+            for window in selected.windows(2) {
+                let state_ratio = window[1].state as f64 / window[0].state as f64;
+                let arithmetic_ratio = window[1].arithmetic as f64 / window[0].arithmetic as f64;
+                println!(
+                    "RATIO kind={kind} series={name} from_depth={} to_depth={} state={state_ratio:.9} arithmetic={arithmetic_ratio:.9}",
+                    window[0].depth, window[1].depth
+                );
+            }
         }
     }
 
@@ -120,28 +136,28 @@ fn main() {
             "PAIR_AGGREGATE_STOP"
         } else if recurrence_proved_below_four && coverage_complete {
             "ALGORITHM_PASS"
-        } else if poly_stop != "none" || dag_stop != "none" {
+        } else if !poly_stops.is_empty() || !dag_stops.is_empty() {
             "INDETERMINATE_CAP"
         } else {
             "BOUNDED_NO_FOLD"
         };
 
     println!(
-        "ANALYSIS schema=pplus-pair-divisor-transfer-analysis-v1 exactness_ok={} coverage_complete={} candidate_complete={} cross_target_amortization=0 pair_aggregate=0 recurrence_rho_lt_4=0 poly_cells={} dag_cells={} poly_stop={} dag_stop={} errors={} verdict={verdict}",
+        "ANALYSIS schema=pplus-pair-divisor-transfer-analysis-v3 exactness_ok={} coverage_complete={} candidate_complete={} cross_target_amortization=0 pair_aggregate=0 recurrence_rho_lt_4=0 poly_cells={} dag_cells={} poly_stops={} dag_stops={} errors={} verdict={verdict}",
         usize::from(exactness_ok),
         usize::from(coverage_complete),
         usize::from(candidate_complete),
         cells.iter().filter(|cell| cell.kind == "poly").count(),
         cells.iter().filter(|cell| cell.kind == "dag").count(),
-        usize::from(poly_stop != "none"),
-        usize::from(dag_stop != "none"),
+        poly_stops.len(),
+        dag_stops.len(),
         parse_errors.len(),
     );
-    if poly_stop != "none" {
-        println!("STOP_DETAIL {poly_stop}");
+    for stop in poly_stops {
+        println!("STOP_DETAIL {stop}");
     }
-    if dag_stop != "none" {
-        println!("STOP_DETAIL {dag_stop}");
+    for stop in dag_stops {
+        println!("STOP_DETAIL {stop}");
     }
     for error in parse_errors {
         println!("ERROR {error}");

@@ -3,6 +3,8 @@ use std::collections::{BTreeMap, HashMap};
 const MODULUS: u64 = 2_147_483_647;
 const CURVE_A: u64 = 2_147_483_644;
 const CURVE_B: u64 = 21;
+const TARGET_G1_X: u64 = 1_391_443_431;
+const TARGET_G17_X: u64 = 1_960_828_035;
 const SLOT_CAP: usize = 262_144;
 const NODE_CAP: usize = 262_144;
 const VARS: usize = 7;
@@ -749,6 +751,24 @@ fn build_h_dag() -> (Dag, usize) {
     dag.compact(root)
 }
 
+fn specialize_dag(source: &Dag, root: usize, input: usize, value: u64) -> (Dag, usize, usize) {
+    let mut destination = Dag::new();
+    let mut map = vec![0; source.nodes.len()];
+    for (id, node) in source.nodes.iter().enumerate() {
+        map[id] = match *node {
+            Node::Input(index) if index as usize == input => destination.constant(value),
+            Node::Input(index) => destination.input(index as usize),
+            Node::Const(c) => destination.constant(c),
+            Node::Add(a, b) => destination.add(map[a], map[b]),
+            Node::Mul(a, b) => destination.mul(map[a], map[b]),
+            Node::Neg(a) => destination.neg(map[a]),
+        };
+    }
+    let peak = source.nodes.len() + destination.nodes.len();
+    let (compact, compact_root) = destination.compact(map[root]);
+    (compact, compact_root, peak)
+}
+
 type Rw = [usize; 2];
 type Elem4 = [usize; 4];
 
@@ -870,41 +890,97 @@ fn emit_dag(label: &str, depth: usize, dag: &Dag, root: usize, peak: usize) {
     println!("DAG_END label={label} depth={depth}");
 }
 
-fn main() {
-    println!("HEADER schema=pplus-pair-divisor-transfer-candidate-v1 prime={MODULUS} seed_manifest=null slot_cap={SLOT_CAP} node_cap={NODE_CAP}");
-
+fn run_poly_series(prefix: &str, target: Option<u64>) {
+    let h_label = if prefix.is_empty() {
+        "h".to_owned()
+    } else {
+        format!("{prefix}_h")
+    };
+    let norm_label = if prefix.is_empty() {
+        "second_pair_norm".to_owned()
+    } else {
+        format!("{prefix}_second_pair_norm")
+    };
     match build_h_poly() {
-        Ok((mut poly, build_counts)) => {
-            emit_poly("h", 0, &poly, build_counts);
+        Ok((formal, mut counts)) => {
+            let mut poly = if let Some(value) = target {
+                match formal.substitute(TARGET_R, &Poly::constant(value), &mut counts) {
+                    Ok(specialized) => specialized,
+                    Err(stop) => {
+                        println!(
+                            "POLY_STOP label={h_label} depth=0 reason={stop:?} prior_slots={}",
+                            formal.terms.len()
+                        );
+                        return;
+                    }
+                }
+            } else {
+                formal
+            };
+            emit_poly(&h_label, 0, &poly, counts);
             for depth in 1..=6 {
-                let mut counts = Counts::default();
-                match pair_norm_poly(&poly, SB, PB, &mut counts) {
+                let mut norm_counts = Counts::default();
+                match pair_norm_poly(&poly, SB, PB, &mut norm_counts) {
                     Ok(next) => {
                         poly = next;
-                        emit_poly("second_pair_norm", depth, &poly, counts);
+                        emit_poly(&norm_label, depth, &poly, norm_counts);
                     }
                     Err(stop) => {
-                        println!("POLY_STOP label=second_pair_norm depth={depth} reason={stop:?} prior_slots={}", poly.terms.len());
+                        println!(
+                            "POLY_STOP label={norm_label} depth={depth} reason={stop:?} prior_slots={}",
+                            poly.terms.len()
+                        );
                         break;
                     }
                 }
             }
         }
-        Err(stop) => println!("POLY_STOP label=h depth=0 reason={stop:?} prior_slots=0"),
+        Err(stop) => println!("POLY_STOP label={h_label} depth=0 reason={stop:?} prior_slots=0"),
     }
+}
 
-    let (mut dag, mut root) = build_h_dag();
-    emit_dag("h", 0, &dag, root, dag.nodes.len());
+fn run_dag_series(prefix: &str, target: Option<u64>) {
+    let h_label = if prefix.is_empty() {
+        "h".to_owned()
+    } else {
+        format!("{prefix}_h")
+    };
+    let norm_label = if prefix.is_empty() {
+        "second_pair_norm".to_owned()
+    } else {
+        format!("{prefix}_second_pair_norm")
+    };
+    let (formal, formal_root) = build_h_dag();
+    let (mut dag, mut root, initial_peak) = if let Some(value) = target {
+        specialize_dag(&formal, formal_root, TARGET_R, value)
+    } else {
+        let nodes = formal.nodes.len();
+        (formal, formal_root, nodes)
+    };
+    emit_dag(&h_label, 0, &dag, root, initial_peak);
     for depth in 1..=6 {
         let (next, next_root, peak) = tower_norm(&dag, root, SB, PB);
         if next.stopped {
-            println!("DAG_STOP label=second_pair_norm depth={depth} reason=CAP prior_nodes={} attempted_peak={peak}", dag.nodes.len());
+            println!(
+                "DAG_STOP label={norm_label} depth={depth} reason=CAP prior_nodes={} attempted_peak={peak}",
+                dag.nodes.len()
+            );
             break;
         }
         dag = next;
         root = next_root;
-        emit_dag("second_pair_norm", depth, &dag, root, peak);
+        emit_dag(&norm_label, depth, &dag, root, peak);
     }
+}
+
+fn main() {
+    println!("HEADER schema=pplus-pair-divisor-transfer-candidate-v3 prime={MODULUS} seed_manifest=null slot_cap={SLOT_CAP} node_cap={NODE_CAP} cross_target_amortization=0");
+    run_poly_series("", None);
+    run_poly_series("g1", Some(TARGET_G1_X));
+    run_poly_series("g17", Some(TARGET_G17_X));
+    run_dag_series("", None);
+    run_dag_series("g1", Some(TARGET_G1_X));
+    run_dag_series("g17", Some(TARGET_G17_X));
     println!("FOOTER status=PRODUCER_COMPLETE");
 }
 
