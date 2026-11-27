@@ -51,6 +51,8 @@ this study does not change those maps.
 | Complete new signed-fibre quadruple family | 87pencils across31groups;124758total occurrences | Zero supported conics;computed236/230/6 |
 | Mixed-sign x-fibre pencils | 538new pencils;771492occurrences | Zero supported conics;computed core134/128/6 |
 | Expanded balanced-image bound | 481images;464166pairs at each target0,2kappa | Only formal zero patterns;no2kappaquartet;core134/128/6 |
+| Stratified mixed-image pencils | 192pencils;274756candidate occurrences | 192known products;zero additional conics;core134/128/6 |
+| Full retained-image union | 685images;940506pairs at each0,kappa,2kappa | Formal zero,237known kappa rows,no2kappaquartet;direct236/230/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -360,12 +362,64 @@ Other image patterns and nonrational individual elliptic images remain
 outside this bound. See EXPANDED_BALANCED_PROTOCOL.md and
 evidence/expanded-balanced-v1/. [pcc:unverified]
 
+## Mixed-image split-line pencils
+
+The192stratified mixed-image pencils use128old/new and64new/new line pairs
+on the saved1434-point pool. Each anchor tuple is general and has a nonzero
+four-image sum,so this is a different selection from the completed x-fibre
+and balanced-image tests. All192pencils recover their nominated line product.
+The274756candidate occurrences yield192supported known products and zero
+additional conics. Each product has an exact normalized polynomial identity
+and a row equal to the sum of its two parent line rows. The reference
+dictionary contains9180distinct products of135known lines. [pcc:unverified]
+
+Native final combine replays geometry,coverage,parent certificates and
+labelled row-space representations. Only an independent added row would
+enter the capped basis. The actual core remains134full,128auxiliary,6closed;
+adding the102private ranks gives derived236/230counts. A separate numerical
+old-column unit vector reaches closed rank7and checks the independence
+collector. It is synthetic and enters no actual elliptic matrix. See
+MIXED_IMAGE_CONIC_PROTOCOL.md and evidence/mixed-image-conics-v1/.
+[pcc:unverified]
+
+## Full retained-image union with active auxiliaries
+
+The combined685-image domain contains all429original images plus256new
+images. Earlier429and481tests overlap on225old labels;their separate nulls
+did not establish the cross-domain condition. Here all460auxiliary columns
+stay active. Original108rows plus128mapped seed rows form an independent
+236-row basis. Both completed kappa inventories bind to exact coordinates
+and basis representations:109old rows and135new rows give237distinct rows
+in their union. [pcc:unverified]
+
+For each target0,kappa,2kappa,the new enumeration covers940506unordered
+signed pairs,including O,repetitions and both signs. Every pair sum and
+complement agrees in GMP and named OpenSSL arithmetic. Independent grouped
+and sorted joins agree on every coefficient row and minimal witness. The
+results are one formal zero row at0,exactly237imported rows at kappa,and no
+quartets at2kappa. Every retained row passes both elliptic checks and an
+exact reconstruction in the236-row basis. No new nonzero row or independent
+constraint is found. [pcc:unverified]
+
+Direct matrix elimination gives full rank236,auxiliary rank230,closed rank6.
+This calculation uses all685columns;no private102-rank block is removed or
+restored. It extends the necessary canonical-line/single-aggregate trace
+bound and exclusion of conics with a four-slot zero-sum subpattern to this
+combined domain. Other conic patterns remain outside the bound. Nonempty
+G,2Gcontrols cover all three targets;coefficient,missing-row/pair and basis
+certificate mutations reject. The separate numerical closed7fixture never
+enters actual data. See FULL_IMAGE_BOUND_PROTOCOL.md and
+evidence/full-image-bound-v1/. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s, with one allowed CPU and1GiB virtual address space.
-Each of the29attempt reports retains its complete per-call and wrapper
-costs,including failures. The new mixed-sign pipeline takes17.343build,
+Each of the31attempt reports retains its complete per-call and wrapper
+costs,including failures. The mixed-image pipeline takes19.449build,
+9.890plan,62.225/50.167batch and13.691combine seconds;wrapper155.498seconds.
+The full685-image test takes15.501build,77.388worker and92.937wrapper
+seconds. The earlier mixed-sign pipeline takes17.343build,
 8.924plan,39.634/40.567/43.650/41.493/19.973batch and9.979combine seconds;
 complete wrapper221.651seconds. The balanced-image filter takes8.070build,
 25.085worker and33.198wrapper seconds. Earlier graph collection takes
@@ -397,20 +451,17 @@ still retains closed rank6. The conic follow-up now exhausts all87pencils
 through four new points with the same signed image,again with no gain.
 A mixed-sign follow-up now covers the remaining538pencils,completing all625
 quadruples in new x-fibres without a supported conic. The481-image bound also
-excludes conics containing a four-slot zero-sum subpattern. A distinct
-successor uses pencils through two points on each of two different known
-split lines spanning different images. Known product conics must have exact
-row-dependence witnesses so that only additional conics can count toward
-independent rank. Native planning,fixed bounds and a separate protocol are
-needed;this successor has not run. The saved pool needs no new fibre solve.
-All images
-outside the original225must remain auxiliary,and all execution/dense caps
-remain fixed. This higher-degree successor is not executed here. Nonrational
-elliptic traces remain another open direction. Repeating the completed
-fixed relation families cannot produce a different rank.
-Any positive candidate still needs actual cover/KM and separate
-elliptic/elimination replay.
-[pcc:unverified]
+excludes conics containing a four-slot zero-sum subpattern. The192mixed-image pencils have now completed and recovered only certified
+known products. Their null does not cover all conic pencils on the1434-point
+pool. The full685-image union now directly checks interactions
+between all460auxiliary labels and retains closed rank6. The next geometric
+coverage gap is mixed-image pencils outside the192frozen stratified choices.
+A successor must use distinct anchor tuples,skip the completed pencils and
+certify known-product row dependencies under the same dense/execution caps.
+No new fibre solve is needed for that saved-pool extension.
+Nonrational individual elliptic traces and other higher-degree function
+relations remain open directions. Any positive candidate needs actual
+cover/KM and separate elliptic/elimination replay. [pcc:unverified]
 
 ## Sources and reproduction
 
@@ -426,13 +477,15 @@ elliptic/elimination replay.
   [expanded conics](EXPANDED_CONIC_PROTOCOL.md) and
   [complete same-image conic family](FULL_FIBRE_CONIC_PROTOCOL.md),
   [mixed-sign pencils](MIXED_SIGN_CONIC_PROTOCOL.md) and
-  [expanded balanced-image bound](EXPANDED_BALANCED_PROTOCOL.md).
+  [expanded balanced-image bound](EXPANDED_BALANCED_PROTOCOL.md),
+  [mixed-image pencils](MIXED_IMAGE_CONIC_PROTOCOL.md) and
+  [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
   run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
   run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
-  and run-expanded-balanced.sh.
+  and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.

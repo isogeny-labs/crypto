@@ -136,6 +136,32 @@ if balanced_exit.exists() and balanced_exit.read_text().strip()=='0':
         f"Imported{balanced['imported_kappa_rows']}kappa rows without reenumeration. Computed core"
         f"{balanced['core_full_rank']}/{balanced['core_auxiliary_rank']}/{balanced['closed_rank']};"
         f"restored{balanced['full_rank']}/{balanced['auxiliary_rank']}counts derive by adding102private ranks. All controls pass.")
+mixed_image_source=ROOT/'evidence/mixed-image-conics-v1/calls/combine/stdout.json'
+if (mixed_image_source.parent/'exit-code.txt').exists() and (mixed_image_source.parent/'exit-code.txt').read_text().strip()=='0':
+    mixed_image=json.loads(mixed_image_source.read_text())
+    attempts['mixed-image-conics-v1']=(
+        f"All{mixed_image['mixed_image_pencils']}mixed-image pencils pass:"
+        f"{mixed_image['candidate_occurrences']}candidate occurrences,"
+        f"{mixed_image['known_product_conics']}supported known products,"
+        f"{mixed_image['additional_conics']}additional conics and"
+        f"{mixed_image['independent_additional_rows']}independent added rows. "
+        "Exact polynomial/parent-row certificates,coverage and replay controls pass. "
+        f"Computed core{mixed_image['core_full_rank']}/{mixed_image['core_auxiliary_rank']}/"
+        f"{mixed_image['closed_rank']};restored236/230counts derive by adding102private ranks. "
+        "Separate numerical rank7control is excluded from actual data.")
+full_image_source=ROOT/'evidence/full-image-bound-v1/calls/scan/stdout.json'
+if (full_image_source.parent/'exit-code.txt').exists() and (full_image_source.parent/'exit-code.txt').read_text().strip()=='0':
+    full_image=json.loads(full_image_source.read_text())
+    attempts['full-image-bound-v1']=(
+        "Complete685-image union passes with all460auxiliaries active. "
+        +';'.join(f"target{d['target_multiple']}: {d['pairs']}pairs,"
+                 f"{d['distinct_rows_including_zero']}rows" for d in full_image['domains'])+'. '
+        f"Imported{full_image['imported_kappa_union_rows']}distinct kappa rows from both inventories;"
+        f"{full_image['new_independent_rows']}new independent rows. Directly computed ranks"
+        f"{full_image['full_rank']}/{full_image['auxiliary_rank']}/{full_image['closed_rank']};"
+        "no private-block restoration formula used. Both group engines,joins,basis "
+        "reconstruction and corruption controls pass. Separate numerical rank7control "
+        "is excluded from actual data.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -147,7 +173,7 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
-    if name=='mixed-sign-conics-v1':
+    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1'):
         def call_order(call):
             if call.name=='build': return (0,0)
             if call.name=='plan': return (1,0)
@@ -233,7 +259,9 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Conic16','expanded-conics-v1/calls/scan'),
                         ('Fibre-all','all-expanded-conics-v2/calls/scan'),
                         ('Mixed sign*','mixed-sign-conics-v1/calls/combine'),
-                        ('Balanced*','expanded-balanced-v1/calls/scan')]:
+                        ('Balanced*','expanded-balanced-v1/calls/scan'),
+                        ('Mixed image*','mixed-image-conics-v1/calls/combine'),
+                        ('Union685','full-image-bound-v1/calls/scan')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
