@@ -9461,12 +9461,13 @@ static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
 /// The authoritative ledger is still worker TLS. The borrowed token gates
 /// traversal, native-driver, GM, generic normalization/explicit monic work,
 /// the admitted wide-field reducer cluster, candidate evaluation,
-/// specialization, and admitted root field arithmetic. It cannot enter
-/// detached `'static` work. Root allocation/index/sort/RNG bookkeeping,
-/// symbolic/matrix construction beyond the current modeled observations,
-/// allocations generally, and separate `jv_bitops` telemetry remain
-/// non-authoritative shadows. Narrow reducers, sibling batching and
-/// multiworker Rayon are outside the admitted profile.
+/// specialization, admitted root field arithmetic, and the fixed dense root
+/// coefficient allocation. It cannot enter detached `'static` work. Other
+/// root allocation/index/sort/RNG bookkeeping, symbolic/matrix construction
+/// beyond the current modeled observations, remaining allocations, and
+/// separate `jv_bitops` telemetry remain non-authoritative shadows. Narrow
+/// reducers, sibling batching and multiworker Rayon are outside the admitted
+/// profile.
 struct VisitAccountingContext {
     id: NonZeroU64,
     owner_thread: ThreadId,
@@ -10153,7 +10154,7 @@ impl VisitAccountingBuilder {
     fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
         self.token_identity = Some(token.id());
         self.arm.accounting_token_mode =
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1";
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1";
     }
 
     fn block(
@@ -10235,7 +10236,6 @@ impl VisitAccountingBuilder {
     /// Admit one positive-byte allocation request as a single checked bundle.
     /// No member is changed unless both phase/total counters and both pending
     /// observations can be represented.
-    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
     fn request_payload(&mut self, requested_bytes: u64) -> bool {
         debug_assert_ne!(requested_bytes, 0);
         let phase = self.current_phase.index();
@@ -10306,7 +10306,6 @@ impl VisitAccountingBuilder {
     }
 
     /// Resolve one admitted request without acquiring payload bytes.
-    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
     fn resolve_payload_request(&mut self, requested_bytes: u64) -> bool {
         let Some(pending_requests) = self.pending_allocation_requests.checked_sub(1) else {
             self.checked_arithmetic_block(
@@ -10333,7 +10332,6 @@ impl VisitAccountingBuilder {
     /// is resolved even when an acquired/live counter cannot be represented;
     /// in that case no lease is published and the caller must drop the actual
     /// allocation.
-    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
     fn activate_payload(
         &mut self,
         requested_bytes: u64,
@@ -10434,7 +10432,6 @@ impl VisitAccountingBuilder {
     /// Release one active payload lease as a single checked bundle. If any
     /// counter or live-state update fails, no member is changed, so sealing
     /// retains the unreconciled live bytes and fails closed.
-    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
     fn release_payload(&mut self, released_bytes: u64, class: VisitPayloadClass) {
         if released_bytes == 0 {
             return;
@@ -10885,7 +10882,6 @@ impl<'a> VisitAccount<'a> {
     /// caller performs the allocator operation, inspects actual capacity and
     /// then either activates or fails the returned reservation. Legacy calls
     /// and zero-byte/ZST shapes need no accounting guard.
-    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
     fn request_payload<T>(
         self,
         requested_capacity: usize,
@@ -11099,8 +11095,8 @@ impl VisitHelperAccount<'_> {
 /// Logical ownership class for one call-owned payload capacity. Scratch bytes
 /// are a subset of total live payload and therefore contribute to both peaks.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[allow(dead_code)] // Production allocation sites are routed in a later slice.
 enum VisitPayloadClass {
+    #[cfg(test)]
     Persistent,
     Scratch,
 }
@@ -11109,7 +11105,6 @@ enum VisitPayloadClass {
 /// allocator's actual capacity. Forgetting this guard leaves pending state for
 /// seal to reject; ordinary drop resolves it and records abandonment.
 #[must_use = "payload reservations must be activated or failed explicitly"]
-#[allow(dead_code)] // Synthetic controls establish the substrate first.
 struct VisitPayloadReservation<'a, T> {
     token: VisitAccountingToken<'a>,
     requested_capacity: usize,
@@ -11120,7 +11115,6 @@ struct VisitPayloadReservation<'a, T> {
     _not_send: PhantomData<Rc<()>>,
 }
 
-#[allow(dead_code)] // Production allocation sites are routed in a later slice.
 impl<'a, T> VisitPayloadReservation<'a, T> {
     /// Activate the request with the capacity inspected after allocator
     /// success. Excess capacity is valid and charged; only a shortfall is an
@@ -11273,7 +11267,6 @@ impl<T> Drop for VisitPayloadReservation<'_, T> {
 /// Active logical ownership of an allocator capacity. The type is neither
 /// Send nor Sync; moving it transfers ownership without charging again.
 #[must_use = "payload leases must remain live with their allocation"]
-#[allow(dead_code)] // Production allocation sites are routed in a later slice.
 struct VisitPayloadLease<'a> {
     token: VisitAccountingToken<'a>,
     bytes: u64,
@@ -11302,6 +11295,245 @@ impl Drop for VisitPayloadLease<'_> {
             }
         });
         self.active = false;
+    }
+}
+
+mod visit_tracked_vec {
+    use super::*;
+
+    /// A call-owned vector whose allocator capacity and logical payload lease
+    /// cannot be separated. Field order is part of the accounting contract:
+    /// the vector (and therefore its allocation) is dropped before the lease
+    /// records the release. The representation lives in this child module so
+    /// callers cannot reach the raw `Vec` and mutate capacity behind the
+    /// ledger.
+    struct VisitTrackedAllocation<'a, T> {
+        inner: Vec<T>,
+        _lease: Option<VisitPayloadLease<'a>>,
+    }
+
+    #[must_use = "tracked vectors must remain live with their payload lease"]
+    pub(super) struct VisitTrackedVec<'a, T> {
+        allocation: VisitTrackedAllocation<'a, T>,
+        token: VisitAccountingToken<'a>,
+        class: VisitPayloadClass,
+        _not_send: PhantomData<Rc<()>>,
+    }
+
+    impl<'a, T> VisitTrackedVec<'a, T> {
+        pub(super) fn try_with_capacity(
+            token: VisitAccountingToken<'a>,
+            requested_capacity: usize,
+            class: VisitPayloadClass,
+        ) -> Result<Self, VisitAccountingControl> {
+            Self::try_with_capacity_inner(token, requested_capacity, class, |inner, capacity| {
+                inner.try_reserve_exact(capacity).map_err(|_| ())
+            })
+        }
+
+        fn try_with_capacity_inner(
+            token: VisitAccountingToken<'a>,
+            requested_capacity: usize,
+            class: VisitPayloadClass,
+            reserve: impl FnOnce(&mut Vec<T>, usize) -> Result<(), ()>,
+        ) -> Result<Self, VisitAccountingControl> {
+            let account = VisitAccount::On(token);
+            // The reservation is declared first. If reserving or activation
+            // unwinds, any later-created vector is destroyed before this
+            // guard records an abandoned request.
+            let reservation = account.request_payload::<T>(requested_capacity, class)?;
+            let mut inner = Vec::new();
+            let Some(reservation) = reservation else {
+                // Zero-capacity and zero-sized-element vectors need neither
+                // an allocator call nor a logical lease. `Vec::new()` already
+                // has the correct zero/ZST capacity representation.
+                return Ok(Self {
+                    allocation: VisitTrackedAllocation {
+                        inner,
+                        _lease: None,
+                    },
+                    token,
+                    class,
+                    _not_send: PhantomData,
+                });
+            };
+            if reserve(&mut inner, requested_capacity).is_err() {
+                let _ = reservation.allocation_failed(format!(
+                    "Vec::try_reserve_exact refused requested capacity {requested_capacity} for {}",
+                    std::any::type_name::<T>()
+                ));
+                return Err(VisitAccountingControl::Stop);
+            }
+            let lease = Some(reservation.activate(inner.capacity())?);
+            Ok(Self {
+                allocation: VisitTrackedAllocation {
+                    inner,
+                    _lease: lease,
+                },
+                token,
+                class,
+                _not_send: PhantomData,
+            })
+        }
+
+        #[cfg(test)]
+        pub(super) fn try_with_capacity_using(
+            token: VisitAccountingToken<'a>,
+            requested_capacity: usize,
+            class: VisitPayloadClass,
+            reserve: fn(&mut Vec<T>, usize) -> Result<(), ()>,
+        ) -> Result<Self, VisitAccountingControl> {
+            Self::try_with_capacity_inner(token, requested_capacity, class, reserve)
+        }
+
+        #[cfg(test)]
+        pub(super) fn len(&self) -> usize {
+            self.allocation.inner.len()
+        }
+
+        #[cfg(test)]
+        pub(super) fn capacity(&self) -> usize {
+            self.allocation.inner.capacity()
+        }
+
+        #[cfg(test)]
+        pub(super) fn is_empty(&self) -> bool {
+            self.allocation.inner.is_empty()
+        }
+
+        pub(super) fn as_slice(&self) -> &[T] {
+            self.allocation.inner.as_slice()
+        }
+
+        pub(super) fn as_mut_slice(&mut self) -> &mut [T] {
+            self.allocation.inner.as_mut_slice()
+        }
+
+        #[cfg(test)]
+        pub(super) fn push_within_capacity(&mut self, value: T) -> Result<(), T> {
+            if self.allocation.inner.len() == self.allocation.inner.capacity() {
+                return Err(value);
+            }
+            self.allocation.inner.push(value);
+            Ok(())
+        }
+
+        /// Replace rather than grow the allocation in place. The replacement
+        /// lease activates while the old lease remains live, so the measured
+        /// peak includes the exact old/new capacity overlap. Request,
+        /// allocation, or activation failure leaves `self` untouched; a stop
+        /// observed while releasing the old lease occurs after replacement
+        /// commits and therefore leaves `self` holding the replacement.
+        #[allow(dead_code)]
+        pub(super) fn try_grow_replacement(
+            &mut self,
+            minimum_capacity: usize,
+        ) -> Result<(), VisitAccountingControl> {
+            self.try_grow_replacement_inner(minimum_capacity, |inner, capacity| {
+                inner.try_reserve_exact(capacity).map_err(|_| ())
+            })
+        }
+
+        fn try_grow_replacement_inner(
+            &mut self,
+            minimum_capacity: usize,
+            reserve: impl FnOnce(&mut Vec<T>, usize) -> Result<(), ()>,
+        ) -> Result<(), VisitAccountingControl> {
+            if VisitAccount::On(self.token).control().stopped() {
+                return Err(VisitAccountingControl::Stop);
+            }
+            if minimum_capacity <= self.allocation.inner.capacity() {
+                return Ok(());
+            }
+            let mut replacement =
+                Self::try_with_capacity_inner(self.token, minimum_capacity, self.class, reserve)?;
+            debug_assert!(replacement.allocation.inner.capacity() >= self.allocation.inner.len());
+            replacement
+                .allocation
+                .inner
+                .append(&mut self.allocation.inner);
+            std::mem::swap(&mut self.allocation, &mut replacement.allocation);
+            // `replacement` now owns the old, empty Vec and its old lease. Its
+            // declaration-ordered fields deallocate first and release second.
+            drop(replacement);
+            match VisitAccount::On(self.token).control() {
+                VisitAccountingControl::Continue => Ok(()),
+                VisitAccountingControl::Stop => Err(VisitAccountingControl::Stop),
+            }
+        }
+
+        #[cfg(test)]
+        pub(super) fn try_grow_replacement_using(
+            &mut self,
+            minimum_capacity: usize,
+            reserve: fn(&mut Vec<T>, usize) -> Result<(), ()>,
+        ) -> Result<(), VisitAccountingControl> {
+            self.try_grow_replacement_inner(minimum_capacity, reserve)
+        }
+    }
+
+    impl<'a, T: Clone> VisitTrackedVec<'a, T> {
+        pub(super) fn try_with_len(
+            token: VisitAccountingToken<'a>,
+            len: usize,
+            value: T,
+            class: VisitPayloadClass,
+        ) -> Result<Self, VisitAccountingControl> {
+            let mut tracked = Self::try_with_capacity(token, len, class)?;
+            // Capacity was admitted and activated above, so resize cannot grow
+            // the allocation. A panicking clone drops the Vec before its lease.
+            tracked.allocation.inner.resize(len, value);
+            Ok(tracked)
+        }
+    }
+}
+
+use visit_tracked_vec::VisitTrackedVec;
+
+/// Dense root coefficients with the legacy and admitted storage policies kept
+/// explicit. Keeping this owner in the caller's root-selection arm preserves
+/// the original allocation lifetime through filtering and diagnostics.
+enum VisitRootCoefficients<'a> {
+    Plain(Vec<u64>),
+    Tracked(VisitTrackedVec<'a, u64>),
+}
+
+impl<'a> VisitRootCoefficients<'a> {
+    fn try_from_sparse(
+        polynomial: &Poly,
+        var: usize,
+        account: VisitAccount<'a>,
+    ) -> Result<Self, F4Stop> {
+        let degree = polynomial
+            .iter()
+            .map(|(exponents, _)| exponents[var])
+            .max()
+            .unwrap_or(0) as usize;
+        match account {
+            VisitAccount::Off => {
+                let mut coefficients = vec![0; degree + 1];
+                for (exponents, coefficient) in polynomial {
+                    coefficients[exponents[var] as usize] = *coefficient;
+                }
+                Ok(Self::Plain(coefficients))
+            }
+            VisitAccount::On(token) => {
+                let mut coefficients =
+                    VisitTrackedVec::try_with_len(token, degree + 1, 0, VisitPayloadClass::Scratch)
+                        .map_err(|_| F4Stop::Accounting)?;
+                for (exponents, coefficient) in polynomial {
+                    coefficients.as_mut_slice()[exponents[var] as usize] = *coefficient;
+                }
+                Ok(Self::Tracked(coefficients))
+            }
+        }
+    }
+
+    fn as_slice(&self) -> &[u64] {
+        match self {
+            Self::Plain(coefficients) => coefficients,
+            Self::Tracked(coefficients) => coefficients.as_slice(),
+        }
     }
 }
 
@@ -12303,14 +12535,15 @@ where
                     self.report.domain_index_entries += domain.len() as u64;
                     self.domain_index[original] = Some(domain_position_index(domain));
                 }
-                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
-                let mut coefficients = vec![0; degree + 1];
-                for (e, c) in g {
-                    coefficients[e[var] as usize] = *c;
-                }
+                let coefficients =
+                    match VisitRootCoefficients::try_from_sparse(g, var, self.account) {
+                        Ok(coefficients) => coefficients,
+                        Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                        Err(_) => unreachable!("coefficient allocation has no other stop"),
+                    };
                 self.report.domain_frobenius_univariates += 1;
                 let (roots, multiplications) = roots_fp_routed(
-                    &coefficients,
+                    coefficients.as_slice(),
                     self.p,
                     VISIT_ROOT_SEED,
                     self.opts.deadline,
@@ -12338,7 +12571,9 @@ where
                     .filter_map(|root| index.get(&root).map(|&position| (position, root)))
                     .collect();
                 hits.sort_unstable_by_key(|&(position, _)| position);
-                hits.into_iter().map(|(_, root)| root).collect()
+                let ordered = hits.into_iter().map(|(_, root)| root).collect();
+                drop(coefficients);
+                ordered
             } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
                 for &x in domain {
@@ -12379,14 +12614,15 @@ where
                 }
                 roots
             } else {
-                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
-                let mut coefficients = vec![0; degree + 1];
-                for (e, c) in g {
-                    coefficients[e[var] as usize] = *c;
-                }
+                let coefficients =
+                    match VisitRootCoefficients::try_from_sparse(g, var, self.account) {
+                        Ok(coefficients) => coefficients,
+                        Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                        Err(_) => unreachable!("coefficient allocation has no other stop"),
+                    };
                 self.report.factored_univariates += 1;
                 let (roots, multiplications) = roots_fp_routed(
-                    &coefficients,
+                    coefficients.as_slice(),
                     self.p,
                     VISIT_ROOT_SEED,
                     self.opts.deadline,
@@ -12402,12 +12638,14 @@ where
                 {
                     return VisitEnd::AccountingStopped;
                 }
-                match roots {
+                let rational = match roots {
                     Ok(Some(roots)) => roots,
                     Ok(None) => return VisitEnd::TimedOut,
                     Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
                     Err(_) => unreachable!("root arithmetic has no other stop"),
-                }
+                };
+                drop(coefficients);
+                rational
             };
             if self
                 .account
@@ -12914,12 +13152,13 @@ pub struct VisitFirstReportV1 {
 /// work to that pool. Traversal, delivery, native-driver orchestration, GM,
 /// generic normalization/explicit monic work, the wide-field pair/RREF and
 /// final polynomial reducers, candidate evaluation, specialization, and the
-/// admitted root field operations now borrow a session-branded token. The
-/// accounted profile admits only `p > 2^16`; legacy narrow-field behavior is
-/// unchanged. Root allocation/index/sort/RNG bookkeeping, symbolic/matrix
-/// construction beyond current modeled observations, allocations generally,
-/// and separate `jv_bitops` telemetry still use shadows. Sibling batching is
-/// preflight-excluded.
+/// admitted root field operations now borrow a session-branded token; fixed
+/// dense root coefficients additionally retain a capacity-matched payload
+/// lease through the root call. The accounted profile admits only `p > 2^16`;
+/// legacy narrow-field behavior is unchanged. Other root allocation/index/
+/// sort/RNG bookkeeping, symbolic/matrix construction beyond current modeled
+/// observations, remaining allocations, and separate `jv_bitops` telemetry
+/// still use shadows. Sibling batching is preflight-excluded.
 /// `work_ownership_complete` therefore remains false until every admitted
 /// charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
@@ -13818,6 +14057,44 @@ mod visit_accounting_tests {
             .work
     }
 
+    fn assert_single_root_coefficient_payload(
+        record: &VisitAccountingV1,
+        requested_elements: usize,
+    ) {
+        let root = phase_work(record, VisitAccountingPhaseV1::RootExtraction);
+        let element_bytes = std::mem::size_of::<u64>() as u64;
+        let requested_bytes = u64::try_from(requested_elements)
+            .unwrap()
+            .checked_mul(element_bytes)
+            .unwrap();
+        assert_eq!(root.allocation_requests, 1);
+        assert_eq!(root.payload_bytes_requested, requested_bytes);
+        assert!(root.payload_bytes_acquired >= requested_bytes);
+        assert_eq!(root.payload_bytes_acquired % element_bytes, 0);
+        assert_eq!(root.payload_bytes_released, root.payload_bytes_acquired);
+        assert_eq!(record.total.allocation_requests, root.allocation_requests);
+        assert_eq!(
+            record.total.payload_bytes_requested,
+            root.payload_bytes_requested
+        );
+        assert_eq!(
+            record.total.payload_bytes_acquired,
+            root.payload_bytes_acquired
+        );
+        assert_eq!(
+            record.total.payload_bytes_released,
+            root.payload_bytes_released
+        );
+        assert_eq!(
+            record.memory.peak_live_payload_bytes,
+            root.payload_bytes_acquired
+        );
+        assert_eq!(
+            record.memory.peak_scratch_payload_bytes,
+            root.payload_bytes_acquired
+        );
+    }
+
     fn assert_reconciles_in_modes(
         record: &VisitAccountingV1,
         ownership_mode: &str,
@@ -13848,7 +14125,7 @@ mod visit_accounting_tests {
         assert_reconciles_in_modes(
             record,
             ownership_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1",
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1",
         );
     }
 
@@ -13912,7 +14189,7 @@ mod visit_accounting_tests {
         assert!(!record.accounting_complete);
         assert_eq!(
             record.arm.accounting_token_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1"
         );
     }
 
@@ -14355,7 +14632,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -15881,6 +16158,10 @@ mod visit_accounting_tests {
         root.field_additions = 2;
         root.root_candidates = 1;
         assert_eq!(phase(VisitAccountingPhaseV1::RootExtraction), root);
+        assert_eq!(record.total.allocation_requests, 0);
+        assert_eq!(record.total.payload_bytes_requested, 0);
+        assert_eq!(record.total.payload_bytes_acquired, 0);
+        assert_eq!(record.total.payload_bytes_released, 0);
 
         let mut specialization = VisitAccountingWorkV1::default();
         specialization.specialization_terms = 2;
@@ -15974,6 +16255,7 @@ mod visit_accounting_tests {
             assert!(root.field_additions > 0);
             assert!(root.field_inversions > 0);
             assert_eq!(root.root_candidates, 2);
+            assert_single_root_coefficient_payload(accounting(report), 3);
             assert_reconciles(accounting(report));
         }
         assert_eq!(accounting(&frobenius.1).arm.domain_root_mode, "frobenius");
@@ -16304,7 +16586,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -16712,7 +16994,7 @@ mod visit_accounting_tests {
             assert!(callback_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 callback_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1"
             );
 
             let trace_context = VisitAccountingContext::new().unwrap();
@@ -16762,7 +17044,7 @@ mod visit_accounting_tests {
             assert!(trace_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 trace_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_token_tls_remaining_allocation_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_scalar_root_field_root_coefficients_token_tls_remaining_allocation_helpers_shadow_v1"
             );
         });
     }
@@ -16879,6 +17161,373 @@ mod visit_accounting_tests {
                 "unbalanced_external_work_suspension"
             );
             assert_reconciles(&next_record);
+        });
+    }
+
+    #[test]
+    fn tracked_vec_replacement_growth_charges_actual_overlap_and_phases() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "tracked-vec-replacement-growth");
+            let account = VisitAccount::On(session.token());
+
+            let (root_phase, control) = account.phase_scope(VisitAccountingPhaseV1::RootExtraction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let mut tracked =
+                VisitTrackedVec::try_with_capacity(session.token(), 2, VisitPayloadClass::Scratch)
+                    .unwrap();
+            assert!(tracked.is_empty());
+            assert_eq!(tracked.len(), 0);
+            assert_eq!(tracked.capacity(), 2);
+            tracked.push_within_capacity(11u64).unwrap();
+            tracked.push_within_capacity(22u64).unwrap();
+            assert_eq!(tracked.push_within_capacity(33u64), Err(33));
+            let first_capacity = tracked.capacity();
+            tracked.try_grow_replacement(first_capacity).unwrap();
+            assert_eq!(tracked.capacity(), first_capacity);
+            assert_eq!(tracked.as_slice(), &[11, 22]);
+            drop(root_phase);
+
+            let replacement_minimum = 4;
+            let (growth_phase, control) = account.phase_scope(VisitAccountingPhaseV1::Traversal);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            tracked.try_grow_replacement(replacement_minimum).unwrap();
+            let replacement_capacity = tracked.capacity();
+            assert_eq!(replacement_capacity, replacement_minimum);
+            assert_eq!(tracked.as_slice(), &[11, 22]);
+            drop(growth_phase);
+
+            let (release_phase, control) =
+                account.phase_scope(VisitAccountingPhaseV1::CandidateVerification);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            drop(tracked);
+            drop(release_phase);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let word_bytes = std::mem::size_of::<u64>() as u64;
+            let requested_bytes = u64::try_from(2usize + replacement_minimum)
+                .unwrap()
+                .checked_mul(word_bytes)
+                .unwrap();
+            let first_bytes = u64::try_from(first_capacity)
+                .unwrap()
+                .checked_mul(word_bytes)
+                .unwrap();
+            let replacement_bytes = u64::try_from(replacement_capacity)
+                .unwrap()
+                .checked_mul(word_bytes)
+                .unwrap();
+            let overlap_bytes = first_bytes.checked_add(replacement_bytes).unwrap();
+            assert_eq!(record.total.allocation_requests, 2);
+            assert_eq!(record.total.payload_bytes_requested, requested_bytes);
+            assert_eq!(record.total.payload_bytes_acquired, overlap_bytes);
+            assert_eq!(record.total.payload_bytes_released, overlap_bytes);
+            assert_eq!(record.memory.peak_live_payload_bytes, overlap_bytes);
+            assert_eq!(record.memory.peak_scratch_payload_bytes, overlap_bytes);
+            assert_eq!(requested_bytes, 48);
+            assert_eq!(overlap_bytes, 48);
+
+            let root = phase_work(&record, VisitAccountingPhaseV1::RootExtraction);
+            assert_eq!(root.allocation_requests, 1);
+            assert_eq!(root.payload_bytes_requested, 2 * word_bytes);
+            assert_eq!(root.payload_bytes_acquired, first_bytes);
+            assert_eq!(root.payload_bytes_released, 0);
+            let growth = phase_work(&record, VisitAccountingPhaseV1::Traversal);
+            assert_eq!(growth.allocation_requests, 1);
+            assert_eq!(
+                growth.payload_bytes_requested,
+                u64::try_from(replacement_minimum).unwrap() * word_bytes
+            );
+            assert_eq!(growth.payload_bytes_acquired, replacement_bytes);
+            assert_eq!(growth.payload_bytes_released, first_bytes);
+            let release = phase_work(&record, VisitAccountingPhaseV1::CandidateVerification);
+            assert_eq!(release.payload_bytes_released, replacement_bytes);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn tracked_vec_charges_injected_excess_capacity_not_requested_minimum() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "tracked-vec-excess-capacity");
+            let tracked = VisitTrackedVec::<u64>::try_with_capacity_using(
+                session.token(),
+                2,
+                VisitPayloadClass::Scratch,
+                |inner, _| inner.try_reserve_exact(5).map_err(|_| ()),
+            )
+            .unwrap();
+            let actual_capacity = tracked.capacity();
+            assert!(actual_capacity >= 5);
+            drop(tracked);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let actual_bytes = u64::try_from(actual_capacity).unwrap() * 8;
+            assert_eq!(record.total.allocation_requests, 1);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, actual_bytes);
+            assert_eq!(record.total.payload_bytes_released, actual_bytes);
+            assert_eq!(record.memory.peak_live_payload_bytes, actual_bytes);
+            assert_eq!(record.memory.peak_scratch_payload_bytes, actual_bytes);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn tracked_vec_allocator_and_growth_failures_leave_no_false_lease() {
+        in_owner_pool(|| {
+            let refused_context = VisitAccountingContext::new().unwrap();
+            let refused_session = begin_session(&refused_context, "tracked-vec-refused");
+            let refused: Result<VisitTrackedVec<'_, u64>, _> =
+                VisitTrackedVec::try_with_capacity_using(
+                    refused_session.token(),
+                    2,
+                    VisitPayloadClass::Scratch,
+                    |_, _| Err(()),
+                );
+            assert!(refused.is_err());
+            drop(refused);
+            let refused_record = refused_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                refused_record.blocker.as_ref().unwrap().code,
+                "allocation_failed"
+            );
+            assert_eq!(refused_record.total.allocation_requests, 1);
+            assert_eq!(refused_record.total.payload_bytes_requested, 16);
+            assert_eq!(refused_record.total.payload_bytes_acquired, 0);
+            assert_eq!(refused_record.total.payload_bytes_released, 0);
+            assert_reconciles(&refused_record);
+
+            let growth_context = VisitAccountingContext::new().unwrap();
+            let growth_session = begin_session(&growth_context, "tracked-vec-growth-refused");
+            let mut tracked = VisitTrackedVec::try_with_capacity(
+                growth_session.token(),
+                2,
+                VisitPayloadClass::Scratch,
+            )
+            .unwrap();
+            tracked.push_within_capacity(7u64).unwrap();
+            tracked.push_within_capacity(9u64).unwrap();
+            let original_capacity = tracked.capacity();
+            let original_contents = tracked.as_slice().to_vec();
+            let requested_growth = original_capacity.checked_add(1).unwrap();
+            let growth = tracked.try_grow_replacement_using(requested_growth, |_, _| Err(()));
+            assert!(growth.is_err());
+            assert_eq!(tracked.capacity(), original_capacity);
+            assert_eq!(tracked.as_slice(), original_contents.as_slice());
+            drop(tracked);
+
+            let growth_record = growth_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                growth_record.blocker.as_ref().unwrap().code,
+                "allocation_failed"
+            );
+            assert_eq!(growth_record.total.allocation_requests, 2);
+            assert_eq!(
+                growth_record.total.payload_bytes_acquired,
+                u64::try_from(original_capacity).unwrap() * 8
+            );
+            assert_eq!(
+                growth_record.total.payload_bytes_released,
+                growth_record.total.payload_bytes_acquired
+            );
+            assert_eq!(
+                growth_record.memory.peak_live_payload_bytes,
+                growth_record.total.payload_bytes_acquired
+            );
+            assert_reconciles(&growth_record);
+
+            let activation_context = VisitAccountingContext::new().unwrap();
+            let activation_session = begin_session(
+                &activation_context,
+                "tracked-vec-growth-activation-rejected",
+            );
+            let mut tracked = VisitTrackedVec::try_with_capacity(
+                activation_session.token(),
+                2,
+                VisitPayloadClass::Scratch,
+            )
+            .unwrap();
+            tracked.push_within_capacity(13u64).unwrap();
+            tracked.push_within_capacity(17u64).unwrap();
+            let original_capacity = tracked.capacity();
+            let original_contents = tracked.as_slice().to_vec();
+            VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+                let mut slot = slot.borrow_mut();
+                let accounting = slot.as_mut().unwrap();
+                let phase = accounting.current_phase.index();
+                accounting.phases[phase].payload_bytes_acquired = u64::MAX;
+                accounting.total.payload_bytes_acquired = u64::MAX;
+            });
+            let growth = tracked.try_grow_replacement(original_capacity.checked_add(1).unwrap());
+            assert!(growth.is_err());
+            assert_eq!(tracked.capacity(), original_capacity);
+            assert_eq!(tracked.as_slice(), original_contents.as_slice());
+            drop(tracked);
+
+            let activation_record = activation_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                activation_record.blocker.as_ref().unwrap().code,
+                "counter_overflow"
+            );
+            assert_eq!(
+                activation_record.blocker.as_ref().unwrap().counter,
+                Some("payload_bytes_acquired")
+            );
+            assert_eq!(activation_record.total.allocation_requests, 2);
+            assert_eq!(activation_record.total.payload_bytes_acquired, u64::MAX);
+            assert_eq!(
+                activation_record.total.payload_bytes_released,
+                u64::try_from(original_capacity).unwrap() * 8
+            );
+            assert_eq!(
+                activation_record
+                    .memory
+                    .pending_allocation_requests_at_finish,
+                0
+            );
+            assert_eq!(activation_record.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(activation_record.memory.live_payload_bytes_at_finish, 0);
+            assert!(!activation_record.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&activation_record);
+        });
+    }
+
+    #[test]
+    fn tracked_vec_drops_elements_before_releasing_its_lease() {
+        use std::cell::Cell;
+
+        struct DropProbe<'a> {
+            observed_live_lease: &'a Cell<bool>,
+            byte: u8,
+        }
+
+        impl Drop for DropProbe<'_> {
+            fn drop(&mut self) {
+                let _ = self.byte;
+                VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+                    let slot = slot.borrow();
+                    let accounting = slot.as_ref().expect("drop remains inside the session");
+                    assert!(accounting.live_payload_bytes > 0);
+                    assert!(accounting.live_scratch_payload_bytes > 0);
+                });
+                self.observed_live_lease.set(true);
+            }
+        }
+
+        in_owner_pool(|| {
+            let observed = Cell::new(false);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "tracked-vec-drop-order");
+            let mut tracked =
+                VisitTrackedVec::try_with_capacity(session.token(), 1, VisitPayloadClass::Scratch)
+                    .unwrap();
+            let actual_capacity = tracked.capacity();
+            tracked
+                .push_within_capacity(DropProbe {
+                    observed_live_lease: &observed,
+                    byte: 1,
+                })
+                .ok()
+                .unwrap();
+            drop(tracked);
+            assert!(observed.get());
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let actual_bytes = u64::try_from(actual_capacity).unwrap()
+                * u64::try_from(std::mem::size_of::<DropProbe<'_>>()).unwrap();
+            assert_eq!(record.total.payload_bytes_acquired, actual_bytes);
+            assert_eq!(record.total.payload_bytes_released, actual_bytes);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn tracked_vec_zero_zst_clone_unwind_and_forget_are_fail_closed() {
+        in_owner_pool(|| {
+            let zero_context = VisitAccountingContext::new().unwrap();
+            let zero_session = begin_session(&zero_context, "tracked-vec-zero-zst");
+            let zero = VisitTrackedVec::<u64>::try_with_capacity_using(
+                zero_session.token(),
+                0,
+                VisitPayloadClass::Scratch,
+                |_, _| panic!("zero capacity reached allocator hook"),
+            )
+            .unwrap();
+            let zst = VisitTrackedVec::<()>::try_with_capacity_using(
+                zero_session.token(),
+                usize::MAX,
+                VisitPayloadClass::Scratch,
+                |_, _| panic!("ZST capacity reached allocator hook"),
+            )
+            .unwrap();
+            drop(zero);
+            drop(zst);
+            let zero_record = zero_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(zero_record.total.allocation_requests, 0);
+            assert_eq!(zero_record.total.payload_bytes_requested, 0);
+            assert_eq!(zero_record.total.payload_bytes_acquired, 0);
+            assert_eq!(zero_record.total.payload_bytes_released, 0);
+            assert_reconciles(&zero_record);
+
+            struct PanicClone(u8);
+            impl Clone for PanicClone {
+                fn clone(&self) -> Self {
+                    let _ = self.0;
+                    panic!("injected tracked-vector clone panic")
+                }
+            }
+
+            let unwind_context = VisitAccountingContext::new().unwrap();
+            let unwind_session = begin_session(&unwind_context, "tracked-vec-clone-unwind");
+            let unwind = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let _ = VisitTrackedVec::try_with_len(
+                    unwind_session.token(),
+                    2,
+                    PanicClone(1),
+                    VisitPayloadClass::Scratch,
+                );
+            }));
+            assert!(unwind.is_err());
+            let unwind_record = unwind_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(unwind_record.total.allocation_requests, 1);
+            assert!(unwind_record.total.payload_bytes_acquired >= 2);
+            assert_eq!(
+                unwind_record.total.payload_bytes_released,
+                unwind_record.total.payload_bytes_acquired
+            );
+            assert_reconciles(&unwind_record);
+
+            let forgotten_context = VisitAccountingContext::new().unwrap();
+            let forgotten_session = begin_session(&forgotten_context, "tracked-vec-forgotten");
+            let forgotten = VisitTrackedVec::<u64>::try_with_capacity(
+                forgotten_session.token(),
+                2,
+                VisitPayloadClass::Scratch,
+            )
+            .unwrap();
+            let forgotten_bytes = u64::try_from(forgotten.capacity()).unwrap() * 8;
+            std::mem::forget(forgotten);
+            let forgotten_record = forgotten_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                forgotten_record.blocker.as_ref().unwrap().code,
+                "memory_reconciliation_mismatch"
+            );
+            assert_eq!(
+                forgotten_record.total.payload_bytes_acquired,
+                forgotten_bytes
+            );
+            assert_eq!(forgotten_record.total.payload_bytes_released, 0);
+            assert_eq!(
+                forgotten_record.memory.live_payload_bytes_at_finish,
+                forgotten_bytes
+            );
+            assert_eq!(
+                forgotten_record.memory.live_scratch_payload_bytes_at_finish,
+                forgotten_bytes
+            );
+            assert!(!forgotten_record.reconciliation.memory_balanced);
         });
     }
 
@@ -17938,6 +18587,7 @@ mod visit_accounting_tests {
         assert_eq!(accounted, plain);
         assert!(record.total.traversal_nodes > 0);
         assert!(record.total.field_multiplications > 0);
+        assert_single_root_coefficient_payload(&record, 3);
         assert_eq!(
             record.arm.legacy_bitops_enabled,
             super::super::jv_bitops::enabled()
