@@ -12,15 +12,17 @@ object is exhaustive deterministic replay, not a zero-knowledge proof.
 - The planted target uses the first finite nonidentity signed four-leaf
   multiset in lexicographic order; the other targets are `G` and `[17]G`.
 - No random stream is used, so there is no seed to disclose or reconstruct.
-- `SOURCE_MANIFEST.json` binds the prospectively qualified sources to the
-  source commit and their SHA-256 values.
+- `SOURCE_MANIFEST_2.json` binds the active, prospectively qualified v2 sources
+  to the source commit and their SHA-256 values. The v1 manifest and packet are
+  retained as the coverage-invalid history described by `AMENDMENT_1.md`.
 
 ## Candidate evidence
 
 The candidate emits:
 
-1. all quotient-fold and multiplication-channel checks through `n=64`;
-2. divisor-remainder recurrence counts through `n=16`;
+1. all quotient-fold and every multiplication-channel entry through `n=64`;
+2. divisor-remainder recurrence and direct-zero sets for all five multiplicity
+   charts and all nine target cells through `n=16`;
 3. every entry of every bounded direct `S_5` kernel, plus its ordinary and two
    pair-invariant displacement ranks;
 4. every lift-filtered zero multiset and the complete recovered signed witness
