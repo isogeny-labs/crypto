@@ -182,7 +182,9 @@ impl Default for Fast2Options {
             sweep_ratio: 1,
             sweep_tile_bytes: 1 << 20,
             sweep_max_words: 1 << 28,
-            skip: false,
+            // Lead-cover skip is exact (PROOF.md); on E2LOCMS45 P2 it cut wall
+            // ~256s → ~153s at ir=0.6/0.65 with unchanged d_F.
+            skip: true,
             skip_order: 1,
             skip_witness: 1,
             skip_witness_max: 0,
