@@ -587,6 +587,12 @@ fixture explicitly proves canonical-parser acceptance and its generic
 degree-indexed product-replay equality, then instantiates this arbitrary-degree
 endpoint; its quotient result no longer depends only on a parallel fixed-size
 statement.
+The same fixture now has a transparent packed-`GF(2)` deterministic-selection
+model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
+loop, and odd candidate order, proves candidate `17` fails and candidate `19`
+passes, proves the first degree-four result is `19`, and binds that result to the
+typed record's polynomial field. This closes finite selection agreement, not a
+general Rust compiler refinement of `Ring::new`.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

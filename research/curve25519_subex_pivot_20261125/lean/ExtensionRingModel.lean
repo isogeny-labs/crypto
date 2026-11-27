@@ -1128,6 +1128,94 @@ theorem parseCanonicalRingMultiplicationArtifact_canonical
   next =>
     simp at hvalidate
 
+/-- Fuel-bounded polynomial remainder over `GF(2)`, using packed coefficient
+bits exactly as the native ring search does. -/
+def gf2PackedRemainderFuel : ℕ → ℕ → ℕ → ℕ
+  | 0, value, _ => value
+  | fuel + 1, value, modulus =>
+      if value == 0 || decide (Nat.log2 value < Nat.log2 modulus) then
+        value
+      else
+        let shift := Nat.log2 value - Nat.log2 modulus
+        gf2PackedRemainderFuel fuel
+          (Nat.xor value (modulus * 2 ^ shift)) modulus
+
+/-- Packed polynomial remainder with enough fuel to clear every source degree. -/
+def gf2PackedRemainder (value modulus : ℕ) : ℕ :=
+  gf2PackedRemainderFuel (Nat.log2 value + 1) value modulus
+
+/-- Unreduced carryless product of two packed `GF(2)` polynomials. -/
+def gf2PackedRawProduct (left right : ℕ) : ℕ :=
+  (List.range (Nat.log2 right + 1)).foldl
+    (fun product index =>
+      if right.testBit index then
+        Nat.xor product (left * 2 ^ index)
+      else
+        product)
+    0
+
+/-- Carryless product reduced by a packed modulus. -/
+def gf2PackedProduct (left right modulus : ℕ) : ℕ :=
+  gf2PackedRemainder (gf2PackedRawProduct left right) modulus
+
+/-- Fuel-bounded Euclidean gcd over packed `GF(2)` polynomials. -/
+def gf2PackedGcdFuel : ℕ → ℕ → ℕ → ℕ
+  | 0, left, _ => left
+  | fuel + 1, left, right =>
+      if right == 0 then
+        left
+      else
+        gf2PackedGcdFuel fuel right (gf2PackedRemainder left right)
+
+/-- Packed polynomial gcd with the sum-of-degrees Euclidean fuel bound. -/
+def gf2PackedGcd (left right : ℕ) : ℕ :=
+  gf2PackedGcdFuel (Nat.log2 left + Nat.log2 right + 2) left right
+
+/-- Native-shaped Rabin loop: repeated Frobenius squaring, early gcd checks
+through half the degree, and the final `x^(2^degree)=x` equality. -/
+def gf2PackedIrreducibleAux (polynomial x degree : ℕ) : ℕ → ℕ → ℕ → Bool
+  | 0, _, value => value == x
+  | remaining + 1, index, value =>
+      let next := gf2PackedProduct value value polynomial
+      let nextIndex := index + 1
+      if decide (nextIndex ≤ degree / 2) &&
+          !(gf2PackedGcd (Nat.xor next x) polynomial == 1) then
+        false
+      else
+        gf2PackedIrreducibleAux polynomial x degree remaining nextIndex next
+
+/-- Rabin irreducibility predicate used by the deterministic packed search. -/
+def gf2PackedIrreducible (polynomial degree : ℕ) : Bool :=
+  let x := gf2PackedRemainder 2 polynomial
+  gf2PackedIrreducibleAux polynomial x degree degree 0 x
+
+/-- Search odd constant-one lower patterns in the exact native order. -/
+def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ
+  | _, 0 => none
+  | lower, remaining + 1 =>
+      let polynomial := 2 ^ degree + lower
+      if gf2PackedIrreducible polynomial degree then
+        some polynomial
+      else
+        firstIrreducibleBinaryPolynomialAux degree (lower + 2) remaining
+
+/-- Deterministic monic binary-polynomial selection modeled after `Ring::new`. -/
+def firstIrreducibleBinaryPolynomial (degree : ℕ) : Option ℕ :=
+  if degree == 0 then none
+  else firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1))
+
+/-- At degree four the first odd candidate `U^4+1` is rejected while
+`U^4+U+1` is accepted by the native-shaped Rabin predicate. -/
+theorem degreeFourIrreducibilityBoundary :
+    gf2PackedIrreducible 17 4 = false ∧
+      gf2PackedIrreducible 19 4 = true := by
+  decide
+
+/-- The transparent deterministic search selects the artifact polynomial `19`. -/
+theorem degreeFourDeterministicPolynomialSelection :
+    firstIrreducibleBinaryPolynomial 4 = some 19 := by
+  decide
+
 /-- Degree-indexed lower-polynomial view of an arbitrary typed artifact. -/
 def RingMultiplicationArtifact.lowerCoefficient
     (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : Bool :=
@@ -1199,6 +1287,13 @@ theorem degreeFourWitnessRecordValues :
 /-- The committed record passes the generic canonical import boundary. -/
 theorem degreeFourWitnessRecordCanonical :
     degreeFourWitnessRecord.canonical = true := by
+  decide
+
+/-- The artifact polynomial is exactly the result of the transparent
+native-shaped deterministic search at its encoded degree. -/
+theorem degreeFourWitnessRecord_polynomialSelected :
+    firstIrreducibleBinaryPolynomial degreeFourWitnessRecord.degree =
+      some degreeFourWitnessRecord.polynomial := by
   decide
 
 /-- The committed bytes are accepted by the public canonical parser, rather

@@ -523,6 +523,15 @@ the arbitrary-degree endpoint. The fixed `Fin 4` theorem is therefore no longer
 the only path from the shared bytes to quotient multiplication.
 `[pcc:unverified]`
 
+The remaining deterministic-polynomial gap is narrowed for this fixture too.
+A transparent packed-`GF(2)` model follows the native remainder, carryless
+product, Euclidean gcd, Rabin squaring, and odd-lower-pattern search order. It
+kernel-checks that degree-four candidate `17` is reducible, candidate `19` is
+accepted, and `19` is the first search result; the typed artifact's polynomial
+field is then proved equal to that selected value. This is a source-shaped
+finite model, not a compiler refinement for the Rust search.
+`[pcc:unverified]`
+
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
 `(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate
