@@ -1,0 +1,13 @@
+FROM public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39
+ARG SOURCE_REVISION
+LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" \
+      org.opencontainers.image.revision="${SOURCE_REVISION}"
+# The trusted publisher copies only these checked files. No source-selected
+# build script or tested executable runs during image publication.
+COPY baseline candidate panel /opt/isolab/point-index/
+COPY optimized-options.json build-info.json SHA256SUMS /opt/isolab/point-index/
+ENV HOME=/work
+WORKDIR /work
+USER 1000:1000
+ENTRYPOINT []
+CMD ["/bin/false"]
