@@ -6,7 +6,10 @@ LABEL org.opencontainers.image.source="https://github.com/isogeny-labs/crypto" \
 # build script or tested executable runs during image publication.
 COPY baseline candidate panel /opt/isolab/point-index/
 COPY optimized-options.json build-info.json SHA256SUMS /opt/isolab/point-index/
+COPY inputs.sha256 run-pair.sh /opt/isolab/point-index/
+COPY inputs/ /opt/isolab/point-index/inputs/
 ENV HOME=/work
+RUN mkdir -p /work && chown 1000:1000 /work
 WORKDIR /work
 USER 1000:1000
 ENTRYPOINT []

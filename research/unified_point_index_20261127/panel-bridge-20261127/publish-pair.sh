@@ -56,14 +56,37 @@ for field in baseline candidate panel optimized-options.json; do
   printf '%s  %s\n' "$digest" "$field" >> "$expected_list"
 done
 cmp -s "$expected_list" "$bundle/SHA256SUMS" || { echo 'bundle checksum list mismatch' >&2; exit 2; }
+# A runnable image must carry the exact frozen public panel. The main-only
+# workflow checks the full spec before this script; repeat the image-local
+# closure checks here before any cloud identity is used.
+panel_dir="$here/fresh-inputs-20261127/panel"
+input_hashes="$here/fresh-inputs-20261127/inputs.sha256"
+[[ -d $panel_dir && ! -L $panel_dir && -f $input_hashes && ! -L $input_hashes ]]
+[[ -z $(find "$panel_dir" -type l -print -quit) ]] || { echo 'symlinked public input' >&2; exit 2; }
+[[ $(wc -l < "$input_hashes") == 86 ]] || { echo 'incomplete public input list' >&2; exit 2; }
+(cd "$panel_dir" && sha256sum -c "$input_hashes" >/dev/null) || { echo 'public input hash mismatch' >&2; exit 2; }
+jq -e --slurpfile build "$bundle/build-info.json" '
+  .schema=="hashed-ecdl-panel/v2" and .status=="prepared"
+  and .baseline==$build[0].baseline_revision
+  and .paired_baseline==$build[0].candidate_revision
+  and .execution=="not_run" and .measurements==null
+  and .development_inputs==60 and .holdout_inputs==24
+  and .required_aa_rounds==5 and .required_ab_rounds==5
+  and (.cases|length)==84
+' "$panel_dir/manifest.json" >/dev/null || { echo 'public panel is not frozen to both arms' >&2; exit 2; }
+[[ -f $here/run-pair.sh && ! -L $here/run-pair.sh ]] || { echo 'missing native runner' >&2; exit 2; }
 if [[ $check_only == true ]]; then
-  echo 'Pair bundle verified without AWS identity; no image or experiment submitted.'
+  echo 'Pair bundle and public panel verified without AWS identity; no image or experiment submitted.'
   exit 0
 fi
 context=$(mktemp -d)
 trap 'rm -rf "$context"; rm -f "$expected_list"' EXIT
 for name in baseline candidate panel; do install -m755 "$bundle/$name" "$context/$name"; done
 for name in optimized-options.json build-info.json SHA256SUMS; do install -m644 "$bundle/$name" "$context/$name"; done
+install -m755 "$here/run-pair.sh" "$context/run-pair.sh"
+install -m644 "$input_hashes" "$context/inputs.sha256"
+cp -R -- "$panel_dir" "$context/inputs"
+"$context/run-pair.sh" --check-only "$context" >/dev/null
 registry=${ISOLAB_IMAGE_REPOSITORY%%/*}
 repository=${ISOLAB_IMAGE_REPOSITORY#*/}
 tag="gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${revision}-point-index"
@@ -80,12 +103,16 @@ digest=$(aws ecr describe-images --repository-name "$repository" --image-ids "im
 [[ $digest =~ ^sha256:[a-f0-9]{64}$ ]] || { echo 'missing immutable image digest' >&2; exit 1; }
 jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg revision "$revision" \
   --arg build "$(sha256sum "$bundle/build-info.json" | cut -d' ' -f1)" \
+  --arg inputs "$(sha256sum "$input_hashes" | cut -d' ' -f1)" \
+  --arg seeds "$(sha256sum "$panel_dir/seed-manifest.json" | cut -d' ' -f1)" \
+  --arg runner "$(sha256sum "$here/run-pair.sh" | cut -d' ' -f1)" \
   --slurpfile source "$bundle/build-info.json" \
-  '{schema:"point-index.image/v2",image_uri:$image,driver_revision:$revision,
+  '{schema:"point-index.image/v3",image_uri:$image,driver_revision:$revision,
     build_info_sha256:$build,baseline_revision:$source[0].baseline_revision,
     candidate_revision:$source[0].candidate_revision,
     baseline_sha256:$source[0].baseline_sha256,candidate_sha256:$source[0].candidate_sha256,
     panel_sha256:$source[0].panel_sha256,
+    inputs_sha256:$inputs,seed_manifest_sha256:$seeds,runner_sha256:$runner,
     optimized_options_sha256:$source[0].optimized_options_sha256,
     measurement_overlay_sha256:$source[0].measurement_overlay_sha256,
     experiment_submitted:false}' > "$output"
