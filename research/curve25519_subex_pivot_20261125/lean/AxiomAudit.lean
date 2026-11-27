@@ -105,6 +105,11 @@ open Curve25519ExtensionRingModel
 #print axioms degreeFourWitnessArtifactValues
 #print axioms parseRingMultiplicationArtifact_wellFormed
 #print axioms parseCanonicalRingMultiplicationArtifact_canonical
+#print axioms packedGF2Polynomial_coeff
+#print axioms packedGF2Polynomial_xor
+#print axioms packedGF2Polynomial_shifted_coeff
+#print axioms packedGF2Polynomial_shifted_low_coeff
+#print axioms packedGF2Polynomial_rawProduct_fold
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

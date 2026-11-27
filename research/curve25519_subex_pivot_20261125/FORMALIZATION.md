@@ -601,6 +601,15 @@ compiler refinement of `Ring::new`.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
+The first arbitrary-width packed-to-polynomial layer is also formalized.
+`packedGF2Polynomial` reads a fixed window of native bits as coefficients in
+`GF(2)[U]`; coefficient lookup agrees with `Nat.testBit`, XOR agrees with
+polynomial addition, and multiplication by a power of two has the expected
+shifted and zero-low coefficient behavior. The source-shaped carryless-product
+fold then decodes exactly to a polynomial-addition fold of those shifted packed
+values. Ordinary polynomial multiplication and the remainder loop remain the
+next semantic refinements. `[pcc:unverified]`
+
 Production `next_tuple` also matches an independent Cartesian enumeration in
 83,970 exhaustive small-state configurations, plus two multi-packet fixtures.
 `WEIGHTED_TUPLE_ITERATOR.md` states the general positive-weight cached-state,

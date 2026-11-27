@@ -2,6 +2,7 @@ module
 
 public import GroupFactorization
 public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Data.Nat.Bitwise
 public import Mathlib.Algebra.Polynomial.Degree.IsMonicOfDegree
 
 @[expose] public section
@@ -1129,6 +1130,95 @@ theorem parseCanonicalRingMultiplicationArtifact_canonical
   next =>
     simp at hvalidate
 
+/-- Decode the low `width` bits of a packed natural number as a polynomial over
+`GF(2)`. This is the coefficient-level interface between native bit operations
+and polynomial semantics. -/
+noncomputable def packedGF2Polynomial (width value : ℕ) :
+    Polynomial (ZMod 2) :=
+  ∑ index : Fin width,
+    if value.testBit index then monomial (index : ℕ) 1 else 0
+
+/-- Every in-range coefficient of the packed polynomial is exactly the
+corresponding native bit. -/
+theorem packedGF2Polynomial_coeff (width value : ℕ) (index : Fin width) :
+    (packedGF2Polynomial width value).coeff index =
+      if value.testBit index then 1 else 0 := by
+  let coefficient : Polynomial (ZMod 2) →+ ZMod 2 :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  rw [packedGF2Polynomial]
+  change coefficient (∑ candidate : Fin width,
+    if value.testBit candidate then monomial (candidate : ℕ) 1 else 0) = _
+  rw [map_sum]
+  have hself :
+      coefficient (if value.testBit index then monomial (index : ℕ) 1 else 0) =
+        (if value.testBit index then 1 else 0) := by
+    by_cases hbit : value.testBit index <;> simp [hbit, coefficient]
+  rw [← hself]
+  apply Finset.sum_eq_single index
+  · intro candidate _ hne
+    have hcoe : (candidate : ℕ) ≠ (index : ℕ) := by
+      intro heq
+      exact hne (Fin.ext heq)
+    by_cases hbit : value.testBit candidate <;>
+      simp [hbit, coefficient, coeff_monomial, hcoe]
+  · simp
+
+/-- At every fixed width, native packed XOR is polynomial addition over
+`GF(2)`. -/
+theorem packedGF2Polynomial_xor (width left right : ℕ) :
+    packedGF2Polynomial width (Nat.xor left right) =
+      packedGF2Polynomial width left + packedGF2Polynomial width right := by
+  rw [packedGF2Polynomial, packedGF2Polynomial, packedGF2Polynomial,
+    ← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro index _
+  have hxor : (Nat.xor left right).testBit (index : ℕ) =
+      ((left.testBit index) ^^ (right.testBit index)) := by
+    change (left ^^^ right).testBit (index : ℕ) = _
+    exact Nat.testBit_xor left right index
+  rw [hxor]
+  cases hleft : left.testBit index <;>
+    cases hright : right.testBit index <;>
+    simp_all
+  ext coefficient
+  by_cases heq : (index : ℕ) = coefficient
+  · simp [coeff_add, heq]
+    decide
+  · simp [coeff_add, coeff_monomial, heq]
+
+/-- Multiplication by `2^shift` moves every in-range native bit to the matching
+higher polynomial coefficient. -/
+theorem packedGF2Polynomial_shifted_coeff
+    (width value shift : ℕ) (index : Fin width) :
+    (packedGF2Polynomial (width + shift) (value * 2 ^ shift)).coeff
+        (index + shift) =
+      if value.testBit index then 1 else 0 := by
+  let shiftedIndex : Fin (width + shift) :=
+    ⟨index + shift, by omega⟩
+  have hcoeff := packedGF2Polynomial_coeff
+    (width + shift) (value * 2 ^ shift) shiftedIndex
+  change (packedGF2Polynomial (width + shift) (value * 2 ^ shift)).coeff
+      (index + shift) = _
+  rw [hcoeff]
+  rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
+  simp [shiftedIndex]
+
+/-- Multiplication by `2^shift` leaves every polynomial coefficient below the
+shift equal to zero. -/
+theorem packedGF2Polynomial_shifted_low_coeff
+    (width value shift : ℕ) (index : Fin shift) :
+    (packedGF2Polynomial (width + shift) (value * 2 ^ shift)).coeff index = 0 := by
+  let lowIndex : Fin (width + shift) :=
+    ⟨index, by omega⟩
+  have hcoeff := packedGF2Polynomial_coeff
+    (width + shift) (value * 2 ^ shift) lowIndex
+  change (packedGF2Polynomial (width + shift) (value * 2 ^ shift)).coeff index = _
+  rw [hcoeff]
+  rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
+  simp [lowIndex, index.isLt]
+
 /-- Fuel-bounded polynomial remainder over `GF(2)`, using packed coefficient
 bits exactly as the native ring search does. -/
 def gf2PackedRemainderFuel : ℕ → ℕ → ℕ → ℕ
@@ -1154,6 +1244,46 @@ def gf2PackedRawProduct (left right : ℕ) : ℕ :=
       else
         product)
     0
+
+/-- The native carryless-product fold decodes to the same fold with packed XOR
+replaced by polynomial addition. Together with the shift coefficient theorems,
+this is the reusable bit-to-polynomial boundary for raw multiplication. -/
+theorem packedGF2Polynomial_rawProduct_fold (width left right : ℕ) :
+    packedGF2Polynomial width (gf2PackedRawProduct left right) =
+      (List.range (Nat.log2 right + 1)).foldl
+        (fun product index =>
+          if right.testBit index then
+            product + packedGF2Polynomial width (left * 2 ^ index)
+          else product)
+        0 := by
+  unfold gf2PackedRawProduct
+  generalize List.range (Nat.log2 right + 1) = indices
+  have hfold : ∀ initial,
+      packedGF2Polynomial width
+          (indices.foldl
+            (fun product index =>
+              if right.testBit index then
+                Nat.xor product (left * 2 ^ index)
+              else product)
+            initial) =
+        indices.foldl
+          (fun product index =>
+            if right.testBit index then
+              product + packedGF2Polynomial width (left * 2 ^ index)
+            else product)
+          (packedGF2Polynomial width initial) := by
+    intro initial
+    induction indices generalizing initial with
+    | nil => simp
+    | cons head tail ih =>
+        simp only [List.foldl_cons]
+        by_cases hbit : right.testBit head
+        · simp only [hbit, ite_true]
+          rw [ih, packedGF2Polynomial_xor]
+        · simp only [hbit]
+          exact ih initial
+  rw [hfold 0]
+  simp [packedGF2Polynomial]
 
 /-- Carryless product reduced by a packed modulus. -/
 def gf2PackedProduct (left right modulus : ℕ) : ℕ :=

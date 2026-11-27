@@ -537,6 +537,15 @@ degree-four finite result, not a general proof that the packed Rabin predicate
 or Rust search refines polynomial irreducibility.
 `[pcc:unverified]`
 
+The packed-search model now also has a general coefficient-level semantics
+boundary. At any fixed width, a natural number decodes to the polynomial whose
+coefficients are its native `testBit` values; packed XOR becomes polynomial
+addition over `GF(2)`; multiplication by `2^s` moves the represented
+coefficients by `s` and leaves lower coefficients zero; and the complete native
+carryless-product fold decodes to the same fold with XOR replaced by polynomial
+addition. This does not yet identify that fold with ordinary polynomial
+multiplication or prove packed remainder correctness. `[pcc:unverified]`
+
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
 `(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate

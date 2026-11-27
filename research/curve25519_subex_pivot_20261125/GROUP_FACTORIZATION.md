@@ -260,6 +260,15 @@ algebraic certificate, not arbitrary-degree Rabin correctness or compiler
 refinement.
 `[pcc:unverified]`
 
+For arbitrary fixed widths, the packed natural representation now decodes to a
+`GF(2)` polynomial coefficientwise. Native XOR is proved to decode as
+polynomial addition, power-of-two multiplication moves coefficients by the
+same shift with zero coefficients below it, and the complete native
+carryless-product fold is transported to a polynomial-addition fold. The
+remaining bridge is to identify the transported fold with ordinary polynomial
+multiplication under explicit support bounds, then refine packed remainder.
+`[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a
