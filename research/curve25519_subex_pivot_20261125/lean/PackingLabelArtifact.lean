@@ -123,6 +123,62 @@ structure PackingLabelArtifact where
   columnLabels : List ℕ
   deriving DecidableEq, Inhabited, Repr
 
+/-- Source-shaped endpoint record matching one native `EdgeEndpoints` value. -/
+structure PackingLabelEdge where
+  left : ℕ
+  leftPort : ℕ
+  right : ℕ
+  rightPort : ℕ
+  deriving DecidableEq, Repr
+
+/-- The four native endpoint fields in their projection order. -/
+def PackingLabelEdge.fields (edge : PackingLabelEdge) : List ℕ :=
+  [edge.left, edge.leftPort, edge.right, edge.rightPort]
+
+/-- Named source view matching the successful native `LabelProjectionView`.
+Machine-word conversions and allocation failure remain on the Rust side; this
+record models the natural-number result once those checks succeed. -/
+structure PackingLabelSource where
+  schema : ℕ
+  radix : ℕ
+  packetExponent : ℕ
+  coordinate : ℕ
+  conditionalLabels : Bool
+  sourceDegreeCap : Option ℕ
+  edges : List PackingLabelEdge
+  rowLabels : List ℕ
+  columnLabels : List ℕ
+  deriving DecidableEq, Repr
+
+/-- Convert the named source view into the exact formal artifact fields. -/
+def PackingLabelSource.artifact (source : PackingLabelSource) :
+    PackingLabelArtifact := {
+  schema := source.schema
+  radix := source.radix
+  packetExponent := source.packetExponent
+  coordinate := source.coordinate
+  conditionalLabels := if source.conditionalLabels then 1 else 0
+  sourceDegreeCap := source.sourceDegreeCap.getD 0
+  edgeCount := source.edges.length
+  rowCount := source.rowLabels.length
+  columnCount := source.columnLabels.length
+  edgeFields := source.edges.flatMap PackingLabelEdge.fields
+  rowLabels := source.rowLabels
+  columnLabels := source.columnLabels
+}
+
+/-- Structured endpoint quadruples always flatten to exactly four fields per
+native edge. -/
+@[simp] theorem PackingLabelSource.edgeFields_length
+    (source : PackingLabelSource) :
+    (source.edges.flatMap PackingLabelEdge.fields).length =
+      4 * source.edges.length := by
+  induction source.edges with
+  | nil => simp
+  | cons edge edges ih =>
+      simp [PackingLabelEdge.fields, ih]
+      omega
+
 /-- Number of native labels, `radix^packetExponent`. -/
 def PackingLabelArtifact.labelCount (artifact : PackingLabelArtifact) : ℕ :=
   artifact.radix ^ artifact.packetExponent
@@ -181,6 +237,22 @@ def PackingLabelArtifact.projectionValues
     artifact.sourceDegreeCap, artifact.edgeCount, artifact.rowCount,
     artifact.columnCount] ++ artifact.edgeFields ++ artifact.rowLabels ++
       artifact.columnLabels
+
+/-- Direct source-shaped flattening in the order used by the native view. -/
+def PackingLabelSource.projectionValues (source : PackingLabelSource) : List ℕ :=
+  [source.schema, source.radix, source.packetExponent, source.coordinate,
+    if source.conditionalLabels then 1 else 0,
+    source.sourceDegreeCap.getD 0, source.edges.length,
+    source.rowLabels.length, source.columnLabels.length] ++
+      source.edges.flatMap PackingLabelEdge.fields ++ source.rowLabels ++
+        source.columnLabels
+
+/-- The named source view and the formal artifact have definitionally identical
+canonical projections. -/
+theorem PackingLabelSource.artifact_projectionValues
+    (source : PackingLabelSource) :
+    source.artifact.projectionValues = source.projectionValues := by
+  rfl
 
 /-- The unchecked parser is a left inverse of the canonical projection when
 the two split positions have their declared lengths. -/
@@ -280,6 +352,17 @@ theorem parsePackingLabelArtifact_iff
   · rintro ⟨hwell, hbounded, hprojection⟩
     rw [← hprojection]
     exact parsePackingLabelArtifact_projectionValues artifact hwell hbounded
+
+/-- The successful native-shaped view is checked exactly by the artifact's
+well-formedness and bounds; its projection equality is definitional. -/
+theorem PackingLabelSource.parseProjection_iff
+    (source : PackingLabelSource) :
+    parsePackingLabelArtifact source.projectionValues = some source.artifact ↔
+      (source.artifact.wellFormed = true ∧
+        source.artifact.bounded = true) := by
+  simpa [PackingLabelSource.artifact_projectionValues] using
+    (parsePackingLabelArtifact_iff
+      (values := source.projectionValues) (artifact := source.artifact))
 
 /-- A shape-checked import retains the exact schema and array-length checks. -/
 theorem parsePackingLabelArtifact_wellFormed
@@ -570,6 +653,33 @@ theorem parseSourceGuardPackingLabelArtifact_iff
   · rintro ⟨hreplayed, hguard⟩
     exact parseSourceGuardPackingLabelArtifact_of_components
       (parseReplayedPackingLabelArtifact_iff.mpr hreplayed) hguard
+
+/-- The replay importer for a successful native-shaped view adds exactly the
+formal trace predicate to the checked artifact conditions. -/
+theorem PackingLabelSource.parseReplayedProjection_iff
+    (source : PackingLabelSource) :
+    parseReplayedPackingLabelArtifact source.projectionValues =
+        some source.artifact ↔
+      ((source.artifact.wellFormed = true ∧
+          source.artifact.bounded = true) ∧
+        source.artifact.traceMatches = true) := by
+  simpa [PackingLabelSource.artifact_projectionValues] using
+    (parseReplayedPackingLabelArtifact_iff
+      (values := source.projectionValues) (artifact := source.artifact))
+
+/-- The strict importer for a successful native-shaped view adds exactly the
+source-class guard after checked parsing and trace replay. -/
+theorem PackingLabelSource.parseSourceGuardProjection_iff
+    (source : PackingLabelSource) :
+    parseSourceGuardPackingLabelArtifact source.projectionValues =
+        some source.artifact ↔
+      (((source.artifact.wellFormed = true ∧
+          source.artifact.bounded = true) ∧
+        source.artifact.traceMatches = true) ∧
+        source.artifact.sourceClassGuardMatches = true) := by
+  simpa [PackingLabelSource.artifact_projectionValues] using
+    (parseSourceGuardPackingLabelArtifact_iff
+      (values := source.projectionValues) (artifact := source.artifact))
 
 /-- A source-guard import retains the complete executable label replay. -/
 theorem parseSourceGuardPackingLabelArtifact_replayed

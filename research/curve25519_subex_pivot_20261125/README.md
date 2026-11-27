@@ -454,6 +454,16 @@ is precisely canonical projection plus well-formedness and bounds; replay adds
 only the formal trace predicate; strict parsing adds only the formal source
 guard. This turns the remaining Rust bridge into an explicit named-predicate
 obligation rather than an opaque parser-refinement claim. `[pcc:unverified]`
+The native side now exposes that obligation through a borrowed
+`LabelProjectionView`: named schema/radix/packet/coordinate/conditional/cap
+fields plus borrowed edge, row-label, and column-label arrays, with checked
+length arithmetic and integer conversion before flattening. Lean now models
+the same source shape as `PackingLabelSource`; each structured edge contributes
+exactly four fields, and its native-order projection is definitionally the
+artifact projection. Source-shaped iff theorems cover checked, replayed, and
+strict import. This is source-interface alignment, not a proof of Rust
+compiler, allocator, conversion, or serialization semantics.
+`[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

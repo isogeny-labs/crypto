@@ -55,6 +55,100 @@ pub struct Certificate {
     pub packet_pairs: Vec<Vec<(usize, usize)>>,
 }
 
+/// Borrowed, checked source view of the canonical packing-label projection.
+///
+/// These named fields are the native counterpart of the formal
+/// `PackingLabelArtifact` header. The edge slice remains structured until
+/// `values` flattens each endpoint quadruple in source order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LabelProjectionView<'a> {
+    /// Wire schema converted to the projection machine word.
+    pub schema: usize,
+    /// Packet label radix.
+    pub radix: usize,
+    /// Packet exponent converted to the projection machine word.
+    pub packet_exponent: usize,
+    /// Active coordinate converted to the projection machine word.
+    pub coordinate: usize,
+    /// Conditional-label flag encoded as zero or one.
+    pub conditional_labels: usize,
+    /// Source degree cap, or zero when it is absent.
+    pub source_degree_cap: usize,
+    /// Source-ordered endpoint quadruples.
+    pub edges: &'a [EdgeEndpoints],
+    /// Every source row label, including isolates.
+    pub row_labels: &'a [usize],
+    /// Every source column label, including isolates.
+    pub column_labels: &'a [usize],
+    length: usize,
+}
+
+impl<'a> LabelProjectionView<'a> {
+    /// Check all projection arithmetic and machine-word conversions once,
+    /// before allocation or flattening.
+    pub fn try_from_certificate(certificate: &'a Certificate) -> Result<Self, String> {
+        let edge_fields = checked_product(
+            &[4, certificate.edges.len()],
+            "packing label projection edge fields",
+        )?;
+        let length = checked_sum(
+            &[
+                9,
+                edge_fields,
+                certificate.row_labels.len(),
+                certificate.column_labels.len(),
+            ],
+            "packing label projection length",
+        )?;
+        Ok(Self {
+            schema: usize::try_from(certificate.schema)
+                .map_err(|_| "packing label projection schema".to_string())?,
+            radix: certificate.radix,
+            packet_exponent: usize::try_from(certificate.packet_exponent)
+                .map_err(|_| "packing label projection packet exponent".to_string())?,
+            coordinate: usize::try_from(certificate.coordinate)
+                .map_err(|_| "packing label projection coordinate".to_string())?,
+            conditional_labels: usize::from(certificate.conditional_labels),
+            source_degree_cap: certificate.source_degree_cap.unwrap_or(0),
+            edges: &certificate.edges,
+            row_labels: &certificate.row_labels,
+            column_labels: &certificate.column_labels,
+            length,
+        })
+    }
+
+    /// The exact nine-field header consumed by the formal importer.
+    pub fn header(self) -> [usize; 9] {
+        [
+            self.schema,
+            self.radix,
+            self.packet_exponent,
+            self.coordinate,
+            self.conditional_labels,
+            self.source_degree_cap,
+            self.edges.len(),
+            self.row_labels.len(),
+            self.column_labels.len(),
+        ]
+    }
+
+    /// Flatten the checked named view in header/edge/row/column order.
+    pub fn values(self) -> Result<Vec<usize>, String> {
+        let mut values = Vec::new();
+        values
+            .try_reserve_exact(self.length)
+            .map_err(|_| "packing label projection allocation".to_string())?;
+        values.extend(self.header());
+        for edge in self.edges {
+            values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
+        }
+        values.extend(self.row_labels.iter().copied());
+        values.extend(self.column_labels.iter().copied());
+        debug_assert_eq!(values.len(), self.length);
+        Ok(values)
+    }
+}
+
 /// Checked dimensions of one accepted packing-provenance replay.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct VerificationSummary {
@@ -131,44 +225,7 @@ fn bit_width(value: usize) -> usize {
 /// row count, and column count. It is followed by four fields per edge, then
 /// every row label and every column label.
 pub fn label_projection(certificate: &Certificate) -> Result<Vec<usize>, String> {
-    let edge_fields = checked_product(
-        &[4, certificate.edges.len()],
-        "packing label projection edge fields",
-    )?;
-    let length = checked_sum(
-        &[
-            9,
-            edge_fields,
-            certificate.row_labels.len(),
-            certificate.column_labels.len(),
-        ],
-        "packing label projection length",
-    )?;
-    let mut values = Vec::new();
-    values
-        .try_reserve_exact(length)
-        .map_err(|_| "packing label projection allocation".to_string())?;
-    values.extend([
-        usize::try_from(certificate.schema)
-            .map_err(|_| "packing label projection schema".to_string())?,
-        certificate.radix,
-        usize::try_from(certificate.packet_exponent)
-            .map_err(|_| "packing label projection packet exponent".to_string())?,
-        usize::try_from(certificate.coordinate)
-            .map_err(|_| "packing label projection coordinate".to_string())?,
-        usize::from(certificate.conditional_labels),
-        certificate.source_degree_cap.unwrap_or(0),
-        certificate.edges.len(),
-        certificate.row_labels.len(),
-        certificate.column_labels.len(),
-    ]);
-    for edge in &certificate.edges {
-        values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
-    }
-    values.extend(certificate.row_labels.iter().copied());
-    values.extend(certificate.column_labels.iter().copied());
-    debug_assert_eq!(values.len(), length);
-    Ok(values)
+    LabelProjectionView::try_from_certificate(certificate)?.values()
 }
 
 fn verify_source_guard_closure(
@@ -956,9 +1013,15 @@ mod tests {
             column_creation_precisions: vec![1, 1, 1, 1],
             packet_pairs: Vec::new(),
         };
+        let view = LabelProjectionView::try_from_certificate(&certificate).unwrap();
+        assert_eq!(view.header(), [3, 2, 1, 0, 0, 0, 1, 2, 4]);
+        assert_eq!(view.edges, certificate.edges);
+        assert_eq!(view.row_labels, certificate.row_labels);
+        assert_eq!(view.column_labels, certificate.column_labels);
         assert_eq!(
-            label_projection(&certificate).unwrap(),
+            view.values().unwrap(),
             vec![3, 2, 1, 0, 0, 0, 1, 2, 4, 1, 2, 3, 4, 0, 1, 1, 0, 1, 0]
         );
+        assert_eq!(label_projection(&certificate), view.values());
     }
 }

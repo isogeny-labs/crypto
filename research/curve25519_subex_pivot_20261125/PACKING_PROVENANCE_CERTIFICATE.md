@@ -121,6 +121,16 @@ to well-formedness, bounds, and equality with the canonical projection;
 replayed acceptance adds exactly `traceMatches`; strict acceptance adds exactly
 `sourceClassGuardMatches`. Thus the future Rust refinement has no hidden parser
 premise beyond those named predicates. `[pcc:unverified]`
+The native exporter is now factored through a borrowed `LabelProjectionView`
+whose named header fields and edge/row/column slices expose the complete source
+shape after checked integer conversion and checked length arithmetic. Its one
+canonical flattener remains the implementation of `label_projection`. A
+matching Lean `PackingLabelSource` uses structured four-field edges, proves
+their flattened length, and has a projection definitionally equal to the
+formal artifact projection. Source-shaped checked, replayed, and strict iff
+theorems therefore reduce native-order input to the same named predicates.
+This aligns the source interfaces; it does not verify Rust compiler,
+allocation, integer-conversion, or serde behavior. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact

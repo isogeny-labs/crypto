@@ -257,6 +257,15 @@ Exact iff characterizations isolate that remaining obligation: the checked
 parser accepts exactly well-formed bounded canonical projections; the replayed
 parser adds exactly the formal trace predicate; and the strict parser adds
 exactly the source-class guard. `[pcc:unverified]`
+`PackingLabelSource` now mirrors the named native projection view rather than
+starting from an already flattened list. Its structured edge record flattens
+to four endpoint/port fields with a proved length, while Boolean conditional
+state and optional source cap map to the native numeric header convention. The
+source projection and `source.artifact.projectionValues` are definitionally
+equal. Consequently, source-shaped checked, replayed, and strict parser iff
+theorems expose precisely the well-formedness, bounds, trace, and source-guard
+obligations. Rust execution, allocation, integer conversion, and serde remain
+outside this formal refinement. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

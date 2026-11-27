@@ -206,6 +206,13 @@ evidence for two independent claims:
    Exact iff specifications further reduce that binding to canonical-projection
    equality plus the named well-formedness, bounds, trace, and source-guard
    predicates; no additional parser premise remains.
+   A borrowed native `LabelProjectionView` now exposes the exact named header
+   and source slices used by the flattener, and a matching formal
+   `PackingLabelSource` proves its structured four-field-edge projection
+   definitionally equal to the artifact projection. Source-shaped checked,
+   replayed, and strict iff theorems now state the remaining obligations at
+   that interface. Compiler, allocation, integer conversion, and serde
+   refinement remain open.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a
