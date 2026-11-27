@@ -26,10 +26,12 @@ jq -n --arg baseline "$base_revision" --arg candidate "$candidate_revision" --ar
   --arg candidate_hash "$(sha256sum "$scratch/bundle/candidate" | cut -d' ' -f1)" \
   --arg panel_hash "$(sha256sum "$scratch/bundle/panel" | cut -d' ' -f1)" \
   --arg options_hash "$(sha256sum "$scratch/bundle/optimized-options.json" | cut -d' ' -f1)" \
-  '{schema:"point-index.build-pair/v1",baseline_revision:$baseline,candidate_revision:$candidate,
+  --arg overlay_hash "$(sha256sum "$here/native-metrics.patch" | cut -d' ' -f1)" \
+  '{schema:"point-index.build-pair/v2",baseline_revision:$baseline,candidate_revision:$candidate,
     driver_revision:$driver,target:"x86_64-unknown-linux-musl",rustflags:"-C target-cpu=x86-64",
     baseline_sha256:$baseline_hash,candidate_sha256:$candidate_hash,panel_sha256:$panel_hash,
-    optimized_options_sha256:$options_hash,experiment_submitted:false}' > "$scratch/bundle/build-info.json"
+    optimized_options_sha256:$options_hash,measurement_overlay_sha256:$overlay_hash,
+    calibrated_total_operations:null,experiment_submitted:false}' > "$scratch/bundle/build-info.json"
 cat > "$scratch/bin/aws" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -52,8 +54,9 @@ export PATH="$scratch/bin:$PATH"
 "$here/publish-pair.sh" "$scratch/bundle" "$driver_revision" "$scratch/image.json" > "$scratch/success.out"
 [[ ! -e $TEST_EXECUTED ]]
 jq -e --arg base "$base_revision" --arg candidate "$candidate_revision" --arg driver "$driver_revision" '
-  .schema=="point-index.image/v1" and .baseline_revision==$base
+  .schema=="point-index.image/v2" and .baseline_revision==$base
   and .candidate_revision==$candidate and .driver_revision==$driver
+  and (.measurement_overlay_sha256|test("^[a-f0-9]{64}$"))
   and .image_uri=="104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:"+("0"*64)
   and .experiment_submitted==false
 ' "$scratch/image.json" >/dev/null
@@ -71,6 +74,10 @@ reject_before_cloud
 cp "$scratch/candidate-original" "$scratch/bundle/candidate"
 cp "$scratch/bundle/build-info.json" "$scratch/build-info-original.json"
 jq '.driver_revision="0000000000000000000000000000000000000000"' "$scratch/bundle/build-info.json" > "$scratch/changed.json"
+mv "$scratch/changed.json" "$scratch/bundle/build-info.json"
+reject_before_cloud
+cp "$scratch/build-info-original.json" "$scratch/bundle/build-info.json"
+jq '.measurement_overlay_sha256="0000000000000000000000000000000000000000000000000000000000000000"' "$scratch/bundle/build-info.json" > "$scratch/changed.json"
 mv "$scratch/changed.json" "$scratch/bundle/build-info.json"
 reject_before_cloud
 cp "$scratch/build-info-original.json" "$scratch/bundle/build-info.json"

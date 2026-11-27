@@ -14,13 +14,16 @@ output=$3
 for name in baseline candidate panel optimized-options.json build-info.json SHA256SUMS; do
   [[ -f $bundle/$name && ! -L $bundle/$name ]] || { echo "missing or symlinked bundle file: $name" >&2; exit 2; }
 done
-jq -e --arg revision "$revision" '
-  .schema=="point-index.build-pair/v1" and .driver_revision==$revision
+overlay_hash=$(sha256sum "$here/native-metrics.patch" | cut -d' ' -f1)
+jq -e --arg revision "$revision" --arg overlay_hash "$overlay_hash" '
+  .schema=="point-index.build-pair/v2" and .driver_revision==$revision
   and .baseline_revision!=.candidate_revision
   and (.baseline_revision|test("^[a-f0-9]{40}$"))
   and (.candidate_revision|test("^[a-f0-9]{40}$"))
   and .target=="x86_64-unknown-linux-musl" and .rustflags=="-C target-cpu=x86-64"
   and .experiment_submitted==false
+  and .calibrated_total_operations==null
+  and .measurement_overlay_sha256==$overlay_hash
   and all(.baseline_sha256,.candidate_sha256,.panel_sha256,.optimized_options_sha256;
     type=="string" and test("^[a-f0-9]{64}$"))
 ' "$bundle/build-info.json" >/dev/null || { echo 'invalid build metadata' >&2; exit 2; }
@@ -65,11 +68,12 @@ digest=$(aws ecr describe-images --repository-name "$repository" --image-ids "im
 jq -n --arg image "$ISOLAB_IMAGE_REPOSITORY@$digest" --arg revision "$revision" \
   --arg build "$(sha256sum "$bundle/build-info.json" | cut -d' ' -f1)" \
   --slurpfile source "$bundle/build-info.json" \
-  '{schema:"point-index.image/v1",image_uri:$image,driver_revision:$revision,
+  '{schema:"point-index.image/v2",image_uri:$image,driver_revision:$revision,
     build_info_sha256:$build,baseline_revision:$source[0].baseline_revision,
     candidate_revision:$source[0].candidate_revision,
     baseline_sha256:$source[0].baseline_sha256,candidate_sha256:$source[0].candidate_sha256,
     panel_sha256:$source[0].panel_sha256,
     optimized_options_sha256:$source[0].optimized_options_sha256,
+    measurement_overlay_sha256:$source[0].measurement_overlay_sha256,
     experiment_submitted:false}' > "$output"
 echo 'Pair image published by immutable digest; no experiment submitted.'
