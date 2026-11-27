@@ -542,6 +542,17 @@ kernel computation. This authenticates arbitrary supplied artifact contents
 inside Lean; it does not prove that Rust produced those contents.
 `[pcc:unverified]`
 
+A final metered importer now binds the two serialized counters as well. It
+recomputes the exact number of nonzero input-pair products in nested loop order
+and threads the changing natural-number buffer through the descending reduction
+schedule before counting each executed set-bit subtraction. Its generic
+certificate returns both counter equalities together with canonicality,
+deterministic modulus selection, actual-modulus irreducibility, and decoded
+quotient multiplication. The committed fixture kernel-checks at `16` products
+and `6` reductions through this strongest parser. This checks every serialized
+artifact field inside Lean; compiled-Rust refinement and external provenance
+remain separate. `[pcc:unverified]`
+
 The deterministic-polynomial boundary is narrowed both generically and for
 this fixture.
 A transparent packed-`GF(2)` model follows the native remainder, carryless

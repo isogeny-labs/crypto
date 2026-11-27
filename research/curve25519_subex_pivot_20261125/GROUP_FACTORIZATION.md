@@ -256,6 +256,16 @@ Lean-side arbitrary-artifact search/product check while leaving concrete Rust
 compiler/serialization refinement and external provenance separate.
 `[pcc:unverified]`
 
+The metered selected-replayed importer also recomputes both serialized
+transition counters. The convolution count follows the exact nested nonzero
+input-pair schedule; the reduction count follows the changing replay buffer in
+descending high-index order and charges each set lower bit only when that row's
+high coefficient is nonzero. Its generic endpoint returns those two equalities
+together with the selected-modulus/product certificate, and the committed
+fixture kernel-checks the expected `16/6`. This closes the Lean-side check of
+all serialized fields, while concrete Rust compiler/serialization refinement
+and external provenance remain separate. `[pcc:unverified]`
+
 The committed degree-four artifact now travels through that generic route too:
 its replayed-parser acceptance is kernel-checked, and the arbitrary-degree
 endpoint returns its canonicality receipt together with decoded multiplication.

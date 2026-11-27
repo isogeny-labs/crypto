@@ -598,6 +598,14 @@ fixture passes this combined parser by kernel computation. Thus both search and
 product contents of an arbitrary supplied artifact are checked in Lean; a
 compiler/serialization refinement proving that concrete Rust emitted the
 artifact remains separate.
+`parseMeteredSelectedReplayedRingMultiplicationArtifact` additionally recomputes
+the exact nonzero convolution-product count and the set-bit subtraction count
+while threading the same changing natural-number buffer through descending
+reduction. Its generic certificate carries both serialized-counter equalities
+alongside the complete selected-modulus/product certificate. The degree-four
+fixture passes at `16/6` by kernel computation, so every serialized field is
+checked at the Lean boundary. Concrete Rust compiler/serialization refinement
+and external provenance remain separate.
 The same fixture now has a transparent packed-`GF(2)` deterministic-selection
 model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
 loop, and odd candidate order, proves candidate `17` fails and candidate `19`

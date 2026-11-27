@@ -1109,6 +1109,19 @@ def naturalConvolutionBuffer
         (naturalConvolutionBufferStep precision degree left right · i ·) buffer)
     0
 
+/-- Exact number of nonzero coefficient products executed by the nested
+convolution loops. -/
+def naturalConvolutionProductCount
+    (degree : ℕ) (left right : Fin degree → ℕ) : ℕ :=
+  (List.finRange degree).foldl
+    (fun count i =>
+      if left i = 0 then count
+      else
+        (List.finRange degree).foldl
+          (fun count j => if right j = 0 then count else count + 1)
+          count)
+    0
+
 /-- The complete executable convolution remains canonical and refines the
 proved source-shaped modular convolution. -/
 theorem naturalConvolutionBuffer_sound
@@ -1222,6 +1235,16 @@ def naturalReductionBufferRow
     (naturalReductionBufferStep precision degree lowerCoefficient · offset ·)
     buffer
 
+/-- Exact number of set-bit subtraction updates executed by one reduction row.
+The high coefficient is inspected before the row mutates lower positions. -/
+def naturalReductionRowCount
+    (degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ℕ) (offset : ℕ) : ℕ :=
+  if buffer (degree + offset) = 0 then 0
+  else
+    (List.finRange degree).foldl
+      (fun count j => if lowerCoefficient j then count + 1 else count) 0
+
 /-- One complete executable reduction row remains canonical and refines the
 proved source-shaped modular row. -/
 theorem naturalReductionBufferRow_sound
@@ -1243,6 +1266,17 @@ def naturalReduceBufferDescending
   | count + 1, buffer =>
       naturalReduceBufferDescending precision degree lowerCoefficient count
         (naturalReductionBufferRow precision degree lowerCoefficient buffer count)
+
+/-- Exact transition count for the descending reduction schedule, threaded
+through the same changing natural-number buffer as the product replay. -/
+def naturalReductionCountDescending
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    ℕ → (ℕ → ℕ) → ℕ
+  | 0, _ => 0
+  | count + 1, buffer =>
+      naturalReductionRowCount degree lowerCoefficient buffer count +
+        naturalReductionCountDescending precision degree lowerCoefficient count
+          (naturalReductionBufferRow precision degree lowerCoefficient buffer count)
 
 /-- The complete executable descending reduction remains canonical and refines
 the proved source-shaped modular schedule. -/
@@ -4248,6 +4282,111 @@ theorem parsedSelectedReplayedRingMultiplicationArtifact_certificate
     parseSelectedReplayedRingMultiplicationArtifact_irreducible hparse,
     hreplayed.2⟩
 
+/-- Recompute the exact nonzero convolution-product count from an artifact. -/
+def RingMultiplicationArtifact.replayedConvolutionProducts
+    (artifact : RingMultiplicationArtifact) : ℕ :=
+  naturalConvolutionProductCount artifact.degree
+    artifact.leftNatural artifact.rightNatural
+
+/-- Recompute the exact descending-reduction count from the same changing
+buffer used by the artifact's executable product replay. -/
+def RingMultiplicationArtifact.replayedReductions
+    (artifact : RingMultiplicationArtifact) : ℕ :=
+  naturalReductionCountDescending artifact.precision artifact.degree
+    artifact.lowerCoefficient (artifact.degree - 1)
+    (naturalConvolutionBuffer artifact.precision artifact.degree
+      artifact.leftNatural artifact.rightNatural)
+
+/-- Check both serialized transition counters against their executable replay. -/
+def RingMultiplicationArtifact.transitionCountsReplayed
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  decide (artifact.convolutionProducts = artifact.replayedConvolutionProducts) &&
+    decide (artifact.reductions = artifact.replayedReductions)
+
+/-- Fail closed unless a selected, product-replayed artifact also carries the
+exact source-shaped transition counters. -/
+def validateMeteredSelectedReplayedRingMultiplicationArtifact
+    (artifact : RingMultiplicationArtifact) : Option RingMultiplicationArtifact :=
+  if artifact.transitionCountsReplayed then some artifact else none
+
+/-- Strongest checked artifact boundary: canonical fields, deterministic
+modulus selection, product replay, and both serialized transition counters. -/
+def parseMeteredSelectedReplayedRingMultiplicationArtifact
+    (values : List ℕ) : Option RingMultiplicationArtifact := do
+  let artifact ← parseSelectedReplayedRingMultiplicationArtifact values
+  validateMeteredSelectedReplayedRingMultiplicationArtifact artifact
+
+private theorem parseMeteredSelectedReplayedRingMultiplicationArtifact_components
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseMeteredSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    parseSelectedReplayedRingMultiplicationArtifact values = some artifact ∧
+      artifact.transitionCountsReplayed = true := by
+  unfold parseMeteredSelectedReplayedRingMultiplicationArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, hselected, hvalidate⟩
+  unfold validateMeteredSelectedReplayedRingMultiplicationArtifact at hvalidate
+  split at hvalidate
+  next hcounts =>
+    have hartifact : candidate = artifact := Option.some.inj hvalidate
+    subst candidate
+    exact ⟨hselected, hcounts⟩
+  next => simp at hvalidate
+
+private theorem parseMeteredSelectedReplayedRingMultiplicationArtifact_conditions
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseMeteredSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    decide (artifact.convolutionProducts = artifact.replayedConvolutionProducts) = true ∧
+      decide (artifact.reductions = artifact.replayedReductions) = true := by
+  have hcounts :=
+    (parseMeteredSelectedReplayedRingMultiplicationArtifact_components hparse).2
+  simpa only [RingMultiplicationArtifact.transitionCountsReplayed,
+    Bool.and_eq_true] using hcounts
+
+/-- Every metered selected-replayed import has the exact convolution counter. -/
+theorem parseMeteredSelectedReplayedRingMultiplicationArtifact_convolutionProducts
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseMeteredSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.convolutionProducts = artifact.replayedConvolutionProducts :=
+  of_decide_eq_true
+    (parseMeteredSelectedReplayedRingMultiplicationArtifact_conditions hparse).1
+
+/-- Every metered selected-replayed import has the exact reduction counter. -/
+theorem parseMeteredSelectedReplayedRingMultiplicationArtifact_reductions
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseMeteredSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.reductions = artifact.replayedReductions :=
+  of_decide_eq_true
+    (parseMeteredSelectedReplayedRingMultiplicationArtifact_conditions hparse).2
+
+/-- A metered selected-replayed import certifies both serialized counters plus
+the complete selected-modulus and decoded-product endpoint. -/
+theorem parsedMeteredSelectedReplayedRingMultiplicationArtifact_certificate
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse :
+      parseMeteredSelectedReplayedRingMultiplicationArtifact values = some artifact) :
+    artifact.convolutionProducts = artifact.replayedConvolutionProducts ∧
+      artifact.reductions = artifact.replayedReductions ∧
+      artifact.canonical = true ∧
+      firstIrreducibleBinaryPolynomial artifact.degree =
+        some artifact.polynomial ∧
+      Irreducible (binaryPolynomial 1 artifact.degree artifact.lowerCoefficient) ∧
+      decodePowerBasis artifact.precision artifact.degree
+          artifact.lowerCoefficient artifact.productCoordinates =
+        decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.leftCoordinates *
+          decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.rightCoordinates := by
+  have hselected := parsedSelectedReplayedRingMultiplicationArtifact_certificate
+    (parseMeteredSelectedReplayedRingMultiplicationArtifact_components hparse).1
+  exact ⟨
+    parseMeteredSelectedReplayedRingMultiplicationArtifact_convolutionProducts hparse,
+    parseMeteredSelectedReplayedRingMultiplicationArtifact_reductions hparse,
+    hselected⟩
+
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=
   (parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers).getD default
@@ -4300,6 +4439,12 @@ theorem degreeFourWitnessRecordSelectedReplayedAccepted :
       some degreeFourWitnessRecord := by
   decide
 
+/-- The committed fixture also passes exact replay of both transition counts. -/
+theorem degreeFourWitnessRecordMeteredSelectedReplayedAccepted :
+    parseMeteredSelectedReplayedRingMultiplicationArtifact degreeFourWitnessNumbers =
+      some degreeFourWitnessRecord := by
+  decide
+
 /-- Combined selected-modulus and quotient-product certificate for the
 committed fixture. -/
 theorem degreeFourWitnessRecord_selectedReplayedCertificate :
@@ -4321,6 +4466,32 @@ theorem degreeFourWitnessRecord_selectedReplayedCertificate :
             degreeFourWitnessRecord.rightCoordinates := by
   exact parsedSelectedReplayedRingMultiplicationArtifact_certificate
     degreeFourWitnessRecordSelectedReplayedAccepted
+
+/-- Combined transition-count, selected-modulus, and quotient-product
+certificate for the committed fixture. -/
+theorem degreeFourWitnessRecord_meteredSelectedReplayedCertificate :
+    degreeFourWitnessRecord.convolutionProducts =
+        degreeFourWitnessRecord.replayedConvolutionProducts ∧
+      degreeFourWitnessRecord.reductions =
+        degreeFourWitnessRecord.replayedReductions ∧
+      degreeFourWitnessRecord.canonical = true ∧
+      firstIrreducibleBinaryPolynomial degreeFourWitnessRecord.degree =
+        some degreeFourWitnessRecord.polynomial ∧
+      Irreducible (binaryPolynomial 1 degreeFourWitnessRecord.degree
+        degreeFourWitnessRecord.lowerCoefficient) ∧
+      decodePowerBasis degreeFourWitnessRecord.precision
+          degreeFourWitnessRecord.degree degreeFourWitnessRecord.lowerCoefficient
+          degreeFourWitnessRecord.productCoordinates =
+        decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.leftCoordinates *
+          decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.rightCoordinates := by
+  exact parsedMeteredSelectedReplayedRingMultiplicationArtifact_certificate
+    degreeFourWitnessRecordMeteredSelectedReplayedAccepted
 
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
 irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/
