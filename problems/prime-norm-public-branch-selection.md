@@ -524,3 +524,19 @@ coefficient-kernel sampler, class-conditioned success probability, support
 selection/label generation, retries and full expected bit cost. Charge all
 per-instance work; no reusable-precomputation shortcut. Original criteria
 and prior scope restrictions unchanged.
+
+## 2026-11-27: actual projective residual sampler interface
+
+103/build109/local054/PCC-20261127-7bc08e checks270 printed/seven new,
+zero warnings/standard foundations. Actual kernel raw residual has exact
+nonzero scalar invariance; derive its descent to projective coefficient
+kernel and integrality from actual membership/distinct point pairs. Exact
+coefficient-line cardinal formulas specialized, without assuming kernel
+rank, output fibers, output uniformity or success probability. Unsigned
+local outside shared audit/fresh. [pcc:unverified]
+
+Next actual output fibers via fractional-unit cancellation and actual
+coordinate-ring unit classification/basis norm laws; then useful labeled
+residual outputs/class-conditioned success/retry/full per-instance bit
+cost. No public useful-label finder or novel attack conclusion from these
+standard projective identities. Original criteria unchanged.
