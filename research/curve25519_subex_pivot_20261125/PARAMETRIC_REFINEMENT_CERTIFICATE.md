@@ -203,6 +203,9 @@ evidence for two independent claims:
    parser-surjectivity subgap. Every successfully parsed list also re-encodes
    exactly, removing alternate formal encodings and accepted trailing data,
    but not the cross-language Rust producer binding.
+   Exact iff specifications further reduce that binding to canonical-projection
+   equality plus the named well-formedness, bounds, trace, and source-guard
+   predicates; no additional parser premise remains.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

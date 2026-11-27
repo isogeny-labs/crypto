@@ -265,6 +265,22 @@ private theorem parsePackingLabelArtifact_components
     simpa only [Bool.and_eq_true] using hconditions
   next => simp at hchecked
 
+/-- Exact specification of the checked flat importer: accepted values are
+precisely the canonical projection of a well-formed bounded artifact. -/
+theorem parsePackingLabelArtifact_iff
+    {values : List ℕ} {artifact : PackingLabelArtifact} :
+    parsePackingLabelArtifact values = some artifact ↔
+      (artifact.wellFormed = true ∧ artifact.bounded = true ∧
+        artifact.projectionValues = values) := by
+  constructor
+  · intro hparse
+    have hcomponents := parsePackingLabelArtifact_components hparse
+    exact ⟨hcomponents.1, hcomponents.2,
+      artifact.projectionValues_of_parse hparse⟩
+  · rintro ⟨hwell, hbounded, hprojection⟩
+    rw [← hprojection]
+    exact parsePackingLabelArtifact_projectionValues artifact hwell hbounded
+
 /-- A shape-checked import retains the exact schema and array-length checks. -/
 theorem parsePackingLabelArtifact_wellFormed
     {values : List ℕ} {artifact : PackingLabelArtifact}
@@ -518,6 +534,42 @@ private theorem parseSourceGuardPackingLabelArtifact_components
     subst candidate
     exact ⟨hreplayed, hmatches⟩
   next => simp at hguard
+
+/-- Exact specification of the replay importer: checked canonical values plus
+the formal trace predicate are necessary and sufficient. -/
+theorem parseReplayedPackingLabelArtifact_iff
+    {values : List ℕ} {artifact : PackingLabelArtifact} :
+    parseReplayedPackingLabelArtifact values = some artifact ↔
+      ((artifact.wellFormed = true ∧ artifact.bounded = true ∧
+          artifact.projectionValues = values) ∧
+        artifact.traceMatches = true) := by
+  constructor
+  · intro hparse
+    have hcomponents := parseReplayedPackingLabelArtifact_components hparse
+    exact ⟨parsePackingLabelArtifact_iff.mp hcomponents.1, hcomponents.2⟩
+  · rintro ⟨hbase, htrace⟩
+    exact parseReplayedPackingLabelArtifact_of_components
+      (parsePackingLabelArtifact_iff.mpr hbase) htrace
+
+/-- Exact specification of the strict importer: checked canonical values, the
+formal replay trace, and the source-class guard are jointly equivalent to
+acceptance. -/
+theorem parseSourceGuardPackingLabelArtifact_iff
+    {values : List ℕ} {artifact : PackingLabelArtifact} :
+    parseSourceGuardPackingLabelArtifact values = some artifact ↔
+      (((artifact.wellFormed = true ∧ artifact.bounded = true ∧
+          artifact.projectionValues = values) ∧
+        artifact.traceMatches = true) ∧
+        artifact.sourceClassGuardMatches = true) := by
+  constructor
+  · intro hparse
+    have hcomponents :=
+      parseSourceGuardPackingLabelArtifact_components hparse
+    exact ⟨parseReplayedPackingLabelArtifact_iff.mp hcomponents.1,
+      hcomponents.2⟩
+  · rintro ⟨hreplayed, hguard⟩
+    exact parseSourceGuardPackingLabelArtifact_of_components
+      (parseReplayedPackingLabelArtifact_iff.mpr hreplayed) hguard
 
 /-- A source-guard import retains the complete executable label replay. -/
 theorem parseSourceGuardPackingLabelArtifact_replayed

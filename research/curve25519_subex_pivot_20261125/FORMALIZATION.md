@@ -253,6 +253,10 @@ formal artifact. Conversely, every successful unchecked or checked parse
 projects back to the exact complete input list, excluding alternate encodings
 and accepted trailing data. The result does not yet refine Rust construction,
 integer conversion, or serialization to that projection. `[pcc:unverified]`
+Exact iff characterizations isolate that remaining obligation: the checked
+parser accepts exactly well-formed bounded canonical projections; the replayed
+parser adds exactly the formal trace predicate; and the strict parser adds
+exactly the source-class guard. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

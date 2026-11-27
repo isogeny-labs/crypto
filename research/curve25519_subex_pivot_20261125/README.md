@@ -449,6 +449,11 @@ suffix, so the checked importer admits no alternate canonical representation.
 The cross-language Rust-to-Lean compiler and serialization refinement remains
 open.
 `[pcc:unverified]`
+The three importer layers also have exact iff specifications. Checked parsing
+is precisely canonical projection plus well-formedness and bounds; replay adds
+only the formal trace predicate; strict parsing adds only the formal source
+guard. This turns the remaining Rust bridge into an explicit named-predicate
+obligation rather than an opaque parser-refinement claim. `[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

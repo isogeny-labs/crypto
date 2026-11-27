@@ -116,6 +116,11 @@ parse reconstructs the complete original flat value list, and every checked
 parse inherits that identity; accepted trailing data or alternate flat shapes
 are therefore impossible. These theorems do not identify the encoder with
 Rust's compiler, overflow, or serde semantics. `[pcc:unverified]`
+Exact iff theorems now package the boundary: checked acceptance is equivalent
+to well-formedness, bounds, and equality with the canonical projection;
+replayed acceptance adds exactly `traceMatches`; strict acceptance adds exactly
+`sourceClassGuardMatches`. Thus the future Rust refinement has no hidden parser
+premise beyond those named predicates. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact
