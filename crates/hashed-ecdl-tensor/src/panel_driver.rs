@@ -502,6 +502,96 @@ pub struct Validation {
     pub diagnostics: Value,
 }
 
+/// Check the optimized arm's informational recorder before using its phase
+/// data in a matched panel. Certificate correctness is checked separately.
+fn validate_native_metrics(diagnostics: &Value, solve_wall_ns: u128) -> Result<Value> {
+    let native = &diagnostics["native_metrics"];
+    if !native
+        .as_object()
+        .is_some_and(|object| object.contains_key("calibrated_total_operations"))
+    {
+        return Err("missing explicit native calibration status".into());
+    }
+    if native["schema"] != "hashed-ecdl.native-metrics/v1"
+        || native["online_start_phase"] != "target_validation"
+        || !native["calibrated_total_operations"].is_null()
+    {
+        return Err("native metric identity or calibration status differs".into());
+    }
+    let online = native["online_phases_ns"]
+        .as_object()
+        .ok_or("missing native online phase map")?;
+    const PHASES: [&str; 5] = [
+        "target_validation",
+        "target_query",
+        "target_PDP",
+        "target_relation_check",
+        "target_recovery_check",
+    ];
+    if online.len() != PHASES.len() {
+        return Err("native online phase map is not the five-phase partition".into());
+    }
+    let mut online_sum = 0u64;
+    for name in PHASES {
+        let value = online
+            .get(name)
+            .and_then(Value::as_u64)
+            .ok_or("missing or invalid native online phase")?;
+        online_sum = online_sum
+            .checked_add(value)
+            .ok_or("native online phase sum overflow")?;
+    }
+    let online_wall = native["online_wall_ns"]
+        .as_u64()
+        .ok_or("missing native online wall time")?;
+    if online_sum != online_wall {
+        return Err("native online phases do not sum to online wall time".into());
+    }
+    let phases = native["phases"]
+        .as_object()
+        .ok_or("missing native cold phase map")?;
+    if !phases.contains_key("setup") || !phases.contains_key("factor_base") {
+        return Err("native cold phases omit setup or factor base".into());
+    }
+    let mut cold_wall = 0u64;
+    let mut charged_steps = 0u64;
+    for phase in phases.values() {
+        for field in ["adds", "doubles", "scalar_mults"] {
+            if phase[field].as_u64().is_none() {
+                return Err("native group counter is missing or invalid".into());
+            }
+        }
+        cold_wall = cold_wall
+            .checked_add(
+                phase["wall_ns"]
+                    .as_u64()
+                    .ok_or("invalid native phase clock")?,
+            )
+            .ok_or("native cold phase sum overflow")?;
+        charged_steps = charged_steps
+            .checked_add(
+                phase["meter_steps"]
+                    .as_u64()
+                    .ok_or("invalid native meter counter")?,
+            )
+            .ok_or("native meter sum overflow")?;
+    }
+    if cold_wall < online_wall || u128::from(cold_wall) > solve_wall_ns {
+        return Err("native cold clock falls outside the process interval".into());
+    }
+    if diagnostics["charged_steps"].as_u64() != Some(charged_steps) {
+        return Err("native meter sum differs from the solve receipt".into());
+    }
+    Ok(json!({
+        "schema": "hashed-ecdl-panel.native-metrics/v1",
+        "online_phases_ns": online,
+        "online_wall_ns": online_wall,
+        "internal_cold_wall_ns": cold_wall,
+        "charged_steps": charged_steps,
+        "calibrated_total_operations": Value::Null,
+    }))
+}
+
 /// Validate one receipt against its input problem and manifest entry. The
 /// order mirrors trust: structure, echo, the independent oracle, the
 /// manifest's expected answer, then the library replay last.
@@ -931,6 +1021,7 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             "replay_status": Value::Null, "replay_wall_ns": Value::Null,
             "checks": Checks::default().json(), "scalar": Value::Null,
             "certificate_sha256": Value::Null, "meter_diagnostics": Value::Null,
+            "native_metrics": Value::Null, "native_metrics_check": Value::Null,
             "phase_ns": phase_ns(None),
             "unpriced_common_operations": Value::Null, "s_over_rho": Value::Null,
         });
@@ -982,6 +1073,10 @@ pub fn run(options: &RunOptions) -> Result<Value> {
                 let remaining = options.deadline.saturating_sub(started.elapsed());
                 if remaining.is_zero() {
                     row["replay_status"] = json!("not_run_deadline");
+                    if row["status"] == "validated" {
+                        row["status"] = json!("not_run_deadline");
+                        row["reason"] = json!("deadline elapsed before arm replay");
+                    }
                 } else {
                     let replay = run_child(
                         binary,
@@ -1000,6 +1095,24 @@ pub fn run(options: &RunOptions) -> Result<Value> {
                         // The arm's own replay disagreeing is a failure too.
                         row["status"] = json!("rejected");
                         row["reason"] = json!("arm replay did not verify its receipt");
+                    }
+                }
+            }
+            if optimized_options.is_some() && row["status"] == "validated" {
+                match validate_native_metrics(
+                    &row["meter_diagnostics"],
+                    outcome.wall_ns.unwrap_or(0),
+                ) {
+                    Ok(summary) => {
+                        row["native_metrics_check"] = json!("validated");
+                        row["native_metrics"] = summary;
+                        row["phase_ns"]["accounting"] =
+                            json!("native metrics validated separately; legacy stage mapping remains null");
+                    }
+                    Err(error) => {
+                        row["native_metrics_check"] = json!("rejected");
+                        row["status"] = json!("rejected");
+                        row["reason"] = json!(format!("native metrics: {error}"));
                     }
                 }
             }
@@ -1058,8 +1171,9 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     Ok(analysis)
 }
 
-/// The arm binaries expose no internal phase timers. Only the separately
-/// spawned replay is a disjoint phase; the rest stay null rather than guessed.
+/// Legacy arm binaries expose no internal phase timers. Optimized metrics are
+/// checked and stored separately; the original stage map stays null rather
+/// than assigning the new native buckets to different historical stages.
 fn phase_ns(replay: Option<u128>) -> Value {
     json!({
         "accounting": "arm_binaries_expose_no_phase_timers; solve_wall_ns covers setup through extraction",
@@ -1317,6 +1431,61 @@ pub fn cli_analyze(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_metrics_require_five_exclusive_phases_and_explicit_unpriced_cost() {
+        let phase = |wall_ns, meter_steps| {
+            json!({
+                "adds": 0, "doubles": 0, "scalar_mults": 0,
+                "meter_steps": meter_steps, "wall_ns": wall_ns,
+            })
+        };
+        let valid = json!({
+            "charged_steps": 6,
+            "native_metrics": {
+                "schema": "hashed-ecdl.native-metrics/v1",
+                "online_start_phase": "target_validation",
+                "online_wall_ns": 5,
+                "online_phases_ns": {
+                    "target_validation": 1, "target_query": 1, "target_PDP": 1,
+                    "target_relation_check": 1, "target_recovery_check": 1,
+                },
+                "phases": {
+                    "setup": phase(3, 1), "factor_base": phase(2, 2),
+                    "target_validation": phase(1, 1),
+                    "relation_search": phase(2, 1),
+                    "recovery_check": phase(2, 1),
+                },
+                "calibrated_total_operations": null,
+            },
+        });
+        let summary = validate_native_metrics(&valid, 20).unwrap();
+        assert_eq!(summary["internal_cold_wall_ns"], 10);
+        assert_eq!(summary["online_wall_ns"], 5);
+        assert!(summary["calibrated_total_operations"].is_null());
+        assert!(validate_native_metrics(&valid, 9).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["online_phases_ns"]["target_PDP"] = json!(2);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["online_phases_ns"]
+            .as_object_mut()
+            .unwrap()
+            .remove("target_PDP");
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["phases"]["factor_base"]["meter_steps"] = json!(3);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]
+            .as_object_mut()
+            .unwrap()
+            .remove("calibrated_total_operations");
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid;
+        bad["native_metrics"]["calibrated_total_operations"] = json!(5);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+    }
 
     #[test]
     fn optimized_panel_uses_the_same_policy_for_either_arm() {
