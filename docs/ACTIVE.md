@@ -17,6 +17,8 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Seek positive P-192 rank gain on the frozen original factor base after eliminating every auxiliary column; preserve baseline, actual KM/elliptic checks and all stage costs under the existing one-CPU/1GiB/300s-build/600s-worker limits (Codex, started 2026-11-27, branch lane/p192-closed-rank-20261127; Conductor T-8; no new PCC or speedup claim).
+
 - [ ] Repair the inherited aimed-gather registry-custody validation failure without changing original scientific values, raw records or reports, so the P-192 verification stack can land (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126, PR #5258; Conductor T-6).
 
 - [x] Replay the fixed P-192 selected construction from GIVEN recorded torsion/module/kernel inputs: all31strict build/worker calls pass expected exits, all5artifacts byte-match the separate verifier inputs,211snapshot subjects unchanged and6custody controls pass;1072.613second construction-chain interval plus0.602second metadata controls, unchanged oneCPU/1GiB/300sbuild/600sworker limits and user waiver. Historical input generation/search remains unpriced (Codex, completed component 2026-11-27, branch lane/p192-synthesis-costs-20261126; consolidated PR #5258, report/summary/raw evidence; full-tree publication CI pending). [pcc:unverified]
