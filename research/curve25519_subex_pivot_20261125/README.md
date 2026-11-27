@@ -445,10 +445,21 @@ geometric remainder, derives the normalized tile shift `2^(i+1-v)j`, and proves
 that Rust's outer `2^(a+1-v)` factor kills the first omitted coefficient under
 the source guard `v<=i<=a`. Its axiom audits contain only Lean/mathlib's
 standard `propext`, `Classical.choice`, and `Quot.sound`. Native graph and
-history bindings, finite factorization realization, concrete Rust-object to
-formal-value bindings, and the remaining external theorem refinements are not
-discharged by this replay.
+history bindings, finite factorization realization, a formal refinement from
+concrete Rust objects to these values, and the remaining external theorem
+refinements are not discharged by this replay.
 `[pcc:unverified]`
+
+The native scalar boundary now has a separate serializable
+`CauchySourceWitness`. It exposes the actual stored base, numerator unit, and
+complete `(difference, valuation, inverse)` factor map. The standalone
+factorization verifier independently reconstructs these values from
+`(a,i,t,z)`, then checks every packet-matrix weight and every nonzero mode row
+and column without importing deformation, packing, child, or recursive code.
+The `L=4` fixture rejects altered valuation, missing factor, inverse,
+numerator-unit, and active-coordinate witnesses, and every executed-source
+certificate path replays the witness before acceptance. This is native
+code-to-formula evidence, not yet a Lean refinement theorem. `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled

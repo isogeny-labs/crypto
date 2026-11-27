@@ -10,9 +10,9 @@ use crate::child_provenance_certificate::{
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, verify as standalone_verify, verify_source_dimensions,
-    verify_with_ring as check, Certificate, CertifiedElement, CertifiedMode, EntryTable,
-    SourceDimensionWitness, SCHEMA,
+    description_envelope, verify as standalone_verify, verify_cauchy_source,
+    verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness,
+    Certificate, CertifiedElement, CertifiedMode, EntryTable, SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
@@ -27,6 +27,26 @@ use crate::packing_provenance_certificate::{
 use crate::Limits;
 use std::collections::BTreeSet;
 use std::sync::Arc;
+
+fn cauchy_source_witness(kernel: &deformation::Cauchy, coordinate: usize) -> CauchySourceWitness {
+    let (sample, base, numerator_unit, factors) = kernel.source_witness_parts();
+    CauchySourceWitness {
+        a: u32::try_from(kernel.a).unwrap(),
+        coordinate: u32::try_from(coordinate).unwrap(),
+        center: kernel.t,
+        sample: sample.coordinates().to_vec(),
+        base: base.coordinates().to_vec(),
+        numerator_unit: numerator_unit.coordinates().to_vec(),
+        factors: factors
+            .iter()
+            .map(|(&difference, (valuation, inverse))| CauchyFactorWitness {
+                difference,
+                valuation: *valuation,
+                inverse: inverse.coordinates().to_vec(),
+            })
+            .collect(),
+    }
+}
 
 fn assert_source_count_bridge(
     certificate: &Certificate,
@@ -607,6 +627,13 @@ pub(super) fn capture_executed_source_checked(
         .map_err(|_| invalid("executed source certificate parsing"))?;
     standalone_verify(&certificate, meter)
         .map_err(|_| integrity("executed source certificate verification"))?;
+    let cauchy_witness = cauchy_source_witness(&kernel, coordinate);
+    let serialized_cauchy = serde_json::to_vec(&cauchy_witness)
+        .map_err(|_| invalid("executed Cauchy witness serialization"))?;
+    let cauchy_witness: CauchySourceWitness = serde_json::from_slice(&serialized_cauchy)
+        .map_err(|_| invalid("executed Cauchy witness parsing"))?;
+    verify_cauchy_source(&certificate, &cauchy_witness, meter)
+        .map_err(|_| integrity("executed Cauchy witness replay"))?;
     if !assert_source_count_bridge(&certificate, parameters, coordinate, false) {
         return Err(invalid("executed source certificate dimensions"));
     }
@@ -672,6 +699,52 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     });
     standalone_verify(&certificate, &mut standalone_meter).unwrap();
     check(&certificate, &ring, &mut meter).unwrap();
+    let cauchy_witness = cauchy_source_witness(&kernel, coordinate);
+    let serialized_cauchy = serde_json::to_vec(&cauchy_witness).unwrap();
+    let cauchy_witness: CauchySourceWitness = serde_json::from_slice(&serialized_cauchy).unwrap();
+    assert_eq!(
+        serde_json::to_vec(&cauchy_witness).unwrap(),
+        serialized_cauchy
+    );
+    let cauchy_summary = verify_cauchy_source(&certificate, &cauchy_witness, &mut meter).unwrap();
+    assert_eq!(cauchy_summary.grid_points, 8);
+    assert_eq!(cauchy_summary.factors, 7);
+    assert_eq!(cauchy_summary.weights, 16 * certificate.packets.len());
+    assert!(cauchy_summary.mode_rows > 0);
+    assert!(cauchy_summary.mode_columns > 0);
+
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors[0].valuation += 1;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor valuation"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors.pop();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor coverage"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors[0].inverse[0] =
+        (&bad_cauchy.factors[0].inverse[0] + BigUint::from(1u8)) % ring.modulus();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor inverse"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.numerator_unit[0] =
+        (&bad_cauchy.numerator_unit[0] + BigUint::from(1u8)) % ring.modulus();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness numerator unit"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.coordinate += 1;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness active coordinate"
+    );
     let provenance = packing_provenance(&graph, &packing, &parameters, coordinate, None);
     let provenance_summary =
         verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();

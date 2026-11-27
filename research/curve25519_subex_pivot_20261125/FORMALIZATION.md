@@ -507,9 +507,17 @@ specialization keeps the finite-series remainder, derives the normalized tile
 shift `2^(i+1-v)j`, and proves from `v<=i<=a` that the outer
 `2^(a+1-v)` shift makes the `b=p-1` remainder zero in every coefficient ring
 where `2^p=0`. The remaining gap is the code-to-model link from concrete Rust
-Cauchy factors, inverses, modes, and child objects to these generic inputs,
-rather than the finite rearrangement, shift, cutoff, or geometric-series
-algebra itself.
+Cauchy modes and child objects to these generic inputs, rather than the finite
+rearrangement, shift, cutoff, or geometric-series algebra itself.
+`[pcc:unverified]`
+
+The scalar half of that link now has a typed native witness. The standalone
+verifier reconstructs the signed grid, derivative content, unit factors and
+inverses, base, numerator unit, all packet weights, and every emitted nonzero
+mode coefficient from serialized `(a,i,t,z)` data. Its implementation imports
+the exact ring only, not the production deformation or recursion modules. The
+remaining formal gap is to instantiate the Lean ring values and mode functions
+from this accepted witness and then bind complete child construction.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

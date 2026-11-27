@@ -5,7 +5,7 @@
 //! deformation, packing, child construction, or packet tensors.
 
 use crate::ring::{Element, Ring};
-use crate::{integrity, overflow, BigUint, Meter, Result};
+use crate::{integrity, overflow, BigInt, BigUint, Meter, Result};
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -147,6 +147,55 @@ pub struct SourceDimensionSummary {
     pub attempted_modes_bound: usize,
     /// Recomputed weighted-tuple base-two exponent ceiling.
     pub tuple_log2_bound: usize,
+}
+
+/// One stored unit inverse in the production Cauchy kernel.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CauchyFactorWitness {
+    /// Grid difference `q=y-x` indexing the factor map.
+    pub difference: i64,
+    /// Exact power of two removed from `t-q`.
+    pub valuation: usize,
+    /// Canonical power-basis coordinates of the stored unit inverse.
+    pub inverse: Vec<BigUint>,
+}
+
+/// Typed scalar witness for one production Cauchy kernel.
+///
+/// This is deliberately separate from schema 2: the finite factorization
+/// certificate remains stable, while callers that possess the source kernel
+/// can additionally bind its concrete stored values to the scalar formulas.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CauchySourceWitness {
+    /// Packet-length exponent, so every packet has `L=2^a` slots.
+    pub a: u32,
+    /// Active valuation coordinate `i`, giving tile period `2^(i+1)`.
+    pub coordinate: u32,
+    /// Nonzero Cauchy center `t` in the signed grid `[-L,L)`.
+    pub center: i64,
+    /// Canonical coordinates of the extension-ring sample `z`.
+    pub sample: Vec<BigUint>,
+    /// Canonical coordinates of the stored diagonal value.
+    pub base: Vec<BigUint>,
+    /// Canonical coordinates of the stored common numerator unit.
+    pub numerator_unit: Vec<BigUint>,
+    /// Complete stored factor map, in increasing difference order.
+    pub factors: Vec<CauchyFactorWitness>,
+}
+
+/// Counts from independent scalar Cauchy witness verification.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct CauchySourceSummary {
+    /// Signed grid size `2L`.
+    pub grid_points: usize,
+    /// Number of independently reconstructed noncenter factors.
+    pub factors: usize,
+    /// Number of packet-matrix weights checked.
+    pub weights: usize,
+    /// Number of nonzero mode-row coefficients checked.
+    pub mode_rows: usize,
+    /// Number of nonzero mode-column coefficients checked.
+    pub mode_columns: usize,
 }
 
 fn checked_product(values: &[usize], label: &str) -> std::result::Result<usize, String> {
@@ -540,6 +589,360 @@ pub fn verify_source_dimensions(
         modes_per_weight_bound: envelope.modes_per_weight_bound,
         attempted_modes_bound: envelope.attempted_modes_bound,
         tuple_log2_bound: envelope.tuple_log2_bound,
+    })
+}
+
+fn cauchy_valuation(value: i64) -> usize {
+    debug_assert_ne!(value, 0);
+    value.unsigned_abs().trailing_zeros() as usize
+}
+
+struct IndependentCauchy {
+    base: Element,
+    numerator_unit: Element,
+    factors: BTreeMap<i64, (usize, Element)>,
+}
+
+fn independent_cauchy(
+    packet_length: usize,
+    a: usize,
+    center: i64,
+    sample: &Element,
+    ring: &Ring,
+    meter: &mut Meter,
+) -> std::result::Result<IndependentCauchy, String> {
+    let length =
+        i64::try_from(packet_length).map_err(|_| "Cauchy signed packet length".to_string())?;
+    let grid_points = packet_length
+        .checked_mul(2)
+        .ok_or_else(|| "Cauchy grid width".to_string())?;
+    meter
+        .vector(grid_points, "Cauchy witness grid")
+        .map_err(|error| error.to_string())?;
+    if center == 0 || !(-length..length).contains(&center) {
+        return Err("Cauchy witness center".into());
+    }
+
+    let mut denominator = ring.one();
+    let mut denominator_valuation = 0usize;
+    for q in -length..length {
+        if q == 0 {
+            continue;
+        }
+        let valuation = cauchy_valuation(q);
+        denominator_valuation = denominator_valuation
+            .checked_add(valuation)
+            .ok_or_else(|| "Cauchy denominator valuation".to_string())?;
+        let odd = BigInt::from(-q) >> valuation;
+        denominator = ring
+            .mul(&denominator, &ring.signed(&odd), meter)
+            .map_err(|error| error.to_string())?;
+    }
+    let inverse_denominator = ring
+        .inverse(&denominator, meter)
+        .map_err(|error| error.to_string())?;
+
+    let mut product = ring.one();
+    let mut numerator_valuation = 0usize;
+    let mut factors = BTreeMap::new();
+    for q in -length..length {
+        if q == center {
+            continue;
+        }
+        let difference = center
+            .checked_sub(q)
+            .ok_or_else(|| "Cauchy grid difference".to_string())?;
+        let valuation = cauchy_valuation(difference);
+        if valuation > a {
+            return Err("Cauchy grid difference valuation".into());
+        }
+        numerator_valuation = numerator_valuation
+            .checked_add(valuation)
+            .ok_or_else(|| "Cauchy numerator valuation".to_string())?;
+        let odd = BigInt::from(difference) >> valuation;
+        let shift = a
+            .checked_add(1)
+            .and_then(|value| value.checked_sub(valuation))
+            .ok_or_else(|| "Cauchy factor shift".to_string())?;
+        let scaled_sample = ring
+            .shift(sample, shift)
+            .map_err(|error| error.to_string())?;
+        let factor = ring
+            .add(&ring.signed(&odd), &scaled_sample, meter)
+            .map_err(|error| error.to_string())?;
+        product = ring
+            .mul(&product, &factor, meter)
+            .map_err(|error| error.to_string())?;
+        let inverse = ring
+            .inverse(&factor, meter)
+            .map_err(|error| error.to_string())?;
+        factors.insert(q, (valuation, inverse));
+    }
+    if numerator_valuation != denominator_valuation {
+        return Err("Cauchy derivative content".into());
+    }
+    let base = ring
+        .mul(&product, &inverse_denominator, meter)
+        .map_err(|error| error.to_string())?;
+    let numerator_unit = ring
+        .mul(&base, sample, meter)
+        .map_err(|error| error.to_string())?;
+    Ok(IndependentCauchy {
+        base,
+        numerator_unit,
+        factors,
+    })
+}
+
+fn independent_cauchy_weight(
+    cauchy: &IndependentCauchy,
+    a: usize,
+    center: i64,
+    x: usize,
+    y: usize,
+    ring: &Ring,
+    meter: &mut Meter,
+) -> std::result::Result<Element, String> {
+    let x = i64::try_from(x).map_err(|_| "Cauchy row position".to_string())?;
+    let y = i64::try_from(y).map_err(|_| "Cauchy column position".to_string())?;
+    let q = y
+        .checked_sub(x)
+        .ok_or_else(|| "Cauchy packet difference".to_string())?;
+    if q == center {
+        return Ok(cauchy.base.clone());
+    }
+    let (valuation, inverse) = cauchy
+        .factors
+        .get(&q)
+        .ok_or_else(|| "Cauchy witness factor coverage".to_string())?;
+    let product = ring
+        .mul(&cauchy.numerator_unit, inverse, meter)
+        .map_err(|error| error.to_string())?;
+    let shift = a
+        .checked_add(1)
+        .and_then(|value| value.checked_sub(*valuation))
+        .ok_or_else(|| "Cauchy weight shift".to_string())?;
+    ring.shift(&product, shift)
+        .map_err(|error| error.to_string())
+}
+
+fn independent_mode_coefficient(
+    cauchy: &IndependentCauchy,
+    a: usize,
+    coordinate: usize,
+    x: usize,
+    y0: usize,
+    exponent: usize,
+    ring: &Ring,
+    meter: &mut Meter,
+) -> std::result::Result<Element, String> {
+    let x = i64::try_from(x).map_err(|_| "Cauchy mode row".to_string())?;
+    let y0 = i64::try_from(y0).map_err(|_| "Cauchy mode tile".to_string())?;
+    let q = y0
+        .checked_sub(x)
+        .ok_or_else(|| "Cauchy mode difference".to_string())?;
+    let (valuation, inverse) = cauchy
+        .factors
+        .get(&q)
+        .ok_or_else(|| "Cauchy mode factor coverage".to_string())?;
+    if *valuation > coordinate || coordinate > a {
+        return Err("Cauchy mode valuation bound".into());
+    }
+    let mode_shift = coordinate
+        .checked_add(1)
+        .and_then(|value| value.checked_sub(*valuation))
+        .ok_or_else(|| "Cauchy mode shift".to_string())?;
+    let base_shift = a
+        .checked_add(1)
+        .and_then(|value| value.checked_sub(*valuation))
+        .ok_or_else(|| "Cauchy mode base shift".to_string())?;
+    let shift = mode_shift
+        .checked_mul(exponent)
+        .and_then(|value| value.checked_add(base_shift))
+        .ok_or_else(|| "Cauchy mode coefficient shift".to_string())?;
+    if shift >= ring.precision() {
+        return Ok(ring.zero());
+    }
+    let power = ring
+        .pow(inverse, exponent + 1, meter)
+        .map_err(|error| error.to_string())?;
+    let coefficient = ring
+        .mul(&cauchy.numerator_unit, &power, meter)
+        .map_err(|error| error.to_string())?;
+    ring.shift(&coefficient, shift)
+        .map_err(|error| error.to_string())
+}
+
+/// Independently bind an accepted schema-2 factorization certificate to the
+/// concrete scalar values stored by one production Cauchy kernel.
+///
+/// The verifier imports only exact ring arithmetic and serialized data. It
+/// reconstructs the signed grid, derivative content, every unit factor and
+/// inverse, the base and numerator unit, every packet weight, and every
+/// nonzero mode row/column. It does not import deformation, packing, child
+/// construction, or recursive contraction code.
+pub fn verify_cauchy_source(
+    certificate: &Certificate,
+    witness: &CauchySourceWitness,
+    meter: &mut Meter,
+) -> std::result::Result<CauchySourceSummary, String> {
+    let ring = Ring::new(certificate.degree, certificate.precision, meter)
+        .map_err(|error| error.to_string())?;
+    verify_with_ring(certificate, &ring, meter)?;
+
+    let a = usize::try_from(witness.a).map_err(|_| "Cauchy witness exponent".to_string())?;
+    let coordinate =
+        usize::try_from(witness.coordinate).map_err(|_| "Cauchy witness coordinate".to_string())?;
+    if witness.center == 0 || coordinate > a || cauchy_valuation(witness.center) != coordinate {
+        return Err("Cauchy witness active coordinate".into());
+    }
+    let packet_length = 1usize
+        .checked_shl(witness.a)
+        .ok_or_else(|| "Cauchy witness packet width".to_string())?;
+    if certificate
+        .packets
+        .iter()
+        .any(|packet| packet.len() != packet_length)
+    {
+        return Err("Cauchy witness packet length".into());
+    }
+    let tiles = 1usize
+        .checked_shl(
+            witness
+                .coordinate
+                .checked_add(1)
+                .ok_or_else(|| "Cauchy witness tile width".to_string())?,
+        )
+        .ok_or_else(|| "Cauchy witness tile width".to_string())?;
+    if certificate.tiles != tiles {
+        return Err("Cauchy witness tile period".into());
+    }
+
+    let sample = CertifiedElement(witness.sample.clone()).decode(&ring)?;
+    let expected = independent_cauchy(packet_length, a, witness.center, &sample, &ring, meter)?;
+    if expected.base.coordinates() != witness.base.as_slice() {
+        return Err("Cauchy witness base".into());
+    }
+    if expected.numerator_unit.coordinates() != witness.numerator_unit.as_slice() {
+        return Err("Cauchy witness numerator unit".into());
+    }
+
+    let mut claimed_factors = BTreeMap::new();
+    for factor in &witness.factors {
+        let inverse = CertifiedElement(factor.inverse.clone()).decode(&ring)?;
+        if claimed_factors
+            .insert(factor.difference, (factor.valuation, inverse))
+            .is_some()
+        {
+            return Err("Cauchy witness factor duplicate".into());
+        }
+    }
+    if claimed_factors.len() != expected.factors.len()
+        || claimed_factors.keys().ne(expected.factors.keys())
+    {
+        return Err("Cauchy witness factor coverage".into());
+    }
+    for (difference, (valuation, inverse)) in &expected.factors {
+        let (claimed_valuation, claimed_inverse) = claimed_factors
+            .get(difference)
+            .ok_or_else(|| "Cauchy witness factor coverage".to_string())?;
+        if claimed_valuation != valuation {
+            return Err("Cauchy witness factor valuation".into());
+        }
+        if claimed_inverse != inverse {
+            return Err("Cauchy witness factor inverse".into());
+        }
+    }
+
+    let mut weights = 0usize;
+    for (packet, rows) in certificate.weights.iter().enumerate() {
+        for (row, columns) in rows.iter().enumerate() {
+            for (column, actual) in columns.iter().enumerate() {
+                let expected_weight = independent_cauchy_weight(
+                    &expected,
+                    a,
+                    witness.center,
+                    row,
+                    column,
+                    &ring,
+                    meter,
+                )?;
+                if expected_weight.coordinates() != actual.0.as_slice() {
+                    return Err(format!(
+                        "Cauchy packet weight: packet={packet}, row={row}, column={column}"
+                    ));
+                }
+                weights = weights
+                    .checked_add(1)
+                    .ok_or_else(|| "Cauchy weight count".to_string())?;
+            }
+        }
+    }
+
+    let mut mode_rows = 0usize;
+    let mut mode_columns = 0usize;
+    for (mode_index, mode) in certificate.modes.iter().enumerate() {
+        let exponent = mode.weight - 1;
+        let y0 = mode.columns[0].0 % tiles;
+        let slots = &certificate.packets[mode.packet];
+        let mut expected_rows = BTreeMap::new();
+        for (row, edge) in slots.iter().enumerate() {
+            let Some(edge) = edge else {
+                continue;
+            };
+            if certificate.left_groups[*edge] != mode.target {
+                continue;
+            }
+            let coefficient = independent_mode_coefficient(
+                &expected, a, coordinate, row, y0, exponent, &ring, meter,
+            )?;
+            if !coefficient.is_zero() {
+                expected_rows.insert(row, coefficient);
+            }
+        }
+        let actual_rows: BTreeMap<_, _> = mode
+            .rows
+            .iter()
+            .map(|(row, value)| Ok((*row, value.decode(&ring)?)))
+            .collect::<std::result::Result<_, String>>()?;
+        if actual_rows != expected_rows {
+            return Err(format!("Cauchy mode rows: mode={mode_index}"));
+        }
+
+        let mut expected_columns = BTreeMap::new();
+        for column in (y0..packet_length).step_by(tiles) {
+            let Some(edge) = slots[column] else {
+                continue;
+            };
+            if certificate.right_groups[edge] != mode.source {
+                return Err(format!("Cauchy mode tile group: mode={mode_index}"));
+            }
+            let j = (column - y0) / tiles;
+            let value = BigUint::from(j).modpow(&BigUint::from(exponent), ring.modulus());
+            if !value.is_zero() {
+                expected_columns.insert(column, value);
+            }
+        }
+        let actual_columns: BTreeMap<_, _> = mode.columns.iter().cloned().collect();
+        if actual_columns != expected_columns {
+            return Err(format!("Cauchy mode columns: mode={mode_index}"));
+        }
+        mode_rows = mode_rows
+            .checked_add(actual_rows.len())
+            .ok_or_else(|| "Cauchy mode-row count".to_string())?;
+        mode_columns = mode_columns
+            .checked_add(actual_columns.len())
+            .ok_or_else(|| "Cauchy mode-column count".to_string())?;
+    }
+
+    Ok(CauchySourceSummary {
+        grid_points: packet_length
+            .checked_mul(2)
+            .ok_or_else(|| "Cauchy grid count".to_string())?,
+        factors: expected.factors.len(),
+        weights,
+        mode_rows,
+        mode_columns,
     })
 }
 

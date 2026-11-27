@@ -166,6 +166,16 @@ inverse with the formal ring values, identify every Rust mode with an
 algebraic coefficient, or show that constructed child objects supply the
 required group-local functions. `[pcc:unverified]`
 
+The native `CauchySourceWitness` narrows the first of those interfaces. It
+serializes the production base, numerator unit, and complete stored factor map.
+An independent verifier reconstructs all of them from `(a,i,t,z)`, checks each
+unit inverse, and recomputes every schema-2 packet weight and nonzero mode
+row/column. The verifier imports ring arithmetic and serialized certificate
+types, but not `deformation`, packing, child construction, or recursion. This
+binds the concrete native values to the displayed scalar formulas; a Lean
+refinement from the accepted witness and the all-mode/all-child object mapping
+remain open. `[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a
@@ -175,8 +185,8 @@ separate semantic premise, covered by its own native mutation controls.
 This closes the abstract finite rearrangement skeleton of C1 items 1–3. What
 remains is an independent or kernel-checked refinement showing that every
 relevant Rust object and loop implements its inputs, plus the scalar mode
-object binding and separate interpolation, Hermite, and creation-precision
-refinements.
+and child object binding and separate interpolation, Hermite, and
+creation-precision refinements.
 `[pcc:unverified]`
 
 ## Evidence and remaining gate

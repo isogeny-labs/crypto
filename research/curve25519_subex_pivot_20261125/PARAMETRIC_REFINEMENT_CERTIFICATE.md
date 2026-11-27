@@ -163,6 +163,13 @@ cancellation to `n*p*u<=204*M^2`. The replay does not yet bind arbitrary native
 endpoint/label traces or recursion histories to those theorem inputs, or
 formalize the external contraction theorem. `[pcc:unverified]`
 
+Separately, the native `CauchySourceWitness` now exposes and independently
+reconstructs every stored scalar factor valuation/inverse, the base and
+numerator unit, all packet weights, and emitted nonzero mode coefficients.
+This supplies replayable native evidence for the scalar code-to-formula
+boundary; instantiating the Lean theorem and binding complete mode/child
+objects remain separate obligations. `[pcc:unverified]`
+
 ## Next measurable goal
 
 The remaining local gap is now premise evidence, not downstream coefficient
