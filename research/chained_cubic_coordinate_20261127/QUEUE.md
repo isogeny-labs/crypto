@@ -8,7 +8,7 @@
 | 4 | Cold setup, transfer, solve, verification and same-target rho | All120 records and40 paired differences analyzed by Rust; all40 cubic construction F7-mul differences positive. Partial source operations only; full word/OS pricing and admitted timing open. Both claims unsigned. [pcc:unverified] |
 | 5 | Publish whole outputs and at most two source-bound PCC claims | Two claim records exhaust this branch; small C/E originals retained, whole ELF/qualifiers pending approved durable store. |
 | 6 | Written construction, faithful formal coverage and visual report | Written proof and fidelity map retained. Official pinned Lean startup aborts before checking at2GiB; zero new accepted theorem. PDF/report packaging next. |
-| 7 | Portable CI, review, ready freeze and merge | Draft5302; refresh main preserving all foreign lines, run canonical unchanged gates, then finish deterministic replay CI/report. Follow50minute/4hour CI floors, all attempts/events and MERGE requirements. |
+| 7 | Portable CI, review, ready freeze and merge | Draft5302; main refreshed and portable first replay G passes14 phases/eight whole output comparisons. Finish report, hosted CI and canonical unchanged gates. Follow50minute/4hour CI floors, all attempts/events and MERGE requirements. |
 | 8 | Complementary coordinate-level cover and actual (3,3) chain | Next genuine component, after source preparation; all-input DLP preservation and full cost screen before claims. |
 | 9 | Prime-field descent and computational advantage | Open; use actual coordinate maps, qualified strongest same-target baselines and explicit full-cost admission. |
 
