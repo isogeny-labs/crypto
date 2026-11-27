@@ -144,6 +144,12 @@ open Curve25519ExtensionRingModel
 #print axioms packedGF2Polynomial_remainder_minimal_reduced
 #print axioms packedGF2Polynomial_frobeniusIterate_eq_pow_modByMonic
 #print axioms packedGF2Polynomial_frobeniusIterate_from_remainder
+#print axioms packedGF2Polynomial_remainder_minimal_eq_modByMonic
+#print axioms packedGF2Polynomial_gcdFuel_eq_gcd
+#print axioms packedGF2Polynomial_gcd_eq_gcd
+#print axioms packedGF2Polynomial_minimal_eq_one_iff
+#print axioms gf2PackedGcd_eq_one_iff
+#print axioms gf2PackedGcd_guard_iff
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

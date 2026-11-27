@@ -568,8 +568,12 @@ square-and-reduce trace equals the matching polynomial Frobenius trace. A
 separate reduction-power induction identifies that trace with the exact
 `2^steps` power modulo the decoded monic modulus whenever the start is reduced;
 the Rabin start is a native remainder, so that premise is discharged. This
-proves the Rabin value trace, not the Euclidean-gcd guards or general predicate
-correctness.
+proves the Rabin value trace. A separate Euclidean induction now shows every
+packed remainder in the GCD loop strictly reduces the right degree, proves the
+public sum-of-degrees fuel sufficient, identifies the returned packed value
+with polynomial GCD, and proves the native `==1` guard equivalent to polynomial
+GCD equaling one. Composing these facts through the Rabin Boolean control flow
+and proving the general irreducibility equivalence remain separate.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

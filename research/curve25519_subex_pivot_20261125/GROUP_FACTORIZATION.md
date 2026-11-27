@@ -284,8 +284,11 @@ every nonzero packed modulus. The theorem is additionally transported to the
 result's minimal decoding window and iterated through every native
 square-and-reduce step. Reduction idempotence and compatibility with powers
 then identify a reduced start with its exact `2^steps` power modulo the packed
-modulus; packed remainders supply such starts automatically. This authenticates
-the Rabin value trace but not its packed Euclidean-gcd guards.
+modulus; packed remainders supply such starts automatically. A second induction
+uses the strict remainder-degree drop to prove the packed GCD fuel sufficient,
+refines its result to Euclidean polynomial GCD, and identifies the exact native
+`==1` guard. Full Rabin control-flow composition and a general irreducibility
+equivalence are not claimed here.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

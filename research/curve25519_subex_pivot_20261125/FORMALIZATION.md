@@ -632,8 +632,12 @@ the wider product window and composed through an arbitrary number of native
 square-and-reduce steps. The resulting Frobenius iterator theorem identifies a
 reduced start with its exact `2^steps` power modulo the decoded modulus. Since
 the Rabin start is itself a packed remainder, its normalization premise is
-kernel-derived. The packed gcd guards and their equivalence to polynomial gcd
-remain outside this value-trace theorem.
+kernel-derived. The packed GCD is now refined separately: minimal-window
+remainder correctness drives a fuel induction, strict right-degree descent
+discharges the public sum-of-degrees bound, and the returned value plus native
+`==1` guard are proved equivalent to Euclidean polynomial GCD and equality to
+one. The remaining Rabin task is the Boolean-loop composition and the general
+irreducibility theorem.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

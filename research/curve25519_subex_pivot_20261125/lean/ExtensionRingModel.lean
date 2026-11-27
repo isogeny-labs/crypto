@@ -2257,6 +2257,195 @@ def gf2PackedGcdFuel : ℕ → ℕ → ℕ → ℕ
 def gf2PackedGcd (left right : ℕ) : ℕ :=
   gf2PackedGcdFuel (Nat.log2 left + Nat.log2 right + 2) left right
 
+/-- Exact packed remainder correctness in the returned value's minimal decoder
+and the input value's minimal decoder. -/
+theorem packedGF2Polynomial_remainder_minimal_eq_modByMonic
+    (value modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder value modulus) + 1)
+        (gf2PackedRemainder value modulus) =
+      (packedGF2Polynomial (Nat.log2 value + 1) value) %ₘ
+        packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  let result := gf2PackedRemainder value modulus
+  let resultWidth := Nat.log2 result + 1
+  let valueWidth := Nat.log2 value + 1
+  let modulusWidth := Nat.log2 modulus + 1
+  let wideWidth := modulusWidth + valueWidth
+  have hresultWidth : resultWidth ≤ modulusWidth := by
+    rcases gf2PackedRemainder_stops_below_modulus value modulus hmodulus with
+      hzero | hdegree
+    · have hresult : result = 0 := by simpa [result] using hzero
+      dsimp [resultWidth, modulusWidth]
+      rw [hresult]
+      simp
+    · change Nat.log2 result < Nat.log2 modulus at hdegree
+      dsimp [resultWidth, modulusWidth]
+      omega
+  have hresultFit : result < 2 ^ resultWidth := by
+    by_cases hresult : result = 0
+    · simp [hresult, resultWidth]
+    · exact ((Nat.log2_eq_iff hresult).mp rfl).2
+  have hresultExtend : packedGF2Polynomial wideWidth result =
+      packedGF2Polynomial resultWidth result := by
+    have hwidth : resultWidth + (wideWidth - resultWidth) = wideWidth := by
+      dsimp [wideWidth]
+      omega
+    rw [← hwidth]
+    exact packedGF2Polynomial_extend resultWidth
+      (wideWidth - resultWidth) result hresultFit
+  have hvalueFit : value < 2 ^ valueWidth := by
+    by_cases hvalue : value = 0
+    · simp [hvalue, valueWidth]
+    · exact ((Nat.log2_eq_iff hvalue).mp rfl).2
+  have hvalueExtend : packedGF2Polynomial wideWidth value =
+      packedGF2Polynomial valueWidth value := by
+    have hwidth : valueWidth + modulusWidth = wideWidth := by
+      dsimp [wideWidth]
+      omega
+    rw [← hwidth]
+    exact packedGF2Polynomial_extend valueWidth modulusWidth value hvalueFit
+  calc
+    packedGF2Polynomial resultWidth result =
+        packedGF2Polynomial wideWidth result := hresultExtend.symm
+    _ = (packedGF2Polynomial wideWidth value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+      exact packedGF2Polynomial_remainder_eq_modByMonic modulusWidth
+        value modulus hmodulus (by dsimp [modulusWidth]; omega)
+    _ = (packedGF2Polynomial valueWidth value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by rw [hvalueExtend]
+
+/-- With enough fuel to cover the current nonzero right degree, the native
+packed Euclidean loop decodes exactly as polynomial GCD. The zero-right case is
+valid even with zero remaining fuel. -/
+theorem packedGF2Polynomial_gcdFuel_eq_gcd
+    (fuel left right : ℕ)
+    (hfuel : right = 0 ∨ Nat.log2 right < fuel) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedGcdFuel fuel left right) + 1)
+        (gf2PackedGcdFuel fuel left right) =
+      EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 right + 1) right)
+        (packedGF2Polynomial (Nat.log2 left + 1) left) := by
+  induction fuel generalizing left right with
+  | zero =>
+      rcases hfuel with hright | hfalse
+      · subst right
+        simp [gf2PackedGcdFuel, packedGF2Polynomial]
+        rfl
+      · omega
+  | succ remaining ih =>
+      rw [gf2PackedGcdFuel]
+      by_cases hright : right = 0
+      · have hbeq : (right == 0) = true := by simp [hright]
+        rw [hbeq]
+        simp [hright, packedGF2Polynomial]
+      · have hbeq : (right == 0) = false := by
+          simpa [beq_iff_eq] using hright
+        rw [hbeq]
+        let remainder := gf2PackedRemainder left right
+        have hremainderFuel : remainder = 0 ∨ Nat.log2 remainder < remaining := by
+          rcases gf2PackedRemainder_stops_below_modulus left right hright with
+            hzero | hdegree
+          · exact Or.inl (by simpa [remainder] using hzero)
+          · right
+            rcases hfuel with hzero | hbound
+            · contradiction
+            · change Nat.log2 remainder < Nat.log2 right at hdegree
+              omega
+        have hrightMonic :
+            (packedGF2Polynomial (Nat.log2 right + 1) right).Monic :=
+          packedGF2Polynomial_monic (Nat.log2 right + 1) right
+            hright (by omega)
+        calc
+          packedGF2Polynomial
+              (Nat.log2 (gf2PackedGcdFuel remaining right remainder) + 1)
+              (gf2PackedGcdFuel remaining right remainder) =
+            EuclideanDomain.gcd
+              (packedGF2Polynomial (Nat.log2 remainder + 1) remainder)
+              (packedGF2Polynomial (Nat.log2 right + 1) right) :=
+                ih right remainder hremainderFuel
+          _ = EuclideanDomain.gcd
+              ((packedGF2Polynomial (Nat.log2 left + 1) left) %ₘ
+                packedGF2Polynomial (Nat.log2 right + 1) right)
+              (packedGF2Polynomial (Nat.log2 right + 1) right) := by
+                rw [packedGF2Polynomial_remainder_minimal_eq_modByMonic
+                  left right hright]
+          _ = EuclideanDomain.gcd
+              ((packedGF2Polynomial (Nat.log2 left + 1) left) %
+                packedGF2Polynomial (Nat.log2 right + 1) right)
+              (packedGF2Polynomial (Nat.log2 right + 1) right) := by
+                rw [Polynomial.modByMonic_eq_mod _ hrightMonic]
+          _ = EuclideanDomain.gcd
+              (packedGF2Polynomial (Nat.log2 right + 1) right)
+              (packedGF2Polynomial (Nat.log2 left + 1) left) :=
+                (EuclideanDomain.gcd_val _ _).symm
+
+/-- The public sum-of-degrees fuel bound always suffices, so packed GCD decodes
+exactly as Euclidean polynomial GCD without a caller premise. -/
+theorem packedGF2Polynomial_gcd_eq_gcd
+    (left right : ℕ) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedGcd left right) + 1)
+        (gf2PackedGcd left right) =
+      EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 right + 1) right)
+        (packedGF2Polynomial (Nat.log2 left + 1) left) := by
+  unfold gf2PackedGcd
+  apply packedGF2Polynomial_gcdFuel_eq_gcd
+  by_cases hright : right = 0
+  · exact Or.inl hright
+  · exact Or.inr (by omega)
+
+/-- Minimal packed decoding equals polynomial one exactly when the source
+natural number equals one. -/
+theorem packedGF2Polynomial_minimal_eq_one_iff (value : ℕ) :
+    packedGF2Polynomial (Nat.log2 value + 1) value = 1 ↔ value = 1 := by
+  constructor
+  · intro heq
+    have hvalue : value ≠ 0 := by
+      intro hzero
+      subst value
+      simp [packedGF2Polynomial] at heq
+    have hdegree := congrArg Polynomial.natDegree heq
+    rw [packedGF2Polynomial_natDegree (Nat.log2 value + 1) value
+        hvalue (by omega), natDegree_one] at hdegree
+    have hbounds := (Nat.log2_eq_iff hvalue).mp hdegree
+    norm_num at hbounds
+    omega
+  · rintro rfl
+    change packedGF2Polynomial 1 1 = 1
+    ext index
+    by_cases hindex : index = 0
+    · subst index
+      simpa using packedGF2Polynomial_coeff 1 1 ⟨0, by omega⟩
+    · rw [packedGF2Polynomial_coeff_eq_zero_of_le 1 1 index (by omega)]
+      simp [coeff_one, hindex]
+
+/-- The packed GCD result is one exactly when the corresponding polynomial GCD
+is one. -/
+theorem gf2PackedGcd_eq_one_iff (left right : ℕ) :
+    gf2PackedGcd left right = 1 ↔
+      EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 right + 1) right)
+        (packedGF2Polynomial (Nat.log2 left + 1) left) = 1 := by
+  have hsemantic := packedGF2Polynomial_gcd_eq_gcd left right
+  constructor
+  · intro hgcd
+    exact hsemantic.symm.trans
+      ((packedGF2Polynomial_minimal_eq_one_iff _).2 hgcd)
+  · intro hgcd
+    exact (packedGF2Polynomial_minimal_eq_one_iff _).1
+      (hsemantic.trans hgcd)
+
+/-- The exact Boolean guard used by the Rabin loop is equivalent to polynomial
+GCD being one. -/
+theorem gf2PackedGcd_guard_iff (left right : ℕ) :
+    (gf2PackedGcd left right == 1) = true ↔
+      EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 right + 1) right)
+        (packedGF2Polynomial (Nat.log2 left + 1) left) = 1 := by
+  simpa [beq_iff_eq] using gf2PackedGcd_eq_one_iff left right
+
 /-- Native-shaped Rabin loop: repeated Frobenius squaring, early gcd checks
 through half the degree, and the final `x^(2^degree)=x` equality. -/
 def gf2PackedIrreducibleAux (polynomial x degree : ℕ) : ℕ → ℕ → ℕ → Bool
