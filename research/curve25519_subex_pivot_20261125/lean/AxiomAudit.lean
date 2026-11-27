@@ -106,6 +106,10 @@ open Curve25519ExtensionRingModel
 #print axioms parseRingMultiplicationArtifact_wellFormed
 #print axioms parseCanonicalRingMultiplicationArtifact_canonical
 #print axioms packedGF2Polynomial_coeff
+#print axioms packedGF2Polynomial_coeff_eq_zero_of_le
+#print axioms packedGF2Polynomial_natDegree
+#print axioms packedGF2Polynomial_ne_zero
+#print axioms packedGF2Polynomial_monic
 #print axioms packedGF2Polynomial_xor
 #print axioms packedGF2Polynomial_shifted_coeff
 #print axioms packedGF2Polynomial_shifted_low_coeff
@@ -124,6 +128,7 @@ open Curve25519ExtensionRingModel
 #print axioms packedGF2Polynomial_remainder_residue_log2
 #print axioms gf2PackedRemainderFuel_stops_below_modulus
 #print axioms gf2PackedRemainder_stops_below_modulus
+#print axioms packedGF2Polynomial_remainder_eq_modByMonic
 #print axioms packedGF2Polynomial_rawProduct_fold
 #print axioms packedGF2Polynomial_rawProduct_eq_mul
 #print axioms degreeFourIrreducibilityBoundary

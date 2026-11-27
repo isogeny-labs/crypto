@@ -1165,6 +1165,83 @@ theorem packedGF2Polynomial_coeff (width value : ℕ) (index : Fin width) :
       simp [hbit, coefficient, coeff_monomial, hcoe]
   · simp
 
+/-- Packed decoding has no coefficient at or above its fixed bit window. -/
+theorem packedGF2Polynomial_coeff_eq_zero_of_le
+    (width value index : ℕ) (hindex : width ≤ index) :
+    (packedGF2Polynomial width value).coeff index = 0 := by
+  let coefficient : Polynomial (ZMod 2) →+ ZMod 2 :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  rw [packedGF2Polynomial]
+  change coefficient
+    (∑ candidate : Fin width,
+      if value.testBit candidate then monomial (candidate : ℕ) 1 else 0) = 0
+  rw [map_sum]
+  apply Finset.sum_eq_zero
+  intro candidate _
+  have hne : (candidate : ℕ) ≠ index := by
+    omega
+  by_cases hbit : value.testBit candidate <;>
+    simp [hbit, coefficient, coeff_monomial, hne]
+
+/-- If a nonzero packed value's leading bit is inside the decoder window, the
+decoded polynomial degree is exactly the native `log2`. -/
+theorem packedGF2Polynomial_natDegree
+    (width value : ℕ) (hvalue : value ≠ 0)
+    (hlead : Nat.log2 value < width) :
+    (packedGF2Polynomial width value).natDegree = Nat.log2 value := by
+  let top : Fin width := ⟨Nat.log2 value, hlead⟩
+  apply natDegree_eq_of_le_of_coeff_ne_zero
+  · apply natDegree_le_iff_coeff_eq_zero.mpr
+    intro index hindex
+    by_cases hin : index < width
+    · let candidate : Fin width := ⟨index, hin⟩
+      have hcoeff := packedGF2Polynomial_coeff width value candidate
+      change (packedGF2Polynomial width value).coeff index = _ at hcoeff
+      rw [hcoeff]
+      have hpow : value < 2 ^ index :=
+        (Nat.log2_lt hvalue).mp hindex
+      have hbit := Nat.testBit_eq_false_of_lt hpow
+      simp [candidate, hbit]
+    · exact packedGF2Polynomial_coeff_eq_zero_of_le width value index
+        (Nat.le_of_not_gt hin)
+  · have hcoeff := packedGF2Polynomial_coeff width value top
+    change (packedGF2Polynomial width value).coeff (Nat.log2 value) = _ at hcoeff
+    rw [Nat.testBit_log2 hvalue] at hcoeff
+    simp only [ite_true] at hcoeff
+    rw [hcoeff]
+    exact one_ne_zero
+
+/-- A nonzero packed value whose leading bit lies inside the window decodes to
+a nonzero polynomial. -/
+theorem packedGF2Polynomial_ne_zero
+    (width value : ℕ) (hvalue : value ≠ 0)
+    (hlead : Nat.log2 value < width) :
+    packedGF2Polynomial width value ≠ 0 := by
+  let top : Fin width := ⟨Nat.log2 value, hlead⟩
+  intro hzero
+  have hcoeff := packedGF2Polynomial_coeff width value top
+  change (packedGF2Polynomial width value).coeff (Nat.log2 value) = _ at hcoeff
+  rw [Nat.testBit_log2 hvalue] at hcoeff
+  simp only [ite_true] at hcoeff
+  rw [hzero, coeff_zero] at hcoeff
+  exact zero_ne_one hcoeff
+
+/-- Every nonzero binary packed value decodes to a monic polynomial when its
+leading bit lies inside the fixed window. -/
+theorem packedGF2Polynomial_monic
+    (width value : ℕ) (hvalue : value ≠ 0)
+    (hlead : Nat.log2 value < width) :
+    (packedGF2Polynomial width value).Monic := by
+  rw [Polynomial.Monic, leadingCoeff,
+    packedGF2Polynomial_natDegree width value hvalue hlead]
+  let top : Fin width := ⟨Nat.log2 value, hlead⟩
+  have hcoeff := packedGF2Polynomial_coeff width value top
+  change (packedGF2Polynomial width value).coeff (Nat.log2 value) = _ at hcoeff
+  rw [Nat.testBit_log2 hvalue] at hcoeff
+  simpa using hcoeff
+
 /-- At every fixed width, native packed XOR is polynomial addition over
 `GF(2)`. -/
 theorem packedGF2Polynomial_xor (width left right : ℕ) :
@@ -1626,6 +1703,53 @@ theorem gf2PackedRemainder_stops_below_modulus
       Nat.log2 (gf2PackedRemainder value modulus) < Nat.log2 modulus := by
   exact gf2PackedRemainderFuel_stops_below_modulus
     (Nat.log2 value + 1) value modulus hmodulus (by omega)
+
+/-- Complete packed-remainder correctness: when the nonzero modulus leading bit
+lies inside its declared window, decoding the native result is exactly
+`modByMonic` of the decoded input. -/
+theorem packedGF2Polynomial_remainder_eq_modByMonic
+    (modulusWidth value modulus : ℕ) (hmodulus : modulus ≠ 0)
+    (hlead : Nat.log2 modulus < modulusWidth) :
+    packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1))
+        (gf2PackedRemainder value modulus) =
+      (packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1)) value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+  let result := gf2PackedRemainder value modulus
+  let modulusPolynomial := packedGF2Polynomial modulusWidth modulus
+  have hmodulusBound : modulus < 2 ^ modulusWidth := by
+    have hupper := ((Nat.log2_eq_iff hmodulus).mp rfl).2
+    exact lt_of_lt_of_le hupper
+      (Nat.pow_le_pow_right (by decide) (by omega))
+  have hmonic : modulusPolynomial.Monic :=
+    packedGF2Polynomial_monic modulusWidth modulus hmodulus hlead
+  have hresidue := packedGF2Polynomial_remainder_residue_log2
+    modulusWidth value modulus hmodulusBound hmonic
+  have hself :
+      (packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1)) result) %ₘ
+          modulusPolynomial =
+        packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1)) result := by
+    rcases gf2PackedRemainder_stops_below_modulus value modulus hmodulus with
+      hzero | hdegree
+    · simp [result, hzero, packedGF2Polynomial]
+    · by_cases hresult : result = 0
+      · simp [hresult, packedGF2Polynomial]
+      · apply (modByMonic_eq_self_iff hmonic).2
+        change Nat.log2 result < Nat.log2 modulus at hdegree
+        have hresultLead :
+            Nat.log2 result < modulusWidth + (Nat.log2 value + 1) := by
+          omega
+        have hresultPolynomial :
+            packedGF2Polynomial
+              (modulusWidth + (Nat.log2 value + 1)) result ≠ 0 :=
+          packedGF2Polynomial_ne_zero
+            (modulusWidth + (Nat.log2 value + 1)) result hresult hresultLead
+        apply (natDegree_lt_natDegree_iff hresultPolynomial).mp
+        rw [packedGF2Polynomial_natDegree
+              (modulusWidth + (Nat.log2 value + 1)) result
+              hresult hresultLead,
+          packedGF2Polynomial_natDegree modulusWidth modulus hmodulus hlead]
+        exact hdegree
+  exact hself.symm.trans hresidue
 
 /-- Unreduced carryless product of two packed `GF(2)` polynomials. -/
 def gf2PackedRawProduct (left right : ℕ) : ℕ :=

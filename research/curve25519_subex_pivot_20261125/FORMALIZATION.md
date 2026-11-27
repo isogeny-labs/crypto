@@ -619,8 +619,10 @@ public remainder. A bit-level leading-term proof now shows every aligned step
 clears the current top bit and introduces nothing higher. Consequently every
 emitted shift fits the input `log2+1` window, the configured fuel suffices, and
 the result is zero or has packed `log2` below a nonzero modulus. The remaining
-normal-form bridge is to identify packed `log2` with the decoded polynomial's
-`natDegree` under the explicit width hypotheses.
+normal-form bridge is now closed: for nonzero values whose leading bit lies in
+the window, the packed decoder has `natDegree=log2(value)`, is nonzero, and is
+monic. Composing degree, residue, and termination proves that the decoded public
+remainder equals `modByMonic` exactly.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

@@ -554,8 +554,11 @@ polynomial residue under explicit monicity, modulus-width, and trace-window
 hypotheses. The aligned step is now also proved to clear the current top bit;
 this discharges the trace-window hypothesis, proves `log2(value)+1` fuel is
 sufficient, and shows the returned packed value is zero or has `log2` below a
-nonzero modulus. Relating packed `log2` to decoder `natDegree` is the remaining
-step before a direct polynomial normal-form equality.
+nonzero modulus. Finally, packed decoding is proved to have
+`natDegree=log2(value)` whenever the nonzero leading bit lies inside its window;
+such a decoded binary polynomial is automatically monic. These facts upgrade
+the residue theorem to an exact identity between the decoded native remainder
+and mathlib `modByMonic`.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

@@ -273,8 +273,10 @@ fuel recursion exactly. The public remainder theorem remains conditional on
 monicity and modulus width, while the trace-window condition is now discharged
 by a leading-bit cancellation proof. The same proof establishes fuel
 sufficiency and a returned packed `log2` below every nonzero modulus. Converting
-that numeric degree statement to decoded-polynomial `natDegree` is the remaining
-normal-form bridge.
+that numeric degree statement to decoded-polynomial `natDegree` is now proved
+for every nonzero value whose leading bit is in the window; the decoder is also
+proved nonzero and monic. The resulting endpoint identifies the decoded native
+remainder with `modByMonic` exactly.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
