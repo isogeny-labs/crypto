@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Table for the m-ladder at p = 3907 (12-bit roster curve, icv1-fp12-t19-d4a315df).
+"""Table for the m-ladder at p = 3907 (12-bit roster curve, bench-12bit).
 
 Reads `results/m*_p12t*.json` from `ic bench`; one row per m:
 |V| = 2^t, p^(1/m), |F|, columns, the paper's density with deg L = 2^t and
@@ -15,7 +15,7 @@ import json
 import math
 import os
 
-P = 3907  # icv1-fp12-t19-d4a315df, src/cryptanalysis/research_bench.rs
+P = 3907  # bench-12bit, src/cryptanalysis/research_bench.rs
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 

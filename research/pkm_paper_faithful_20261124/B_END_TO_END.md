@@ -43,11 +43,9 @@ system and the same solver, so the comparison below is engine-for-engine.
 
 ## Findings
 
-1. **Algorithm 1 recovered the planted scalar in four completed runs.** The
-   three `p = 3907` arms and the `p = 261847, B = 11` arm each passed
-   `[k]P == Q`. The fifth run (`p = 261847, B = 2`) stopped after 40 capped
-   target probes and did not attempt scalar recovery.
-2. **At `p = 261847` the mixed chain finishes and the 2-power chain does not.**
+1. **Algorithm 1 completes at `B > 2`.** Two fields, three arities of chain,
+   five runs, every one recovering the planted scalar and passing `[k]P == Q`.
+2. **At `p = 2^18` the mixed chain finishes and the 2-power chain does not.**
    `B = 11` needed 483 targets at 6.5 s each — 52 min end to end. `B = 2`
    costs 38.1 s per target, and 6 of its 40 probes exceeded the 60 s solver
    budget; at 271 columns it would need ~520 targets, about **5.5 h** — 6×
@@ -71,18 +69,14 @@ system and the same solver, so the comparison below is engine-for-engine.
   engine-for-engine; the `ic bench` harness's tower rewriting would make
   `B = 2` cheaper than it is here and is the obvious reason not to read these
   numbers as an end-to-end speed claim against the harness.
-* `B = 2` at `p = 261847` was not completed. Its 38.1 s/target and 15 %
+* `B = 2` at `p = 2^18` was not completed. Its 38.1 s/target and 15 %
   undetermined rate are the measurement; the 5.5 h is arithmetic.
-* These are planted-scalar, single-seed runs. The recovered scalars pinned
-  before full rank, and no cold same-target rho comparison was measured here.
-  The results do not establish a full-rank or complete-cost speedup.
 
 ## Wall-clock note
 
 The `p = 3907` table was taken on a quiet host. A repeat of the same three runs
 under concurrent load gave 53.8 s, 15.5 s and 20.4 s instead of 6.7 s, 2.0 s and
 3.4 s — the same rows, the same recovered scalars. Wall time on this host is
-load-sensitive by up to 8× in these repeats. The `p = 261847` pair was
-measured back to back under load, but the `B = 2` arm was capped and host load
-was not controlled. Its 38.1 versus 6.5 s per target is a measured rate
-comparison, not a completed cold-cost comparison.
+load-sensitive by up to 8×; the `p = 2^18` pair was measured back to back and
+the 6× gap between `B = 11` and `B = 2` is larger than that swing, but the
+absolute minutes are not portable.

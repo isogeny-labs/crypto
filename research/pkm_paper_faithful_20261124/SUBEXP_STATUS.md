@@ -31,6 +31,7 @@ fields per `B`:
 | 2 | 0.0905 s (74 targets) | 38.1 s (40 targets) | 421× | **1.44** |
 | 11 | 0.037 s (60 targets) | 6.47 s (483 targets) | 175× | **1.23** |
 | 31 | 0.020 s (5 targets) | 5.98 s (12 targets) | 299× | **1.36** |
+| 61 | <0.01 s (5 targets) | 2.64 s (5 targets) | >264× | **≈1.3** |
 
 `γ = log(cost ratio)/log(p ratio)`, `p` ratio 67.
 
@@ -46,10 +47,12 @@ Both chains verified the planted scalar at both fields (`k = 2683` and
   the exponent tends to `γ`, still 1.2–1.4. This is the same statement as the
   `m`-ladder's variable-count wall (`m·n0 = log p`), seen in cost.
 * **`B` does not move `γ` down.** 1.44 (`B = 2`), 1.23 (`B = 11`), 1.36
-  (`B = 31`): flat within the error, not the ~0.02-per-doubling decline the
-  first two points suggested. Reaching `γ < 1/2` at this trend would need a
-  change of regime, not a bigger `B` — and the `B = 31` chain already needs
-  degree-31 equations, where each Vélu step is a degree-31 rational map.
+  (`B = 31`), ≈1.3 (`B = 61`): flat within the error, not the ~0.02-per-doubling
+  decline the first two points suggested. Reaching `γ < 1/2` at this trend would
+  need a change of regime, not a bigger `B` — and the `B = 61` chain already
+  needs degree-61 equations, where each Vélu step is a degree-61 rational map.
+  The `B = 61` pair is the last falsifier named above; it confirmed the
+  flatness, so the construction is closed for this goal on measured evidence.
 * The `B = 31` pair is a warning about the model: both fields use `n0 = 2`
   levels and the same four variables, yet cost 0.02 s and 5.98 s. Whatever
   drives the second number is not captured by `(n0, B)`, so `γ` from two
