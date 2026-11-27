@@ -186,9 +186,12 @@ supplied label or minimizer family. `PackingLabelArtifact.lean` now parses a
 shared flat projection of the admitted three-edge schema-3 native control,
 checks its exact lengths and endpoint/label bounds, proves its typed endpoints
 are the serialized indices, and replays the complete nontrivial native trace:
-rows `[0,1,0]`, then columns `[0,0,1]`. The remaining boundary is to lift this
-finite code-to-model control to every arbitrary-size producer object and live
-recursive history.
+rows `[0,1,0]`, then columns `[0,0,1]`.
+`parseReplayedPackingLabelArtifact_classCap` rewrites every accepted artifact's
+serialized label arrays to that executable schedule and feeds them directly
+into the strongest source-guard class-cap theorem. The remaining boundary is
+to lift this finite code-to-model control to every arbitrary-size producer
+object and live recursive history.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

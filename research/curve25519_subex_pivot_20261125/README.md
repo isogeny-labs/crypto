@@ -384,7 +384,10 @@ three-edge schema-3 control now binds endpoint quadruples and selected labels
 to that executable model. Rust checks the projection against the produced
 certificate; Lean parses and bounds it, proves the typed endpoints are the
 serialized indices, and kernel-replays the nontrivial row `[0,1,0]` and column
-`[0,0,1]` traces. This is one finite code-to-model control, not a uniform
+`[0,0,1]` traces. For every successfully replayed artifact, the parsed label
+arrays now feed directly into the strongest source-guard class-cap theorem;
+the caller supplies only degree caps and the guard. This is one finite
+code-to-model control plus a generic checked-import endpoint, not a uniform
 arbitrary-size Rust refinement. `[pcc:unverified]`
 
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one

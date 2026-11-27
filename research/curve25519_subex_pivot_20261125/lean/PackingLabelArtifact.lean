@@ -1,6 +1,6 @@
 module
 
-public import LabelSequence
+public import ObjectiveBoundary
 
 @[expose] public section
 
@@ -16,6 +16,7 @@ namespace Curve25519PackingLabelArtifact
 
 open Curve25519LabelSequence
 open Curve25519ConditionalObjective
+open Curve25519ObjectiveBoundary
 
 /-- Shared native projection: schema/radix/context, endpoint quadruples, then
 row and column labels. -/
@@ -318,6 +319,75 @@ theorem parseReplayedPackingLabelArtifact_columns
   simp only [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns,
     ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
   exact of_decide_eq_true (htrace.2 column (by simp))
+
+/-- A replayed artifact feeds its serialized labels directly into the strongest
+source-guard class cap. The parser supplies the executable-label equalities;
+callers provide only the graph's degree caps and source guard. -/
+theorem parseReplayedPackingLabelArtifact_classCap
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact)
+    (δ : ℕ)
+    (hleftCap : ∀ row,
+      fiberSize
+        (artifact.leftEndpoint
+          (parseReplayedPackingLabelArtifact_rowCount_pos hparse)) row ≤ δ)
+    (hrightCap : ∀ column,
+      fiberSize
+        (artifact.rightEndpoint
+          (parseReplayedPackingLabelArtifact_columnCount_pos hparse)) column ≤ δ)
+    (hguard :
+      2 * (((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ^ 2) *
+          (δ : ℝ) ≤
+        (artifact.edgeCount : ℝ)) :
+    ∀ γ : Fin (artifact.labelCount * artifact.labelCount),
+      (fiberSize
+          (classMap
+            (artifact.leftEndpoint
+              (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+            (artifact.rightEndpoint
+              (parseReplayedPackingLabelArtifact_columnCount_pos hparse))
+            (artifact.rowLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos hparse))
+            (artifact.columnLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos hparse))) γ : ℝ) *
+          ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ≤
+        2 * (artifact.edgeCount : ℝ) := by
+  have hrows :
+      artifact.rowLabel
+          (parseReplayedPackingLabelArtifact_labelCount_pos hparse) =
+        executableRowLabels
+          (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+          (artifact.leftEndpoint
+            (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+          (artifact.rightEndpoint
+            (parseReplayedPackingLabelArtifact_columnCount_pos hparse)) := by
+    funext row
+    exact parseReplayedPackingLabelArtifact_rows hparse row
+  have hcolumns :
+      artifact.columnLabel
+          (parseReplayedPackingLabelArtifact_labelCount_pos hparse) =
+        executableColumnLabels
+          (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+          (artifact.leftEndpoint
+            (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+          (artifact.rightEndpoint
+            (parseReplayedPackingLabelArtifact_columnCount_pos hparse))
+          (executableRowLabels
+            (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+            (artifact.leftEndpoint
+              (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+            (artifact.rightEndpoint
+              (parseReplayedPackingLabelArtifact_columnCount_pos hparse))) := by
+    funext column
+    exact parseReplayedPackingLabelArtifact_columns hparse column
+  rw [hrows, hcolumns]
+  exact class_cap_for_executable_labels
+    (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+    (artifact.leftEndpoint
+      (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+    (artifact.rightEndpoint
+      (parseReplayedPackingLabelArtifact_columnCount_pos hparse))
+    δ hleftCap hrightCap hguard
 
 /-- The shared native projection contains these exact fields. -/
 theorem packingLabelWitnessArtifactValues :

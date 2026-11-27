@@ -62,6 +62,7 @@ open Curve25519ExtensionRingModel
 #print axioms parseReplayedPackingLabelArtifact_columnCount_pos
 #print axioms parseReplayedPackingLabelArtifact_rows
 #print axioms parseReplayedPackingLabelArtifact_columns
+#print axioms parseReplayedPackingLabelArtifact_classCap
 #print axioms packingLabelWitnessArtifactValues
 #print axioms packingLabelWitness_parsed
 #print axioms packingLabelWitness_traceMatches

@@ -74,7 +74,10 @@ certificate. The transparent Lean parser in `lean/PackingLabelArtifact.lean`
 checks exact lengths and bounds, proves typed endpoint values are the serialized
 indices, and replays the same strict-first-minimum algorithm. The
 kernel-checked trace is rows `[0,1,0]` followed by columns `[0,0,1]`; both sides
-therefore exercise a nonzero choice. `[pcc:unverified]`
+therefore exercise a nonzero choice. A generic checked-import theorem rewrites
+accepted serialized labels to the executable schedule and returns the strongest
+source-guard class cap from caller-supplied degree caps and guard alone.
+`[pcc:unverified]`
 
 ## Remaining boundary
 
