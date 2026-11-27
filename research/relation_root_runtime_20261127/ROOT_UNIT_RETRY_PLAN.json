@@ -1,0 +1,21 @@
+{
+  "schema": "root-unit-resource-retry/v1",
+  "source": "ROOT_UNIT_SOURCE.sha256",
+  "first_failure": "ROOT_UNIT_FIRST_OUTCOME.json retained unchanged",
+  "reason": "allocation failed under12GiBAS; retry larger existing virtual-address allowance and smaller per-unit codegen batches",
+  "default_features": true,
+  "tests_or_algorithms_excluded": false,
+  "cpu": 0,
+  "jobs_and_threads": 1,
+  "wall_seconds": 1800,
+  "address_space_bytes": 15032385536,
+  "file_limit_bytes": 1073741824,
+  "physical_cgroup_memory_bytes": 17179869184,
+  "new_cloud_resources": false,
+  "profile": "same opt0/LTOoff/debug0; root-package-only codegen-units256, dependencies retain16",
+  "command": "cargo --config profile.release.package.crypto.codegen-units=256 test --release --locked --offline --lib --no-run -j1",
+  "failure_policy": "preserve every failure; no further identical retry, no old worker used for new source",
+  "full_runtime_admission": "requires separately copied/hash-pinned worker and complete passing runtime; no pass inferred from compile",
+  "benchmark": false,
+  "signed_verdict": false
+}
