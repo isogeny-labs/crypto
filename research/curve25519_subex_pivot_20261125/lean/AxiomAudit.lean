@@ -152,11 +152,17 @@ open Curve25519ExtensionRingModel
 #print axioms gf2PackedGcd_guard_iff
 #print axioms packedGF2Polynomial_injective_of_lt
 #print axioms packedGF2Polynomial_minimal_injective
+#print axioms packedGF2Polynomial_minimal_xor
 #print axioms gf2PackedIrreducibleAux_iff_semantic
 #print axioms gf2PackedIrreducible_iff_semantic
 #print axioms gf2PackedRabinSemanticAux_iff_closed
 #print axioms gf2PackedIrreducible_iff_closed
 #print axioms gf2PackedRabinClosed_final_power
+#print axioms gf2PackedRabinClosed_guard_power_modByMonic
+#print axioms gf2Polynomial_gcd_modByMonic_add
+#print axioms gf2PackedRabinClosed_guard_add
+#print axioms gf2Polynomial_add_eq_sub
+#print axioms gf2PackedRabinClosed_guard_sub
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

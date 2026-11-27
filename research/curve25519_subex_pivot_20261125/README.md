@@ -581,7 +581,11 @@ step is the general theorem equating that criterion with irreducibility under
 the required degree and monicity hypotheses. The recursive trace is also
 unrolled into a single indexed family of every active Frobenius/GCD check plus
 the final equality; for nonzero modulus the latter is proved to be exactly
-`x^(2^degree)=x mod f`.
+`x^(2^degree)=x mod f`. Minimal-window XOR decoding and GCD invariance under
+reduction now normalize every indexed guard too: for each active offset it is
+exactly `gcd(f, x^(2^(offset+1))-x)=1` over `GF(2)`, with the implementation's
+inner remainder removed. This is the complete standard Rabin criterion, while
+its external equivalence with irreducibility remains the unproved boundary.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

@@ -295,7 +295,11 @@ guard. The resulting public-Boolean equivalence stops at the explicit semantic
 Rabin trace; the general irreducibility theorem is still not claimed.
 That trace is now unrolled into one indexed family of all active guards and a
 terminal condition; the terminal condition is independently rewritten as the
-exact `x^(2^degree)=x mod f` polynomial identity for nonzero modulus.
+exact `x^(2^degree)=x mod f` polynomial identity for nonzero modulus. Exact
+minimal-window XOR decoding, GCD invariance under `modByMonic`, and
+addition-equals-subtraction over `GF(2)` also rewrite every active guard as
+`gcd(f, x^(2^(offset+1))-x)=1`. This closes the standard Rabin criterion while
+leaving its general irreducibility equivalence explicitly unclaimed.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

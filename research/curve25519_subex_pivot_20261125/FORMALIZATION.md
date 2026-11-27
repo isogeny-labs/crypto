@@ -647,6 +647,11 @@ semantic recursion is now additionally unrolled into a nonrecursive indexed
 family of the active Frobenius/GCD checks and terminal equality. Composing the
 arbitrary-step Frobenius theorem identifies that terminal equality with the
 closed `x^(2^degree)=x mod f` condition for every nonzero packed modulus.
+Minimal-window XOR is additionally identified with polynomial addition, and
+GCD invariance removes the inner `modByMonic` from every active guard. Since
+addition equals subtraction over `GF(2)`, each indexed guard now has the exact
+standard form `gcd(f, x^(2^(offset+1))-x)=1`. The remaining boundary is the
+external algebraic theorem equating this closed criterion with irreducibility.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

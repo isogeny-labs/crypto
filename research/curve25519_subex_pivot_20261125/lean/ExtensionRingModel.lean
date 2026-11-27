@@ -2506,6 +2506,70 @@ theorem packedGF2Polynomial_minimal_injective (left right : ℕ)
         exact (packedGF2Polynomial_extend rightWidth leftWidth right
           hrightFit).symm
 
+/-- Minimal packed XOR decoding is polynomial addition even when the three
+source values use different `log2+1` windows. -/
+theorem packedGF2Polynomial_minimal_xor (left right : ℕ) :
+    packedGF2Polynomial (Nat.log2 (Nat.xor left right) + 1)
+        (Nat.xor left right) =
+      packedGF2Polynomial (Nat.log2 left + 1) left +
+        packedGF2Polynomial (Nat.log2 right + 1) right := by
+  let leftWidth := Nat.log2 left + 1
+  let rightWidth := Nat.log2 right + 1
+  let xorValue := Nat.xor left right
+  let xorWidth := Nat.log2 xorValue + 1
+  let wideWidth := leftWidth + rightWidth
+  have hleftFit : left < 2 ^ leftWidth := by
+    by_cases hleft : left = 0
+    · simp [hleft, leftWidth]
+    · exact ((Nat.log2_eq_iff hleft).mp rfl).2
+  have hrightFit : right < 2 ^ rightWidth := by
+    by_cases hright : right = 0
+    · simp [hright, rightWidth]
+    · exact ((Nat.log2_eq_iff hright).mp rfl).2
+  have hleftWide : left < 2 ^ wideWidth :=
+    lt_of_lt_of_le hleftFit
+      (Nat.pow_le_pow_right (by decide) (by dsimp [wideWidth]; omega))
+  have hrightWide : right < 2 ^ wideWidth :=
+    lt_of_lt_of_le hrightFit
+      (Nat.pow_le_pow_right (by decide) (by dsimp [wideWidth]; omega))
+  have hxorWide : xorValue < 2 ^ wideWidth := by
+    exact Nat.xor_lt_two_pow hleftWide hrightWide
+  have hxorWidth : xorWidth ≤ wideWidth := by
+    by_cases hxor : xorValue = 0
+    · simp [hxor, xorWidth]
+      dsimp [wideWidth, leftWidth, rightWidth]
+      omega
+    · have hlog : Nat.log2 xorValue < wideWidth :=
+        (Nat.log2_lt hxor).mpr hxorWide
+      dsimp [xorWidth]
+      omega
+  have hxorExtend : packedGF2Polynomial wideWidth xorValue =
+      packedGF2Polynomial xorWidth xorValue := by
+    have hwidth : xorWidth + (wideWidth - xorWidth) = wideWidth := by omega
+    rw [← hwidth]
+    exact packedGF2Polynomial_extend xorWidth (wideWidth - xorWidth)
+      xorValue (by
+        by_cases hxor : xorValue = 0
+        · simp [hxor, xorWidth]
+        · exact ((Nat.log2_eq_iff hxor).mp rfl).2)
+  have hleftExtend : packedGF2Polynomial wideWidth left =
+      packedGF2Polynomial leftWidth left :=
+    packedGF2Polynomial_extend leftWidth rightWidth left hleftFit
+  have hrightExtend : packedGF2Polynomial wideWidth right =
+      packedGF2Polynomial rightWidth right := by
+    dsimp [wideWidth]
+    rw [add_comm]
+    exact packedGF2Polynomial_extend rightWidth leftWidth right hrightFit
+  calc
+    packedGF2Polynomial xorWidth xorValue =
+        packedGF2Polynomial wideWidth xorValue := hxorExtend.symm
+    _ = packedGF2Polynomial wideWidth left +
+        packedGF2Polynomial wideWidth right :=
+      packedGF2Polynomial_xor wideWidth left right
+    _ = packedGF2Polynomial leftWidth left +
+        packedGF2Polynomial rightWidth right := by
+      rw [hleftExtend, hrightExtend]
+
 /-- Native-shaped Rabin loop: repeated Frobenius squaring, early gcd checks
 through half the degree, and the final `x^(2^degree)=x` equality. -/
 def gf2PackedIrreducibleAux (polynomial x degree : ℕ) : ℕ → ℕ → ℕ → Bool
@@ -2733,6 +2797,114 @@ theorem gf2PackedRabinClosed_final_power
   have htrace := packedGF2Polynomial_frobeniusIterate_from_remainder
     degree 2 polynomial hpolynomial
   exact htrace.symm.trans hsemantic.2
+
+/-- Every active closed Rabin guard is the GCD of the packed modulus with the
+corresponding reduced `2^(offset+1)` power plus the packed start. -/
+theorem gf2PackedRabinClosed_guard_power_modByMonic
+    (polynomial degree offset : ℕ) (hpolynomial : polynomial ≠ 0)
+    (hsemantic : gf2PackedRabinClosed polynomial degree)
+    (hhalf : offset < degree / 2) :
+    EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+        ((((packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) ^ (2 ^ (offset + 1))) %ₘ
+              packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial) +
+          packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) = 1 := by
+  let x := gf2PackedRemainder 2 polynomial
+  let value := gf2PackedFrobeniusIterate polynomial (offset + 1) x
+  unfold gf2PackedRabinClosed gf2PackedRabinClosedAux at hsemantic
+  have hguard := hsemantic.1 offset (by omega) (by omega)
+  have hxor := packedGF2Polynomial_minimal_xor value x
+  have htrace := packedGF2Polynomial_frobeniusIterate_from_remainder
+    (offset + 1) 2 polynomial hpolynomial
+  change packedGF2Polynomial (Nat.log2 (Nat.xor value x) + 1)
+    (Nat.xor value x) = _ at hxor
+  change packedGF2Polynomial (Nat.log2 value + 1) value = _ at htrace
+  rw [hxor, htrace] at hguard
+  exact hguard
+
+/-- Reducing one GCD input modulo a monic polynomial before adding a second
+input does not change the GCD. -/
+theorem gf2Polynomial_gcd_modByMonic_add
+    (value addend modulus : Polynomial (ZMod 2)) (hmonic : modulus.Monic) :
+    EuclideanDomain.gcd modulus ((value %ₘ modulus) + addend) =
+      EuclideanDomain.gcd modulus (value + addend) := by
+  have hresidue : ((value %ₘ modulus) + addend) %ₘ modulus =
+      (value + addend) %ₘ modulus := by
+    apply Polynomial.modByMonic_eq_of_dvd_sub hmonic
+    simpa only [add_sub_add_right_eq_sub] using
+      Polynomial.dvd_modByMonic_sub value modulus
+  calc
+    EuclideanDomain.gcd modulus ((value %ₘ modulus) + addend) =
+        EuclideanDomain.gcd (((value %ₘ modulus) + addend) % modulus)
+          modulus := EuclideanDomain.gcd_val _ _
+    _ = EuclideanDomain.gcd ((value + addend) % modulus) modulus := by
+      rw [← Polynomial.modByMonic_eq_mod _ hmonic,
+        ← Polynomial.modByMonic_eq_mod _ hmonic, hresidue]
+    _ = EuclideanDomain.gcd modulus (value + addend) :=
+      (EuclideanDomain.gcd_val _ _).symm
+
+/-- The inner implementation remainder can be removed from every active
+closed Rabin GCD guard. -/
+theorem gf2PackedRabinClosed_guard_add
+    (polynomial degree offset : ℕ) (hpolynomial : polynomial ≠ 0)
+    (hsemantic : gf2PackedRabinClosed polynomial degree)
+    (hhalf : offset < degree / 2) :
+    EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+        ((packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) ^ (2 ^ (offset + 1)) +
+          packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) = 1 := by
+  let modulusPolynomial :=
+    packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial
+  let xPolynomial :=
+    packedGF2Polynomial
+      (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+      (gf2PackedRemainder 2 polynomial)
+  have hguard := gf2PackedRabinClosed_guard_power_modByMonic
+    polynomial degree offset hpolynomial hsemantic hhalf
+  have hmonic : modulusPolynomial.Monic :=
+    packedGF2Polynomial_monic (Nat.log2 polynomial + 1) polynomial
+      hpolynomial (by omega)
+  change EuclideanDomain.gcd modulusPolynomial
+    (((xPolynomial ^ (2 ^ (offset + 1))) %ₘ modulusPolynomial) +
+      xPolynomial) = 1 at hguard
+  rw [gf2Polynomial_gcd_modByMonic_add
+    (xPolynomial ^ (2 ^ (offset + 1))) xPolynomial modulusPolynomial hmonic]
+    at hguard
+  exact hguard
+
+/-- Addition and subtraction coincide for polynomials over `GF(2)`. -/
+theorem gf2Polynomial_add_eq_sub (left right : Polynomial (ZMod 2)) :
+    left + right = left - right := by
+  rw [sub_eq_add_neg]
+  congr 1
+  ext index
+  rw [Polynomial.coeff_neg, ZMod.neg_eq_self_mod_two]
+
+/-- Every active closed Rabin guard has the standard textbook form
+`gcd(f, x^(2^i) - x) = 1`. -/
+theorem gf2PackedRabinClosed_guard_sub
+    (polynomial degree offset : ℕ) (hpolynomial : polynomial ≠ 0)
+    (hsemantic : gf2PackedRabinClosed polynomial degree)
+    (hhalf : offset < degree / 2) :
+    EuclideanDomain.gcd
+        (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)
+        ((packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) ^ (2 ^ (offset + 1)) -
+          packedGF2Polynomial
+            (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+            (gf2PackedRemainder 2 polynomial)) = 1 := by
+  rw [← gf2Polynomial_add_eq_sub]
+  exact gf2PackedRabinClosed_guard_add polynomial degree offset
+    hpolynomial hsemantic hhalf
 
 /-- Search odd constant-one lower patterns in the exact native order. -/
 def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ
