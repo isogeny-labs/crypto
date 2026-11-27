@@ -214,7 +214,11 @@ p_next u_d <= 34 M_d (L_d/2^i).
 
 `audit_uniform_history` checks the complete finite depth schedule and the
 negative `lambda=2^23` control.  The following all-lambda derivation is the
-independent proof-obligation sketch, not a kernel check. `[pcc:unverified]`
+source-schedule proof-obligation sketch. The scalar consequences
+`81hu<=2^(u+1)`, evaluation-loss absorption, active-cutoff comparison, and the
+composition with the existing finite precision-history theorem are now kernel
+checked in `lean/PrecisionAbsorption.lean`; binding `u>=32,h<=512u` and the
+numeric recurrence to actual native paths remains open. `[pcc:unverified]`
 For `d<=4`, the threshold gives `u_d>=32`; for `d>=5`,
 activity gives `lambda>2^(6d)` and therefore
 `u_d>=2^(5d-17)>=2^d>=32`.  Consequently
@@ -255,9 +259,11 @@ statements expose nonnegative `M` in the child-shrink steps and positive `D`
 in the mode/precision cancellation. It also proves
 `2^(i+1)*2^(a-i)=2*2^a` and derives `nD<=6M` directly from `KL<=3M` for every
 admitted coordinate. The axiom audit reports only `propext`,
-`Classical.choice`, and `Quot.sound`; the native code-to-model binding,
-normalized-precision derivation `pu<=34MD`, finite factorization realization,
-and external contraction theorem remain explicit hypotheses or out of scope.
+`Classical.choice`, and `Quot.sound`. The imported finite-history theorem and
+new absorption bridge now derive `pu<=34MD` from explicit numeric path and
+schedule facts. The native code-to-model bindings for graph labels and
+precision histories, finite factorization realization, and external
+contraction theorem remain explicit hypotheses or out of scope.
 `[pcc:unverified]`
 
 The next Lean module closes two more graph-side algebra layers: capped left and

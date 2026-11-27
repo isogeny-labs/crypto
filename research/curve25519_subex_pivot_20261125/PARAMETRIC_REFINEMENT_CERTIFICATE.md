@@ -119,6 +119,17 @@ with the `q^2` encoded class collision sum, and combines the degree cap and
 source guard into `c_gamma D<=2M` for every class. The statements admit
 zero-degree isolates and distinct parallel edges directly. `[pcc:unverified]`
 
+`lean/PrecisionAbsorption.lean` imports the repository's existing exact
+`childPrecision` model and finite-history theorem without changing their
+sources. It kernel-checks `81hu<=2^(u+1)` from `u>=32,h<=512u`, the
+evaluation-loss absorption for every prior exponent, the root-to-current
+comparison from the active leaf cutoff, and the composed
+`p_next*u<=34*M*2^(A+2u-i)` conclusion. The imported source files retain
+SHA-256 values `92e4300c...951989a` and `0a235579...cd4b4`; their declarations
+and the new bridge are audited together. This theorem still requires a native
+path witness for the exact precision recurrence, shrink history, scale floor,
+and leaf comparison. `[pcc:unverified]`
+
 The project pins Lean `v4.35.0` and mathlib commit
 `56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
 
@@ -127,18 +138,25 @@ cd research/curve25519_subex_pivot_20261125/lean
 lake update
 lake build
 lake env lean AxiomAudit.lean
+lake env lean PrecisionAxiomAudit.lean
 ```
 
-The build completes 9,053 jobs. `#print axioms` reports only `propext`,
+The build completes 9,057 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
-project axioms or admitted proofs. There are 33 explicitly audited theorems.
+project axioms or admitted proofs. There are 43 explicitly audited declarations,
+including four reused precision declarations and six new absorption/bridge
+declarations. The frozen pre-module precision-history source emits six Lean
+module-compatibility warnings when imported into this project; its bytes are
+unchanged.
+
 The aggregate downstream theorem still consumes the variance, source-guard,
 precision, and mode inequalities as hypotheses, but the separate natural-number
 theorem now derives the mode inequality uniformly from the same packet-capacity
-and coordinate conditions checked by `audit_node_dimensions`. The replay does
-not yet bind an arbitrary native endpoint/label trace to the graph theorem,
-derive the normalized precision inequality, or formalize the external
-contraction theorem. `[pcc:unverified]`
+and coordinate conditions checked by `audit_node_dimensions`. The separate
+precision theorem derives the normalized inequality from explicit history and
+schedule facts. The replay does not yet bind arbitrary native endpoint/label
+traces or recursion histories to those theorem inputs, or formalize the
+external contraction theorem. `[pcc:unverified]`
 
 ## Next measurable goal
 
@@ -150,10 +168,11 @@ evidence for two independent claims:
 1. a typed code-to-model binding, or replayable proof object, showing that the
    native endpoint arrays and first-minimum traces instantiate the formal
    graph theorem at each active call; and
-2. a typed derivation or producer-bound witness for `pu<=34MD` at every active
-   call. The companion `nD<=6M` inequality is now kernel-derived from packet
-   admission and the exact tile/distance identity, so it is no longer an
-   independent factorization premise.
+2. a replayable native path witness instantiating the checked precision theorem:
+   initial precision, exact `childPrecision` recurrence, eightfold shrink,
+   active leaf cutoff, `u>=32`, and `h<=512u`. The companion `nD<=6M`
+   inequality and the scalar `pu<=34MD` implication are now kernel-derived, so
+   neither remains an independent algebraic premise.
 
 The acceptance target is a verifier that consumes those proof objects at each
 retained depth and emits the same parametric summary with

@@ -1,0 +1,17 @@
+import PrecisionAbsorption
+
+open Curve25519PrecisionAbsorption
+open CryptoLeanCore.TaperedPrecision
+open NativePrecisionHistory
+
+#print axioms childPrecision_mul_le
+#print axioms inherited_precision_le
+#print axioms nonempty_normalization
+#print axioms next_precision_mul_le
+
+#print axioms inherited_quadratic_absorption
+#print axioms inherited_history_absorption
+#print axioms evaluation_zero_absorption
+#print axioms evaluation_history_absorption
+#print axioms active_node_root_comparison
+#print axioms next_precision_mul_le_of_uniform_history

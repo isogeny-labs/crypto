@@ -291,9 +291,12 @@ native taper term they give the uniform local bound
 p_next*u <= 34*M*2^(A+2*u-i)
 ```
 
-at every possible active child history above the threshold.  This is an
-unverified producer derivation composed from separately retained components,
-not a new kernel-checked refinement theorem. [pcc:unverified]
+at every possible active child history above the threshold. The scalar
+absorption and final constant-34 composition are now independently
+kernel-checked in the pivot's pinned Lean project by reusing the exact retained
+precision model and finite-history theorem. This remains an unverified producer
+composition until a native path witness supplies the recurrence, shrink,
+active-cutoff, scale-floor, and leaf-comparison inputs. [pcc:unverified]
 
 The exact-integer Rust certificate is `tensor-history-audit`.  At the first
 claimed threshold `lambda=2^26`, it enumerates the only five depths not
@@ -432,10 +435,12 @@ A pinned Lean 4.35/mathlib replay now kernel-checks the same downstream
 real-inequality and ledger chain. It makes the parent-size nonnegativity and
 positive-dimension cancellation conditions explicit. It also derives
 `nD<=6M` from `KL<=3M` and the exact power-of-two tile/distance identity for
-every admitted coordinate; its axiom audit contains only Lean/mathlib's
-standard `propext`, `Classical.choice`, and `Quot.sound`. The native graph
-binding, normalized-precision derivation, finite factorization realization,
-and external theorem are not discharged by this replay. `[pcc:unverified]`
+every admitted coordinate and composes the existing finite precision-history
+theorem with uniform absorption to obtain `pu<=34MD` from explicit path facts;
+its axiom audits contain only Lean/mathlib's standard `propext`,
+`Classical.choice`, and `Quot.sound`. Native graph and history bindings, finite
+factorization realization, and the external theorem are not discharged by this
+replay. `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled

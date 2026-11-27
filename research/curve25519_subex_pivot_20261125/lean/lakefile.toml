@@ -9,4 +9,14 @@ rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
 
 [[lean_lib]]
 name = "Curve25519ParametricRefinement"
-roots = ["ParametricRefinement", "ConditionalVariance", "ConditionalObjective", "LabelSequence", "ObjectiveBoundary", "AxiomAudit"]
+roots = ["ParametricRefinement", "ConditionalVariance", "ConditionalObjective", "LabelSequence", "ObjectiveBoundary", "PrecisionAbsorption", "PrecisionAxiomAudit", "AxiomAudit"]
+
+[[lean_lib]]
+name = "CryptoLeanCore"
+srcDir = "../../hashed_ecdl_precision_20261123/formal"
+roots = ["CryptoLeanCore.TaperedPrecision"]
+
+[[lean_lib]]
+name = "NativePrecisionHistory"
+srcDir = "../../hashed_ecdl_precision_history_20261123/formal"
+roots = ["PrecisionHistory"]
