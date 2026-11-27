@@ -89,6 +89,9 @@ open Curve25519ExtensionRingModel
 #print axioms convolutionBufferStep_apply
 #print axioms convolutionBufferRow_apply
 #print axioms convolutionBuffer_apply
+#print axioms nativeReductionBufferStep_apply
+#print axioms nativeReductionBufferRow_apply
+#print axioms nativeReductionBufferRow_high
 #print axioms decodePowerBasis_mul_eq_mk
 #print axioms decodePowerBasis_mul_eq_reduced_mk
 #print axioms nativeExtension_pow_two_zero

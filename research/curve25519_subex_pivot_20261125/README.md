@@ -487,9 +487,12 @@ The zero-initialized mutable nested loops are formal too: both zero-coordinate
 fast paths and every `i+j` update compose to exactly those final slot values.
 The exact descending polynomial offsets `d-2,...,0` now preserve the quotient,
 clear every target without later reintroduction, and leave no coefficient at
-index at least `d`. The mutable high-degree reduction/truncation correspondence,
-deterministic polynomial selection, and accepted-vector elaboration still
-require concrete refinement.
+index at least `d`. One complete mutable reduction inner row is formal too: its
+cloned-coefficient zero fast path and set-bit subtractions have exact slot
+formulas, and the retained target plus all higher slots stay unchanged until
+truncation. Composing those rows with the logical descending schedule and final
+truncation, deterministic polynomial selection, and accepted-vector elaboration
+still require concrete refinement.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

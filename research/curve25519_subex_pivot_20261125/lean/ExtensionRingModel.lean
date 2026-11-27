@@ -251,6 +251,113 @@ theorem convolutionBuffer_apply
   rw [← List.sum_toFinset _ (List.nodup_finRange degree),
     List.toFinset_finRange]
 
+/-- One mutable native high-degree reduction update for a single lower
+polynomial bit. The source retains the processed high slot and later truncates
+it; this transition changes only the lower `offset+j` slot. -/
+noncomputable def nativeReductionBufferStep
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ) (j : Fin degree) :
+    ℕ → ZMod (2 ^ precision) :=
+  let coefficient := buffer (degree + offset)
+  if coefficient = 0 then buffer
+  else if lowerCoefficient j then
+    Function.update buffer (offset + (j : ℕ))
+      (buffer (offset + (j : ℕ)) - coefficient)
+  else buffer
+
+/-- Reading any slot after one native lower-bit reduction update gives exactly
+the old value plus the selected negative high coefficient. -/
+theorem nativeReductionBufferStep_apply
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ) (j : Fin degree) :
+    nativeReductionBufferStep precision degree lowerCoefficient buffer offset j
+        index =
+      buffer index +
+        if lowerCoefficient j then
+          if offset + (j : ℕ) = index then -buffer (degree + offset) else 0
+        else 0 := by
+  by_cases hcoefficient : buffer (degree + offset) = 0
+  · simp [nativeReductionBufferStep, hcoefficient]
+  by_cases hbit : lowerCoefficient j
+  · by_cases hindex : offset + (j : ℕ) = index
+    · subst index
+      simp [nativeReductionBufferStep, hcoefficient, hbit, sub_eq_add_neg]
+    · have hindex' : index ≠ offset + (j : ℕ) := Ne.symm hindex
+      simp [nativeReductionBufferStep, hcoefficient, hbit,
+        hindex, hindex']
+  · simp [nativeReductionBufferStep, hcoefficient, hbit]
+
+private theorem nativeReductionBufferFold_apply
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ)
+    (indices : List (Fin degree)) :
+    (indices.foldl
+        (nativeReductionBufferStep precision degree lowerCoefficient · offset ·)
+        buffer) index =
+      buffer index +
+        (indices.map fun (j : Fin degree) =>
+          if lowerCoefficient j then
+            if offset + (j : ℕ) = index then -buffer (degree + offset) else 0
+          else 0).sum := by
+  induction indices generalizing buffer with
+  | nil => simp
+  | cons j indices ih =>
+      have htarget :
+          nativeReductionBufferStep precision degree lowerCoefficient buffer
+              offset j (degree + offset) = buffer (degree + offset) := by
+        rw [nativeReductionBufferStep_apply]
+        have hne : offset + (j : ℕ) ≠ degree + offset := by
+          have hj : (j : ℕ) < degree := j.isLt
+          omega
+        simp [hne]
+      rw [List.foldl_cons, ih, nativeReductionBufferStep_apply, htarget]
+      simp only [List.map_cons, List.sum_cons]
+      ring
+
+/-- One complete native reduction inner loop over all lower polynomial bits. -/
+noncomputable def nativeReductionBufferRow
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ) :
+    ℕ → ZMod (2 ^ precision) :=
+  (List.finRange degree).foldl
+    (nativeReductionBufferStep precision degree lowerCoefficient · offset ·)
+    buffer
+
+/-- The complete mutable lower-bit loop has the exact conditional slot formula
+induced by the cloned high coefficient and binary modulus bits. -/
+theorem nativeReductionBufferRow_apply
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ) :
+    nativeReductionBufferRow precision degree lowerCoefficient buffer offset index =
+      buffer index + ∑ j : Fin degree,
+        if lowerCoefficient j then
+          if offset + (j : ℕ) = index then -buffer (degree + offset) else 0
+        else 0 := by
+  rw [nativeReductionBufferRow, nativeReductionBufferFold_apply]
+  congr 1
+
+/-- The native inner reduction loop changes no slot at or above the cloned
+high coefficient; in particular, the source retains that slot until truncation. -/
+theorem nativeReductionBufferRow_high
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision)) (offset : ℕ)
+    (hindex : degree + offset ≤ index) :
+    nativeReductionBufferRow precision degree lowerCoefficient buffer offset index =
+      buffer index := by
+  rw [nativeReductionBufferRow_apply]
+  have hsum :
+      (∑ j : Fin degree,
+        if lowerCoefficient j then
+          if offset + (j : ℕ) = index then -buffer (degree + offset) else 0
+        else 0) = 0 := by
+    apply Finset.sum_eq_zero
+    intro j _
+    have hne : offset + (j : ℕ) ≠ index := by
+      have hj : (j : ℕ) < degree := j.isLt
+      omega
+    simp [hne]
+  rw [hsum, add_zero]
+
 /-- Multiplication of decoded coordinate vectors is projection of the ordinary
 coordinate-polynomial convolution product. -/
 theorem decodePowerBasis_mul_eq_mk

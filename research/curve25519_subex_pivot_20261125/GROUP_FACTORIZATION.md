@@ -206,7 +206,11 @@ deterministic irreducible-polynomial selection, and accepted-vector elaboration
 remain open. At the polynomial level the exact source offsets `d-2,...,0` now
 preserve the quotient, clear every targeted coefficient without later
 reintroduction, and leave every coefficient at index at least `d` equal to zero
-for the `2d-1` convolution.
+for the `2d-1` convolution. The mutable source inner row is also formal: it
+clones the high coefficient, follows the zero fast path, subtracts only at set
+lower bits, and provably leaves the processed high slot and every higher slot
+unchanged pending truncation. Composing that row formula with the logical
+polynomial step over the full descending fold remains open.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

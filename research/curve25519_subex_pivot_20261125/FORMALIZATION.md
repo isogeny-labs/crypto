@@ -544,6 +544,11 @@ selection and accepted witness instantiation. The exact polynomial schedule is
 no longer a gap: offsets `d-2,...,0` preserve the quotient, each cleared high
 coefficient stays cleared through all later lower steps, and every coefficient
 at index at least `d` vanishes after reducing a `2d-1` convolution.
+The mutable reduction inner row is source-shaped as well: it clones the current
+high coefficient, preserves its zero fast path, subtracts it exactly at each set
+lower-polynomial bit, and changes no slot at or above the processed target. The
+remaining reduction obligation is to compose that coefficient formula with the
+logical step invariant through the full descending fold and final truncation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
