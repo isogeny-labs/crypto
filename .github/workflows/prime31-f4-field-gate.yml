@@ -16,9 +16,9 @@ on:
 jobs:
   field-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 50
     env:
-      CARGO_BUILD_JOBS: '2'
+      CARGO_BUILD_JOBS: '4'
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -27,9 +27,12 @@ jobs:
         with:
           cache-on-failure: true
       # Compile is separately timed. Previous run #44984788855 timed out while
-      # compiling dependencies inside its three-minute execution budget.
+      # compiling dependencies inside its three-minute execution budget. A
+      # cold release build of the crypto library no longer fits 18 minutes on
+      # a hosted runner (2026-11-26/27 runs on several branches), so the
+      # compile budget is 40 minutes; the execution budgets below are unchanged.
       - name: Build only the three Prime31 research examples
-        timeout-minutes: 18
+        timeout-minutes: 40
         run: |
           cargo build --release \
             --example prime31_coset_cubic_factor \
