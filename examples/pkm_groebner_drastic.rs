@@ -32,11 +32,11 @@ use crypto_lib::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunRep
 use serde::Serialize;
 use std::time::Instant;
 
-const INSTANCE_SEED: u64 = 20_261_185;
+const DEFAULT_INSTANCE_SEED: u64 = 20_261_185;
 const PLANTED_LOG: u64 = 2_261;
 const EXPECTED_ABSCISSAE: usize = 18;
 const MIN_F4_SPEEDUP: u64 = 20;
-const MAX_E2E_GAE_RATIO: f64 = 0.5;
+const DEFAULT_MAX_E2E_GAE_RATIO: f64 = 0.5;
 const DEFAULT_E2E_PAIRS: usize = 1;
 
 #[derive(Serialize)]
@@ -71,7 +71,7 @@ struct ArmSummary {
     verified: bool,
 }
 
-fn spec(factor_base: &str, oracle: &str) -> PipelineSpec {
+fn spec(factor_base: &str, oracle: &str, instance_seed: u64) -> PipelineSpec {
     let (factor_base, factor_base_params) = Params::parse_spec(factor_base)
         .unwrap_or_else(|e| panic!("invalid factor-base fixture: {e}"));
     let (oracle, oracle_params) =
@@ -84,7 +84,7 @@ fn spec(factor_base: &str, oracle: &str) -> PipelineSpec {
         targets: Targets::Walk,
         linalg: "incremental-gauss".into(),
         max_trials: 1_000,
-        seed: INSTANCE_SEED,
+        seed: instance_seed,
         solver_budget_seconds: 5,
         ..Default::default()
     }
@@ -136,11 +136,13 @@ fn run_interval(
     ctx: &InstanceCtx<'_, crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>,
     instance: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
     calibration: &Calibration,
+    instance_seed: u64,
 ) -> ArmSummary {
     let started = Instant::now();
     let interval_spec = spec(
         "prime-abscissa:below=32",
         "pkm-semaev:m=2,engine=f4,degree=8,bits=5,lo=0,mode=chain,trace=0",
+        instance_seed,
     );
     let mut interval_oracle = PkmSemaevOracle::from_spec(2, &interval_spec, instance)
         .expect("build the interval PKM oracle");
@@ -162,11 +164,13 @@ fn run_velu(
     ctx: &InstanceCtx<'_, crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>,
     instance: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
     calibration: &Calibration,
+    instance_seed: u64,
 ) -> ArmSummary {
     let started = Instant::now();
     let velu_spec = spec(
         "prime-isogeny:t=5,seed=5,aux=ordinary",
         "pkm-semaev:m=2,engine=f4,degree=8,mode=chain,trace=0",
+        instance_seed,
     );
     let mut velu_oracle = PkmSemaevOracle::from_spec(2, &velu_spec, instance)
         .expect("build the degree-32 Velu PKM oracle");
@@ -224,7 +228,27 @@ fn assert_matched(interval: &ArmSummary, velu: &ArmSummary) {
 }
 
 fn main() {
-    let instance = prime_instance_for(13, INSTANCE_SEED);
+    let instance_seed = std::env::var("PKM_INSTANCE_SEED")
+        .ok()
+        .map(|value| {
+            value
+                .parse::<u64>()
+                .expect("PKM_INSTANCE_SEED must be an integer")
+        })
+        .unwrap_or(DEFAULT_INSTANCE_SEED);
+    let max_e2e_gae_ratio = std::env::var("PKM_MAX_E2E_GAE_RATIO")
+        .ok()
+        .map(|value| {
+            value
+                .parse::<f64>()
+                .expect("PKM_MAX_E2E_GAE_RATIO must be a number")
+        })
+        .unwrap_or(DEFAULT_MAX_E2E_GAE_RATIO);
+    assert!(
+        max_e2e_gae_ratio > 0.0 && max_e2e_gae_ratio <= 1.0,
+        "PKM_MAX_E2E_GAE_RATIO must be in (0, 1]"
+    );
+    let instance = prime_instance_for(13, instance_seed);
     let curve = &instance.curve;
     let mut target_ops = GroupOps::default();
     let target = curve.mul(
@@ -265,10 +289,10 @@ fn main() {
     let mut intervals = Vec::with_capacity(2 * pairs);
     let mut velus = Vec::with_capacity(2 * pairs);
     for _ in 0..pairs {
-        intervals.push(run_interval(&ctx, &instance, &calibration));
-        velus.push(run_velu(&ctx, &instance, &calibration));
-        velus.push(run_velu(&ctx, &instance, &calibration));
-        intervals.push(run_interval(&ctx, &instance, &calibration));
+        intervals.push(run_interval(&ctx, &instance, &calibration, instance_seed));
+        velus.push(run_velu(&ctx, &instance, &calibration, instance_seed));
+        velus.push(run_velu(&ctx, &instance, &calibration, instance_seed));
+        intervals.push(run_interval(&ctx, &instance, &calibration, instance_seed));
     }
     for (interval, velu) in intervals.iter().zip(&velus) {
         assert_matched(interval, velu);
@@ -279,15 +303,17 @@ fn main() {
     let interval_cold_wall_seconds: f64 = intervals.iter().map(|run| run.cold_wall_seconds).sum();
     let velu_cold_wall_seconds: f64 = velus.iter().map(|run| run.cold_wall_seconds).sum();
     assert!(
-        velu_total_gae <= MAX_E2E_GAE_RATIO * interval_total_gae,
-        "degree-32 Velu complete charged cost missed the {MAX_E2E_GAE_RATIO} ratio gate: {velu_total_gae} / {interval_total_gae}",
+        velu_total_gae <= max_e2e_gae_ratio * interval_total_gae,
+        "degree-32 Velu complete charged cost missed the {max_e2e_gae_ratio} ratio gate: {velu_total_gae} / {interval_total_gae}",
     );
 
     let result = serde_json::json!({
         "schema": "pkm-groebner-drastic/v2",
         "claim_scope": "selected 13-bit matched complete native pipeline; host-measured F4 pricing; not random-instance, rho, or asymptotic",
         "balanced_order": "interval, degree32_velu, degree32_velu, interval",
+        "instance_seed": instance_seed,
         "pairs": pairs,
+        "maximum_e2e_gae_candidate_over_interval": max_e2e_gae_ratio,
         "calibration": {
             "ns_per_add": calibration.ns_per_add,
             "ns_per_row_op": calibration.ns_per_row_op,

@@ -99,3 +99,42 @@ A wall-time regression does not invalidate the counted result, but it must be
 reported and prevents a wall-speedup claim. Failure of the total-GAE gate is
 retained as a component-only result. Passing does not establish a random
 instance result, an asymptotic improvement or a Pollard-rho crossover.
+
+## Frozen continuation: source-pinned three-fixture replication
+
+**Frozen:** 2026-11-27, after the single-fixture result and before executing
+any additional target. All empirical measurements remain
+`[pcc:unverified]`.
+
+### Question and fixed fixtures
+
+Does the complete-pipeline reduction survive on all three 13-bit seeds that
+the pre-existing size-only scan selected as exact 18-abscissa matches, without
+searching for a new curve or target after seeing E2E cost?
+
+- Instance seeds: `20261185`, `20261221`, `20261276`, exactly the panel in
+  `RESULT_F4_DEGREE32_SOURCE_PINNED_EQUAL18_20261125.md`.
+- Planted scalar: `2261` on every fixture (reduced modulo the subgroup order
+  by the instrument); no target retry or target selection.
+- Arms, system parameters and accounting are unchanged from the complete cold
+  target continuation above.
+- Each fixture runs two serialized balanced pairs with
+  `RAYON_NUM_THREADS=4`. The instrument is built once from the frozen commit;
+  each process measures and shares one fixture-local calibration.
+
+### Admission
+
+Every run must pass the existing scalar, base-cardinality, system-shape,
+phase-sum and ordinary-degree assertions. Retain every fixture regardless of
+outcome. Call this a source-pinned three-fixture E2E replication only if:
+
+1. each fixture has `candidate_total_gae / interval_total_gae <= 0.75`; and
+2. the ratio of candidate and interval GAE summed across all three fixtures is
+   at most `0.5`.
+
+The wider per-fixture bound is fixed before execution to distinguish a
+combined win from one seed carrying a regression. The combined gate remains
+the original 2x total-cost threshold. Cold wall is descriptive; F4 pricing is
+host-measured and must be disclosed. Passing still does not establish an
+unselected random-instance result, an asymptotic improvement, transfer to
+larger fields or a rho crossover.
