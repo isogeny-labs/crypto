@@ -997,24 +997,89 @@ theorem degreeFourWitnessArtifactValues :
         30, 29, 0, 3, 16, 6] := by
   decide
 
+/-- Typed form of one native multiplication replay artifact. The parser below
+checks all four degree-sized vector boundaries before constructing this value. -/
+structure RingMultiplicationArtifact where
+  degree : ℕ
+  precision : ℕ
+  polynomial : ℕ
+  lowerCoefficients : List Bool
+  left : List ℕ
+  right : List ℕ
+  product : List ℕ
+  convolutionProducts : ℕ
+  reductions : ℕ
+  deriving DecidableEq, Inhabited, Repr
+
+/-- Decode a native lower-polynomial bit and reject non-Boolean fields. -/
+def ringMultiplicationArtifactBit : ℕ → Option Bool
+  | 0 => some false
+  | 1 => some true
+  | _ => none
+
+/-- Parse the flat native record into named fields. The degree from the record
+determines every vector boundary; short, long, and non-Boolean records fail. -/
+def parseRingMultiplicationArtifact : List ℕ → Option RingMultiplicationArtifact
+  | degree :: precision :: polynomial :: fields => do
+      let (lowerNumbers, afterLower) := fields.splitAt degree
+      let (left, afterLeft) := afterLower.splitAt degree
+      let (right, afterRight) := afterLeft.splitAt degree
+      let (product, counts) := afterRight.splitAt degree
+      if lowerNumbers.length = degree ∧ left.length = degree ∧
+          right.length = degree ∧ product.length = degree then
+        let lowerCoefficients ← lowerNumbers.mapM ringMultiplicationArtifactBit
+        match counts with
+        | [convolutionProducts, reductions] =>
+            some {
+              degree, precision, polynomial, lowerCoefficients, left, right,
+              product, convolutionProducts, reductions
+            }
+        | _ => none
+      else
+        none
+  | _ => none
+
+/-- Typed, length-checked view of the committed degree-four artifact. -/
+def degreeFourWitnessRecord : RingMultiplicationArtifact :=
+  (parseRingMultiplicationArtifact degreeFourWitnessNumbers).getD default
+
+/-- The shared bytes decode to every named witness field, including both input
+vectors and the exact transition counts. -/
+theorem degreeFourWitnessRecordValues :
+    degreeFourWitnessRecord = {
+      degree := 4
+      precision := 5
+      polynomial := 19
+      lowerCoefficients := [true, true, false, false]
+      left := [1, 1, 1, 1]
+      right := [1, 1, 1, 1]
+      product := [30, 29, 0, 3]
+      convolutionProducts := 16
+      reductions := 6
+    } := by
+  decide
+
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
 irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/
 def degreeFourLowerCoefficient (index : Fin 4) : Bool :=
-  degreeFourWitnessNumbers.getD (3 + index.val) 0 == 1
+  degreeFourWitnessRecord.lowerCoefficients.getD index.val false
 
-/-- The dense canonical coordinate vector serialized by the native degree-four
-multiplication control. -/
-def degreeFourDenseCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
-  degreeFourWitnessNumbers.getD (7 + index.val) 0
+/-- The dense canonical left coordinate vector in the typed artifact. -/
+def degreeFourDenseLeftCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
+  degreeFourWitnessRecord.left.getD index.val 0
+
+/-- The dense canonical right coordinate vector in the typed artifact. -/
+def degreeFourDenseRightCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
+  degreeFourWitnessRecord.right.getD index.val 0
 
 /-- The exact canonical native product serialized by the same control. -/
 def degreeFourDenseProductCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
-  degreeFourWitnessNumbers.getD (15 + index.val) 0
+  degreeFourWitnessRecord.product.getD index.val 0
 
 /-- The serialized packed polynomial `19` is exactly the monic degree-four bit
 plus the accepted lower-bit vector. -/
 theorem degreeFourPolynomialBits :
-    degreeFourWitnessNumbers.getD 2 0 = 2 ^ 4 + ∑ index : Fin 4,
+    degreeFourWitnessRecord.polynomial = 2 ^ 4 + ∑ index : Fin 4,
       if degreeFourLowerCoefficient index then 2 ^ (index : ℕ) else 0 := by
   decide
 
@@ -1022,14 +1087,15 @@ theorem degreeFourPolynomialBits :
 witness: `[1,1,1,1]^2 = [30,29,0,3]` modulo 32 and `U^4+U+1`. -/
 theorem degreeFourDenseNativeProduct :
     nativeProductCoordinates 5 4 degreeFourLowerCoefficient
-        degreeFourDenseCoordinates degreeFourDenseCoordinates =
+        degreeFourDenseLeftCoordinates degreeFourDenseRightCoordinates =
       degreeFourDenseProductCoordinates := by
   funext index
   fin_cases index <;>
     norm_num [nativeProductCoordinates, nativeReduceBufferDescending,
       nativeReductionBufferRow_apply, convolutionBuffer_apply,
       convolutionCoefficient, degreeFourLowerCoefficient,
-      degreeFourDenseCoordinates, degreeFourDenseProductCoordinates,
+      degreeFourDenseLeftCoordinates, degreeFourDenseRightCoordinates,
+      degreeFourDenseProductCoordinates, degreeFourWitnessRecord,
       degreeFourWitnessNumbers, degreeFourWitnessArtifact,
       Fin.sum_univ_succ] <;>
     decide

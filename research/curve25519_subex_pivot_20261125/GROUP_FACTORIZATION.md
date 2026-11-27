@@ -222,10 +222,12 @@ canonical `Vec<BigUint>` inputs and output. A dense degree-4 control exercises
 both arithmetic phases, compares every flattened field and transition count
 with one committed CSV artifact, and rejects a changed product coordinate. Lean
 reads the same artifact with a transparent kernel-reducible parser, proves that
+its degree-derived vector boundaries are exact in a typed record, proves that
 its lower bits pack to polynomial `19`, and proves that the exact formal
-transition evaluator maps `[1,1,1,1]^2` to `[30,29,0,3]` at precision five.
-This closes manual cross-file transfer for one finite sample, not the remaining
-mechanized Rust compiler refinement or authenticated general witness binding.
+transition evaluator maps its named left/right vectors to `[30,29,0,3]` at
+precision five. This closes manual cross-file transfer and positional field
+reads for one finite sample, not the remaining mechanized Rust compiler
+refinement or authenticated general witness binding.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

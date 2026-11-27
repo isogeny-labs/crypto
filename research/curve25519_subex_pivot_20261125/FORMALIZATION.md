@@ -560,9 +560,12 @@ reduction, and truncation transition order, and rejects a changed output. The
 native control flattens those fields plus exact `16/6` transition counts and
 compares them with `ring_multiplication_witness.csv`. The formal model consumes
 that same artifact through `include_str` and a transparent decimal parser,
-kernel-checks its complete field list, then uses its packed polynomial `19`,
-lower bits `[1,1,0,0]`, dense inputs, and product `[30,29,0,3]` in the exact
-source-shaped evaluation. The remaining boundary is a mechanized compiler
+then derives all four degree-sized vector boundaries into a typed record and
+rejects malformed lengths or non-Boolean lower-bit fields. It kernel-checks the
+complete named record, then uses its packed polynomial `19`, lower bits
+`[1,1,0,0]`, separate dense left/right inputs, and product `[30,29,0,3]` in the
+exact source-shaped evaluation without positional field offsets. The remaining
+boundary is a mechanized compiler
 refinement from concrete Rust `Vec<BigUint>` execution to the model and an
 authenticated general serialized-witness-to-Lean binding; the current degree-4
 agreement is one finite shared-artifact sample.

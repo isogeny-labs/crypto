@@ -488,8 +488,12 @@ instantiation. `[pcc:unverified]`
 
 The same committed artifact now has a concrete kernel-checked Lean consumer.
 The formal model reads it with `include_str`, parses its decimal fields with a
-transparent digit/comma parser, kernel-checks the exact parsed list, proves that
-its lower bits `[1,1,0,0]` give monic degree-four packing `19`
+transparent digit/comma parser, and then constructs a typed
+`RingMultiplicationArtifact`. That second parser derives four vector boundaries
+from the encoded degree, rejects short, long, or non-Boolean records, and gives
+the formal multiplication named lower-bit, left, right, and product fields
+instead of positional offsets. Lean kernel-checks the exact parsed record,
+proves that its lower bits `[1,1,0,0]` give monic degree-four packing `19`
 (`U^4+U+1`), and evaluates the audited source-shaped transition equations to
 `[1,1,1,1]^2=[30,29,0,3]` in precision five. This removes manual cross-file
 constant transfer for the fixed sample; it does not authenticate arbitrary
@@ -525,7 +529,8 @@ mechanized concrete-`Vec<BigUint>` compiler refinement and an authenticated
 general witness-to-Lean binding still require formal work. Deterministic
 polynomial selection and one accepted multiplication are independently replayed
 by native witnesses, and one committed fixed-sample artifact now supplies its
-exact bits, coordinates, and transition counts to both Rust and Lean.
+exact bits, named coordinates, and transition counts to both Rust and Lean
+through a length-checked formal record.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
