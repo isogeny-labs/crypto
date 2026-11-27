@@ -672,6 +672,18 @@ impl TowerRing {
         self.mul_terms_fp(fp, g.terms(), g.len(), u, w)
     }
 
+    /// [`Self::mul_elem`], returning `None` once `deadline` has passed.
+    fn mul_elem_until(
+        &self,
+        fp: Fp,
+        g: &Elem,
+        u: Mono,
+        w: TowerWeights,
+        deadline: Instant,
+    ) -> Option<RPoly> {
+        self.mul_terms_fp_until(fp, g.terms(), g.len(), u, w, Some(deadline))
+    }
+
     /// `u · g` in normal form, for `g` given by its terms, descending and
     /// with non-zero coefficients (`len` of them). `g`, `u` and the result
     /// are keyed in the grading `w`.
@@ -683,6 +695,22 @@ impl TowerRing {
         u: Mono,
         w: TowerWeights,
     ) -> RPoly {
+        self.mul_terms_fp_until(fp, g, len, u, w, None)
+            .expect("an unbounded product cannot expire")
+    }
+
+    /// Deadline-aware implementation of [`Self::mul_terms_fp`]. A bounded
+    /// caller can abandon a large carried-term expansion before its final
+    /// sort; the unbounded public path is byte-for-byte the same algorithm.
+    fn mul_terms_fp_until(
+        &self,
+        fp: Fp,
+        g: impl Iterator<Item = (Mono, u32)>,
+        len: usize,
+        u: Mono,
+        w: TowerWeights,
+        deadline: Option<Instant>,
+    ) -> Option<RPoly> {
         let (mu, fu) = (mask_of(u), free_of(u));
         // When `u` has no free variable, the key of a plain product is the
         // key of the term plus a constant: the degree rises by that of `u`,
@@ -700,6 +728,9 @@ impl TowerRing {
         let mut tmp: Vec<(u64, u64)> = Vec::new();
         let mut scratch = MaskScratch::default();
         for (m, c) in g {
+            if deadline.is_some_and(|limit| Instant::now() >= limit) {
+                return None;
+            }
             let mm = mask_of(m);
             if mm & mu == 0 {
                 monos.push(match plain_shift {
@@ -715,9 +746,15 @@ impl TowerRing {
             }
         }
         if carried.is_empty() {
-            return RPoly { monos, coefs };
+            return Some(RPoly { monos, coefs });
+        }
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return None;
         }
         carried.sort_unstable_by_key(|t| std::cmp::Reverse(t.0));
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return None;
+        }
         // Merge the two descending lists, adding the coefficients of a
         // repeated monomial and dropping a zero sum: what `from_terms` does
         // to the concatenation. Both lists hold coefficients below `p`.
@@ -727,6 +764,9 @@ impl TowerRing {
         };
         let (mut i, mut j) = (0, 0);
         loop {
+            if (i + j) & 4095 == 0 && deadline.is_some_and(|limit| Instant::now() >= limit) {
+                return None;
+            }
             let m = match (monos.get(i), carried.get(j)) {
                 (Some(&a), Some(&(b, _))) => a.max(b),
                 (Some(&a), None) => a,
@@ -747,7 +787,7 @@ impl TowerRing {
                 out.coefs.push(c as u32);
             }
         }
-        out
+        Some(out)
     }
 
     /// The normal form of a polynomial given by arbitrary exponent vectors
@@ -4189,11 +4229,15 @@ fn scan_products(
         if deadline.is_some_and(|limit| Instant::now() >= limit) {
             return Err(terms);
         }
-        let prods: Vec<RPoly> = batch
+        let prods: Vec<Option<RPoly>> = batch
             .par_iter()
-            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult, w))
+            .map(|&(mult, g)| match deadline {
+                Some(limit) => ring.mul_elem_until(fp, &polys[g as usize], mult, w, limit),
+                None => Some(ring.mul_elem(fp, &polys[g as usize], mult, w)),
+            })
             .collect();
         for (&(mult, g), p) in batch.iter().zip(&prods) {
+            let Some(p) = p else { return Err(terms) };
             let Some(lead) = p.lm() else { continue };
             terms += p.len() as u64;
             let keep = cache.has_room(p.len());
@@ -4919,6 +4963,15 @@ mod tests {
         );
         assert_eq!(result, Err(0));
         assert!(out.is_empty() && examined.is_empty() && frontier.is_empty());
+        assert!(ring
+            .mul_elem_until(
+                fp(7),
+                &polys[0],
+                ONE,
+                TowerWeights::UNIT,
+                Instant::now() - Duration::from_millis(1),
+            )
+            .is_none());
     }
 
     /// grevlex on exponent vectors, variable 0 largest.
