@@ -110,6 +110,32 @@ if all_conics_exit.exists() and all_conics_exit.read_text().strip()=='0':
         f"{all_conics['supported_conics']}new supported conics;computed ranks"
         f"{all_conics['full_rank']}/{all_conics['auxiliary_rank']}/"
         f"{all_conics['closed_rank']},gain{all_conics['candidate_gain']}. All controls pass.")
+mixed_sign_source=ROOT/'evidence/mixed-sign-conics-v1/calls/combine/stdout.json'
+mixed_sign_exit=mixed_sign_source.parent/'exit-code.txt'
+if mixed_sign_exit.exists() and mixed_sign_exit.read_text().strip()=='0':
+    mixed_sign=json.loads(mixed_sign_source.read_text())
+    attempts['mixed-sign-conics-v1']=(
+        f"Native plan/batch/combine passes:{mixed_sign['mixed_sign_pencils']}new mixed-sign pencils,"
+        f"{mixed_sign['batch_count']}complete batches,"
+        f"{mixed_sign['same_sign_pencils_skipped']}completed same-sign cases skipped;"
+        f"{mixed_sign['candidate_occurrences']}candidate occurrences,"
+        f"{mixed_sign['supported_conics']}supported conics. Computed core ranks"
+        f"{mixed_sign['core_full_rank']}/{mixed_sign['core_auxiliary_rank']}/"
+        f"{mixed_sign['closed_rank']};restored full/auxiliary ranks"
+        f"{mixed_sign['full_rank']}/{mixed_sign['auxiliary_rank']}derive by adding102private ranks. "
+        "Coverage,replay,nonempty and corruption controls pass.")
+balanced_source=ROOT/'evidence/expanded-balanced-v1/calls/scan/stdout.json'
+balanced_exit=balanced_source.parent/'exit-code.txt'
+if balanced_exit.exists() and balanced_exit.read_text().strip()=='0':
+    balanced=json.loads(balanced_source.read_text())
+    attempts['expanded-balanced-v1']=(
+        "Expanded481-image bound passes:464166pairs at each new target0and2kappa;"
+        f"{balanced['domains'][0]['distinct_rows_including_zero']}row at0and"
+        f"{balanced['domains'][1]['distinct_rows_including_zero']}rows at2kappa. "
+        "Zero patterns are formal;balanced conic pattern excluded at this domain. "
+        f"Imported{balanced['imported_kappa_rows']}kappa rows without reenumeration. Computed core"
+        f"{balanced['core_full_rank']}/{balanced['core_auxiliary_rank']}/{balanced['closed_rank']};"
+        f"restored{balanced['full_rank']}/{balanced['auxiliary_rank']}counts derive by adding102private ranks. All controls pass.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -121,6 +147,13 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
+    if name=='mixed-sign-conics-v1':
+        def call_order(call):
+            if call.name=='build': return (0,0)
+            if call.name=='plan': return (1,0)
+            if call.name.startswith('batch-'): return (2,int(call.name.removeprefix('batch-')))
+            return (3,0)
+        calls.sort(key=call_order)
     entries = []
     for call in calls:
         entries.append({'call': call.name,
@@ -198,7 +231,9 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Anchor16','anchors-v1/calls/scan'),
                         ('Anchor256','anchors-expanded-v1/calls/scan'),
                         ('Conic16','expanded-conics-v1/calls/scan'),
-                        ('Fibre-all','all-expanded-conics-v2/calls/scan')]:
+                        ('Fibre-all','all-expanded-conics-v2/calls/scan'),
+                        ('Mixed sign*','mixed-sign-conics-v1/calls/combine'),
+                        ('Balanced*','expanded-balanced-v1/calls/scan')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -207,6 +242,10 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
             record={key:record['combined_'+key] for key in metrics}
         cases.append((label,record))
 data = {label:{k:record[k] for k in metrics} for label,record in cases}
+for label,record in cases:
+    if record.get('restored_ranks_are_derived'):
+        data[label].update({key:record[key] for key in
+                            ('restored_ranks_are_derived','core_full_rank','core_auxiliary_rank')})
 (ROOT/'rank-values.json').write_text(json.dumps(data, indent=2)+'\n')
 fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(9,4.6),sharex=True,
                                      gridspec_kw={'height_ratios':[2,1]},layout='constrained')
@@ -215,15 +254,11 @@ for position, key in enumerate(metrics[:2]):
     values=[record[key] for _,record in cases]
     bars=axis.bar(x,values,width=.33,label=key.replace('_',' '))
     axis.bar_label(bars,labels=[str(v) if 0<v<1000 else '' for v in values],padding=2+8*position,fontsize=6.5)
-    for case_index,(at,value) in enumerate(zip(x,values)):
+    for at,value in zip(x,values):
         if not value:
             axis.text(at,.9,'0',ha='center',va='bottom',fontsize=7)
-        elif value>=1000:
-            axis.annotate(f'{value:,}',(at,value),xytext=(-2 if position==0 else 2,2+24*(case_index%2)),
-                          textcoords='offset points',ha='right' if position==0 else 'left',
-                          va='bottom',fontsize=6.5)
 axis.set_yscale('log')
-axis.set_ylim(.7,max(record['full_rank'] for _,record in cases)*64)
+axis.set_ylim(.7,max(record['full_rank'] for _,record in cases)*8)
 axis.set_ylabel('Full / auxiliary rank (log scale)')
 axis.legend(loc='upper left',bbox_to_anchor=(0,1.25),ncol=2,fontsize=9)
 closed_values=[record['closed_rank'] for _,record in cases]

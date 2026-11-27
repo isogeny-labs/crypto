@@ -5,7 +5,7 @@ give **zero additional rank** on the unchanged original 225 elliptic columns.
 The positive-rank objective remains open. These are finite component results
 for the recorded P-192 d7/kernel3 construction. [pcc:unverified]
 
-![Recorded full/auxiliary ranks above (log scale) and closed rank below. Norm225 uses the225-column diagnostic. Residual graph adds auxiliary columns;Mixed ranks are derived disjoint-block bounds,not a dense recomputation. One finite-domain evaluation per case; no statistical error bars.](ranks.pdf)
+![Recorded full/auxiliary ranks above (log scale) and closed rank below. Norm225 uses the225-column diagnostic. Mixed-image bounds are derived. Starred cases restore102private ranks to computed core counts;see text. One finite-domain evaluation per case; no statistical error bars.](ranks.pdf)
 
 ## Frozen question and inputs
 
@@ -49,6 +49,8 @@ this study does not change those maps.
 | Diversified residual-fibre expansion | 256new image labels;782new curve points | Computed236/230/6;all135necessary image rows |
 | First new signed-fibre conic pencils | 16pencils;22944candidate occurrences | Zero supported conics;computed236/230/6 |
 | Complete new signed-fibre quadruple family | 87pencils across31groups;124758total occurrences | Zero supported conics;computed236/230/6 |
+| Mixed-sign x-fibre pencils | 538new pencils;771492occurrences | Zero supported conics;computed core134/128/6 |
+| Expanded balanced-image bound | 481images;464166pairs at each target0,2kappa | Only formal zero patterns;no2kappaquartet;core134/128/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -305,29 +307,71 @@ other anchors and other functions are not covered. See
 FULL_FIBRE_CONIC_PROTOCOL.md and evidence/all-expanded-conics-v2/.
 [pcc:unverified]
 
+## Mixed-sign pencils and broader balanced-image bound
+
+Native planning groups the new points by x-coordinate,including both signed
+images. There are91fibres with at least four rational points and625general-
+position quadruples,with no degeneracies. It binds/skips all87completed
+same-sign cases and schedules538new mixed-sign pencils in five batches of
+128,128,128,128and26. Plan digest:
+
+```
+f1d6a36e7957bb528865e2cce17e7233c47076300a21284fdebc8e7f1764e1d7
+```
+
+The original102added tangent rows still have private witnesses in their204
+columns;every new row has zero coefficients there. Exact removal leaves a
+134-row/481-column working core,with134full/128auxiliary/6closed ranks.
+Original236/230ranks are rechecked against that core. A mutant new row
+touching an old private column rejects. Restoring the private block adds102
+to both ranks;restored236/230counts are **derived**,not a new larger dense
+computation. The256row/1024column helper caps stay unchanged. [pcc:unverified]
+
+All five batches finish with771492candidate occurrences and no supported
+conic. Final native combination checks gap-free,nonduplicated complete
+coverage and provides a fresh replay path for any accepted support,row and
+origin-pencil witness. Nonempty replay and collector controls pass;changed
+plans/support/rows and omitted/duplicated batch ranges reject. The combined
+batch-receipt digest is
+
+```
+d2ab06b8fd5f26ad0c160214e33a64b222cd1fefd2e0fe1f8850b8b7abfc5178
+```
+
+Thus all625pencils from general-position quadruples in the new x-fibres are
+now covered. Core ranks remain134/128/6. See MIXED_SIGN_CONIC_PROTOCOL.md
+and evidence/mixed-sign-conics-v1/. [pcc:unverified]
+
+The balanced-image follow-up uses all481old/new signed image labels. A conic
+has total image2kappa. If four image slots sum to0,the complementary four
+must sum to2kappa,even when those slots come from different fibres. The new
+complete target0and2kappaenumerations each cover464166pairs with matching
+OpenSSL/GMP streams and grouped/sorted joins. Target0has one coefficient-
+zero row only;target2kappa has no quartet. All135saved kappanorm rows are
+verified/reused without reenumeration. Appending the new zero row leaves
+core rank134/128/6. Nonempty fixtures at0and8Gand coefficient,row/pair and
+private-column corruption controls pass. [pcc:unverified]
+
+This excludes the stated balanced conic pattern over the fixed rational
+image domain,including repeated slots. Combined with the imported kappa
+inventory,it also extends the earlier single-aggregate residual-trace bound
+to481images at closed rank6,using the elimination in TRACE_PROTOCOL.md.
+Other image patterns and nonrational individual elliptic images remain
+outside this bound. See EXPANDED_BALANCED_PROTOCOL.md and
+evidence/expanded-balanced-v1/. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s, with one allowed CPU and1GiB virtual address space.
-Wrapper wall seconds, recorded once per evaluation, are:
-pilot18.070; full lift98.915; original scan28.197; lifted scan131.778;
-failed old audit build1.642; corrected old audit5.887; lifted audit6.236;
-failed norm build1.583; corrected norm test17.734; failed trace build6.502;
-corrected trace test40.438; conic search27.453; signed-six171.878;
-same-image conic extension42.602;partial lines22.842;separate geometry6.555;
-coupled residual graph277.788;mixed comparison92.381;failed divided build2.212;
-corrected divided15.373;divided/individual comparison96.061.
-The initial actual-anchor expansion takes29.979wrapper seconds;the larger
-diversified expansion takes131.444wrapper seconds and reuses16fibre solves.
-The first new conic pencils take36.278wrapper seconds;the complete same-image
-follow-up takes47.927wrapper seconds and reuses16completed empty pencils.
-Their workers take20.425and30.997seconds. A second pre-build wrapper failure
-takes0.019seconds and is preserved.
-The graph collector itself takes265.461seconds;mixed build13.501and scan78.801.
-The divided/individual build takes14.143seconds and scan81.873seconds.
-The same-image conic wrapper first failed before build in0.012seconds.
-These are feasibility
-cost receipts, not speed comparisons or repeated timing estimates.
+Each of the29attempt reports retains its complete per-call and wrapper
+costs,including failures. The new mixed-sign pipeline takes17.343build,
+8.924plan,39.634/40.567/43.650/41.493/19.973batch and9.979combine seconds;
+complete wrapper221.651seconds. The balanced-image filter takes8.070build,
+25.085worker and33.198wrapper seconds. Earlier graph collection takes
+265.461worker seconds. The two pre-build copy failures take0.012and0.019
+seconds. Every value is one recorded execution;these are feasibility cost
+receipts,not speed comparisons or repeated timing estimates.
 
 Four build failures are preserved: audit-old-v1 lacked iostream; norms-v1
 had an SSL type-name ambiguity and strict indentation warning; trace-v1
@@ -351,10 +395,15 @@ images. Actual cover-anchor expansion now reaches1434curve points and256new
 auxiliary images,but the complete necessary canonical-line image condition
 still retains closed rank6. The conic follow-up now exhausts all87pencils
 through four new points with the same signed image,again with no gain.
-A distinct successor takes four points in a common x-fibre whose images
-include both Qand-Q. Native planning must count those mixed-sign quadruples,
-skip all87completed same-sign cases,and keep any scan batches bounded.
-The saved actual pool can be reused without another fibre solve. All images
+A mixed-sign follow-up now covers the remaining538pencils,completing all625
+quadruples in new x-fibres without a supported conic. The481-image bound also
+excludes conics containing a four-slot zero-sum subpattern. A distinct
+successor uses pencils through two points on each of two different known
+split lines spanning different images. Known product conics must have exact
+row-dependence witnesses so that only additional conics can count toward
+independent rank. Native planning,fixed bounds and a separate protocol are
+needed;this successor has not run. The saved pool needs no new fibre solve.
+All images
 outside the original225must remain auxiliary,and all execution/dense caps
 remain fixed. This higher-degree successor is not executed here. Nonrational
 elliptic traces remain another open direction. Repeating the completed
@@ -375,20 +424,23 @@ elliptic/elimination replay.
   [actual anchors](ANCHOR_PROTOCOL.md),
   [diversified anchors](ANCHOR_EXPANDED_PROTOCOL.md),
   [expanded conics](EXPANDED_CONIC_PROTOCOL.md) and
-  [complete same-image conic family](FULL_FIBRE_CONIC_PROTOCOL.md).
+  [complete same-image conic family](FULL_FIBRE_CONIC_PROTOCOL.md),
+  [mixed-sign pencils](MIXED_SIGN_CONIC_PROTOCOL.md) and
+  [expanded balanced-image bound](EXPANDED_BALANCED_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
   run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
-  run-expanded-conics.sh and run-all-expanded-conics.sh.
+  run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
+  and run-expanded-balanced.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.
 - Diem, *On the discrete logarithm problem in class groups of curves*,
   JTNB24 (2012),639--667, DOI10.5802/jtnb.815, canonical line and
-  large-prime construction: <https://www.numdam.org/item/10.5802/jtnb.815.pdf>.
+  large-prime construction: [primary paper](https://www.numdam.org/item/10.5802/jtnb.815.pdf).
 - Gaudry, Theriault and Thome, double large-prime work, graph recombination:
-  <https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf>.
+  [primary paper](https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf).
 - KB tools unavailable in this runtime; these primary sources and repository
   negative results were reviewed before the experiments. No novelty claim.
 
