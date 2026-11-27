@@ -242,6 +242,13 @@ transition function. This isolates the remaining arbitrary-record gap as the
 native compiler/replay equality rather than parsing or finite-vector transport.
 `[pcc:unverified]`
 
+The committed degree-four artifact now travels through that generic route too:
+its canonical parser acceptance and degree-indexed product-replay equality are
+kernel-checked, and the arbitrary-degree endpoint returns its canonicality
+receipt together with decoded multiplication. The older fixed-size theorem is
+retained as a direct concrete regression, not as the only formal bridge.
+`[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a

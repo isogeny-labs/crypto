@@ -582,7 +582,11 @@ lists as `Fin degree` functions and proves the same decoded quotient-product
 conclusion conditionally on one explicit product-replay equality. Thus parsing,
 shape, polynomial packing, coordinate canonicality, dependent indexing, and
 universal decoding are generic; connecting native execution to that replay
-equality remains the compiler-refinement obligation.
+equality remains the compiler-refinement obligation. The committed degree-four
+fixture explicitly proves canonical-parser acceptance and its generic
+degree-indexed product-replay equality, then instantiates this arbitrary-degree
+endpoint; its quotient result no longer depends only on a parallel fixed-size
+statement.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

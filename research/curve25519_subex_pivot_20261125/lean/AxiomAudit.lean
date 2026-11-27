@@ -108,8 +108,11 @@ open Curve25519ExtensionRingModel
 #print axioms parsedCanonicalRingMultiplicationArtifact_decodes_mul
 #print axioms degreeFourWitnessRecordValues
 #print axioms degreeFourWitnessRecordCanonical
+#print axioms degreeFourWitnessRecordAccepted
 #print axioms degreeFourPolynomialBits
 #print axioms degreeFourDenseNativeProduct
+#print axioms degreeFourWitnessRecord_productReplay
+#print axioms degreeFourWitnessRecord_generic_decodes_mul
 #print axioms degreeFourWitnessRecord_decodes_mul
 #print axioms decodePowerBasis_mul_eq_mk
 #print axioms decodePowerBasis_mul_eq_reduced_mk

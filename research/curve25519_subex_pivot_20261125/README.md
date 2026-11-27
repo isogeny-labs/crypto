@@ -516,7 +516,12 @@ left/right/product coordinate functions over `ZMod (2^artifact.precision)`.
 canonical import reaches quotient multiplication once an independent replay
 supplies the remaining equality between the serialized product and
 `nativeProductCoordinates`. That equality is precisely the compiler/replay
-binding still missing for arbitrary native records. `[pcc:unverified]`
+binding still missing for arbitrary native records. For the committed fixture,
+Lean now separately proves canonical-parser acceptance, discharges that generic
+product-replay equality through the degree-indexed projections, and instantiates
+the arbitrary-degree endpoint. The fixed `Fin 4` theorem is therefore no longer
+the only path from the shared bytes to quotient multiplication.
+`[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape

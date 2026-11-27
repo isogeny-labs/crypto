@@ -1201,6 +1201,13 @@ theorem degreeFourWitnessRecordCanonical :
     degreeFourWitnessRecord.canonical = true := by
   decide
 
+/-- The committed bytes are accepted by the public canonical parser, rather
+than reaching the record through its fallback value. -/
+theorem degreeFourWitnessRecordAccepted :
+    parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers =
+      some degreeFourWitnessRecord := by
+  decide
+
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
 irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/
 def degreeFourLowerCoefficient (index : Fin 4) : Bool :=
@@ -1241,6 +1248,44 @@ theorem degreeFourDenseNativeProduct :
       degreeFourWitnessNumbers, degreeFourWitnessArtifact,
       Fin.sum_univ_succ] <;>
     decide
+
+/-- The committed record discharges the sole arithmetic replay premise of the
+generic imported-record endpoint. -/
+theorem degreeFourWitnessRecord_productReplay :
+    degreeFourWitnessRecord.productCoordinates =
+      nativeProductCoordinates degreeFourWitnessRecord.precision
+        degreeFourWitnessRecord.degree degreeFourWitnessRecord.lowerCoefficient
+        degreeFourWitnessRecord.leftCoordinates
+        degreeFourWitnessRecord.rightCoordinates := by
+  rw [degreeFourWitnessRecordValues]
+  funext index
+  fin_cases index <;>
+    norm_num [nativeProductCoordinates, nativeReduceBufferDescending,
+      nativeReductionBufferRow_apply, convolutionBuffer_apply,
+      convolutionCoefficient, RingMultiplicationArtifact.productCoordinates,
+      RingMultiplicationArtifact.lowerCoefficient,
+      RingMultiplicationArtifact.leftCoordinates,
+      RingMultiplicationArtifact.rightCoordinates, Fin.sum_univ_succ] <;>
+    decide
+
+/-- The committed fixture instantiates the arbitrary-degree checked-import
+endpoint, including its canonicality receipt and decoded product. -/
+theorem degreeFourWitnessRecord_generic_decodes_mul :
+    degreeFourWitnessRecord.canonical = true ∧
+      decodePowerBasis degreeFourWitnessRecord.precision
+          degreeFourWitnessRecord.degree degreeFourWitnessRecord.lowerCoefficient
+          degreeFourWitnessRecord.productCoordinates =
+        decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.leftCoordinates *
+          decodePowerBasis degreeFourWitnessRecord.precision
+            degreeFourWitnessRecord.degree
+            degreeFourWitnessRecord.lowerCoefficient
+            degreeFourWitnessRecord.rightCoordinates := by
+  exact parsedCanonicalRingMultiplicationArtifact_decodes_mul
+    degreeFourWitnessRecordAccepted (by decide)
+    degreeFourWitnessRecord_productReplay
 
 /-- The typed shared record reaches the universal quotient-product theorem:
 its named product coordinates decode as its named left/right product. -/
