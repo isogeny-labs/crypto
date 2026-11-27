@@ -477,6 +477,9 @@ It also proves `U^d=-sum_j f_j U^j` and the exact one-step high-coefficient
 subtraction performed by the native reduction loop. The loop induction is now
 formal at the polynomial level: every logical step clears its targeted
 coefficient, and every finite offset schedule preserves the quotient value.
+Low coordinate vectors also decode exactly as quotient projections of their
+coordinate polynomials; their decoded product is therefore the projection of
+ordinary coordinate convolution followed by any verified reduction schedule.
 The native in-place array correspondence, schedule-completeness/low-coordinate
 theorem, deterministic polynomial selection, and accepted-vector elaboration
 still require concrete refinement.

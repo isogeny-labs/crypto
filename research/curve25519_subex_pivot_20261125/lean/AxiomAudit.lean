@@ -76,6 +76,9 @@ open Curve25519ExtensionRingModel
 #print axioms binaryReductionStep_coeff
 #print axioms binaryReductionStep_mk
 #print axioms binaryReduceOffsets_mk
+#print axioms coordinatePolynomial_mk
+#print axioms decodePowerBasis_mul_eq_mk
+#print axioms decodePowerBasis_mul_eq_reduced_mk
 #print axioms nativeExtension_pow_two_zero
 #print axioms decodePowerBasis_add
 #print axioms decodePowerBasis_neg

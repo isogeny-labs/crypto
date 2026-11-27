@@ -193,7 +193,10 @@ root relation `U^d=-sum_j f_j U^j` and the exact one-step identity used when
 the native loop subtracts one high coefficient into every set lower bit. A
 logical polynomial reduction step clears its targeted coefficient and preserves
 the quotient value; induction now proves preservation for every finite offset
-schedule. Matching the native in-place array to that polynomial schedule,
+schedule. Coordinate vectors now decode exactly as quotient projections of
+their low coordinate polynomials, so coordinate-polynomial convolution followed
+by any such schedule is proved to represent the decoded product. Matching the
+native in-place array to that polynomial convolution/reduction schedule,
 proving the descending schedule leaves only low coordinates, deterministic
 irreducible-polynomial selection, and accepted-vector elaboration remain open.
 `[pcc:unverified]`

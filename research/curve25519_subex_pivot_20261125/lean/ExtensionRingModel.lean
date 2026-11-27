@@ -58,6 +58,40 @@ noncomputable def decodeSerialized
   decodePowerBasis precision degree lowerCoefficient
     (fun index => coordinates index)
 
+/-- Polynomial whose low power-basis coefficients are one serialized
+coordinate vector. -/
+noncomputable def coordinatePolynomial
+    (precision degree : ℕ)
+    (coordinates : Fin degree → ZMod (2 ^ precision)) :
+    Polynomial (ZMod (2 ^ precision)) :=
+  ∑ index : Fin degree, monomial (index : ℕ) (coordinates index)
+
+/-- Power-basis decoding is exactly projection of the coordinate polynomial
+into the quotient. -/
+theorem coordinatePolynomial_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (coordinates : Fin degree → ZMod (2 ^ precision)) :
+    AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (coordinatePolynomial precision degree coordinates) =
+      decodePowerBasis precision degree lowerCoefficient coordinates := by
+  rw [coordinatePolynomial, map_sum]
+  apply Finset.sum_congr rfl
+  intro index _
+  rw [← C_mul_X_pow_eq_monomial, map_mul, map_pow]
+  rfl
+
+/-- Multiplication of decoded coordinate vectors is projection of the ordinary
+coordinate-polynomial convolution product. -/
+theorem decodePowerBasis_mul_eq_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    decodePowerBasis precision degree lowerCoefficient left *
+        decodePowerBasis precision degree lowerCoefficient right =
+      AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (coordinatePolynomial precision degree left *
+          coordinatePolynomial precision degree right) := by
+  rw [← coordinatePolynomial_mk, ← coordinatePolynomial_mk, map_mul]
+
 /-- The adjoined power-basis generator satisfies the exact binary-polynomial
 relation used by the native high-degree reduction loop. -/
 theorem nativeExtension_root_relation
@@ -206,6 +240,20 @@ theorem binaryReduceOffsets_mk
   | nil => rfl
   | cons offset offsets ih =>
       rw [binaryReduceOffsets, ih, binaryReductionStep_mk]
+
+/-- Coordinate-polynomial convolution followed by any finite logical reduction
+schedule represents the product of the decoded inputs. -/
+theorem decodePowerBasis_mul_eq_reduced_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) (offsets : List ℕ) :
+    decodePowerBasis precision degree lowerCoefficient left *
+        decodePowerBasis precision degree lowerCoefficient right =
+      AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (binaryReduceOffsets precision degree lowerCoefficient offsets
+          (coordinatePolynomial precision degree left *
+            coordinatePolynomial precision degree right)) := by
+  rw [binaryReduceOffsets_mk]
+  exact decodePowerBasis_mul_eq_mk precision degree lowerCoefficient left right
 
 /-- The base characteristic relation survives in every polynomial quotient:
 the formal native extension satisfies the modulus premise used by the Cauchy

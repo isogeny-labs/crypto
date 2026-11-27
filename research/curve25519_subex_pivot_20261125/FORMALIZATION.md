@@ -531,9 +531,12 @@ high-power subtraction step matching the native reduction loop. The formal
 layer now represents each reduction as subtraction of a shifted modulus,
 proves that it clears the targeted coefficient, and proves by induction that
 every finite reduction-offset schedule preserves the quotient value. The
-remaining scalar gap is the native array-to-polynomial invariant and proof that
-the actual descending schedule leaves only the returned low coordinates,
-plus deterministic polynomial selection and accepted witness instantiation.
+coordinate-polynomial projection theorem additionally identifies decoded
+multiplication with ordinary polynomial convolution followed by any verified
+reduction schedule. The remaining scalar gap is the native
+array-to-polynomial coefficient invariant and proof that the actual descending
+schedule leaves only the returned low coordinates, plus deterministic
+polynomial selection and accepted witness instantiation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
