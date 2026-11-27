@@ -1215,11 +1215,15 @@ fn poly_powmod_observed<E>(
     mut e: u64,
     m: &[u64],
     p: u64,
+    deadline: Option<std::time::Instant>,
     observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
-) -> Result<Vec<u64>, E> {
+) -> Result<Option<Vec<u64>>, E> {
     let mut acc = vec![1u64];
     let mut b = poly_rem_observed(base, m, p, observe)?;
     while e > 0 {
+        if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+            return Ok(None);
+        }
         if e & 1 == 1 {
             let product = poly_mul_observed(&acc, &b, p, observe)?;
             acc = poly_rem_observed(&product, m, p, observe)?;
@@ -1228,7 +1232,7 @@ fn poly_powmod_observed<E>(
         b = poly_rem_observed(&square, m, p, observe)?;
         e >>= 1;
     }
-    Ok(acc)
+    Ok(Some(acc))
 }
 
 #[cfg(test)]
@@ -1321,7 +1325,9 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
         return Ok(Some(vec![root_neg(scaled, p, observe)?]));
     }
     // x^p − x mod f
-    let xp = poly_powmod_observed(&[0, 1], p, &f, p, observe)?;
+    let Some(xp) = poly_powmod_observed(&[0, 1], p, &f, p, deadline, observe)? else {
+        return Ok(None);
+    };
     let mut xp_minus_x = xp;
     if xp_minus_x.len() < 2 {
         xp_minus_x.resize(2, 0);
@@ -1345,7 +1351,11 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
             _ => {
                 // Split h with gcd((x + δ)^((p−1)/2) − 1, h).
                 let delta = rng.gen_range(0..p);
-                let mut s = poly_powmod_observed(&[delta, 1], (p - 1) / 2, &h, p, observe)?;
+                let Some(mut s) =
+                    poly_powmod_observed(&[delta, 1], (p - 1) / 2, &h, p, deadline, observe)?
+                else {
+                    return Ok(None);
+                };
                 if s.is_empty() {
                     s.push(0);
                 }
@@ -1891,6 +1901,31 @@ mod tests {
         );
         assert_eq!(expired, Ok(None));
         assert_eq!(deadline_observations, 0);
+    }
+
+    #[test]
+    fn observed_powmod_internal_deadline_and_refusal_remain_distinct() {
+        let mut deadline_operations = Vec::new();
+        let expired = poly_powmod_observed(
+            &[0, 1],
+            101,
+            &[1, 0, 1],
+            101,
+            Some(std::time::Instant::now() - std::time::Duration::from_secs(1)),
+            &mut |operation| {
+                deadline_operations.push(operation);
+                Ok::<(), &'static str>(())
+            },
+        );
+        assert_eq!(expired, Ok(None));
+        // The base is reduced once before the exponent loop; the expired
+        // loop poll prevents every multiply/square operation after that.
+        assert_eq!(deadline_operations, vec![RootFieldOperation::Inversion]);
+
+        let refused = poly_powmod_observed(&[0, 1], 3, &[1, 0, 1], 101, None, &mut |_| {
+            Err::<(), _>("operation refused")
+        });
+        assert_eq!(refused, Err("operation refused"));
     }
 
     #[test]
