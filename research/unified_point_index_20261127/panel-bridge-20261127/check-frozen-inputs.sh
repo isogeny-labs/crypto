@@ -41,6 +41,11 @@ jq -e --slurpfile publication "$inputs" '
   and .experiment_submitted==false
   and .threads==1 and .deadline_secs==1800
   and .aa_rounds>=5 and .ab_rounds>=5 and .repetitions==3
+  and .job_cpu==4 and .job_memory=="8Gi" and .job_seconds==2100
+  and .job_instance_type=="c8a.2xlarge" and .job_isolation_profile=="l2"
+  and .job_retries==0 and .max_jobs==3
+  and (.budget_max_usd|type)=="number"
+  and .budget_max_usd>0 and .budget_max_usd<=10
   and (.driver_crate_tree|test("^[a-f0-9]{40}$"))
   and all(.builder_sha256,.measurement_overlay_sha256,.panel_manifest_sha256,
     .seed_manifest_sha256,.inputs_sha256,.optimized_options_sha256;
