@@ -646,3 +646,86 @@ pub fn predict_summary(pred: &str, bwd: &str) {
         println!("predicted slope (log2 cost on log2 ell, n >= 36) {arm}: {sl:.3}");
     }
 }
+
+/// Post-freeze sensitivity (NOT part of the frozen analysis; REPORT.md says
+/// so): the frozen projection fits targets/F ∝ (fs/F)^{p_α} on the measured
+/// rungs, where α = fs/F ≥ 0.12, and so extrapolates with p_α ≈ −0.5. The
+/// 2LP counting argument gives targets/F = K·(c + α)/(1 − (1 − α)³), i.e.
+/// p_α → −1 as α → 0. This refits (K, c) on the same census rows and
+/// redoes the sparse-model projections with that shape.
+pub fn sensitivity(summary: &str) {
+    let s: Value = serde_json::from_str(&std::fs::read_to_string(summary).unwrap()).unwrap();
+    let p = &s["projection"]["fit"];
+    let g = |v: &Value, k: &str| v[k].as_f64().unwrap();
+    let mut pts = vec![]; // (alpha, targets/F)
+    for r in s["rungs"].as_array().unwrap() {
+        for a in ["D2", "D2e"] {
+            let c = &r["census"][a];
+            if c.is_null() || g(c, "fs") >= g(c, "fb") - 1.5 {
+                continue;
+            }
+            pts.push((g(c, "fs") / g(c, "fb"), g(c, "targets") / g(c, "fb")));
+        }
+    }
+    let shape = |a: f64, c: f64| (c + a) / (1.0 - (1.0 - a).powi(3));
+    let mut best = (f64::MAX, 0.0, 0.0);
+    let mut c = 0.0;
+    while c <= 20.0 {
+        let lk = mean(&pts.iter().map(|&(a, t)| t.ln() - shape(a, c).ln()).collect::<Vec<_>>());
+        let sse: f64 = pts.iter().map(|&(a, t)| (t.ln() - lk - shape(a, c).ln()).powi(2)).sum();
+        if sse < best.0 {
+            best = (sse, c, lk.exp());
+        }
+        c += 0.005;
+    }
+    let (sse, cc, kk) = best;
+    println!("theory-shaped targets/F = K(c+alpha)/(1-(1-alpha)^3): K = {kk:.4}, c = {cc:.3}, rms log residual = {:.4} over {} rows", (sse / pts.len() as f64).sqrt(), pts.len());
+    let (ca, cb, gpt, fbr, s_top, hbar, wbar) = (g(p, "alpha"), g(p, "beta"), g(p, "graph_meq_per_target"), g(p, "fb_over_qp"), g(p, "rho_S_top"), g(p, "h_mean"), g(p, "wbar"));
+    let (l0, gam) = (g(&p["la_echelon"], "log2_coeff"), g(&p["la_echelon"], "gamma"));
+    let rho = |np: f64| s_top * (2f64.powf(3.0 * np) / hbar).sqrt();
+    let cost = |np: f64, fs: f64, sparse: bool| {
+        let f = fbr * 2f64.powf(np);
+        let fs = fs.min(f - 1.0);
+        let tg = f * kk * shape(fs / f, cc);
+        tg * (ca + cb * np + gpt) + if sparse { 3.0 * wbar * fs * fs } else { 2f64.powf(l0 + gam * fs.log2()) }
+    };
+    let mut first: BTreeMap<&str, Option<f64>> = BTreeMap::new();
+    let mut minr: BTreeMap<&str, (f64, f64)> = BTreeMap::new();
+    let mut np = 6.0;
+    println!("| n | D2 sparse | D2e sparse | rebalanced sparse (fs) | rebalanced echelon (fs) |\n|---|---|---|---|---|");
+    while np <= 64.0 {
+        let f = fbr * 2f64.powf(np);
+        let r = rho(np);
+        let d2 = cost(np, (4.0 * f.powf(2.0 / 3.0)).ceil(), true) / r;
+        let d2e = cost(np, (16.0 * f.powf(0.528)).ceil(), true) / r;
+        let (mut bs, mut be) = ((f64::MAX, 0.0), (f64::MAX, 0.0));
+        let mut fs = 16.0;
+        while fs < f {
+            let a = cost(np, fs, true);
+            if a < bs.0 {
+                bs = (a, fs);
+            }
+            let b = cost(np, fs, false);
+            if b < be.0 {
+                be = (b, fs);
+            }
+            fs *= 1.05;
+        }
+        for (k, v) in [("D2_sparse", d2), ("D2e_sparse", d2e), ("rebalanced_sparse", bs.0 / r), ("rebalanced_echelon", be.0 / r)] {
+            if first.get(k).map(|x| x.is_none()).unwrap_or(true) {
+                first.insert(k, if v <= 1.0 { Some(np) } else { None });
+            }
+            let m = minr.entry(k).or_insert((f64::MAX, 0.0));
+            if v < m.0 {
+                *m = (v, np);
+            }
+        }
+        if (np as u32) % 4 == 0 && np.fract() == 0.0 {
+            println!("| {} | {:.3} | {:.3} | {:.3} ({:.0}) | {:.3} ({:.0}) |", 3.0 * np, d2, d2e, bs.0 / r, bs.1, be.0 / r, be.1);
+        }
+        np += 0.25;
+    }
+    for (k, v) in &first {
+        println!("{k}: first n' with ratio <= 1: {:?} (n = {:?}); min ratio {:.3} at n' = {}", v, v.map(|x| 3.0 * x), minr[k].0, minr[k].1);
+    }
+}
