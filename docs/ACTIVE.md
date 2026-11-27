@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Seek positive P-192 rank gain on the frozen original factor base after eliminating every auxiliary column; preserve baseline, actual KM/elliptic checks and all stage costs under the existing one-CPU/1GiB/300s-build/600s-worker limits (Codex, started 2026-11-27, branch lane/p192-closed-rank-20261127; Conductor T-8; no new PCC or speedup claim).
+- [ ] Seek positive P-192 rank gain on the frozen original factor base after eliminating every auxiliary column; preserve baseline, actual KM/elliptic checks and all stage costs under the existing one-CPU/1GiB/300s-build/600s-worker limits (Codex, started 2026-11-27, branch lane/p192-closed-rank-20261127; Conductor T-8, PR #5265 after #5258; no new PCC or speedup claim).
 
 - [ ] Repair the inherited aimed-gather registry-custody validation failure without changing original scientific values, raw records or reports, so the P-192 verification stack can land (Codex, started 2026-11-26, branch lane/p192-synthesis-costs-20261126, PR #5258; Conductor T-6).
 
