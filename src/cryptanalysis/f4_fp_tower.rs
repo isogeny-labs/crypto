@@ -4171,10 +4171,24 @@ fn scan_products(
     examined: &mut MonoMap<u32>,
     frontier: &mut Vec<Mono>,
     cache: &mut ProductCache,
-) -> u64 {
+    deadline: Option<Instant>,
+) -> Result<u64, u64> {
     let mut terms = 0u64;
     let mut ids: Vec<u32> = Vec::new();
-    for batch in todo.chunks(1024) {
+    // With a deadline, one wave contains at most one product per worker.
+    // A large symbolic step used to form 1024 products before looking at
+    // the clock, allowing a 60-second run to remain inside this function
+    // for minutes.  Finished waves are still integrated in input order, so
+    // the monomial numbering and the uncapped algorithm do not change.
+    let batch_size = if deadline.is_some() {
+        rayon::current_num_threads().max(1)
+    } else {
+        1024
+    };
+    for batch in todo.chunks(batch_size) {
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return Err(terms);
+        }
         let prods: Vec<RPoly> = batch
             .par_iter()
             .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult, w))
@@ -4205,8 +4219,11 @@ fn scan_products(
                 },
             });
         }
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return Err(terms);
+        }
     }
-    terms
+    Ok(terms)
 }
 
 // ── The algorithm ────────────────────────────────────────────────────
@@ -4491,7 +4508,7 @@ fn f4_tower_cached(
         let mut frontier: Vec<Mono> = Vec::new();
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
         let mut cache = ProductCache::new(cache_terms);
-        let mut nnz = scan_products(
+        let (mut nnz, mut aborted) = match scan_products(
             ring,
             fp,
             s.w,
@@ -4502,10 +4519,13 @@ fn f4_tower_cached(
             &mut examined,
             &mut frontier,
             &mut cache,
-        );
+            opts.deadline,
+        ) {
+            Ok(terms) => (terms, false),
+            Err(terms) => (terms, true),
+        };
         let mut r_desc: Vec<RowDesc> = Vec::new();
-        let mut aborted = false;
-        while !frontier.is_empty() {
+        while !aborted && !frontier.is_empty() {
             if opts.deadline.is_some_and(|dl| Instant::now() >= dl) {
                 aborted = true;
                 break;
@@ -4525,7 +4545,7 @@ fn f4_tower_cached(
                 }
             }
             let before = r_desc.len();
-            nnz += scan_products(
+            match scan_products(
                 ring,
                 fp,
                 s.w,
@@ -4536,7 +4556,15 @@ fn f4_tower_cached(
                 &mut examined,
                 &mut frontier,
                 &mut cache,
-            );
+                opts.deadline,
+            ) {
+                Ok(terms) => nnz += terms,
+                Err(terms) => {
+                    nnz += terms;
+                    aborted = true;
+                    break;
+                }
+            }
             debug_assert!(
                 r_desc[before..]
                     .iter()
@@ -4861,6 +4889,36 @@ mod tests {
 
     fn fp(p: u64) -> Fp {
         Fp::new(p)
+    }
+
+    #[test]
+    fn symbolic_product_scan_obeys_an_expired_deadline() {
+        let ring = TowerRing::new(7, Vec::new(), 1);
+        let x = mono(0, [1, 0, 0, 0, 0]);
+        let polys = vec![Elem::from_rpoly(RPoly {
+            monos: vec![x, ONE],
+            coefs: vec![1, 1],
+        })];
+        let todo = vec![(ONE, 0)];
+        let mut out = Vec::new();
+        let mut examined = MonoMap::default();
+        let mut frontier = Vec::new();
+        let mut cache = ProductCache::new(16);
+        let result = scan_products(
+            &ring,
+            fp(7),
+            TowerWeights::UNIT,
+            &polys,
+            &todo,
+            0,
+            &mut out,
+            &mut examined,
+            &mut frontier,
+            &mut cache,
+            Some(Instant::now() - Duration::from_millis(1)),
+        );
+        assert_eq!(result, Err(0));
+        assert!(out.is_empty() && examined.is_empty() && frontier.is_empty());
     }
 
     /// grevlex on exponent vectors, variable 0 largest.

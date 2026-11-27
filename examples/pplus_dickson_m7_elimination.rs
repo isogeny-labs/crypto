@@ -148,10 +148,13 @@ fn cold_target(
     let expected_hit = expected.is_some();
     let truth_agreement = got.is_some() == expected_hit;
     let witness_valid = got.as_ref().is_none_or(|indices| {
-        indices.len() == ARITY
-            && sum_indices(&fixture.instance.curve, &base, indices) == target
+        indices.len() == ARITY && sum_indices(&fixture.instance.curve, &base, indices) == target
     });
-    assert!(witness_valid, "{}: candidate witness does not replay", fixture.label);
+    assert!(
+        witness_valid,
+        "{}: candidate witness does not replay",
+        fixture.label
+    );
     assert_eq!(
         native
             .get("pkm_descent_deferred_to_grid")
@@ -165,8 +168,7 @@ fn cold_target(
         assert!(
             truth_agreement,
             "{}: algebraic truth differs from affine control for {:?}",
-            fixture.label,
-            target
+            fixture.label, target
         );
     }
 
@@ -205,19 +207,22 @@ fn cold_target(
     })
 }
 
-fn run_fixture(fixture: Fixture, include_miss: bool) -> Vec<Value> {
+fn run_fixture(fixture: Fixture, include_hit: bool, include_miss: bool) -> Vec<Value> {
     let base = dickson_factor_base(&fixture.instance, fixture.depth, 0, 0)
         .expect("control Dickson factor base");
     assert!(!base.points.is_empty());
     let truth = exhaustive_affine(&fixture.instance.curve, &base);
 
-    let planted_indices = vec![0; ARITY];
-    let planted = sum_indices(&fixture.instance.curve, &base, &planted_indices);
-    assert!(!planted.infinity);
-    let planted_control = truth
-        .get(&fixture.instance.curve.key(&planted))
-        .expect("planted target is reachable");
-    let mut rows = vec![cold_target(&fixture, planted, Some(planted_control), 60)];
+    let mut rows = Vec::new();
+    if include_hit {
+        let planted_indices = vec![0; ARITY];
+        let planted = sum_indices(&fixture.instance.curve, &base, &planted_indices);
+        assert!(!planted.infinity);
+        let planted_control = truth
+            .get(&fixture.instance.curve.key(&planted))
+            .expect("planted target is reachable");
+        rows.push(cold_target(&fixture, planted, Some(planted_control), 60));
+    }
 
     if include_miss {
         let generator = fixture.instance.generator_point();
@@ -252,13 +257,18 @@ fn run_fixture(fixture: Fixture, include_miss: bool) -> Vec<Value> {
 fn main() {
     let selection = std::env::args().nth(1).unwrap_or_else(|| "all".into());
     let rows = match selection.as_str() {
-        "depth1" => run_fixture(f7_depth1(), false),
-        "depth2" => run_fixture(f31_depth2_sparse(), true),
-        "all" => run_fixture(f7_depth1(), false)
+        "depth1" => run_fixture(f7_depth1(), true, false),
+        "depth2" => run_fixture(f31_depth2_sparse(), true, true),
+        "depth2-hit" => run_fixture(f31_depth2_sparse(), true, false),
+        "depth2-miss" => run_fixture(f31_depth2_sparse(), false, true),
+        "all" => run_fixture(f7_depth1(), true, false)
             .into_iter()
-            .chain(run_fixture(f31_depth2_sparse(), true))
+            .chain(run_fixture(f31_depth2_sparse(), true, true))
             .collect(),
-        _ => panic!("usage: pplus_dickson_m7_elimination [depth1|depth2|all]"),
+        _ => panic!(
+            "usage: pplus_dickson_m7_elimination \
+             [depth1|depth2|depth2-hit|depth2-miss|all]"
+        ),
     };
     for row in rows {
         println!("{}", serde_json::to_string(&row).expect("serialize result"));
