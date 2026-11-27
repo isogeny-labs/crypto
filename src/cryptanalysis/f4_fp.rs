@@ -57,6 +57,7 @@
 //! no F5 signatures or sugar selection; this module was written so that
 //! the descent systems of the coordinate thread can be timed at `m = 3`.
 
+use std::alloc::Layout;
 use std::collections::HashSet;
 use std::marker::PhantomData;
 use std::num::NonZeroU64;
@@ -9690,6 +9691,7 @@ pub struct VisitAccountingWorkV1 {
     pub trace_deliveries: u64,
     pub allocation_requests: u64,
     pub payload_bytes_requested: u64,
+    pub payload_bytes_acquired: u64,
     pub payload_bytes_released: u64,
     pub wall_ns: u64,
     pub thread_cpu_ns: u64,
@@ -9732,6 +9734,7 @@ impl VisitAccountingWorkV1 {
             trace_deliveries,
             allocation_requests,
             payload_bytes_requested,
+            payload_bytes_acquired,
             payload_bytes_released,
             wall_ns,
             thread_cpu_ns,
@@ -9752,7 +9755,10 @@ pub struct VisitAccountingPhaseRecordV1 {
 /// those units distinct.
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
 pub struct VisitAccountingMemoryV1 {
+    pub pending_allocation_requests_at_finish: u64,
+    pub pending_payload_bytes_at_finish: u64,
     pub live_payload_bytes_at_finish: u64,
+    pub live_scratch_payload_bytes_at_finish: u64,
     pub peak_live_payload_bytes: u64,
     pub peak_scratch_payload_bytes: u64,
     pub allocator_overhead_included: bool,
@@ -9870,6 +9876,7 @@ enum VisitAccountingCounter {
     TraceDeliveries,
     AllocationRequests,
     PayloadBytesRequested,
+    PayloadBytesAcquired,
     PayloadBytesReleased,
     WallNs,
     ThreadCpuNs,
@@ -9907,6 +9914,7 @@ impl VisitAccountingCounter {
             Self::TraceDeliveries => "trace_deliveries",
             Self::AllocationRequests => "allocation_requests",
             Self::PayloadBytesRequested => "payload_bytes_requested",
+            Self::PayloadBytesAcquired => "payload_bytes_acquired",
             Self::PayloadBytesReleased => "payload_bytes_released",
             Self::WallNs => "wall_ns",
             Self::ThreadCpuNs => "thread_cpu_ns",
@@ -9944,6 +9952,7 @@ impl VisitAccountingCounter {
             Self::TraceDeliveries => &mut work.trace_deliveries,
             Self::AllocationRequests => &mut work.allocation_requests,
             Self::PayloadBytesRequested => &mut work.payload_bytes_requested,
+            Self::PayloadBytesAcquired => &mut work.payload_bytes_acquired,
             Self::PayloadBytesReleased => &mut work.payload_bytes_released,
             Self::WallNs => &mut work.wall_ns,
             Self::ThreadCpuNs => &mut work.thread_cpu_ns,
@@ -9963,7 +9972,10 @@ struct VisitAccountingBuilder {
     blocker: Option<VisitAccountingBlockerV1>,
     checked_arithmetic: bool,
     suspended_depth: usize,
+    pending_allocation_requests: u64,
+    pending_payload_bytes: u64,
     live_payload_bytes: u64,
+    live_scratch_payload_bytes: u64,
     peak_live_payload_bytes: u64,
     peak_scratch_payload_bytes: u64,
     operation_tracking_complete: bool,
@@ -10122,7 +10134,10 @@ impl VisitAccountingBuilder {
             blocker: None,
             checked_arithmetic: true,
             suspended_depth: 0,
+            pending_allocation_requests: 0,
+            pending_payload_bytes: 0,
             live_payload_bytes: 0,
+            live_scratch_payload_bytes: 0,
             peak_live_payload_bytes: 0,
             peak_scratch_payload_bytes: 0,
             // Operation, memory and work ownership are independent promotion
@@ -10215,6 +10230,274 @@ impl VisitAccountingBuilder {
                 );
             }
         }
+    }
+
+    /// Admit one positive-byte allocation request as a single checked bundle.
+    /// No member is changed unless both phase/total counters and both pending
+    /// observations can be represented.
+    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
+    fn request_payload(&mut self, requested_bytes: u64) -> bool {
+        debug_assert_ne!(requested_bytes, 0);
+        let phase = self.current_phase.index();
+
+        let Some(phase_requests) = self.phases[phase].allocation_requests.checked_add(1) else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("allocation_requests"),
+                "checked allocation-request phase increment failed",
+            );
+            return false;
+        };
+        let Some(total_requests) = self.total.allocation_requests.checked_add(1) else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("allocation_requests"),
+                "checked allocation-request total increment failed",
+            );
+            return false;
+        };
+        let Some(phase_requested_bytes) = self.phases[phase]
+            .payload_bytes_requested
+            .checked_add(requested_bytes)
+        else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("payload_bytes_requested"),
+                format!("checked addition of {requested_bytes} requested phase bytes failed"),
+            );
+            return false;
+        };
+        let Some(total_requested_bytes) = self
+            .total
+            .payload_bytes_requested
+            .checked_add(requested_bytes)
+        else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("payload_bytes_requested"),
+                format!("checked addition of {requested_bytes} requested total bytes failed"),
+            );
+            return false;
+        };
+        let Some(pending_requests) = self.pending_allocation_requests.checked_add(1) else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("pending_allocation_requests"),
+                "checked pending allocation-request increment failed",
+            );
+            return false;
+        };
+        let Some(pending_bytes) = self.pending_payload_bytes.checked_add(requested_bytes) else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("pending_payload_bytes"),
+                format!("checked addition of {requested_bytes} pending payload bytes failed"),
+            );
+            return false;
+        };
+
+        self.phases[phase].allocation_requests = phase_requests;
+        self.total.allocation_requests = total_requests;
+        self.phases[phase].payload_bytes_requested = phase_requested_bytes;
+        self.total.payload_bytes_requested = total_requested_bytes;
+        self.pending_allocation_requests = pending_requests;
+        self.pending_payload_bytes = pending_bytes;
+        true
+    }
+
+    /// Resolve one admitted request without acquiring payload bytes.
+    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
+    fn resolve_payload_request(&mut self, requested_bytes: u64) -> bool {
+        let Some(pending_requests) = self.pending_allocation_requests.checked_sub(1) else {
+            self.checked_arithmetic_block(
+                "counter_underflow",
+                Some("pending_allocation_requests"),
+                "pending allocation-request count was already zero",
+            );
+            return false;
+        };
+        let Some(pending_bytes) = self.pending_payload_bytes.checked_sub(requested_bytes) else {
+            self.checked_arithmetic_block(
+                "counter_underflow",
+                Some("pending_payload_bytes"),
+                format!("cannot resolve {requested_bytes} pending payload bytes"),
+            );
+            return false;
+        };
+        self.pending_allocation_requests = pending_requests;
+        self.pending_payload_bytes = pending_bytes;
+        true
+    }
+
+    /// Convert one pending request into an active payload lease. Pending state
+    /// is resolved even when an acquired/live counter cannot be represented;
+    /// in that case no lease is published and the caller must drop the actual
+    /// allocation.
+    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
+    fn activate_payload(
+        &mut self,
+        requested_bytes: u64,
+        acquired_bytes: u64,
+        class: VisitPayloadClass,
+    ) -> (bool, bool) {
+        debug_assert_ne!(requested_bytes, 0);
+        debug_assert_ne!(acquired_bytes, 0);
+
+        let Some(pending_requests) = self.pending_allocation_requests.checked_sub(1) else {
+            self.checked_arithmetic_block(
+                "counter_underflow",
+                Some("pending_allocation_requests"),
+                "activation found no pending allocation request",
+            );
+            return (false, false);
+        };
+        let Some(pending_bytes) = self.pending_payload_bytes.checked_sub(requested_bytes) else {
+            self.checked_arithmetic_block(
+                "counter_underflow",
+                Some("pending_payload_bytes"),
+                format!("activation cannot resolve {requested_bytes} pending payload bytes"),
+            );
+            return (false, false);
+        };
+
+        if self.blocker.is_some() {
+            self.pending_allocation_requests = pending_requests;
+            self.pending_payload_bytes = pending_bytes;
+            return (true, false);
+        }
+
+        macro_rules! activation_value {
+            ($value:expr, $counter:expr, $detail:expr) => {
+                match $value {
+                    Some(value) => value,
+                    None => {
+                        self.pending_allocation_requests = pending_requests;
+                        self.pending_payload_bytes = pending_bytes;
+                        self.checked_arithmetic_block("counter_overflow", Some($counter), $detail);
+                        return (true, false);
+                    }
+                }
+            };
+        }
+
+        let phase = self.current_phase.index();
+        let phase_acquired = activation_value!(
+            self.phases[phase]
+                .payload_bytes_acquired
+                .checked_add(acquired_bytes),
+            "payload_bytes_acquired",
+            format!("checked addition of {acquired_bytes} acquired phase bytes failed")
+        );
+        let total_acquired = activation_value!(
+            self.total
+                .payload_bytes_acquired
+                .checked_add(acquired_bytes),
+            "payload_bytes_acquired",
+            format!("checked addition of {acquired_bytes} acquired total bytes failed")
+        );
+        let live_payload = activation_value!(
+            self.live_payload_bytes.checked_add(acquired_bytes),
+            "live_payload_bytes",
+            format!("checked addition of {acquired_bytes} live payload bytes failed")
+        );
+        let live_scratch = if class == VisitPayloadClass::Scratch {
+            activation_value!(
+                self.live_scratch_payload_bytes.checked_add(acquired_bytes),
+                "live_scratch_payload_bytes",
+                format!("checked addition of {acquired_bytes} live scratch bytes failed")
+            )
+        } else {
+            self.live_scratch_payload_bytes
+        };
+        if live_scratch > live_payload {
+            self.pending_allocation_requests = pending_requests;
+            self.pending_payload_bytes = pending_bytes;
+            self.checked_arithmetic_block(
+                "memory_reconciliation_mismatch",
+                Some("live_scratch_payload_bytes"),
+                "scratch payload would exceed total live payload during activation",
+            );
+            return (true, false);
+        }
+
+        self.pending_allocation_requests = pending_requests;
+        self.pending_payload_bytes = pending_bytes;
+        self.phases[phase].payload_bytes_acquired = phase_acquired;
+        self.total.payload_bytes_acquired = total_acquired;
+        self.live_payload_bytes = live_payload;
+        self.live_scratch_payload_bytes = live_scratch;
+        self.peak_live_payload_bytes = self.peak_live_payload_bytes.max(live_payload);
+        self.peak_scratch_payload_bytes = self.peak_scratch_payload_bytes.max(live_scratch);
+        (true, true)
+    }
+
+    /// Release one active payload lease as a single checked bundle. If any
+    /// counter or live-state update fails, no member is changed, so sealing
+    /// retains the unreconciled live bytes and fails closed.
+    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
+    fn release_payload(&mut self, released_bytes: u64, class: VisitPayloadClass) {
+        if released_bytes == 0 {
+            return;
+        }
+        let phase = self.current_phase.index();
+        let Some(phase_released) = self.phases[phase]
+            .payload_bytes_released
+            .checked_add(released_bytes)
+        else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("payload_bytes_released"),
+                format!("checked addition of {released_bytes} released phase bytes failed"),
+            );
+            return;
+        };
+        let Some(total_released) = self
+            .total
+            .payload_bytes_released
+            .checked_add(released_bytes)
+        else {
+            self.checked_arithmetic_block(
+                "counter_overflow",
+                Some("payload_bytes_released"),
+                format!("checked addition of {released_bytes} released total bytes failed"),
+            );
+            return;
+        };
+        let Some(live_payload) = self.live_payload_bytes.checked_sub(released_bytes) else {
+            self.checked_arithmetic_block(
+                "counter_underflow",
+                Some("live_payload_bytes"),
+                format!("cannot release {released_bytes} from total live payload"),
+            );
+            return;
+        };
+        let live_scratch = if class == VisitPayloadClass::Scratch {
+            let Some(live_scratch) = self.live_scratch_payload_bytes.checked_sub(released_bytes)
+            else {
+                self.checked_arithmetic_block(
+                    "counter_underflow",
+                    Some("live_scratch_payload_bytes"),
+                    format!("cannot release {released_bytes} from live scratch payload"),
+                );
+                return;
+            };
+            live_scratch
+        } else {
+            self.live_scratch_payload_bytes
+        };
+        if live_scratch > live_payload {
+            self.checked_arithmetic_block(
+                "memory_reconciliation_mismatch",
+                Some("live_scratch_payload_bytes"),
+                "scratch payload would exceed total live payload after release",
+            );
+            return;
+        }
+
+        self.phases[phase].payload_bytes_released = phase_released;
+        self.total.payload_bytes_released = total_released;
+        self.live_payload_bytes = live_payload;
+        self.live_scratch_payload_bytes = live_scratch;
     }
 
     fn close_current_interval(&mut self) {
@@ -10326,7 +10609,26 @@ impl VisitAccountingBuilder {
                 "a frozen process-global solver mode changed before seal",
             );
         }
-        let memory_balanced = self.live_payload_bytes == 0;
+        let acquired_balance = match self
+            .total
+            .payload_bytes_acquired
+            .checked_sub(self.total.payload_bytes_released)
+        {
+            Some(outstanding) => outstanding == self.live_payload_bytes,
+            None => {
+                self.checked_arithmetic = false;
+                false
+            }
+        };
+        let memory_balanced = self.pending_allocation_requests == 0
+            && self.pending_payload_bytes == 0
+            && self.live_scratch_payload_bytes <= self.live_payload_bytes
+            && self.live_payload_bytes <= self.peak_live_payload_bytes
+            && self.live_scratch_payload_bytes <= self.peak_scratch_payload_bytes
+            && self.peak_scratch_payload_bytes <= self.peak_live_payload_bytes
+            && acquired_balance
+            && self.live_payload_bytes == 0
+            && self.live_scratch_payload_bytes == 0;
         // Charge gate and preliminary reconciliation work to the explicit
         // accounting-overhead phase.  The final clock read is necessarily
         // the boundary of the observable interval.
@@ -10350,10 +10652,17 @@ impl VisitAccountingBuilder {
         if !memory_balanced {
             self.block(
                 "memory_reconciliation_mismatch",
-                Some("payload_bytes_released"),
+                Some("payload_bytes_acquired"),
                 format!(
-                    "{} logical payload bytes remain live at seal",
-                    self.live_payload_bytes
+                    "memory reconciliation failed: pending_requests={}, pending_bytes={}, acquired={}, released={}, live={}, live_scratch={}, peak_live={}, peak_scratch={}",
+                    self.pending_allocation_requests,
+                    self.pending_payload_bytes,
+                    self.total.payload_bytes_acquired,
+                    self.total.payload_bytes_released,
+                    self.live_payload_bytes,
+                    self.live_scratch_payload_bytes,
+                    self.peak_live_payload_bytes,
+                    self.peak_scratch_payload_bytes,
                 ),
             );
         }
@@ -10407,7 +10716,10 @@ impl VisitAccountingBuilder {
             total: self.total,
             phases,
             memory: VisitAccountingMemoryV1 {
+                pending_allocation_requests_at_finish: self.pending_allocation_requests,
+                pending_payload_bytes_at_finish: self.pending_payload_bytes,
                 live_payload_bytes_at_finish: self.live_payload_bytes,
+                live_scratch_payload_bytes_at_finish: self.live_scratch_payload_bytes,
                 peak_live_payload_bytes: self.peak_live_payload_bytes,
                 peak_scratch_payload_bytes: self.peak_scratch_payload_bytes,
                 allocator_overhead_included: false,
@@ -10569,6 +10881,79 @@ impl<'a> VisitAccount<'a> {
         }
     }
 
+    /// Admit the accounting side of a future positive-byte allocation. The
+    /// caller performs the allocator operation, inspects actual capacity and
+    /// then either activates or fails the returned reservation. Legacy calls
+    /// and zero-byte/ZST shapes need no accounting guard.
+    #[allow(dead_code)] // Production allocation sites are routed in a later slice.
+    fn request_payload<T>(
+        self,
+        requested_capacity: usize,
+        class: VisitPayloadClass,
+    ) -> Result<Option<VisitPayloadReservation<'a, T>>, VisitAccountingControl> {
+        let token = match self {
+            Self::Off => return Ok(None),
+            Self::On(token) => token,
+        };
+        if visit_account_with_token(token, false, false, |_| {}).stopped() {
+            return Err(VisitAccountingControl::Stop);
+        }
+        if requested_capacity == 0 || std::mem::size_of::<T>() == 0 {
+            return Ok(None);
+        }
+
+        let layout = match Layout::array::<T>(requested_capacity) {
+            Ok(layout) => layout,
+            Err(_) => {
+                let _ = visit_account_with_token(token, false, false, |accounting| {
+                    accounting.checked_arithmetic_block(
+                        "counter_overflow",
+                        Some("payload_bytes_requested"),
+                        format!(
+                            "Layout::array rejected capacity {requested_capacity} for {}",
+                            std::any::type_name::<T>()
+                        ),
+                    );
+                });
+                return Err(VisitAccountingControl::Stop);
+            }
+        };
+        let requested_bytes = match u64::try_from(layout.size()) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                let _ = visit_account_with_token(token, false, false, |accounting| {
+                    accounting.checked_arithmetic_block(
+                        "counter_overflow",
+                        Some("payload_bytes_requested"),
+                        format!(
+                            "requested layout of {} bytes does not fit u64",
+                            layout.size()
+                        ),
+                    );
+                });
+                return Err(VisitAccountingControl::Stop);
+            }
+        };
+        debug_assert_ne!(requested_bytes, 0);
+
+        let mut admitted = false;
+        let control = visit_account_with_token(token, false, false, |accounting| {
+            admitted = accounting.request_payload(requested_bytes);
+        });
+        if control.stopped() || !admitted {
+            return Err(VisitAccountingControl::Stop);
+        }
+        Ok(Some(VisitPayloadReservation {
+            token,
+            requested_capacity,
+            requested_bytes,
+            class,
+            pending: true,
+            _element: PhantomData,
+            _not_send: PhantomData,
+        }))
+    }
+
     fn block(
         self,
         code: &'static str,
@@ -10708,6 +11093,215 @@ impl VisitHelperAccount<'_> {
                 VisitAccount::On(token).checked_arithmetic_block(code, counter, detail)
             }
         }
+    }
+}
+
+/// Logical ownership class for one call-owned payload capacity. Scratch bytes
+/// are a subset of total live payload and therefore contribute to both peaks.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(dead_code)] // Production allocation sites are routed in a later slice.
+enum VisitPayloadClass {
+    Persistent,
+    Scratch,
+}
+
+/// An admitted allocation request which has not yet been paired with the
+/// allocator's actual capacity. Forgetting this guard leaves pending state for
+/// seal to reject; ordinary drop resolves it and records abandonment.
+#[must_use = "payload reservations must be activated or failed explicitly"]
+#[allow(dead_code)] // Synthetic controls establish the substrate first.
+struct VisitPayloadReservation<'a, T> {
+    token: VisitAccountingToken<'a>,
+    requested_capacity: usize,
+    requested_bytes: u64,
+    class: VisitPayloadClass,
+    pending: bool,
+    _element: PhantomData<fn() -> T>,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+#[allow(dead_code)] // Production allocation sites are routed in a later slice.
+impl<'a, T> VisitPayloadReservation<'a, T> {
+    /// Activate the request with the capacity inspected after allocator
+    /// success. Excess capacity is valid and charged; only a shortfall is an
+    /// allocator-contract failure.
+    fn activate(
+        mut self,
+        actual_capacity: usize,
+    ) -> Result<VisitPayloadLease<'a>, VisitAccountingControl> {
+        if actual_capacity < self.requested_capacity {
+            let mut resolved = false;
+            let _ = visit_account_with_token(self.token, true, true, |accounting| {
+                resolved = accounting.resolve_payload_request(self.requested_bytes);
+                if resolved {
+                    accounting.block(
+                        "allocator_capacity_shortfall",
+                        Some("payload_bytes_acquired"),
+                        format!(
+                            "allocator returned capacity {actual_capacity} below requested minimum {}",
+                            self.requested_capacity
+                        ),
+                    );
+                }
+            });
+            if resolved {
+                self.pending = false;
+            }
+            return Err(VisitAccountingControl::Stop);
+        }
+
+        let layout = match Layout::array::<T>(actual_capacity) {
+            Ok(layout) => layout,
+            Err(_) => {
+                let mut resolved = false;
+                let _ = visit_account_with_token(self.token, true, true, |accounting| {
+                    resolved = accounting.resolve_payload_request(self.requested_bytes);
+                    if resolved {
+                        accounting.checked_arithmetic_block(
+                            "allocator_capacity_overflow",
+                            Some("payload_bytes_acquired"),
+                            format!(
+                                "Layout::array rejected actual capacity {actual_capacity} for {}",
+                                std::any::type_name::<T>()
+                            ),
+                        );
+                    }
+                });
+                if resolved {
+                    self.pending = false;
+                }
+                return Err(VisitAccountingControl::Stop);
+            }
+        };
+        let acquired_bytes = match u64::try_from(layout.size()) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                let mut resolved = false;
+                let _ = visit_account_with_token(self.token, true, true, |accounting| {
+                    resolved = accounting.resolve_payload_request(self.requested_bytes);
+                    if resolved {
+                        accounting.checked_arithmetic_block(
+                            "allocator_capacity_overflow",
+                            Some("payload_bytes_acquired"),
+                            format!("actual layout of {} bytes does not fit u64", layout.size()),
+                        );
+                    }
+                });
+                if resolved {
+                    self.pending = false;
+                }
+                return Err(VisitAccountingControl::Stop);
+            }
+        };
+        debug_assert_ne!(acquired_bytes, 0);
+
+        let mut resolved = false;
+        let mut activated = false;
+        let _ = visit_account_with_token(self.token, true, true, |accounting| {
+            if accounting.suspended_depth != 0 {
+                resolved = accounting.resolve_payload_request(self.requested_bytes);
+                if resolved {
+                    accounting.block(
+                        "payload_activation_during_external_work",
+                        Some("payload_bytes_acquired"),
+                        "payload activation occurred while solver accounting was suspended",
+                    );
+                }
+            } else {
+                (resolved, activated) =
+                    accounting.activate_payload(self.requested_bytes, acquired_bytes, self.class);
+            }
+        });
+        if resolved {
+            self.pending = false;
+        }
+        if !activated {
+            return Err(VisitAccountingControl::Stop);
+        }
+        Ok(VisitPayloadLease {
+            token: self.token,
+            bytes: acquired_bytes,
+            class: self.class,
+            active: true,
+            _not_send: PhantomData,
+        })
+    }
+
+    /// Resolve an admitted request after deterministic or real allocator
+    /// refusal. Requested work remains recorded; no bytes become live.
+    fn allocation_failed(mut self, detail: impl Into<String>) -> VisitAccountingControl {
+        let detail = detail.into();
+        let mut resolved = false;
+        let control = visit_account_with_token(self.token, true, true, |accounting| {
+            resolved = accounting.resolve_payload_request(self.requested_bytes);
+            if resolved {
+                accounting.block("allocation_failed", Some("payload_bytes_acquired"), detail);
+            }
+        });
+        if resolved {
+            self.pending = false;
+        }
+        control
+    }
+}
+
+impl<T> Drop for VisitPayloadReservation<'_, T> {
+    fn drop(&mut self) {
+        if !self.pending {
+            return;
+        }
+        let mut resolved = false;
+        let _ = visit_account_with_token(self.token, true, true, |accounting| {
+            resolved = accounting.resolve_payload_request(self.requested_bytes);
+            if resolved {
+                accounting.block(
+                    "allocation_request_abandoned",
+                    Some("payload_bytes_requested"),
+                    format!(
+                        "reservation for {} requested payload bytes was dropped before activation",
+                        self.requested_bytes
+                    ),
+                );
+            }
+        });
+        if resolved {
+            self.pending = false;
+        }
+    }
+}
+
+/// Active logical ownership of an allocator capacity. The type is neither
+/// Send nor Sync; moving it transfers ownership without charging again.
+#[must_use = "payload leases must remain live with their allocation"]
+#[allow(dead_code)] // Production allocation sites are routed in a later slice.
+struct VisitPayloadLease<'a> {
+    token: VisitAccountingToken<'a>,
+    bytes: u64,
+    class: VisitPayloadClass,
+    active: bool,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitPayloadLease<'_> {
+    fn drop(&mut self) {
+        if !self.active {
+            return;
+        }
+        let _ = visit_account_with_token(self.token, true, true, |accounting| {
+            let suspended = accounting.suspended_depth != 0;
+            accounting.release_payload(self.bytes, self.class);
+            if suspended {
+                accounting.block(
+                    "payload_release_during_external_work",
+                    Some("payload_bytes_released"),
+                    format!(
+                        "released {} logical payload bytes while solver accounting was suspended",
+                        self.bytes
+                    ),
+                );
+            }
+        });
+        self.active = false;
     }
 }
 
@@ -13199,6 +13793,31 @@ mod visit_accounting_tests {
             .expect("accounted entry point returns its ledger")
     }
 
+    fn begin_session<'a>(
+        context: &'a VisitAccountingContext,
+        id: &str,
+    ) -> VisitAccountingSession<'a> {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        VisitAccountingSession::begin(
+            VisitAccountingBuilder::new(request(id), &opts, false),
+            context,
+        )
+        .ok()
+        .expect("test owns the accounted session")
+    }
+
+    fn phase_work(
+        record: &VisitAccountingV1,
+        phase: VisitAccountingPhaseV1,
+    ) -> &VisitAccountingWorkV1 {
+        &record
+            .phases
+            .iter()
+            .find(|entry| entry.phase == phase)
+            .expect("every accounting phase is serialized")
+            .work
+    }
+
     fn assert_reconciles_in_modes(
         record: &VisitAccountingV1,
         ownership_mode: &str,
@@ -13210,6 +13829,7 @@ mod visit_accounting_tests {
         }
         assert_eq!(sum, record.total);
         assert!(record.reconciliation.phase_sum_equals_total);
+        assert!(record.reconciliation.memory_balanced);
         assert!(record.reconciliation.checked_arithmetic);
         assert!(!record.reconciliation.operation_tracking_complete);
         assert!(!record.reconciliation.memory_tracking_complete);
@@ -13218,6 +13838,10 @@ mod visit_accounting_tests {
         assert_eq!(record.arm.accounting_token_mode, accounting_token_mode);
         assert_eq!(record.scope, "solve_visit_call_only");
         assert!(record.whole_collector_accounting_required);
+        assert_eq!(record.memory.pending_allocation_requests_at_finish, 0);
+        assert_eq!(record.memory.pending_payload_bytes_at_finish, 0);
+        assert_eq!(record.memory.live_payload_bytes_at_finish, 0);
+        assert_eq!(record.memory.live_scratch_payload_bytes_at_finish, 0);
     }
 
     fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
@@ -16255,6 +16879,790 @@ mod visit_accounting_tests {
                 "unbalanced_external_work_suspension"
             );
             assert_reconciles(&next_record);
+        });
+    }
+
+    #[test]
+    fn payload_leases_track_nested_live_and_scratch_peaks_exactly() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-nested-peaks");
+            let account = VisitAccount::On(session.token());
+
+            let persistent = account
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            let scratch_24 = account
+                .request_payload::<u8>(24, VisitPayloadClass::Scratch)
+                .unwrap()
+                .unwrap()
+                .activate(24)
+                .unwrap();
+            let scratch_8 = account
+                .request_payload::<u8>(8, VisitPayloadClass::Scratch)
+                .unwrap()
+                .unwrap()
+                .activate(8)
+                .unwrap();
+            drop(scratch_8);
+            drop(scratch_24);
+            drop(persistent);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 3);
+            assert_eq!(record.total.payload_bytes_requested, 48);
+            assert_eq!(record.total.payload_bytes_acquired, 48);
+            assert_eq!(record.total.payload_bytes_released, 48);
+            assert_eq!(record.memory.peak_live_payload_bytes, 48);
+            assert_eq!(record.memory.peak_scratch_payload_bytes, 32);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_excess_capacity_is_charged_and_valid() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-excess-capacity");
+            let account = VisitAccount::On(session.token());
+            let lease = account
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(32)
+                .unwrap();
+            drop(lease);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 1);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, 32);
+            assert_eq!(record.total.payload_bytes_released, 32);
+            assert_eq!(record.memory.peak_live_payload_bytes, 32);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "memory_tracking_gap");
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_request_bundle_overflows_are_atomic() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let request_context = VisitAccountingContext::new().unwrap();
+            let request_session = begin_counter_overflow_session(
+                &request_context,
+                "payload-request-count-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::AllocationRequests,
+            );
+            let request_result = VisitAccount::On(request_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(request_result.is_err());
+            drop(request_result);
+            let request_record = request_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(request_record.total.allocation_requests, u64::MAX);
+            assert_eq!(request_record.total.payload_bytes_requested, 0);
+            assert_eq!(
+                request_record.memory.pending_allocation_requests_at_finish,
+                0
+            );
+            assert_eq!(request_record.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(
+                request_record.blocker.as_ref().unwrap().counter,
+                Some("allocation_requests")
+            );
+            assert!(request_record.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&request_record);
+
+            let bytes_context = VisitAccountingContext::new().unwrap();
+            let bytes_session = begin_counter_overflow_session(
+                &bytes_context,
+                "payload-request-bytes-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::PayloadBytesRequested,
+            );
+            let bytes_result = VisitAccount::On(bytes_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(bytes_result.is_err());
+            drop(bytes_result);
+            let bytes_record = bytes_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(bytes_record.total.allocation_requests, 0);
+            assert_eq!(bytes_record.total.payload_bytes_requested, u64::MAX);
+            assert_eq!(bytes_record.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(bytes_record.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(
+                bytes_record.blocker.as_ref().unwrap().counter,
+                Some("payload_bytes_requested")
+            );
+            assert!(bytes_record.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&bytes_record);
+        });
+    }
+
+    #[test]
+    fn payload_request_late_members_and_total_only_overflows_are_atomic() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let total_request_context = VisitAccountingContext::new().unwrap();
+            let mut total_request_builder = VisitAccountingBuilder::new(
+                request("payload-total-request-overflow"),
+                &opts,
+                false,
+            );
+            total_request_builder.total.allocation_requests = u64::MAX;
+            total_request_builder.phases[VisitAccountingPhaseV1::RootExtraction.index()]
+                .allocation_requests = u64::MAX;
+            let total_request_session =
+                VisitAccountingSession::begin(total_request_builder, &total_request_context)
+                    .ok()
+                    .unwrap();
+            let result = VisitAccount::On(total_request_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(result.is_err());
+            drop(result);
+            let total_request = total_request_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(total_request.total.allocation_requests, u64::MAX);
+            assert_eq!(total_request.total.payload_bytes_requested, 0);
+            assert_eq!(
+                phase_work(&total_request, VisitAccountingPhaseV1::Validation).allocation_requests,
+                0
+            );
+            assert_eq!(
+                total_request.blocker.as_ref().unwrap().counter,
+                Some("allocation_requests")
+            );
+            assert!(total_request.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&total_request);
+
+            let total_bytes_context = VisitAccountingContext::new().unwrap();
+            let mut total_bytes_builder =
+                VisitAccountingBuilder::new(request("payload-total-bytes-overflow"), &opts, false);
+            total_bytes_builder.total.payload_bytes_requested = u64::MAX;
+            total_bytes_builder.phases[VisitAccountingPhaseV1::RootExtraction.index()]
+                .payload_bytes_requested = u64::MAX;
+            let total_bytes_session =
+                VisitAccountingSession::begin(total_bytes_builder, &total_bytes_context)
+                    .ok()
+                    .unwrap();
+            let result = VisitAccount::On(total_bytes_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(result.is_err());
+            drop(result);
+            let total_bytes = total_bytes_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(total_bytes.total.allocation_requests, 0);
+            assert_eq!(total_bytes.total.payload_bytes_requested, u64::MAX);
+            let validation = phase_work(&total_bytes, VisitAccountingPhaseV1::Validation);
+            assert_eq!(validation.allocation_requests, 0);
+            assert_eq!(validation.payload_bytes_requested, 0);
+            assert_eq!(
+                total_bytes.blocker.as_ref().unwrap().counter,
+                Some("payload_bytes_requested")
+            );
+            assert!(total_bytes.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&total_bytes);
+
+            let pending_count_context = VisitAccountingContext::new().unwrap();
+            let mut pending_count_builder = VisitAccountingBuilder::new(
+                request("payload-pending-count-overflow"),
+                &opts,
+                false,
+            );
+            pending_count_builder.pending_allocation_requests = u64::MAX;
+            let pending_count_session =
+                VisitAccountingSession::begin(pending_count_builder, &pending_count_context)
+                    .ok()
+                    .unwrap();
+            let result = VisitAccount::On(pending_count_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(result.is_err());
+            drop(result);
+            let pending_count = pending_count_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(pending_count.total.allocation_requests, 0);
+            assert_eq!(pending_count.total.payload_bytes_requested, 0);
+            assert_eq!(
+                pending_count.memory.pending_allocation_requests_at_finish,
+                u64::MAX
+            );
+            assert_eq!(pending_count.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(
+                pending_count.blocker.as_ref().unwrap().counter,
+                Some("pending_allocation_requests")
+            );
+            assert!(!pending_count.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&pending_count);
+
+            let pending_bytes_context = VisitAccountingContext::new().unwrap();
+            let mut pending_bytes_builder = VisitAccountingBuilder::new(
+                request("payload-pending-bytes-overflow"),
+                &opts,
+                false,
+            );
+            pending_bytes_builder.pending_payload_bytes = u64::MAX;
+            let pending_bytes_session =
+                VisitAccountingSession::begin(pending_bytes_builder, &pending_bytes_context)
+                    .ok()
+                    .unwrap();
+            let result = VisitAccount::On(pending_bytes_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(result.is_err());
+            drop(result);
+            let pending_bytes = pending_bytes_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(pending_bytes.total.allocation_requests, 0);
+            assert_eq!(pending_bytes.total.payload_bytes_requested, 0);
+            assert_eq!(
+                pending_bytes.memory.pending_allocation_requests_at_finish,
+                0
+            );
+            assert_eq!(
+                pending_bytes.memory.pending_payload_bytes_at_finish,
+                u64::MAX
+            );
+            assert_eq!(
+                pending_bytes.blocker.as_ref().unwrap().counter,
+                Some("pending_payload_bytes")
+            );
+            assert!(!pending_bytes.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&pending_bytes);
+        });
+    }
+
+    #[test]
+    fn payload_layout_overflow_precedes_request_accounting() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-layout-overflow");
+            let result = VisitAccount::On(session.token())
+                .request_payload::<u64>(usize::MAX, VisitPayloadClass::Persistent);
+            assert!(result.is_err());
+            drop(result);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 0);
+            assert_eq!(record.total.payload_bytes_requested, 0);
+            assert_eq!(record.total.payload_bytes_acquired, 0);
+            assert_eq!(record.total.payload_bytes_released, 0);
+            assert_eq!(record.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 0);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.counter, Some("payload_bytes_requested"));
+            assert!(record.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_release_after_sticky_blocker_preserves_first_reason() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-sticky-release");
+            let account = VisitAccount::On(session.token());
+            let lease = account
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            assert_eq!(
+                account.block("seeded_payload_block", None, "seeded for cleanup control"),
+                VisitAccountingControl::Stop
+            );
+            drop(lease);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "seeded_payload_block"
+            );
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, 16);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_release_during_external_pause_blocks_but_balances() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-suspended-release");
+            let account = VisitAccount::On(session.token());
+            let lease = account
+                .request_payload::<u8>(16, VisitPayloadClass::Scratch)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            let pause = account.pause_external().unwrap();
+            drop(lease);
+            drop(pause);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "payload_release_during_external_work"
+            );
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, 16);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn forgotten_payload_lease_fails_memory_reconciliation() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-forgotten-lease");
+            let lease = VisitAccount::On(session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Scratch)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            std::mem::forget(lease);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 1);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, 0);
+            assert_eq!(record.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 16);
+            assert_eq!(record.memory.live_scratch_payload_bytes_at_finish, 16);
+            assert_eq!(record.memory.peak_live_payload_bytes, 16);
+            assert_eq!(record.memory.peak_scratch_payload_bytes, 16);
+            assert!(!record.reconciliation.memory_balanced);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "memory_reconciliation_mismatch"
+            );
+            let mut sum = VisitAccountingWorkV1::default();
+            for phase in &record.phases {
+                sum.checked_add_assign(&phase.work).unwrap();
+            }
+            assert_eq!(sum, record.total);
+        });
+    }
+
+    #[test]
+    fn forgotten_and_dropped_payload_reservations_are_distinct() {
+        in_owner_pool(|| {
+            let forgotten_context = VisitAccountingContext::new().unwrap();
+            let forgotten_session = begin_session(&forgotten_context, "payload-forgotten-request");
+            let reservation = VisitAccount::On(forgotten_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap();
+            std::mem::forget(reservation);
+            let forgotten = forgotten_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(forgotten.total.allocation_requests, 1);
+            assert_eq!(forgotten.total.payload_bytes_requested, 16);
+            assert_eq!(forgotten.total.payload_bytes_acquired, 0);
+            assert_eq!(forgotten.memory.pending_allocation_requests_at_finish, 1);
+            assert_eq!(forgotten.memory.pending_payload_bytes_at_finish, 16);
+            assert_eq!(forgotten.memory.live_payload_bytes_at_finish, 0);
+            assert!(!forgotten.reconciliation.memory_balanced);
+            assert_eq!(
+                forgotten.blocker.as_ref().unwrap().code,
+                "memory_reconciliation_mismatch"
+            );
+
+            let dropped_context = VisitAccountingContext::new().unwrap();
+            let dropped_session = begin_session(&dropped_context, "payload-dropped-request");
+            let reservation = VisitAccount::On(dropped_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap();
+            drop(reservation);
+            let dropped = dropped_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                dropped.blocker.as_ref().unwrap().code,
+                "allocation_request_abandoned"
+            );
+            assert_eq!(dropped.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(dropped.memory.pending_payload_bytes_at_finish, 0);
+            assert_reconciles(&dropped);
+        });
+    }
+
+    #[test]
+    fn payload_requests_reject_wrong_and_foreign_owners_uncharged() {
+        in_owner_pool(|| {
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let wrong_session = begin_session(&owning_context, "payload-wrong-token");
+            let wrong = VisitAccount::On(wrong_context.unbound_test_token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent);
+            assert!(wrong.is_err());
+            let wrong_record = wrong_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                wrong_record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(wrong_record.total.allocation_requests, 0);
+            assert_eq!(wrong_record.total.payload_bytes_requested, 0);
+            assert_eq!(wrong_record.total.payload_bytes_acquired, 0);
+            assert_eq!(wrong_record.memory.pending_allocation_requests_at_finish, 0);
+            assert_reconciles(&wrong_record);
+
+            let foreign_context = VisitAccountingContext::new().unwrap();
+            let foreign_session = begin_session(&foreign_context, "payload-foreign-token");
+            let token = foreign_session.token();
+            let stopped = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        VisitAccount::On(token)
+                            .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                            .is_err()
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert!(stopped);
+            let foreign_record = foreign_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                foreign_record.blocker.as_ref().unwrap().code,
+                "foreign_thread_work"
+            );
+            assert_eq!(foreign_record.total.allocation_requests, 0);
+            assert_eq!(foreign_record.total.payload_bytes_requested, 0);
+            assert_eq!(foreign_record.total.payload_bytes_acquired, 0);
+            assert_eq!(
+                foreign_record.memory.pending_allocation_requests_at_finish,
+                0
+            );
+            assert_reconciles(&foreign_record);
+        });
+    }
+
+    #[test]
+    fn payload_allocator_failure_retains_request_without_live_bytes() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-allocation-failed");
+            let reservation = VisitAccount::On(session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap();
+            assert_eq!(
+                reservation.allocation_failed("injected allocator refusal"),
+                VisitAccountingControl::Stop
+            );
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "allocation_failed");
+            assert_eq!(record.total.allocation_requests, 1);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, 0);
+            assert_eq!(record.total.payload_bytes_released, 0);
+            assert_eq!(record.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 0);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_activation_shortfall_and_capacity_overflow_resolve_pending() {
+        in_owner_pool(|| {
+            let short_context = VisitAccountingContext::new().unwrap();
+            let short_session = begin_session(&short_context, "payload-capacity-shortfall");
+            let short = VisitAccount::On(short_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(15);
+            assert!(short.is_err());
+            drop(short);
+            let short_record = short_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                short_record.blocker.as_ref().unwrap().code,
+                "allocator_capacity_shortfall"
+            );
+            assert_eq!(short_record.total.payload_bytes_acquired, 0);
+            assert_eq!(short_record.memory.pending_allocation_requests_at_finish, 0);
+            assert!(short_record.reconciliation.memory_balanced);
+            assert_reconciles(&short_record);
+
+            let overflow_context = VisitAccountingContext::new().unwrap();
+            let overflow_session = begin_session(&overflow_context, "payload-capacity-overflow");
+            let overflow = VisitAccount::On(overflow_session.token())
+                .request_payload::<u64>(1, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(usize::MAX);
+            assert!(overflow.is_err());
+            drop(overflow);
+            let overflow_record = overflow_session.finish(VisitDispositionV1::Incomplete);
+            let blocker = overflow_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "allocator_capacity_overflow");
+            assert_eq!(blocker.counter, Some("payload_bytes_acquired"));
+            assert_eq!(overflow_record.total.payload_bytes_acquired, 0);
+            assert_eq!(
+                overflow_record.memory.pending_allocation_requests_at_finish,
+                0
+            );
+            assert_eq!(overflow_record.memory.live_payload_bytes_at_finish, 0);
+            assert!(overflow_record.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&overflow_record);
+        });
+    }
+
+    #[test]
+    fn payload_activation_suspension_and_late_live_overflow_fail_closed() {
+        in_owner_pool(|| {
+            let suspended_context = VisitAccountingContext::new().unwrap();
+            let suspended_session =
+                begin_session(&suspended_context, "payload-activation-suspended");
+            let suspended_account = VisitAccount::On(suspended_session.token());
+            let reservation = suspended_account
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap();
+            let pause = suspended_account.pause_external().unwrap();
+            let activation = reservation.activate(16);
+            assert!(activation.is_err());
+            drop(activation);
+            drop(pause);
+            let suspended = suspended_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                suspended.blocker.as_ref().unwrap().code,
+                "payload_activation_during_external_work"
+            );
+            assert_eq!(suspended.total.allocation_requests, 1);
+            assert_eq!(suspended.total.payload_bytes_requested, 16);
+            assert_eq!(suspended.total.payload_bytes_acquired, 0);
+            assert_eq!(suspended.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(suspended.memory.pending_payload_bytes_at_finish, 0);
+            assert!(suspended.reconciliation.memory_balanced);
+            assert_reconciles(&suspended);
+
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let live_context = VisitAccountingContext::new().unwrap();
+            let mut live_builder =
+                VisitAccountingBuilder::new(request("payload-live-overflow"), &opts, false);
+            live_builder.live_payload_bytes = u64::MAX;
+            live_builder.peak_live_payload_bytes = u64::MAX;
+            let live_session = VisitAccountingSession::begin(live_builder, &live_context)
+                .ok()
+                .unwrap();
+            let activation = VisitAccount::On(live_session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16);
+            assert!(activation.is_err());
+            drop(activation);
+            let live = live_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(live.total.allocation_requests, 1);
+            assert_eq!(live.total.payload_bytes_requested, 16);
+            assert_eq!(live.total.payload_bytes_acquired, 0);
+            assert_eq!(live.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(live.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(live.memory.live_payload_bytes_at_finish, u64::MAX);
+            let blocker = live.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.counter, Some("live_payload_bytes"));
+            assert!(!live.reconciliation.memory_balanced);
+            assert_overflow_reconciles(&live);
+        });
+    }
+
+    #[test]
+    fn payload_acquired_counter_overflow_resolves_pending_without_lease() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_counter_overflow_session(
+                &context,
+                "payload-acquired-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::PayloadBytesAcquired,
+            );
+            let activation = VisitAccount::On(session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16);
+            assert!(activation.is_err());
+            drop(activation);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 1);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, u64::MAX);
+            assert_eq!(record.total.payload_bytes_released, 0);
+            assert_eq!(record.memory.pending_allocation_requests_at_finish, 0);
+            assert_eq!(record.memory.pending_payload_bytes_at_finish, 0);
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 0);
+            assert!(!record.reconciliation.memory_balanced);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.counter, Some("payload_bytes_acquired"));
+            assert_overflow_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_phase_attribution_follows_request_activation_and_release() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-phase-attribution");
+            let account = VisitAccount::On(session.token());
+
+            let (traversal, control) = account.phase_scope(VisitAccountingPhaseV1::Traversal);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let lease = account
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            drop(traversal);
+
+            let (verification, control) =
+                account.phase_scope(VisitAccountingPhaseV1::CandidateVerification);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            drop(lease);
+            drop(verification);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let traversal = phase_work(&record, VisitAccountingPhaseV1::Traversal);
+            assert_eq!(traversal.allocation_requests, 1);
+            assert_eq!(traversal.payload_bytes_requested, 16);
+            assert_eq!(traversal.payload_bytes_acquired, 16);
+            assert_eq!(traversal.payload_bytes_released, 0);
+            let verification = phase_work(&record, VisitAccountingPhaseV1::CandidateVerification);
+            assert_eq!(verification.allocation_requests, 0);
+            assert_eq!(verification.payload_bytes_requested, 0);
+            assert_eq!(verification.payload_bytes_acquired, 0);
+            assert_eq!(verification.payload_bytes_released, 16);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_release_overflow_leaves_live_state_for_seal() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-release-overflow");
+            let lease = VisitAccount::On(session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+                let mut slot = slot.borrow_mut();
+                let accounting = slot.as_mut().unwrap();
+                let phase = accounting.current_phase.index();
+                accounting.phases[phase].payload_bytes_released = u64::MAX;
+                accounting.total.payload_bytes_released = u64::MAX;
+            });
+            drop(lease);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, u64::MAX);
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 16);
+            assert!(!record.reconciliation.memory_balanced);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.counter, Some("payload_bytes_released"));
+            assert_overflow_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_total_only_release_overflow_does_not_commit_phase_or_live_state() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-total-release-overflow");
+            let lease = VisitAccount::On(session.token())
+                .request_payload::<u8>(16, VisitPayloadClass::Persistent)
+                .unwrap()
+                .unwrap()
+                .activate(16)
+                .unwrap();
+            VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+                let mut slot = slot.borrow_mut();
+                let accounting = slot.as_mut().unwrap();
+                accounting.total.payload_bytes_released = u64::MAX;
+                accounting.phases[VisitAccountingPhaseV1::RootExtraction.index()]
+                    .payload_bytes_released = u64::MAX;
+            });
+            drop(lease);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, u64::MAX);
+            assert_eq!(
+                phase_work(&record, VisitAccountingPhaseV1::Validation).payload_bytes_released,
+                0
+            );
+            assert_eq!(record.memory.live_payload_bytes_at_finish, 16);
+            assert!(!record.reconciliation.memory_balanced);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.counter, Some("payload_bytes_released"));
+            assert_overflow_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn payload_zero_capacity_and_zst_are_uncharged() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-zero-zst");
+            let account = VisitAccount::On(session.token());
+            assert!(account
+                .request_payload::<u64>(0, VisitPayloadClass::Persistent)
+                .unwrap()
+                .is_none());
+            assert!(account
+                .request_payload::<()>(usize::MAX, VisitPayloadClass::Scratch)
+                .unwrap()
+                .is_none());
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.allocation_requests, 0);
+            assert_eq!(record.total.payload_bytes_requested, 0);
+            assert_eq!(record.total.payload_bytes_acquired, 0);
+            assert_eq!(record.total.payload_bytes_released, 0);
+            assert_eq!(record.memory.peak_live_payload_bytes, 0);
+            assert_eq!(record.memory.peak_scratch_payload_bytes, 0);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn caught_unwind_drops_payload_lease_and_balances() {
+        in_owner_pool(|| {
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_session(&context, "payload-caught-unwind");
+            let token = session.token();
+            let unwind = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let _lease = VisitAccount::On(token)
+                    .request_payload::<u8>(16, VisitPayloadClass::Scratch)
+                    .unwrap()
+                    .unwrap()
+                    .activate(16)
+                    .unwrap();
+                panic!("synthetic caught unwind");
+            }));
+            assert!(unwind.is_err());
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.total.payload_bytes_requested, 16);
+            assert_eq!(record.total.payload_bytes_acquired, 16);
+            assert_eq!(record.total.payload_bytes_released, 16);
+            assert_reconciles(&record);
         });
     }
 
