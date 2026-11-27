@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render recorded values only; no curve, group, polynomial or rank arithmetic."""
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -257,6 +258,64 @@ if (high_scan_source.parent/'exit-code.txt').exists() and (high_scan_source.pare
         f"{high_scan['core_full_rank']}/{high_scan['core_auxiliary_rank']}/{high_scan['closed_rank']}; "
         f"restored {high_scan['full_rank']}/{high_scan['auxiliary_rank']} counts are derived. "
         "Contact-order histogram is retained in the synthesis with exact branch witnesses.")
+shifted_failure=ROOT/'evidence/shifted-six-v1/calls/full/exit-code.txt'
+if shifted_failure.exists():
+    attempts['shifted-six-v1']=(
+        "Strict native build passes; nonzero fixture and brute six-word controls pass before "
+        "actual enumeration. Source review finds a hard-coded final reference-word label "
+        "off by one column. The actual target calculation is correct. Native worker is "
+        "intentionally interrupted by SIGTERM (exit 143); wrapper exits 1. Partial progress "
+        "and source/input/binary receipts remain intact. No complete enumeration, final "
+        "stream digest, final result or rank outcome is claimed from this attempt. "
+        "The correction derives labels from verified reference images and checks them "
+        "before enumeration; it runs in a fresh v2 snapshot.")
+shifted_source=ROOT/'evidence/shifted-six-v2/calls/full/stdout.json'
+if (shifted_source.parent/'exit-code.txt').exists() and (shifted_source.parent/'exit-code.txt').read_text().strip()=='0':
+    shifted=json.loads(shifted_source.read_text())
+    attempts['shifted-six-v2']=(
+        f"Complete reference-shifted six-symbol necessary bound: {shifted['unordered_triples']} "
+        f"unordered triples on {shifted['signed_alphabet']} symbols at target 2rho. "
+        f"Both arithmetic streams and both joins agree. Retained distinct rows including "
+        f"zero: {shifted['distinct_rows_including_zero']}; independent added rows: "
+        f"{shifted['independent_added_rows']}. Full/auxiliary/closed ranks: "
+        f"{shifted['full_rank']}/{shifted['auxiliary_rank']}/{shifted['closed_rank']}. "
+        "Actual reference points 223,224,225 are freshly mapped and checked in both "
+        "group implementations. Formal labels derive from those bindings and pass "
+        "before enumeration. Nonempty fixture agrees with independent brute six-word "
+        "enumeration; altered row, missing row/triple and changed orientation reject. "
+        "Fixture rank one enters no actual data. This is a necessary image bound, "
+        "not geometric principal-divisor or KM realization evidence.")
+canonical_source=ROOT/'evidence/canonical-six-v1/calls/full/stdout.json'
+if (canonical_source.parent/'exit-code.txt').exists() and (canonical_source.parent/'exit-code.txt').read_text().strip()=='0':
+    canonical=json.loads(canonical_source.read_text())
+    attempts['canonical-six-v1']=(
+        f"Degree-six pole divisor H+2R has target kappa; H is the verified split canonical "
+        f"section x=56 and R is original exceptional point 0 mapping to O. All "
+        f"{canonical['unordered_triples']} shifted triples agree between named OpenSSL "
+        f"and GMP; both joins agree on {canonical['distinct_rows_including_zero']} "
+        f"distinct rows including zero. All seven original section rows are recovered; "
+        f"independent additions: {canonical['independent_added_rows']}. Actual ranks are "
+        f"{canonical['full_rank']}/{canonical['auxiliary_rank']}/{canonical['closed_rank']}. "
+        "Exact line factor product, exceptional charts, derived formal labels, half-target, "
+        "all word/row group sums, nonzero fixture/brute enumeration and corruption controls "
+        "pass. No fixture enters actual data. The earlier kappa test covered four symbols; "
+        "this completes the necessary six-symbol image condition in the fixed domain.")
+exceptional_source=ROOT/'evidence/exceptional-conic-six-v1/calls/full/stdout.json'
+if (exceptional_source.parent/'exit-code.txt').exists() and (exceptional_source.parent/'exit-code.txt').read_text().strip()=='0':
+    exceptional=json.loads(exceptional_source.read_text())
+    attempts['exceptional-conic-six-v1']=(
+        f"Complete six-image necessary bound for conics tangent at exceptional R, using "
+        f"RR divisor 2H-2R and target 2kappa. H is disjoint from smooth R; the two "
+        f"conic local constraints have native rank {exceptional['conic_contact_constraint_rank']}. "
+        f"All {exceptional['unordered_triples']} triples agree between GMP and named "
+        f"OpenSSL. Both joins agree on {exceptional['distinct_rows_including_zero']} "
+        f"rows including zero; independent additions {exceptional['independent_added_rows']}. "
+        f"Actual full/auxiliary/closed ranks {exceptional['full_rank']}/"
+        f"{exceptional['auxiliary_rank']}/{exceptional['closed_rank']}. No formal zero "
+        "word is required or inserted for this divisor. Actual reference-sign corruption, "
+        "nonzero fixture/brute enumeration and all row/triple/orientation controls pass. "
+        "Fixtures enter no actual data. Individual rational images remain restricted to "
+        "the frozen original signed domain; this does not exhaust other conics.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -279,7 +338,8 @@ for name, outcome in attempts.items():
     for call in calls:
         entries.append({'call': call.name,
                         'exit': int((call/'exit-code.txt').read_text()),
-                        **json.loads((call/'cost.json').read_text())})
+                        **json.loads(next(line for line in reversed((call/'cost.json').read_text().splitlines())
+                                         if line.startswith('{"wall_seconds":')))})
     wrapper_lines = (raw/'wrapper-stderr-and-cost.txt').read_text().splitlines()
     cost_line = next(line for line in reversed(wrapper_lines) if line.startswith('{"wall_seconds":'))
     commit_file = raw/'source-commit.txt'
@@ -363,6 +423,25 @@ if 'high_scan' in globals():
          [r['count'] for r in histogram], 'First unfixed contact parameters: actual 512-pencil domain',
          'Verified branches (count)')
 
+if 'shifted' in globals() and 'canonical' in globals():
+    records=[{'divisor':'2E_ref','target':'2rho','source':'evidence/shifted-six-v2/calls/full/stdout.json','native':shifted},
+             {'divisor':'H+2R','target':'kappa','source':'evidence/canonical-six-v1/calls/full/stdout.json','native':canonical}]
+    if 'exceptional' in globals():
+        records.append({'divisor':'2H-2R','target':'2kappa','source':'evidence/exceptional-conic-six-v1/calls/full/stdout.json','native':exceptional})
+    (ROOT/'degree-six-values.json').write_text(json.dumps(records,indent=2)+'\n')
+    dot='digraph G {rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];'
+    for i,record in enumerate(records):
+        native=record['native']
+        dot+=(f'a{i}[label="RR divisor {record["divisor"]}\\nImage target {record["target"]}"];'
+              f'b{i}[label="{native["unordered_triples"]:,} shifted triples\\nTwo arithmetic engines / two joins"];'
+              f'c{i}[label="{native["distinct_rows_including_zero"]} distinct rows incl. zero\\n'
+              f'{native["independent_added_rows"]} independent additions\\nClosed rank {native["closed_rank"]}"];'
+              f'a{i}->b{i}->c{i};')
+    dot+='}'
+    (ROOT/'degree-six.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'degree-six.dot','-o','degree-six.'+suffix],cwd=ROOT,check=True)
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -388,7 +467,10 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Four-line*','four-line-conics-v1/calls/combine'),
                         ('Tangent*','tangent-conics-v1/calls/combine'),
                         ('Bitangent*','bitangent-conics-v1/calls/combine'),
-                        ('Higher contact*','high-contact-scan-v1/calls/combine')]:
+                        ('Higher contact*','high-contact-scan-v1/calls/combine'),
+                        ('2Eref six','shifted-six-v2/calls/full'),
+                        ('H+2R six','canonical-six-v1/calls/full'),
+                        ('2H-2R six','exceptional-conic-six-v1/calls/full')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -402,7 +484,7 @@ for label,record in cases:
         data[label].update({key:record[key] for key in
                             ('restored_ranks_are_derived','core_full_rank','core_auxiliary_rank')})
 (ROOT/'rank-values.json').write_text(json.dumps(data, indent=2)+'\n')
-fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(9,4.6),sharex=True,
+fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(9,5.2),sharex=True,
                                      gridspec_kw={'height_ratios':[2,1]},layout='constrained')
 for position, key in enumerate(metrics[:2]):
     x = [i+(position-.5)*.36 for i in range(len(cases))]
@@ -422,10 +504,23 @@ closed_axis.bar_label(bars,padding=2,fontsize=8)
 closed_axis.set_ylim(0,max(closed_values)*1.5)
 closed_axis.set_ylabel('Closed rank')
 closed_axis.set_xticks(range(len(cases)),[label for label,_ in cases])
-closed_axis.tick_params(axis='x',labelsize=7,labelrotation=28)
+closed_axis.tick_params(axis='x',labelsize=7,labelrotation=55)
+for label in closed_axis.get_xticklabels(): label.set_ha('right')
 for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
+
+# Compact only the editable rank SVG; source values and all sealed evidence stay exact.
+rank_svg=ROOT/'ranks.svg'
+s=rank_svg.read_text()
+s=re.sub(r'<!--.*?-->','',s,flags=re.S)
+s=re.sub(r'>\s+<','><',s)
+s=re.sub(r'(?<![A-Za-z0-9_])(-?\d+\.\d{4,})',
+         lambda m:format(float(m.group()),'.3f').rstrip('0').rstrip('.'),s)
+refs=set(re.findall(r'(?:url\(#|href="#)([^)" ]+)',s))
+s=re.sub(r' id="([^"]+)"',lambda m:m.group() if m[1] in refs else '',s)
+s=re.sub(r'style="([^"]*)"',lambda m:'style="'+re.sub(r'\s*([:;])\s*',r'\1',m[1])+'"',s)
+rank_svg.write_text(s+'\n')

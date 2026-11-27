@@ -58,6 +58,9 @@ this study does not change those maps.
 | Three-point/tangent pencils | 384new pencils;550656candidate occurrences | Zero supported conics;384higher-contact parameters checked;core134/128/6 |
 | Two-point/bitangent pencils | 128new pencils;183552candidate occurrences | Zero supported conics;256higher-contact branches checked;core134/128/6 |
 | Actual higher-contact profiles3+1and4 | 512new pencils;734208candidate occurrences | Zero supported conics;768exact branch replays;core134/128/6 |
+| Degree-six poles 2E_ref | 15,390,826 shifted triples at target 2rho | Only formal zero row; direct 108/102/6 |
+| Degree-six poles H+2R | 15,390,826 shifted triples at target kappa | Exactly seven known rows; direct 108/102/6 |
+| Conics tangent at exceptional R | 15,390,826 shifted triples at target 2kappa | No six-image word; direct 108/102/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -574,16 +577,149 @@ certificate mutations reject. The separate numerical closed7fixture never
 enters actual data. See FULL_IMAGE_BOUND_PROTOCOL.md and
 evidence/full-image-bound-v1/. [pcc:unverified]
 
+## Degree-six functions with a different pole divisor
+
+The native reference-shifted test changes the pole divisor to
+$D=2E_{\mathrm{ref}}$, where $E_{\mathrm{ref}}$ consists of original
+quartic points 223, 224 and 225. Fresh actual map evaluation identifies
+these images as the negatives of columns 222, 223 and 224. If
+$\rho=f_*(E_{\mathrm{ref}})$, a function in $L(D)$ has effective zeros of
+degree six, after padding cancelled poles, whose elliptic image sum is
+$2\rho$. The native target differs from $O$, $\kappa$ and $2\kappa$.
+Thus the previous zero-target six-symbol result does not answer this
+question. [pcc:unverified]
+
+The exact target is:
+
+```
+x = 2605172243064974128828395173461348789790288923828041863253
+y = 4139875000803477430951892779468652918082041115551322701550
+```
+
+Each unordered triple is shifted by $-\rho$. Two such shifted sums are
+opposites exactly when the original six images sum to $2\rho$. The
+complete 451-symbol alphabet consists of $O$ and both signs of every
+original column. Native GMP and named OpenSSL arithmetic agree on all
+15,390,826 triples and their ordered hash:
+
+```
+097e969b718c8f5ee9b16fbe73b3b62ced6c7ef77b37c3f218e0dbb4aac2760c
+```
+
+An in-place grouped join and a separately indexed orientation-stream
+merge agree on all coefficient rows and witnesses. There are three
+opposite-orientation pairs and one identity self-pair. All recover the
+single zero row with formal word 446,446,448,448,450,450, representing
+the doubled reference itself. No nonzero coefficient row remains.
+The actual full/auxiliary/closed ranks are 108/102/6. All rows have only
+original-column support, so this is the same closed rank-six span as
+in the expanded core. [pcc:unverified]
+
+The 32-byte table payload is 492,506,432 bytes, and the second join uses
+61,563,304 bytes of index payload. These are exact native data sizes,
+not peak-memory measurements. The table is not committed. A separate
+public G/2G fixture recovers a nonzero row of rank one; both joins equal
+an independent brute unordered six-word enumeration, including their
+minimal witnesses. Changed coefficients, omitted rows/triples and
+altered orientation reject. Fixture rows enter no actual matrix.
+[pcc:unverified]
+
+This necessary bound excludes added projected rank from $L(2E_{\mathrm{ref}})$
+when each individual zero image lies in the original signed rational
+image domain. Repetitions and closed source points mapping to those
+rational images are included by multiplicity. A zero projected row can
+still correspond to different curve-point supports; it contributes no
+new equation to this elliptic-column matrix. The test does not exhaust
+other pole divisors, longer words or nonrational individual images.
+It does not construct Riemann–Roch functions. See
+[the frozen protocol](SHIFTED_SIX_PROTOCOL.md) and the separate
+[interrupted](reports/shifted-six-v1/REPORT.pdf) and
+[complete](reports/shifted-six-v2/REPORT.pdf) reports. [pcc:unverified]
+
+## Canonical reference with an exceptional-point pole
+
+For $D=H+2R$, the reference section $H$ is the actual line $x=56$
+with support indices 42,43,44,45. Original point 0 is the exceptional
+point $R$, and fresh local-chart evaluation verifies $f(R)=O$.
+The degree-six reference word therefore has image sum $\kappa$.
+Since the curve has genus three, Riemann–Roch gives $l(D)=4$.
+The previous target-$\kappa$ bound used four symbols. [pcc:unverified]
+
+The native six-symbol test verifies the complete factor product for $H$,
+its four images, both copies of $R$, and a group half of $\kappa$ used
+only for the shifted join. Both native engines agree on all 15,390,826
+triples. Both joins recover exactly the seven known coefficient rows,
+including zero, from 15,715 opposite-orientation pairs. There are no
+identity pairs and no independent added row. Direct ranks remain
+108/102/6. The exact ordered digest is:
+
+```
+7eb97904c8cd8659c0c6165662a89a3267f8cd3489464a45ffd196dbf56fa234
+```
+
+All seven original section rows must be recovered, and an omitted-row
+mutation rejects. The nonzero fixture and independent brute enumeration
+also pass. Thus this larger pole family supplies no added projected rank
+when all individual images lie in the unchanged signed original domain.
+Other images remain outside the bound. See
+[the protocol](CANONICAL_SIX_PROTOCOL.md) and
+[the run report](reports/canonical-six-v1/REPORT.pdf). [pcc:unverified]
+
+## Complete necessary bound for conics tangent at R
+
+A conic $N$ with intersection order at least two at exceptional point $R$
+has six remaining intersections, counting multiplicities. With the fixed
+reference line equation $L_H$, its rational function satisfies
+$\operatorname{div}(N/L_H^2)=Z+2R-2H$. Therefore
+$f_*(Z)=2\kappa$. Equivalently, the Riemann–Roch divisor
+$D=2H-2R$ has degree six and $l(D)=4$. It has a negative coefficient at
+$R$, so it is not an effective pole divisor. [pcc:unverified]
+
+Native checks freshly verify that $H$ is disjoint from smooth $R$, whose
+exceptional image is $O$. Conic value and tangent constraints at $R$ have
+rank two on the six conic monomials. This verifies the four-dimensional
+conic numerator family without constructing every numerator. The full
+six-symbol necessary image test uses shift $-\kappa$ and target $2\kappa$.
+The earlier target-$2\kappa$ test had four symbols. [pcc:unverified]
+
+All 15,390,826 triples agree between native GMP and named OpenSSL
+arithmetic. Both joins have zero opposite-orientation pairs and zero
+identity pairs: **there is no six-image word at all** at this target in
+the fixed signed original domain. The actual matrix remains 108/102/6.
+There is no required formal zero candidate for this divisor, and none is
+inserted. The exact ordered digest is:
+
+```
+c8763b80a5afe8880a93fea5fe747b5174d4be6da992e951a147ad7a44f51e85
+```
+
+Consequently no conic tangent at $R$ has all six residual individual
+images in that domain, including repeated slots and closed source points
+with rational listed images. This bounds the whole declared conic family,
+rather than only the earlier finite pencil samples. It does not cover
+other image domains or conics without the prescribed contact at $R$.
+Nonzero fixture/brute enumeration and actual-reference coefficient
+corruption checks pass. No fixture enters the actual matrix. See
+[the protocol](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md) and
+[the run report](reports/exceptional-conic-six-v1/REPORT.pdf). [pcc:unverified]
+
+![Three completed degree-six necessary image bounds. Each uses the same original 451-symbol alphabet and 15,390,826 triples; counts are exact finite evaluations. No repeated-sample uncertainty applies. Fixture rows are excluded. Divisor dimensions come from Riemann–Roch; actual conic local constraint rank is separately checked.](degree-six.pdf)
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of37immutable attempt reports retains complete per-call and wrapper
+Each of41immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
 62.156/62.566/59.306/60.530batch and51.188combine seconds;wrapper364.196seconds. Every value is one recorded execution,not a speed comparison or repeated
-timing estimate. Earlier costs remain in their unchanged attempt reports.
+timing estimate. The corrected reference-shifted build takes 15.338 seconds;
+its full worker takes 170.862 seconds and wrapper 186.243 seconds.
+The H+2R build, full worker and wrapper take 14.526, 178.044 and
+192.615 seconds respectively. The exceptional tangent-conic build, full
+worker and wrapper take 14.459, 175.874 and 190.378 seconds respectively.
+Earlier costs remain in their unchanged attempt reports.
 
 Four build failures are preserved: audit-old-v1 lacked iostream; norms-v1
 had an SSL type-name ambiguity and strict indentation warning; trace-v1
@@ -594,7 +730,14 @@ same-image conic wrapper failed during input copy, before any build or worker.
 The all-expanded-conics-v1wrapper repeated that input-copy argument defect;
 its fresh corrected v2attempt passes. Both failed wrappers remain intact.
 Fresh attempts
-fixed those integration defects. No mathematical worker failed or timed out.
+fixed those integration defects. The first shifted-six native run was
+intentionally stopped with SIGTERM after 44.156 seconds when source review
+found an off-by-one final formal-word label. Its actual target was correct,
+but no complete enumeration or final digest is claimed. The strict build
+had passed in 13.789 seconds. The corrected fresh v2 derives labels from
+actual verified images and checks the formal word before enumeration.
+No worker timed out. The interrupted attempt retains its partial records
+and available source/input/binary hashes; it has no final result manifest.
 Each attempt's stdout, stderr, exits, source/input/binary manifests and costs
 remain under evidence/. The norm source commit is an ancestor; the frozen
 source snapshots and hashes identify the exact executed source.
@@ -624,20 +767,19 @@ contact branches,with no supported conic. Both higher-contact types have now com
 no supported conic. This is finite type/anchor coverage,not exhaustion of
 all conics on the pool.
 
-A distinct next hypothesis changes the pole divisor. The retained backward
-KM interface uses E_ref at original point indices225,224,223. Functions
-with poles bounded by2E_ref have effective zero degree six,and their
-elliptic image sum is2rho,where rho=f_*(E_ref). The prior signed-six test
-used target zero;it did not test this reference-shifted target. First verify
-rho and target relations natively,then test the complete signed-six
-necessary condition on the unchanged225columns. A packed triple table can
-shift the third symbol by-rho before enumeration,so opposite shifted sums
-select the new target without rerunning the completed zero-target join.
-This successor has not run. Positive image rows would still need actual
-degree-six RR/KM realization and separate elliptic/elimination replay.
-Nonrational individual elliptic traces and other higher-degree function
-relations remain open directions. Any positive candidate needs actual
-cover/KM and separate elliptic/elimination replay. [pcc:unverified]
+All three degree-six successors now complete: $2E_{\mathrm{ref}}$ has
+only the formal zero row, $H+2R$ has exactly seven known rows, and
+$2H-2R$ has no six-image word. They leave the frozen closed span at six.
+
+A distinct next mechanism is closure of three degree-two residual traces.
+Each has trace $T_i=\kappa-A_i-B_i$, so
+$T_1+T_2+T_3=O$ requires the six original images to sum to $3\kappa$.
+That six-symbol target has not been tested. Freeze a protocol before
+running it, and bind any positive image word to actual residual supports
+and cover/KM verification with separate elliptic/elimination replay.
+A null would bound this three-trace mechanism in the fixed image domain.
+Nonrational individual images and longer coupled traces remain outside
+these tests. [pcc:unverified]
 
 ## Sources and reproduction
 
@@ -661,7 +803,10 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   [bitangent pencils](BITANGENT_CONIC_PROTOCOL.md),
   [higher-contact controls](HIGH_CONTACT_CONTROL_PROTOCOL.md),
   [actual higher-contact scan](HIGH_CONTACT_SCAN_PROTOCOL.md) and
-  [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md).
+  [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md) and
+  [reference-shifted six symbols](SHIFTED_SIX_PROTOCOL.md),
+  [canonical-plus-exceptional six symbols](CANONICAL_SIX_PROTOCOL.md) and
+  [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -669,7 +814,8 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
-  run-high-contact-scan.sh.
+  run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
+  run-exceptional-conic-six.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
@@ -690,3 +836,5 @@ The index-calculus scoreboard and progress timeline receive no speed or
 PCC promotion: this is producer evidence of finite closure nulls. The study-local rank graph records completed actual finite domains,including nulls.
 The new control-isolation diagram and contact histogram copy native receipts;
 the control-only preflight is excluded from the rank-case graph.
+The degree-six flow diagram and its editable data copy the three native
+terminal results; earlier parent-map and scoreboard figures remain unchanged.
