@@ -3,7 +3,7 @@
 - **Status:** `open`
 - **Kind:** implementation gap; measurement and accounting gap
 - **Affected work:** the prospective [Prime31 common-support RR9/F4 protocol](../research/prime31_shared_coefficient_membership_20261118/PROTOCOL_RR9_F4_20261120.md) and its [machine-readable v1 protocol](../research/prime31_shared_coefficient_membership_20261118/protocol-rr9-f4-v1.json), the [RR9 and closures development report](../research/prime31_rr9_and_closures_20261119/REPORT.md) and [raw result](../research/prime31_rr9_and_closures_20261119/RESULTS.json), and the separate [B8 full-eight precursor protocol](../research/prime31_ic_20261115/rr9/RR9_FULL8_F4_PROTOCOL_20261122.md)
-- **Next action owner:** draft PR #5274 for the GM handoff; next token slice is normalization/scalar arithmetic
+- **Next action owner:** draft PR #5274; next token slice is reducer/Rayon work, followed by remaining scalar/root and allocation ownership
 - **Last updated:** 2026-11-27
 
 ## Problem
@@ -75,24 +75,35 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   trace-sink delivery after a counter failure.  Those controls stop before
   later native/root/delivery work, but they do not yet cover every deep charge
   site; the operation gate remains false.
-  Draft PR #5274 continues that migration by binding every GM Visit-accounting
-  mutation to the same exclusive route. The current implementation binds each
-  admitted call to a unique accounting
-  context and records
-  `accounting_token_mode=borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1`;
+  Draft PR #5274 continues that migration by binding every GM and generic
+  normalization/explicit monic Visit-accounting mutation to the same exclusive
+  route. The current implementation binds each admitted call to a unique
+  accounting context and records
+  `accounting_token_mode=borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1`;
   rejected preflight records retain `not_started_preflight_rejected`.
   Production tokens borrow the live session, their phase and external-pause
   guards are non-`Send`, and same-thread mismatch, scoped foreign-thread use,
   suspended-token use and an unbalanced external pause fail closed with
   structured blockers. Traversal, callback/trace delivery, direct admitted
-  native-driver phases, charges and blockers, and both admitted GM monomial
-  representations now use that token boundary. Tokenless native
-  plain/record/replay entry under an unsuspended ledger is rejected, and a
-  native stop is polled before wrapper follow-on work. Separate `jv_bitops`
-  telemetry plus normalization/scalar arithmetic, root, reducer,
-  Rayon-closure and allocation helpers remain non-authoritative TLS shadows.
-  Operation, memory and work-ownership gates therefore all remain false, no
-  checklist item is closed, and no ledger is promotion-ready.
+  native-driver phases, charges and blockers, both admitted GM monomial
+  representations, native input normalization, recursive specialization's
+  post-substitution normalization, and bounded or fallback polynomial monic
+  cleanup now use that token boundary. The owned normalizer checks its sort
+  product and sort-plus-scan sum, charges before sorting/merging/scaling, and
+  uses a raw Barrett inverse/multiply core rather than re-entering TLS Visit
+  hooks. Separate live-ledger controls match the legacy route exactly at 12
+  word operations, 8 sort comparisons, 1 field addition, 1 inversion and 2
+  multiplications for a cancellation fixture; 240 deterministic cancellation
+  patterns also match legacy output. Wrong-owner, foreign-thread, computed
+  overflow and every charge-boundary overflow stop before the corresponding
+  mutation. Tokenless native plain/record/replay entry under an unsuspended
+  ledger is rejected, and a native stop is polled before wrapper follow-on
+  work. Separate `jv_bitops` telemetry plus specialization/evaluation and
+  other scalar arithmetic, roots, reducers, row-produced monic work, Rayon
+  closures and allocation helpers remain non-authoritative TLS shadows.
+  Modeled normalization observations also do not cover clone/filter/allocation
+  work. Operation, memory and work-ownership gates therefore all remain false,
+  no checklist item is closed, and no ledger is promotion-ready.
 - **Observed partial collector charge:** the development whole-solve code adds
   only `rec.f4_field_ops + rec.root_field_muls` for each RR9 call. Its Prime31
   scaling table derives a lower bound from the smaller observed UNSAT
@@ -132,10 +143,10 @@ multiplicity-aware B4/B8 protocol or for a B31 collector ledger.
   instrumentation costs.
 - **Missing capability:** source-complete call-owned operation,
   allocation/capacity and scratch accounting; propagation of the borrowed
-  token through normalization/scalar arithmetic, root, reducer,
-  Rayon-closure and allocator-owned work; prospective runner integration; and
-  a distinct whole-collector ledger that covers every attempt and phase in a
-  common, source-bound schema.
+  token through specialization/evaluation and other scalar arithmetic, root,
+  reducer, row-produced monic, Rayon-closure and allocator-owned work;
+  prospective runner integration; and a distinct whole-collector ledger that
+  covers every attempt and phase in a common, source-bound schema.
 - **What this evidence does not establish:** it does not invalidate the B4/B8
   fibre observations, supply a B31 cost ratio, refute any unexecuted RR9 stratum,
   or justify abandoning the active RR9 lane. Only a regime ruled out by its
@@ -199,18 +210,19 @@ still require prospective executions and independent replay.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** extend the reviewed borrowed-token boundary
-  beyond traversal, delivery, native-driver orchestration and GM
-  Visit-accounting mutations through the complete normalization/monic-scaling
-  cluster, then root, reducer, Rayon-closure and allocator-owned work while
-  retaining TLS only as a differential shadow. Route every admitted
-  allocation/capacity/scratch lifetime and
-  remaining operation/branch through checked call-owned accounting; extend the
-  typed stop to every unowned operation or overflow; close the remaining phase
-  and hand-count controls; and keep all three promotion gates false until that
-  review passes. Keep both copied-source bridges compiling, then integrate only
-  through a prospectively frozen successor RR9 runner schema. Do not combine
-  this slice with a B31 run or the whole-collector implementation.
+- **Action or proof obligation:** retain the reviewed token boundary through
+  traversal, delivery, native-driver orchestration, GM and the generic
+  normalization/explicit monic helper cluster, then extend it through the
+  reducer/Rayon paths. Follow with specialization/evaluation and other scalar
+  arithmetic, roots and allocator-owned work while retaining TLS only as a
+  differential shadow. Route every admitted allocation/capacity/scratch
+  lifetime and remaining operation/branch through checked call-owned
+  accounting; extend the typed stop to every unowned operation or overflow;
+  close the remaining phase and hand-count controls; and keep all three
+  promotion gates false until that review passes. Keep both copied-source
+  bridges compiling, then integrate only through a prospectively frozen
+  successor RR9 runner schema. Do not combine this slice with a B31 run or the
+  whole-collector implementation.
 - **Inputs and controls:** use small deterministic polynomial systems to
   exercise each phase, then the existing public B8 known-chart case only as a
   non-registered integration preflight. Compare solutions, completion states
@@ -293,3 +305,23 @@ normalization/scalar-arithmetic, reducer/Rayon, root and allocation helpers
 are not token-owned, so all three promotion gates remain false. No B4, B8,
 B31, full-eight or six-size scientific case was run, and every such
 obligation remains open.
+
+2026-11-27: Draft PR #5274 extended the exclusive route through every generic
+normalization and explicit polynomial-monic Visit-accounting mutation
+reachable from an admitted call, including native input, recursive
+post-specialization normalization, bounded cleanup and the Prime31 polynomial
+interreduce fallback. The owned route validates authority before modulo or
+mutation, uses checked sort/scan arithmetic, charges each merge and scale
+before mutation, and uses raw Barrett arithmetic so it cannot also charge the
+TLS Visit hooks. Legacy and owned live ledgers agree exactly on a cancellation
+fixture (12 words, 8 sort comparisons, 1 addition, 1 inversion and 2
+multiplications), and 240 deterministic cancellation patterns preserve legacy
+output. Wrong-owner, foreign-thread, computed-overflow and word, sort,
+addition, inversion and multiplication boundary controls fail closed.
+Accepted records use
+`borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1`.
+This label does not cover substitution/evaluation arithmetic, reducer or
+row-produced monic work, roots, Rayon closures, allocations, modeled-operation
+completeness or separate `jv_bitops` telemetry; all promotion gates remain
+false. No B4, B8, B31, full-eight or six-size scientific case was run, and all
+unrefuted regimes remain open.

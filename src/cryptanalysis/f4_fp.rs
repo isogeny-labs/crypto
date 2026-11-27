@@ -493,20 +493,8 @@ fn invmod(a: u64, p: u64) -> u64 {
     visit_account_charge(VisitAccountingCounter::FieldInversions, 1);
     // p prime, a != 0
     if (2..1 << 32).contains(&p) {
-        // the same powers, each product reduced by Barrett's method
-        // instead of a 128-bit division
         let fp = Barrett::new(p);
-        let mut r = 1u64;
-        let mut base = a % p;
-        let mut e = p - 2;
-        while e > 0 {
-            if e & 1 == 1 {
-                r = fp.reduce(r * base);
-            }
-            base = fp.reduce(base * base);
-            e >>= 1;
-        }
-        return r;
+        return invmod_barrett_raw(a, fp);
     }
     let mut r = 1u64;
     let mut base = a % p;
@@ -519,6 +507,30 @@ fn invmod(a: u64, p: u64) -> u64 {
         e >>= 1;
     }
     r
+}
+
+/// The Barrett arithmetic core of [`invmod`], without either accounting
+/// surface. Token-owned normalization uses it after charging its own
+/// inversion observation, so the same work cannot also reach the TLS shadow.
+fn invmod_barrett_raw(a: u64, fp: Barrett) -> u64 {
+    let mut r = 1u64;
+    let mut base = a % fp.p;
+    let mut e = fp.p - 2;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = barrett_mul_raw(r, base, fp);
+        }
+        base = barrett_mul_raw(base, base, fp);
+        e >>= 1;
+    }
+    r
+}
+
+#[inline]
+fn barrett_mul_raw(a: u64, b: u64, fp: Barrett) -> u64 {
+    debug_assert!(a < fp.p && b < fp.p);
+    // `fp.p < 2^32`, so the product is strictly below 2^64.
+    fp.reduce(a * b)
 }
 
 /// Reduction modulo a fixed `p < 2³²` by Barrett's method: a precomputed
@@ -609,6 +621,45 @@ fn scale_monic(f: &mut Poly, p: u64) {
     }
 }
 
+/// Token-owned counterpart of [`scale_monic`]. Legacy callers retain the
+/// original TLS path; admitted accounted calls charge through their borrowed
+/// token and use raw Barrett arithmetic underneath it.
+fn scale_monic_routed(f: &mut Poly, p: u64, account: VisitHelperAccount<'_>) -> Result<(), F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        scale_monic(f, p);
+        return Ok(());
+    }
+
+    if account
+        .charge(VisitAccountingCounter::FieldInversions, 1)
+        .stopped()
+    {
+        return Err(F4Stop::Accounting);
+    }
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
+    // Accounted visitor preflight admits only prime 2 <= p < 2^32. Keeping
+    // this constructor here makes a violated internal invariant fail loudly;
+    // an invalid/wrong token is rejected above before `p` is inspected.
+    let fp = Barrett::new(p);
+    let inv = invmod_barrett_raw(f[0].1, fp);
+
+    if account
+        .charge_usize(VisitAccountingCounter::FieldMultiplications, f.len())
+        .stopped()
+    {
+        return Err(F4Stop::Accounting);
+    }
+    let terms = u64::try_from(f.len()).expect("successful accounting conversion");
+    super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, terms);
+    for (_, c) in f.iter_mut() {
+        *c = barrett_mul_raw(*c, inv, fp);
+    }
+    Ok(())
+}
+
 /// Normalise: merge duplicate monomials, drop zeros, sort leading-first,
 /// make monic.
 pub fn normalise(terms: &[(Vec<u32>, u64)], p: u64, ord: Ordering) -> Poly {
@@ -616,6 +667,26 @@ pub fn normalise(terms: &[(Vec<u32>, u64)], p: u64, ord: Ordering) -> Poly {
         terms.iter().filter(|(_, c)| c % p != 0).cloned().collect(),
         p,
         ord,
+    )
+}
+
+fn normalise_routed(
+    terms: &[(Vec<u32>, u64)],
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(normalise(terms, p, ord));
+    }
+    normalise_owned_routed(
+        terms.iter().filter(|(_, c)| c % p != 0).cloned().collect(),
+        p,
+        ord,
+        account,
     )
 }
 
@@ -659,6 +730,128 @@ fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
         scale_monic(&mut out, p);
     }
     out
+}
+
+/// Checked modeled cost of sorting and scanning `terms` normalization terms.
+/// The legacy route records a blocker and returns saturated diagnostic values;
+/// the owned route fail-closes before the sort begins.
+fn normalisation_cost(terms: usize, account: VisitHelperAccount<'_>) -> Result<(u64, u64), F4Stop> {
+    let scanned = match u64::try_from(terms) {
+        Ok(scanned) => scanned,
+        Err(_) => {
+            if account
+                .checked_arithmetic_block(
+                    "counter_overflow",
+                    Some("word_operations"),
+                    "normalization term population does not fit u64",
+                )
+                .stopped()
+            {
+                return Err(F4Stop::Accounting);
+            }
+            return Ok((u64::MAX, u64::MAX));
+        }
+    };
+    let levels = if terms <= 1 {
+        0
+    } else {
+        u64::from(usize::BITS - (terms - 1).leading_zeros())
+    };
+    let sort = match scanned.checked_mul(levels) {
+        Some(sort) => sort,
+        None => {
+            if account
+                .checked_arithmetic_block(
+                    "counter_overflow",
+                    Some("sort_comparisons"),
+                    format!("checked normalization sort product {scanned} * {levels} failed"),
+                )
+                .stopped()
+            {
+                return Err(F4Stop::Accounting);
+            }
+            u64::MAX
+        }
+    };
+    let words = match sort.checked_add(scanned) {
+        Some(words) => words,
+        None => {
+            if account
+                .checked_arithmetic_block(
+                    "counter_overflow",
+                    Some("word_operations"),
+                    format!("checked normalization sort plus scan {sort} + {scanned} failed"),
+                )
+                .stopped()
+            {
+                return Err(F4Stop::Accounting);
+            }
+            u64::MAX
+        }
+    };
+    Ok((sort, words))
+}
+
+fn normalise_owned_routed(
+    mut out: Poly,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(normalise_owned(out, p, ord));
+    }
+
+    out.retain_mut(|(_, c)| {
+        *c %= p;
+        *c != 0
+    });
+    let (sort, words) = normalisation_cost(out.len(), account)?;
+    if account
+        .charge(VisitAccountingCounter::WordOperations, words)
+        .stopped()
+    {
+        return Err(F4Stop::Accounting);
+    }
+    if account
+        .charge(VisitAccountingCounter::SortComparisons, sort)
+        .stopped()
+    {
+        return Err(F4Stop::Accounting);
+    }
+    super::jv_bitops::words(words);
+    out.sort_unstable_by(|(a, _), (b, _)| cmp_monomial(b, a, ord));
+
+    // Compact in place. Each duplicate's field addition is admitted before
+    // its coefficient is changed, making an accounting stop a strict prefix.
+    let mut kept = 0usize;
+    for read in 0..out.len() {
+        if kept != 0 && out[kept - 1].0 == out[read].0 {
+            if account
+                .charge(VisitAccountingCounter::FieldAdditions, 1)
+                .stopped()
+            {
+                return Err(F4Stop::Accounting);
+            }
+            super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, 1);
+            let later = out[read].1;
+            out[kept - 1].1 = (out[kept - 1].1 + later) % p;
+        } else {
+            if kept != read {
+                out.swap(kept, read);
+            }
+            kept += 1;
+        }
+    }
+    out.truncate(kept);
+    out.retain(|(_, c)| *c != 0);
+    if !out.is_empty() {
+        scale_monic_routed(&mut out, p, account)?;
+    }
+    Ok(out)
 }
 
 fn divides(a: &[u32], b: &[u32]) -> bool {
@@ -5802,7 +5995,12 @@ fn f4_hilbert_guarded(
                 .filter(|(e, _)| total_degree(e) == d)
                 .cloned()
                 .collect();
-            lead.push(normalise(&t, p, opts.order));
+            let normalized = match normalise_routed(&t, p, opts.order, account.into()) {
+                Ok(normalized) => normalized,
+                Err(F4Stop::Accounting) => return f4_accounting_stopped_report(),
+                Err(_) => unreachable!("normalization has no non-accounting stop"),
+            };
+            lead.push(normalized);
             if account.control().stopped() {
                 return f4_accounting_stopped_report();
             }
@@ -6210,7 +6408,10 @@ fn f4_with_arithmetic(
         account_or_abort!(control);
         for f in input {
             bounded_deadline!();
-            let f = normalise(f, p, ord);
+            let f = match normalise_routed(f, p, ord, account.into()) {
+                Ok(f) => f,
+                Err(stop) => abort_call!(stop),
+            };
             account_or_abort!(account.control());
             if f.is_empty() {
                 continue;
@@ -7583,13 +7784,18 @@ fn f4_with_arithmetic(
     let ti = Instant::now();
     pp_dump("steps");
     reduced = if let Some(limits) = &opts.resource_limits {
-        match interreduce_bounded(reduced, p, ord, limits, opts.deadline) {
+        match interreduce_bounded(reduced, p, ord, limits, opts.deadline, account.into()) {
             Ok(reduced) => reduced,
             Err(stop) => abort_call!(stop),
         }
     } else {
-        interreduce_linear(&reduced, n_vars, p, ord)
-            .unwrap_or_else(|| interreduce(&reduced, p, ord))
+        match interreduce_linear(&reduced, n_vars, p, ord) {
+            Some(reduced) => reduced,
+            None => match interreduce_with_routed(&reduced, p, ord, true, account.into()) {
+                Ok(reduced) => reduced,
+                Err(stop) => abort_call!(stop),
+            },
+        }
     };
     account_or_abort!(account.control());
     if debug {
@@ -8189,6 +8395,17 @@ fn make_monic(mut f: Poly, p: u64) -> Poly {
     f
 }
 
+fn make_monic_routed(mut f: Poly, p: u64, account: VisitHelperAccount<'_>) -> Result<Poly, F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(make_monic(f, p));
+    }
+    scale_monic_routed(&mut f, p, account)?;
+    Ok(f)
+}
+
 enum F4Stop {
     Resource(F4ResourceLimit),
     Deadline,
@@ -8278,7 +8495,11 @@ fn interreduce_bounded(
     ord: Ordering,
     limits: &F4ResourceLimits,
     deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
 ) -> Result<Vec<Poly>, F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
     let mut keep = Vec::new();
     for (i, f) in basis.iter().enumerate() {
         if deadline.is_some_and(|d| Instant::now() > d) {
@@ -8308,7 +8529,7 @@ fn interreduce_bounded(
                 limits.max_symbolic_monomials,
             )?;
             terms = terms - out[i].len() + r.len();
-            out[i] = make_monic(r, p);
+            out[i] = make_monic_routed(r, p, account)?;
         }
     }
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -8324,6 +8545,22 @@ pub fn interreduce(basis: &[Poly], p: u64, ord: Ordering) -> Vec<Poly> {
 /// [`interreduce`], on packed monomials or (`packed` false) exponent vectors
 /// only, the control the tests compare the packed path with.
 fn interreduce_with(basis: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<Poly> {
+    match interreduce_with_routed(basis, p, ord, packed, VisitHelperAccount::LegacyTls) {
+        Ok(out) => out,
+        Err(_) => unreachable!("legacy interreduction cannot accounting-stop"),
+    }
+}
+
+fn interreduce_with_routed(
+    basis: &[Poly],
+    p: u64,
+    ord: Ordering,
+    packed: bool,
+    account: VisitHelperAccount<'_>,
+) -> Result<Vec<Poly>, F4Stop> {
+    if account.control().stopped() {
+        return Err(F4Stop::Accounting);
+    }
     let mut keep: Vec<Poly> = Vec::new();
     for (i, f) in basis.iter().enumerate() {
         let redundant = basis
@@ -8339,14 +8576,14 @@ fn interreduce_with(basis: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<
     for i in 0..out.len() {
         let r = reduce_skipping(&out, ps.as_ref(), i, p, ord);
         if !r.is_empty() {
-            out[i] = make_monic(r, p);
+            out[i] = make_monic_routed(r, p, account)?;
             if let Some(ps) = ps.as_mut() {
                 ps.replace(i, &out[i]);
             }
         }
     }
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
-    out
+    Ok(out)
 }
 
 /// Autoreduce a *generating set* (not a Gröbner basis): reduce every
@@ -8435,11 +8672,12 @@ static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
 
 /// Per-call ownership identity for the explicit-token migration.
 ///
-/// The authoritative ledger is still worker TLS.  The borrowed token gates
-/// traversal, native-driver and GM Visit-accounting mutations and cannot enter
-/// detached `'static` work; normalization/scalar arithmetic, reducers, roots
-/// and allocation helpers remain a non-authoritative TLS shadow until later
-/// migration.
+/// The authoritative ledger is still worker TLS. The borrowed token gates
+/// traversal, native-driver, GM, and generic normalization/explicit monic
+/// Visit-accounting mutations and cannot enter detached `'static` work.
+/// Specialization and other scalar arithmetic, reducers and row-produced
+/// monic work, roots, Rayon helpers, allocations, and separate `jv_bitops`
+/// telemetry remain non-authoritative TLS shadows until later migration.
 struct VisitAccountingContext {
     id: NonZeroU64,
     owner_thread: ThreadId,
@@ -9112,7 +9350,7 @@ impl VisitAccountingBuilder {
     fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
         self.token_identity = Some(token.id());
         self.arm.accounting_token_mode =
-            "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1";
+            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1";
     }
 
     fn block(
@@ -9625,6 +9863,13 @@ impl<'a> VisitAccount<'a> {
 }
 
 impl VisitHelperAccount<'_> {
+    fn control(self) -> VisitAccountingControl {
+        match self {
+            Self::LegacyTls => VisitAccountingControl::Continue,
+            Self::Owned(token) => VisitAccount::On(token).control(),
+        }
+    }
+
     fn charge(self, counter: VisitAccountingCounter, amount: u64) -> VisitAccountingControl {
         match self {
             Self::LegacyTls => {
@@ -10853,13 +11098,24 @@ where
                         return VisitEnd::AccountingStopped;
                     }
                 }
-                generating_set
-                    .iter()
-                    .map(|g| {
-                        normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
-                    })
-                    .filter(|g| !g.is_empty())
-                    .collect()
+                let mut sub = Vec::with_capacity(generating_set.len());
+                for g in generating_set {
+                    let specialized = specialise(g, var, value, self.p);
+                    let normalized = match normalise_owned_routed(
+                        specialized,
+                        self.p,
+                        self.opts.order,
+                        self.account.into(),
+                    ) {
+                        Ok(normalized) => normalized,
+                        Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                        Err(_) => unreachable!("normalization has no non-accounting stop"),
+                    };
+                    if !normalized.is_empty() {
+                        sub.push(normalized);
+                    }
+                }
+                sub
             };
             if self.account.control().stopped() {
                 return VisitEnd::AccountingStopped;
@@ -11013,11 +11269,18 @@ where
         let Some((z, h)) = best else {
             self.report.batched_field_multiplications += muls;
             self.report.batched_fallbacks += 1;
-            let normalised: Vec<Poly> = live
-                .into_iter()
-                .map(|g| normalise_owned(g, self.p, self.opts.order))
-                .filter(|g| !g.is_empty())
-                .collect();
+            let mut normalised = Vec::with_capacity(live.len());
+            for g in live {
+                let normalized =
+                    match normalise_owned_routed(g, self.p, self.opts.order, self.account.into()) {
+                        Ok(normalized) => normalized,
+                        Err(F4Stop::Accounting) => return VisitEnd::AccountingStopped,
+                        Err(_) => unreachable!("normalization has no non-accounting stop"),
+                    };
+                if !normalized.is_empty() {
+                    normalised.push(normalized);
+                }
+            }
             return self.walk(&normalised, vars, Some(node_id));
         };
         let z_original = vars[z];
@@ -11236,10 +11499,11 @@ pub struct VisitFirstReportV1 {
 ///
 /// The executor owns a one-thread Rayon pool and exposes no caller callback or
 /// trace sink, preventing those extension points from submitting unrelated
-/// work to that pool. Traversal, delivery, native-driver orchestration and GM
-/// Visit-accounting mutations now borrow a session-branded token, but
-/// normalization/scalar arithmetic, reducers, roots and allocation helpers
-/// still use the worker-local meter as a shadow.
+/// work to that pool. Traversal, delivery, native-driver orchestration, GM,
+/// and generic normalization/explicit monic Visit-accounting mutations now
+/// borrow a session-branded token. Specialization and other scalar arithmetic,
+/// reducers and row-produced monic work, roots, Rayon helpers, allocations,
+/// and separate `jv_bitops` telemetry still use worker-local shadows.
 /// `work_ownership_complete` therefore remains false until every admitted
 /// charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
@@ -12132,7 +12396,7 @@ mod visit_accounting_tests {
         assert_reconciles_in_modes(
             record,
             ownership_mode,
-            "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1",
+            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1",
         );
     }
 
@@ -12180,6 +12444,24 @@ mod visit_accounting_tests {
         work.wall_ns = 0;
         work.thread_cpu_ns = 0;
         assert_eq!(work, VisitAccountingWorkV1::default());
+    }
+
+    fn assert_overflow_reconciles(record: &VisitAccountingV1) {
+        let mut sum = VisitAccountingWorkV1::default();
+        for phase in &record.phases {
+            sum.checked_add_assign(&phase.work).unwrap();
+        }
+        assert_eq!(sum, record.total);
+        assert!(record.reconciliation.phase_sum_equals_total);
+        assert!(!record.reconciliation.checked_arithmetic);
+        assert!(!record.reconciliation.operation_tracking_complete);
+        assert!(!record.reconciliation.memory_tracking_complete);
+        assert!(!record.reconciliation.work_ownership_complete);
+        assert!(!record.accounting_complete);
+        assert_eq!(
+            record.arm.accounting_token_mode,
+            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+        );
     }
 
     fn non_time_work(mut work: VisitAccountingWorkV1) -> VisitAccountingWorkV1 {
@@ -12621,8 +12903,502 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
             );
+        });
+    }
+
+    fn normalization_fixture() -> Poly {
+        vec![(vec![2], 2), (vec![1], 2), (vec![2], 5), (vec![0], 3)]
+    }
+
+    fn run_normalization_accounting_fixture(account: VisitHelperAccount<'_>) -> Poly {
+        match normalise_owned_routed(normalization_fixture(), 7, Ordering::Grevlex, account) {
+            Ok(normalized) => normalized,
+            Err(_) => panic!("unblocked normalization accounting fixture stopped"),
+        }
+    }
+
+    #[test]
+    fn normalization_token_route_is_exact_and_does_not_double_charge_tls() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let legacy_context = VisitAccountingContext::new().unwrap();
+            let legacy_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-exact-legacy-route"),
+                    &opts,
+                    false,
+                ),
+                &legacy_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let legacy_account = VisitAccount::On(legacy_session.token());
+            let (legacy_phase, control) =
+                legacy_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let legacy = run_normalization_accounting_fixture(VisitHelperAccount::LegacyTls);
+            drop(legacy_phase);
+            let legacy_record = legacy_session.finish(VisitDispositionV1::Incomplete);
+
+            let owned_context = VisitAccountingContext::new().unwrap();
+            let owned_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-exact-token-route"),
+                    &opts,
+                    false,
+                ),
+                &owned_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owned_account = VisitAccount::On(owned_session.token());
+            let (owned_phase, control) =
+                owned_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let owned = run_normalization_accounting_fixture(owned_account.into());
+            drop(owned_phase);
+            let owned_record = owned_session.finish(VisitDispositionV1::Incomplete);
+
+            let expected_output = vec![(vec![1], 1), (vec![0], 5)];
+            assert_eq!(legacy, expected_output);
+            assert_eq!(owned, expected_output);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.word_operations = 12;
+            expected.sort_comparisons = 8;
+            expected.field_additions = 1;
+            expected.field_inversions = 1;
+            expected.field_multiplications = 2;
+            for record in [&legacy_record, &owned_record] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                let phase = record
+                    .phases
+                    .iter()
+                    .find(|phase| phase.phase == VisitAccountingPhaseV1::InputNormalization)
+                    .unwrap()
+                    .work
+                    .clone();
+                assert_eq!(non_time_work(phase), expected);
+                assert_reconciles(record);
+            }
+            assert_eq!(
+                non_time_work(legacy_record.total.clone()),
+                non_time_work(owned_record.total.clone())
+            );
+        });
+    }
+
+    #[test]
+    fn normalization_token_route_matches_legacy_across_cancellation_patterns() {
+        in_owner_pool(|| {
+            let mut state = 0x6e6f_726d_5f72_6f75u64;
+            let mut cases = Vec::new();
+            for case in 0..240usize {
+                let p = [2u64, 3, 5, 7, 31][case % 5];
+                let ord = [Ordering::Lex, Ordering::Grlex, Ordering::Grevlex][case % 3];
+                let len = case % 17;
+                let mut terms = Vec::with_capacity(len);
+                for _ in 0..len {
+                    state = state
+                        .wrapping_mul(0x5851_f42d_4c95_7f2d)
+                        .wrapping_add(0x1405_7b7e_f767_814f);
+                    let e0 = (state & 3) as u32;
+                    let e1 = ((state >> 7) & 3) as u32;
+                    let coefficient = (state >> 13) % (2 * p + 1);
+                    terms.push((vec![e0, e1], coefficient));
+                }
+                let expected = normalise_owned(terms.clone(), p, ord);
+                cases.push((terms, p, ord, expected));
+            }
+
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-cancellation-parity"),
+                    &opts,
+                    false,
+                ),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let account = VisitAccount::On(session.token());
+            let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            for (terms, p, ord, expected) in cases {
+                let actual = match normalise_owned_routed(terms, p, ord, account.into()) {
+                    Ok(actual) => actual,
+                    Err(_) => panic!("unblocked routed normalization stopped"),
+                };
+                assert_eq!(actual, expected);
+            }
+            drop(phase);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn monic_token_route_is_exact_and_does_not_double_charge_tls() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let input = vec![(vec![1], 2), (vec![0], 3)];
+            let run = |id: &str, route: bool| {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+                assert_eq!(control, VisitAccountingControl::Continue);
+                let helper = if route {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let output = match make_monic_routed(input.clone(), 7, helper) {
+                    Ok(output) => output,
+                    Err(_) => panic!("unblocked monic accounting fixture stopped"),
+                };
+                drop(phase);
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (output, record)
+            };
+            let (legacy, legacy_record) = run("monic-exact-legacy-route", false);
+            let (owned, owned_record) = run("monic-exact-token-route", true);
+            assert_eq!(legacy, vec![(vec![1], 1), (vec![0], 5)]);
+            assert_eq!(owned, legacy);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.field_inversions = 1;
+            expected.field_multiplications = 2;
+            for record in [&legacy_record, &owned_record] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                assert_reconciles(record);
+            }
+        });
+    }
+
+    #[test]
+    fn normalization_token_route_rejects_wrong_and_foreign_owners_before_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let mismatch_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("normalization-token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owner = VisitAccount::On(mismatch_session.token());
+            let (mismatch_phase, control) =
+                owner.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let wrong = VisitHelperAccount::Owned(wrong_context.unbound_test_token());
+            assert!(matches!(
+                normalise_routed(&[], 0, Ordering::Grevlex, wrong),
+                Err(F4Stop::Accounting)
+            ));
+            assert!(matches!(
+                normalise_routed(&[(vec![], 1)], 0, Ordering::Grevlex, wrong),
+                Err(F4Stop::Accounting)
+            ));
+            let mut polynomial = vec![(vec![], 1)];
+            let before = polynomial.clone();
+            assert!(matches!(
+                scale_monic_routed(&mut polynomial, 1, wrong),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(polynomial, before);
+            drop(mismatch_phase);
+            let mismatch_record = mismatch_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                mismatch_record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_no_non_time_work(&mismatch_record);
+            assert_reconciles(&mismatch_record);
+
+            let foreign_context = VisitAccountingContext::new().unwrap();
+            let foreign_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-token-foreign-thread"),
+                    &opts,
+                    false,
+                ),
+                &foreign_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let foreign_account = VisitAccount::On(foreign_session.token());
+            let (foreign_phase, control) =
+                foreign_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let token = foreign_session.token();
+            std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        let helper = VisitHelperAccount::Owned(token);
+                        assert!(matches!(
+                            normalise_routed(&[], 0, Ordering::Grevlex, helper),
+                            Err(F4Stop::Accounting)
+                        ));
+                        assert!(matches!(
+                            normalise_routed(&[(vec![], 1)], 0, Ordering::Grevlex, helper),
+                            Err(F4Stop::Accounting)
+                        ));
+                        let mut polynomial = vec![(vec![], 1)];
+                        let before = polynomial.clone();
+                        assert!(matches!(
+                            scale_monic_routed(&mut polynomial, 1, helper),
+                            Err(F4Stop::Accounting)
+                        ));
+                        assert_eq!(polynomial, before);
+                    })
+                    .join()
+                    .unwrap();
+            });
+            assert_eq!(foreign_account.control(), VisitAccountingControl::Stop);
+            drop(foreign_phase);
+            let foreign_record = foreign_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                foreign_record.blocker.as_ref().unwrap().code,
+                "foreign_thread_work"
+            );
+            assert_no_non_time_work(&foreign_record);
+            assert_reconciles(&foreign_record);
+        });
+    }
+
+    #[test]
+    fn normalization_checked_cost_overflows_fail_closed() {
+        if usize::BITS != 64 {
+            return;
+        }
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let legacy_context = VisitAccountingContext::new().unwrap();
+            let legacy_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-cost-overflow-legacy"),
+                    &opts,
+                    false,
+                ),
+                &legacy_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let legacy_cost = match normalisation_cost(usize::MAX, VisitHelperAccount::LegacyTls) {
+                Ok(cost) => cost,
+                Err(_) => panic!("legacy cost accounting cannot stop"),
+            };
+            assert_eq!(legacy_cost, (u64::MAX, u64::MAX));
+            let legacy_record = legacy_session.finish(VisitDispositionV1::Incomplete);
+
+            let owned_context = VisitAccountingContext::new().unwrap();
+            let owned_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-cost-overflow-owned"),
+                    &opts,
+                    false,
+                ),
+                &owned_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owned_account = VisitAccount::On(owned_session.token());
+            assert!(matches!(
+                normalisation_cost(usize::MAX, owned_account.into()),
+                Err(F4Stop::Accounting)
+            ));
+            let owned_record = owned_session.finish(VisitDispositionV1::Incomplete);
+
+            for record in [&legacy_record, &owned_record] {
+                let blocker = record.blocker.as_ref().unwrap();
+                assert_eq!(blocker.code, "counter_overflow");
+                assert_eq!(blocker.counter, Some("sort_comparisons"));
+                assert_no_non_time_work(record);
+                assert!(!record.reconciliation.checked_arithmetic);
+                assert!(record.reconciliation.phase_sum_equals_total);
+                assert!(!record.accounting_complete);
+            }
+
+            let sum_context = VisitAccountingContext::new().unwrap();
+            let sum_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(
+                    request("normalization-sum-overflow-owned"),
+                    &opts,
+                    false,
+                ),
+                &sum_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let sum_account = VisitAccount::On(sum_session.token());
+            let terms = usize::try_from(u64::MAX / 60 + 1).unwrap();
+            assert!(matches!(
+                normalisation_cost(terms, sum_account.into()),
+                Err(F4Stop::Accounting)
+            ));
+            let sum_record = sum_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                sum_record.blocker.as_ref().unwrap().counter,
+                Some("word_operations")
+            );
+            assert_no_non_time_work(&sum_record);
+            assert!(!sum_record.reconciliation.checked_arithmetic);
+        });
+    }
+
+    #[test]
+    fn normalization_and_monic_overflows_stop_at_prefix_boundaries() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let word_context = VisitAccountingContext::new().unwrap();
+            let word_session = begin_counter_overflow_session(
+                &word_context,
+                "normalization-word-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::WordOperations,
+            );
+            let word_account = VisitAccount::On(word_session.token());
+            let (word_phase, control) =
+                word_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert!(matches!(
+                normalise_owned_routed(
+                    normalization_fixture(),
+                    7,
+                    Ordering::Grevlex,
+                    word_account.into(),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            drop(word_phase);
+            let word_record = word_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(word_record.total.word_operations, u64::MAX);
+            assert_eq!(word_record.total.sort_comparisons, 0);
+            assert_eq!(word_record.total.field_additions, 0);
+            assert_eq!(word_record.total.field_inversions, 0);
+            assert_eq!(word_record.total.field_multiplications, 0);
+            assert_overflow_reconciles(&word_record);
+
+            let sort_context = VisitAccountingContext::new().unwrap();
+            let sort_session = begin_counter_overflow_session(
+                &sort_context,
+                "normalization-sort-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::SortComparisons,
+            );
+            let sort_account = VisitAccount::On(sort_session.token());
+            let (sort_phase, control) =
+                sort_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert!(matches!(
+                normalise_owned_routed(
+                    normalization_fixture(),
+                    7,
+                    Ordering::Grevlex,
+                    sort_account.into(),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            drop(sort_phase);
+            let sort_record = sort_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(sort_record.total.word_operations, 12);
+            assert_eq!(sort_record.total.sort_comparisons, u64::MAX);
+            assert_eq!(sort_record.total.field_additions, 0);
+            assert_eq!(sort_record.total.field_inversions, 0);
+            assert_eq!(sort_record.total.field_multiplications, 0);
+            assert_overflow_reconciles(&sort_record);
+
+            let add_context = VisitAccountingContext::new().unwrap();
+            let add_session = begin_counter_overflow_session(
+                &add_context,
+                "normalization-add-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldAdditions,
+            );
+            let add_account = VisitAccount::On(add_session.token());
+            let (add_phase, control) =
+                add_account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert!(matches!(
+                normalise_owned_routed(
+                    normalization_fixture(),
+                    7,
+                    Ordering::Grevlex,
+                    add_account.into(),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            drop(add_phase);
+            let add_record = add_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(add_record.total.word_operations, 12);
+            assert_eq!(add_record.total.sort_comparisons, 8);
+            assert_eq!(add_record.total.field_additions, u64::MAX);
+            assert_eq!(add_record.total.field_inversions, 0);
+            assert_eq!(add_record.total.field_multiplications, 0);
+            assert_overflow_reconciles(&add_record);
+
+            let inv_context = VisitAccountingContext::new().unwrap();
+            let inv_session = begin_counter_overflow_session(
+                &inv_context,
+                "monic-inversion-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldInversions,
+            );
+            let inv_account = VisitAccount::On(inv_session.token());
+            let (inv_phase, control) =
+                inv_account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let mut inv_polynomial = vec![(vec![1], 2), (vec![0], 3)];
+            let inv_before = inv_polynomial.clone();
+            assert!(matches!(
+                scale_monic_routed(&mut inv_polynomial, 1, inv_account.into()),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(inv_polynomial, inv_before);
+            drop(inv_phase);
+            let inv_record = inv_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(inv_record.total.field_inversions, u64::MAX);
+            assert_eq!(inv_record.total.field_multiplications, 0);
+            assert_overflow_reconciles(&inv_record);
+
+            let mul_context = VisitAccountingContext::new().unwrap();
+            let mul_session = begin_counter_overflow_session(
+                &mul_context,
+                "monic-multiplication-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldMultiplications,
+            );
+            let mul_account = VisitAccount::On(mul_session.token());
+            let (mul_phase, control) =
+                mul_account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let mut mul_polynomial = vec![(vec![1], 2), (vec![0], 3)];
+            let mul_before = mul_polynomial.clone();
+            assert!(matches!(
+                scale_monic_routed(&mut mul_polynomial, 7, mul_account.into()),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(mul_polynomial, mul_before);
+            drop(mul_phase);
+            let mul_record = mul_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(mul_record.total.field_inversions, 1);
+            assert_eq!(mul_record.total.field_multiplications, u64::MAX);
+            assert_overflow_reconciles(&mul_record);
         });
     }
 
@@ -12821,7 +13597,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
@@ -13216,7 +13992,7 @@ mod visit_accounting_tests {
             assert!(callback_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 callback_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
             );
 
             let trace_context = VisitAccountingContext::new().unwrap();
@@ -13266,7 +14042,7 @@ mod visit_accounting_tests {
             assert!(trace_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 trace_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
