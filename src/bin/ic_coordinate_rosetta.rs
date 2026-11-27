@@ -11,6 +11,7 @@
 //! as a new intrinsic coordinate on the curve.
 
 use crypto_lib::cryptanalysis::efd_representations::{chart_ids, EfdRepresentation};
+use crypto_lib::cryptanalysis::ic_coordinate_degree::{degree_inventory, run_degree_study};
 use crypto_lib::cryptanalysis::prime_small_x::{Curve, PrimeField, Pt, SmallPrime};
 use crypto_lib::ecc::field::FieldElement;
 use crypto_lib::prime_ecc::efd::{catalogue, Bindings, OperationCounts, ProgramSource};
@@ -916,6 +917,12 @@ fn u64_option(args: &[String], name: &str, default: u64) -> u64 {
         .unwrap_or(default)
 }
 
+fn u32_option(args: &[String], name: &str, default: u32) -> u32 {
+    option_value(args, name)
+        .and_then(|value| value.parse().ok())
+        .unwrap_or(default)
+}
+
 fn inventory() -> serde_json::Value {
     let formulas = &catalogue().formulas;
     let operation_counts = [
@@ -966,7 +973,7 @@ fn inventory() -> serde_json::Value {
 
 fn usage() -> ! {
     eprintln!(
-        "usage:\n  ic_coordinate_rosetta inventory\n  ic_coordinate_rosetta chart --model M --chart C [--iterations N]\n  ic_coordinate_rosetta chart-all [--workers N] [--iterations N]\n  ic_coordinate_rosetta relations --coordinate C [--samples N] [--seed N]\n  ic_coordinate_rosetta relations-all [--workers N] [--samples N] [--seed N]"
+        "usage:\n  ic_coordinate_rosetta inventory\n  ic_coordinate_rosetta degree-inventory [--output FILE]\n  ic_coordinate_rosetta degree-study --protocol-sha256 HEX --instrument-commit SHA [--max-degree N] [--output FILE]\n  ic_coordinate_rosetta chart --model M --chart C [--iterations N]\n  ic_coordinate_rosetta chart-all [--workers N] [--iterations N]\n  ic_coordinate_rosetta relations --coordinate C [--samples N] [--seed N]\n  ic_coordinate_rosetta relations-all [--workers N] [--samples N] [--seed N]"
     );
     std::process::exit(2);
 }
@@ -978,6 +985,22 @@ fn main() {
     };
     let value = match command {
         "inventory" => inventory(),
+        "degree-inventory" => {
+            serde_json::to_value(degree_inventory()).expect("serialize degree inventory")
+        }
+        "degree-study" => {
+            let protocol_sha256 =
+                option_value(&args, "--protocol-sha256").unwrap_or_else(|| usage());
+            let instrument_commit =
+                option_value(&args, "--instrument-commit").unwrap_or_else(|| usage());
+            let max_degree = u32_option(&args, "--max-degree", 32);
+            let report = run_degree_study(protocol_sha256, instrument_commit, max_degree)
+                .unwrap_or_else(|error| {
+                    eprintln!("degree study refused: {error}");
+                    std::process::exit(2);
+                });
+            serde_json::to_value(report).expect("serialize degree study")
+        }
         "chart" => {
             let model = option_value(&args, "--model").unwrap_or_else(|| usage());
             let chart = option_value(&args, "--chart").unwrap_or_else(|| usage());
@@ -1018,8 +1041,11 @@ fn main() {
         }
         _ => usage(),
     };
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&value).expect("serialize output")
-    );
+    let mut rendered = serde_json::to_string_pretty(&value).expect("serialize output");
+    rendered.push('\n');
+    if let Some(path) = option_value(&args, "--output") {
+        std::fs::write(path, rendered).expect("write output");
+    } else {
+        print!("{rendered}");
+    }
 }
