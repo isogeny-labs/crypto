@@ -1,6 +1,6 @@
 # P-192 closed-rank search, 27 November 2026
 
-The completed fibre, section, norm, residual graph and cross-image tests
+The completed fibre, line/conic, norm, residual graph and cross-image tests
 give **zero additional rank** on the unchanged original 225 elliptic columns.
 The positive-rank objective remains open. These are finite component results
 for the recorded P-192 d7/kernel3 construction. [pcc:unverified]
@@ -47,6 +47,8 @@ this study does not change those maps.
 | Divided/individual cross-images | 203402signed labels;212842individual slots | Zero cross-aliases;derived309829/309823/6 |
 | First residual-fibre expansion | 16new image labels;39new curve points | Computed116/110/6;all15necessary image rows |
 | Diversified residual-fibre expansion | 256new image labels;782new curve points | Computed236/230/6;all135necessary image rows |
+| First new signed-fibre conic pencils | 16pencils;22944candidate occurrences | Zero supported conics;computed236/230/6 |
+| Complete new signed-fibre quadruple family | 87pencils across31groups;124758total occurrences | Zero supported conics;computed236/230/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -267,6 +269,42 @@ rank. No expensive repeat of the geometric all-pair line scan is needed.
 The conclusion does not cover other images,nonrational elliptic traces or
 higher-degree function relations. [pcc:unverified]
 
+## Conic pencils on expanded actual fibres
+
+The higher-degree follow-up uses the saved1434-point pool without another
+fibre solve. Revalidate every curve point,image/sign and128actual seed-line
+restrictions and factor products. Original108rows plus128seed rows form a
+236-row starting basis with ranks236/230/6. All135saved norm rows are bound
+to the seed/baseline span. All original204and new256image columns remain
+auxiliary. [pcc:unverified]
+
+There are31new signed-image groups with at least four rational preimages.
+Each admits a general-position quadruple. The first16chosen pencils give
+22944candidate occurrences and no fully supported degree-eight conic.
+The same parameter-bucket collector,run on a separate known-product pencil,
+does recover a nonzero conic. Direct checks of21original line products span
+rank6;the repeated reference has four multiplicities2and row0. Changed
+coefficients,missing support/control conics,seeds and pencil accounting reject.
+See EXPANDED_CONIC_PROTOCOL.md and evidence/expanded-conics-v1/.
+[pcc:unverified]
+
+The complete follow-up enumerates every four-subset in all31groups. There
+are87general-position pencils and no degenerate quadruples. It binds/skips
+the16completed empty pencils and scans only71new ones,with101814new candidate
+occurrences. Together the two attempts cover124758occurrences. The new
+ordered-bucket digest is
+
+```
+6fc19f4bf8020f35fee603a933a6bc6c902c8096f26d92003ac739e8704df2a6
+```
+
+No supported conic is found. All controls pass,and direct full/auxiliary
+elimination remains236/230/6. This completes only the same-signed-image
+quadruple/pencil family on the saved pool. Mixed signed-image pencils,
+other anchors and other functions are not covered. See
+FULL_FIBRE_CONIC_PROTOCOL.md and evidence/all-expanded-conics-v2/.
+[pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
@@ -281,6 +319,10 @@ coupled residual graph277.788;mixed comparison92.381;failed divided build2.212;
 corrected divided15.373;divided/individual comparison96.061.
 The initial actual-anchor expansion takes29.979wrapper seconds;the larger
 diversified expansion takes131.444wrapper seconds and reuses16fibre solves.
+The first new conic pencils take36.278wrapper seconds;the complete same-image
+follow-up takes47.927wrapper seconds and reuses16completed empty pencils.
+Their workers take20.425and30.997seconds. A second pre-build wrapper failure
+takes0.019seconds and is preserved.
 The graph collector itself takes265.461seconds;mixed build13.501and scan78.801.
 The divided/individual build takes14.143seconds and scan81.873seconds.
 The same-image conic wrapper first failed before build in0.012seconds.
@@ -293,6 +335,8 @@ used multiplication in a boolean condition under strict warnings;divided-v1
 had an unqualified SSL helper type. Its build stopped after2.191seconds;
 the corrected divided-v2worker takes7.985seconds. A separate
 same-image conic wrapper failed during input copy, before any build or worker.
+The all-expanded-conics-v1wrapper repeated that input-copy argument defect;
+its fresh corrected v2attempt passes. Both failed wrappers remain intact.
 Fresh attempts
 fixed those integration defects. No mathematical worker failed or timed out.
 Each attempt's stdout, stderr, exits, source/input/binary manifests and costs
@@ -305,8 +349,11 @@ The residual graph covers every rationally split pair/tangent section on
 the652-point old pool. Aggregate/divided labels do not couple to its individual
 images. Actual cover-anchor expansion now reaches1434curve points and256new
 auxiliary images,but the complete necessary canonical-line image condition
-still retains closed rank6. A distinct successor is to assess higher-degree
-sections,such as conic pencils through the newly recovered fibre points.
+still retains closed rank6. The conic follow-up now exhausts all87pencils
+through four new points with the same signed image,again with no gain.
+A distinct successor takes four points in a common x-fibre whose images
+include both Qand-Q. Native planning must count those mixed-sign quadruples,
+skip all87completed same-sign cases,and keep any scan batches bounded.
 The saved actual pool can be reused without another fibre solve. All images
 outside the original225must remain auxiliary,and all execution/dense caps
 remain fixed. This higher-degree successor is not executed here. Nonrational
@@ -323,14 +370,17 @@ elliptic/elimination replay.
   [traces](TRACE_PROTOCOL.md), [conics](CONIC_PROTOCOL.md),
   [same-image conics](FIBRE_CONIC_PROTOCOL.md), [signed six](SIX_PROTOCOL.md),
   [partial lines](PARTIAL_PROTOCOL.md), [residual graph](GRAPH_PROTOCOL.md),
-  [mixed images](MIXED_PROTOCOL.md), [divided images](DIVIDED_PROTOCOL.md)
-  and [divided/individual images](MIXED_DIVIDED_PROTOCOL.md),
+  [mixed images](MIXED_PROTOCOL.md), [divided images](DIVIDED_PROTOCOL.md),
+  [divided/individual images](MIXED_DIVIDED_PROTOCOL.md),
   [actual anchors](ANCHOR_PROTOCOL.md),
-  [diversified anchors](ANCHOR_EXPANDED_PROTOCOL.md).
+  [diversified anchors](ANCHOR_EXPANDED_PROTOCOL.md),
+  [expanded conics](EXPANDED_CONIC_PROTOCOL.md) and
+  [complete same-image conic family](FULL_FIBRE_CONIC_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
-  run-mixed-divided.sh,run-anchors.sh and run-anchors-expanded.sh.
+  run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
+  run-expanded-conics.sh and run-all-expanded-conics.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.

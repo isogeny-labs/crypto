@@ -54,6 +54,8 @@ attempts = {
     'divided-v1': 'Strict build failed: unqualified helper SSL collides with the OpenSSL global typedef. No mathematical worker ran. Frozen source and diagnostics retained.',
     'divided-v2': 'All three denominators1,2,3pass:101926pairs and226checked divisions each;305103distinct xlabels,zero unequal-expression aliases and zero candidate rows. Actual augmented ranks108/102/6,gain0. Nonempty G,2Gfixture finds primitive(2,-1),rank1;three identity branches and all corruption controls pass.',
     'mixed-divided-v1': 'Both new divided families pass:203852pairs,203402distinct signed labels,212842individual residual-image slots,and zero cross-aliases. The full individual image stream matches mixed-v1. Derived disjoint-block ranks309829/309823/6,gain0;no giant dense matrix formed. All declared controls pass.',
+    'expanded-conics-v1': 'First16new signed-fibre conic pencils pass on1434actual points:22944candidate occurrences,zero supported conics,computed ranks236/230/6,gain0. All31qualifying signed groups admit general-position anchors. Separate same-collector pencil finds one nonzero conic;21direct products span6;all controls pass.',
+    'all-expanded-conics-v1': 'Wrapper failed during input copy before compiler or mathematical worker. A broad path-suffix replacement added an unintended third cp argument. Frozen partial snapshot and exact stderr retained;no scientific scan ran.',
 }
 
 figure_only = '--figure-only' in sys.argv[1:]
@@ -94,6 +96,20 @@ for anchor_attempt in ('anchors-v1','anchors-expanded-v1'):
             f"Reused{anchor.get('reused_fibres',0)}frozen complete fibres;"
             f"solved{anchor.get('freshly_solved_fibres',anchor['new_auxiliary_columns'])}fresh fibres. "
             "Both elliptic streams/joins,actual witness recovery and corruption controls pass.")
+all_conics_source=ROOT/'evidence/all-expanded-conics-v2/calls/scan/stdout.json'
+all_conics_exit=all_conics_source.parent/'exit-code.txt'
+if all_conics_exit.exists() and all_conics_exit.read_text().strip()=='0':
+    all_conics=json.loads(all_conics_source.read_text())
+    attempts['all-expanded-conics-v2']=(
+        f"Complete same-image four-subset family passes:"
+        f"{all_conics['qualifying_groups']}signed groups,"
+        f"{all_conics['combined_pencil_count']}total general-position pencils;"
+        f"{all_conics['reused_pencils']}reused empty pencils and"
+        f"{all_conics['pencil_count']}fresh scans. "
+        f"{all_conics['combined_candidate_occurrences']}combined candidate occurrences,"
+        f"{all_conics['supported_conics']}new supported conics;computed ranks"
+        f"{all_conics['full_rank']}/{all_conics['auxiliary_rank']}/"
+        f"{all_conics['closed_rank']},gain{all_conics['candidate_gain']}. All controls pass.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -180,7 +196,9 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Divided','divided-v2/calls/scan'),
                         ('Mixed /2,/3','mixed-divided-v1/calls/scan'),
                         ('Anchor16','anchors-v1/calls/scan'),
-                        ('Anchor256','anchors-expanded-v1/calls/scan')]:
+                        ('Anchor256','anchors-expanded-v1/calls/scan'),
+                        ('Conic16','expanded-conics-v1/calls/scan'),
+                        ('Fibre-all','all-expanded-conics-v2/calls/scan')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -196,7 +214,7 @@ for position, key in enumerate(metrics[:2]):
     x = [i+(position-.5)*.36 for i in range(len(cases))]
     values=[record[key] for _,record in cases]
     bars=axis.bar(x,values,width=.33,label=key.replace('_',' '))
-    axis.bar_label(bars,labels=[str(v) if 0<v<1000 else '' for v in values],padding=2,fontsize=6.5)
+    axis.bar_label(bars,labels=[str(v) if 0<v<1000 else '' for v in values],padding=2+8*position,fontsize=6.5)
     for case_index,(at,value) in enumerate(zip(x,values)):
         if not value:
             axis.text(at,.9,'0',ha='center',va='bottom',fontsize=7)
