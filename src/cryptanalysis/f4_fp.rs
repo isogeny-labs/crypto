@@ -2947,7 +2947,15 @@ fn gm_update<K: PartialEq>(
     coprime: impl Fn(&K, &K) -> bool,
     limits: Option<&F4ResourceLimits>,
     deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
 ) -> Result<Vec<(usize, K)>, F4Stop> {
+    macro_rules! account_or_stop {
+        ($control:expr) => {
+            if $control.stopped() {
+                return Err(F4Stop::Accounting);
+            }
+        };
+    }
     // bitop/v1: criterion B tests every held pair (a divisibility and two
     // lcm compares, a packed monomial being two words each), every alive
     // element gets a divisibility, coprimality and lcm, and criteria M/F
@@ -2959,19 +2967,33 @@ fn gm_update<K: PartialEq>(
         0
     }
     .saturating_add(k.saturating_mul(6));
-    visit_account_charge_usize(VisitAccountingCounter::WordOperations, legacy_words);
-    super::jv_bitops::words(u64::try_from(legacy_words).unwrap_or(u64::MAX));
+    let checked_words = held
+        .and_then(|held| if gm { held.checked_mul(6) } else { Some(0) })
+        .and_then(|held_words| {
+            k.checked_mul(6)
+                .and_then(|alive_words| held_words.checked_add(alive_words))
+        });
+    if checked_words.is_none() {
+        account_or_stop!(account.checked_arithmetic_block(
+            "counter_overflow",
+            Some("word_operations"),
+            "checked GM held/alive word estimate overflowed usize",
+        ));
+    }
+    let charged_words = checked_words.unwrap_or(legacy_words);
+    account_or_stop!(account.charge_usize(VisitAccountingCounter::WordOperations, charged_words));
+    super::jv_bitops::words(u64::try_from(charged_words).unwrap_or(u64::MAX));
     if held.is_none() {
-        visit_account_block(
+        account_or_stop!(account.checked_arithmetic_block(
             "counter_overflow",
             Some("word_operations"),
             "held-pair population overflowed usize",
-        );
+        ));
     }
     if gm {
         if let Some(held) = held {
-            visit_account_charge_usize(VisitAccountingCounter::DivisibilityTests, held);
-            visit_account_charge_product(VisitAccountingCounter::Comparisons, held, 2);
+            account_or_stop!(account.charge_usize(VisitAccountingCounter::DivisibilityTests, held));
+            account_or_stop!(account.charge_product(VisitAccountingCounter::Comparisons, held, 2));
         }
         // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
         // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
@@ -3004,8 +3026,8 @@ fn gm_update<K: PartialEq>(
         if !alive[i] {
             continue;
         }
-        visit_account_charge(VisitAccountingCounter::CriticalPairCandidates, 1);
-        visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
+        account_or_stop!(account.charge(VisitAccountingCounter::CriticalPairCandidates, 1));
+        account_or_stop!(account.charge(VisitAccountingCounter::DivisibilityTests, 1));
         let lmi = lm(i);
         if div(h, &lmi) {
             // `basis[i]` is redundant in the final basis, but its pair with
@@ -3025,12 +3047,15 @@ fn gm_update<K: PartialEq>(
             .and_then(|n| n.checked_mul(2))
             .and_then(|n| u64::try_from(n).ok())
         {
-            Some(words) => count_words(words),
-            None => visit_account_block(
+            Some(words) => {
+                account_or_stop!(account.charge(VisitAccountingCounter::WordOperations, words));
+                super::jv_bitops::words(words);
+            }
+            None => account_or_stop!(account.checked_arithmetic_block(
                 "counter_overflow",
                 Some("word_operations"),
                 "quadratic critical-pair comparison bound overflowed",
-            ),
+            )),
         }
         // Criteria M and F: drop (h, g1) when another pair (h, g2) still
         // standing has an lcm dividing its own; of several with equal lcms
@@ -3043,13 +3068,18 @@ fn gm_update<K: PartialEq>(
             if cand[a].2 {
                 continue;
             }
-            if (0..cand.len()).any(|b| {
+            let mut dominated = false;
+            for b in 0..cand.len() {
                 if b == a || !kept[b] {
-                    return false;
+                    continue;
                 }
-                visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
-                div(&cand[b].1, &cand[a].1)
-            }) {
+                account_or_stop!(account.charge(VisitAccountingCounter::DivisibilityTests, 1));
+                if div(&cand[b].1, &cand[a].1) {
+                    dominated = true;
+                    break;
+                }
+            }
+            if dominated {
                 kept[a] = false;
             }
         }
@@ -6120,6 +6150,7 @@ fn f4_with_arithmetic(
                     |a, b| packed_coprime(*a, *b),
                     limits,
                     deadline,
+                    account.into(),
                 )?;
                 lmp.push(h);
                 new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
@@ -6140,6 +6171,7 @@ fn f4_with_arithmetic(
                     |a, b| a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0),
                     limits,
                     deadline,
+                    account.into(),
                 )?;
                 new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
@@ -8404,9 +8436,10 @@ static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
 /// Per-call ownership identity for the explicit-token migration.
 ///
 /// The authoritative ledger is still worker TLS.  The borrowed token gates
-/// traversal and native-driver mutations and cannot enter detached `'static`
-/// work; shared arithmetic, reducers, roots and allocation helpers remain a
-/// non-authoritative TLS shadow until later migration.
+/// traversal, native-driver and GM Visit-accounting mutations and cannot enter
+/// detached `'static` work; normalization/scalar arithmetic, reducers, roots
+/// and allocation helpers remain a non-authoritative TLS shadow until later
+/// migration.
 struct VisitAccountingContext {
     id: NonZeroU64,
     owner_thread: ThreadId,
@@ -8464,6 +8497,28 @@ impl VisitAccountingToken<'_> {
 enum VisitAccount<'a> {
     Off,
     On(VisitAccountingToken<'a>),
+}
+
+/// Exclusive accounting route for shared helpers during token migration.
+///
+/// Legacy public calls retain the worker-local shadow. An admitted accounted
+/// call selects `Owned` and must never also mutate that shadow for the same
+/// observation. Stops are prefix-atomic rather than transactional: each charge
+/// precedes the work it represents, while earlier charged mutations are not
+/// rolled back when a later charge fails.
+#[derive(Clone, Copy)]
+enum VisitHelperAccount<'a> {
+    LegacyTls,
+    Owned(VisitAccountingToken<'a>),
+}
+
+impl<'a> From<VisitAccount<'a>> for VisitHelperAccount<'a> {
+    fn from(account: VisitAccount<'a>) -> Self {
+        match account {
+            VisitAccount::Off => Self::LegacyTls,
+            VisitAccount::On(token) => Self::Owned(token),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -9056,7 +9111,8 @@ impl VisitAccountingBuilder {
 
     fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
         self.token_identity = Some(token.id());
-        self.arm.accounting_token_mode = "borrowed_traversal_native_driver_tls_helper_shadow_v1";
+        self.arm.accounting_token_mode =
+            "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1";
     }
 
     fn block(
@@ -9073,6 +9129,16 @@ impl VisitAccountingBuilder {
                 detail: detail.into(),
             });
         }
+    }
+
+    fn checked_arithmetic_block(
+        &mut self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) {
+        self.checked_arithmetic = false;
+        self.block(code, counter, detail);
     }
 
     fn charge(&mut self, counter: VisitAccountingCounter, amount: u64) {
@@ -9453,7 +9519,7 @@ impl<'a> VisitAccount<'a> {
     fn charge_usize(self, counter: VisitAccountingCounter, value: usize) -> VisitAccountingControl {
         match u64::try_from(value) {
             Ok(value) => self.charge(counter, value),
-            Err(_) => self.block(
+            Err(_) => self.checked_arithmetic_block(
                 "counter_overflow",
                 Some(counter.name()),
                 "usize observation does not fit u64",
@@ -9469,7 +9535,7 @@ impl<'a> VisitAccount<'a> {
     ) -> VisitAccountingControl {
         match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
             Some(value) => self.charge(counter, value),
-            None => self.block(
+            None => self.checked_arithmetic_block(
                 "counter_overflow",
                 Some(counter.name()),
                 format!("checked product {left} * {right} failed"),
@@ -9487,6 +9553,20 @@ impl<'a> VisitAccount<'a> {
             Self::Off => VisitAccountingControl::Continue,
             Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
                 accounting.block(code, counter, detail);
+            }),
+        }
+    }
+
+    fn checked_arithmetic_block(
+        self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.checked_arithmetic_block(code, counter, detail);
             }),
         }
     }
@@ -9540,6 +9620,60 @@ impl<'a> VisitAccount<'a> {
             Err(VisitAccountingControl::Stop)
         } else {
             Ok(guard)
+        }
+    }
+}
+
+impl VisitHelperAccount<'_> {
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> VisitAccountingControl {
+        match self {
+            Self::LegacyTls => {
+                visit_account_charge(counter, amount);
+                VisitAccountingControl::Continue
+            }
+            Self::Owned(token) => VisitAccount::On(token).charge(counter, amount),
+        }
+    }
+
+    fn charge_usize(self, counter: VisitAccountingCounter, value: usize) -> VisitAccountingControl {
+        match self {
+            Self::LegacyTls => {
+                visit_account_charge_usize(counter, value);
+                VisitAccountingControl::Continue
+            }
+            Self::Owned(token) => VisitAccount::On(token).charge_usize(counter, value),
+        }
+    }
+
+    fn charge_product(
+        self,
+        counter: VisitAccountingCounter,
+        left: usize,
+        right: usize,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::LegacyTls => {
+                visit_account_charge_product(counter, left, right);
+                VisitAccountingControl::Continue
+            }
+            Self::Owned(token) => VisitAccount::On(token).charge_product(counter, left, right),
+        }
+    }
+
+    fn checked_arithmetic_block(
+        self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::LegacyTls => {
+                visit_account_checked_arithmetic_block(code, counter, detail);
+                VisitAccountingControl::Continue
+            }
+            Self::Owned(token) => {
+                VisitAccount::On(token).checked_arithmetic_block(code, counter, detail)
+            }
         }
     }
 }
@@ -9608,6 +9742,16 @@ fn visit_account_block(
     detail: impl Into<String>,
 ) {
     visit_account_with(|accounting| accounting.block(code, counter, detail));
+}
+
+fn visit_account_checked_arithmetic_block(
+    code: &'static str,
+    counter: Option<&'static str>,
+    detail: impl Into<String>,
+) {
+    visit_account_with(|accounting| {
+        accounting.checked_arithmetic_block(code, counter, detail);
+    });
 }
 
 struct VisitAccountingSession<'a> {
@@ -9869,7 +10013,7 @@ fn visit_accounting_cached_profile_is_default(
 fn visit_account_charge_usize(counter: VisitAccountingCounter, value: usize) {
     match u64::try_from(value) {
         Ok(value) => visit_account_charge(counter, value),
-        Err(_) => visit_account_block(
+        Err(_) => visit_account_checked_arithmetic_block(
             "counter_overflow",
             Some(counter.name()),
             "usize observation does not fit u64",
@@ -9880,7 +10024,7 @@ fn visit_account_charge_usize(counter: VisitAccountingCounter, value: usize) {
 fn visit_account_charge_product(counter: VisitAccountingCounter, left: usize, right: usize) {
     match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
         Some(value) => visit_account_charge(counter, value),
-        None => visit_account_block(
+        None => visit_account_checked_arithmetic_block(
             "counter_overflow",
             Some(counter.name()),
             format!("checked product {left} * {right} failed"),
@@ -11092,9 +11236,10 @@ pub struct VisitFirstReportV1 {
 ///
 /// The executor owns a one-thread Rayon pool and exposes no caller callback or
 /// trace sink, preventing those extension points from submitting unrelated
-/// work to that pool. Traversal, delivery and native-driver orchestration now
-/// borrow a session-branded token, but shared arithmetic, reducers, roots and
-/// allocation helpers still use the worker-local meter as a shadow.
+/// work to that pool. Traversal, delivery, native-driver orchestration and GM
+/// Visit-accounting mutations now borrow a session-branded token, but
+/// normalization/scalar arithmetic, reducers, roots and allocation helpers
+/// still use the worker-local meter as a shadow.
 /// `work_ownership_complete` therefore remains false until every admitted
 /// charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
@@ -11987,7 +12132,7 @@ mod visit_accounting_tests {
         assert_reconciles_in_modes(
             record,
             ownership_mode,
-            "borrowed_traversal_native_driver_tls_helper_shadow_v1",
+            "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1",
         );
     }
 
@@ -12035,6 +12180,450 @@ mod visit_accounting_tests {
         work.wall_ns = 0;
         work.thread_cpu_ns = 0;
         assert_eq!(work, VisitAccountingWorkV1::default());
+    }
+
+    fn non_time_work(mut work: VisitAccountingWorkV1) -> VisitAccountingWorkV1 {
+        work.wall_ns = 0;
+        work.thread_cpu_ns = 0;
+        work
+    }
+
+    type PairSnapshot = (usize, usize, Vec<u32>, u128, u32);
+
+    fn pair_snapshots(pairs: &[Pair]) -> Vec<PairSnapshot> {
+        pairs
+            .iter()
+            .map(|pair| (pair.i, pair.j, pair.lcm.clone(), pair.lcm_p, pair.degree))
+            .collect()
+    }
+
+    fn run_gm_accounting_fixture(
+        account: VisitHelperAccount<'_>,
+    ) -> (
+        Vec<(usize, u128)>,
+        Vec<PairSnapshot>,
+        Vec<PairSnapshot>,
+        Vec<bool>,
+    ) {
+        let h = 0b0011u128;
+        let lms = [0b0101u128, 0b1010, 0b0100, 0b0001];
+        let mut pairs = vec![Pair {
+            i: 0,
+            j: 1,
+            lcm: vec![1, 1, 1, 1],
+            lcm_p: 0b1111,
+            degree: 4,
+        }];
+        let mut above = Vec::new();
+        let mut alive = vec![true; lms.len()];
+        let selected = match gm_update(
+            &h,
+            |i| lms[i],
+            &mut pairs,
+            &mut above,
+            |pair| pair.lcm_p,
+            &mut alive,
+            lms.len(),
+            true,
+            |a, b| (*a & *b) == *a,
+            |a, b| *a | *b,
+            |a, b| (*a & *b) == 0,
+            None,
+            None,
+            account,
+        ) {
+            Ok(selected) => selected,
+            Err(_) => panic!("unblocked GM accounting fixture stopped"),
+        };
+        (
+            selected,
+            pair_snapshots(&pairs),
+            pair_snapshots(&above),
+            alive,
+        )
+    }
+
+    fn assert_gm_stops_before_closures_or_mutation(account: VisitHelperAccount<'_>) {
+        let h = 0b0011u128;
+        let lms = [0b0101u128, 0b1010, 0b0100, 0b0001];
+        let mut pairs = vec![Pair {
+            i: 0,
+            j: 1,
+            lcm: vec![1, 1, 1, 1],
+            lcm_p: 0b1111,
+            degree: 4,
+        }];
+        let mut above = Vec::new();
+        let mut alive = vec![true; lms.len()];
+        let pairs_before = pair_snapshots(&pairs);
+        let alive_before = alive.clone();
+        let closure_calls = std::cell::Cell::new(0usize);
+        let result = gm_update(
+            &h,
+            |i| {
+                closure_calls.set(closure_calls.get() + 1);
+                lms[i]
+            },
+            &mut pairs,
+            &mut above,
+            |pair| {
+                closure_calls.set(closure_calls.get() + 1);
+                pair.lcm_p
+            },
+            &mut alive,
+            lms.len(),
+            true,
+            |a, b| {
+                closure_calls.set(closure_calls.get() + 1);
+                (*a & *b) == *a
+            },
+            |a, b| {
+                closure_calls.set(closure_calls.get() + 1);
+                *a | *b
+            },
+            |a, b| {
+                closure_calls.set(closure_calls.get() + 1);
+                (*a & *b) == 0
+            },
+            None,
+            None,
+            account,
+        );
+        assert!(matches!(result, Err(F4Stop::Accounting)));
+        assert_eq!(closure_calls.get(), 0);
+        assert_eq!(pair_snapshots(&pairs), pairs_before);
+        assert!(above.is_empty());
+        assert_eq!(alive, alive_before);
+    }
+
+    #[test]
+    fn gm_token_route_is_exact_and_does_not_double_charge_tls() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let legacy_context = VisitAccountingContext::new().unwrap();
+            let legacy_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-exact-legacy-route"), &opts, false),
+                &legacy_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let legacy_account = VisitAccount::On(legacy_session.token());
+            let (legacy_phase, control) =
+                legacy_account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let legacy = run_gm_accounting_fixture(VisitHelperAccount::LegacyTls);
+            drop(legacy_phase);
+            let legacy_record = legacy_session.finish(VisitDispositionV1::Incomplete);
+
+            let owned_context = VisitAccountingContext::new().unwrap();
+            let owned_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-exact-token-route"), &opts, false),
+                &owned_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let account = VisitAccount::On(owned_session.token());
+            let (owned_phase, control) = account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let owned = run_gm_accounting_fixture(account.into());
+            drop(owned_phase);
+            let owned_record = owned_session.finish(VisitDispositionV1::Incomplete);
+
+            assert_eq!(owned, legacy);
+            assert_eq!(owned.0, vec![(3, 0b0011)]);
+            assert!(owned.1.is_empty() && owned.2.is_empty());
+            assert_eq!(owned.3, vec![true; 4]);
+
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.word_operations = 62;
+            expected.comparisons = 2;
+            expected.divisibility_tests = 10;
+            expected.critical_pair_candidates = 4;
+            for record in [&legacy_record, &owned_record] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                let critical_pairs = record
+                    .phases
+                    .iter()
+                    .find(|phase| phase.phase == VisitAccountingPhaseV1::CriticalPairs)
+                    .unwrap()
+                    .work
+                    .clone();
+                assert_eq!(non_time_work(critical_pairs), expected);
+                assert_reconciles(record);
+            }
+            assert_eq!(
+                non_time_work(legacy_record.total.clone()),
+                non_time_work(owned_record.total.clone())
+            );
+        });
+    }
+
+    #[test]
+    fn gm_token_route_is_copy_send_sync_and_rejects_wrong_owners_before_work() {
+        fn assert_copy_send_sync<T: Copy + Send + Sync>() {}
+        assert_copy_send_sync::<VisitAccountingToken<'static>>();
+        assert_copy_send_sync::<VisitHelperAccount<'static>>();
+
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let mismatch_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owner = VisitAccount::On(mismatch_session.token());
+            let (mismatch_phase, control) =
+                owner.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert_gm_stops_before_closures_or_mutation(VisitHelperAccount::Owned(
+                wrong_context.unbound_test_token(),
+            ));
+            drop(mismatch_phase);
+
+            let mismatch_record = mismatch_session.finish(VisitDispositionV1::Incomplete);
+            let mismatch_blocker = mismatch_record.blocker.as_ref().unwrap();
+            assert_eq!(mismatch_blocker.code, "accounting_token_mismatch");
+            assert_eq!(
+                mismatch_blocker.phase,
+                Some(VisitAccountingPhaseV1::CriticalPairs)
+            );
+            assert_no_non_time_work(&mismatch_record);
+            assert_reconciles(&mismatch_record);
+
+            let foreign_context = VisitAccountingContext::new().unwrap();
+            let foreign_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-token-foreign-thread"), &opts, false),
+                &foreign_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let foreign_account = VisitAccount::On(foreign_session.token());
+            let (foreign_phase, control) =
+                foreign_account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let token = foreign_session.token();
+            std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        assert_gm_stops_before_closures_or_mutation(VisitHelperAccount::Owned(
+                            token,
+                        ));
+                    })
+                    .join()
+                    .unwrap();
+            });
+            assert_eq!(foreign_account.control(), VisitAccountingControl::Stop);
+            drop(foreign_phase);
+
+            let foreign_record = foreign_session.finish(VisitDispositionV1::Incomplete);
+            let foreign_blocker = foreign_record.blocker.as_ref().unwrap();
+            assert_eq!(foreign_blocker.code, "foreign_thread_work");
+            assert_eq!(
+                foreign_blocker.phase,
+                Some(VisitAccountingPhaseV1::CriticalPairs)
+            );
+            assert_no_non_time_work(&foreign_record);
+            assert_reconciles(&foreign_record);
+        });
+    }
+
+    #[test]
+    fn gm_helper_computed_overflow_clears_checked_arithmetic() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let legacy_context = VisitAccountingContext::new().unwrap();
+            let legacy_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-computed-overflow-legacy"), &opts, false),
+                &legacy_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let legacy_account = VisitAccount::On(legacy_session.token());
+            let (legacy_phase, control) =
+                legacy_account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert_eq!(
+                VisitHelperAccount::LegacyTls.charge_product(
+                    VisitAccountingCounter::Comparisons,
+                    usize::MAX,
+                    2,
+                ),
+                VisitAccountingControl::Continue
+            );
+            drop(legacy_phase);
+            let legacy_record = legacy_session.finish(VisitDispositionV1::Incomplete);
+
+            let owned_context = VisitAccountingContext::new().unwrap();
+            let owned_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("gm-computed-overflow-owned"), &opts, false),
+                &owned_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owned_account = VisitAccount::On(owned_session.token());
+            let (owned_phase, control) =
+                owned_account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert_eq!(
+                VisitHelperAccount::from(owned_account).charge_product(
+                    VisitAccountingCounter::Comparisons,
+                    usize::MAX,
+                    2,
+                ),
+                VisitAccountingControl::Stop
+            );
+            drop(owned_phase);
+            let owned_record = owned_session.finish(VisitDispositionV1::Incomplete);
+
+            for record in [&legacy_record, &owned_record] {
+                let blocker = record.blocker.as_ref().unwrap();
+                assert_eq!(blocker.code, "counter_overflow");
+                assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::CriticalPairs));
+                assert_eq!(blocker.counter, Some("comparisons"));
+                assert_no_non_time_work(record);
+                assert!(!record.reconciliation.checked_arithmetic);
+                assert!(record.reconciliation.phase_sum_equals_total);
+                assert!(!record.reconciliation.operation_tracking_complete);
+                assert!(!record.reconciliation.memory_tracking_complete);
+                assert!(!record.reconciliation.work_ownership_complete);
+                assert!(!record.accounting_complete);
+            }
+        });
+    }
+
+    #[test]
+    fn gm_late_overflow_stops_before_the_next_uncharged_operation() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_counter_overflow_session(
+                &context,
+                "gm-late-candidate-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::CriticalPairCandidates,
+            );
+            let account = VisitAccount::On(session.token());
+            let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+
+            let h = 0b0011u128;
+            let lms = [0b0101u128, 0b1010, 0b0100, 0b0001];
+            let mut pairs = vec![Pair {
+                i: 0,
+                j: 1,
+                lcm: vec![1, 1, 1, 1],
+                lcm_p: 0b1111,
+                degree: 4,
+            }];
+            let mut above = Vec::new();
+            let mut alive = vec![true; lms.len()];
+            let alive_before = alive.clone();
+            let lm_calls = std::cell::Cell::new(0usize);
+            let pair_lcm_calls = std::cell::Cell::new(0usize);
+            let div_calls = std::cell::Cell::new(0usize);
+            let lcm_calls = std::cell::Cell::new(0usize);
+            let coprime_calls = std::cell::Cell::new(0usize);
+            let result = gm_update(
+                &h,
+                |i| {
+                    lm_calls.set(lm_calls.get() + 1);
+                    lms[i]
+                },
+                &mut pairs,
+                &mut above,
+                |pair| {
+                    pair_lcm_calls.set(pair_lcm_calls.get() + 1);
+                    pair.lcm_p
+                },
+                &mut alive,
+                lms.len(),
+                true,
+                |a, b| {
+                    div_calls.set(div_calls.get() + 1);
+                    (*a & *b) == *a
+                },
+                |a, b| {
+                    lcm_calls.set(lcm_calls.get() + 1);
+                    *a | *b
+                },
+                |a, b| {
+                    coprime_calls.set(coprime_calls.get() + 1);
+                    (*a & *b) == 0
+                },
+                None,
+                None,
+                account.into(),
+            );
+            assert!(matches!(result, Err(F4Stop::Accounting)));
+            // Criterion B was fully charged and may mutate its pair list. The
+            // failed candidate charge must stop before the first candidate's
+            // lm/divisibility/coprimality/lcm work or any alive mutation.
+            assert!(pairs.is_empty() && above.is_empty());
+            assert_eq!(alive, alive_before);
+            assert_eq!(pair_lcm_calls.get(), 1);
+            assert_eq!(lm_calls.get(), 2);
+            assert_eq!(div_calls.get(), 1);
+            assert_eq!(lcm_calls.get(), 2);
+            assert_eq!(coprime_calls.get(), 0);
+            drop(phase);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::CriticalPairs));
+            assert_eq!(blocker.counter, Some("critical_pair_candidates"));
+            assert_eq!(record.total.word_operations, 30);
+            assert_eq!(record.total.comparisons, 2);
+            assert_eq!(record.total.divisibility_tests, 1);
+            assert_eq!(record.total.critical_pair_candidates, u64::MAX);
+            assert!(!record.reconciliation.checked_arithmetic);
+            assert!(record.reconciliation.phase_sum_equals_total);
+            assert!(!record.accounting_complete);
+        });
+    }
+
+    #[test]
+    fn gm_word_overflow_stops_before_closures_or_mutation() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_counter_overflow_session(
+                &context,
+                "gm-word-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::WordOperations,
+            );
+            let account = VisitAccount::On(session.token());
+            let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            assert_gm_stops_before_closures_or_mutation(account.into());
+            drop(phase);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::CriticalPairs));
+            assert_eq!(blocker.counter, Some("word_operations"));
+            assert_eq!(record.total.word_operations, u64::MAX);
+            assert_eq!(record.total.comparisons, 0);
+            assert_eq!(record.total.divisibility_tests, 0);
+            assert_eq!(record.total.critical_pair_candidates, 0);
+            assert!(!record.reconciliation.checked_arithmetic);
+            assert!(record.reconciliation.phase_sum_equals_total);
+            assert!(!record.reconciliation.operation_tracking_complete);
+            assert!(!record.reconciliation.memory_tracking_complete);
+            assert!(!record.reconciliation.work_ownership_complete);
+            assert!(!record.accounting_complete);
+            assert_eq!(
+                record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
+            );
+        });
     }
 
     #[test]
@@ -12232,7 +12821,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
@@ -12627,7 +13216,7 @@ mod visit_accounting_tests {
             assert!(callback_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 callback_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
             );
 
             let trace_context = VisitAccountingContext::new().unwrap();
@@ -12677,7 +13266,7 @@ mod visit_accounting_tests {
             assert!(trace_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 trace_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+                "borrowed_traversal_native_driver_gm_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
