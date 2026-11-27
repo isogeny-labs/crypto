@@ -526,10 +526,12 @@ including all empty-tile, empty-row, zero-form, and zero-row suppressions. The
 formal `ExtensionRingModel` now supplies the exact quotient type
 `(Z/2^p)[U]/f`, power-basis coordinate decoding, additive operations,
 extension nilpotence, and a Cauchy-series specialization with the modulus
-premise discharged. The remaining scalar gap is native-to-formal refinement of
-the deterministic polynomial and multiplication/reduction loop, followed by
-instantiation of every accepted witness value and mode function. Complete
-child construction remains a separate concrete binding.
+premise discharged. It also proves the binary root relation and one exact
+high-power subtraction step matching the native reduction loop. The remaining
+scalar gap is induction over the complete convolution/reduction array and
+deterministic polynomial selection, followed by instantiation of every
+accepted witness value and mode function. Complete child construction remains
+a separate concrete binding.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

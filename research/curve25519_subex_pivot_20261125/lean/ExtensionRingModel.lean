@@ -58,6 +58,76 @@ noncomputable def decodeSerialized
   decodePowerBasis precision degree lowerCoefficient
     (fun index => coordinates index)
 
+/-- The adjoined power-basis generator satisfies the exact binary-polynomial
+relation used by the native high-degree reduction loop. -/
+theorem nativeExtension_root_relation
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    AdjoinRoot.root (binaryPolynomial precision degree lowerCoefficient) ^ degree =
+      -∑ index,
+        AdjoinRoot.of (binaryPolynomial precision degree lowerCoefficient)
+            (if lowerCoefficient index then 1 else 0) *
+          AdjoinRoot.root (binaryPolynomial precision degree lowerCoefficient) ^
+            (index : ℕ) := by
+  let f := binaryPolynomial precision degree lowerCoefficient
+  let root := AdjoinRoot.root f
+  let of := AdjoinRoot.of f
+  have hlow :
+      Polynomial.eval₂ of root
+          (∑ index, if lowerCoefficient index then monomial (index : ℕ) 1 else 0) =
+        ∑ index, of (if lowerCoefficient index then 1 else 0) *
+          root ^ (index : ℕ) := by
+    change (Polynomial.eval₂RingHom of root)
+        (∑ index, if lowerCoefficient index then monomial (index : ℕ) 1 else 0) = _
+    rw [map_sum]
+    apply Finset.sum_congr rfl
+    intro index _
+    by_cases h : lowerCoefficient index
+    · simp [h, Polynomial.eval₂RingHom]
+    · simp [h, Polynomial.eval₂RingHom]
+  have hroot := AdjoinRoot.eval₂_root f
+  change Polynomial.eval₂ of root
+      (X ^ degree +
+        ∑ index, if lowerCoefficient index then monomial (index : ℕ) 1 else 0) = 0 at hroot
+  rw [eval₂_add, eval₂_pow, eval₂_X, hlow] at hroot
+  exact eq_neg_of_add_eq_zero_left hroot
+
+/-- One native high-degree reduction step is sound in the formal quotient:
+subtracting the current coefficient at every set lower-polynomial bit replaces
+`coefficient * U^(degree+offset)` exactly. -/
+theorem nativeExtension_reduce_high_power
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (coefficient : ZMod (2 ^ precision)) (offset : ℕ) :
+    AdjoinRoot.of (binaryPolynomial precision degree lowerCoefficient) coefficient *
+        AdjoinRoot.root (binaryPolynomial precision degree lowerCoefficient) ^
+          (degree + offset) =
+      ∑ index,
+        AdjoinRoot.of (binaryPolynomial precision degree lowerCoefficient)
+            (if lowerCoefficient index then -coefficient else 0) *
+          AdjoinRoot.root (binaryPolynomial precision degree lowerCoefficient) ^
+            (offset + (index : ℕ)) := by
+  let f := binaryPolynomial precision degree lowerCoefficient
+  let root := AdjoinRoot.root f
+  let of := AdjoinRoot.of f
+  calc
+    of coefficient * root ^ (degree + offset) =
+        of coefficient * root ^ degree * root ^ offset := by
+          simp [pow_add, mul_assoc]
+    _ = of coefficient *
+          (-∑ index, of (if lowerCoefficient index then 1 else 0) *
+            root ^ (index : ℕ)) * root ^ offset := by
+          rw [nativeExtension_root_relation]
+    _ = ∑ index,
+          of (if lowerCoefficient index then -coefficient else 0) *
+            root ^ (offset + (index : ℕ)) := by
+      rw [mul_neg, Finset.mul_sum, neg_mul, Finset.sum_mul,
+        ← Finset.sum_neg_distrib]
+      apply Finset.sum_congr rfl
+      intro index _
+      by_cases h : lowerCoefficient index
+      · simp [h, pow_add]
+        ring
+      · simp [h]
+
 /-- The base characteristic relation survives in every polynomial quotient:
 the formal native extension satisfies the modulus premise used by the Cauchy
 series theorem. -/

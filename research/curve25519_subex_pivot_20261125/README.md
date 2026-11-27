@@ -473,8 +473,10 @@ The formal coefficient ring is no longer left wholly abstract.
 `(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate
 vectors, proves coordinatewise addition and negation, proves `2^p=0` in the
 quotient, and specializes the exact Cauchy cutoff with that premise discharged.
-The native convolution/reduction loop, deterministic polynomial selection,
-and accepted-vector elaboration still require a concrete refinement proof.
+It also proves `U^d=-sum_j f_j U^j` and the exact one-step high-coefficient
+subtraction performed by the native reduction loop. The full loop induction,
+deterministic polynomial selection, and accepted-vector elaboration still
+require a concrete refinement proof.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

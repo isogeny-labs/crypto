@@ -188,11 +188,12 @@ same power-basis shape as native `Ring`: a quotient
 `(Z/2^p)[U]/f` for a monic binary-coefficient polynomial. It decodes a
 fixed-length coordinate function into the quotient, proves coordinatewise
 addition and negation, derives `2^p=0` in every such extension, and instantiates
-the exact Cauchy cutoff without an abstract modulus premise. This does not yet
-prove that Rust's convolution/reduction loop implements quotient
-multiplication, bind the deterministic irreducible-polynomial search to the
-formal Boolean coefficients, or turn an accepted serialized vector into a
-Lean term automatically. `[pcc:unverified]`
+the exact Cauchy cutoff without an abstract modulus premise. It also proves the
+root relation `U^d=-sum_j f_j U^j` and the exact one-step identity used when
+the native loop subtracts one high coefficient into every set lower bit. A
+full loop induction, the deterministic irreducible-polynomial selection, and
+automatic elaboration of an accepted serialized vector remain open.
+`[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of

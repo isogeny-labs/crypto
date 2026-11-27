@@ -70,6 +70,8 @@ open Curve25519ExtensionRingModel
 #print axioms inverse_eq_geometric_add_remainder
 #print axioms cauchy_weight_mode_series
 #print axioms cauchy_weight_mode_series_at_precision
+#print axioms nativeExtension_root_relation
+#print axioms nativeExtension_reduce_high_power
 #print axioms nativeExtension_pow_two_zero
 #print axioms decodePowerBasis_add
 #print axioms decodePowerBasis_neg
