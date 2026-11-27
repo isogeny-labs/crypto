@@ -49,3 +49,53 @@ disjoint confirmation cell.
 
 No result here establishes an exponent change, a lower ordinary solving
 degree, or competitiveness with Pollard rho.
+
+## Frozen continuation: complete cold target
+
+**Frozen:** 2026-11-27, before running the continuation below. All empirical
+measurements remain `[pcc:unverified]`.
+
+### Question
+
+Does the selected degree-32 five-Velu factor base reduce the complete native
+pipeline cost, rather than only the F4 multiply-add counter, against the
+matched 18-abscissa interval on the already selected 13-bit fixture?
+
+### Fixed panel
+
+- Instrument: `examples/pkm_groebner_drastic.rs` at the protocol commit.
+- Instance seed `20261185`, planted scalar `2261`, `m=2`, degree bound `8`,
+  1,000 target trials, five-second per-call solver budget, incremental Gauss.
+- Arms: `prime-abscissa:below=32` and
+  `prime-isogeny:t=5,seed=5,aux=ordinary`; each must expose 18 abscissae and
+  the same 10-variable, 11-equation degree vector.
+- Execution: one release binary, `RAYON_NUM_THREADS=4`, two serialized balanced
+  pairs in order interval / candidate / candidate / interval. Each arm is
+  reconstructed cold for every observation. Calibration is measured once
+  before the panel and shared by both arms.
+- Complete interval: arm construction through verified scalar recovery. The
+  framework total includes factor-base construction, oracle setup, failed
+  trials and relation collection, F4, relation-matrix work, linear algebra and
+  verification. The outer cold wall interval additionally includes oracle
+  construction.
+
+### Metrics and gate
+
+The primary metric is the sum of `RunReport.total_gae` over the four
+observations per arm. It is a complete charged pipeline figure, but its F4
+unit is host-measured because this generated curve has no repository-pinned
+`ns_per_f4_muladd`; the receipt must retain that pricing mode. Deterministic
+F4 multiply-adds and solving degree remain audit metrics. Summed cold wall is
+descriptive only because the shared host is not load-isolated.
+
+Call this a selected-fixture end-to-end speedup only if:
+
+1. all eight runs recover and verify scalar `2261`;
+2. cardinality, system-shape and ordinary solving-degree checks remain exact;
+3. `sum(total_gae_candidate) <= 0.5 * sum(total_gae_interval)`; and
+4. no phase or failed attempt is removed from the candidate accounting.
+
+A wall-time regression does not invalidate the counted result, but it must be
+reported and prevents a wall-speedup claim. Failure of the total-GAE gate is
+retained as a component-only result. Passing does not establish a random
+instance result, an asymptotic improvement or a Pollard-rho crossover.
