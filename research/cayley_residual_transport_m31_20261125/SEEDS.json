@@ -1,0 +1,30 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "cayley-residual-transport-m31-v1",
+  "purpose": "bounded untimed correctness; no statistical performance claim",
+  "master_seed": "0x5452414e53503331",
+  "seed_width_bits": 64,
+  "encoding": "explicit unsigned hexadecimal integers; no byte serialization is used in derivation",
+  "prng": "standalone Rust SplitMix64, wrapping u64, increment 0x9e3779b97f4a7c15",
+  "finalizer": "x=(x^(x>>30))*0xbf58476d1ce4e5b9; x=(x^(x>>27))*0x94d049bb133111eb; return x^(x>>31), all arithmetic wrapping u64",
+  "replicate_keys": ["0x5245504c00000001", "0x5245504c00000002", "0x5245504c00000003", "0x5245504c00000004"],
+  "fixture_tags": ["0x4355525600000001", "0x4355525600000002"],
+  "stream_tags": {
+    "targets": "0x5441524745540001",
+    "factors": "0x464143544f520001",
+    "slopes": "0x534c4f5045530001",
+    "positive_controls": "0x504f534954560001",
+    "prefixes": "0x5052454649580001"
+  },
+  "derivation": "key=mix64(mix64(master XOR fixture_tag) XOR replicate_key); child=mix64(key XOR stream_tag)",
+  "logical_child_streams": 40,
+  "duplicate_child_seeds": "asserted absent before fixture generation",
+  "input_pairing": "same materialized public inputs for candidate and independent references; no algorithm-side randomness",
+  "sample_transform": "modulo reduction for deterministic correctness coverage only",
+  "target_scalar_custody": "scalar generation exists only in evaluator Rng::point; candidate API contains only curve and public point coordinates",
+  "expected_targets": 128,
+  "expected_frames": 512,
+  "expected_transport_cases": 12288,
+  "expected_set_queries": 1536,
+  "expected_prefix_cases": 256
+}
