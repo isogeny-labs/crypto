@@ -120,10 +120,11 @@ jobs:
     # keep enough of the job budget for the site and browser assertions.
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
       # scripts/site/test_build.py reads the backend leaderboard from the store.
       # tools/artifacts pull: docs/backend-leaderboard/leaderboard.json
+      - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -178,10 +179,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
       # scripts/site/test_build.py reads the backend leaderboard from the store.
       # tools/artifacts pull: docs/backend-leaderboard/leaderboard.json
+      - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
