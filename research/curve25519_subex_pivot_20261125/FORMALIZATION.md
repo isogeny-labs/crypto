@@ -591,8 +591,13 @@ The same fixture now has a transparent packed-`GF(2)` deterministic-selection
 model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
 loop, and odd candidate order, proves candidate `17` fails and candidate `19`
 passes, proves the first degree-four result is `19`, and binds that result to the
-typed record's polynomial field. This closes finite selection agreement, not a
-general Rust compiler refinement of `Ring::new`.
+typed record's polynomial field. An independent algebraic proof then exhausts
+the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
+`U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
+that polynomial. The combined theorem therefore pairs selection with genuine
+irreducibility for this fixture. This closes the degree-four algebraic check,
+not a general equivalence proof for the packed Rabin predicate or a Rust
+compiler refinement of `Ring::new`.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

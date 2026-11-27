@@ -2,6 +2,7 @@ module
 
 public import GroupFactorization
 public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Algebra.Polynomial.Degree.IsMonicOfDegree
 
 @[expose] public section
 
@@ -1216,6 +1217,66 @@ theorem degreeFourDeterministicPolynomialSelection :
     firstIrreducibleBinaryPolynomial 4 = some 19 := by
   decide
 
+/-- Independent algebraic certificate for the degree-four polynomial accepted
+by the packed search. The proof exhausts the two monic linear and four monic
+quadratic divisor shapes over `GF(2)`, rather than trusting the packed Rabin
+predicate itself. -/
+theorem degreeFourPolynomialGF2_irreducible :
+    Irreducible (X ^ 4 + (X + 1) : Polynomial (ZMod 2)) := by
+  let p : Polynomial (ZMod 2) := X ^ 4 + (X + 1)
+  have hpShape : Polynomial.IsMonicOfDegree p 4 := by
+    apply (Polynomial.isMonicOfDegree_X_pow (ZMod 2) 4).add_right
+    norm_num [p]
+  have hp : p.Monic := hpShape.monic
+  have hpdeg : p.natDegree = 4 := hpShape.natDegree_eq
+  have hp1 : p ≠ 1 := by
+    intro h
+    rw [h, natDegree_one] at hpdeg
+    omega
+  rw [hp.irreducible_iff_lt_natDegree_lt hp1]
+  intro q hq hdegree hdiv
+  rw [hpdeg] at hdegree
+  simp only [Finset.mem_Ioc, Nat.reduceDiv] at hdegree
+  have hcases : q.natDegree = 1 ∨ q.natDegree = 2 := by omega
+  rcases hcases with hdegreeOne | hdegreeTwo
+  · have hshape : Polynomial.IsMonicOfDegree q 1 := ⟨hdegreeOne, hq⟩
+    obtain ⟨a, rfl⟩ := Polynomial.isMonicOfDegree_one_iff.mp hshape
+    obtain ⟨r, hr⟩ := hdiv
+    have heval := congrArg (Polynomial.eval (-a)) hr
+    simp only [p, eval_add, eval_pow, eval_X, eval_one, eval_mul, eval_C,
+      neg_add_cancel, zero_mul] at heval
+    generalize a = a' at heval
+    fin_cases a' <;> change (1 : ZMod 2) = 0 at heval <;>
+      exact one_ne_zero heval
+  · have hshape : Polynomial.IsMonicOfDegree q 2 := ⟨hdegreeTwo, hq⟩
+    obtain ⟨a, b, rfl⟩ := Polynomial.isMonicOfDegree_two_iff.mp hshape
+    obtain ⟨r, hr⟩ := hdiv
+    have hproduct : Polynomial.IsMonicOfDegree
+        ((X ^ 2 + C a * X + C b) * r) (2 + 2) := by
+      rw [← hr]
+      exact hpShape
+    have hrshape : Polynomial.IsMonicOfDegree r 2 :=
+      (Polynomial.isMonicOfDegree_add_add_two a b).of_mul_left hproduct
+    obtain ⟨c, d, rfl⟩ := Polynomial.isMonicOfDegree_two_iff.mp hrshape
+    have hexpand :
+        (X ^ 2 + C a * X + C b) * (X ^ 2 + C c * X + C d) =
+          X ^ 4 + C (a + c) * X ^ 3 + C (a * c + b + d) * X ^ 2 +
+            C (a * d + b * c) * X + C (b * d) := by
+      simp only [map_add, map_mul]
+      ring
+    rw [hexpand] at hr
+    have hzero := congrArg (fun f : Polynomial (ZMod 2) => f.coeff 0) hr
+    have hone := congrArg (fun f : Polynomial (ZMod 2) => f.coeff 1) hr
+    have htwo := congrArg (fun f : Polynomial (ZMod 2) => f.coeff 2) hr
+    have hthree := congrArg (fun f : Polynomial (ZMod 2) => f.coeff 3) hr
+    simp [p, coeff_mul_X_pow', coeff_one, coeff_X] at hzero hone htwo hthree
+    have hnoFactorCoefficients : ∀ a b c d : ZMod 2,
+        ¬(1 = b * d ∧ 1 = a * d + b * c ∧
+          0 = a * c + b + d ∧ 0 = a + c) := by
+      decide
+    exact hnoFactorCoefficients a b c d
+      ⟨hzero, hone, htwo, hthree⟩
+
 /-- Degree-indexed lower-polynomial view of an arbitrary typed artifact. -/
 def RingMultiplicationArtifact.lowerCoefficient
     (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : Bool :=
@@ -1307,6 +1368,32 @@ theorem degreeFourWitnessRecordAccepted :
 irreducible binary polynomial `U^4 + U + 1`, read from the shared artifact. -/
 def degreeFourLowerCoefficient (index : Fin 4) : Bool :=
   degreeFourWitnessRecord.lowerCoefficients.getD index.val false
+
+/-- The typed artifact's lower-bit vector decodes over `GF(2)` to the exact
+quartic certified independently above. -/
+theorem degreeFourWitnessRecord_polynomialGF2 :
+    binaryPolynomial 1 4 degreeFourLowerCoefficient =
+      (X ^ 4 + (X + 1) : Polynomial (ZMod 2)) := by
+  rw [binaryPolynomial]
+  norm_num [degreeFourLowerCoefficient, degreeFourWitnessRecordValues,
+    Fin.sum_univ_succ]
+  simp [monomial_one_right_eq_X_pow, add_comm]
+
+/-- The committed artifact's selected binary polynomial is algebraically
+irreducible over `GF(2)`, independently of the packed search predicate. -/
+theorem degreeFourWitnessRecord_polynomialIrreducible :
+    Irreducible (binaryPolynomial 1 4 degreeFourLowerCoefficient) := by
+  rw [degreeFourWitnessRecord_polynomialGF2]
+  exact degreeFourPolynomialGF2_irreducible
+
+/-- Combined degree-four endpoint: the deterministic search selects the
+artifact's packed polynomial and its decoded `GF(2)` polynomial is irreducible. -/
+theorem degreeFourWitnessRecord_selectionAndIrreducibility :
+    firstIrreducibleBinaryPolynomial degreeFourWitnessRecord.degree =
+        some degreeFourWitnessRecord.polynomial ∧
+      Irreducible (binaryPolynomial 1 4 degreeFourLowerCoefficient) := by
+  exact ⟨degreeFourWitnessRecord_polynomialSelected,
+    degreeFourWitnessRecord_polynomialIrreducible⟩
 
 /-- The dense canonical left coordinate vector in the typed artifact. -/
 def degreeFourDenseLeftCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=

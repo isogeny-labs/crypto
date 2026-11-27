@@ -252,8 +252,12 @@ retained as a direct concrete regression, not as the only formal bridge.
 A transparent packed-`GF(2)` search model also follows the native degree-four
 polynomial-selection control flow. The Rabin predicate rejects packed candidate
 `17`, accepts `19`, and the odd-pattern search returns `19` first; the canonical
-record's polynomial field equals that result. This is finite source-shaped
-selection evidence, not arbitrary-degree compiler refinement.
+record's polynomial field equals that result. Independently of that predicate,
+Lean rules out both monic linear factors and all four monic quadratic factor
+shapes over `GF(2)`, proving `U^4+U+1` irreducible; the artifact lower bits are
+proved to decode to the same polynomial. This is a degree-four selection and
+algebraic certificate, not arbitrary-degree Rabin correctness or compiler
+refinement.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

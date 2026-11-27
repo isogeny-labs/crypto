@@ -107,11 +107,15 @@ open Curve25519ExtensionRingModel
 #print axioms parseCanonicalRingMultiplicationArtifact_canonical
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
+#print axioms degreeFourPolynomialGF2_irreducible
 #print axioms parsedCanonicalRingMultiplicationArtifact_decodes_mul
 #print axioms degreeFourWitnessRecordValues
 #print axioms degreeFourWitnessRecordCanonical
 #print axioms degreeFourWitnessRecord_polynomialSelected
 #print axioms degreeFourWitnessRecordAccepted
+#print axioms degreeFourWitnessRecord_polynomialGF2
+#print axioms degreeFourWitnessRecord_polynomialIrreducible
+#print axioms degreeFourWitnessRecord_selectionAndIrreducibility
 #print axioms degreeFourPolynomialBits
 #print axioms degreeFourDenseNativeProduct
 #print axioms degreeFourWitnessRecord_productReplay

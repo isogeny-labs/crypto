@@ -528,8 +528,13 @@ A transparent packed-`GF(2)` model follows the native remainder, carryless
 product, Euclidean gcd, Rabin squaring, and odd-lower-pattern search order. It
 kernel-checks that degree-four candidate `17` is reducible, candidate `19` is
 accepted, and `19` is the first search result; the typed artifact's polynomial
-field is then proved equal to that selected value. This is a source-shaped
-finite model, not a compiler refinement for the Rust search.
+field is then proved equal to that selected value. Separately, Lean classifies
+every relevant monic factor over `GF(2)` as one of two linear or four quadratic
+shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
+is proved to decode to that polynomial, so packed-search acceptance is paired
+with an independent algebraic irreducibility certificate. This remains a
+degree-four finite result, not a general proof that the packed Rabin predicate
+or Rust search refines polynomial irreducibility.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
