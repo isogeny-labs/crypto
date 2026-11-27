@@ -471,6 +471,18 @@ empty/zero suppression; a mutated packet pair changes the first expected mode
 header and is rejected. This is native code-to-formula evidence, not yet a Lean
 refinement theorem. `[pcc:unverified]`
 
+A separate serializable `RingMultiplicationWitness` now narrows the native
+arithmetic boundary. For canonical degree-`d` input and output coordinates it
+reruns `Ring::new`, checks the exact polynomial and all lower bits, and then
+independently replays the zero-fast-path nested convolution, retained-high
+reverse reduction, and final truncation before comparing every product
+coordinate, charging each executed product and reduction. The dense degree-4,
+precision-5 control exercises both convolution
+and reduction, round-trips through JSON, and rejects an altered output
+coordinate. This is bounded concrete `Vec<BigUint>` code-to-transition
+evidence; it is not a mechanized Rust compiler refinement or a universal Lean
+instantiation. `[pcc:unverified]`
+
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
 `(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate
@@ -496,8 +508,10 @@ formulas, and the retained target plus all higher slots stay unchanged until
 truncation. The complete reverse fold is now composed: every returned low slot
 equals the logical reduced coefficient, the truncated coordinate polynomial is
 the reduced convolution, and decoding it gives the quotient product. A
-mechanized concrete-`Vec<BigUint>` binding, deterministic polynomial selection,
-and accepted-vector elaboration still require concrete refinement.
+mechanized concrete-`Vec<BigUint>` compiler refinement and accepted-vector
+elaboration still require formal work. Deterministic polynomial selection and
+one accepted multiplication are now independently replayed by native witnesses,
+but have not yet been instantiated in Lean.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

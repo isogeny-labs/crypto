@@ -215,9 +215,13 @@ unchanged pending truncation. The coefficient invariant now composes those rows
 over the full reverse range: every returned low slot equals the exact reduced
 polynomial coefficient, the truncated coordinate polynomial is that reduced
 polynomial, and decoding the returned coordinates equals quotient-ring
-multiplication. A mechanized binding from concrete `Vec<BigUint>` execution to
-this source-shaped model, deterministic irreducible-polynomial selection, and
-accepted-vector elaboration remain open.
+multiplication. A serializable native multiplication witness now reruns
+deterministic polynomial selection and independently replays the same
+zero-fast-path convolution, retained-high reverse reduction, and truncation for
+canonical `Vec<BigUint>` inputs and output. A dense degree-4 control exercises
+both arithmetic phases and rejects a changed product coordinate. This closes one
+finite code-to-transition sample, not the remaining mechanized Rust compiler
+refinement or accepted-vector elaboration in Lean.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

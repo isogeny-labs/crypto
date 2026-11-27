@@ -6,7 +6,7 @@
 
 use crate::ring::{Element, Ring};
 use crate::{integrity, overflow, BigInt, BigUint, Meter, Result};
-use num_traits::Zero;
+use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -214,6 +214,123 @@ pub struct CauchyModeCoverageSummary {
     pub mode_rows: usize,
     /// Retained nonzero source-form coefficients.
     pub mode_columns: usize,
+}
+
+/// Concrete native multiplication input/output bound to the same source-shaped
+/// transition system as the formal extension-ring multiplication theorem.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RingMultiplicationWitness {
+    /// Power-basis coordinate count.
+    pub degree: usize,
+    /// Coefficient modulus exponent, giving `2^precision`.
+    pub precision: usize,
+    /// Exact monic binary polynomial selected by `Ring::new`.
+    pub polynomial: BigUint,
+    /// Lower polynomial bits in ascending power order.
+    pub lower_coefficients: Vec<bool>,
+    /// Canonical left input coordinates.
+    pub left: Vec<BigUint>,
+    /// Canonical right input coordinates.
+    pub right: Vec<BigUint>,
+    /// Claimed canonical product coordinates after truncation.
+    pub product: Vec<BigUint>,
+}
+
+/// Counts from standalone source-shaped multiplication replay.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct RingMultiplicationSummary {
+    /// Nonzero coefficient products accumulated by the convolution loops.
+    pub convolution_products: usize,
+    /// Set lower-bit subtractions performed by descending reduction.
+    pub reductions: usize,
+}
+
+/// Independently replay one concrete `Ring::mul` input/output through the exact
+/// mutable transition order used by the formal source-shaped model.
+pub fn verify_ring_multiplication_witness(
+    witness: &RingMultiplicationWitness,
+    meter: &mut Meter,
+) -> std::result::Result<RingMultiplicationSummary, String> {
+    let ring =
+        Ring::new(witness.degree, witness.precision, meter).map_err(|error| error.to_string())?;
+    if &witness.polynomial != ring.polynomial() {
+        return Err("ring multiplication polynomial".into());
+    }
+    if witness.lower_coefficients.len() != ring.degree()
+        || witness
+            .lower_coefficients
+            .iter()
+            .enumerate()
+            .any(|(index, &coefficient)| coefficient != ring.polynomial().bit(index as u64))
+    {
+        return Err("ring multiplication polynomial coefficients".into());
+    }
+    if [&witness.left, &witness.right, &witness.product]
+        .iter()
+        .any(|coordinates| {
+            coordinates.len() != ring.degree()
+                || coordinates.iter().any(|value| value >= ring.modulus())
+        })
+    {
+        return Err("ring multiplication coordinates".into());
+    }
+
+    let length = witness
+        .degree
+        .checked_mul(2)
+        .and_then(|value| value.checked_sub(1))
+        .ok_or_else(|| "ring multiplication length".to_string())?;
+    meter
+        .vector(length, "ring multiplication witness buffer")
+        .map_err(|error| error.to_string())?;
+    let mask = ring.modulus() - BigUint::one();
+    let mut buffer = vec![BigUint::zero(); length];
+    let mut convolution_products = 0usize;
+    for (i, left) in witness.left.iter().enumerate() {
+        if left.is_zero() {
+            continue;
+        }
+        for (j, right) in witness.right.iter().enumerate() {
+            if right.is_zero() {
+                continue;
+            }
+            meter
+                .charge(1, "ring multiplication witness coefficient product")
+                .map_err(|error| error.to_string())?;
+            buffer[i + j] = (&buffer[i + j] + left * right) & &mask;
+            convolution_products = convolution_products
+                .checked_add(1)
+                .ok_or_else(|| "ring multiplication product count".to_string())?;
+        }
+    }
+
+    let mut reductions = 0usize;
+    for high in (witness.degree..length).rev() {
+        let coefficient = buffer[high].clone();
+        if coefficient.is_zero() {
+            continue;
+        }
+        let offset = high - witness.degree;
+        for (j, &is_set) in witness.lower_coefficients.iter().enumerate() {
+            if is_set {
+                meter
+                    .charge(1, "ring multiplication witness reduction")
+                    .map_err(|error| error.to_string())?;
+                buffer[offset + j] = (&buffer[offset + j] + ring.modulus() - &coefficient) & &mask;
+                reductions = reductions
+                    .checked_add(1)
+                    .ok_or_else(|| "ring multiplication reduction count".to_string())?;
+            }
+        }
+    }
+    buffer.truncate(witness.degree);
+    if buffer != witness.product {
+        return Err("ring multiplication product".into());
+    }
+    Ok(RingMultiplicationSummary {
+        convolution_products,
+        reductions,
+    })
 }
 
 fn checked_product(values: &[usize], label: &str) -> std::result::Result<usize, String> {

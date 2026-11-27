@@ -552,10 +552,14 @@ retained-high polynomial differs from the logical clearing step only by the
 processed monomial that truncation discards. Induction over the complete reverse
 range now proves every returned low slot equals the logical reduced coefficient;
 the returned coordinate polynomial equals the reduced convolution, and its
-power-basis decoding is exactly the product of the decoded inputs. The remaining
-boundary is a mechanized binding from concrete Rust `Vec<BigUint>` code to this
-source-shaped transition system, plus deterministic polynomial selection and
-accepted witness instantiation.
+power-basis decoding is exactly the product of the decoded inputs. A native
+`RingMultiplicationWitness` now serializes canonical inputs and output together
+with the deterministic polynomial and lower-bit vector. Its standalone verifier
+independently executes the same zero-fast-path convolution, retained-high reverse
+reduction, and truncation transition order, and rejects a changed output. The
+remaining boundary is a mechanized compiler refinement from concrete Rust
+`Vec<BigUint>` execution to the model and Lean instantiation of accepted native
+witnesses; the current degree-4 replay is finite code-to-transition evidence.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 

@@ -11,9 +11,10 @@ use crate::child_provenance_certificate::{
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
     description_envelope, verify as standalone_verify, verify_cauchy_mode_coverage,
-    verify_cauchy_source, verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness,
-    CauchySourceWitness, Certificate, CertifiedElement, CertifiedMode, EntryTable,
-    SourceDimensionWitness, SCHEMA,
+    verify_cauchy_source, verify_ring_multiplication_witness, verify_source_dimensions,
+    verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness, Certificate,
+    CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness, SourceDimensionWitness,
+    SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
@@ -725,6 +726,34 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(cauchy_summary.weights, 16 * certificate.packets.len());
     assert!(cauchy_summary.mode_rows > 0);
     assert!(cauchy_summary.mode_columns > 0);
+
+    let left = ring.point(&BigUint::from(15u8)).unwrap();
+    let right = ring.point(&BigUint::from(15u8)).unwrap();
+    let product = ring.mul(&left, &right, &mut meter).unwrap();
+    let multiplication_witness = RingMultiplicationWitness {
+        degree: ring.degree(),
+        precision: ring.precision(),
+        polynomial: ring.polynomial().clone(),
+        lower_coefficients: (0..ring.degree())
+            .map(|index| ring.polynomial().bit(index as u64))
+            .collect(),
+        left: left.coordinates().to_vec(),
+        right: right.coordinates().to_vec(),
+        product: product.coordinates().to_vec(),
+    };
+    let serialized_multiplication = serde_json::to_vec(&multiplication_witness).unwrap();
+    let multiplication_witness: RingMultiplicationWitness =
+        serde_json::from_slice(&serialized_multiplication).unwrap();
+    let multiplication_summary =
+        verify_ring_multiplication_witness(&multiplication_witness, &mut meter).unwrap();
+    assert!(multiplication_summary.convolution_products > 0);
+    assert!(multiplication_summary.reductions > 0);
+    let mut bad_multiplication = multiplication_witness.clone();
+    bad_multiplication.product[0] ^= BigUint::from(1u8);
+    assert_eq!(
+        verify_ring_multiplication_witness(&bad_multiplication, &mut meter).unwrap_err(),
+        "ring multiplication product"
+    );
 
     let mut bad_cauchy = cauchy_witness.clone();
     bad_cauchy.polynomial ^= BigUint::from(2u8);

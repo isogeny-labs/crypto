@@ -311,6 +311,15 @@
     "observed_gate": "L=4 witness reconstructs 8 grid points and 7 noncenter factors; all four factorization-certificate controls pass and the complete native library passes 202/202 tests",
     "claim_boundary": "typed native deterministic-polynomial, scalar and complete-mode code-to-formula binding; instantiation of the serialized lower-bit vector and accepted coordinates in Lean plus complete child-object mapping remain unverified"
   },
+  "ring_multiplication_witness_control": {
+    "verifier_source": "crates/hashed-ecdl-tensor/src/factorization_certificate.rs",
+    "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
+    "witness": "degree, precision, deterministic polynomial and lower bits, plus canonical left, right and product coordinate vectors",
+    "checks": "independent Ring::new replay; exact polynomial and lower-bit expansion; canonical coordinate bounds; metered zero-fast-path nested convolution; metered reverse retained-high set-bit reduction; truncation; exact product-vector equality",
+    "mutations": "altered product coordinate rejects",
+    "observed_gate": "dense degree-4 precision-5 inputs round-trip through JSON and replay with positive convolution and reduction counts; the focused exact test, warnings-denied production Clippy and complete native library pass",
+    "claim_boundary": "bounded concrete Vec<BigUint> code-to-transition replay for one accepted sample; not a mechanized Rust compiler refinement or universal theorem, and the accepted vector is not yet instantiated in Lean"
+  },
   "packet_entry_coefficient_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
     "test": "contraction::deformation::tests::packet_entry_matches_exhaustive_multimode_coefficient_oracle",
@@ -519,5 +528,5 @@
     "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
     "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
   },
-  "next_gate": "bind native endpoint arrays and first-minimum replay to the formal class-cap theorem, bind arbitrary-size recursion histories to the formal precision theorem, mechanize the concrete Vec<BigUint> multiplication-code binding to the completed source-shaped quotient-product theorem, instantiate the accepted deterministic lower-bit vector and scalar/mode coordinates in Lean, and refine accepted child arrays into the packet/group child-table interface; the live usize branch cannot reach nonzero u, while schedule, nD, pu, combined npu, quotient 2^p nilpotence, the complete source-shaped convolution/reduction/truncation product semantics, complete mode-exponent regrouping, exact 2M endpoint mass, typed child-table Fubini, weighted truncation and the native-extension scalar cutoff are kernel-derived from typed premises; separately complete interpolation, Hermite and creation-precision refinement"
+  "next_gate": "bind native endpoint arrays and first-minimum replay to the formal class-cap theorem, bind arbitrary-size recursion histories to the formal precision theorem, mechanize the Rust compiler refinement behind the accepted concrete Vec<BigUint> multiplication replay and instantiate its deterministic lower-bit vector and coordinates in Lean, bind scalar/mode coordinates in Lean, and refine accepted child arrays into the packet/group child-table interface; the live usize branch cannot reach nonzero u, while schedule, nD, pu, combined npu, quotient 2^p nilpotence, the complete source-shaped convolution/reduction/truncation product semantics, complete mode-exponent regrouping, exact 2M endpoint mass, typed child-table Fubini, weighted truncation and the native-extension scalar cutoff are kernel-derived from typed premises; separately complete interpolation, Hermite and creation-precision refinement"
 }
