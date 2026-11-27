@@ -190,7 +190,10 @@ evidence for two independent claims:
    family remains open. The generic Lean importer now recomputes endpoint
    degree caps and the strongest source-class guard and closes the class cap
    with no caller premise whenever those projected checks pass; the current
-   three-edge control is correctly rejected by that stronger parser; and
+   three-edge control is correctly rejected by that stronger parser. A shared
+   degree-one, two-label, 32-edge control now meets the source-class guard at
+   equality and passes both native verification and the formal strict parser;
+   uniform producer-family binding remains open; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
    active leaf cutoff, exact source quotient, and the exact root square-root

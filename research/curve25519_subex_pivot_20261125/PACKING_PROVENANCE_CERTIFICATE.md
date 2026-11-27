@@ -84,7 +84,12 @@ second generic importer recomputes both endpoint degree bounds and the exact
 `2(q^2)^2 delta<=M` source-class guard from the flat values, and returns the
 class cap with no remaining premise. The admitted three-edge control is
 kernel-proved to fail this stronger guard and parser, matching the native
-`source_guard_closure_admitted=false` result.
+`source_guard_closure_admitted=false` result. Replay now checks each local
+first-minimum against the serialized prefix and derives equality with the
+recursive executable schedule by well-founded induction. The separate shared
+`packing_label_source_guard_witness.csv` is a degree-one matching with two
+labels and 32 edges, exactly `M=2(q^2)^2 delta`; the native verifier reports
+source-guard closure and Lean's strict parser accepts the same projection.
 `[pcc:unverified]`
 
 ## Remaining boundary
@@ -92,7 +97,8 @@ kernel-proved to fail this stronger guard and parser, matching the native
 This closes finite replay from an edge skeleton through conditional label
 selection, source packing bounds, packet slots, and active factorization groups.
 The native flat-export path is now size-generic; semantic Rust-to-Lean binding
-still has only the admitted three-edge control.
+still has only the admitted three-edge control and exact-boundary 32-edge
+control.
 The endpoint ports and source creation precisions also feed the separate
 schema-2 child provenance replay in `CHILD_PROVENANCE_CERTIFICATE.md`.
 `PROVENANCE_DESCRIPTION_ENVELOPE.md` gives the checked structural description
@@ -100,7 +106,7 @@ ceiling for this object and the complete child family.
 Together with `PACKING_GUARD_CLOSURE.md`, it gives a uniform producer-side
 packing theorem conditional on the source guards; child symmetry is not
 needed. It does not independently formalize that implication, discharge the
-factorization/refinement theorem, lift the single shared trace to every
+factorization/refinement theorem, lift the finite shared traces to every
 arbitrary-size producer object, or prove the external contraction theorem. No
 practical Curve25519 attack follows.
 `[pcc:unverified]`

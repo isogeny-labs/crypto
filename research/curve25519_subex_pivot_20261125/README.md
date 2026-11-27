@@ -393,9 +393,13 @@ source-guard class-cap theorem; the caller supplies only degree caps and the
 guard. A stricter generic importer now recomputes both endpoint degree caps and
 the natural-number source-class guard from the projection itself, casts the
 guard to the formal real inequality, and reaches the same class cap with no
-remaining premise. The three-edge fixture is proved to fail this stronger
-parser, so finite replay is not promoted to asymptotic admission. This is one finite
-code-to-model control plus generic native export and checked-import endpoints,
+remaining premise. Its trace checker evaluates each serialized prefix as an
+auxiliary assignment, and well-founded induction proves those local checks equal
+the original recursive executable schedule. A second shared degree-one matching
+with two labels and 32 edges meets `M=2(q^2)^2 delta` at equality; both the native
+verifier and the Lean strict parser accept that exact projection. The three-edge
+fixture remains proved to fail the stronger parser. These are finite
+code-to-model controls plus generic native export and checked-import endpoints,
 not a uniform arbitrary-size Rust-to-Lean semantic refinement.
 `[pcc:unverified]`
 

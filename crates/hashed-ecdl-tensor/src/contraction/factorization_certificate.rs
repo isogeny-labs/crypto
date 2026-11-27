@@ -1260,6 +1260,82 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         .starts_with("packet coefficient table:"));
 }
 
+fn check_strict_source_guard_exact_boundary(
+    packet_exponent: usize,
+    edges: usize,
+    expected_projection: Option<&str>,
+) {
+    let mut meter = Meter::new(Limits {
+        steps: 100_000_000,
+        ..Limits::default()
+    });
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: packet_exponent,
+        length: 1usize << packet_exponent,
+        array: 2usize.pow((2 * packet_exponent) as u32),
+    };
+    let endpoints: Vec<_> = (0..edges).collect();
+    let graph = partition_graph(&endpoints, &endpoints);
+    graph.validate().unwrap();
+    let packing = packing::pack(&graph, &parameters, 1, &mut meter).unwrap();
+    let certificate = Certificate {
+        schema: SCHEMA,
+        degree: 1,
+        radix: parameters.radix,
+        precision: 1,
+        tiles: 2,
+        edge_count: graph.edges.len(),
+        packets: packing
+            .packets
+            .iter()
+            .map(|packet| packet.slots.clone())
+            .collect(),
+        left_groups: graph
+            .edges
+            .iter()
+            .map(|edge| packing::digit(packing.row_labels[edge.left.0], 0, parameters.radix))
+            .collect(),
+        right_groups: graph
+            .edges
+            .iter()
+            .map(|edge| packing::digit(packing.column_labels[edge.right.0], 0, parameters.radix))
+            .collect(),
+        weights: Vec::new(),
+        modes: Vec::new(),
+        tuples: Vec::new(),
+        entries: Vec::new(),
+    };
+    let provenance = packing_provenance(&graph, &packing, &parameters, 0, Some(1));
+    let summary = verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();
+    assert_eq!(summary.edges, edges);
+    assert!(summary.conditional_labels_verified);
+    assert!(summary.source_bounds_verified);
+    assert!(summary.source_guard_closure_admitted);
+    if let Some(expected_projection) = expected_projection {
+        let projection = packing_label_projection(&provenance).unwrap();
+        let fixture_values: Vec<usize> = expected_projection
+            .trim()
+            .split(',')
+            .map(|value| value.parse().unwrap())
+            .collect();
+        assert_eq!(projection, fixture_values);
+    }
+}
+
+#[test]
+fn strict_source_guard_projection_accepts_nontrivial_exact_boundary() {
+    check_strict_source_guard_exact_boundary(
+        1,
+        32,
+        Some(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/curve25519_subex_pivot_20261125/packing_label_source_guard_witness.csv"
+        ))),
+    );
+}
+
 #[test]
 fn serialized_certificate_covers_every_three_edge_partition_shape() {
     let mut meter = Meter::new(Limits {

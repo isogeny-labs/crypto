@@ -70,6 +70,11 @@ open Curve25519ExtensionRingModel
 #print axioms parseSourceGuardPackingLabelArtifact_rightDegreeCap
 #print axioms parseSourceGuardPackingLabelArtifact_guard
 #print axioms parseSourceGuardPackingLabelArtifact_classCap
+#print axioms packingLabelSourceGuardWitness_parsed
+#print axioms packingLabelSourceGuardWitness_traceMatches
+#print axioms packingLabelSourceGuardWitness_replayed
+#print axioms packingLabelSourceGuardWitness_sourceClassGuardMatches
+#print axioms packingLabelSourceGuardWitness_sourceGuardParsed
 #print axioms packingLabelWitnessArtifactValues
 #print axioms packingLabelWitness_parsed
 #print axioms packingLabelWitness_traceMatches

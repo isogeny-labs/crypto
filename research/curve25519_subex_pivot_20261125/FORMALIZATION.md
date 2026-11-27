@@ -197,9 +197,14 @@ into the strongest source-guard class-cap theorem. The stricter
 `parseSourceGuardPackingLabelArtifact` additionally recomputes every left/right
 endpoint fiber against the serialized degree cap and the full
 `2(q^2)^2 delta<=M` natural-number guard. Successful imports reach the class cap
-without caller premises; the finite three-edge fixture is kernel-proved to be
-rejected by this stronger parser. The remaining boundary is
-to lift this finite code-to-model control to every arbitrary-size producer
+without caller premises. The replay checker uses the serialized row and column
+prefixes directly as auxiliary assignments; well-founded induction proves that
+passing local first-minimum steps equals the recursive executable schedule. A
+shared degree-one, two-label, 32-edge projection satisfies the strongest guard
+at equality and is accepted by both the native verifier and Lean strict parser,
+while the finite three-edge fixture is kernel-proved to be rejected. The
+remaining boundary is to lift these finite code-to-model controls to every
+arbitrary-size producer
 object semantically and to every live recursive history.
 `[pcc:unverified]`
 
