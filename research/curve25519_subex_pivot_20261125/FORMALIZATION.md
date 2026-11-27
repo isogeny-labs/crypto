@@ -256,6 +256,15 @@ in the mode/precision cancellation. The axiom audit reports only `propext`,
 finite factorization realization, and external contraction theorem remain
 explicit hypotheses or out of scope. `[pcc:unverified]`
 
+The next Lean module closes two more graph-side algebra layers: capped left and
+right degree sequences have total ordered endpoint charge at most `2M delta`,
+and the scaled collision-objective inequality implies the exact centered
+variance sum and every `c_gamma D<=2M` class cap. Isolates are degree-zero
+entries and parallel edges contribute their full port multiplicity. What is
+not yet formalized is the first-minimum conditional-expectation descent that
+connects the native labeling algorithm to that scaled objective inequality.
+`[pcc:unverified]`
+
 For the schema-2 factorization description, the same verifier reconstructs
 `Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks
 `Delta_d floor(sqrt(lambda)) ceil(sqrt(u_d))<=2^(lambda-1)` at every retained

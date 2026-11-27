@@ -435,6 +435,13 @@ only Lean/mathlib's standard `propext`, `Classical.choice`, and `Quot.sound`.
 The variance, finite factorization/precision realization, and external theorem
 are not discharged by this replay. `[pcc:unverified]`
 
+The formal replay also covers the `2M delta` bipartite degree-square budget,
+the centered class-variance identity, and the conversion from the scaled
+collision objective to every per-class cap, with isolates and parallel ports
+represented in the degree data. The exact remaining graph-side lemma is the
+greedy first-minimum conditional-objective descent; factorization/precision
+realization and the external theorem remain separate. `[pcc:unverified]`
+
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
 `M=32<LD=512` child fails exactly at packet padding, while all four two-group

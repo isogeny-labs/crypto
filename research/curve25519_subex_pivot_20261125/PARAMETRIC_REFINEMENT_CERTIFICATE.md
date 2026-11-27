@@ -89,6 +89,15 @@ exact cost-ledger constants. The proof makes `M>=0` explicit in both shrink
 lemmas; Lean rejected the first draft without it, exposing a genuine missing
 domain condition in that standalone formulation.
 
+`lean/ConditionalVariance.lean` moves one premise boundary upstream. It
+kernel-checks the bipartite degree-square budget
+`sum_left deg^2+sum_right deg^2<=2M delta`, with zero-degree isolates and
+parallel-port multiplicity represented directly, the exact centered class
+variance identity, division of the scaled collision-objective inequality by
+positive `D`, and the resulting `c_gamma D<=2M` cap. The remaining variance
+step is now specifically the greedy first-minimum descent from the initial
+partially labeled objective to the final class collision sum.
+
 The project pins Lean `v4.35.0` and mathlib commit
 `56a005855ea17e0b0958f73ec801ae140b0a1679`. Reproduce it with:
 
@@ -99,7 +108,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-The build completes 9,049 jobs. `#print axioms` reports only `propext`,
+The build completes 9,050 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
 project axioms or admitted proofs. This formal replay still takes the variance,
 source guard, precision, and mode inequalities as hypotheses. It neither
@@ -113,8 +122,9 @@ arithmetic.
 A useful next certificate must replace the generic Boolean tokens with typed
 evidence for two independent claims:
 
-1. the conditional-label variance theorem for an arbitrary admitted
-   bipartite multigraph, including isolates and parallel ports; and
+1. the remaining conditional-label descent theorem for an arbitrary admitted
+   bipartite multigraph: the first-minimum label choices do not increase the
+   scaled objective; and
 2. the factorization/precision bounds `nD<=6M` and `pu<=34MD` for the exact
    finite rearrangement consumed by the child interface.
 

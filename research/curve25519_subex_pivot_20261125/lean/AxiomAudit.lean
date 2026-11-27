@@ -1,8 +1,10 @@
 module
 
 import ParametricRefinement
+import ConditionalVariance
 
 open Curve25519ParametricRefinement
+open Curve25519ConditionalVariance
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
@@ -12,3 +14,7 @@ open Curve25519ParametricRefinement
 #print axioms mode_precision_product
 #print axioms cost_ledger_constants
 #print axioms parametric_refinement_certificate
+#print axioms bipartite_degree_square_budget
+#print axioms class_variance_identity
+#print axioms variance_bound_of_scaled_objective
+#print axioms class_cap_of_scaled_objective

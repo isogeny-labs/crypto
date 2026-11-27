@@ -62,6 +62,15 @@ This is the inequality checked independently by the schema-3 packing
 provenance verifier. Its quadratic replay is separate from the optimized
 incidence-Gram producer. `[pcc:unverified]`
 
+The pinned Lean project now checks the degree-sequence part of this argument,
+including isolates and parallel-port multiplicity, as well as the exact
+collision-to-centered-variance conversion and its per-class-cap consequence.
+The formal boundary is narrower than the displayed native argument: it still
+takes the final scaled collision-objective inequality as a hypothesis. A
+complete formal refinement must show that each native first-minimum label
+choice preserves the conditional-expectation descent from the initially
+unlabeled objective. `[pcc:unverified]`
+
 ## Per-class cap
 
 The strongest source guard gives
