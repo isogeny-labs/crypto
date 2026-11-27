@@ -379,9 +379,7 @@ pub fn norm_ops_total() -> u64 {
 
 #[inline]
 fn count_norm(n: usize) {
-    if super::jv_bitops::enabled() {
-        NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    }
+    record_norm_diagnostics(n);
     if let Ok(n) = u64::try_from(n) {
         // `count_ops` conservatively records a multiply-subtract.  Pivot
         // normalization is multiplication-only and reads one rather than two
@@ -394,6 +392,13 @@ fn count_norm(n: usize) {
             Some("row_operations"),
             "normalization length does not fit u64",
         );
+    }
+}
+
+#[inline]
+fn record_norm_diagnostics(n: usize) {
+    if super::jv_bitops::enabled() {
+        NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
     }
 }
 
@@ -474,12 +479,178 @@ fn count_probes(n: u64, key_words: u64) {
 
 #[inline]
 fn count_ops(n: usize) {
+    record_row_diagnostics(n);
+    visit_account_row_operations(n);
+}
+
+#[inline]
+fn record_row_diagnostics(n: usize) {
     FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
     FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
     super::jv_bitops::row_ops(n as u64);
-    visit_account_row_operations(n);
+}
+
+/// Exclusive accounting route for matrix and polynomial reducer work.
+///
+/// Legacy helpers keep their existing aggregate TLS observations. The owned
+/// route admits the exact net ledger leaves before represented work and only
+/// then permits diagnostics or mutation. Accounted execution is deliberately
+/// restricted to the wide-field profile, so owned inversions and products can
+/// use the raw Barrett core rather than the global TLS arithmetic wrappers.
+#[derive(Clone, Copy)]
+struct ReducerMeter<'a> {
+    account: VisitHelperAccount<'a>,
+}
+
+impl<'a> From<VisitHelperAccount<'a>> for ReducerMeter<'a> {
+    fn from(account: VisitHelperAccount<'a>) -> Self {
+        Self { account }
+    }
+}
+
+impl ReducerMeter<'_> {
+    fn owned(self) -> bool {
+        matches!(self.account, VisitHelperAccount::Owned(_))
+    }
+
+    fn control(self) -> Result<(), F4Stop> {
+        if self.account.control().stopped() {
+            Err(F4Stop::Accounting)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn checked_count(self, n: usize, counter: &'static str) -> Result<u64, F4Stop> {
+        match u64::try_from(n) {
+            Ok(n) => Ok(n),
+            Err(_) => {
+                if self
+                    .account
+                    .checked_arithmetic_block(
+                        "counter_overflow",
+                        Some(counter),
+                        "reducer observation does not fit u64",
+                    )
+                    .stopped()
+                {
+                    Err(F4Stop::Accounting)
+                } else {
+                    Ok(u64::MAX)
+                }
+            }
+        }
+    }
+
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> Result<(), F4Stop> {
+        if self.account.charge(counter, amount).stopped() {
+            Err(F4Stop::Accounting)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn admit_matrix_update(self, operations: usize) -> Result<(), F4Stop> {
+        if !self.owned() {
+            return Ok(());
+        }
+        self.control()?;
+        let operations = self.checked_count(operations, "row_operations")?;
+        let reads = match operations.checked_mul(2) {
+            Some(reads) => reads,
+            None => {
+                if self
+                    .account
+                    .checked_arithmetic_block(
+                        "counter_overflow",
+                        Some("row_reads"),
+                        "checked reducer read count overflowed",
+                    )
+                    .stopped()
+                {
+                    return Err(F4Stop::Accounting);
+                }
+                u64::MAX
+            }
+        };
+        self.charge(VisitAccountingCounter::RowOperations, operations)?;
+        self.charge(VisitAccountingCounter::FieldMultiplications, operations)?;
+        self.charge(VisitAccountingCounter::FieldAdditions, operations)?;
+        self.charge(VisitAccountingCounter::RowReads, reads)?;
+        self.charge(VisitAccountingCounter::RowWrites, operations)
+    }
+
+    fn finish_matrix_update(self, operations: usize) {
+        if self.owned() {
+            record_row_diagnostics(operations);
+        } else {
+            count_ops(operations);
+        }
+    }
+
+    fn pivot_inverse(
+        self,
+        coefficient: u64,
+        fp: Barrett,
+        operations: usize,
+    ) -> Result<u64, F4Stop> {
+        if !self.owned() {
+            return Ok(invmod(coefficient, fp.p));
+        }
+        self.control()?;
+        self.charge(VisitAccountingCounter::FieldInversions, 1)?;
+        let inverse = invmod_barrett_raw(coefficient, fp);
+        super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
+
+        let operations = self.checked_count(operations, "row_operations")?;
+        self.charge(VisitAccountingCounter::RowOperations, operations)?;
+        self.charge(VisitAccountingCounter::FieldMultiplications, operations)?;
+        self.charge(VisitAccountingCounter::RowReads, operations)?;
+        self.charge(VisitAccountingCounter::RowWrites, operations)?;
+        Ok(inverse)
+    }
+
+    fn finish_pivot(self, operations: usize) {
+        if self.owned() {
+            record_row_diagnostics(operations);
+            record_norm_diagnostics(operations);
+        } else {
+            count_ops(operations);
+            count_norm(operations);
+        }
+    }
+
+    fn observe_word<T>(self, observe: impl FnOnce() -> T) -> Result<T, F4Stop> {
+        debug_assert!(self.owned());
+        self.control()?;
+        self.charge(VisitAccountingCounter::WordOperations, 1)?;
+        let value = observe();
+        super::jv_bitops::words(1);
+        Ok(value)
+    }
+
+    fn admit_polynomial_update(self) -> Result<(), F4Stop> {
+        if !self.owned() {
+            return Ok(());
+        }
+        self.control()?;
+        self.charge(VisitAccountingCounter::RowOperations, 1)?;
+        self.charge(VisitAccountingCounter::FieldMultiplications, 1)?;
+        self.charge(VisitAccountingCounter::FieldAdditions, 1)?;
+        self.charge(VisitAccountingCounter::RowReads, 2)?;
+        self.charge(VisitAccountingCounter::RowWrites, 1)?;
+        self.charge(VisitAccountingCounter::HashProbes, 1)?;
+        self.charge(VisitAccountingCounter::WordOperations, 2)
+    }
+
+    fn finish_polynomial_update(self) {
+        if self.owned() {
+            super::jv_bitops::row_ops(1);
+            super::jv_bitops::probes(1, 2);
+        }
+    }
 }
 
 #[inline]
@@ -3551,7 +3722,7 @@ fn sparse_tail(pivot: &[u64], col: usize) -> Option<Vec<(u32, u64)>> {
         return None;
     }
     let nnz = tail.iter().filter(|&&y| y != 0).count();
-    if nnz * 4 > tail.len() {
+    if nnz > tail.len() / 4 {
         return None;
     }
     Some(
@@ -5690,6 +5861,198 @@ fn rref_ckpt(
     Some(pivots)
 }
 
+/// Token-routed wide-field RREF for the checkpoint-free accounted profile.
+///
+/// The legacy route remains the aggregate/Rayon implementation above. The
+/// owned route is deliberately serial: accounted entry admits exactly one
+/// Rayon worker, and keeping each mutation on the token owner makes an
+/// accounting refusal a typed prefix rather than work that can outlive it.
+fn rref_routed(
+    rows: &mut Vec<Vec<u64>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
+) -> Result<Option<Vec<usize>>, F4Stop> {
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(rref(rows, fp, deadline));
+    }
+    rref_owned(rows, fp, deadline, account)
+}
+
+fn eliminate_rows_owned(
+    rows: &mut [Vec<u64>],
+    pivot: &[u64],
+    col: usize,
+    fp: Barrett,
+    meter: ReducerMeter<'_>,
+) -> Result<(), F4Stop> {
+    meter.control()?;
+    let sparse = sparse_tail(pivot, col);
+    let dense_operations = sparse.is_none().then(|| {
+        pivot[col..]
+            .iter()
+            .filter(|&&coefficient| coefficient != 0)
+            .count()
+    });
+    for row in rows {
+        meter.control()?;
+        if row[col] == 0 {
+            continue;
+        }
+        let operations = sparse
+            .as_ref()
+            .map_or_else(|| dense_operations.unwrap_or(0), Vec::len);
+        meter.admit_matrix_update(operations)?;
+        let observed = match sparse.as_deref() {
+            Some(nonzero) => eliminate_sparse(row, nonzero, col, fp),
+            None => eliminate(row, pivot, col, fp),
+        };
+        debug_assert_eq!(observed, operations);
+        meter.finish_matrix_update(operations);
+    }
+    Ok(())
+}
+
+fn rref_owned(
+    rows: &mut Vec<Vec<u64>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
+) -> Result<Option<Vec<usize>>, F4Stop> {
+    let meter = ReducerMeter::from(account);
+    meter.control()?;
+    let n_cols = rows.first().map_or(0, Vec::len);
+    let mut pivots = Vec::new();
+    let mut pivot_row = 0usize;
+    for col in 0..n_cols {
+        if pivot_row >= rows.len() {
+            break;
+        }
+        if col % 32 == 0 && deadline.is_some_and(|limit| Instant::now() > limit) {
+            return Ok(None);
+        }
+        let mut found = None;
+        for candidate in pivot_row..rows.len() {
+            if meter.observe_word(|| rows[candidate][col] != 0)? {
+                found = Some(candidate);
+                break;
+            }
+        }
+        let Some(found) = found else {
+            continue;
+        };
+        rows.swap(pivot_row, found);
+        let operations = rows[pivot_row][col..]
+            .iter()
+            .filter(|&&coefficient| coefficient != 0)
+            .count();
+        let inverse = meter.pivot_inverse(rows[pivot_row][col], fp, operations)?;
+        for coefficient in &mut rows[pivot_row][col..] {
+            if *coefficient != 0 {
+                *coefficient = barrett_mul_raw(*coefficient, inverse, fp);
+            }
+        }
+        meter.finish_pivot(operations);
+
+        let (head, tail) = rows.split_at_mut(pivot_row + 1);
+        eliminate_rows_owned(tail, &head[pivot_row], col, fp, meter)?;
+        pivots.push(col);
+        pivot_row += 1;
+    }
+    rows.truncate(pivot_row);
+    for i in (1..pivot_row).rev() {
+        if deadline.is_some_and(|limit| Instant::now() > limit) {
+            return Ok(None);
+        }
+        let col = pivots[i];
+        let (head, tail) = rows.split_at_mut(i);
+        eliminate_rows_owned(head, &tail[0], col, fp, meter)?;
+    }
+    Ok(Some(pivots))
+}
+
+#[allow(clippy::too_many_arguments)]
+fn reduce_pair_row_wide_owned(
+    row: &[(u32, u64)],
+    reducers: &[Vec<(u32, u64)>],
+    reducer_at: &[u32],
+    free_columns: &[usize],
+    column_count: usize,
+    p: u64,
+    fp: Barrett,
+    lazy_limit: usize,
+    deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
+) -> Result<Option<Vec<u64>>, F4Stop> {
+    let meter = ReducerMeter::from(account);
+    meter.control()?;
+    if deadline.is_some_and(|limit| Instant::now() > limit) {
+        return Ok(None);
+    }
+    let mut accumulator = vec![0u64; column_count];
+    for &(column, value) in row {
+        accumulator[column as usize] = value;
+    }
+    let first_column = row
+        .first()
+        .map_or(column_count, |&(column, _)| column as usize);
+    if lazy_limit >= 64 {
+        let mut pending = 0usize;
+        for column in first_column..column_count {
+            let reducer_index = reducer_at[column];
+            if reducer_index == u32::MAX || accumulator[column] == 0 {
+                continue;
+            }
+            let factor = fp.reduce(accumulator[column]);
+            if factor == 0 {
+                continue;
+            }
+            let reducer = &reducers[reducer_index as usize][1..];
+            meter.admit_matrix_update(reducer.len())?;
+            accumulator[column] = 0;
+            let negative = p - factor;
+            for &(target, value) in reducer {
+                accumulator[target as usize] += negative * value;
+            }
+            meter.finish_matrix_update(reducer.len());
+            pending += 1;
+            if pending == lazy_limit {
+                normalize_lazy(&mut accumulator, fp);
+                pending = 0;
+            }
+        }
+        return Ok(Some(
+            free_columns
+                .iter()
+                .map(|&column| fp.reduce(accumulator[column]))
+                .collect(),
+        ));
+    }
+
+    for column in first_column..column_count {
+        let factor = accumulator[column];
+        let reducer_index = reducer_at[column];
+        if factor == 0 || reducer_index == u32::MAX {
+            continue;
+        }
+        let reducer = &reducers[reducer_index as usize][1..];
+        meter.admit_matrix_update(reducer.len())?;
+        accumulator[column] = 0;
+        let negative = p - factor;
+        for &(target, value) in reducer {
+            let entry = &mut accumulator[target as usize];
+            *entry = fp.reduce(*entry + negative * value);
+        }
+        meter.finish_matrix_update(reducer.len());
+    }
+    Ok(Some(
+        free_columns
+            .iter()
+            .map(|&column| accumulator[column])
+            .collect(),
+    ))
+}
+
 /// Degree-bounded F4.
 pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
     f4_with_visit_account(input, n_vars, p, opts, VisitAccount::Off)
@@ -7364,136 +7727,183 @@ fn f4_with_arithmetic(
             // Products an entry below `p` can take without reaching `2⁶⁴`
             // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
             let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
-            let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
-                if deadline.is_some_and(|d| Instant::now() > d) {
-                    return None;
+            if account.enabled() {
+                let routed = (|| -> Result<Option<(Vec<Vec<u64>>, Vec<usize>)>, F4Stop> {
+                    if block_classes.is_some() || resume_here.is_some() {
+                        let _ = account.block(
+                            "unsupported_reducer_route",
+                            None,
+                            "owned wide reducer excludes weighted and checkpoint-resume paths",
+                        );
+                        return Err(F4Stop::Accounting);
+                    }
+                    let mut rows = Vec::with_capacity(pair_rows.len());
+                    for row in pair_rows {
+                        let Some(row) = reduce_pair_row_wide_owned(
+                            row,
+                            reducers,
+                            &reducer_at,
+                            &free_cols,
+                            n_cols,
+                            p,
+                            fp,
+                            lazy_limit,
+                            deadline,
+                            account.into(),
+                        )?
+                        else {
+                            return Ok(None);
+                        };
+                        rows.push(row);
+                    }
+                    useful = rows
+                        .iter()
+                        .map(|row| row.iter().any(|&value| value != 0))
+                        .collect();
+                    rows.retain(|row| row.iter().any(|&value| value != 0));
+                    if recording {
+                        rec_rows = rows.iter().map(|row| row.to_vec()).collect();
+                    }
+                    let Some(pivots) = rref_routed(&mut rows, fp, deadline, account.into())? else {
+                        return Ok(None);
+                    };
+                    Ok(Some((rows, pivots)))
+                })();
+                match routed {
+                    Ok(pivots) => pivots,
+                    Err(stop) => abort_call!(stop),
                 }
-                let mut acc = vec![0u64; n_cols];
-                for &(c, v) in r {
-                    acc[c as usize] = v;
-                }
-                // One count a pair row, on the thread that reduced it: the same
-                // totals as one a reducer (assessment 2026-11-10, R3).
-                let mut row_ops = 0usize;
-                if lazy_limit >= 64 {
-                    // Unreduced accumulation: a product is below
-                    // `(p - 1)²`, so `lazy_limit` of them on an entry below
-                    // `p` stay below `2⁶⁴`; the entry at a reducer's column
-                    // is read through one reduction and the row is
-                    // reduced when read out, so every value is the
-                    // remainder the reducing form gave.
-                    let mut pending = 0usize;
-                    for c in r[0].0 as usize..n_cols {
-                        if reducer_at[c] == NONE || acc[c] == 0 {
-                            continue;
+            } else {
+                let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
+                    if deadline.is_some_and(|d| Instant::now() > d) {
+                        return None;
+                    }
+                    let mut acc = vec![0u64; n_cols];
+                    for &(c, v) in r {
+                        acc[c as usize] = v;
+                    }
+                    // One count a pair row, on the thread that reduced it: the same
+                    // totals as one a reducer (assessment 2026-11-10, R3).
+                    let mut row_ops = 0usize;
+                    if lazy_limit >= 64 {
+                        // Unreduced accumulation: a product is below
+                        // `(p - 1)²`, so `lazy_limit` of them on an entry below
+                        // `p` stay below `2⁶⁴`; the entry at a reducer's column
+                        // is read through one reduction and the row is
+                        // reduced when read out, so every value is the
+                        // remainder the reducing form gave.
+                        let mut pending = 0usize;
+                        for c in r[0].0 as usize..n_cols {
+                            if reducer_at[c] == NONE || acc[c] == 0 {
+                                continue;
+                            }
+                            let f = fp.reduce(acc[c]);
+                            if f == 0 {
+                                continue;
+                            }
+                            acc[c] = 0;
+                            let neg = p - f;
+                            let reducer = &reducers[reducer_at[c] as usize][1..];
+                            for &(cc, v) in reducer {
+                                acc[cc as usize] += neg * v;
+                            }
+                            row_ops += reducer.len();
+                            pending += 1;
+                            if pending == lazy_limit {
+                                normalize_lazy(&mut acc, fp);
+                                pending = 0;
+                            }
                         }
-                        let f = fp.reduce(acc[c]);
-                        if f == 0 {
+                        count_ops(row_ops);
+                        return Some(free_cols.iter().map(|&c| fp.reduce(acc[c])).collect());
+                    }
+                    for c in r[0].0 as usize..n_cols {
+                        let f = acc[c];
+                        if f == 0 || reducer_at[c] == NONE {
                             continue;
                         }
                         acc[c] = 0;
                         let neg = p - f;
                         let reducer = &reducers[reducer_at[c] as usize][1..];
                         for &(cc, v) in reducer {
-                            acc[cc as usize] += neg * v;
+                            let x = &mut acc[cc as usize];
+                            *x = fp.reduce(*x + neg * v);
                         }
                         row_ops += reducer.len();
-                        pending += 1;
-                        if pending == lazy_limit {
-                            normalize_lazy(&mut acc, fp);
-                            pending = 0;
-                        }
                     }
                     count_ops(row_ops);
-                    return Some(free_cols.iter().map(|&c| fp.reduce(acc[c])).collect());
-                }
-                for c in r[0].0 as usize..n_cols {
-                    let f = acc[c];
-                    if f == 0 || reducer_at[c] == NONE {
-                        continue;
-                    }
-                    acc[c] = 0;
-                    let neg = p - f;
-                    let reducer = &reducers[reducer_at[c] as usize][1..];
-                    for &(cc, v) in reducer {
-                        let x = &mut acc[cc as usize];
-                        *x = fp.reduce(*x + neg * v);
-                    }
-                    row_ops += reducer.len();
-                }
-                count_ops(row_ops);
-                Some(free_cols.iter().map(|&c| acc[c]).collect())
-            };
-            // an in-step snapshot stands in for the reducer pass and the finished
-            // part of the reduction
-            let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
-                Some(Vec::new())
-            } else if parallel {
-                pair_rows.par_iter().map(reduce_pair_row).collect()
-            } else {
-                pair_rows.iter().map(reduce_pair_row).collect()
-            };
-            let mut snapshot_hook = |v: &RrefView| -> bool {
-                let (Some((path, _)), Some(top), Some(every), Some(fp)) =
-                    (&opts.checkpoint, &top, opts.checkpoint_in_step, ck_fp)
-                else {
-                    return false;
+                    Some(free_cols.iter().map(|&c| acc[c]).collect())
                 };
-                if last_snap.elapsed() < every {
-                    return false;
-                }
-                let tw = Instant::now();
-                if !top_written {
-                    let snap = ckpt::Snap {
-                        fingerprint: fp,
-                        n_vars,
-                        elapsed: top.elapsed,
-                        field_ops: top.ops,
-                        basis: &basis,
-                        alive: &alive,
-                        pairs: &top.pairs,
-                        above: &above,
-                        pairs_above_bound,
-                        steps: top.steps,
-                        max_rows: top.max_rows,
-                        max_cols: top.max_cols,
-                        degree_reached: top.degree_reached,
-                        solving_degree: top.solving_degree,
-                        learned: top.learned,
-                        blocked_steps: top.blocked_steps,
+                // an in-step snapshot stands in for the reducer pass and the finished
+                // part of the reduction
+                let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
+                    Some(Vec::new())
+                } else if parallel {
+                    pair_rows.par_iter().map(reduce_pair_row).collect()
+                } else {
+                    pair_rows.iter().map(reduce_pair_row).collect()
+                };
+                let mut snapshot_hook = |v: &RrefView| -> bool {
+                    let (Some((path, _)), Some(top), Some(every), Some(fp)) =
+                        (&opts.checkpoint, &top, opts.checkpoint_in_step, ck_fp)
+                    else {
+                        return false;
                     };
-                    match ckpt::save(path, &snap) {
-                        Ok(bytes) => {
-                            top_written = true;
-                            eprintln!(
+                    if last_snap.elapsed() < every {
+                        return false;
+                    }
+                    let tw = Instant::now();
+                    if !top_written {
+                        let snap = ckpt::Snap {
+                            fingerprint: fp,
+                            n_vars,
+                            elapsed: top.elapsed,
+                            field_ops: top.ops,
+                            basis: &basis,
+                            alive: &alive,
+                            pairs: &top.pairs,
+                            above: &above,
+                            pairs_above_bound,
+                            steps: top.steps,
+                            max_rows: top.max_rows,
+                            max_cols: top.max_cols,
+                            degree_reached: top.degree_reached,
+                            solving_degree: top.solving_degree,
+                            learned: top.learned,
+                            blocked_steps: top.blocked_steps,
+                        };
+                        match ckpt::save(path, &snap) {
+                            Ok(bytes) => {
+                                top_written = true;
+                                eprintln!(
                                 "f4: checkpoint {} at the top of step {}, written inside it: {bytes} bytes in {:.1} s",
                                 path.display(),
                                 top.steps,
                                 tw.elapsed().as_secs_f64()
                             );
-                        }
-                        Err(e) => {
-                            eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display());
-                            last_snap = Instant::now();
-                            return false;
+                            }
+                            Err(e) => {
+                                eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display());
+                                last_snap = Instant::now();
+                                return false;
+                            }
                         }
                     }
-                }
-                let tr = Instant::now();
-                let rs = ckpt::RrefSnap {
-                    fingerprint: fp,
-                    top_steps: top.steps,
-                    top_elapsed: top.elapsed,
-                    ops: ops_carry.get() + (field_ops_now() - ops0),
-                    elapsed: t0.elapsed() + carried.get(),
-                    phase: v.phase,
-                    c: v.c,
-                    pr: v.pr,
-                    i: v.i,
-                    pivots: v.pivots,
-                    rows: v.rows,
-                };
-                match ckpt::save_rref(&ckpt::rref_path(path), &rs) {
+                    let tr = Instant::now();
+                    let rs = ckpt::RrefSnap {
+                        fingerprint: fp,
+                        top_steps: top.steps,
+                        top_elapsed: top.elapsed,
+                        ops: ops_carry.get() + (field_ops_now() - ops0),
+                        elapsed: t0.elapsed() + carried.get(),
+                        phase: v.phase,
+                        c: v.c,
+                        pr: v.pr,
+                        i: v.i,
+                        pivots: v.pivots,
+                        rows: v.rows,
+                    };
+                    match ckpt::save_rref(&ckpt::rref_path(path), &rs) {
                     Ok(bytes) => eprintln!(
                         "f4: in-step snapshot of step {} (phase {}, column {}, {} pivots): {bytes} bytes in {:.1} s",
                         top.steps + 1,
@@ -7504,36 +7914,37 @@ fn f4_with_arithmetic(
                     ),
                     Err(e) => eprintln!("f4: IN-STEP SNAPSHOT FAILED: {e}"),
                 }
-                last_snap = Instant::now();
-                snaps += 1;
-                opts.checkpoint_stop_in_rref.is_some_and(|k| snaps >= k)
-            };
-            reduced.and_then(|mut rows| {
-                let mut resume_arg = None;
-                if let Some(rs) = resume_here {
-                    rows = rs.rows;
-                    resume_arg = Some((rs.phase, rs.c, rs.pr, rs.i, rs.pivots));
-                } else {
-                    useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
-                    rows.retain(|r| r.iter().any(|&v| v != 0));
-                    if recording {
-                        rec_rows = rows.iter().map(|r| r.to_vec()).collect();
-                    }
-                }
-                let piv = match &block_classes {
-                    Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
-                    None => {
-                        let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                            if top.is_some() && opts.checkpoint.is_some() {
-                                Some(&mut snapshot_hook)
-                            } else {
-                                None
-                            };
-                        rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
-                    }
+                    last_snap = Instant::now();
+                    snaps += 1;
+                    opts.checkpoint_stop_in_rref.is_some_and(|k| snaps >= k)
                 };
-                piv.map(|piv| (rows, piv))
-            })
+                reduced.and_then(|mut rows| {
+                    let mut resume_arg = None;
+                    if let Some(rs) = resume_here {
+                        rows = rs.rows;
+                        resume_arg = Some((rs.phase, rs.c, rs.pr, rs.i, rs.pivots));
+                    } else {
+                        useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
+                        rows.retain(|r| r.iter().any(|&v| v != 0));
+                        if recording {
+                            rec_rows = rows.iter().map(|r| r.to_vec()).collect();
+                        }
+                    }
+                    let piv = match &block_classes {
+                        Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
+                        None => {
+                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                if top.is_some() && opts.checkpoint.is_some() {
+                                    Some(&mut snapshot_hook)
+                                } else {
+                                    None
+                                };
+                            rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        }
+                    };
+                    piv.map(|piv| (rows, piv))
+                })
+            }
         };
         drop(account_rows);
         account_or_abort!(account.control());
@@ -8123,6 +8534,77 @@ fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Orde
     out
 }
 
+fn reduce_skipping_vecs_owned(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    let meter = ReducerMeter::from(account);
+    meter.control()?;
+    let fp = Barrett::new(p);
+    let mut work: FxMap<Vec<u32>, u64> = FxMap::default();
+    let mut heap: std::collections::BinaryHeap<Keyed> = std::collections::BinaryHeap::new();
+    for (exponents, coefficient) in f {
+        let value = work.entry(exponents.clone()).or_insert_with(|| {
+            heap.push(Keyed(exponents.clone(), &ord));
+            0
+        });
+        *value = (*value + coefficient % p) % p;
+    }
+    let mut out = Vec::new();
+    while let Some(Keyed(monomial, _)) = heap.pop() {
+        let Some(coefficient) = work.remove(&monomial) else {
+            continue;
+        };
+        if coefficient == 0 {
+            continue;
+        }
+        let reducer = basis
+            .iter()
+            .enumerate()
+            .find(|&(index, polynomial)| index != skip && divides(&polynomial[0].0, &monomial));
+        if let Some((_, reducer)) = reducer {
+            let negative = p - coefficient;
+            for (exponents, reducer_coefficient) in &reducer[1..] {
+                let shifted: Vec<u32> = exponents
+                    .iter()
+                    .zip(&monomial)
+                    .zip(&reducer[0].0)
+                    .map(|((entry, multiplier), lead)| entry + multiplier - lead)
+                    .collect();
+                meter.admit_polynomial_update()?;
+                let value = work.entry(shifted).or_insert_with_key(|key| {
+                    heap.push(Keyed(key.clone(), &ord));
+                    0
+                });
+                let product = barrett_mul_raw(negative, fp.reduce(*reducer_coefficient), fp);
+                *value = fp.reduce(*value + product);
+                meter.finish_polynomial_update();
+            }
+        } else {
+            out.push((monomial, coefficient));
+        }
+    }
+    Ok(out)
+}
+
+fn reduce_skipping_vecs_routed(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(reduce_skipping_vecs(f, basis, skip, p, ord));
+    }
+    reduce_skipping_vecs_owned(f, basis, skip, p, ord, account)
+}
+
 // ── Reducing a set on packed monomials ─────────────────────────────
 //
 // `interreduce` and `autoreduce` reduce every element of a set by the others
@@ -8380,11 +8862,109 @@ fn reduce_skipping_packed(
     Some(out)
 }
 
+fn reduce_skipping_packed_owned(
+    f: &Poly,
+    set: &[Poly],
+    ps: &PackedSet,
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Option<Poly>, F4Stop> {
+    let meter = ReducerMeter::from(account);
+    meter.control()?;
+    let fp = Barrett::new(p);
+    let Some(packed_f) = set_pack_poly(f, ps.n_vars) else {
+        return Ok(None);
+    };
+    let mut work: PkMap<u128, u64> = PkMap::default();
+    let mut heap: std::collections::BinaryHeap<std::cmp::Reverse<(u32, u128)>> =
+        std::collections::BinaryHeap::new();
+    for (packed, (_, coefficient)) in packed_f.into_iter().zip(f) {
+        let value = work.entry(packed).or_insert_with(|| {
+            heap.push(std::cmp::Reverse(set_order_key(ord, packed)));
+            0
+        });
+        *value = (*value + coefficient % p) % p;
+    }
+    let mut out = Vec::new();
+    while let Some(std::cmp::Reverse(key)) = heap.pop() {
+        let packed = set_from_order_key(ord, key);
+        let Some(coefficient) = work.remove(&packed) else {
+            continue;
+        };
+        if coefficient == 0 {
+            continue;
+        }
+        let Some(index) = first_divisor(&ps.lms, skip, packed) else {
+            out.push((unpack(packed, ps.n_vars), coefficient));
+            continue;
+        };
+        let reducer = &set[index];
+        let Some(packed_reducer) = ps.terms[index].as_deref() else {
+            return Ok(None);
+        };
+        let multiplier = packed - packed_reducer[0];
+        let negative = p - coefficient;
+        for (&exponents, &(_, reducer_coefficient)) in packed_reducer[1..].iter().zip(&reducer[1..])
+        {
+            let Some(shifted) = set_mul(exponents, multiplier) else {
+                return Ok(None);
+            };
+            meter.admit_polynomial_update()?;
+            let value = work.entry(shifted).or_insert_with(|| {
+                heap.push(std::cmp::Reverse(set_order_key(ord, shifted)));
+                0
+            });
+            let product = barrett_mul_raw(negative, fp.reduce(reducer_coefficient), fp);
+            *value = fp.reduce(*value + product);
+            meter.finish_polynomial_update();
+        }
+    }
+    Ok(Some(out))
+}
+
+fn reduce_skipping_packed_routed(
+    f: &Poly,
+    set: &[Poly],
+    ps: &PackedSet,
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Option<Poly>, F4Stop> {
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(reduce_skipping_packed(f, set, ps, skip, p, ord));
+    }
+    reduce_skipping_packed_owned(f, set, ps, skip, p, ord, account)
+}
+
 /// [`reduce_skipping_vecs`] of `set[i]` by the rest of `set`, on packed
 /// monomials when `ps` (the packed form of `set`) is given and they hold.
 fn reduce_skipping(set: &[Poly], ps: Option<&PackedSet>, i: usize, p: u64, ord: Ordering) -> Poly {
     ps.and_then(|ps| reduce_skipping_packed(&set[i], set, ps, i, p, ord))
         .unwrap_or_else(|| reduce_skipping_vecs(&set[i], set, i, p, ord))
+}
+
+fn reduce_skipping_routed(
+    set: &[Poly],
+    ps: Option<&PackedSet>,
+    i: usize,
+    p: u64,
+    ord: Ordering,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return Ok(reduce_skipping(set, ps, i, p, ord));
+    }
+    ReducerMeter::from(account).control()?;
+    if let Some(ps) = ps {
+        if let Some(reduced) = reduce_skipping_packed_routed(&set[i], set, ps, i, p, ord, account)?
+        {
+            return Ok(reduced);
+        }
+    }
+    reduce_skipping_vecs_routed(&set[i], set, i, p, ord, account)
 }
 
 /// Scale a reduction's output to be monic.  [`reduce_skipping`] returns
@@ -8406,6 +8986,7 @@ fn make_monic_routed(mut f: Poly, p: u64, account: VisitHelperAccount<'_>) -> Re
     Ok(f)
 }
 
+#[derive(Debug)]
 enum F4Stop {
     Resource(F4ResourceLimit),
     Deadline,
@@ -8489,6 +9070,83 @@ fn reduce_skipping_bounded(
     Ok(out)
 }
 
+#[allow(clippy::too_many_arguments)]
+fn reduce_skipping_bounded_routed(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+    account: VisitHelperAccount<'_>,
+) -> Result<Poly, F4Stop> {
+    if matches!(account, VisitHelperAccount::LegacyTls) {
+        return reduce_skipping_bounded(f, basis, skip, p, ord, limits, deadline);
+    }
+    let meter = ReducerMeter::from(account);
+    meter.control()?;
+    let fp = Barrett::new(p);
+    limits.symbolic("interreduce", f.len())?;
+    let mut work: FxMap<Vec<u32>, u64> = FxMap::default();
+    let mut heap: std::collections::BinaryHeap<Keyed> = std::collections::BinaryHeap::new();
+    for (exponents, coefficient) in f {
+        let value = work.entry(exponents.clone()).or_insert_with(|| {
+            heap.push(Keyed(exponents.clone(), &ord));
+            0
+        });
+        *value = (*value + coefficient % p) % p;
+    }
+    let mut out = Vec::new();
+    let mut scratch = vec![0; f.first().map_or(0, |(exponents, _)| exponents.len())];
+    while let Some(Keyed(monomial, _)) = heap.pop() {
+        if deadline.is_some_and(|limit| Instant::now() > limit) {
+            return Err(F4Stop::Deadline);
+        }
+        let Some(coefficient) = work.remove(&monomial) else {
+            continue;
+        };
+        if coefficient == 0 {
+            continue;
+        }
+        let reducer = basis
+            .iter()
+            .enumerate()
+            .find(|&(index, polynomial)| index != skip && divides(&polynomial[0].0, &monomial));
+        if let Some((_, reducer)) = reducer {
+            let negative = p - coefficient;
+            for (exponents, reducer_coefficient) in &reducer[1..] {
+                if deadline.is_some_and(|limit| Instant::now() > limit) {
+                    return Err(F4Stop::Deadline);
+                }
+                for (index, entry) in scratch.iter_mut().enumerate() {
+                    *entry = exponents[index] + monomial[index] - reducer[0].0[index];
+                }
+                if !work.contains_key(scratch.as_slice()) {
+                    limits.check(
+                        "interreduce",
+                        "symbolic_monomials",
+                        work.len()
+                            .checked_add(out.len())
+                            .and_then(|count| count.checked_add(1)),
+                        limits.max_symbolic_monomials,
+                    )?;
+                    heap.push(Keyed(scratch.clone(), &ord));
+                    work.insert(scratch.clone(), 0);
+                }
+                meter.admit_polynomial_update()?;
+                let value = work.get_mut(scratch.as_slice()).unwrap();
+                let product = barrett_mul_raw(negative, fp.reduce(*reducer_coefficient), fp);
+                *value = fp.reduce(*value + product);
+                meter.finish_polynomial_update();
+            }
+        } else {
+            out.push((monomial, coefficient));
+        }
+    }
+    Ok(out)
+}
+
 fn interreduce_bounded(
     basis: Vec<Poly>,
     p: u64,
@@ -8520,7 +9178,8 @@ fn interreduce_bounded(
     let mut terms: usize = out.iter().map(Vec::len).sum();
     limits.symbolic("interreduce_basis", terms)?;
     for i in 0..out.len() {
-        let r = reduce_skipping_bounded(&out[i], &out, i, p, ord, limits, deadline)?;
+        let r =
+            reduce_skipping_bounded_routed(&out[i], &out, i, p, ord, limits, deadline, account)?;
         if !r.is_empty() {
             limits.check(
                 "interreduce_basis",
@@ -8574,7 +9233,7 @@ fn interreduce_with_routed(
     let mut out = keep;
     let mut ps = if packed { PackedSet::new(&out) } else { None };
     for i in 0..out.len() {
-        let r = reduce_skipping(&out, ps.as_ref(), i, p, ord);
+        let r = reduce_skipping_routed(&out, ps.as_ref(), i, p, ord, account)?;
         if !r.is_empty() {
             out[i] = make_monic_routed(r, p, account)?;
             if let Some(ps) = ps.as_mut() {
@@ -8673,11 +9332,13 @@ static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
 /// Per-call ownership identity for the explicit-token migration.
 ///
 /// The authoritative ledger is still worker TLS. The borrowed token gates
-/// traversal, native-driver, GM, and generic normalization/explicit monic
-/// Visit-accounting mutations and cannot enter detached `'static` work.
-/// Specialization and other scalar arithmetic, reducers and row-produced
-/// monic work, roots, Rayon helpers, allocations, and separate `jv_bitops`
-/// telemetry remain non-authoritative TLS shadows until later migration.
+/// traversal, native-driver, GM, generic normalization/explicit monic work,
+/// and the admitted wide-field reducer cluster. It cannot enter detached
+/// `'static` work. Specialization and other scalar arithmetic, roots,
+/// symbolic/matrix construction beyond the current modeled observations,
+/// allocations, and separate `jv_bitops` telemetry remain non-authoritative
+/// shadows until later migration. Narrow reducers and multiworker Rayon are
+/// outside the admitted profile.
 struct VisitAccountingContext {
     id: NonZeroU64,
     owner_thread: ThreadId,
@@ -9350,7 +10011,7 @@ impl VisitAccountingBuilder {
     fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
         self.token_identity = Some(token.id());
         self.arm.accounting_token_mode =
-            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1";
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1";
     }
 
     fn block(
@@ -10147,6 +10808,7 @@ fn visit_accounting_binding_error(binding: &VisitAccountingBindingV1) -> Option<
 }
 
 fn visit_accounting_basic_configuration_error(
+    p: u64,
     opts: &F4Options,
     trace_pool: bool,
 ) -> Option<String> {
@@ -10161,6 +10823,11 @@ fn visit_accounting_basic_configuration_error(
     }
     if opts.order != Ordering::Grevlex {
         return Some("accounted visitor supports only grevlex ordering".into());
+    }
+    if p <= 1 << 16 {
+        return Some(
+            "accounted visitor reducer ownership supports only wide fields (p > 2^16)".into(),
+        );
     }
     if trace_pool {
         return Some("trace reuse is outside VisitAccountingV1".into());
@@ -11365,7 +12032,7 @@ where
         .then(|| visit_accounting_binding_error(&request.binding))
         .flatten();
     let basic_configuration_error = (!nested && binding_error.is_none())
-        .then(|| visit_accounting_basic_configuration_error(opts, false))
+        .then(|| visit_accounting_basic_configuration_error(p, opts, false))
         .flatten();
     let resolve_profile = !nested && binding_error.is_none() && basic_configuration_error.is_none();
     let mut builder = VisitAccountingBuilder::new_for_entry(
@@ -11408,7 +12075,7 @@ where
             accounting: builder.seal(VisitDispositionV1::Unsupported),
         });
     }
-    if let Some(error) = visit_accounting_basic_configuration_error(opts, false) {
+    if let Some(error) = visit_accounting_basic_configuration_error(p, opts, false) {
         builder.block("unsupported_configuration", None, error.clone());
         return Err(VisitAccountedErrorV1 {
             message: error,
@@ -11500,10 +12167,12 @@ pub struct VisitFirstReportV1 {
 /// The executor owns a one-thread Rayon pool and exposes no caller callback or
 /// trace sink, preventing those extension points from submitting unrelated
 /// work to that pool. Traversal, delivery, native-driver orchestration, GM,
-/// and generic normalization/explicit monic Visit-accounting mutations now
-/// borrow a session-branded token. Specialization and other scalar arithmetic,
-/// reducers and row-produced monic work, roots, Rayon helpers, allocations,
-/// and separate `jv_bitops` telemetry still use worker-local shadows.
+/// generic normalization/explicit monic work, and the wide-field pair/RREF
+/// and final polynomial reducers now borrow a session-branded token. The
+/// accounted profile admits only `p > 2^16`; legacy narrow-field behavior is
+/// unchanged. Specialization and other scalar arithmetic, roots,
+/// symbolic/matrix construction beyond current modeled observations,
+/// allocations, and separate `jv_bitops` telemetry still use shadows.
 /// `work_ownership_complete` therefore remains false until every admitted
 /// charged path carries explicit call ownership.
 pub struct VisitAccountingExecutorV1 {
@@ -11563,9 +12232,10 @@ impl VisitAccountingExecutorV1 {
 ///
 /// This entry point preserves its ledger on validation failure through
 /// [`VisitAccountedErrorV1`].  It must be invoked inside a dedicated
-/// one-thread Rayon pool.  The returned record covers only this solver call;
-/// public-system construction, arbitrary callback work, replay, storage and
-/// the enclosing relation collector require their own ledger.
+/// one-thread Rayon pool and currently admits only wide fields, `p > 2^16`.
+/// The returned record covers only this solver call; public-system
+/// construction, arbitrary callback work, replay, storage and the enclosing
+/// relation collector require their own ledger.
 pub fn solve_visit_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -12341,6 +13011,8 @@ mod visit_timing_tests {
 mod visit_accounting_tests {
     use super::*;
 
+    const ACCOUNTED_TEST_P: u64 = 65_537;
+
     fn request(id: &str) -> VisitAccountingRequestV1 {
         VisitAccountingRequestV1 {
             binding: VisitAccountingBindingV1 {
@@ -12396,7 +13068,7 @@ mod visit_accounting_tests {
         assert_reconciles_in_modes(
             record,
             ownership_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1",
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1",
         );
     }
 
@@ -12460,7 +13132,7 @@ mod visit_accounting_tests {
         assert!(!record.accounting_complete);
         assert_eq!(
             record.arm.accounting_token_mode,
-            "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+            "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
         );
     }
 
@@ -12903,7 +13575,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
@@ -13402,6 +14074,536 @@ mod visit_accounting_tests {
         });
     }
 
+    fn run_wide_rref_accounting_fixture(
+        id: &str,
+        input: Vec<Vec<u64>>,
+        owned: bool,
+    ) -> (Vec<Vec<u64>>, Vec<usize>, VisitAccountingV1) {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let context = VisitAccountingContext::new().unwrap();
+        let session = VisitAccountingSession::begin(
+            VisitAccountingBuilder::new(request(id), &opts, false),
+            &context,
+        )
+        .ok()
+        .expect("test owns the accounted session");
+        let account = VisitAccount::On(session.token());
+        let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+        assert_eq!(control, VisitAccountingControl::Continue);
+        let helper = if owned {
+            VisitHelperAccount::from(account)
+        } else {
+            VisitHelperAccount::LegacyTls
+        };
+        let mut rows = input;
+        let pivots = rref_routed(&mut rows, Barrett::new(2_147_483_647), None, helper)
+            .expect("unblocked RREF accounting fixture")
+            .expect("fixture has no deadline");
+        drop(phase);
+        let record = session.finish(VisitDispositionV1::Incomplete);
+        (rows, pivots, record)
+    }
+
+    #[test]
+    fn wide_rref_token_route_is_exact_and_does_not_double_charge_tls() {
+        in_owner_pool(|| {
+            let input = vec![vec![2, 3, 0], vec![4, 1, 5]];
+            let legacy =
+                run_wide_rref_accounting_fixture("wide-rref-exact-legacy", input.clone(), false);
+            let owned = run_wide_rref_accounting_fixture("wide-rref-exact-owned", input, true);
+            let expected_rows = vec![vec![1, 0, 1_073_741_825], vec![0, 1, 2_147_483_646]];
+            assert_eq!(legacy.0, expected_rows);
+            assert_eq!(owned.0, expected_rows);
+            assert_eq!(legacy.1, vec![0, 1]);
+            assert_eq!(owned.1, legacy.1);
+
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.word_operations = 2;
+            expected.row_operations = 8;
+            expected.field_multiplications = 8;
+            expected.field_additions = 4;
+            expected.field_inversions = 2;
+            expected.row_reads = 12;
+            expected.row_writes = 8;
+            for record in [&legacy.2, &owned.2] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                assert_reconciles(record);
+            }
+        });
+    }
+
+    #[test]
+    fn wide_rref_owned_matches_legacy_deterministic_panel() {
+        in_owner_pool(|| {
+            const P: u64 = 2_147_483_647;
+            let mut state = 0x7265_6475_6365_725fu64;
+            let mut controls = Vec::new();
+            for case in 0..64usize {
+                let row_count = case % 7;
+                let column_count = (case * 5) % 11;
+                let mut rows = vec![vec![0; column_count]; row_count];
+                for (row_index, row) in rows.iter_mut().enumerate() {
+                    for (column_index, value) in row.iter_mut().enumerate() {
+                        state = state
+                            .wrapping_mul(6_364_136_223_846_793_005)
+                            .wrapping_add(1_442_695_040_888_963_407);
+                        *value = if (case + row_index + column_index) % 5 == 0 {
+                            0
+                        } else {
+                            state % P
+                        };
+                    }
+                }
+                let mut expected_rows = rows.clone();
+                let expected_pivots = rref(&mut expected_rows, Barrett::new(P), None).unwrap();
+                controls.push((rows, expected_rows, expected_pivots));
+            }
+
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("wide-rref-panel"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let account = VisitAccount::On(session.token());
+            let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            for (mut rows, expected_rows, expected_pivots) in controls {
+                let pivots = rref_routed(
+                    &mut rows,
+                    Barrett::new(P),
+                    None,
+                    VisitHelperAccount::from(account),
+                )
+                .expect("panel accounting remains admitted")
+                .expect("panel has no deadline");
+                assert_eq!(rows, expected_rows);
+                assert_eq!(pivots, expected_pivots);
+            }
+            drop(phase);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert!(record.total.row_operations > 0);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn wide_rref_owned_matches_one_worker_legacy_rayon_and_sparse_tail() {
+        in_owner_pool(|| {
+            let dense = vec![vec![1u64; 33]; 1_026];
+            let legacy = run_wide_rref_accounting_fixture(
+                "wide-rref-rayon-threshold-legacy",
+                dense.clone(),
+                false,
+            );
+            let owned =
+                run_wide_rref_accounting_fixture("wide-rref-rayon-threshold-owned", dense, true);
+            assert_eq!(legacy.0, vec![vec![1; 33]]);
+            assert_eq!(owned.0, legacy.0);
+            assert_eq!(legacy.1, vec![0]);
+            assert_eq!(owned.1, legacy.1);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.word_operations = 32_801;
+            expected.row_operations = 33_858;
+            expected.field_multiplications = 33_858;
+            expected.field_additions = 33_825;
+            expected.field_inversions = 1;
+            expected.row_reads = 67_683;
+            expected.row_writes = 33_858;
+            for record in [&legacy.2, &owned.2] {
+                assert_eq!(non_time_work(record.total.clone()), expected);
+                assert_reconciles(record);
+            }
+
+            let mut first = vec![0u64; 40];
+            first[0] = 2;
+            first[39] = 4;
+            let mut second = vec![0u64; 40];
+            second[0] = 3;
+            second[1] = 5;
+            second[39] = 7;
+            let sparse_input = vec![first, second];
+            let sparse_legacy = run_wide_rref_accounting_fixture(
+                "wide-rref-sparse-tail-legacy",
+                sparse_input.clone(),
+                false,
+            );
+            let sparse_owned =
+                run_wide_rref_accounting_fixture("wide-rref-sparse-tail-owned", sparse_input, true);
+            assert_eq!(sparse_owned.0, sparse_legacy.0);
+            assert_eq!(sparse_owned.1, sparse_legacy.1);
+            assert_eq!(
+                non_time_work(sparse_owned.2.total.clone()),
+                non_time_work(sparse_legacy.2.total.clone())
+            );
+            assert_reconciles(&sparse_legacy.2);
+            assert_reconciles(&sparse_owned.2);
+        });
+    }
+
+    #[test]
+    fn wide_pair_cascade_owned_route_is_exact() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("wide-pair-cascade"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let account = VisitAccount::On(session.token());
+            let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let row = vec![(0, 4), (1, 5)];
+            let reducers = vec![vec![(0, 1), (1, 2), (2, 3)]];
+            let reducer_at = vec![0, u32::MAX, u32::MAX];
+            for p in [2_147_483_647u64, ACCOUNTED_TEST_P] {
+                let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
+                let output = reduce_pair_row_wide_owned(
+                    &row,
+                    &reducers,
+                    &reducer_at,
+                    &[1, 2],
+                    3,
+                    p,
+                    Barrett::new(p),
+                    lazy_limit,
+                    None,
+                    account.into(),
+                )
+                .expect("cascade accounting remains admitted")
+                .expect("fixture has no deadline");
+                assert_eq!(output, vec![p - 3, p - 12]);
+            }
+            drop(phase);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.row_operations = 4;
+            expected.field_multiplications = 4;
+            expected.field_additions = 4;
+            expected.row_reads = 8;
+            expected.row_writes = 4;
+            assert_eq!(non_time_work(record.total.clone()), expected);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn wide_reducers_reject_wrong_and_foreign_owners_before_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owner_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let mismatch_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("wide-reducer-token-mismatch"), &opts, false),
+                &owner_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let owner = VisitAccount::On(mismatch_session.token());
+            let (phase, control) = owner.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let wrong = VisitHelperAccount::Owned(wrong_context.unbound_test_token());
+            let mut rows = vec![vec![1u64]];
+            let before = rows.clone();
+            assert!(matches!(
+                rref_routed(&mut rows, Barrett { p: 0, m: 0 }, None, wrong),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(rows, before);
+            assert!(matches!(
+                reduce_skipping_routed(&[], None, usize::MAX, 0, Ordering::Grevlex, wrong),
+                Err(F4Stop::Accounting)
+            ));
+            drop(phase);
+            let mismatch_record = mismatch_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                mismatch_record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_no_non_time_work(&mismatch_record);
+            assert_reconciles(&mismatch_record);
+
+            let foreign_context = VisitAccountingContext::new().unwrap();
+            let foreign_session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("wide-reducer-foreign"), &opts, false),
+                &foreign_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+            let foreign_account = VisitAccount::On(foreign_session.token());
+            let (foreign_phase, control) =
+                foreign_account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let token = foreign_session.token();
+            let returned = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        let mut rows = vec![vec![1u64]];
+                        let before = rows.clone();
+                        assert!(matches!(
+                            rref_routed(
+                                &mut rows,
+                                Barrett { p: 0, m: 0 },
+                                None,
+                                VisitHelperAccount::Owned(token),
+                            ),
+                            Err(F4Stop::Accounting)
+                        ));
+                        assert_eq!(rows, before);
+                        rows
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_eq!(returned, vec![vec![1]]);
+            drop(foreign_phase);
+            let foreign_record = foreign_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                foreign_record.blocker.as_ref().unwrap().code,
+                "foreign_thread_work"
+            );
+            assert_no_non_time_work(&foreign_record);
+            assert_reconciles(&foreign_record);
+        });
+    }
+
+    #[test]
+    fn wide_rref_overflows_stop_before_the_blocked_mutation() {
+        in_owner_pool(|| {
+            const P: u64 = 2_147_483_647;
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let input = vec![vec![2, 3, 0], vec![4, 1, 5]];
+
+            let word_context = VisitAccountingContext::new().unwrap();
+            let word_session = begin_counter_overflow_session(
+                &word_context,
+                "wide-rref-word-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::WordOperations,
+            );
+            let word_account = VisitAccount::On(word_session.token());
+            let (word_phase, control) =
+                word_account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let mut word_rows = input.clone();
+            assert!(matches!(
+                rref_routed(&mut word_rows, Barrett::new(P), None, word_account.into(),),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(word_rows, input);
+            drop(word_phase);
+            let word_record = word_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(word_record.total.word_operations, u64::MAX);
+            assert_eq!(word_record.total.row_operations, 0);
+            assert_overflow_reconciles(&word_record);
+
+            let addition_context = VisitAccountingContext::new().unwrap();
+            let addition_session = begin_counter_overflow_session(
+                &addition_context,
+                "wide-rref-addition-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::FieldAdditions,
+            );
+            let addition_account = VisitAccount::On(addition_session.token());
+            let (addition_phase, control) =
+                addition_account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+            assert_eq!(control, VisitAccountingControl::Continue);
+            let mut addition_rows = input.clone();
+            assert!(matches!(
+                rref_routed(
+                    &mut addition_rows,
+                    Barrett::new(P),
+                    None,
+                    addition_account.into(),
+                ),
+                Err(F4Stop::Accounting)
+            ));
+            assert_eq!(
+                addition_rows,
+                vec![vec![1, 1_073_741_825, 0], vec![4, 1, 5]]
+            );
+            drop(addition_phase);
+            let addition_record = addition_session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(addition_record.total.word_operations, 1);
+            assert_eq!(addition_record.total.field_inversions, 1);
+            assert_eq!(addition_record.total.row_operations, 4);
+            assert_eq!(addition_record.total.field_multiplications, 4);
+            assert_eq!(addition_record.total.field_additions, u64::MAX);
+            assert_eq!(addition_record.total.row_reads, 2);
+            assert_eq!(addition_record.total.row_writes, 2);
+            assert_overflow_reconciles(&addition_record);
+
+            if usize::BITS == 64 {
+                let checked_context = VisitAccountingContext::new().unwrap();
+                let checked_session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(
+                        request("wide-reducer-checked-overflow"),
+                        &opts,
+                        false,
+                    ),
+                    &checked_context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let checked_account = VisitAccount::On(checked_session.token());
+                assert!(matches!(
+                    ReducerMeter::from(VisitHelperAccount::from(checked_account))
+                        .admit_matrix_update(usize::MAX),
+                    Err(F4Stop::Accounting)
+                ));
+                let checked_record = checked_session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(
+                    checked_record.blocker.as_ref().unwrap().counter,
+                    Some("row_reads")
+                );
+                assert_no_non_time_work(&checked_record);
+                assert!(!checked_record.reconciliation.checked_arithmetic);
+                assert!(checked_record.reconciliation.phase_sum_equals_total);
+            }
+        });
+    }
+
+    #[test]
+    fn wide_polynomial_reducer_routes_are_exact() {
+        in_owner_pool(|| {
+            const P: u64 = 2_147_483_647;
+            let basis = vec![vec![(vec![1], 1)], vec![(vec![1], 1), (vec![0], 2)]];
+            let packed = PackedSet::new(&basis).unwrap();
+            let limits = F4ResourceLimits {
+                max_pairs: usize::MAX,
+                max_symbolic_monomials: usize::MAX,
+                max_matrix_entries: usize::MAX,
+            };
+            let run = |route: u8, owned: bool, id: &str| {
+                let opts = F4Options::new(Ordering::Grevlex, 4);
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(request(id), &opts, false),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+                let account = VisitAccount::On(session.token());
+                let (phase, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+                assert_eq!(control, VisitAccountingControl::Continue);
+                let helper = if owned {
+                    VisitHelperAccount::from(account)
+                } else {
+                    VisitHelperAccount::LegacyTls
+                };
+                let output = match route {
+                    0 => reduce_skipping_vecs_routed(
+                        &basis[0],
+                        &basis,
+                        0,
+                        P,
+                        Ordering::Grevlex,
+                        helper,
+                    )
+                    .unwrap(),
+                    1 => reduce_skipping_packed_routed(
+                        &basis[0],
+                        &basis,
+                        &packed,
+                        0,
+                        P,
+                        Ordering::Grevlex,
+                        helper,
+                    )
+                    .unwrap()
+                    .unwrap(),
+                    2 => reduce_skipping_routed(
+                        &basis,
+                        Some(&packed),
+                        0,
+                        P,
+                        Ordering::Grevlex,
+                        helper,
+                    )
+                    .unwrap(),
+                    3 => reduce_skipping_bounded_routed(
+                        &basis[0],
+                        &basis,
+                        0,
+                        P,
+                        Ordering::Grevlex,
+                        &limits,
+                        None,
+                        helper,
+                    )
+                    .unwrap(),
+                    _ => unreachable!(),
+                };
+                drop(phase);
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                (output, record)
+            };
+
+            let mut expected = VisitAccountingWorkV1::default();
+            expected.word_operations = 2;
+            expected.hash_probes = 1;
+            expected.row_operations = 1;
+            expected.field_multiplications = 1;
+            expected.field_additions = 1;
+            expected.row_reads = 2;
+            expected.row_writes = 1;
+            for route in 0..4u8 {
+                let legacy = run(route, false, &format!("polynomial-route-{route}-legacy"));
+                let owned = run(route, true, &format!("polynomial-route-{route}-owned"));
+                assert_eq!(legacy.0, vec![(vec![0], P - 2)]);
+                assert_eq!(owned.0, legacy.0);
+                for record in [&legacy.1, &owned.1] {
+                    assert_eq!(non_time_work(record.total.clone()), expected);
+                    assert_reconciles(record);
+                }
+            }
+        });
+    }
+
+    #[test]
+    fn accounted_profile_rejects_narrow_fields_but_legacy_remains_available() {
+        let legacy = solve_visit(
+            &[],
+            0,
+            7,
+            &F4Options::new(Ordering::Grevlex, 4),
+            &[],
+            |_| false,
+        )
+        .unwrap();
+        assert!(legacy.complete);
+
+        let rejected = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("narrow-preflight-rejection"),
+                |_| false,
+            )
+            .unwrap_err()
+        });
+        assert_eq!(
+            rejected.accounting.solver_disposition,
+            VisitDispositionV1::Unsupported
+        );
+        assert_eq!(
+            rejected.accounting.blocker.as_ref().unwrap().code,
+            "unsupported_configuration"
+        );
+        assert!(rejected.message.contains("p > 2^16"));
+        assert_no_non_time_work(&rejected.accounting);
+        assert_reconciles_rejected(&rejected.accounting);
+    }
+
     #[test]
     fn native_preblocked_token_stops_before_engine_entry() {
         in_owner_pool(|| {
@@ -13597,7 +14799,7 @@ mod visit_accounting_tests {
             assert!(!record.accounting_complete);
             assert_eq!(
                 record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
@@ -13612,7 +14814,7 @@ mod visit_accounting_tests {
                 let error = solve_visit_accounted_v1(
                     &[],
                     0,
-                    7,
+                    ACCOUNTED_TEST_P,
                     &F4Options::new(Ordering::Grevlex, 4),
                     &[],
                     request("two-thread-native-rejection"),
@@ -13682,7 +14884,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &[],
                 0,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[],
                 request("cached-profile"),
@@ -13703,7 +14905,7 @@ mod visit_accounting_tests {
                 solve_visit_accounted_v1(
                     &[],
                     0,
-                    7,
+                    ACCOUNTED_TEST_P,
                     &F4Options::new(Ordering::Grevlex, 4),
                     &[],
                     request(if stop { "stop" } else { "complete" }),
@@ -13733,10 +14935,10 @@ mod visit_accounting_tests {
 
     #[test]
     fn private_first_executor_matches_legacy_and_is_sequentially_reusable() {
-        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let input = vec![vec![(vec![2], 1), (vec![0], ACCOUNTED_TEST_P - 1)]];
         let opts = F4Options::new(Ordering::Grevlex, 4);
         let mut legacy_first = None;
-        let legacy = solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+        let legacy = solve_visit(&input, 1, ACCOUNTED_TEST_P, &opts, &[None], |solution| {
             legacy_first = Some(solution.to_vec());
             true
         })
@@ -13745,7 +14947,14 @@ mod visit_accounting_tests {
 
         let mut executor = VisitAccountingExecutorV1::try_new().unwrap();
         let first = executor
-            .solve_first(&input, 1, 7, &opts, &[None], request("private-first"))
+            .solve_first(
+                &input,
+                1,
+                ACCOUNTED_TEST_P,
+                &opts,
+                &[None],
+                request("private-first"),
+            )
             .unwrap();
         assert_eq!(first.first_solution, legacy_first);
         assert_eq!(first.first_solution, Some(vec![1]));
@@ -13759,7 +14968,7 @@ mod visit_accounting_tests {
             .solve_first(
                 &[],
                 1,
-                7,
+                ACCOUNTED_TEST_P,
                 &opts,
                 &[Some(Vec::new())],
                 request("private-empty"),
@@ -13778,7 +14987,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &[],
                 1,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[Some(vec![])],
                 request("empty-domain"),
@@ -13797,9 +15006,15 @@ mod visit_accounting_tests {
         let timeout = in_owner_pool(|| {
             let mut opts = F4Options::new(Ordering::Grevlex, 4);
             opts.deadline = Some(Instant::now() - Duration::from_millis(1));
-            solve_visit_accounted_v1(&[], 0, 7, &opts, &[], request("timeout"), |_| {
-                panic!("expired deadline reached callback")
-            })
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                ACCOUNTED_TEST_P,
+                &opts,
+                &[],
+                request("timeout"),
+                |_| panic!("expired deadline reached callback"),
+            )
             .unwrap()
         });
         assert_eq!(
@@ -13813,8 +15028,8 @@ mod visit_accounting_tests {
     #[test]
     fn resource_and_trace_stops_retain_their_solver_dispositions() {
         let input = vec![
-            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
-            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+            vec![(vec![2, 0], 1), (vec![0, 0], ACCOUNTED_TEST_P - 1)],
+            vec![(vec![1, 1], 1), (vec![0, 0], ACCOUNTED_TEST_P - 1)],
         ];
         let resource = in_owner_pool(|| {
             let mut opts = F4Options::new(Ordering::Grevlex, 10);
@@ -13826,7 +15041,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &input,
                 2,
-                7,
+                ACCOUNTED_TEST_P,
                 &opts,
                 &[None, None],
                 request("resource"),
@@ -13845,7 +15060,7 @@ mod visit_accounting_tests {
             solve_visit_traced_accounted_v1(
                 &[],
                 0,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[],
                 request("trace"),
@@ -13873,7 +15088,7 @@ mod visit_accounting_tests {
             let report = solve_visit_traced_accounted_v1(
                 &input,
                 1,
-                7,
+                ACCOUNTED_TEST_P,
                 &opts,
                 &[None],
                 request("recording-boundary"),
@@ -13914,7 +15129,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &input,
                 1,
-                7,
+                ACCOUNTED_TEST_P,
                 &opts,
                 &[None],
                 request("packed-boundary"),
@@ -13992,7 +15207,7 @@ mod visit_accounting_tests {
             assert!(callback_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 callback_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
             );
 
             let trace_context = VisitAccountingContext::new().unwrap();
@@ -14042,7 +15257,7 @@ mod visit_accounting_tests {
             assert!(trace_record.reconciliation.phase_sum_equals_total);
             assert_eq!(
                 trace_record.arm.accounting_token_mode,
-                "borrowed_traversal_native_driver_gm_normalization_monic_token_tls_remaining_helpers_shadow_v1"
+                "borrowed_traversal_native_driver_gm_normalization_monic_wide_row_reducer_token_tls_remaining_helpers_shadow_v1"
             );
         });
     }
@@ -14167,7 +15382,7 @@ mod visit_accounting_tests {
         let outside = solve_visit_accounted_v1(
             &[],
             0,
-            7,
+            ACCOUNTED_TEST_P,
             &F4Options::new(Ordering::Grevlex, 4),
             &[],
             request("outside-pool"),
@@ -14190,7 +15405,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &[],
                 0,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[],
                 bad,
@@ -14214,7 +15429,7 @@ mod visit_accounting_tests {
                 solve_visit_accounted_v1(
                     &[],
                     0,
-                    7,
+                    ACCOUNTED_TEST_P,
                     &F4Options::new(Ordering::Grevlex, 4),
                     &[],
                     request("progress-observer"),
@@ -14282,7 +15497,7 @@ mod visit_accounting_tests {
                         let report = solve_visit_accounted_v1(
                             &[],
                             1,
-                            11,
+                            ACCOUNTED_TEST_P,
                             &F4Options::new(Ordering::Grevlex, 2),
                             &domains,
                             request(&format!("concurrent-{callbacks}")),
@@ -14311,7 +15526,7 @@ mod visit_accounting_tests {
             solve_visit_accounted_v1(
                 &[],
                 0,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[],
                 request("callback-boundary"),
@@ -14337,7 +15552,7 @@ mod visit_accounting_tests {
                     let nested_accounted = solve_visit_accounted_v1(
                         &[],
                         0,
-                        7,
+                        ACCOUNTED_TEST_P,
                         &F4Options::new(Ordering::Grevlex, 2),
                         &[],
                         request("callback-nested-accounted"),
@@ -14384,7 +15599,7 @@ mod visit_accounting_tests {
             solve_visit_traced_accounted_v1(
                 &[],
                 0,
-                7,
+                ACCOUNTED_TEST_P,
                 &F4Options::new(Ordering::Grevlex, 4),
                 &[],
                 request("trace-boundary"),
@@ -14405,10 +15620,10 @@ mod visit_accounting_tests {
 
     #[test]
     fn accounted_real_f4_preserves_plain_solution_sequence() {
-        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let input = vec![vec![(vec![2], 1), (vec![0], ACCOUNTED_TEST_P - 1)]];
         let opts = F4Options::new(Ordering::Grevlex, 4);
         let mut plain = Vec::new();
-        solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+        solve_visit(&input, 1, ACCOUNTED_TEST_P, &opts, &[None], |solution| {
             plain.push(solution.to_vec());
             false
         })
@@ -14418,7 +15633,7 @@ mod visit_accounting_tests {
             let report = solve_visit_accounted_v1(
                 &input,
                 1,
-                7,
+                ACCOUNTED_TEST_P,
                 &opts,
                 &[None],
                 request("real-f4-parity"),
@@ -14430,7 +15645,7 @@ mod visit_accounting_tests {
             .unwrap();
             (solutions, report.accounting_v1.unwrap())
         });
-        assert_eq!(plain, vec![vec![1], vec![6]]);
+        assert_eq!(plain, vec![vec![1], vec![ACCOUNTED_TEST_P - 1]]);
         assert_eq!(accounted, plain);
         assert!(record.total.traversal_nodes > 0);
         assert!(record.total.field_multiplications > 0);
