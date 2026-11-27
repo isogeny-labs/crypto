@@ -55,6 +55,7 @@ this study does not change those maps.
 | Full retained-image union | 685images;940506pairs at each0,kappa,2kappa | Formal zero,237known kappa rows,no2kappaquartet;direct236/230/6 |
 | Complete old-pair strata | 168choices for seeds0,32,64,96;164new pencils | 28distinct known products;zero additional conics;core134/128/6 |
 | Product-free four-line pencils | 512new pencils;734208candidate occurrences | Zero supported conics;core134/128/6 |
+| Three-point/tangent pencils | 384new pencils;550656candidate occurrences | Zero supported conics;384higher-contact parameters checked;core134/128/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -422,6 +423,42 @@ null for the fixed512choices,not all product-free conic pencils. See
 FOUR_LINE_CONIC_PROTOCOL.md and evidence/four-line-conics-v1/.
 [pcc:unverified]
 
+## Three-point conics with forced tangency
+
+The next experiment changes the base scheme to2+1+1:three distinct points,
+with a tangent condition at one. For s0..15,it uses one residual point on
+each of seeds s,s+32,s+64,all eight residual choices and each of the three
+choices of tangent anchor. All384raw choices are admissible. The anchors
+are noncollinear,and neither other anchor lies on the chosen C-tangent.
+Four independent constraints on six conic coefficients give a checked
+two-dimensional basis. No other pool point is a base point,distinguishing
+these pencils from the earlier four-distinct-point base schemes.
+[pcc:unverified]
+
+The first derivative at the forced tangent point vanishes for the entire
+pencil. The collector therefore uses its second local coefficient to select
+the unique higher-contact parameter. It also enumerates every other pool
+point and tangency at each ordinary anchor. All384forced parameters are
+checked and have contact at least three. Exact local-monomial coefficients
+come from the existing precision9smooth lift;accepted higher multiplicities
+are compared with the original homogeneous evaluator. [pcc:unverified]
+
+A separate same-collector fixture uses two known seed lines sharing old
+anchor0. Their product passes through one residual point on each and has
+order two at0;the collector recovers its nonzero image row. The fixture's
+selected higher-contact parameter has order three. Using the identically
+zero first-derivative selector,omitting that parameter,changing the basis,
+tangent origin,support or row and corrupting batch coverage all reject.
+The fixture never enters the actual data. [pcc:unverified]
+
+Three native batches and final combine cover550656candidate occurrences
+and find no supported conic or independent added row. Actual pencils
+exclude known line products by anchor incidence and dictionary checks.
+Core ranks remain134/128/6;restored236/230counts are derived. Numerical
+closed7is a separate synthetic control. This completes the fixed384choices,
+not all tangent conics. See TANGENT_CONIC_PROTOCOL.md and
+evidence/tangent-conics-v1/. [pcc:unverified]
+
 ## Full retained-image union with active auxiliaries
 
 The combined685-image domain contains all429original images plus256new
@@ -455,12 +492,14 @@ evidence/full-image-bound-v1/. [pcc:unverified]
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s, with one allowed CPU and1GiB virtual address space.
-Each of the33attempt reports retains its complete per-call and wrapper
+Each of the34attempt reports retains its complete per-call and wrapper
 costs,including failures. The mixed-image pipeline takes19.449build,
 9.890plan,62.225/50.167batch and13.691combine seconds;wrapper155.498seconds.
 The old-pair extension takes94.880wrapper seconds.
 The product-free four-line pipeline takes19.159build,10.483plan,
 38.878/38.587/37.997/38.333batch and11.871combine seconds;wrapper195.405seconds.
+The tangent pipeline takes19.239build,9.777plan,
+32.980/32.903/33.684batch and11.780combine seconds;wrapper140.437seconds.
 The full685-image test takes15.501build,77.388worker and92.937wrapper
 seconds. The earlier mixed-sign pipeline takes17.343build,
 8.924plan,39.634/40.567/43.650/41.493/19.973batch and9.979combine seconds;
@@ -502,16 +541,16 @@ including164new scans and four reused tuples. The512product-free four-line
 pencils also complete with no supported conic. Other seed combinations and
 conic pencil types remain outside those finite domains.
 
-A distinct successor uses three points plus a tangent condition at one.
-These are four linear constraints on conic coefficients with a repeated
-intersection condition,instead of four distinct point conditions. A native
-implementation must check independence of those constraints,handle the
-next local coefficient at the forced tangent point,and verify complete
-parameter/tangency buckets before a scan. A nonempty same-collector fixture
-can use two known seed lines sharing an old anchor:their product has order
-at least two at that anchor. First freeze a bounded set and disjointness
-checks;this successor has not run. No new fibre solve is required.
-Nonrational individual elliptic traces and other higher-degree function
+The three-point/one-tangent successor has now completed384pencils and
+550656candidate occurrences,including the forced higher-contact branch,
+with no supported conic. A proposed next base scheme is2+2:two points with
+tangency at both. It uses four linear constraints distributed differently.
+A native planner must exclude a point on the other anchor's C-tangent,
+check rank4and complete parameter coverage using the next coefficient at
+both anchors. A nonempty same-collector fixture can use a nonreference
+known line squared with two of its support points. This successor has not
+run;first freeze a bounded domain and exact product-exclusion checks.
+No new fibres are needed. Nonrational individual elliptic traces and other higher-degree function
 relations remain open directions. Any positive candidate needs actual
 cover/KM and separate elliptic/elimination replay. [pcc:unverified]
 
@@ -532,7 +571,8 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   [expanded balanced-image bound](EXPANDED_BALANCED_PROTOCOL.md),
   [mixed-image pencils](MIXED_IMAGE_CONIC_PROTOCOL.md),
   [old-pair extension](MIXED_IMAGE_EXTENSION_PROTOCOL.md),
-  [four-line pencils](FOUR_LINE_CONIC_PROTOCOL.md) and
+  [four-line pencils](FOUR_LINE_CONIC_PROTOCOL.md),
+  [tangent pencils](TANGENT_CONIC_PROTOCOL.md) and
   [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
@@ -540,7 +580,7 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
   run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
-  and run-four-line-conics.sh.
+  and run-four-line-conics.sh,run-tangent-conics.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.

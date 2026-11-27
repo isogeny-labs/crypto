@@ -194,6 +194,23 @@ if (four_line_source.parent/'exit-code.txt').exists() and (four_line_source.pare
         "nonempty separate fixtures and final coverage/replay controls pass. Computed core "
         f"{four_line['core_full_rank']}/{four_line['core_auxiliary_rank']}/{four_line['closed_rank']}; "
         f"restored {four_line['full_rank']}/{four_line['auxiliary_rank']} counts are derived.")
+tangent_source=ROOT/'evidence/tangent-conics-v1/calls/combine/stdout.json'
+if (tangent_source.parent/'exit-code.txt').exists() and (tangent_source.parent/'exit-code.txt').read_text().strip()=='0':
+    tangent=json.loads(tangent_source.read_text())
+    attempts['tangent-conics-v1']=(
+        f"Three-point/forced-tangent selection completes {tangent['raw_choices']} raw choices: "
+        f"{tangent['tangent_pencils']} admitted pencils in {tangent['batch_count']} batches. "
+        f"{tangent['candidate_occurrences']} candidate occurrences yield "
+        f"{tangent['supported_conics']} supported conics and "
+        f"{tangent['independent_additional_rows']} independent added rows. "
+        f"All {tangent['forced_contact_candidates_verified']} forced second-coefficient parameters "
+        "are checked. Separate same-collector product fixture is nonempty; its higher-contact "
+        f"candidate has order {tangent['control_higher_contact_order']}. "
+        "Four-constraint basis, local multiplicity, corrupted selector/support/row/origin and "
+        "coverage controls pass. Computed core "
+        f"{tangent['core_full_rank']}/{tangent['core_auxiliary_rank']}/{tangent['closed_rank']}; "
+        f"restored {tangent['full_rank']}/{tangent['auxiliary_rank']} counts are derived. "
+        "Separate numerical rank-seven control enters no actual matrix.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -205,7 +222,7 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
-    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1'):
+    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1','tangent-conics-v1'):
         def call_order(call):
             if call.name=='build': return (0,0)
             if call.name=='plan': return (1,0)
@@ -295,7 +312,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Mixed image*','mixed-image-conics-v1/calls/combine'),
                         ('Union685','full-image-bound-v1/calls/scan'),
                         ('Old-pair*','mixed-image-extension-v1/calls/combine'),
-                        ('Four-line*','four-line-conics-v1/calls/combine')]:
+                        ('Four-line*','four-line-conics-v1/calls/combine'),
+                        ('Tangent*','tangent-conics-v1/calls/combine')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
