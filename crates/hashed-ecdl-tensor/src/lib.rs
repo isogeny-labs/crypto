@@ -35,6 +35,7 @@ pub mod network;
 pub mod node_refinement_certificate;
 pub mod optimized;
 pub mod packing_provenance_certificate;
+pub mod parametric_refinement_certificate;
 pub mod partial;
 pub mod prepared;
 pub mod primality;

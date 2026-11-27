@@ -67,6 +67,14 @@ pub struct VerificationSummary {
     pub source_child_shrink_factor: u64,
     /// Denominator in the symbolic history's child upper bound `M/8`.
     pub history_child_shrink_factor: u64,
+    /// Number of retained active depths in the symbolic schedule.
+    pub active_depths: usize,
+    /// Local tuple-count exponent constant reconstructed by the history.
+    pub tuple_exponent_constant: u64,
+    /// Complete recursion exponent constant in root-`u` units.
+    pub total_root_u_exponent_constant: u64,
+    /// Complete recursion exponent constant in root-log units.
+    pub total_root_log_exponent_constant: u64,
     /// Whether the independently replayed schedules agree.
     pub schedule_compatible: bool,
     /// Whether the stronger source shrink satisfies the history inequality.
@@ -175,6 +183,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
         normalized_root_packets: history.normalized_root_packets,
         source_child_shrink_factor: source.child_edge_shrink_factor,
         history_child_shrink_factor: history.strict_edge_shrink_factor,
+        active_depths: history.active_depths,
+        tuple_exponent_constant: history.tuple_exponent_constant,
+        total_root_u_exponent_constant: history.total_root_u_exponent_constant,
+        total_root_log_exponent_constant: history.total_root_log_exponent_constant,
         schedule_compatible,
         source_bound_implies_history_bound,
         normalized_dimensions_equal_strict_root,

@@ -63,7 +63,7 @@ promotions. The verifier imports only the two standalone component verifiers;
 it imports no graph, packing, contraction, or producer implementation.
 `[pcc:unverified]`
 
-## Next measurable goal
+## Parametric follow-up
 
 Do not try to make the normalized exemplar equal the root. The next useful
 bridge is a **parametric one-step refinement certificate**. It should take
@@ -75,8 +75,9 @@ derive, without allocating the root:
 3. preservation of the next-call degree and fallback disjunction; and
 4. the local exponent ledger used by the symbolic history.
 
-The optimization target is binary and reviewable: one independent checker must
-accept the strict symmetric root's symbolic premises and the generic child
-premises through every retained depth, while mutations of every premise edge
-fail. Passing that target would close the local parametric interface, not the
-external Theorem D.1 or its asymptotic running-time claim. `[pcc:unverified]`
+`PARAMETRIC_REFINEMENT_CERTIFICATE.md` implements this target. Its standalone
+checker composes the implication through all five retained threshold depths
+and rejects mutations of schedule, source/shrink constants, cost constants,
+premises, conclusions, and unsupported promotions. The generic premises remain
+explicit assumptions; the external Theorem D.1 and its asymptotic running-time
+claim remain open. `[pcc:unverified]`

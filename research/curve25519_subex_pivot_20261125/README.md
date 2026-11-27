@@ -420,6 +420,14 @@ also exposes the decisive non-identity: the root uses
 to promote schedule compatibility into dimension equality, graph realization,
 external-theorem verification, or a total-work conclusion. `[pcc:unverified]`
 
+`PARAMETRIC_REFINEMENT_CERTIFICATE.md` takes the next step without undoing that
+separation. From explicit generic premises it reconstructs the variance/class
+cap, `KL<=3M`, group loads, child numerators `4/64` and `6/64`, strict shrink,
+degree preservation, and the `80 -> 96 -> 290 -> 148480` cost ledger through
+all five retained threshold depths. Its summary keeps
+`generic_premises_remain_assumed=true`; graph realization and the external
+theorem remain false. `[pcc:unverified]`
+
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
 `M=32<LD=512` child fails exactly at packet padding, while all four two-group

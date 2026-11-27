@@ -239,6 +239,15 @@ data without changing `96`, `290`, or `148480`. This strengthens R2's finite
 replay and proves consistency of its scalar premises, but does not discharge
 R1's graph-realization premise. `[pcc:unverified]`
 
+The schema-1 parametric-refinement certificate now separates those normalized
+examples from the generic implication. It consumes the checked root/history
+schedule, assumes the variance/source/precision/mode premise tokens explicitly,
+and reconstructs `cD<=2M`, `KL<=3M`, the `4M/64` derived child bound, the
+history's `6M/64` bound, eightfold shrink, degree preservation, and the complete
+`80,96,290,148480` ledger across every retained depth. Its accepted summary
+still reports that the generic premises remain assumed, so this is not a graph
+realization or an external contraction proof. `[pcc:unverified]`
+
 For the schema-2 factorization description, the same verifier reconstructs
 `Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks
 `Delta_d floor(sqrt(lambda)) ceil(sqrt(u_d))<=2^(lambda-1)` at every retained
