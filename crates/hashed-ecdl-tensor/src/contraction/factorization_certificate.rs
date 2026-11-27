@@ -924,6 +924,31 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
     assert!(!conditional_summary.source_guard_closure_admitted);
+    let label_fixture_values: Vec<usize> = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../research/curve25519_subex_pivot_20261125/packing_label_witness.csv"
+    ))
+    .trim()
+    .split(',')
+    .map(|value| value.parse().unwrap())
+    .collect();
+    let mut observed_label_values = vec![
+        usize::try_from(conditional_provenance.schema).unwrap(),
+        conditional_provenance.radix,
+        usize::try_from(conditional_provenance.packet_exponent).unwrap(),
+        usize::try_from(conditional_provenance.coordinate).unwrap(),
+        usize::from(conditional_provenance.conditional_labels),
+        conditional_provenance.source_degree_cap.unwrap(),
+        conditional_provenance.edges.len(),
+        conditional_provenance.row_labels.len(),
+        conditional_provenance.column_labels.len(),
+    ];
+    for edge in &conditional_provenance.edges {
+        observed_label_values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
+    }
+    observed_label_values.extend(&conditional_provenance.row_labels);
+    observed_label_values.extend(&conditional_provenance.column_labels);
+    assert_eq!(observed_label_values, label_fixture_values);
     let mut bad_degree_cap = conditional_provenance.clone();
     bad_degree_cap.source_degree_cap = Some(0);
     assert_eq!(

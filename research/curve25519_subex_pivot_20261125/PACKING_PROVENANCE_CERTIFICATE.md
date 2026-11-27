@@ -67,6 +67,15 @@ source-bound replays pass. A label mutation fails with
 actual degree fails with `packing provenance source degree cap`.
 `[pcc:unverified]`
 
+The admitted control also exports `packing_label_witness.csv`, a compact
+projection of the actual schema-3 context, endpoint quadruples, and selected
+label arrays. The native test compares every projected field to the produced
+certificate. The transparent Lean parser in `lean/PackingLabelArtifact.lean`
+checks exact lengths and bounds, proves typed endpoint values are the serialized
+indices, and replays the same strict-first-minimum algorithm. The
+kernel-checked trace is rows `[0,1,0]` followed by columns `[0,0,1]`; both sides
+therefore exercise a nonzero choice. `[pcc:unverified]`
+
 ## Remaining boundary
 
 This closes finite replay from an edge skeleton through conditional label
@@ -78,6 +87,7 @@ ceiling for this object and the complete child family.
 Together with `PACKING_GUARD_CLOSURE.md`, it gives a uniform producer-side
 packing theorem conditional on the source guards; child symmetry is not
 needed. It does not independently formalize that implication, discharge the
-factorization/refinement theorem, or prove the external contraction theorem.
-No practical Curve25519 attack follows.
+factorization/refinement theorem, lift the single shared trace to every
+arbitrary-size producer object, or prove the external contraction theorem. No
+practical Curve25519 attack follows.
 `[pcc:unverified]`

@@ -182,8 +182,13 @@ prefix recursion to construct the complete native-order schedule. Its exact
 prefix-minimum receipts prove the fully labeled objective nonincreasing, and
 `class_cap_for_executable_labels` carries those constructed labels through the
 strongest source guard to the final real-valued class cap without a caller-
-supplied label or minimizer family. The remaining native boundary is to parse
-the complete endpoint/selected-label arrays and prove they equal this trace.
+supplied label or minimizer family. `PackingLabelArtifact.lean` now parses a
+shared flat projection of the admitted three-edge schema-3 native control,
+checks its exact lengths and endpoint/label bounds, proves its typed endpoints
+are the serialized indices, and replays the complete nontrivial native trace:
+rows `[0,1,0]`, then columns `[0,0,1]`. The remaining boundary is to lift this
+finite code-to-model control to every arbitrary-size producer object and live
+recursive history.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

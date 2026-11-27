@@ -4,6 +4,7 @@ import ParametricRefinement
 import ConditionalVariance
 import ConditionalObjective
 import LabelSequence
+import PackingLabelArtifact
 import ObjectiveBoundary
 import GroupFactorization
 import ExtensionRingModel
@@ -12,6 +13,7 @@ open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
 open Curve25519ConditionalObjective
 open Curve25519LabelSequence
+open Curve25519PackingLabelArtifact
 open Curve25519ObjectiveBoundary
 open Curve25519GroupFactorization
 open Curve25519ExtensionRingModel
@@ -51,6 +53,19 @@ open Curve25519ExtensionRingModel
 #print axioms executableColumnLabels_eq
 #print axioms executableColumnLabels_minimum
 #print axioms executableFullLabelSequence_nonincreasing
+#print axioms parsePackingLabelArtifact_wellFormed
+#print axioms parsePackingLabelArtifact_bounded
+#print axioms parsePackingLabelArtifact_leftEndpoint_val
+#print axioms parsePackingLabelArtifact_rightEndpoint_val
+#print axioms parseReplayedPackingLabelArtifact_labelCount_pos
+#print axioms parseReplayedPackingLabelArtifact_rowCount_pos
+#print axioms parseReplayedPackingLabelArtifact_columnCount_pos
+#print axioms parseReplayedPackingLabelArtifact_rows
+#print axioms parseReplayedPackingLabelArtifact_columns
+#print axioms packingLabelWitnessArtifactValues
+#print axioms packingLabelWitness_parsed
+#print axioms packingLabelWitness_traceMatches
+#print axioms packingLabelWitness_replayed
 #print axioms sum_fiberSize
 #print axioms endpointPairCount_eq_sum_fiberSize_sq
 #print axioms initial_objective_bound

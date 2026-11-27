@@ -1,0 +1,559 @@
+module
+
+public import LabelSequence
+
+@[expose] public section
+
+/-!
+# Executable packing-label artifact
+
+This module imports the compact projection of the native schema-3 packing
+provenance fixture.  It checks the projection's shape and bounds, then replays
+the exact row-then-column strict-first-minimum schedule from `LabelSequence`.
+-/
+
+namespace Curve25519PackingLabelArtifact
+
+open Curve25519LabelSequence
+open Curve25519ConditionalObjective
+
+/-- Shared native projection: schema/radix/context, endpoint quadruples, then
+row and column labels. -/
+def packingLabelWitnessArtifact : String :=
+  include_str ".." / "packing_label_witness.csv"
+
+/-- Transparent decimal digit parser for the shared projection. -/
+def packingLabelWitnessDigit : Char → Option ℕ
+  | '0' => some 0
+  | '1' => some 1
+  | '2' => some 2
+  | '3' => some 3
+  | '4' => some 4
+  | '5' => some 5
+  | '6' => some 6
+  | '7' => some 7
+  | '8' => some 8
+  | '9' => some 9
+  | _ => none
+
+/-- Transparent comma-separated decimal parser; the final newline is required. -/
+def parsePackingLabelWitness : List Char → ℕ → List ℕ → Option (List ℕ)
+  | [], _, _ => none
+  | '\n' :: [], current, values => some ((current :: values).reverse)
+  | ',' :: rest, current, values =>
+      parsePackingLabelWitness rest 0 (current :: values)
+  | character :: rest, current, values => do
+      let digit ← packingLabelWitnessDigit character
+      parsePackingLabelWitness rest (10 * current + digit) values
+
+/-- Parse the shared projection without an opaque runtime parser. -/
+def packingLabelWitnessNumbers : List ℕ :=
+  (parsePackingLabelWitness packingLabelWitnessArtifact.toList 0 []).getD []
+
+/-- Named representation of the compact native projection. -/
+structure PackingLabelArtifact where
+  schema : ℕ
+  radix : ℕ
+  packetExponent : ℕ
+  coordinate : ℕ
+  conditionalLabels : ℕ
+  sourceDegreeCap : ℕ
+  edgeCount : ℕ
+  rowCount : ℕ
+  columnCount : ℕ
+  edgeFields : List ℕ
+  rowLabels : List ℕ
+  columnLabels : List ℕ
+  deriving DecidableEq, Inhabited, Repr
+
+/-- Number of native labels, `radix^packetExponent`. -/
+def PackingLabelArtifact.labelCount (artifact : PackingLabelArtifact) : ℕ :=
+  artifact.radix ^ artifact.packetExponent
+
+/-- Left endpoint index of an edge in the interleaved endpoint quadruples. -/
+def PackingLabelArtifact.leftIndex
+    (artifact : PackingLabelArtifact) (edge : ℕ) : ℕ :=
+  artifact.edgeFields.getD (4 * edge) 0
+
+/-- Right endpoint index of an edge in the interleaved endpoint quadruples. -/
+def PackingLabelArtifact.rightIndex
+    (artifact : PackingLabelArtifact) (edge : ℕ) : ℕ :=
+  artifact.edgeFields.getD (4 * edge + 2) 0
+
+/-- Exact field lengths and the schema-3 conditional-label context. -/
+def PackingLabelArtifact.wellFormed (artifact : PackingLabelArtifact) : Bool :=
+  artifact.schema == 3 &&
+    artifact.conditionalLabels == 1 &&
+    artifact.edgeFields.length == 4 * artifact.edgeCount &&
+    artifact.rowLabels.length == artifact.rowCount &&
+    artifact.columnLabels.length == artifact.columnCount
+
+/-- Endpoint and label fields lie inside their serialized array bounds. -/
+def PackingLabelArtifact.bounded (artifact : PackingLabelArtifact) : Bool :=
+  (List.range artifact.edgeCount).all (fun edge =>
+      decide (artifact.leftIndex edge < artifact.rowCount) &&
+        decide (artifact.rightIndex edge < artifact.columnCount)) &&
+    artifact.rowLabels.all (fun label => decide (label < artifact.labelCount)) &&
+    artifact.columnLabels.all (fun label => decide (label < artifact.labelCount))
+
+/-- Split the flat native projection into its named arrays. -/
+def parsePackingLabelArtifactUnchecked : List ℕ → Option PackingLabelArtifact
+  | schema :: radix :: packetExponent :: coordinate :: conditionalLabels ::
+      sourceDegreeCap :: edgeCount :: rowCount :: columnCount :: fields => do
+      let (edgeFields, afterEdges) := fields.splitAt (4 * edgeCount)
+      let (rowLabels, columnLabels) := afterEdges.splitAt rowCount
+      some {
+        schema, radix, packetExponent, coordinate, conditionalLabels,
+        sourceDegreeCap, edgeCount, rowCount, columnCount, edgeFields,
+        rowLabels, columnLabels
+      }
+  | _ => none
+
+/-- Shape- and bounds-checked parser for the native projection. -/
+def parsePackingLabelArtifact (values : List ℕ) : Option PackingLabelArtifact := do
+  let artifact ← parsePackingLabelArtifactUnchecked values
+  if artifact.wellFormed && artifact.bounded then some artifact else none
+
+private theorem parsePackingLabelArtifact_components
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact) :
+    artifact.wellFormed = true ∧ artifact.bounded = true := by
+  unfold parsePackingLabelArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with ⟨candidate, _, hchecked⟩
+  split at hchecked
+  next hconditions =>
+    have hartifact : candidate = artifact := Option.some.inj hchecked
+    subst candidate
+    simpa only [Bool.and_eq_true] using hconditions
+  next => simp at hchecked
+
+/-- A shape-checked import retains the exact schema and array-length checks. -/
+theorem parsePackingLabelArtifact_wellFormed
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact) :
+    artifact.wellFormed = true :=
+  (parsePackingLabelArtifact_components hparse).1
+
+/-- A shape-checked import retains every endpoint and label bound. -/
+theorem parsePackingLabelArtifact_bounded
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact) :
+    artifact.bounded = true :=
+  (parsePackingLabelArtifact_components hparse).2
+
+/-- Typed endpoint map used by the formal objective. -/
+def PackingLabelArtifact.leftEndpoint
+    (artifact : PackingLabelArtifact) (hrows : 0 < artifact.rowCount) :
+    Fin artifact.edgeCount → Fin artifact.rowCount :=
+  fun edge =>
+    ⟨artifact.leftIndex edge.val % artifact.rowCount,
+      Nat.mod_lt _ hrows⟩
+
+/-- Typed right-endpoint map used by the formal objective. -/
+def PackingLabelArtifact.rightEndpoint
+    (artifact : PackingLabelArtifact) (hcolumns : 0 < artifact.columnCount) :
+    Fin artifact.edgeCount → Fin artifact.columnCount :=
+  fun edge =>
+    ⟨artifact.rightIndex edge.val % artifact.columnCount,
+      Nat.mod_lt _ hcolumns⟩
+
+/-- Typed serialized row label. -/
+def PackingLabelArtifact.rowLabel
+    (artifact : PackingLabelArtifact) (hlabels : 0 < artifact.labelCount) :
+    Fin artifact.rowCount → Fin artifact.labelCount :=
+  fun row =>
+    ⟨artifact.rowLabels.getD row.val 0 % artifact.labelCount,
+      Nat.mod_lt _ hlabels⟩
+
+/-- Typed serialized column label. -/
+def PackingLabelArtifact.columnLabel
+    (artifact : PackingLabelArtifact) (hlabels : 0 < artifact.labelCount) :
+    Fin artifact.columnCount → Fin artifact.labelCount :=
+  fun column =>
+    ⟨artifact.columnLabels.getD column.val 0 % artifact.labelCount,
+      Nat.mod_lt _ hlabels⟩
+
+/-- A parsed typed left endpoint is the exact serialized index, not merely its
+reduction modulo the row count. -/
+theorem parsePackingLabelArtifact_leftEndpoint_val
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact)
+    (hrows : 0 < artifact.rowCount) (edge : Fin artifact.edgeCount) :
+    (artifact.leftEndpoint hrows edge).val = artifact.leftIndex edge.val := by
+  have hbounded := parsePackingLabelArtifact_bounded hparse
+  simp only [PackingLabelArtifact.bounded, Bool.and_eq_true,
+    List.all_eq_true, decide_eq_true_eq] at hbounded
+  have hleft := (hbounded.1.1 edge.val (by simp)).1
+  simp [PackingLabelArtifact.leftEndpoint, Nat.mod_eq_of_lt hleft]
+
+/-- A parsed typed right endpoint is the exact serialized index, not merely
+its reduction modulo the column count. -/
+theorem parsePackingLabelArtifact_rightEndpoint_val
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parsePackingLabelArtifact values = some artifact)
+    (hcolumns : 0 < artifact.columnCount) (edge : Fin artifact.edgeCount) :
+    (artifact.rightEndpoint hcolumns edge).val = artifact.rightIndex edge.val := by
+  have hbounded := parsePackingLabelArtifact_bounded hparse
+  simp only [PackingLabelArtifact.bounded, Bool.and_eq_true,
+    List.all_eq_true, decide_eq_true_eq] at hbounded
+  have hright := (hbounded.1.1 edge.val (by simp)).2
+  simp [PackingLabelArtifact.rightEndpoint, Nat.mod_eq_of_lt hright]
+
+/-- Replay the exact executable row-then-column schedule against both native
+label arrays. Positivity is checked before dependent finite types are formed. -/
+def PackingLabelArtifact.traceMatches (artifact : PackingLabelArtifact) : Bool :=
+  if hlabels : 0 < artifact.labelCount then
+    if hrows : 0 < artifact.rowCount then
+      if hcolumns : 0 < artifact.columnCount then
+        (List.finRange artifact.rowCount).all (fun row =>
+          decide (artifact.rowLabel hlabels row =
+            executableRowLabels hlabels (artifact.leftEndpoint hrows)
+              (artifact.rightEndpoint hcolumns) row)) &&
+        (List.finRange artifact.columnCount).all (fun column =>
+          decide (artifact.columnLabel hlabels column =
+            executableColumnLabels hlabels (artifact.leftEndpoint hrows)
+              (artifact.rightEndpoint hcolumns)
+              (executableRowLabels hlabels (artifact.leftEndpoint hrows)
+                (artifact.rightEndpoint hcolumns)) column))
+      else false
+    else false
+  else false
+
+/-- Fail closed unless the checked native projection equals the executable
+formal first-minimum trace. -/
+def parseReplayedPackingLabelArtifact
+    (values : List ℕ) : Option PackingLabelArtifact := do
+  let artifact ← parsePackingLabelArtifact values
+  if artifact.traceMatches then some artifact else none
+
+private theorem parseReplayedPackingLabelArtifact_components
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact) :
+    parsePackingLabelArtifact values = some artifact ∧
+      artifact.traceMatches = true := by
+  unfold parseReplayedPackingLabelArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with ⟨candidate, hchecked, htrace⟩
+  split at htrace
+  next hmatches =>
+    have hartifact : candidate = artifact := Option.some.inj htrace
+    subst candidate
+    exact ⟨hchecked, hmatches⟩
+  next => simp at htrace
+
+/-- Every replayed import has a nonempty label alphabet. -/
+theorem parseReplayedPackingLabelArtifact_labelCount_pos
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact) :
+    0 < artifact.labelCount := by
+  have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
+  by_contra hlabels
+  simp [PackingLabelArtifact.traceMatches, hlabels] at htrace
+
+/-- Every replayed import has a nonempty row array. -/
+theorem parseReplayedPackingLabelArtifact_rowCount_pos
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact) :
+    0 < artifact.rowCount := by
+  have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
+  have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
+  by_contra hrows
+  simp [PackingLabelArtifact.traceMatches, hlabels, hrows] at htrace
+
+/-- Every replayed import has a nonempty column array. -/
+theorem parseReplayedPackingLabelArtifact_columnCount_pos
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact) :
+    0 < artifact.columnCount := by
+  have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
+  have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
+  by_contra hcolumns
+  simp [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns] at htrace
+
+/-- A replayed import's row array is exactly the executable native-order row
+trace. -/
+theorem parseReplayedPackingLabelArtifact_rows
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact)
+    (row : Fin artifact.rowCount) :
+    artifact.rowLabel (parseReplayedPackingLabelArtifact_labelCount_pos hparse) row =
+      executableRowLabels
+        (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+        (artifact.leftEndpoint
+          (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+        (artifact.rightEndpoint
+          (parseReplayedPackingLabelArtifact_columnCount_pos hparse)) row := by
+  have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
+  have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hparse
+  simp only [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns,
+    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
+  exact of_decide_eq_true (htrace.1 row (by simp))
+
+/-- A replayed import's column array is exactly the executable native-order
+column trace after fixing the replayed row trace. -/
+theorem parseReplayedPackingLabelArtifact_columns
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseReplayedPackingLabelArtifact values = some artifact)
+    (column : Fin artifact.columnCount) :
+    artifact.columnLabel
+        (parseReplayedPackingLabelArtifact_labelCount_pos hparse) column =
+      executableColumnLabels
+        (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+        (artifact.leftEndpoint
+          (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+        (artifact.rightEndpoint
+          (parseReplayedPackingLabelArtifact_columnCount_pos hparse))
+        (executableRowLabels
+          (parseReplayedPackingLabelArtifact_labelCount_pos hparse)
+          (artifact.leftEndpoint
+            (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
+          (artifact.rightEndpoint
+            (parseReplayedPackingLabelArtifact_columnCount_pos hparse))) column := by
+  have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
+  have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hparse
+  simp only [PackingLabelArtifact.traceMatches, hlabels, hrows, hcolumns,
+    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
+  exact of_decide_eq_true (htrace.2 column (by simp))
+
+/-- The shared native projection contains these exact fields. -/
+theorem packingLabelWitnessArtifactValues :
+    packingLabelWitnessNumbers =
+      [3, 2, 1, 0, 1, 2, 3, 3, 3,
+        0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 2, 0,
+        0, 1, 0, 0, 0, 1] := by
+  decide
+
+/-- Named value encoded by the shared native projection. -/
+def packingLabelWitness : PackingLabelArtifact := {
+  schema := 3
+  radix := 2
+  packetExponent := 1
+  coordinate := 0
+  conditionalLabels := 1
+  sourceDegreeCap := 2
+  edgeCount := 3
+  rowCount := 3
+  columnCount := 3
+  edgeFields := [0, 0, 0, 0, 1, 0, 1, 0, 2, 0, 2, 0]
+  rowLabels := [0, 1, 0]
+  columnLabels := [0, 0, 1]
+}
+
+/-- The shape- and bounds-checked parser returns the named projection. -/
+theorem packingLabelWitness_parsed :
+    parsePackingLabelArtifact packingLabelWitnessNumbers =
+      some packingLabelWitness := by
+  rw [packingLabelWitnessArtifactValues]
+  decide
+
+/-- First executable row choice for the identity three-edge fixture. -/
+private theorem packingLabelWitness_row_zero :
+    executableRowLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge) ⟨0, by decide⟩ =
+      ⟨0, by decide⟩ := by
+  rw [executableRowLabels_eq]
+  rw [prefixAssignment_zero]
+  unfold firstMinimumRowLabel firstMinimumLabel
+  decide +revert
+
+/-- Second executable row choice for the identity three-edge fixture. -/
+private theorem packingLabelWitness_row_one :
+    executableRowLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge) ⟨1, by decide⟩ =
+      ⟨1, by decide⟩ := by
+  rw [executableRowLabels_eq]
+  have hprefix :
+      prefixAssignment
+          (executableRowLabels (q := 2) (by decide)
+            (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)) 1 =
+        fun vertex => if vertex.val = 0 then some ⟨0, by decide⟩ else none := by
+    funext vertex
+    fin_cases vertex <;> simp [prefixAssignment]
+    exact packingLabelWitness_row_zero
+  rw [hprefix]
+  unfold firstMinimumRowLabel firstMinimumLabel
+  decide +revert
+
+/-- Third executable row choice for the identity three-edge fixture. -/
+private theorem packingLabelWitness_row_two :
+    executableRowLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge) ⟨2, by decide⟩ =
+      ⟨0, by decide⟩ := by
+  rw [executableRowLabels_eq]
+  have hprefix :
+      prefixAssignment
+          (executableRowLabels (q := 2) (by decide)
+            (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)) 2 =
+        fun vertex =>
+          if vertex.val = 0 then some ⟨0, by decide⟩
+          else if vertex.val = 1 then some ⟨1, by decide⟩ else none := by
+    funext vertex
+    fin_cases vertex <;> simp [prefixAssignment]
+    · exact packingLabelWitness_row_zero
+    · exact packingLabelWitness_row_one
+  rw [hprefix]
+  unfold firstMinimumRowLabel firstMinimumLabel
+  decide +revert
+
+/-- Complete executable row array of the identity three-edge fixture. -/
+private theorem packingLabelWitness_rows :
+    executableRowLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge) =
+      fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩ := by
+  funext row
+  fin_cases row
+  · exact packingLabelWitness_row_zero
+  · exact packingLabelWitness_row_one
+  · exact packingLabelWitness_row_two
+
+/-- First executable column choice after the fixed row trace. -/
+private theorem packingLabelWitness_column_zero :
+    executableColumnLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+        (fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩)
+        ⟨0, by decide⟩ = ⟨0, by decide⟩ := by
+  rw [executableColumnLabels_eq]
+  rw [prefixAssignment_zero]
+  unfold firstMinimumColumnLabel firstMinimumLabel
+  decide +revert
+
+/-- Second executable column choice after the fixed row trace. -/
+private theorem packingLabelWitness_column_one :
+    executableColumnLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+        (fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩)
+        ⟨1, by decide⟩ = ⟨0, by decide⟩ := by
+  rw [executableColumnLabels_eq]
+  have hprefix :
+      prefixAssignment
+          (executableColumnLabels (q := 2) (by decide)
+            (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+            (fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩)) 1 =
+        fun vertex => if vertex.val = 0 then some ⟨0, by decide⟩ else none := by
+    funext vertex
+    fin_cases vertex <;> simp [prefixAssignment]
+    exact packingLabelWitness_column_zero
+  rw [hprefix]
+  unfold firstMinimumColumnLabel firstMinimumLabel
+  decide +revert
+
+/-- Third executable column choice after the fixed row trace. -/
+private theorem packingLabelWitness_column_two :
+    executableColumnLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+        (fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩)
+        ⟨2, by decide⟩ = ⟨1, by decide⟩ := by
+  rw [executableColumnLabels_eq]
+  have hprefix :
+      prefixAssignment
+          (executableColumnLabels (q := 2) (by decide)
+            (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+            (fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩)) 2 =
+        fun vertex =>
+          if vertex.val = 0 then some ⟨0, by decide⟩
+          else if vertex.val = 1 then some ⟨0, by decide⟩ else none := by
+    funext vertex
+    fin_cases vertex <;> simp [prefixAssignment]
+    · exact packingLabelWitness_column_zero
+    · exact packingLabelWitness_column_one
+  rw [hprefix]
+  unfold firstMinimumColumnLabel firstMinimumLabel
+  decide +revert
+
+/-- Complete executable column array of the identity three-edge fixture. -/
+private theorem packingLabelWitness_columns :
+    executableColumnLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+        (executableRowLabels (by decide)
+          (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)) =
+      fun column => if column.val = 2 then ⟨1, by decide⟩ else ⟨0, by decide⟩ := by
+  rw [packingLabelWitness_rows]
+  funext column
+  fin_cases column
+  · exact packingLabelWitness_column_zero
+  · exact packingLabelWitness_column_one
+  · exact packingLabelWitness_column_two
+
+/-- The projection's typed left endpoints are the identity edge map. -/
+private theorem packingLabelWitness_leftEndpoint :
+    packingLabelWitness.leftEndpoint (by decide) = fun edge : Fin 3 => edge := by
+  funext edge
+  fin_cases edge <;> rfl
+
+/-- The projection's typed right endpoints are the identity edge map. -/
+private theorem packingLabelWitness_rightEndpoint :
+    packingLabelWitness.rightEndpoint (by decide) = fun edge : Fin 3 => edge := by
+  funext edge
+  fin_cases edge <;> rfl
+
+/-- The projection's typed row labels are `[0,1,0]`. -/
+private theorem packingLabelWitness_rowLabel :
+    packingLabelWitness.rowLabel (by decide) =
+      fun row => if row.val = 1 then ⟨1, by decide⟩ else ⟨0, by decide⟩ := by
+  funext row
+  fin_cases row <;> rfl
+
+/-- The projection's typed column labels are `[0,0,1]`. -/
+private theorem packingLabelWitness_columnLabel :
+    packingLabelWitness.columnLabel (by decide) =
+      fun column => if column.val = 2 then ⟨1, by decide⟩ else ⟨0, by decide⟩ := by
+  funext column
+  fin_cases column <;> rfl
+
+/-- The shared native projection passes exact executable trace replay. -/
+theorem packingLabelWitness_traceMatches :
+    packingLabelWitness.traceMatches = true := by
+  unfold PackingLabelArtifact.traceMatches
+  simp only [show 0 < packingLabelWitness.labelCount by decide,
+    show 0 < packingLabelWitness.rowCount by decide,
+    show 0 < packingLabelWitness.columnCount by decide,
+    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true]
+  constructor
+  · intro row _
+    apply decide_eq_true
+    rw [packingLabelWitness_rowLabel, packingLabelWitness_leftEndpoint,
+      packingLabelWitness_rightEndpoint]
+    change (if row.val = 1 then (⟨1, by decide⟩ : Fin 2)
+        else ⟨0, by decide⟩) =
+      executableRowLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge) row
+    fin_cases row
+    · convert packingLabelWitness_row_zero.symm using 1 <;> simp
+      congr 1
+    · convert packingLabelWitness_row_one.symm using 1 <;> simp
+      congr 1
+    · convert packingLabelWitness_row_two.symm using 1 <;> simp
+      congr 1
+  · intro column _
+    apply decide_eq_true
+    rw [packingLabelWitness_columnLabel, packingLabelWitness_leftEndpoint,
+      packingLabelWitness_rightEndpoint]
+    change (if column.val = 2 then (⟨1, by decide⟩ : Fin 2)
+        else ⟨0, by decide⟩) =
+      executableColumnLabels (q := 2) (by decide)
+        (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)
+        (executableRowLabels (by decide)
+          (fun edge : Fin 3 => edge) (fun edge : Fin 3 => edge)) column
+    fin_cases column
+    · convert (congrFun packingLabelWitness_columns ⟨0, by decide⟩).symm using 1
+      all_goals simp
+      congr 1
+    · convert (congrFun packingLabelWitness_columns ⟨1, by decide⟩).symm using 1
+      all_goals simp
+      congr 1
+    · convert (congrFun packingLabelWitness_columns ⟨2, by decide⟩).symm using 1
+      all_goals simp
+      congr 1
+
+/-- The shared native projection parses and replays to the named artifact. -/
+theorem packingLabelWitness_replayed :
+    parseReplayedPackingLabelArtifact packingLabelWitnessNumbers =
+      some packingLabelWitness := by
+  simp [parseReplayedPackingLabelArtifact, packingLabelWitness_parsed,
+    packingLabelWitness_traceMatches]
+
+end Curve25519PackingLabelArtifact
