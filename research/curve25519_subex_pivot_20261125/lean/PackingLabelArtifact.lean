@@ -277,6 +277,30 @@ def parseReplayedPackingLabelArtifact
   let artifact ← parsePackingLabelArtifact values
   if artifact.traceMatches then some artifact else none
 
+/-- Recompute the two serialized endpoint degree caps and the strongest
+source-class guard needed by the formal class-cap theorem. -/
+def PackingLabelArtifact.sourceClassGuardMatches
+    (artifact : PackingLabelArtifact) : Bool :=
+  if hrows : 0 < artifact.rowCount then
+    if hcolumns : 0 < artifact.columnCount then
+      (List.finRange artifact.rowCount).all (fun row =>
+        decide (fiberSize (artifact.leftEndpoint hrows) row ≤
+          artifact.sourceDegreeCap)) &&
+      (List.finRange artifact.columnCount).all (fun column =>
+        decide (fiberSize (artifact.rightEndpoint hcolumns) column ≤
+          artifact.sourceDegreeCap)) &&
+      decide (2 * (artifact.labelCount * artifact.labelCount) ^ 2 *
+        artifact.sourceDegreeCap ≤ artifact.edgeCount)
+    else false
+  else false
+
+/-- Fail closed unless a replayed projection also discharges its serialized
+endpoint degree caps and strongest source-class guard. -/
+def parseSourceGuardPackingLabelArtifact
+    (values : List ℕ) : Option PackingLabelArtifact := do
+  let artifact ← parseReplayedPackingLabelArtifact values
+  if artifact.sourceClassGuardMatches then some artifact else none
+
 private theorem parseReplayedPackingLabelArtifact_components
     {values : List ℕ} {artifact : PackingLabelArtifact}
     (hparse : parseReplayedPackingLabelArtifact values = some artifact) :
@@ -290,6 +314,27 @@ private theorem parseReplayedPackingLabelArtifact_components
     subst candidate
     exact ⟨hchecked, hmatches⟩
   next => simp at htrace
+
+private theorem parseSourceGuardPackingLabelArtifact_components
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    parseReplayedPackingLabelArtifact values = some artifact ∧
+      artifact.sourceClassGuardMatches = true := by
+  unfold parseSourceGuardPackingLabelArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with ⟨candidate, hreplayed, hguard⟩
+  split at hguard
+  next hmatches =>
+    have hartifact : candidate = artifact := Option.some.inj hguard
+    subst candidate
+    exact ⟨hreplayed, hmatches⟩
+  next => simp at hguard
+
+/-- A source-guard import retains the complete executable label replay. -/
+theorem parseSourceGuardPackingLabelArtifact_replayed
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    parseReplayedPackingLabelArtifact values = some artifact :=
+  (parseSourceGuardPackingLabelArtifact_components hparse).1
 
 /-- Every replayed import has a nonempty label alphabet. -/
 theorem parseReplayedPackingLabelArtifact_labelCount_pos
@@ -370,6 +415,60 @@ theorem parseReplayedPackingLabelArtifact_columns
     ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at htrace
   exact of_decide_eq_true (htrace.2 column (by simp))
 
+/-- A source-guard import proves every serialized left-endpoint fiber is at
+most its serialized degree cap. -/
+theorem parseSourceGuardPackingLabelArtifact_leftDegreeCap
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    ∀ row, fiberSize
+        (artifact.leftEndpoint
+          (parseReplayedPackingLabelArtifact_rowCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse))) row ≤
+      artifact.sourceDegreeCap := by
+  have hreplayed := parseSourceGuardPackingLabelArtifact_replayed hparse
+  have hmatches := (parseSourceGuardPackingLabelArtifact_components hparse).2
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hreplayed
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hreplayed
+  simp only [PackingLabelArtifact.sourceClassGuardMatches, hrows, hcolumns,
+    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at hmatches
+  intro row
+  exact of_decide_eq_true (hmatches.1.1 row (by simp))
+
+/-- A source-guard import proves every serialized right-endpoint fiber is at
+most its serialized degree cap. -/
+theorem parseSourceGuardPackingLabelArtifact_rightDegreeCap
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    ∀ column, fiberSize
+        (artifact.rightEndpoint
+          (parseReplayedPackingLabelArtifact_columnCount_pos
+            (parseSourceGuardPackingLabelArtifact_replayed hparse))) column ≤
+      artifact.sourceDegreeCap := by
+  have hreplayed := parseSourceGuardPackingLabelArtifact_replayed hparse
+  have hmatches := (parseSourceGuardPackingLabelArtifact_components hparse).2
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hreplayed
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hreplayed
+  simp only [PackingLabelArtifact.sourceClassGuardMatches, hrows, hcolumns,
+    ↓reduceDIte, Bool.and_eq_true, List.all_eq_true] at hmatches
+  intro column
+  exact of_decide_eq_true (hmatches.1.2 column (by simp))
+
+/-- A source-guard import proves the strongest real-valued class guard from
+the serialized natural-number inequality. -/
+theorem parseSourceGuardPackingLabelArtifact_guard
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    2 * (((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ^ 2) *
+        (artifact.sourceDegreeCap : ℝ) ≤
+      (artifact.edgeCount : ℝ) := by
+  have hreplayed := parseSourceGuardPackingLabelArtifact_replayed hparse
+  have hmatches := (parseSourceGuardPackingLabelArtifact_components hparse).2
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hreplayed
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hreplayed
+  simp only [PackingLabelArtifact.sourceClassGuardMatches, hrows, hcolumns,
+    ↓reduceDIte, Bool.and_eq_true] at hmatches
+  exact_mod_cast of_decide_eq_true hmatches.2
+
 /-- A replayed artifact feeds its serialized labels directly into the strongest
 source-guard class cap. The parser supplies the executable-label equalities;
 callers provide only the graph's degree caps and source guard. -/
@@ -438,6 +537,35 @@ theorem parseReplayedPackingLabelArtifact_classCap
     (artifact.rightEndpoint
       (parseReplayedPackingLabelArtifact_columnCount_pos hparse))
     δ hleftCap hrightCap hguard
+
+/-- A source-guard import reaches the class cap with no remaining degree or
+guard premise: all three are recomputed from the flat projection. -/
+theorem parseSourceGuardPackingLabelArtifact_classCap
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    ∀ γ : Fin (artifact.labelCount * artifact.labelCount),
+      (fiberSize
+          (classMap
+            (artifact.leftEndpoint
+              (parseReplayedPackingLabelArtifact_rowCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (artifact.rightEndpoint
+              (parseReplayedPackingLabelArtifact_columnCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (artifact.rowLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))
+            (artifact.columnLabel
+              (parseReplayedPackingLabelArtifact_labelCount_pos
+                (parseSourceGuardPackingLabelArtifact_replayed hparse)))) γ : ℝ) *
+          ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ≤
+        2 * (artifact.edgeCount : ℝ) := by
+  have hreplayed := parseSourceGuardPackingLabelArtifact_replayed hparse
+  exact parseReplayedPackingLabelArtifact_classCap hreplayed
+    artifact.sourceDegreeCap
+    (parseSourceGuardPackingLabelArtifact_leftDegreeCap hparse)
+    (parseSourceGuardPackingLabelArtifact_rightDegreeCap hparse)
+    (parseSourceGuardPackingLabelArtifact_guard hparse)
 
 /-- The shared native projection contains these exact fields. -/
 theorem packingLabelWitnessArtifactValues :
@@ -675,5 +803,18 @@ theorem packingLabelWitness_replayed :
       some packingLabelWitness := by
   simp [parseReplayedPackingLabelArtifact, packingLabelWitness_parsed,
     packingLabelWitness_traceMatches]
+
+/-- The three-edge fixture deliberately fails the asymptotic source-class
+guard; finite trace replay is not promoted to strict admission. -/
+theorem packingLabelWitness_sourceClassGuardRejected :
+    packingLabelWitness.sourceClassGuardMatches = false := by
+  decide
+
+/-- The strongest parser therefore rejects the finite fixture even though its
+shape, bounds, and executable label trace all pass. -/
+theorem packingLabelWitness_sourceGuardParserRejects :
+    parseSourceGuardPackingLabelArtifact packingLabelWitnessNumbers = none := by
+  simp [parseSourceGuardPackingLabelArtifact, packingLabelWitness_replayed,
+    packingLabelWitness_sourceClassGuardRejected]
 
 end Curve25519PackingLabelArtifact

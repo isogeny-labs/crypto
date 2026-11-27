@@ -187,7 +187,10 @@ evidence for two independent claims:
    that binding through `packing_label_witness.csv`; a single size-generic
    native exporter now constructs the same canonical projection on every
    producer round trip, but semantic binding of the arbitrary-size producer
-   family remains open; and
+   family remains open. The generic Lean importer now recomputes endpoint
+   degree caps and the strongest source-class guard and closes the class cap
+   with no caller premise whenever those projected checks pass; the current
+   three-edge control is correctly rejected by that stronger parser; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
    active leaf cutoff, exact source quotient, and the exact root square-root

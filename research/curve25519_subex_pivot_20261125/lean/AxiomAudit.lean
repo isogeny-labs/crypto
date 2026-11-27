@@ -65,10 +65,17 @@ open Curve25519ExtensionRingModel
 #print axioms parseReplayedPackingLabelArtifact_rows
 #print axioms parseReplayedPackingLabelArtifact_columns
 #print axioms parseReplayedPackingLabelArtifact_classCap
+#print axioms parseSourceGuardPackingLabelArtifact_replayed
+#print axioms parseSourceGuardPackingLabelArtifact_leftDegreeCap
+#print axioms parseSourceGuardPackingLabelArtifact_rightDegreeCap
+#print axioms parseSourceGuardPackingLabelArtifact_guard
+#print axioms parseSourceGuardPackingLabelArtifact_classCap
 #print axioms packingLabelWitnessArtifactValues
 #print axioms packingLabelWitness_parsed
 #print axioms packingLabelWitness_traceMatches
 #print axioms packingLabelWitness_replayed
+#print axioms packingLabelWitness_sourceClassGuardRejected
+#print axioms packingLabelWitness_sourceGuardParserRejects
 #print axioms sum_fiberSize
 #print axioms endpointPairCount_eq_sum_fiberSize_sq
 #print axioms initial_objective_bound

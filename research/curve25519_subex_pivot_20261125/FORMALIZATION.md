@@ -193,7 +193,12 @@ representatives, and replays the complete nontrivial native trace: rows
 `[0,1,0]`, then columns `[0,0,1]`.
 `parseReplayedPackingLabelArtifact_classCap` rewrites every accepted artifact's
 serialized label arrays to that executable schedule and feeds them directly
-into the strongest source-guard class-cap theorem. The remaining boundary is
+into the strongest source-guard class-cap theorem. The stricter
+`parseSourceGuardPackingLabelArtifact` additionally recomputes every left/right
+endpoint fiber against the serialized degree cap and the full
+`2(q^2)^2 delta<=M` natural-number guard. Successful imports reach the class cap
+without caller premises; the finite three-edge fixture is kernel-proved to be
+rejected by this stronger parser. The remaining boundary is
 to lift this finite code-to-model control to every arbitrary-size producer
 object semantically and to every live recursive history.
 `[pcc:unverified]`

@@ -390,7 +390,11 @@ serialized natural values without modulo wrapping, and kernel-replays the
 nontrivial row `[0,1,0]` and column `[0,0,1]` traces. For every successfully
 replayed artifact, the parsed label arrays now feed directly into the strongest
 source-guard class-cap theorem; the caller supplies only degree caps and the
-guard. This is one finite
+guard. A stricter generic importer now recomputes both endpoint degree caps and
+the natural-number source-class guard from the projection itself, casts the
+guard to the formal real inequality, and reaches the same class cap with no
+remaining premise. The three-edge fixture is proved to fail this stronger
+parser, so finite replay is not promoted to asymptotic admission. This is one finite
 code-to-model control plus generic native export and checked-import endpoints,
 not a uniform arbitrary-size Rust-to-Lean semantic refinement.
 `[pcc:unverified]`

@@ -79,7 +79,12 @@ without modulo wrapping, and replays the same strict-first-minimum algorithm. Th
 kernel-checked trace is rows `[0,1,0]` followed by columns `[0,0,1]`; both sides
 therefore exercise a nonzero choice. A generic checked-import theorem rewrites
 accepted serialized labels to the executable schedule and returns the strongest
-source-guard class cap from caller-supplied degree caps and guard alone.
+source-guard class cap from caller-supplied degree caps and guard alone. A
+second generic importer recomputes both endpoint degree bounds and the exact
+`2(q^2)^2 delta<=M` source-class guard from the flat values, and returns the
+class cap with no remaining premise. The admitted three-edge control is
+kernel-proved to fail this stronger guard and parser, matching the native
+`source_guard_closure_admitted=false` result.
 `[pcc:unverified]`
 
 ## Remaining boundary
