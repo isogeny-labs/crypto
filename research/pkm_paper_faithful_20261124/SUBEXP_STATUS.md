@@ -116,3 +116,41 @@ What would have to be invented: either a solver for the chain system with cost
 polynomial system — or a smoothness structure on `E(F_p)` itself, which is the
 open problem the literature is stuck on. Neither is an engineering gap in this
 repository, and no amount of further running here produces one.
+
+## The two-constraint closure
+
+The measurements above and the paper's own cost formula pin the construction
+between two independent constraints. At the density condition
+`deg L = |V| = p^{1/m}`:
+
+**C1, linear algebra.** `|V|^ω = p^{ω/m}` with `2 < ω ≤ 3`. To beat rho's
+`p^{1/2}` this needs `m > 2ω`, i.e. `m ≥ 5` for `ω = 2.5`, `m ≥ 7` for `ω = 3`.
+At `m = 2` — every run in this record — no solver can win, whatever it costs,
+because the matrix alone is `p^{1.25}`.
+
+**C2, the relation system.** The tower has `V = m·n0 = log2 p / log2 B`
+variables. The measured F4 ceiling is `V* ≈ 14` (`CHAIN_DIAGNOSTIC.md`: 13–14
+variables decide at degree 7; 18 never decide at any bound tried).
+
+Together: `log2 p / log2 B ≤ 14`, so
+
+    log2 B ≥ log2 p / 14.
+
+| field | `log2 p` | required `B` | equation degree |
+|:--|--:|--:|--:|
+| 2^20 | 20 | 2^1.4 = 3 | 3 |
+| 2^32 | 32 | 2^2.3 = 5 | 5 |
+| 2^64 | 64 | 2^4.6 = 24 | 24 |
+| P-192 | 192 | **2^13.7 ≈ 13 000** | 13 000 |
+
+So the construction is computable *as it stands* on fields up to roughly 50
+bits, where C1 already rules it out; and at P-192 it needs degree-`2^14` Vélu
+steps, whose equations F4 would have to eliminate at degree 13 000 in 14
+variables — a Macaulay matrix of order `C(13014, 14) ≈ 10^{44}` monomials.
+
+Beating P-192 therefore requires a solver that is **polynomial in the equation
+degree at fixed variable count** for these chain systems. No Gröbner engine is,
+and no such algorithm is known for any polynomial system. That is the precise
+content of "there is no cube-root algorithm here": not that a search has not
+found one, but that the requirement reduces to an open problem in elimination
+theory, with the numbers attached.
