@@ -128,7 +128,11 @@ canonical flattener remains the implementation of `label_projection`. A
 matching Lean `PackingLabelSource` uses structured four-field edges, proves
 their flattened length, and has a projection definitionally equal to the
 formal artifact projection. Source-shaped checked, replayed, and strict iff
-theorems therefore reduce native-order input to the same named predicates.
+theorems now reduce native-order input to explicit `WellFormed` and `Bounded`
+propositions over the named schema/context fields, each structured endpoint,
+and every row/column label, followed only by the existing trace and guard
+predicates. Lean proves the artifact Boolean shape and bounds checks equivalent
+to those source propositions.
 This aligns the source interfaces; it does not verify Rust compiler,
 allocation, integer-conversion, or serde behavior. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap

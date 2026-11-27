@@ -129,7 +129,7 @@ structure PackingLabelEdge where
   leftPort : ℕ
   right : ℕ
   rightPort : ℕ
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Inhabited, Repr
 
 /-- The four native endpoint fields in their projection order. -/
 def PackingLabelEdge.fields (edge : PackingLabelEdge) : List ℕ :=
@@ -179,6 +179,50 @@ native edge. -/
       simp [PackingLabelEdge.fields, ih]
       omega
 
+private theorem edgeFields_left_getD
+    (edges : List PackingLabelEdge) (index : ℕ)
+    (hindex : index < edges.length) :
+    (edges.flatMap PackingLabelEdge.fields).getD (4 * index) 0 =
+      (edges.getD index default).left := by
+  induction edges generalizing index with
+  | nil => simp at hindex
+  | cons edge edges ih =>
+      cases index with
+      | zero => simp [PackingLabelEdge.fields]
+      | succ index =>
+          have htail : index < edges.length := by simpa using hindex
+          simpa [PackingLabelEdge.fields, Nat.mul_succ] using ih index htail
+
+private theorem edgeFields_right_getD
+    (edges : List PackingLabelEdge) (index : ℕ)
+    (hindex : index < edges.length) :
+    (edges.flatMap PackingLabelEdge.fields).getD (4 * index + 2) 0 =
+      (edges.getD index default).right := by
+  induction edges generalizing index with
+  | nil => simp at hindex
+  | cons edge edges ih =>
+      cases index with
+      | zero => simp [PackingLabelEdge.fields]
+      | succ index =>
+          have htail : index < edges.length := by simpa using hindex
+          simpa [PackingLabelEdge.fields, Nat.mul_succ] using ih index htail
+
+/-- Direct shape and context proposition over the named native source fields. -/
+def PackingLabelSource.WellFormed (source : PackingLabelSource) : Prop :=
+  source.schema = 3 ∧ source.conditionalLabels = true ∧
+    0 < source.radix ∧ source.coordinate < source.packetExponent
+
+/-- Direct endpoint and label bounds over the named native source fields. -/
+def PackingLabelSource.Bounded (source : PackingLabelSource) : Prop :=
+  ((∀ index < source.edges.length,
+      let edge := source.edges.getD index default
+      edge.left < source.rowLabels.length ∧
+        edge.right < source.columnLabels.length) ∧
+    (∀ label ∈ source.rowLabels,
+      label < source.radix ^ source.packetExponent)) ∧
+    (∀ label ∈ source.columnLabels,
+      label < source.radix ^ source.packetExponent)
+
 /-- Number of native labels, `radix^packetExponent`. -/
 def PackingLabelArtifact.labelCount (artifact : PackingLabelArtifact) : ℕ :=
   artifact.radix ^ artifact.packetExponent
@@ -209,6 +253,57 @@ def PackingLabelArtifact.bounded (artifact : PackingLabelArtifact) : Bool :=
         decide (artifact.rightIndex edge < artifact.columnCount)) &&
     artifact.rowLabels.all (fun label => decide (label < artifact.labelCount)) &&
     artifact.columnLabels.all (fun label => decide (label < artifact.labelCount))
+
+/-- Formal artifact shape checks are exactly the direct named-source proposition. -/
+theorem PackingLabelSource.artifact_wellFormed_iff
+    (source : PackingLabelSource) :
+    source.artifact.wellFormed = true ↔ source.WellFormed := by
+  simp only [PackingLabelArtifact.wellFormed, PackingLabelSource.artifact,
+    Bool.and_eq_true, beq_iff_eq]
+  rw [PackingLabelSource.edgeFields_length]
+  cases hconditional : source.conditionalLabels <;>
+    simp [PackingLabelSource.WellFormed, hconditional]
+  intro _
+  exact decide_eq_true_iff
+
+/-- Formal artifact bounds are exactly the direct named-source proposition. -/
+theorem PackingLabelSource.artifact_bounded_iff
+    (source : PackingLabelSource) :
+    source.artifact.bounded = true ↔ source.Bounded := by
+  simp only [PackingLabelArtifact.bounded,
+    PackingLabelSource.artifact,
+    PackingLabelArtifact.leftIndex, PackingLabelArtifact.rightIndex,
+    PackingLabelArtifact.labelCount, Bool.and_eq_true, List.all_eq_true,
+    List.mem_range]
+  constructor
+  · rintro ⟨⟨hedges, hrows⟩, hcolumns⟩
+    refine ⟨⟨?_, ?_⟩, ?_⟩
+    · intro index hindex
+      have hedge := hedges index hindex
+      constructor
+      · rw [← edgeFields_left_getD source.edges index hindex]
+        exact of_decide_eq_true hedge.1
+      · rw [← edgeFields_right_getD source.edges index hindex]
+        exact of_decide_eq_true hedge.2
+    · intro label hlabel
+      exact of_decide_eq_true (hrows label hlabel)
+    · intro label hlabel
+      exact of_decide_eq_true (hcolumns label hlabel)
+  · rintro ⟨⟨hedges, hrows⟩, hcolumns⟩
+    refine ⟨⟨?_, ?_⟩, ?_⟩
+    · intro index hindex
+      have hedge := hedges index hindex
+      constructor
+      · apply decide_eq_true
+        rw [edgeFields_left_getD source.edges index hindex]
+        exact hedge.1
+      · apply decide_eq_true
+        rw [edgeFields_right_getD source.edges index hindex]
+        exact hedge.2
+    · intro label hlabel
+      exact decide_eq_true (hrows label hlabel)
+    · intro label hlabel
+      exact decide_eq_true (hcolumns label hlabel)
 
 /-- Split the flat native projection into its named arrays. -/
 def parsePackingLabelArtifactUnchecked : List ℕ → Option PackingLabelArtifact
@@ -358,9 +453,10 @@ well-formedness and bounds; its projection equality is definitional. -/
 theorem PackingLabelSource.parseProjection_iff
     (source : PackingLabelSource) :
     parsePackingLabelArtifact source.projectionValues = some source.artifact ↔
-      (source.artifact.wellFormed = true ∧
-        source.artifact.bounded = true) := by
-  simpa [PackingLabelSource.artifact_projectionValues] using
+      (source.WellFormed ∧ source.Bounded) := by
+  simpa only [PackingLabelSource.artifact_projectionValues,
+    PackingLabelSource.artifact_wellFormed_iff,
+    PackingLabelSource.artifact_bounded_iff, and_true] using
     (parsePackingLabelArtifact_iff
       (values := source.projectionValues) (artifact := source.artifact))
 
@@ -660,10 +756,11 @@ theorem PackingLabelSource.parseReplayedProjection_iff
     (source : PackingLabelSource) :
     parseReplayedPackingLabelArtifact source.projectionValues =
         some source.artifact ↔
-      ((source.artifact.wellFormed = true ∧
-          source.artifact.bounded = true) ∧
+      ((source.WellFormed ∧ source.Bounded) ∧
         source.artifact.traceMatches = true) := by
-  simpa [PackingLabelSource.artifact_projectionValues] using
+  simpa only [PackingLabelSource.artifact_projectionValues,
+    PackingLabelSource.artifact_wellFormed_iff,
+    PackingLabelSource.artifact_bounded_iff, and_true] using
     (parseReplayedPackingLabelArtifact_iff
       (values := source.projectionValues) (artifact := source.artifact))
 
@@ -673,11 +770,12 @@ theorem PackingLabelSource.parseSourceGuardProjection_iff
     (source : PackingLabelSource) :
     parseSourceGuardPackingLabelArtifact source.projectionValues =
         some source.artifact ↔
-      (((source.artifact.wellFormed = true ∧
-          source.artifact.bounded = true) ∧
+      (((source.WellFormed ∧ source.Bounded) ∧
         source.artifact.traceMatches = true) ∧
         source.artifact.sourceClassGuardMatches = true) := by
-  simpa [PackingLabelSource.artifact_projectionValues] using
+  simpa only [PackingLabelSource.artifact_projectionValues,
+    PackingLabelSource.artifact_wellFormed_iff,
+    PackingLabelSource.artifact_bounded_iff, and_true] using
     (parseSourceGuardPackingLabelArtifact_iff
       (values := source.projectionValues) (artifact := source.artifact))
 

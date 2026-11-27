@@ -105,6 +105,8 @@ open Curve25519ExtensionRingModel
 #print axioms parsePackingLabelArtifact_projectionValues
 #print axioms PackingLabelSource.edgeFields_length
 #print axioms PackingLabelSource.artifact_projectionValues
+#print axioms PackingLabelSource.artifact_wellFormed_iff
+#print axioms PackingLabelSource.artifact_bounded_iff
 #print axioms PackingLabelArtifact.projectionValues_of_parseUnchecked
 #print axioms PackingLabelArtifact.projectionValues_of_parse
 #print axioms parsePackingLabelArtifact_iff

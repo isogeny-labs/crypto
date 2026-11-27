@@ -264,7 +264,11 @@ state and optional source cap map to the native numeric header convention. The
 source projection and `source.artifact.projectionValues` are definitionally
 equal. Consequently, source-shaped checked, replayed, and strict parser iff
 theorems expose precisely the well-formedness, bounds, trace, and source-guard
-obligations. Rust execution, allocation, integer conversion, and serde remain
+obligations. The first two are now direct propositions over the named source:
+schema/conditional/context equalities, every structured endpoint bound, and
+every row/column label bound. Separate equivalence theorems discharge the
+flattened artifact's Boolean checks. Rust execution, allocation, integer
+conversion, and serde remain
 outside this formal refinement. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

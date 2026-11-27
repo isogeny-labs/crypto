@@ -461,7 +461,10 @@ length arithmetic and integer conversion before flattening. Lean now models
 the same source shape as `PackingLabelSource`; each structured edge contributes
 exactly four fields, and its native-order projection is definitionally the
 artifact projection. Source-shaped iff theorems cover checked, replayed, and
-strict import. This is source-interface alignment, not a proof of Rust
+strict import. Their base conditions are now explicit `WellFormed` and
+`Bounded` propositions over the named source fields, structured endpoint
+records, and label arrays; artifact Boolean checks are proved equivalent to
+those propositions. This is source-interface alignment, not a proof of Rust
 compiler, allocator, conversion, or serialization semantics.
 `[pcc:unverified]`
 

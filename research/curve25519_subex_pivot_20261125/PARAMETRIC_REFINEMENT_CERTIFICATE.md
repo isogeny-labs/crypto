@@ -210,8 +210,10 @@ evidence for two independent claims:
    and source slices used by the flattener, and a matching formal
    `PackingLabelSource` proves its structured four-field-edge projection
    definitionally equal to the artifact projection. Source-shaped checked,
-   replayed, and strict iff theorems now state the remaining obligations at
-   that interface. Compiler, allocation, integer conversion, and serde
+   replayed, and strict iff theorems now state the base obligations directly
+   as named-source shape/context, structured-endpoint, and label-array
+   propositions; separate theorems prove equivalence to the artifact Boolean
+   checks. Compiler, allocation, integer conversion, and serde
    refinement remain open.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
