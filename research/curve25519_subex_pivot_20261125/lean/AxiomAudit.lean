@@ -103,6 +103,7 @@ open Curve25519ExtensionRingModel
 #print axioms nativeProductPolynomial_eq
 #print axioms decodeNativeProductCoordinates
 #print axioms degreeFourWitnessArtifactValues
+#print axioms parseRingMultiplicationArtifact_wellFormed
 #print axioms degreeFourWitnessRecordValues
 #print axioms degreeFourPolynomialBits
 #print axioms degreeFourDenseNativeProduct

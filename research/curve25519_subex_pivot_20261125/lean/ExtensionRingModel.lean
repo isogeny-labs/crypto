@@ -1011,33 +1011,67 @@ structure RingMultiplicationArtifact where
   reductions : ℕ
   deriving DecidableEq, Inhabited, Repr
 
+/-- Transparent shape predicate required before a parsed artifact can reach the
+model. Keeping it Boolean preserves kernel computation for included fixtures. -/
+def RingMultiplicationArtifact.wellFormed
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  artifact.lowerCoefficients.length == artifact.degree &&
+    artifact.left.length == artifact.degree &&
+    artifact.right.length == artifact.degree &&
+    artifact.product.length == artifact.degree
+
 /-- Decode a native lower-polynomial bit and reject non-Boolean fields. -/
 def ringMultiplicationArtifactBit : ℕ → Option Bool
   | 0 => some false
   | 1 => some true
   | _ => none
 
-/-- Parse the flat native record into named fields. The degree from the record
-determines every vector boundary; short, long, and non-Boolean records fail. -/
-def parseRingMultiplicationArtifact : List ℕ → Option RingMultiplicationArtifact
+/-- Split the flat native record into named fields. The checked wrapper below
+enforces the exact vector lengths before exposing a successful result. -/
+def parseRingMultiplicationArtifactUnchecked :
+    List ℕ → Option RingMultiplicationArtifact
   | degree :: precision :: polynomial :: fields => do
       let (lowerNumbers, afterLower) := fields.splitAt degree
       let (left, afterLeft) := afterLower.splitAt degree
       let (right, afterRight) := afterLeft.splitAt degree
       let (product, counts) := afterRight.splitAt degree
-      if lowerNumbers.length = degree ∧ left.length = degree ∧
-          right.length = degree ∧ product.length = degree then
-        let lowerCoefficients ← lowerNumbers.mapM ringMultiplicationArtifactBit
-        match counts with
-        | [convolutionProducts, reductions] =>
-            some {
-              degree, precision, polynomial, lowerCoefficients, left, right,
-              product, convolutionProducts, reductions
-            }
-        | _ => none
-      else
-        none
+      let lowerCoefficients ← lowerNumbers.mapM ringMultiplicationArtifactBit
+      match counts with
+      | [convolutionProducts, reductions] =>
+          some {
+            degree, precision, polynomial, lowerCoefficients, left, right,
+            product, convolutionProducts, reductions
+          }
+      | _ => none
   | _ => none
+
+/-- Fail closed unless all four decoded vectors match the encoded degree. -/
+def validateRingMultiplicationArtifact
+    (artifact : RingMultiplicationArtifact) : Option RingMultiplicationArtifact :=
+  if artifact.wellFormed then some artifact else none
+
+/-- Parse the flat native record into named, length-checked fields. -/
+def parseRingMultiplicationArtifact
+    (values : List ℕ) : Option RingMultiplicationArtifact := do
+  let artifact ← parseRingMultiplicationArtifactUnchecked values
+  validateRingMultiplicationArtifact artifact
+
+/-- Any successfully parsed multiplication artifact has all four vector lengths
+equal to its encoded degree. -/
+theorem parseRingMultiplicationArtifact_wellFormed
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseRingMultiplicationArtifact values = some artifact) :
+    artifact.wellFormed = true := by
+  unfold parseRingMultiplicationArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, _, hvalidate⟩
+  unfold validateRingMultiplicationArtifact at hvalidate
+  split at hvalidate
+  next hwellFormed =>
+    have hartifact : candidate = artifact := Option.some.inj hvalidate
+    simpa only [hartifact] using hwellFormed
+  next =>
+    simp at hvalidate
 
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=

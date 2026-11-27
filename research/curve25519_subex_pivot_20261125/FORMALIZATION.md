@@ -562,7 +562,10 @@ compares them with `ring_multiplication_witness.csv`. The formal model consumes
 that same artifact through `include_str` and a transparent decimal parser,
 then derives all four degree-sized vector boundaries into a typed record and
 rejects malformed lengths or non-Boolean lower-bit fields. It kernel-checks the
-complete named record, then uses its packed polynomial `19`, lower bits
+generic successful-parse implication from the Boolean shape validator, proving
+that every exposed record has four vectors of exactly its encoded degree. It
+also kernel-checks the complete named sample, then uses its packed polynomial
+`19`, lower bits
 `[1,1,0,0]`, separate dense left/right inputs, and product `[30,29,0,3]` in the
 exact source-shaped evaluation without positional field offsets. The concrete
 evaluation is composed with `decodeNativeProductCoordinates`, so the typed

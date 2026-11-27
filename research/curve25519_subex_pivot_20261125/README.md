@@ -492,7 +492,9 @@ transparent digit/comma parser, and then constructs a typed
 `RingMultiplicationArtifact`. That second parser derives four vector boundaries
 from the encoded degree, rejects short, long, or non-Boolean records, and gives
 the formal multiplication named lower-bit, left, right, and product fields
-instead of positional offsets. Lean kernel-checks the exact parsed record,
+instead of positional offsets. A generic soundness theorem now proves that
+every successful parse has all four vector lengths equal to its encoded degree.
+Lean kernel-checks the exact parsed record,
 proves that its lower bits `[1,1,0,0]` give monic degree-four packing `19`
 (`U^4+U+1`), and evaluates the audited source-shaped transition equations to
 `[1,1,1,1]^2=[30,29,0,3]` in precision five. That equality now composes with
