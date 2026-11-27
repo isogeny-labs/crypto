@@ -1029,6 +1029,58 @@ theorem parseSourceGuardPackingLabelArtifact_classCap
     (parseSourceGuardPackingLabelArtifact_rightDegreeCap hparse)
     (parseSourceGuardPackingLabelArtifact_guard hparse)
 
+/-- Largest recomputed endpoint-label class. Malformed zero-dimensional
+artifacts map to zero; strict parsing establishes all three positive branches. -/
+def PackingLabelArtifact.maximumClassSize
+    (artifact : PackingLabelArtifact) : ℕ :=
+  if hlabels : 0 < artifact.labelCount then
+    if hrows : 0 < artifact.rowCount then
+      if hcolumns : 0 < artifact.columnCount then
+        (Finset.univ :
+            Finset (Fin (artifact.labelCount * artifact.labelCount))).sup
+          (fun gamma => fiberSize
+            (classMap
+              (artifact.leftEndpoint hrows)
+              (artifact.rightEndpoint hcolumns)
+              (artifact.rowLabel hlabels)
+              (artifact.columnLabel hlabels)) gamma)
+      else 0
+    else 0
+  else 0
+
+/-- Strict source acceptance bounds the actual maximum recomputed class, not
+only a caller-selected class. -/
+theorem parseSourceGuardPackingLabelArtifact_maximumClassCap
+    {values : List ℕ} {artifact : PackingLabelArtifact}
+    (hparse : parseSourceGuardPackingLabelArtifact values = some artifact) :
+    (artifact.maximumClassSize : ℝ) *
+        ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ≤
+      2 * (artifact.edgeCount : ℝ) := by
+  have hreplayed := parseSourceGuardPackingLabelArtifact_replayed hparse
+  have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hreplayed
+  have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hreplayed
+  have hcolumns := parseReplayedPackingLabelArtifact_columnCount_pos hreplayed
+  have hclasses : 0 < artifact.labelCount * artifact.labelCount :=
+    Nat.mul_pos hlabels hlabels
+  have huniv :
+      (Finset.univ :
+        Finset (Fin (artifact.labelCount * artifact.labelCount))).Nonempty :=
+    ⟨⟨0, hclasses⟩, Finset.mem_univ _⟩
+  obtain ⟨gamma, _, hmaximum⟩ :=
+    Finset.exists_mem_eq_sup
+      (Finset.univ :
+        Finset (Fin (artifact.labelCount * artifact.labelCount)))
+      huniv
+      (fun index => fiberSize
+        (classMap
+          (artifact.leftEndpoint hrows)
+          (artifact.rightEndpoint hcolumns)
+          (artifact.rowLabel hlabels)
+          (artifact.columnLabel hlabels)) index)
+  have hclass := parseSourceGuardPackingLabelArtifact_classCap hparse gamma
+  simpa [PackingLabelArtifact.maximumClassSize, hlabels, hrows, hcolumns,
+    hmaximum] using hclass
+
 /-- A strictly accepted named source view feeds its recomputed class cap into
 the retained-history eightfold shrink. The only remaining premises describe
 the source length mass, padded group height, and two-sided child group. -/
@@ -1084,6 +1136,51 @@ theorem PackingLabelSource.historyChildStrictShrink
           (parseReplayedPackingLabelArtifact_labelCount_pos
             (parseSourceGuardPackingLabelArtifact_replayed hparse)))) γ : ℝ)
     height child hM (by positivity) hclass hlength hheight hchild
+
+/-- The exact maximum-class ceil-and-multiply height computed by the native
+packer removes both a selected-class witness and the padded-height premise
+from `historyChildStrictShrink`. Source length mass and two-sided child load
+remain explicit. -/
+theorem PackingLabelSource.historyChildStrictShrinkOfRoundedMaximum
+    (source : PackingLabelSource)
+    (hparse :
+      parseSourceGuardPackingLabelArtifact source.projectionValues =
+        some source.artifact)
+    (packetLength : ℕ)
+    (child : ℝ)
+    (hM : 0 ≤ (source.artifact.edgeCount : ℝ))
+    (hlength :
+      (packetLength : ℝ) *
+          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ) ≤
+        (source.artifact.edgeCount : ℝ))
+    (hchild :
+      child * 64 ≤ 2 *
+        (((source.artifact.maximumClassSize ⌈/⌉ packetLength) *
+            packetLength : ℕ) : ℝ) *
+          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ)) :
+    8 * child ≤ (source.artifact.edgeCount : ℝ) := by
+  let classSize := source.artifact.maximumClassSize
+  have hclass :=
+    parseSourceGuardPackingLabelArtifact_maximumClassCap hparse
+  have hheightNat :=
+    Curve25519ParametricRefinement.rounded_class_height_le_add
+      classSize packetLength
+  have hheight :
+      (((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ) ≤
+        (classSize : ℝ) + (packetLength : ℝ) := by
+    exact_mod_cast hheightNat
+  have hchild' :
+      child * 64 ≤ 2 *
+        ((((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ) *
+          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ)) := by
+    simpa [classSize, mul_assoc] using hchild
+  exact Curve25519ParametricRefinement.history_child_strict_shrink_of_class_capacity
+    (source.artifact.edgeCount : ℝ)
+    ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ)
+    (packetLength : ℝ)
+    (classSize : ℝ)
+    (((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ)
+    child hM (by positivity) hclass hlength hheight hchild'
 
 /-- The shared native projection contains these exact fields. -/
 theorem packingLabelWitnessArtifactValues :

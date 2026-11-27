@@ -470,10 +470,13 @@ compiler, allocator, conversion, or serialization semantics.
 The positive 32-edge boundary fixture is now represented directly as a
 structured `PackingLabelSource`; its converted artifact is field-for-field
 the existing witness and its native-order projection passes strict import.
-For any strict source view, the premise-free class cap now composes with an
-explicit length-mass bound, padded group-height bound, and two-sided child
-group bound to prove the retained-history invariant `8*child<=M`. Binding
-those three child-construction premises at every live call remains open.
+For any strict source view, the formal artifact recomputes the finite maximum
+class directly. Strict acceptance bounds that maximum, and the exact native
+`ceil(maximum/length)*length` formula is proved at most `maximum+length`.
+The rounded-height composition therefore no longer accepts a selected maximum
+class or padded-height inequality from the producer. The remaining live-call
+premises are `length*class_count<=edges` and the two-sided child-incidence
+bound; compiler/allocation/integer-conversion refinement remains open.
 `[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as

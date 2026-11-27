@@ -44,6 +44,16 @@ theorem padded_capacity
   have hscaled := mul_le_mul_of_nonneg_right hheight hD
   nlinarith
 
+/-- Rounding a class size up to a packet-length multiple adds at most one
+packet length. This is the exact arithmetic shape of Rust's
+`maximum.div_ceil(length) * length` packing height. -/
+theorem rounded_class_height_le_add
+    (maximum length : ℕ) :
+    (maximum ⌈/⌉ length) * length ≤ maximum + length := by
+  rw [Nat.ceilDiv_eq_add_pred_div]
+  exact (Nat.div_mul_le_self (maximum + length - 1) length).trans
+    (Nat.sub_le (maximum + length) 1)
+
 /-- The history's coarser `6M/64` child bound still implies eightfold shrink. -/
 theorem history_child_strict_shrink
     (M child : ℝ)

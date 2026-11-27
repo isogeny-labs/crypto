@@ -272,11 +272,13 @@ conversion, and serde remain
 outside this formal refinement. `[pcc:unverified]`
 The exact-boundary source is now constructed as structured edges and labels,
 proved to convert to the existing artifact exactly, and accepted from its own
-canonical projection. `PackingLabelSource.historyChildStrictShrink` then
-feeds strict acceptance through the recomputed class cap, `padded_capacity`,
-and the historical child bound to obtain eightfold shrink. Its remaining
-premises name the unformalized constructor interface: source length mass,
-padded group height, and the two-sided child-group edge bound.
+canonical projection. The strengthened source-to-history endpoint defines the
+maximum class as a finite supremum over every recomputed class, proves that
+strict acceptance's pointwise cap applies to that maximum, and kernel-checks
+the exact native ceil-and-multiply padding inequality before obtaining
+eightfold shrink. It removes the selected-class and padded-height producer
+premises. Source length mass and the exact two-sided child-incidence inequality
+remain to be bound at every live call.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

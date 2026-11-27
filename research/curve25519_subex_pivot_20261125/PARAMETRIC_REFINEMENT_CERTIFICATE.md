@@ -216,11 +216,14 @@ evidence for two independent claims:
    checks. Compiler, allocation, integer conversion, and serde
    refinement remain open.
    The positive exact-boundary control now has a structured formal source
-   record accepted through its own projection. A generic composition carries
-   strict source acceptance through its recomputed class cap, the length and
-   padded-height inequalities, and the two-sided child-group inequality to
-   the retained-history conclusion `8*child<=M`. The latter three inequalities
-   still need extraction from every live child constructor.
+   record accepted through its own projection. A generic composition takes the
+   finite supremum of all recomputed class sizes, proves the strict cap for
+   that actual maximum, and derives the exact
+   native `ceil(maximum/length)*length<=maximum+length` padding inequality.
+   It carries those facts, source length mass, and the two-sided child-group
+   inequality to `8*child<=M`. Thus maximum selection and padded height are
+   internal formal facts; only source length mass and two-sided child incidence
+   remain live-call inputs.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

@@ -26,6 +26,7 @@ open Curve25519ExtensionRingModel
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
+#print axioms rounded_class_height_le_add
 #print axioms history_child_strict_shrink
 #print axioms history_child_strict_shrink_of_class_capacity
 #print axioms derived_child_strict_shrink
@@ -131,7 +132,10 @@ open Curve25519ExtensionRingModel
 #print axioms parseSourceGuardPackingLabelArtifact_rightDegreeCap
 #print axioms parseSourceGuardPackingLabelArtifact_guard
 #print axioms parseSourceGuardPackingLabelArtifact_classCap
+#print axioms PackingLabelArtifact.maximumClassSize
+#print axioms parseSourceGuardPackingLabelArtifact_maximumClassCap
 #print axioms PackingLabelSource.historyChildStrictShrink
+#print axioms PackingLabelSource.historyChildStrictShrinkOfRoundedMaximum
 #print axioms packingLabelSourceGuardWitnessSource_artifact
 #print axioms packingLabelSourceGuardWitnessArtifact_toList
 #print axioms packingLabelSourceGuardWitness_parsed
