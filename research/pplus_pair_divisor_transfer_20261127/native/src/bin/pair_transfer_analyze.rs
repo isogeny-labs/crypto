@@ -42,7 +42,7 @@ fn main() {
 
     let verifier_summary = verifier
         .lines()
-        .find(|line| line.starts_with("VERIFY schema=pplus-pair-divisor-transfer-verify-v1"));
+        .find(|line| line.starts_with("VERIFY schema=pplus-pair-divisor-transfer-verify-v"));
     let exactness_ok = verifier_summary.and_then(|line| field(line, "exactness_ok")) == Some("1");
     let verifier_errors = verifier_summary
         .and_then(|line| field(line, "errors"))

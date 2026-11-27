@@ -32,6 +32,10 @@ fn neg(a: u64) -> u64 {
     }
 }
 
+fn sub(a: u64, b: u64) -> u64 {
+    add(a, neg(b))
+}
+
 fn mul(a: u64, b: u64) -> u64 {
     ((a as u128 * b as u128) % P as u128) as u64
 }
@@ -583,6 +587,95 @@ fn eval_dag(cell: &DagCell, inputs: &[u64; NV]) -> u64 {
     values[cell.root]
 }
 
+type NumericRw = [u64; 2];
+type NumericElem = [u64; 4];
+
+fn numeric_rw_add(a: NumericRw, b: NumericRw) -> NumericRw {
+    [add(a[0], b[0]), add(a[1], b[1])]
+}
+
+fn numeric_rw_sub(a: NumericRw, b: NumericRw) -> NumericRw {
+    [add(a[0], neg(b[0])), add(a[1], neg(b[1]))]
+}
+
+fn numeric_rw_mul(a: NumericRw, b: NumericRw, k: u64) -> NumericRw {
+    let u = mul(a[0], b[0]);
+    let v = mul(a[1], b[1]);
+    let cross = sub(sub(mul(add(a[0], a[1]), add(b[0], b[1])), u), v);
+    [add(u, mul(k, v)), cross]
+}
+
+fn numeric_q_mul(value: NumericRw, s4: u64, k: u64) -> NumericRw {
+    [
+        add(mul(s4, value[0]), mul(mul(2, k), value[1])),
+        add(mul(2, value[0]), mul(s4, value[1])),
+    ]
+}
+
+fn numeric_elem_add(a: NumericElem, b: NumericElem) -> NumericElem {
+    [
+        add(a[0], b[0]),
+        add(a[1], b[1]),
+        add(a[2], b[2]),
+        add(a[3], b[3]),
+    ]
+}
+
+fn numeric_elem_neg(a: NumericElem) -> NumericElem {
+    [neg(a[0]), neg(a[1]), neg(a[2]), neg(a[3])]
+}
+
+fn numeric_elem_mul(a: NumericElem, b: NumericElem, s4: u64, k: u64) -> NumericElem {
+    let a0 = [a[0], a[1]];
+    let a1 = [a[2], a[3]];
+    let b0 = [b[0], b[1]];
+    let b1 = [b[2], b[3]];
+    let u = numeric_rw_mul(a0, b0, k);
+    let v = numeric_rw_mul(a1, b1, k);
+    let cross = numeric_rw_sub(
+        numeric_rw_sub(
+            numeric_rw_mul(numeric_rw_add(a0, a1), numeric_rw_add(b0, b1), k),
+            u,
+        ),
+        v,
+    );
+    let constant = numeric_rw_add(u, numeric_q_mul(v, s4, k));
+    [constant[0], constant[1], cross[0], cross[1]]
+}
+
+fn independently_norm_dag(
+    cell: &DagCell,
+    inputs: &[u64; NV],
+    s_index: usize,
+    pair_index: usize,
+) -> u64 {
+    let s = inputs[s_index];
+    let pair = inputs[pair_index];
+    let k = add(add(pair, mul(2, s)), 4);
+    let s4 = add(s, 4);
+    let mut values = Vec::with_capacity(cell.nodes.len());
+    for node in &cell.nodes {
+        let value = match *node {
+            ParsedNode::Input(index) if index == s_index => [0, 0, 1, 0],
+            ParsedNode::Input(index) if index == pair_index => [0, 1, 0, 0],
+            ParsedNode::Input(index) => [inputs[index], 0, 0, 0],
+            ParsedNode::Constant(c) => [c, 0, 0, 0],
+            ParsedNode::Add(a, b) => numeric_elem_add(values[a], values[b]),
+            ParsedNode::Multiply(a, b) => numeric_elem_mul(values[a], values[b], s4, k),
+            ParsedNode::Negative(a) => numeric_elem_neg(values[a]),
+        };
+        values.push(value);
+    }
+    let value = values[cell.root];
+    let a = [value[0], value[1]];
+    let b = [value[2], value[3]];
+    let g = numeric_rw_sub(
+        numeric_rw_mul(a, a, k),
+        numeric_q_mul(numeric_rw_mul(b, b, k), s4, k),
+    );
+    sub(mul(g[0], g[0]), mul(k, mul(g[1], g[1])))
+}
+
 fn main() {
     let path = env::args().nth(1).unwrap_or_else(|| {
         eprintln!("usage: pair-transfer-verify CANDIDATE.txt");
@@ -661,10 +754,42 @@ fn main() {
         }
     }
 
+    let dag_index: BTreeMap<_, _> = dags
+        .iter()
+        .map(|cell| ((cell.label.clone(), cell.depth), cell))
+        .collect();
+    let mut dag_norm_checks = 0usize;
+    for current in dags.iter().filter(|cell| cell.label == "second_pair_norm") {
+        let previous_key = if current.depth == 1 {
+            ("h".to_owned(), 0)
+        } else {
+            ("second_pair_norm".to_owned(), current.depth - 1)
+        };
+        let Some(previous) = dag_index.get(&previous_key) else {
+            errors.push(format!(
+                "missing predecessor DAG for depth {}",
+                current.depth
+            ));
+            continue;
+        };
+        for assignment in &assignments {
+            let expected = independently_norm_dag(previous, assignment, SB, PB);
+            let actual = eval_dag(current, assignment);
+            dag_norm_checks += 1;
+            if actual != expected {
+                errors.push(format!(
+                    "independent DAG norm mismatch depth {}",
+                    current.depth
+                ));
+                break;
+            }
+        }
+    }
+
     let exactness_ok = usize::from(errors.is_empty());
     println!(
-        "VERIFY schema=pplus-pair-divisor-transfer-verify-v1 exactness_ok={exactness_ok} poly_cells={} dag_cells={} dag_eval_checks={} errors={}",
-        expected_cells.len(), dags.len(), dag_eval_checks, errors.len()
+        "VERIFY schema=pplus-pair-divisor-transfer-verify-v2 exactness_ok={exactness_ok} poly_cells={} dag_cells={} dag_eval_checks={} dag_norm_checks={} errors={}",
+        expected_cells.len(), dags.len(), dag_eval_checks, dag_norm_checks, errors.len()
     );
     for error in &errors {
         println!("ERROR {error}");
