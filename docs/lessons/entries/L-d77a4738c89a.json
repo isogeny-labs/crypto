@@ -1,0 +1,15 @@
+{
+  "action": "Inspect the persisted auth_outcome and the credential-exchange log before treating the step as authenticated; require successful identity and budget read outcomes before launch.",
+  "created": "2026-11-27T22:21:05Z",
+  "evidence": [
+    "https://github.com/isogeny-labs/crypto/actions/runs/46072715236/job/140753214745",
+    "research/pkm_native_rootfinder_e2e_20261127/access/workflow.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "isolab-eks"
+  ],
+  "trigger": "A GitHub Actions credential step uses continue-on-error and its step summary appears successful",
+  "why": "The credential step conclusion was success while its actual auth_outcome was failure after AWS rejected AssumeRoleWithWebIdentity; the budget step was skipped."
+}
