@@ -2259,6 +2259,33 @@ fn run_diem_inner(
                 })
                 .collect();
             dg.ab_rank = dense_rank(&ab, 2, None, r);
+            // uncounted dump of the attempt's core for offline kernel analysis
+            if let Ok(path) = std::env::var("QL_CORE_DUMP") {
+                use std::io::Write;
+                let rows_s: Vec<String> = core
+                    .iter()
+                    .map(|(t, rhs)| {
+                        let e: Vec<String> =
+                            t.iter().map(|&(c, v)| format!("[{c},{}]", v % r)).collect();
+                        format!("[[{}],{}]", e.join(","), rhs % r)
+                    })
+                    .collect();
+                if let Ok(mut f) =
+                    std::fs::OpenOptions::new().create(true).append(true).open(path)
+                {
+                    let _ = writeln!(
+                        f,
+                        "{{\"q\":{},\"seed\":{},\"attempt\":{},\"r\":{},\"cc\":{},\"ct\":{},\"rows\":[{}]}}",
+                        inst.q,
+                        prm.seed,
+                        res.attempts,
+                        r,
+                        cc,
+                        ct,
+                        rows_s.join(",")
+                    );
+                }
+            }
         }
         if core.len() >= cc + margin(cc) {
             // Linked: no core row holds t, so t is not determined (counted scan)
