@@ -20,12 +20,15 @@ The verifier requires normalized precision and checks, in order:
 5. exact equality of edge, packet, packet-length, exponent, coordinate, tuple,
    and group dimensions across those interfaces.
 
-The report returns actual maximum child edges and degree, whether
-`M>=2D^2delta` and `M>=LD` imply uniform packing closure, and whether the fixed
-radix-64 child shrink/degree guards hold. `verify_strict` requires both guard
-closure and observed child refinement. This separates a valid finite
-algebraic/refinement object from a strict theorem node rather than promoting
-one to the other.
+The report returns actual maximum child edges and degree, recomputed class
+count/maximum/padded height, the explicit `LD<=M` result, whether
+`M>=2D^2delta` and `M>=LD` imply uniform packing closure, and whether exact
+child replay satisfies `child*radix<=2*height*D`. For radix 64 it composes those
+facts into a separate packing-derived eightfold-shrink result and rejects any
+disagreement with observed child shrink. `verify_strict` requires that derived
+result, source closure, and child degree refinement. This separates a valid
+finite algebraic/refinement object from a strict theorem node rather than
+promoting one to the other.
 `[pcc:unverified]`
 
 ## Native control
@@ -34,7 +37,9 @@ The admitted three-edge conditional-packing fixture serializes and parses a
 complete node bundle. The composed verifier accepts it, including normalized
 precision, while reporting source-guard closure and strict source refinement
 false because the small radix-2 object is below the asymptotic guards and its
-children do not meet the fixed radix-64 interface. The strict entry point
+children do not meet the fixed radix-64 interface. It still reports exact
+row/column incidence accounting and the rounded-height child bound true. The
+strict entry point
 rejects with `node refinement strict source guards`. Clearing the required
 normalized-precision flag rejects at the context gate.
 `[pcc:unverified]`
@@ -47,8 +52,10 @@ code. `PACKING_GUARD_CLOSURE.md` gives the uniform producer induction, while
 the strict root and schema-6 transcript supply compatible schedules.
 `COMPOSITION_BOUNDARY_CERTIFICATE.md` now checks that compatibility and
 falsifies the stronger identification: the schema-6 normalized local witness
-has different `M,K` from the strict root. A parametric implication from generic
-node premises into the history ledger is still needed, the live `usize` branch
-cannot allocate a strict-root bundle, and the external contraction theorem
-remains unproved. No practical Curve25519 attack follows.
+has different `M,K` from the strict root. A natural-number formal endpoint now
+consumes the exact `LD<=M` and `child*64<=2*height*D` facts reported here.
+Rust/Lean semantic refinement for arbitrary successful node summaries is still
+needed, the live `usize` branch cannot allocate a strict-root bundle, and the
+external contraction theorem remains unproved. No practical Curve25519 attack
+follows.
 `[pcc:unverified]`

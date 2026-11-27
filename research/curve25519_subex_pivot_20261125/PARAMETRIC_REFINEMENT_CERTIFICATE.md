@@ -224,6 +224,12 @@ evidence for two independent claims:
    inequality to `8*child<=M`. Thus maximum selection and padded height are
    internal formal facts; only source length mass and two-sided child incidence
    remain live-call inputs.
+   Native packing replay now reports exact length mass and padded height; exact
+   child replay splits row and column incidences, reconstructs their sum, and
+   checks the two-sided rounded-height bound for every child. The node summary
+   reports shrink derived from these facts separately from observed shrink.
+   A natural-number Lean endpoint consumes the two native-shaped inequalities;
+   arbitrary-size cross-language summary refinement remains open.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

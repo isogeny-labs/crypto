@@ -836,6 +836,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(provenance_summary.edges, 2);
     assert_eq!(provenance_summary.packet_length, 4);
     assert!(!provenance_summary.source_capacity_admitted);
+    assert!(!provenance_summary.source_length_mass_admitted);
     assert!(!provenance_summary.source_guard_closure_admitted);
     let mode_summary = verify_cauchy_mode_coverage(
         &certificate,
@@ -931,6 +932,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.conditional_labels_verified);
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
+    assert!(!conditional_summary.source_length_mass_admitted);
     assert!(!conditional_summary.source_guard_closure_admitted);
     let mut missing_degree_cap = conditional_provenance.clone();
     missing_degree_cap.source_degree_cap = None;
@@ -996,6 +998,10 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
             .unwrap();
             assert_eq!(summary.edges, child.edges.len());
             assert_eq!(
+                summary.edges,
+                summary.row_group_edges + summary.column_group_edges
+            );
+            assert_eq!(
                 summary.packet_entry_tables,
                 conditional_certificate.packets.len()
             );
@@ -1025,6 +1031,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         conditional_certificate.tuples.len() * 2 * conditional_graph.edges.len()
     );
     assert!(!family_summary.eightfold_edge_shrink_admitted);
+    assert!(family_summary.rounded_height_child_bound_verified);
     assert!(!family_summary.packet_degree_guard_admitted);
     assert!(!family_summary.strict_source_refinement_admitted);
     let packing_description = packing_description_envelope(&conditional_provenance).unwrap();
@@ -1065,6 +1072,9 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     let node_summary = verify_node_refinement(&parsed_node, &mut meter).unwrap();
     assert!(node_summary.normalized_precision_admitted);
     assert!(!node_summary.source_guard_closure_admitted);
+    assert!(!node_summary.source_length_mass_admitted);
+    assert!(node_summary.rounded_height_child_bound_verified);
+    assert!(!node_summary.history_shrink_derived_from_packing);
     assert!(!node_summary.strict_source_refinement_admitted);
     assert_eq!(
         verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),
@@ -1319,6 +1329,8 @@ fn check_strict_source_guard_exact_boundary(
     assert_eq!(summary.edges, edges);
     assert!(summary.conditional_labels_verified);
     assert!(summary.source_bounds_verified);
+    assert_eq!(summary.padded_class_height, summary.maximum_class);
+    assert!(summary.source_length_mass_admitted);
     assert!(summary.source_guard_closure_admitted);
     if let Some(expected_projection) = expected_projection {
         let projection = packing_label_projection(&provenance).unwrap();

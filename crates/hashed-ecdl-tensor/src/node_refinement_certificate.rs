@@ -43,6 +43,12 @@ pub struct VerificationSummary {
     pub packets: BigUint,
     /// Packet length `L=2^a`.
     pub packet_length: BigUint,
+    /// Ordered label-class count `D`.
+    pub label_classes: usize,
+    /// Largest recomputed endpoint-label class.
+    pub maximum_class: usize,
+    /// Exact native `ceil(maximum_class/L)*L` class height.
+    pub padded_class_height: usize,
     /// Number of retained mode tuples.
     pub tuples: usize,
     /// Number of radix groups.
@@ -57,6 +63,12 @@ pub struct VerificationSummary {
     pub normalized_precision_admitted: bool,
     /// Whether source guards imply uniform packing and group-load closure.
     pub source_guard_closure_admitted: bool,
+    /// Whether the explicit source length-mass premise `L D<=M` holds.
+    pub source_length_mass_admitted: bool,
+    /// Whether exact child replay proves the rounded-height two-sided bound.
+    pub rounded_height_child_bound_verified: bool,
+    /// Whether the packing facts derive eightfold shrink for radix 64.
+    pub history_shrink_derived_from_packing: bool,
     /// Whether all fixed radix-64 strict child guards hold.
     pub strict_source_refinement_admitted: bool,
 }
@@ -90,10 +102,22 @@ pub fn verify(certificate: &Certificate, meter: &mut Meter) -> Result<Verificati
     {
         return Err("node refinement dimensions".into());
     }
+    let history_shrink_derived_from_packing = certificate.packing.radix == 64
+        && packing.source_guard_closure_admitted
+        && packing.source_length_mass_admitted
+        && children.rounded_height_child_bound_verified;
+    if history_shrink_derived_from_packing && !children.eightfold_edge_shrink_admitted {
+        return Err("node refinement derived child shrink".into());
+    }
+    let strict_source_refinement_admitted =
+        history_shrink_derived_from_packing && children.strict_source_refinement_admitted;
     Ok(VerificationSummary {
         edges: source.edges,
         packets: source.packets,
         packet_length: source.packet_length,
+        label_classes: packing.label_classes,
+        maximum_class: packing.maximum_class,
+        padded_class_height: packing.padded_class_height,
         tuples: children.tuples,
         groups: children.groups,
         children: children.children,
@@ -101,7 +125,10 @@ pub fn verify(certificate: &Certificate, meter: &mut Meter) -> Result<Verificati
         maximum_child_degree: children.maximum_degree,
         normalized_precision_admitted: source.normalized_precision_admitted,
         source_guard_closure_admitted: packing.source_guard_closure_admitted,
-        strict_source_refinement_admitted: children.strict_source_refinement_admitted,
+        source_length_mass_admitted: packing.source_length_mass_admitted,
+        rounded_height_child_bound_verified: children.rounded_height_child_bound_verified,
+        history_shrink_derived_from_packing,
+        strict_source_refinement_admitted,
     })
 }
 
@@ -111,7 +138,10 @@ pub fn verify_strict(
     meter: &mut Meter,
 ) -> Result<VerificationSummary, String> {
     let summary = verify(certificate, meter)?;
-    if !summary.source_guard_closure_admitted || !summary.strict_source_refinement_admitted {
+    if !summary.source_guard_closure_admitted
+        || !summary.history_shrink_derived_from_packing
+        || !summary.strict_source_refinement_admitted
+    {
         return Err("node refinement strict source guards".into());
     }
     Ok(summary)

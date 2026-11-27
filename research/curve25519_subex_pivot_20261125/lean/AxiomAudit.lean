@@ -136,6 +136,7 @@ open Curve25519ExtensionRingModel
 #print axioms parseSourceGuardPackingLabelArtifact_maximumClassCap
 #print axioms PackingLabelSource.historyChildStrictShrink
 #print axioms PackingLabelSource.historyChildStrictShrinkOfRoundedMaximum
+#print axioms PackingLabelSource.historyChildStrictShrinkOfRoundedMaximumNat
 #print axioms packingLabelSourceGuardWitnessSource_artifact
 #print axioms packingLabelSourceGuardWitnessArtifact_toList
 #print axioms packingLabelSourceGuardWitness_parsed

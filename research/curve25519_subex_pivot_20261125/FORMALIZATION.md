@@ -280,6 +280,14 @@ eightfold shrink. It removes the selected-class and padded-height producer
 premises. Source length mass and the exact two-sided child-incidence inequality
 remain to be bound at every live call.
 `[pcc:unverified]`
+The independent native packing verifier now exposes exact length mass and
+padded height. Child replay counts row and column incidences separately, proves
+their sum by exact edge-array reconstruction, and checks the rounded-height
+two-sided inequality for every child. The node verifier composes those facts
+into a distinct radix-64 derived-shrink result and cross-checks observed
+eightfold shrink. A natural-number formal endpoint accepts the same two
+inequalities without caller-managed casts. Cross-language summary refinement
+is still open. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

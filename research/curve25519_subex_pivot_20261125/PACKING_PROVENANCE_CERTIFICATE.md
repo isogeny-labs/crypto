@@ -146,6 +146,13 @@ premise and derives `8*child<=M`; source length mass and two-sided child
 incidence remain explicit. This is not yet an arbitrary-history producer
 refinement.
 `[pcc:unverified]`
+The native packing summary now exposes the same exact maximum, padded height,
+and Boolean `length*class_count<=edges` result. The independent child replay
+counts row and column incidences separately and verifies
+`child*radix<=2*height*class_count` for every child. A natural-number Lean
+endpoint consumes those two inequalities directly. Proving arbitrary native
+summary fields equal the formal source values remains a cross-language
+semantic obligation. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact

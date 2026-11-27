@@ -166,12 +166,16 @@ pub struct VerificationSummary {
     pub label_classes: usize,
     /// Largest reconstructed row/column label class.
     pub maximum_class: usize,
+    /// Exact native padded class height `ceil(maximum_class/L)*L`.
+    pub padded_class_height: usize,
     /// Number of unordered digit patterns replayed before empty suppression.
     pub orientation_patterns: usize,
     /// Nonnegative slack in `K L<=3M`, when that inequality holds.
     pub packing_slack: Option<BigUint>,
     /// Whether the replayed packet array satisfies source capacity.
     pub source_capacity_admitted: bool,
+    /// Whether the source length-mass guard `L D<=M` holds.
+    pub source_length_mass_admitted: bool,
     /// Whether conditional-expectation label selection was independently replayed.
     pub conditional_labels_verified: bool,
     /// Whether degree, variance, capacity, and all-coordinate balance were checked.
@@ -840,6 +844,8 @@ pub fn verify(
     if provenance.source_degree_cap.is_some() && !source_capacity_admitted {
         return Err("packing provenance source capacity".into());
     }
+    let source_length_mass_admitted = BigUint::from(packet_length) * BigUint::from(label_classes)
+        <= BigUint::from(provenance.edges.len());
     let mut maximum_group_load = 0usize;
     if provenance.source_degree_cap.is_some() {
         for coordinate in 0..provenance.packet_exponent {
@@ -904,9 +910,11 @@ pub fn verify(
         packet_length,
         label_classes,
         maximum_class: maximum,
+        padded_class_height: height,
         orientation_patterns,
         packing_slack: source_capacity_admitted.then(|| packing_rhs - packing_lhs),
         source_capacity_admitted,
+        source_length_mass_admitted,
         conditional_labels_verified: provenance.conditional_labels,
         source_bounds_verified: provenance.source_degree_cap.is_some(),
         source_guard_closure_admitted,

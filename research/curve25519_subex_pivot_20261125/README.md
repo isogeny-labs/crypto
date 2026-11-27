@@ -478,6 +478,14 @@ class or padded-height inequality from the producer. The remaining live-call
 premises are `length*class_count<=edges` and the two-sided child-incidence
 bound; compiler/allocation/integer-conversion refinement remains open.
 `[pcc:unverified]`
+The native packing summary now reports its recomputed maximum, padded height,
+and exact length-mass admission. Exact child replay reports row and column
+incidences separately, checks their sum against the live child array, and
+verifies `child*radix<=2*height*class_count` across the complete family. The
+node verifier separately reports radix-64 shrink derived from those packing
+facts and rejects disagreement with observed eightfold shrink. A
+natural-number Lean endpoint consumes the same two inequalities; arbitrary-size
+Rust-to-Lean summary refinement remains open. `[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row
