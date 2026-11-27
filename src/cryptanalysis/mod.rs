@@ -239,6 +239,7 @@ pub use ecdl_tensor_ic as tensor_ic;
 pub mod binary_radical_root;
 pub mod dreg_forecast;
 pub mod dreg_prior_table;
+pub mod fp_gemm;
 pub mod genus_ladder;
 pub mod genus_ladder_fastgroup;
 pub mod genus_ladder_harvest;

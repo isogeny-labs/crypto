@@ -41,10 +41,12 @@ pub use extension_sparse_dlp::{
 pub use sparse_collection_rank::Options as SparseCollectionRankOptions;
 
 /// Grounded signed witnesses for already-checked one/two-quadratic relations.
+#[allow(clippy::duplicate_mod)] // Also loaded by jv_forced_graph.
 #[path = "jv_quadratic_pair_graph.rs"]
 pub mod quadratic_pair_graph;
 
 /// Checked principal sources with at most two irreducible quadratic classes.
+#[allow(clippy::duplicate_mod)] // Also loaded by jv_forced_graph.
 #[path = "jv_quadratic_pair_relation.rs"]
 pub mod quadratic_pair_relation;
 
@@ -59,6 +61,7 @@ pub use extension_quadratic_pair_dlp::{
 };
 
 /// Deferred activation keeps checked ungrounded edges until a unit anchor arrives.
+#[allow(clippy::duplicate_mod)] // Also loaded by jv_forced_graph.
 #[path = "jv_deferred_pair_graph.rs"]
 pub mod deferred_pair_graph;
 #[path = "jv_extension_deferred_pair_dlp.rs"]
@@ -74,8 +77,9 @@ mod homogeneous_quotient;
 
 #[path = "jv_extension_remainder_dlp.rs"]
 mod extension_remainder_dlp;
+#[allow(clippy::duplicate_mod)] // Also loaded by jv_forced_graph.
 #[path = "jv_principal_relation.rs"]
-pub(crate) mod principal_relation;
+pub mod principal_relation;
 pub use extension_remainder_dlp::{run_extension_remainder_dlp_on, ExtensionRemainderDlpOptions};
 
 #[path = "jv_extension_anchored_dlp.rs"]
