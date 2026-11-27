@@ -48,10 +48,23 @@ Each factor is measured with the other three fixed at their fair settings
 Inversion and hashing matter only to the unbatched arms. Once inversions are
 batched (2 in setup, 179 in query), all three inversion routines tie.
 
-The x-only arm's gain over the best PR-style arm is a point estimate. Its CI is
-not computed directly, but the two arms' fair-control intervals,
-[3.123–3.131] and [4.580–4.604], do not overlap, so the frozen falsification
-target (a CI including 1.0) is not met.
+**Endpoint incomplete: x-only against the best PR-style arm.** The frozen
+protocol asked for a direct round-paired 95% interval for this comparison.
+`xonly` emitted only per-arm summaries, not per-round samples, so that interval
+cannot be computed or recomputed from the retained data. The point ratios,
+4.930/3.358 = 1.468 (primary) and 4.950/3.343 = 1.481 (replication), are
+descriptive only. Non-overlapping intervals against a common control are not the
+preregistered paired test. The original summaries are kept as recorded; no raw
+rows have been reconstructed. A future rerun must emit per-round rows (trial id,
+arm, order, per-phase and total elapsed, witness digest) and the direct paired
+interval with a fixed analysis seed. [pcc:unverified]
+
+From the retained per-round `ablate.csv` samples, reviewed independently on
+PR #5262: batch + quotient against the fair control, both at i64 inversion and
+Fx hash, gives a 3.104 ratio of medians and a 3.120 median within-round ratio.
+The candidate is faster in 41/41 rounds; the replication gives 3.104, 3.111 and
+41/41. These are timing repeats on one corpus, not independent instances.
+[pcc:unverified]
 
 ## The x-only query
 
@@ -106,6 +119,17 @@ the Jacobian path. `L = O` is handled as `T − O = T`.
   unmeasured.
 - Setup (1.48 ms) is now 44% of the total. Building the three-sum table level
   by level in affine coordinates, with batched inversion, is the next lever.
+- The timed interval covers table setup plus queries for all 40 targets
+  (32 random, 8 planted). It is not a cold single-target cost. Fixture
+  construction, verification and solver teardown are outside it.
+- Evaluator custody is not enforced. The harness reads the public master seed
+  and builds targets and planted witnesses in the same executable as the
+  solver. Nothing suggests the solver uses them, but nothing prevents it.
+- There are no A/A repeats in `time_arms` (the #5229 manifest had them). The 41
+  rounds repeat one corpus. The recall panel is a fresh domain on the same
+  master seed, a correctness check rather than a performance replicate.
+  Qualification needs independently prepared public input files, retained A/A
+  and independent held-out panels.
 
 ## Reproduce
 
