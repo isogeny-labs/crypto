@@ -25,3 +25,6 @@ target.
 The wrapper is orchestration only. All field/group arithmetic, exact support
 construction, independent replay, growth calculations, and promotion logic are
 implemented in the source-manifest-bound Rust binaries.
+
+The active custody record is `SOURCE_MANIFEST_2.json`; v1 is retained as the
+historical pre-amendment record.
