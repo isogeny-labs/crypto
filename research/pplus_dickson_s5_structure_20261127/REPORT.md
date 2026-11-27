@@ -22,8 +22,10 @@ verdict is `STRUCTURE_ONLY_STOP`; no m=7 or production census is authorized.
 - Active source custody: `SOURCE_MANIFEST_2.json` and
   `SOURCE_SHA256SUMS_2`, qualified source commit
   `18dca898e2b895a31f7651e230498baf583c2eb8`.
-- Raw v2 packet: `evidence-v2/candidate.txt`, `verifier.txt`, `analysis.txt`,
-  `RUN.txt` and `SHA256SUMS`.
+- Raw v2 packet: lossless `evidence-v2/candidate.txt.gz`, `verifier.txt`,
+  `analysis.txt`, `RUN.txt`, the original `SHA256SUMS`, and the stored-byte
+  `PACKAGE_SHA256SUMS`. `verify_evidence_package.sh` checks both the package and
+  the original uncompressed candidate digest without an object store.
 - Candidate SHA-256:
   `036663ad01fe17fc52a2d784857f8f74939f093a03e46428bfb392852044388f`.
 - Independent-verifier result:
