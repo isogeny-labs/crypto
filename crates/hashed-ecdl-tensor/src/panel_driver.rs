@@ -1050,6 +1050,11 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     if !binaries_unchanged {
         return Err("an arm binary changed during the run; analysis retained but invalid".into());
     }
+    if !options_unchanged {
+        return Err(
+            "optimized options changed during the run; analysis retained but invalid".into(),
+        );
+    }
     Ok(analysis)
 }
 

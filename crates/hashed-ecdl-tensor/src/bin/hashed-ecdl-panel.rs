@@ -258,6 +258,55 @@ mod tests {
     use super::*;
     use hashed_ecdl_tensor::curve::{Curve, Point as NativePoint};
     use hashed_ecdl_tensor::{Limits, Meter};
+    #[cfg(unix)]
+    use std::os::unix::fs::PermissionsExt;
+    #[cfg(unix)]
+    use std::time::Duration;
+
+    #[cfg(unix)]
+    #[test]
+    fn changed_optimized_policy_fails_run_after_retaining_rows() {
+        let dir = std::env::temp_dir().join(format!(
+            "hashed-ecdl-panel-policy-mutation-{}",
+            std::process::id()
+        ));
+        fs::create_dir(&dir).unwrap();
+        let panel_dir = dir.join("panel");
+        prepare(&panel_dir).unwrap();
+        let hashes = dir.join("inputs.sha256");
+        fs::write(&hashes, driver::hash_list(&panel_dir).unwrap()).unwrap();
+        let options = dir.join("options.json");
+        fs::write(&options, "{}\n").unwrap();
+        let binary = dir.join("mutating-solver");
+        fs::write(&binary, "#!/bin/sh\nprintf ' ' >> \"$3\"\nexit 0\n").unwrap();
+        fs::set_permissions(&binary, fs::Permissions::from_mode(0o755)).unwrap();
+        let output = dir.join("run");
+        let run = driver::RunOptions {
+            panel: panel_dir,
+            inputs_sha256: hashes,
+            baseline: binary.clone(),
+            candidate: binary,
+            optimized_options: Some(options),
+            out: output.clone(),
+            seed: 1,
+            aa_rounds: 1,
+            ab_rounds: 1,
+            deadline: Duration::from_secs(10),
+            case_limit: Duration::from_secs(1),
+            cases: Some(vec!["p5-development-s001-t0".into()]),
+            allow_incomplete_panel: true,
+            label: "policy-mutation-control".into(),
+        };
+        let error = driver::run(&run).unwrap_err();
+        assert!(error.to_string().contains("optimized options changed"));
+        let analysis: Value =
+            serde_json::from_slice(&fs::read(output.join("analysis.json")).unwrap()).unwrap();
+        assert_eq!(analysis["evidence_class"], "invalid_mutated_arm_or_policy");
+        assert!(!fs::read_to_string(output.join("rows.jsonl"))
+            .unwrap()
+            .is_empty());
+        fs::remove_dir_all(dir).unwrap();
+    }
 
     #[test]
     fn oracle_checks_full_cardinality_and_all_native_multiples() {
