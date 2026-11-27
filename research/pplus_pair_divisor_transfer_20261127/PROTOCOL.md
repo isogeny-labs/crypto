@@ -248,7 +248,7 @@ Peak live state is the sum of slots in every simultaneously live input,
 temporary and output; an input is released only after its last consumer.
 Arithmetic counts every field add/multiply used to produce the canonical map.
 
-### B. Hash-consed ordinary arithmetic DAG
+### B. Quadratic-tower ordinary arithmetic DAG
 
 Allowed nodes are only `input`, field `constant`, binary `add`, binary `mul`
 and unary `neg`. Squaring is a multiplication. Fixed-input nodes may fan out.
@@ -261,6 +261,33 @@ the prospectively listed identities `x+0=x`, `x*0=0`, `x*1=x`,
 arm and must be frozen before use. One state unit is one live arithmetic node;
 edges, peak nodes and operation counts are all emitted. Garbage collection may
 discard a node only after its last consumer.
+
+The novel representation tested here evaluates the input circuit in the
+explicit four-dimensional quadratic tower
+
+```text
+R[w,z] / (w^2-(P+2*S+4), z^2-(S+2*w+4))
+```
+
+on the basis `(1,w,z,w*z)`. Every one of the four components is an ordinary
+DAG root. Addition is componentwise. Multiplication is expanded using the
+two-level quadratic/Karatsuba formulas; every resulting base-ring
+multiplication is a charged `mul` node. There is no extension-element or
+Karatsuba node in the emitted representation.
+
+For an evaluated value `a+b*z`, with `a,b in R[w]`, the output norm is expanded
+as
+
+```text
+g = a^2 - (S+2*w+4)*b^2,
+N = g_0^2 - (P+2*S+4)*g_1^2,  where g=g_0+g_1*w.
+```
+
+Zero components are removed only by the listed exact simplifications. This arm
+therefore tests the strongest obvious sharing opportunity: four conjugates are
+carried as tower components rather than four separately expanded calls. If the
+actual polar keeps four independent components per level, that state is still
+charged and is not renamed a constant-size extension object.
 
 The sparse arm detects coefficient cancellation; the DAG arm tests whether a
 non-expanded circuit actually avoids four fresh instantiations per level.
