@@ -1297,16 +1297,64 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
     deadline: Option<std::time::Instant>,
     observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
 ) -> Result<Option<Vec<u64>>, E> {
+    let mut roots = Vec::new();
+    match poly_roots_fp_observed_into_until(f, p, seed, deadline, &mut roots, observe)? {
+        Some(()) => Ok(Some(roots)),
+        None => Ok(None),
+    }
+}
+
+/// Caller-owned output for the observed rational-root kernel.
+///
+/// The accounted F4 visitor uses this boundary to allocate the result under
+/// its call token *before* the kernel writes it, and then carries the same
+/// owner across filtering and traversal.  The ordinary `Vec` implementation
+/// below preserves the public root APIs.  Polynomial workspace inside the
+/// kernel remains a separate storage-policy migration.
+pub(crate) trait RootOutput<E> {
+    fn try_push_root(&mut self, root: u64) -> Result<(), E>;
+    fn try_store_only_root(&mut self, root: u64) -> Result<(), E>;
+    fn sort_unstable_dedup(&mut self);
+}
+
+impl<E> RootOutput<E> for Vec<u64> {
+    fn try_push_root(&mut self, root: u64) -> Result<(), E> {
+        self.push(root);
+        Ok(())
+    }
+
+    fn try_store_only_root(&mut self, root: u64) -> Result<(), E> {
+        debug_assert!(self.is_empty());
+        *self = vec![root];
+        Ok(())
+    }
+
+    fn sort_unstable_dedup(&mut self) {
+        self.sort_unstable();
+        self.dedup();
+    }
+}
+
+/// The observed root kernel with storage supplied by the caller for the final
+/// result. `output` must be empty on entry. `Ok(None)` may leave a partial
+/// output, which the caller must discard; `Err` has the same requirement.
+pub(crate) fn poly_roots_fp_observed_into_until<E>(
+    f: &[u64],
+    p: u64,
+    seed: u64,
+    deadline: Option<std::time::Instant>,
+    output: &mut impl RootOutput<E>,
+    observe: &mut impl FnMut(RootFieldOperation) -> Result<(), E>,
+) -> Result<Option<()>, E> {
     let expired = || deadline.is_some_and(|d| std::time::Instant::now() >= d);
     if expired() {
         return Ok(None);
     }
     let f = poly_trim(f.to_vec());
     if f.len() <= 1 {
-        return Ok(Some(Vec::new()));
+        return Ok(Some(()));
     }
     if p == 2 {
-        let mut roots = Vec::new();
         for x in 0..2 {
             let mut value = 0;
             for &coefficient in f.iter().rev() {
@@ -1314,15 +1362,16 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
                 value = root_add(value, coefficient, p, observe)?;
             }
             if value == 0 {
-                roots.push(x);
+                output.try_push_root(x)?;
             }
         }
-        return Ok(Some(roots));
+        return Ok(Some(()));
     }
     if f.len() == 2 {
         let inverse = root_inv(f[1], p, observe)?;
         let scaled = root_mul(f[0], inverse, p, observe)?;
-        return Ok(Some(vec![root_neg(scaled, p, observe)?]));
+        output.try_store_only_root(root_neg(scaled, p, observe)?)?;
+        return Ok(Some(()));
     }
     // x^p − x mod f
     let Some(xp) = poly_powmod_observed(&[0, 1], p, &f, p, deadline, observe)? else {
@@ -1335,7 +1384,6 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
     xp_minus_x[1] = root_sub(xp_minus_x[1], 1, p, observe)?;
     let g = poly_gcd_observed(&f, &poly_trim(xp_minus_x), p, observe)?;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x524F_4F54);
-    let mut out = Vec::new();
     let mut stack = vec![g];
     while let Some(h) = stack.pop() {
         if expired() {
@@ -1346,7 +1394,7 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
             2 => {
                 let inverse = root_inv(h[1], p, observe)?;
                 let scaled = root_mul(h[0], inverse, p, observe)?;
-                out.push(root_neg(scaled, p, observe)?);
+                output.try_push_root(root_neg(scaled, p, observe)?)?;
             }
             _ => {
                 // Split h with gcd((x + δ)^((p−1)/2) − 1, h).
@@ -1386,12 +1434,11 @@ pub(crate) fn poly_roots_fp_observed_until<E>(
             }
         }
     }
-    out.sort_unstable();
-    out.dedup();
+    output.sort_unstable_dedup();
     if expired() {
         Ok(None)
     } else {
-        Ok(Some(out))
+        Ok(Some(()))
     }
 }
 
@@ -1861,6 +1908,7 @@ mod tests {
         .unwrap()
         .unwrap();
         assert_eq!(roots, vec![1]);
+        assert_eq!(roots.capacity(), 1, "linear legacy allocation stays exact");
         assert_eq!(
             operations,
             vec![
