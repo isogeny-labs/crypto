@@ -61,6 +61,7 @@ this study does not change those maps.
 | Degree-six poles 2E_ref | 15,390,826 shifted triples at target 2rho | Only formal zero row; direct 108/102/6 |
 | Degree-six poles H+2R | 15,390,826 shifted triples at target kappa | Exactly seven known rows; direct 108/102/6 |
 | Conics tangent at exceptional R | 15,390,826 shifted triples at target 2kappa | No six-image word; direct 108/102/6 |
+| Three whole residual traces | 15,390,826 shifted triples at target 3kappa | No word; combined signed-case bound leaves 108/102/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -705,11 +706,57 @@ corruption checks pass. No fixture enters the actual matrix. See
 
 ![Three completed degree-six necessary image bounds. Each uses the same original 451-symbol alphabet and 15,390,826 triples; counts are exact finite evaluations. No repeated-sample uncertainty applies. Fixture rows are excluded. Divisor dimensions come from Riemann–Roch; actual conic local constraint rank is separately checked.](degree-six.pdf)
 
+## Three whole residual traces
+
+For three degree-two residual traces $T_i=\kappa-A_i-B_i$, closure
+$T_1+T_2+T_3=O$ requires six signed old images to sum to $3\kappa$.
+The new native test exhausts that necessary condition on the same
+451-symbol alphabet. The target differs from $O$, $\kappa$, $2\kappa$
+and the completed $2\rho$ target. Both arithmetic streams agree on all
+15,390,826 triples, and both exact joins find zero pairs and zero
+coefficient rows. No formal zero word is required or inserted.
+Actual full/auxiliary/closed ranks stay 108/102/6. [pcc:unverified]
+
+The exact ordered stream digest is:
+
+```
+31439860aa79a92bb3c50dfd66804354735d6901f2ac559be77bfb261c280560
+```
+
+Three actual split sections have support indices 42..45,79..82,91..94.
+For each, native checks reconstruct the complete quartic factor product,
+evaluate all four actual map images and compare the residual trace with
+$\kappa-A_i-B_i$ using both group implementations. Changed actual traces
+reject. These witnesses verify the trace identity; they do not assert
+three-trace closure for those actual sections. A separate public fixture
+uses $\kappa=2G$ and nonzero traces $G,G,-2G$. It detects coefficient row
+$(-4,2)$ on $G,2G$, of rank one. Changed anchors break closure. The
+ordinary nonzero six-word fixture and independent small brute enumeration
+also pass. No fixture enters the actual matrix. [pcc:unverified]
+
+The result combines with the earlier complete six-symbol target-$\kappa$
+bound. For signs $s_i=\pm1$, closure requires the six signed anchor
+images to sum to $(s_1+s_2+s_3)\kappa$, hence to one of
+$\pm\kappa,\pm3\kappa$. Negation is already included in the alphabet.
+The $3\kappa$ case is empty; the $\kappa$ case has exactly seven known
+rows in the original rank-six span. Therefore **every signed combination
+of three whole traces adds no projected rank within this anchor domain**.
+This does not exclude every mixed-sign cycle; such cycles can reproduce
+known rows. Selected individual residual points, larger combinations and
+other anchor domains remain outside the bound. [pcc:unverified]
+
+![Signed-case reduction for three whole traces. The reduction is algebraic; counts copy the new 3kappa result and the earlier complete kappa result. Exact finite domains, no statistical error bars.](three-trace.pdf)
+
+See [the frozen protocol](THREE_TRACE_PROTOCOL.md),
+[the immutable run report](reports/three-trace-six-v1/REPORT.pdf) and
+`evidence/three-trace-six-v1/` for exact target coordinates, actual trace
+witnesses, controls, hashes, argv, exits and resource costs.
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of41immutable attempt reports retains complete per-call and wrapper
+Each of42immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
@@ -719,6 +766,8 @@ its full worker takes 170.862 seconds and wrapper 186.243 seconds.
 The H+2R build, full worker and wrapper take 14.526, 178.044 and
 192.615 seconds respectively. The exceptional tangent-conic build, full
 worker and wrapper take 14.459, 175.874 and 190.378 seconds respectively.
+The three-trace build, full worker and wrapper take 14.425, 175.104 and
+189.579 seconds respectively.
 Earlier costs remain in their unchanged attempt reports.
 
 Four build failures are preserved: audit-old-v1 lacked iostream; norms-v1
@@ -771,15 +820,22 @@ All three degree-six successors now complete: $2E_{\mathrm{ref}}$ has
 only the formal zero row, $H+2R$ has exactly seven known rows, and
 $2H-2R$ has no six-image word. They leave the frozen closed span at six.
 
-A distinct next mechanism is closure of three degree-two residual traces.
-Each has trace $T_i=\kappa-A_i-B_i$, so
-$T_1+T_2+T_3=O$ requires the six original images to sum to $3\kappa$.
-That six-symbol target has not been tested. Freeze a protocol before
-running it, and bind any positive image word to actual residual supports
-and cover/KM verification with separate elliptic/elimination replay.
-A null would bound this three-trace mechanism in the fixed image domain.
-Nonrational individual images and longer coupled traces remain outside
-these tests. [pcc:unverified]
+The three-whole-trace successor now completes with no $3\kappa$ word.
+Together with the prior $\kappa$ six-symbol bound it closes every signed
+three-whole-trace combination at the current projected span.
+
+Next proposed work tests degree-five and degree-six residual divisors
+whose individual images all equal a rational old image $P$. A function
+with poles bounded by $H+(m-2)R$ and two old zeros $A,B$ leaves effective
+residual degree $m$ and requires $\kappa-A-B=mP$. A closed point mapping
+to rational $P$ contributes its residue degree times $P$; degrees five
+and six are admissible component degrees for the verified degree-six map.
+These image constraints can be tested by a direct pair-to-multiple join
+for $m=5,6$. The $m=4$ condition is already contained in the completed
+six-symbol target-$\kappa$ bound and should be reused, not rerun.
+This successor has not run. Freeze its protocol and use a nonempty control
+before execution. Any positive row needs actual closed-fibre or RR/KM
+realization and separate elliptic/elimination replay. [pcc:unverified]
 
 ## Sources and reproduction
 
@@ -806,7 +862,8 @@ these tests. [pcc:unverified]
   [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md) and
   [reference-shifted six symbols](SHIFTED_SIX_PROTOCOL.md),
   [canonical-plus-exceptional six symbols](CANONICAL_SIX_PROTOCOL.md) and
-  [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md).
+  [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md) and
+  [three whole residual traces](THREE_TRACE_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -815,7 +872,7 @@ these tests. [pcc:unverified]
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
   run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
-  run-exceptional-conic-six.sh.
+  run-exceptional-conic-six.sh and run-three-trace-six.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
@@ -838,3 +895,7 @@ The new control-isolation diagram and contact histogram copy native receipts;
 the control-only preflight is excluded from the rank-case graph.
 The degree-six flow diagram and its editable data copy the three native
 terminal results; earlier parent-map and scoreboard figures remain unchanged.
+
+The signed three-trace diagram combines the new native target3kappa receipt
+with the earlier native targetkappa receipt; its sign reduction is derived
+algebraically. Other parent-map and scoreboard graphs remain unchanged.

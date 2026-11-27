@@ -316,6 +316,22 @@ if (exceptional_source.parent/'exit-code.txt').exists() and (exceptional_source.
         "nonzero fixture/brute enumeration and all row/triple/orientation controls pass. "
         "Fixtures enter no actual data. Individual rational images remain restricted to "
         "the frozen original signed domain; this does not exhaust other conics.")
+trace3_source=ROOT/'evidence/three-trace-six-v1/calls/full/stdout.json'
+if (trace3_source.parent/'exit-code.txt').exists() and (trace3_source.parent/'exit-code.txt').read_text().strip()=='0':
+    triple_trace=json.loads(trace3_source.read_text())
+    attempts['three-trace-six-v1']=(
+        f"Three whole residual traces require six signed old images at target 3kappa. "
+        f"All {triple_trace['unordered_triples']} triples agree between native GMP and "
+        f"named OpenSSL; both joins agree on {triple_trace['distinct_rows_including_zero']} "
+        f"rows, with no formal zero inserted. Full/auxiliary/closed ranks "
+        f"{triple_trace['full_rank']}/{triple_trace['auxiliary_rank']}/{triple_trace['closed_rank']}. "
+        "Three actual split sections have complete factor/map/trace checks. A separate "
+        "nonzero G,G,-2G trace-closure fixture gives a rank-one coefficient row; its "
+        "changed-anchor control rejects. Earlier nonzero fixture/brute six-word and "
+        "row/triple/orientation controls also pass. No fixture enters actual data. "
+        "Combined with the completed kappa six-symbol bound, all signed three-whole-trace "
+        "closures add no rank in the original image domain. This does not bound cycles "
+        "involving selected individual residual points or longer trace combinations.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -442,6 +458,24 @@ if 'shifted' in globals() and 'canonical' in globals():
     for suffix in ('svg','pdf'):
         subprocess.run(['dot','-T'+suffix,'degree-six.dot','-o','degree-six.'+suffix],cwd=ROOT,check=True)
 
+if 'triple_trace' in globals():
+    (ROOT/'three-trace-values.json').write_text(json.dumps({
+        'new_source':'evidence/three-trace-six-v1/calls/full/stdout.json',
+        'new_result':triple_trace,
+        'imported_kappa_source':'evidence/canonical-six-v1/calls/full/stdout.json',
+        'imported_kappa_result':canonical,
+        'sign_reduction':'sum(s_i*T_i)=0 implies six signed anchor images sum to (sum s_i)*kappa; sum s_i is +/-1 or +/-3'},indent=2)+'\n')
+    dot=('digraph G {rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];'
+         'a[label="Three whole traces\\nT_i = kappa - A_i - B_i"];'
+         'b[label="Signed closure\\ns_i = +1 or -1"];'
+         f'c[label="All signs equal: +/-3kappa\\n{triple_trace["unordered_triples"]:,} triples\\n{triple_trace["distinct_rows_including_zero"]} rows"];'
+         f'd[label="Mixed signs: +/-kappa\\nPrior complete six-symbol bound\\n{canonical["distinct_rows_including_zero"]} known rows incl. zero"];'
+         f'e[label="No independent added row\\nClosed rank {triple_trace["closed_rank"]} on original 225 columns"];'
+         'a->b;b->c;b->d;c->e;d->e;}')
+    (ROOT/'three-trace.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'three-trace.dot','-o','three-trace.'+suffix],cwd=ROOT,check=True)
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -470,7 +504,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Higher contact*','high-contact-scan-v1/calls/combine'),
                         ('2Eref six','shifted-six-v2/calls/full'),
                         ('H+2R six','canonical-six-v1/calls/full'),
-                        ('2H-2R six','exceptional-conic-six-v1/calls/full')]:
+                        ('2H-2R six','exceptional-conic-six-v1/calls/full'),
+                        ('Three traces','three-trace-six-v1/calls/full')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -510,7 +545,7 @@ for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
 
 # Compact only the editable rank SVG; source values and all sealed evidence stay exact.
@@ -519,7 +554,7 @@ s=rank_svg.read_text()
 s=re.sub(r'<!--.*?-->','',s,flags=re.S)
 s=re.sub(r'>\s+<','><',s)
 s=re.sub(r'(?<![A-Za-z0-9_])(-?\d+\.\d{4,})',
-         lambda m:format(float(m.group()),'.3f').rstrip('0').rstrip('.'),s)
+         lambda m:format(float(m.group()),'.2f').rstrip('0').rstrip('.'),s)
 refs=set(re.findall(r'(?:url\(#|href="#)([^)" ]+)',s))
 s=re.sub(r' id="([^"]+)"',lambda m:m.group() if m[1] in refs else '',s)
 s=re.sub(r'style="([^"]*)"',lambda m:'style="'+re.sub(r'\s*([:;])\s*',r'\1',m[1])+'"',s)
