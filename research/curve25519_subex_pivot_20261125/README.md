@@ -368,6 +368,15 @@ complete finite path from an edge skeleton to packet/group objects, not a
 uniform arbitrary-size theorem, asymptotic graph realization, or the external
 contraction theorem. `[pcc:unverified]`
 
+The formal objective model now executes the same ascending-label,
+strict-improvement first-minimum fold rather than only accepting an abstract
+minimizer premise. A generic theorem proves the selected cost is at most every
+candidate cost; exact row and column corollaries feed that receipt into the
+conditional-objective averaging proof and show each executable choice is
+nonincreasing. Equal costs retain the earlier label by construction. Binding a
+complete serialized native endpoint/label trace to the resulting finite
+sequence remains separate. `[pcc:unverified]`
+
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
 group child. From schema-3 parent provenance and the accepted factorization
 object, its schema-2 verifier reconstructs retained old vertices including

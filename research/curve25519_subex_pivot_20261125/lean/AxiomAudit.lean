@@ -39,6 +39,9 @@ open Curve25519ExtensionRingModel
 #print axioms exists_nonincreasing_column_label
 #print axioms minimum_row_label_nonincreasing
 #print axioms minimum_column_label_nonincreasing
+#print axioms firstMinimumLabel_le
+#print axioms firstMinimumRowLabel_nonincreasing
+#print axioms firstMinimumColumnLabel_nonincreasing
 #print axioms prefixAssignment_step
 #print axioms row_sequence_nonincreasing
 #print axioms column_sequence_nonincreasing

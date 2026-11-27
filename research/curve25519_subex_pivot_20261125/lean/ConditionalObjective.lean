@@ -187,6 +187,63 @@ theorem column_update_objective_sum
             intro second _
             ring
 
+/-- Source-shaped strict-improvement fold used by the native first-minimum
+selector. Equal costs retain the earlier candidate. -/
+def firstMinimumFrom {q : ℕ} (cost : Fin q → ℕ) :
+    Fin q → List (Fin q) → Fin q
+  | best, [] => best
+  | best, candidate :: candidates =>
+      firstMinimumFrom cost
+        (if cost candidate < cost best then candidate else best) candidates
+
+private theorem firstMinimumFrom_le_best
+    {q : ℕ} (cost : Fin q → ℕ) (best : Fin q)
+    (candidates : List (Fin q)) :
+    cost (firstMinimumFrom cost best candidates) ≤ cost best := by
+  induction candidates generalizing best with
+  | nil => simp [firstMinimumFrom]
+  | cons candidate candidates ih =>
+      rw [firstMinimumFrom]
+      by_cases hcost : cost candidate < cost best
+      · simp only [hcost, ↓reduceIte]
+        exact (ih candidate).trans (Nat.le_of_lt hcost)
+      · simp only [hcost, ↓reduceIte]
+        exact ih best
+
+private theorem firstMinimumFrom_le_of_mem
+    {q : ℕ} (cost : Fin q → ℕ) (best candidate : Fin q)
+    (candidates : List (Fin q)) (hmem : candidate ∈ candidates) :
+    cost (firstMinimumFrom cost best candidates) ≤ cost candidate := by
+  induction candidates generalizing best with
+  | nil => simp at hmem
+  | cons head tail ih =>
+      rw [firstMinimumFrom]
+      simp only [List.mem_cons] at hmem
+      by_cases hcost : cost head < cost best
+      · simp only [hcost, ↓reduceIte]
+        rcases hmem with rfl | hmem
+        · exact firstMinimumFrom_le_best cost candidate tail
+        · exact ih head hmem
+      · simp only [hcost, ↓reduceIte]
+        rcases hmem with rfl | hmem
+        · exact (firstMinimumFrom_le_best cost best tail).trans
+            (Nat.le_of_not_lt hcost)
+        · exact ih best hmem
+
+/-- Execute the native ascending-label, strict-improvement first-minimum rule
+over a nonempty label alphabet. -/
+def firstMinimumLabel {q : ℕ} (hq : 0 < q)
+    (cost : Fin q → ℕ) : Fin q :=
+  firstMinimumFrom cost ⟨0, hq⟩ (List.finRange q)
+
+/-- The executable first-minimum selector has cost no larger than every
+candidate in the alphabet. -/
+theorem firstMinimumLabel_le
+    {q : ℕ} (hq : 0 < q) (cost : Fin q → ℕ) (candidate : Fin q) :
+    cost (firstMinimumLabel hq cost) ≤ cost candidate := by
+  apply firstMinimumFrom_le_of_mem
+  simp
+
 /-- If the sum of `q` candidate costs is `q` times the old cost, at least one
 candidate is nonincreasing. -/
 theorem exists_candidate_le_of_sum_eq
@@ -303,5 +360,87 @@ theorem minimum_column_label_nonincreasing
   obtain ⟨candidate, hcandidate⟩ :=
     exists_nonincreasing_column_label hq left right rows columns vertex hunknown
   exact (hminimum candidate).trans hcandidate
+
+/-- Execute the first-minimum rule on the exact row-candidate objectives. -/
+def firstMinimumRowLabel
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Row) : Fin q :=
+  firstMinimumLabel hq fun label =>
+    conditionalObjective q left right
+      (Function.update rows vertex (some label)) columns
+
+/-- The executable first-minimum row choice discharges the abstract minimizer
+premise and cannot increase the exact conditional objective. -/
+theorem firstMinimumRowLabel_nonincreasing
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Row)
+    (hunknown : rows vertex = none) :
+    conditionalObjective q left right
+        (Function.update rows vertex
+          (some (firstMinimumRowLabel hq left right rows columns vertex))) columns ≤
+      conditionalObjective q left right rows columns := by
+  apply minimum_row_label_nonincreasing hq left right rows columns vertex _ hunknown
+  intro label
+  simpa only [firstMinimumRowLabel] using
+    (firstMinimumLabel_le hq
+      (fun candidate => conditionalObjective q left right
+        (Function.update rows vertex (some candidate)) columns) label)
+
+/-- Execute the first-minimum rule on the exact column-candidate objectives. -/
+def firstMinimumColumnLabel
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Column) : Fin q :=
+  firstMinimumLabel hq fun label =>
+    conditionalObjective q left right rows
+      (Function.update columns vertex (some label))
+
+/-- The executable first-minimum column choice discharges the abstract minimizer
+premise and cannot increase the exact conditional objective. -/
+theorem firstMinimumColumnLabel_nonincreasing
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Column)
+    (hunknown : columns vertex = none) :
+    conditionalObjective q left right rows
+        (Function.update columns vertex
+          (some (firstMinimumColumnLabel hq left right rows columns vertex))) ≤
+      conditionalObjective q left right rows columns := by
+  apply minimum_column_label_nonincreasing hq left right rows columns vertex _ hunknown
+  intro label
+  simpa only [firstMinimumColumnLabel] using
+    (firstMinimumLabel_le hq
+      (fun candidate => conditionalObjective q left right rows
+        (Function.update columns vertex (some candidate))) label)
 
 end Curve25519ConditionalObjective

@@ -170,6 +170,17 @@ path to 0.02 seconds and enables the 0.06-second four-path control. The separate
 packing-provenance verifier still replays the original objective.
 `[pcc:unverified]`
 
+Lean now has a transparent version of the verifier's first-minimum rule as
+well. `firstMinimumLabel` scans `List.finRange q` in ascending order and replaces
+the incumbent only on strict cost improvement, so equal costs keep the first
+label. `firstMinimumLabel_le` proves its selected cost is no greater than every
+candidate; `firstMinimumRowLabel_nonincreasing` and
+`firstMinimumColumnLabel_nonincreasing` instantiate the exact conditional
+objective and eliminate the abstract minimizer premise for each executable
+step. The remaining native boundary is to parse the complete endpoint/selected-
+label arrays and connect their full row-then-column trace to these steps.
+`[pcc:unverified]`
+
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,
 degree 256, maximum class 36--40, padded mass 65536, 1188--1214 packets, and
