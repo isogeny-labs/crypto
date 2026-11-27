@@ -956,6 +956,45 @@ theorem decodeNativeProductCoordinates
           decodePowerBasis precision degree lowerCoefficient right :=
       (decodePowerBasis_mul_eq_mk precision degree lowerCoefficient left right).symm
 
+/-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the
+irreducible binary polynomial `U^4 + U + 1`, packed as integer `19`. -/
+def degreeFourLowerCoefficient (index : Fin 4) : Bool :=
+  index.val == 0 || index.val == 1
+
+/-- The dense canonical coordinate vector serialized by the native degree-four
+multiplication control. -/
+def degreeFourDenseCoordinates (_ : Fin 4) : ZMod (2 ^ 5) := 1
+
+/-- The exact canonical native product serialized by the same control. -/
+def degreeFourDenseProductCoordinates (index : Fin 4) : ZMod (2 ^ 5) :=
+  match index.val with
+  | 0 => 30
+  | 1 => 29
+  | 2 => 0
+  | _ => 3
+
+/-- The serialized packed polynomial `19` is exactly the monic degree-four bit
+plus the accepted lower-bit vector. -/
+theorem degreeFourPolynomialBits :
+    19 = 2 ^ 4 + ∑ index : Fin 4,
+      if degreeFourLowerCoefficient index then 2 ^ (index : ℕ) else 0 := by
+  decide
+
+/-- Kernel-checked concrete counterpart of the native dense multiplication
+witness: `[1,1,1,1]^2 = [30,29,0,3]` modulo 32 and `U^4+U+1`. -/
+theorem degreeFourDenseNativeProduct :
+    nativeProductCoordinates 5 4 degreeFourLowerCoefficient
+        degreeFourDenseCoordinates degreeFourDenseCoordinates =
+      degreeFourDenseProductCoordinates := by
+  funext index
+  fin_cases index <;>
+    norm_num [nativeProductCoordinates, nativeReduceBufferDescending,
+      nativeReductionBufferRow_apply, convolutionBuffer_apply,
+      convolutionCoefficient, degreeFourLowerCoefficient,
+      degreeFourDenseCoordinates, degreeFourDenseProductCoordinates,
+      Fin.sum_univ_succ] <;>
+    decide
+
 /-- Coordinate-polynomial convolution followed by any finite logical reduction
 schedule represents the product of the decoded inputs. -/
 theorem decodePowerBasis_mul_eq_reduced_mk

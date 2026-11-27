@@ -477,11 +477,19 @@ reruns `Ring::new`, checks the exact polynomial and all lower bits, and then
 independently replays the zero-fast-path nested convolution, retained-high
 reverse reduction, and final truncation before comparing every product
 coordinate, charging each executed product and reduction. The dense degree-4,
-precision-5 control exercises both convolution
-and reduction, round-trips through JSON, and rejects an altered output
-coordinate. This is bounded concrete `Vec<BigUint>` code-to-transition
+precision-5 control exercises both convolution and reduction, round-trips
+through JSON, and rejects an altered output coordinate. This is bounded
+concrete `Vec<BigUint>` code-to-transition
 evidence; it is not a mechanized Rust compiler refinement or a universal Lean
 instantiation. `[pcc:unverified]`
+
+The same control now has a concrete kernel-checked Lean counterpart. The formal
+model defines the accepted lower bits `[1,1,0,0]`, proves that the monic
+degree-four packing is exactly `19` (`U^4+U+1`), and evaluates the audited
+source-shaped transition equations to
+`[1,1,1,1]^2=[30,29,0,3]` in precision five. This manually instantiates the
+native sample values; it does not authenticate arbitrary serialized witnesses
+into Lean or prove Rust compiler refinement. `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
@@ -508,10 +516,11 @@ formulas, and the retained target plus all higher slots stay unchanged until
 truncation. The complete reverse fold is now composed: every returned low slot
 equals the logical reduced coefficient, the truncated coordinate polynomial is
 the reduced convolution, and decoding it gives the quotient product. A
-mechanized concrete-`Vec<BigUint>` compiler refinement and accepted-vector
-elaboration still require formal work. Deterministic polynomial selection and
-one accepted multiplication are now independently replayed by native witnesses,
-but have not yet been instantiated in Lean.
+mechanized concrete-`Vec<BigUint>` compiler refinement and an authenticated
+general witness-to-Lean binding still require formal work. Deterministic
+polynomial selection and one accepted multiplication are independently replayed
+by native witnesses, and that sample's exact bits and coordinates are now also
+instantiated in Lean.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

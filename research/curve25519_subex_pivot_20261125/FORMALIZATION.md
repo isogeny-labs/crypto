@@ -557,9 +557,12 @@ power-basis decoding is exactly the product of the decoded inputs. A native
 with the deterministic polynomial and lower-bit vector. Its standalone verifier
 independently executes the same zero-fast-path convolution, retained-high reverse
 reduction, and truncation transition order, and rejects a changed output. The
-remaining boundary is a mechanized compiler refinement from concrete Rust
-`Vec<BigUint>` execution to the model and Lean instantiation of accepted native
-witnesses; the current degree-4 replay is finite code-to-transition evidence.
+formal model now fixes that sample's packed polynomial `19`, lower bits
+`[1,1,0,0]`, dense inputs, and product `[30,29,0,3]`, and kernel-checks the
+exact source-shaped evaluation. The remaining boundary is a mechanized compiler
+refinement from concrete Rust `Vec<BigUint>` execution to the model and an
+authenticated general serialized-witness-to-Lean binding; the current degree-4
+agreement is one finite manually instantiated sample.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
