@@ -438,6 +438,14 @@ fixture remains proved to fail the stronger parser. These are finite
 code-to-model controls plus generic native export and checked-import endpoints,
 not a uniform arbitrary-size Rust-to-Lean semantic refinement.
 `[pcc:unverified]`
+Independently of those concrete controls, the formal artifact now exposes its
+own canonical header/edge/row/column projection. The unchecked parser is proved
+to recover every artifact with the declared edge and row split lengths; the
+checked, replayed, and strict source-guard parsers are proved to recover every
+artifact satisfying their respective formal predicates. This closes the
+arbitrary-finite Lean encoder/parser round trip, while the cross-language
+Rust-to-Lean compiler and serialization refinement remains open.
+`[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

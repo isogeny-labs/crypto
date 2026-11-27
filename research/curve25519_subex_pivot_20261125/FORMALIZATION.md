@@ -243,6 +243,14 @@ seconds after compilation. The remaining boundary is to lift these finite
 code-to-model controls to every arbitrary-size producer object semantically
 and to every live recursive history.
 `[pcc:unverified]`
+The formal artifact itself now has a size-generic canonical projection in the
+same field order expected by the checked importer. Kernel proofs show that the
+unchecked parser is a left inverse under its declared split lengths, that every
+well-formed bounded artifact survives checked parsing, and that the replayed
+and strict source-guard parsers accept the projection when the corresponding
+formal trace and guard predicates hold. These statements quantify over every
+formal artifact; they do not yet refine Rust construction, integer conversion,
+or serialization to that projection. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,

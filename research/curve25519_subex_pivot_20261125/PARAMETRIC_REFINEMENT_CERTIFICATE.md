@@ -197,7 +197,11 @@ evidence for two independent claims:
    exponents `a=2,3,4`, reaching 131,072 edges and 256 label classes at the
    largest rung through an independent sparse auxiliary-state replay. This is
    finite scaling evidence; uniform producer-family binding remains open. The
-   first replay-compression
+   formal artifact's canonical flat encoder is now proved to round-trip through
+   the checked, replayed, and strict parsers for every artifact satisfying the
+   corresponding formal predicates. This removes the arbitrary-size formal
+   parser-surjectivity subgap, but not the cross-language Rust producer binding.
+   The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a
    fixed offset plus `2q` times a directed interaction score. The formal

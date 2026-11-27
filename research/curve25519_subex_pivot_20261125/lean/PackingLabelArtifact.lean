@@ -172,6 +172,42 @@ def parsePackingLabelArtifact (values : List ℕ) : Option PackingLabelArtifact 
   let artifact ← parsePackingLabelArtifactUnchecked values
   if artifact.wellFormed && artifact.bounded then some artifact else none
 
+/-- Canonical flat projection emitted by the native schema-3 exporter: the
+nine-field header, endpoint quadruples, row labels, then column labels. -/
+def PackingLabelArtifact.projectionValues
+    (artifact : PackingLabelArtifact) : List ℕ :=
+  [artifact.schema, artifact.radix, artifact.packetExponent,
+    artifact.coordinate, artifact.conditionalLabels,
+    artifact.sourceDegreeCap, artifact.edgeCount, artifact.rowCount,
+    artifact.columnCount] ++ artifact.edgeFields ++ artifact.rowLabels ++
+      artifact.columnLabels
+
+/-- The unchecked parser is a left inverse of the canonical projection when
+the two split positions have their declared lengths. -/
+theorem parsePackingLabelArtifactUnchecked_projectionValues
+    (artifact : PackingLabelArtifact)
+    (hedges : artifact.edgeFields.length = 4 * artifact.edgeCount)
+    (hrows : artifact.rowLabels.length = artifact.rowCount) :
+    parsePackingLabelArtifactUnchecked artifact.projectionValues =
+      some artifact := by
+  simp [PackingLabelArtifact.projectionValues,
+    parsePackingLabelArtifactUnchecked, hedges, hrows]
+
+/-- Every well-formed, bounded artifact round-trips through the exact flat
+projection interface consumed by the checked formal importer. -/
+theorem parsePackingLabelArtifact_projectionValues
+    (artifact : PackingLabelArtifact)
+    (hwell : artifact.wellFormed = true)
+    (hbounded : artifact.bounded = true) :
+    parsePackingLabelArtifact artifact.projectionValues = some artifact := by
+  have hshape := hwell
+  simp only [PackingLabelArtifact.wellFormed, Bool.and_eq_true,
+    beq_iff_eq] at hshape
+  unfold parsePackingLabelArtifact
+  rw [parsePackingLabelArtifactUnchecked_projectionValues artifact
+    hshape.1.1.1.2 hshape.1.1.2]
+  simp [hwell, hbounded]
+
 private theorem parsePackingLabelArtifact_components
     {values : List ℕ} {artifact : PackingLabelArtifact}
     (hparse : parsePackingLabelArtifact values = some artifact) :
@@ -383,6 +419,33 @@ theorem parseSourceGuardPackingLabelArtifact_of_components
     (hguard : artifact.sourceClassGuardMatches = true) :
     parseSourceGuardPackingLabelArtifact values = some artifact := by
   simp [parseSourceGuardPackingLabelArtifact, hreplayed, hguard]
+
+/-- A formally replayable artifact is accepted after canonical projection. -/
+theorem parseReplayedPackingLabelArtifact_projectionValues
+    (artifact : PackingLabelArtifact)
+    (hwell : artifact.wellFormed = true)
+    (hbounded : artifact.bounded = true)
+    (htrace : artifact.traceMatches = true) :
+    parseReplayedPackingLabelArtifact artifact.projectionValues =
+      some artifact := by
+  exact parseReplayedPackingLabelArtifact_of_components
+    (parsePackingLabelArtifact_projectionValues artifact hwell hbounded)
+    htrace
+
+/-- A formally replayable artifact satisfying the source-degree guard is
+accepted by the strict importer after canonical projection. -/
+theorem parseSourceGuardPackingLabelArtifact_projectionValues
+    (artifact : PackingLabelArtifact)
+    (hwell : artifact.wellFormed = true)
+    (hbounded : artifact.bounded = true)
+    (htrace : artifact.traceMatches = true)
+    (hguard : artifact.sourceClassGuardMatches = true) :
+    parseSourceGuardPackingLabelArtifact artifact.projectionValues =
+      some artifact := by
+  exact parseSourceGuardPackingLabelArtifact_of_components
+    (parseReplayedPackingLabelArtifact_projectionValues
+      artifact hwell hbounded htrace)
+    hguard
 
 private theorem parseReplayedPackingLabelArtifact_components
     {values : List ℕ} {artifact : PackingLabelArtifact}

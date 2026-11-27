@@ -105,6 +105,14 @@ controls also pass at `a=2,3,4`, respectively
 after compilation. This is finite scaling evidence for the proved score
 interface, not a uniform code-to-Lean refinement theorem.
 `[pcc:unverified]`
+The formal artifact type now also has a canonical `projectionValues` encoder
+in exactly the header/edge/row/column order consumed by its parser. Lean proves
+the unchecked parser is a left inverse whenever the two declared split lengths
+hold, and proves every well-formed bounded artifact round-trips through the
+checked parser. The replay and source-guard parsers inherit that round trip
+when their formal trace and guard predicates hold. This is arbitrary-finite
+formal encoder/parser closure; it does not identify the encoder with Rust's
+compiler, overflow, or serde semantics. `[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact
