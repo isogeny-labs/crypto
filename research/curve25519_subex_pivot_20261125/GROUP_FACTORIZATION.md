@@ -172,16 +172,20 @@ or refine the accepted Rust child arrays into those typed group-local
 functions. `[pcc:unverified]`
 
 The native `CauchySourceWitness` narrows the first of those interfaces. It
-serializes the production base, numerator unit, and complete stored factor map.
-An independent verifier reconstructs all of them from `(a,i,t,z)`, checks each
-unit inverse, and recomputes every schema-2 packet weight and nonzero mode
-row/column. The verifier imports ring arithmetic and serialized certificate
+serializes the exact monic polynomial selected by `Ring::new`, its length-`d`
+lower-bit vector matching the formal `Fin d -> Bool` parameter, the production
+base, numerator unit, and complete stored factor map. An independent verifier
+reruns deterministic polynomial selection, checks every lower bit, reconstructs
+the scalar values from `(a,i,t,z)`, checks each unit inverse, and recomputes every
+schema-2 packet weight and nonzero mode row/column. The verifier imports ring
+arithmetic and serialized certificate
 types, but not `deformation`, packing, child construction, or recursion. This
 binds the concrete native values to the displayed scalar formulas. Composing
 the separately accepted packet-pair provenance now also reconstructs the full
 mode list in packet/tile/weight order and checks every source zero-suppression.
-A Lean refinement from the accepted witness and a concrete all-child
-Rust-to-typed-function mapping remain open. `[pcc:unverified]`
+Instantiation of the accepted lower-bit vector and scalar coordinates in Lean,
+plus a concrete all-child Rust-to-typed-function mapping, remain open.
+`[pcc:unverified]`
 
 `lean/ExtensionRingModel.lean` now fixes the formal coefficient type to the
 same power-basis shape as native `Ring`: a quotient

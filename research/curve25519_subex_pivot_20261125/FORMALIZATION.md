@@ -516,9 +516,12 @@ shift, cutoff, or geometric-series algebra itself.
 `[pcc:unverified]`
 
 The scalar half of that link now has a typed native witness. The standalone
-verifier reconstructs the signed grid, derivative content, unit factors and
-inverses, base, numerator unit, all packet weights, and every emitted nonzero
-mode coefficient from serialized `(a,i,t,z)` data. Its implementation imports
+verifier first reruns `Ring::new` and checks the serialized monic bit pattern
+plus the exact length-`d` lower-bit vector corresponding to the formal
+`Fin d -> Bool` parameter. It then reconstructs the signed grid, derivative
+content, unit factors and inverses, base, numerator unit, all packet weights,
+and every emitted nonzero mode coefficient from serialized `(a,i,t,z)` data.
+Its implementation imports
 the exact ring only, not the production deformation or recursion modules. The
 same verifier composes accepted packing-provenance packet pairs with the scalar
 witness to enumerate the complete mode vector in exact source-loop order,

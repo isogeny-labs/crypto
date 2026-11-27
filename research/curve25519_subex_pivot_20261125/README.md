@@ -455,12 +455,15 @@ refinements are not discharged by this replay.
 
 The native scalar boundary now has a separate serializable
 `CauchySourceWitness`. It exposes the actual stored base, numerator unit, and
-complete `(difference, valuation, inverse)` factor map. The standalone
-factorization verifier independently reconstructs these values from
+complete `(difference, valuation, inverse)` factor map, plus the exact monic
+polynomial bit pattern and length-`d` lower-bit vector selected by `Ring::new`.
+The standalone factorization verifier reruns that deterministic selection,
+checks every lower bit, independently reconstructs the scalar values from
 `(a,i,t,z)`, then checks every packet-matrix weight and every nonzero mode row
 and column without importing deformation, packing, child, or recursive code.
-The `L=4` fixture rejects altered valuation, missing factor, inverse,
-numerator-unit, and active-coordinate witnesses, and every executed-source
+The `L=4` fixture rejects altered polynomial or lower-bit data, valuation,
+missing factor, inverse, numerator-unit, and active-coordinate witnesses, and
+every executed-source
 certificate path replays the witness before acceptance. Composing the accepted
 packing-provenance packet pairs with that witness now reconstructs the complete
 mode list in exact packet/tile/weight loop order, including every source-side

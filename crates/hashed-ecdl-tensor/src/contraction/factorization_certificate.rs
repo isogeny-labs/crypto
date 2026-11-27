@@ -32,6 +32,10 @@ use std::sync::Arc;
 fn cauchy_source_witness(kernel: &deformation::Cauchy, coordinate: usize) -> CauchySourceWitness {
     let (sample, base, numerator_unit, factors) = kernel.source_witness_parts();
     CauchySourceWitness {
+        polynomial: kernel.ring.polynomial().clone(),
+        lower_coefficients: (0..kernel.ring.degree())
+            .map(|index| kernel.ring.polynomial().bit(index as u64))
+            .collect(),
         a: u32::try_from(kernel.a).unwrap(),
         coordinate: u32::try_from(coordinate).unwrap(),
         center: kernel.t,
@@ -722,6 +726,18 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(cauchy_summary.mode_rows > 0);
     assert!(cauchy_summary.mode_columns > 0);
 
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.polynomial ^= BigUint::from(2u8);
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness polynomial"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.lower_coefficients[0] ^= true;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness polynomial coefficients"
+    );
     let mut bad_cauchy = cauchy_witness.clone();
     bad_cauchy.factors[0].valuation += 1;
     assert_eq!(

@@ -167,6 +167,11 @@ pub struct CauchyFactorWitness {
 /// can additionally bind its concrete stored values to the scalar formulas.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CauchySourceWitness {
+    /// Exact monic binary polynomial selected by `Ring::new`, as a bit pattern.
+    pub polynomial: BigUint,
+    /// Lower polynomial bits in ascending power-basis order; this is the
+    /// serialized counterpart of the formal `Fin degree -> Bool` parameter.
+    pub lower_coefficients: Vec<bool>,
     /// Packet-length exponent, so every packet has `L=2^a` slots.
     pub a: u32,
     /// Active valuation coordinate `i`, giving tile period `2^(i+1)`.
@@ -802,6 +807,18 @@ pub fn verify_cauchy_source(
     let ring = Ring::new(certificate.degree, certificate.precision, meter)
         .map_err(|error| error.to_string())?;
     verify_with_ring(certificate, &ring, meter)?;
+    if &witness.polynomial != ring.polynomial() {
+        return Err("Cauchy witness polynomial".into());
+    }
+    if witness.lower_coefficients.len() != ring.degree()
+        || witness
+            .lower_coefficients
+            .iter()
+            .enumerate()
+            .any(|(index, &coefficient)| coefficient != ring.polynomial().bit(index as u64))
+    {
+        return Err("Cauchy witness polynomial coefficients".into());
+    }
 
     let a = usize::try_from(witness.a).map_err(|_| "Cauchy witness exponent".to_string())?;
     let coordinate =
