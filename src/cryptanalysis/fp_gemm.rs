@@ -57,8 +57,7 @@ pub fn detect_gemm_simd() -> GemmSimd {
         {
             return GemmSimd::Avx512;
         }
-        if std::arch::is_x86_feature_detected!("avx2")
-            && std::arch::is_x86_feature_detected!("fma")
+        if std::arch::is_x86_feature_detected!("avx2") && std::arch::is_x86_feature_detected!("fma")
         {
             return GemmSimd::Avx2Fma;
         }
@@ -1271,7 +1270,13 @@ mod tests {
             state ^= state << 17;
             state % p
         };
-        for &(m, n, k) in &[(1, 1, 1), (6, 24, 17), (7, 25, 33), (19, 73, 300), (37, 263, 270)] {
+        for &(m, n, k) in &[
+            (1, 1, 1),
+            (6, 24, 17),
+            (7, 25, 33),
+            (19, 73, 300),
+            (37, 263, 270),
+        ] {
             let a_u: Vec<u64> = (0..m * k).map(|_| next()).collect();
             let b_u: Vec<u64> = (0..k * n).map(|_| next()).collect();
             let c0_u: Vec<u64> = (0..m * n).map(|_| next()).collect();
@@ -1280,7 +1285,9 @@ mod tests {
             let b_f: Vec<f64> = b_u.iter().map(|&x| x as f64).collect();
             let mut c_f: Vec<f64> = c0_u.iter().map(|&x| x as f64).collect();
             let mut pack = Vec::new();
-            gemm_f64_mod_p(simd, m, n, k, &a_f, k, &b_f, n, &mut c_f, n, p, bm, &mut pack);
+            gemm_f64_mod_p(
+                simd, m, n, k, &a_f, k, &b_f, n, &mut c_f, n, p, bm, &mut pack,
+            );
 
             for i in 0..m {
                 for j in 0..n {
@@ -1289,7 +1296,11 @@ mod tests {
                         ref_v += u128::from(a_u[i * k + kk]) * u128::from(b_u[kk * n + j]);
                     }
                     let want = (ref_v % u128::from(p)) as u64;
-                    assert_eq!(c_f[i * n + j] as u64, want, "mismatch at ({i},{j}) for ({m},{n},{k})");
+                    assert_eq!(
+                        c_f[i * n + j] as u64,
+                        want,
+                        "mismatch at ({i},{j}) for ({m},{n},{k})"
+                    );
                 }
             }
         }
@@ -1301,9 +1312,23 @@ mod tests {
             let bm = barrett_m(p);
             let max_v = 1u64 << 52;
             let mut vals: Vec<u64> = vec![
-                0, 1, p - 1, p, p + 1, 2 * p - 1, 2 * p, 2 * p + 1,
-                p * p - 1, p * p, p * p + 1,
-                max_v - 2 * p, max_v - p - 1, max_v - p, max_v - p + 1, max_v - 1, max_v,
+                0,
+                1,
+                p - 1,
+                p,
+                p + 1,
+                2 * p - 1,
+                2 * p,
+                2 * p + 1,
+                p * p - 1,
+                p * p,
+                p * p + 1,
+                max_v - 2 * p,
+                max_v - p - 1,
+                max_v - p,
+                max_v - p + 1,
+                max_v - 1,
+                max_v,
             ];
             let q_max = max_v / p;
             for dq in 0..16u64 {
@@ -1321,8 +1346,16 @@ mod tests {
             let mut want_nnz = 0u32;
             for i in 0..vals.len() {
                 let want = vals[i] % p;
-                assert_eq!(f[i] as u64, want, "reduce_f64 mismatch for p={p} v={}", vals[i]);
-                assert_eq!(u[i] as u64, want, "reduce_u32 mismatch for p={p} v={}", vals[i]);
+                assert_eq!(
+                    f[i] as u64, want,
+                    "reduce_f64 mismatch for p={p} v={}",
+                    vals[i]
+                );
+                assert_eq!(
+                    u[i] as u64, want,
+                    "reduce_u32 mismatch for p={p} v={}",
+                    vals[i]
+                );
                 if want != 0 {
                     want_nnz += 1;
                 }
@@ -1338,8 +1371,12 @@ mod tests {
         let bm = barrett_m(p);
         assert!(k_safe_f64(p) < 16 && k_safe_f64(p) >= 3);
         let (m, n, k) = (13, 51, 40);
-        let a_u: Vec<u64> = (0..m * k).map(|i| (i as u64 * 1234567 + 99991) % p).collect();
-        let b_u: Vec<u64> = (0..k * n).map(|i| (i as u64 * 7654321 + 31337) % p).collect();
+        let a_u: Vec<u64> = (0..m * k)
+            .map(|i| (i as u64 * 1234567 + 99991) % p)
+            .collect();
+        let b_u: Vec<u64> = (0..k * n)
+            .map(|i| (i as u64 * 7654321 + 31337) % p)
+            .collect();
         let c0_u: Vec<u64> = (0..m * n).map(|i| p - 1 - (i as u64 % 97)).collect();
         let a_f: Vec<f64> = a_u.iter().map(|&x| x as f64).collect();
         let b_f: Vec<f64> = b_u.iter().map(|&x| x as f64).collect();
