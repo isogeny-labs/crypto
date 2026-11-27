@@ -27,13 +27,16 @@ RECORDED_PREFIXES = (
     "KIC_", "F4_", "IC_", "ICX_", "GB_", "GAUDRY_", "KOBLITZ_", "JV_", "BSGS_",
     "BTW_", "DREG_", "SOLVER_", "SPOT_", "SOLINAS_", "TRAITS_", "WDSAT_",
     "ECBENCH_", "DQ_", "W1_", "N37_", "ZERO_DIM_LA_", "M4GB_", "PROBE_", "CERTICOM_TEST_",
+    # HKY3_* selects hky_fp_tower_fast2 schedule / GEMM arms (exact, but path-affecting).
+    "HKY3_",
 )
 RECORDED_EXACT = (
     "RAYON_NUM_THREADS", "OMP_NUM_THREADS", "CUDA_VISIBLE_DEVICES",
     "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CC", "CXX", "CFLAGS", "HASHCLASH_PREFIX",
     "D4_BIN_MVAR", "FES_GPU_TIMING", "PENCIL_RETAINED_INVENTORY", "SMITH_CANONICAL_SWEEP",
-    # HKY2_SIMD selects the field kernel; N83_SAT_PHASE_TRACE times solve phases (overhead).
-    "HKY2_SIMD", "N83_SAT_PHASE_TRACE",
+    # HKY2_SIMD / FP_GEMM_SIMD select the field or dense kernel; N83_SAT_PHASE_TRACE
+    # times solve phases (overhead).
+    "HKY2_SIMD", "FP_GEMM_SIMD", "N83_SAT_PHASE_TRACE",
     # QDIAG_Q/QDIAG_CS pick the quartic_ladder diag workload; GOLDEN_PRINT makes the
     # gaudry golden test print and skip its assertions; GENUS_LADDER_EXPORT_CORE
     # names a core-dump path. Recorded so a run states them.
@@ -51,6 +54,8 @@ NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DI
                                   # read only inside #[cfg(test)] code: the #[ignore]d quartic_ladder
                                   # diag_attempts inputs and gaudry_cubic's print-instead-of-assert mode
                                   "QDIAG_Q", "QDIAG_CS", "GOLDEN_PRINT",
+                                  # HKY3_PROF only prints phase timers; arithmetic path unchanged.
+                                  "HKY3_PROF",
                                   "GH_TOKEN", "GITHUB_TOKEN"})
 
 
