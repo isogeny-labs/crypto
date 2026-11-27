@@ -63,6 +63,8 @@ this study does not change those maps.
 | Conics tangent at exceptional R | 15,390,826 shifted triples at target 2kappa | No six-image word; direct 108/102/6 |
 | Three whole residual traces | 15,390,826 shifted triples at target 3kappa | No word; combined signed-case bound leaves 108/102/6 |
 | Same-image residual m=5,6 | Shared 101,926 pairs; 902 multiple queries | No matches in either degree; direct 108/102/6 |
+| Actual ramification | Degrees 1,1,2; four simple geometric supports | Map indices 2; specified-axis polar rank 3; Ram-H gives 237/231/6 |
+| Individual ramification poles | H+2B1, H+2B2, H+Q; 15,390,826 triples each | Zero words in all three; joint 237/231/6; partial poles reduce to canonical H |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -876,11 +878,97 @@ the frozen base; this single row cannot eliminate them. A positive goal
 result still needs additional closed rank with separate elliptic and
 elimination replay and actual cover/KM validity.
 
+## Individual ramification components as pole divisors
+
+The whole ramification divisor is linearly equivalent to $H$, so using
+it wholesale repeats the canonical pole class. The successor instead
+uses $D_1=H+2B_1$, $D_2=H+2B_2$ and $D_3=H+Q$, where $B_1,B_2$ are
+the two rational ramification points and $Q$ is the degree-two closed
+component. Each divisor has degree six and Riemann--Roch dimension four.
+Writing $P_i=f(B_i)$ and $T=\operatorname{Tr}(f(Q))$, the necessary
+six-image targets are
+
+$$\kappa+2P_1,\qquad\kappa+2P_2,\qquad\kappa+T.$$
+
+The degree-two source component contributes its full trace **once**.
+The native plan checks all three targets, full-width references and
+public half-targets in GMP and named OpenSSL before allocating a triple
+table. The targets are distinct up to sign from one another and from
+all completed full-six-word targets $0,\kappa,2\kappa,3\kappa$ and
+$2\rho_{\mathrm{ref}}$. Because principal divisors push forward to zero,
+these target differences also distinguish the pole classes from those
+previous classes with different targets. This is a necessary signature,
+not a classification of the entire Picard group. [pcc:unverified]
+
+These three targets were chosen to let the new trace columns cancel.
+Let $h$ denote the old coefficient word for $H$. If old-image words
+$W_1,W_2,W_3$ realized the three targets, their relations would be
+$W_1-h-2P_1$, $W_2-h-2P_2$, and $W_3-h-T$. Adding the first two,
+twice the third, and twice the actual relation
+$P_1+P_2+T-h$ leaves the pure-old word
+
+$$W_1+W_2+2W_3-6h.$$
+
+Its independence would still require the rank test and actual RR/KM
+realization; the construction does not assume a rank gain.
+
+Each of the three workers completes all **15,390,826 unordered triples**
+on the 451-symbol original signed alphabet. Every shifted triple and
+stream hash agrees between GMP and named OpenSSL; the grouped and indexed
+joins agree on every row and witness. All three families return **zero
+candidate words**. The separate native combine validates all receipts
+and leaves actual and candidate ranks **237/231/6**, with zero joint
+additional closed rank. [pcc:unverified]
+
+![Three actual ramification pole classes, their new image targets, complete signed-triple bounds and joint auxiliary elimination. All values copied from ramification-poles-v1.](ramification-poles.pdf)
+
+All 688 columns, including the three ramification trace columns, remain
+in the reference and candidate rows. The signed contributions beyond
+$H$ are $+2e_{685}$, $-2e_{686}$ and $+e_{687}$ respectively. The
+237-row actual matrix and all 463 auxiliary columns remain active.
+Candidate words are checked on this entire width; removing their
+nonzero trace contributions would not give valid old-base relations.
+
+A nonempty auxiliary-reference fixture uses old symbols $G,2G$, a
+separate auxiliary $3G$, and target $6G$ with reference $2(3G)$.
+Both joins equal independent brute six-word enumeration. Including the
+baseline row $(-2,1,0)$ gives full rank two, auxiliary one and closed one.
+An isolated numerical old-unit mutant gives closed two and fails both
+group checks. Changed reference coefficient, trace sign, repeated
+quadratic-trace weight, finite branch image, orientation, omitted
+candidate/triple and missing-family controls reject. No fixture enters
+actual data. [pcc:unverified]
+
+The literal comparison uses the **complete padded zero divisor**
+$D+\operatorname{div}(u)$ with all six images in the original signed
+rational domain. Here a Riemann--Roch argument also handles cancellation
+at the new poles. Because $H$ is canonical in genus three,
+
+$$l(H)=3=l(H+B_i),\qquad L(H+B_i)=L(H).$$
+
+Thus a function in $L(H+2B_i)$ either uses the full double pole at $B_i$
+or belongs to $L(H)$; an intermediate simple pole supplies no new
+function. A function over $\mathbb F_p$ has equal pole orders at the two
+conjugates of $Q$, so for $L(H+Q)$ it likewise uses both simple poles or
+neither. The new ramification supports are disjoint from the split
+reference $H$.
+
+Consequently, when the three full-pole bounds are null, any function in
+these three spaces whose **actual zero images** all belong to the old
+domain must lie in $L(H)$. Padding cancelled poles at $H$ uses only its
+known old images, so the prior complete canonical bound already puts
+its projected row in the original rank-six span. This is derived
+whole-space coverage for these three divisors, not another measured
+search. Other pole classes and zero images outside the fixed domain
+remain outside the result. Necessary candidates would still require
+actual RR/KM realization and separate replay for positive goal
+completion. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of44immutable attempt reports retains complete per-call and wrapper
+Each of45immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
@@ -919,6 +1007,12 @@ source snapshots and hashes identify the exact executed source.
 The ramification-support strict build takes 16.145 seconds, its native worker
 30.713 seconds and complete wrapper 46.908 seconds. These are resource
 receipts from one capped execution, not performance comparisons.
+
+The individual-ramification pole run has strict build 17.317 seconds,
+plan 15.918 seconds, family workers 185.503/185.083/184.422 seconds and
+combine 17.949 seconds. The serial wrapper totals 606.283 seconds across
+all six calls; the 600-second limit applies to each native worker.
+These are single-execution resource receipts, not performance comparisons.
 
 ## Next discriminating work
 
@@ -962,11 +1056,19 @@ has simple support of degrees 1,1,2, with actual map index two at every
 geometric point. Its three fresh rational traces yield one actual row,
 which leaves closed rank six after full auxiliary elimination. The
 specified-axis reflection is excluded by a rank-three certificate.
-The next useful family must provide additional actual relations coupling
-these trace columns to the old base, or another independently justified
-pole class. Repeating the one principal Ram-H row cannot close that gap.
-Freeze that family before execution and retain the existing caps.
-[pcc:unverified]
+The three individual-ramification pole spaces $H+2B_1$, $H+2B_2$ and
+$H+Q$ now yield no new old-base relation. The full-pole bounds are null;
+Riemann--Roch reduces every incomplete new pole to the already bounded
+canonical space. No extra simple-pole enumeration is needed.
+
+The remaining degree-two divisor supported on the ramification set is
+$B_1+B_2$: the complete list is $2B_1,B_1+B_2,2B_2,Q$.
+Its pole class $H+B_1+B_2$ has target
+$\kappa+P_1+P_2=2\kappa-T$. Preflight that target, freeze its protocol,
+and test it without repeating the three completed searches. Reuse their
+receipts in a joint elimination check. This fourth target is not tested
+by the current run. Positive old-base gain still needs actual RR/KM and
+separate elliptic/elimination replay. [pcc:unverified]
 
 ## Sources and reproduction
 
@@ -996,7 +1098,8 @@ Freeze that family before execution and retain the existing caps.
   [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md) and
   [three whole residual traces](THREE_TRACE_PROTOCOL.md) and
   [same-image closed residuals](CLOSED_RESIDUAL_PROTOCOL.md) and
-  [actual ramification supports](RAMIFICATION_PROTOCOL.md).
+  [actual ramification supports](RAMIFICATION_PROTOCOL.md) and
+  [individual ramification poles](RAMIFICATION_POLE_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -1005,7 +1108,7 @@ Freeze that family before execution and retain the existing caps.
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
   run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
-  run-exceptional-conic-six.sh, run-three-trace-six.sh, run-closed-residual.sh and run-ramification.sh.
+  run-exceptional-conic-six.sh, run-three-trace-six.sh, run-closed-residual.sh, run-ramification.sh and run-ramification-poles.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
@@ -1040,4 +1143,9 @@ identifies the reused low-degree bound; other completed figures remain unchanged
 
 The ramification diagram and its editable values copy the new native support,
 local-index and trace/rank records. Other parent-map and scoreboard graphs
+remain unchanged.
+
+The individual-ramification pole diagram copies all three new native target
+family results and their joint ranks; its partial-pole reduction is the
+written Riemann--Roch argument. Other parent-map and scoreboard figures
 remain unchanged.

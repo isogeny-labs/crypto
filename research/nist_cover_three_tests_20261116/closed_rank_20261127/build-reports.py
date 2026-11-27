@@ -366,6 +366,26 @@ if (ramification_source.parent/'exit-code.txt').exists() and (ramification_sourc
         f"{ramification['auxiliary_rank']}/{ramification['closed_rank']}. All 460 old auxiliaries "
         "remain active. The isolated numerical old-unit fixture reaches closed seven and "
         "fails the actual group-relation checks. No earlier enumeration rerun.")
+ram_poles_source=ROOT/'evidence/ramification-poles-v1/calls/combine/stdout.json'
+if (ram_poles_source.parent/'exit-code.txt').exists() and (ram_poles_source.parent/'exit-code.txt').read_text().strip()=='0':
+    ram_poles=json.loads(ram_poles_source.read_text())
+    ram_pole_families=[json.loads((ROOT/f'evidence/ramification-poles-v1/calls/family-{i}/stdout.json').read_text()) for i in range(3)]
+    attempts['ramification-poles-v1']=(
+        "Three individual ramification pole divisors H+2B1,H+2B2,H+Q have signed-distinct "
+        "new targets after both-group reference/half checks. Each family examines "
+        f"{ram_pole_families[0]['unordered_triples']} unordered signed triples with repeated slots; "
+        "every shifted triple agrees in GMP/named OpenSSL and both joins give identical "
+        "coefficient rows/minimal witnesses. Family row counts are "
+        f"{ram_poles['family_row_counts']}; joint independent additions "
+        f"{ram_poles['independent_added_rows']}, candidate ranks "
+        f"{ram_poles['full_rank']}/{ram_poles['auxiliary_rank']}/{ram_poles['closed_rank']}. "
+        "The actual 237/231/6 matrix retains all 688 columns and 463 auxiliaries. "
+        "Nonempty auxiliary-reference/brute controls give full2/aux1/closed1; a numerical "
+        "old-unit mutant gives closed2 and fails groups. All declared corruptions reject. "
+        "Riemann--Roch L(H+Bi)=L(H) reduces partial new rational poles to the old "
+        "canonical space; Q poles occur in conjugate pairs. Thus null full-pole bounds "
+        "and the prior canonical bound cover these three complete spaces on old images. "
+        "Any necessary candidate still requires actual RR/KM and separate replay.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -384,6 +404,13 @@ for name, outcome in attempts.items():
             if call.name.startswith('batch-'): return (2,int(call.name.removeprefix('batch-')))
             return (3,0)
         calls.sort(key=call_order)
+    if name=='ramification-poles-v1':
+        def pole_call_order(call):
+            if call.name=='build': return (0,0)
+            if call.name=='plan': return (1,0)
+            if call.name.startswith('family-'): return (2,int(call.name.removeprefix('family-')))
+            return (3,0)
+        calls.sort(key=pole_call_order)
     entries = []
     for call in calls:
         entries.append({'call': call.name,
@@ -543,6 +570,24 @@ if 'ramification' in globals():
     for suffix in ('svg','pdf'):
         subprocess.run(['dot','-T'+suffix,'ramification.dot','-o','ramification.'+suffix],cwd=ROOT,check=True)
 
+if 'ram_poles' in globals():
+    (ROOT/'ramification-poles-values.json').write_text(json.dumps({
+        'source':'evidence/ramification-poles-v1/calls/combine/stdout.json',
+        'native':ram_poles,'families':ram_pole_families,
+        'scope':'Full poles use six old image slots; Riemann--Roch reduces partial poles to L(H); candidate rows need geometry'},indent=2)+'\n')
+    dot=('digraph G {rankdir=TB;node[shape=box,fontname="Helvetica",fontsize=11];'
+         'a[label="Individual ramification components\\n2B1, 2B2, Q\\nD = H + component; degree 6"];'
+         'b[label="Three different image targets\\nDistinct from completed targets up to sign\\nFull reference and half checked in two groups"];'
+         'd[label="Full poles: six old image slots\\nPartial poles: L(H+Bi) = L(H)\\nReuse the canonical rank-six bound"];')
+    for i,record in enumerate(ram_pole_families):
+        dot+=(f'c{i}[label="{record["divisor"]}\\n{record["unordered_triples"]:,} shifted triples\\n'
+              f'{record["distinct_rows_including_zero"]} candidate rows"];b->c{i};c{i}->d;')
+    dot+=(f'e[label="Joint necessary-candidate ranks\\n{ram_poles["full_rank"]} full / {ram_poles["auxiliary_rank"]} auxiliary / {ram_poles["closed_rank"]} closed\\n'
+          f'Actual baseline stays 237 / 231 / 6"];a->b;d->e;}}')
+    (ROOT/'ramification-poles.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'ramification-poles.dot','-o','ramification-poles.'+suffix],cwd=ROOT,check=True)
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -574,11 +619,14 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('2H-2R six','exceptional-conic-six-v1/calls/full'),
                         ('Three traces','three-trace-six-v1/calls/full'),
                         ('Closed m5/m6','closed-residual-v1/calls/full'),
-                        ('Ramification','ramification-v1/calls/full')]:
+                        ('Ramification','ramification-v1/calls/full'),
+                        ('Ram poles','ramification-poles-v1/calls/combine')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
         record=json.loads(source.read_text())
+        if label=='Ram poles' and record['distinct_candidate_rows']!=0:
+            continue  # Required geometric realization precedes actual-rank plotting.
         if label in ('Mixed (derived)','Mixed /2,/3'):
             record={key:record['combined_'+key] for key in metrics}
         cases.append((label,record))
@@ -614,7 +662,7 @@ for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *([ROOT/'closed-residual.svg'] if (ROOT/'closed-residual.svg').exists() else []), *([ROOT/'ramification.svg'] if (ROOT/'ramification.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *([ROOT/'closed-residual.svg'] if (ROOT/'closed-residual.svg').exists() else []), *([ROOT/'ramification.svg'] if (ROOT/'ramification.svg').exists() else []), *([ROOT/'ramification-poles.svg'] if (ROOT/'ramification-poles.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
 
 # Compact only the editable rank SVG; source values and all sealed evidence stay exact.
