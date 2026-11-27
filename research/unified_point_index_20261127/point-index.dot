@@ -1,0 +1,19 @@
+digraph PointIndex {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.28", ranksep="0.45"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef5ff", color="#3c5875", fontname="DejaVu Sans", fontsize=10];
+  edge [color="#45627f", fontname="DejaVu Sans", fontsize=9];
+  bases [label="Complete validated\nfactor-base points"];
+  tree [label="Current: tree columns\n+ membership set\n+ graph map", fillcolor="#f1f1f1"];
+  shared [label="Proposed: one exact\npoint-to-column index", style="rounded,dashed,filled", fillcolor="#fff3df"];
+  complement [label="Online: R - P\nthen exact probe"];
+  pairs [label="Optional: precompute\nP + Q -> first witness", style="rounded,dashed,filled", fillcolor="#fff3df"];
+  graph_rows [label="Slot-tagged graph\nand matrix columns"];
+  replay [label="Membership + sum replay\ncycle + scalar verification", fillcolor="#e5f4e9"];
+  bases -> tree -> complement;
+  bases -> shared [style=dashed];
+  shared -> complement [style=dashed];
+  shared -> pairs [style=dashed];
+  complement -> graph_rows;
+  pairs -> graph_rows [style=dashed];
+  graph_rows -> replay;
+}
