@@ -13585,7 +13585,7 @@ fn upoly_split_linear(g: Vec<u64>, p: u64, out: &mut Vec<u64>) -> Option<()> {
 /// `None` for the zero polynomial (every element is a root) or an even
 /// field, which the exhaustive scan handles.
 fn roots_univariate_split(coeffs: &[(u32, u64)], p: u64) -> Option<Vec<u64>> {
-    if p < 3 || p % 2 == 0 {
+    if p < 3 || p.is_multiple_of(2) {
         return None;
     }
     let deg = coeffs.iter().map(|(k, _)| *k as usize).max()?;
@@ -13934,7 +13934,7 @@ mod tests {
                 let deg = 1 + (roots_test_rng(&mut state) % 12) as u32;
                 let mut coeffs: Vec<(u32, u64)> = Vec::new();
                 for k in 0..=deg {
-                    if roots_test_rng(&mut state) % 3 != 0 {
+                    if !roots_test_rng(&mut state).is_multiple_of(3) {
                         coeffs.push((k, roots_test_rng(&mut state) % p));
                     }
                 }
