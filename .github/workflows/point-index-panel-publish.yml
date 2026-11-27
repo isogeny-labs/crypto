@@ -63,6 +63,12 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /crates/hashed-ecdl-tensor/
+      - name: Verify the complete frozen native panel without AWS
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          "$study/check-frozen-inputs.sh" driver "$GITHUB_SHA"
       - name: Install the native static toolchain
         shell: bash
         run: |
@@ -77,6 +83,7 @@ jobs:
           study=driver/research/unified_point_index_20261127/panel-bridge-20261127
           CARGO_TARGET_DIR="$RUNNER_TEMP/point-index-panel-tests" cargo +1.78.0 test --locked --release \
             --manifest-path driver/crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl-panel
+          "$study/test-check-frozen-inputs.sh"
           "$study/test-publish-pair.sh"
           "$study/build-pair.sh" baseline '${{ steps.pins.outputs.baseline }}' \
             candidate '${{ steps.pins.outputs.candidate }}' driver "$GITHUB_SHA" \
@@ -132,6 +139,7 @@ jobs:
           ' "$bundle/build-info.json" >/dev/null
           (cd "$bundle" && sha256sum -c SHA256SUMS)
           test -z "$(find "$bundle" -maxdepth 1 -type l -print -quit)"
+          "$study/check-frozen-inputs.sh" driver "$GITHUB_SHA"
           "$study/publish-pair.sh" --check-only "$bundle" "$GITHUB_SHA"
       - name: Obtain the existing temporary publisher identity
         uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5

@@ -67,7 +67,9 @@ jobs:
           driver_sha=$(git -C driver rev-parse HEAD)
           test "$driver_sha" = '${{ github.event.pull_request.head.sha }}'
           study=driver/research/unified_point_index_20261127/panel-bridge-20261127
-          bash -n "$study/build-pair.sh" "$study/publish-pair.sh" "$study/test-publish-pair.sh"
+          bash -n "$study/build-pair.sh" "$study/publish-pair.sh" "$study/test-publish-pair.sh" \
+            "$study/check-frozen-inputs.sh" "$study/checkpoint-pair.sh" "$study/test-check-frozen-inputs.sh"
+          "$study/test-check-frozen-inputs.sh"
           "$study/test-publish-pair.sh"
           CARGO_TARGET_DIR="$RUNNER_TEMP/point-index-panel-tests" cargo +1.78.0 test --locked --release \
             --manifest-path driver/crates/hashed-ecdl-tensor/Cargo.toml \
