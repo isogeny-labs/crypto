@@ -166,9 +166,11 @@ formalize the external contraction theorem. `[pcc:unverified]`
 Separately, the native `CauchySourceWitness` now exposes and independently
 reconstructs every stored scalar factor valuation/inverse, the base and
 numerator unit, all packet weights, and emitted nonzero mode coefficients.
-This supplies replayable native evidence for the scalar code-to-formula
-boundary; instantiating the Lean theorem and binding complete mode/child
-objects remain separate obligations. `[pcc:unverified]`
+Together with accepted packing-provenance packet pairs it reconstructs the
+complete mode list and every source zero-suppression in exact loop order. This
+supplies replayable native evidence for the scalar and mode code-to-formula
+boundary; instantiating the Lean theorem and binding complete child objects
+remain separate obligations. `[pcc:unverified]`
 
 ## Next measurable goal
 

@@ -458,8 +458,12 @@ factorization verifier independently reconstructs these values from
 and column without importing deformation, packing, child, or recursive code.
 The `L=4` fixture rejects altered valuation, missing factor, inverse,
 numerator-unit, and active-coordinate witnesses, and every executed-source
-certificate path replays the witness before acceptance. This is native
-code-to-formula evidence, not yet a Lean refinement theorem. `[pcc:unverified]`
+certificate path replays the witness before acceptance. Composing the accepted
+packing-provenance packet pairs with that witness now reconstructs the complete
+mode list in exact packet/tile/weight loop order, including every source-side
+empty/zero suppression; a mutated packet pair changes the first expected mode
+header and is rejected. This is native code-to-formula evidence, not yet a Lean
+refinement theorem. `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled

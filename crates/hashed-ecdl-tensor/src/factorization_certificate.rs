@@ -198,6 +198,19 @@ pub struct CauchySourceSummary {
     pub mode_columns: usize,
 }
 
+/// Counts from complete Cauchy mode-list reconstruction.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct CauchyModeCoverageSummary {
+    /// Candidate `(packet,tile,weight)` modes visited in source loop order.
+    pub attempted_modes: usize,
+    /// Nonzero modes retained by the source rules.
+    pub retained_modes: usize,
+    /// Retained nonzero row coefficients.
+    pub mode_rows: usize,
+    /// Retained nonzero source-form coefficients.
+    pub mode_columns: usize,
+}
+
 fn checked_product(values: &[usize], label: &str) -> std::result::Result<usize, String> {
     values.iter().try_fold(1usize, |product, &value| {
         product
@@ -941,6 +954,168 @@ pub fn verify_cauchy_source(
             .ok_or_else(|| "Cauchy grid count".to_string())?,
         factors: expected.factors.len(),
         weights,
+        mode_rows,
+        mode_columns,
+    })
+}
+
+/// Reconstruct the complete production mode list from an accepted scalar
+/// witness and the packet digit pairs supplied by packing provenance.
+///
+/// The mode sequence must match the exact source loop order over packets,
+/// tile residues, and weights. Empty tiles, empty target-row sets, zero source
+/// forms, and zero row-coefficient vectors are suppressed exactly as in the
+/// producer. The packet-pair array is checked independently by the packing
+/// provenance verifier before callers compose this result.
+pub fn verify_cauchy_mode_coverage(
+    certificate: &Certificate,
+    witness: &CauchySourceWitness,
+    packet_pairs: &[Vec<(usize, usize)>],
+    meter: &mut Meter,
+) -> std::result::Result<CauchyModeCoverageSummary, String> {
+    verify_cauchy_source(certificate, witness, meter)?;
+    if packet_pairs.len() != certificate.packets.len() {
+        return Err("Cauchy mode packet-pair count".into());
+    }
+
+    let ring = Ring::new(certificate.degree, certificate.precision, meter)
+        .map_err(|error| error.to_string())?;
+    let a = usize::try_from(witness.a).map_err(|_| "Cauchy witness exponent".to_string())?;
+    let coordinate =
+        usize::try_from(witness.coordinate).map_err(|_| "Cauchy witness coordinate".to_string())?;
+    let packet_length = 1usize
+        .checked_shl(witness.a)
+        .ok_or_else(|| "Cauchy witness packet width".to_string())?;
+    let tiles = 1usize
+        .checked_shl(
+            witness
+                .coordinate
+                .checked_add(1)
+                .ok_or_else(|| "Cauchy witness tile width".to_string())?,
+        )
+        .ok_or_else(|| "Cauchy witness tile width".to_string())?;
+    let sample = CertifiedElement(witness.sample.clone()).decode(&ring)?;
+    let cauchy = independent_cauchy(packet_length, a, witness.center, &sample, &ring, meter)?;
+
+    let mut attempted_modes = 0usize;
+    let mut retained_modes = 0usize;
+    let mut mode_rows = 0usize;
+    let mut mode_columns = 0usize;
+    for (packet, slots) in certificate.packets.iter().enumerate() {
+        let pairs = &packet_pairs[packet];
+        let &(lo, hi) = pairs
+            .get(coordinate)
+            .ok_or_else(|| "Cauchy mode packet-pair coordinate".to_string())?;
+        if lo == hi {
+            continue;
+        }
+        for y0 in 0..tiles {
+            let (source, target) = if (y0 >> coordinate) & 1 == 0 {
+                (hi, lo)
+            } else {
+                (lo, hi)
+            };
+            let tile_columns: Vec<_> = (y0..packet_length)
+                .step_by(tiles)
+                .filter_map(|column| slots[column].map(|edge| (column, edge)))
+                .collect();
+            if tile_columns.is_empty() {
+                continue;
+            }
+            if tile_columns
+                .iter()
+                .any(|&(_, edge)| certificate.right_groups[edge] != source)
+            {
+                return Err(format!(
+                    "Cauchy mode packet-pair source: packet={packet}, tile={y0}"
+                ));
+            }
+            let rows: Vec<_> = slots
+                .iter()
+                .enumerate()
+                .filter_map(|(row, edge)| {
+                    edge.filter(|&edge| certificate.left_groups[edge] == target)
+                        .map(|_| row)
+                })
+                .collect();
+            if rows.is_empty() {
+                continue;
+            }
+            for exponent in 0..ring.precision().saturating_sub(1) {
+                attempted_modes = attempted_modes
+                    .checked_add(1)
+                    .ok_or_else(|| "Cauchy attempted-mode count".to_string())?;
+                let columns: BTreeMap<_, _> = tile_columns
+                    .iter()
+                    .filter_map(|&(column, _)| {
+                        let j = (column - y0) / tiles;
+                        let value =
+                            BigUint::from(j).modpow(&BigUint::from(exponent), ring.modulus());
+                        (!value.is_zero()).then_some((column, value))
+                    })
+                    .collect();
+                if columns.is_empty() {
+                    continue;
+                }
+                let mut coefficients = BTreeMap::new();
+                for &row in &rows {
+                    let coefficient = independent_mode_coefficient(
+                        &cauchy, a, coordinate, row, y0, exponent, &ring, meter,
+                    )?;
+                    if !coefficient.is_zero() {
+                        coefficients.insert(row, coefficient);
+                    }
+                }
+                if coefficients.is_empty() {
+                    continue;
+                }
+
+                let mode = certificate
+                    .modes
+                    .get(retained_modes)
+                    .ok_or_else(|| "Cauchy mode coverage missing".to_string())?;
+                if mode.packet != packet
+                    || mode.source != source
+                    || mode.target != target
+                    || mode.weight != exponent + 1
+                {
+                    return Err(format!(
+                        "Cauchy mode header: expected={retained_modes}, packet={packet}, tile={y0}, weight={}",
+                        exponent + 1
+                    ));
+                }
+                let actual_rows: BTreeMap<_, _> = mode
+                    .rows
+                    .iter()
+                    .map(|(row, value)| Ok((*row, value.decode(&ring)?)))
+                    .collect::<std::result::Result<_, String>>()?;
+                let actual_columns: BTreeMap<_, _> = mode.columns.iter().cloned().collect();
+                if actual_rows != coefficients {
+                    return Err(format!("Cauchy complete mode rows: mode={retained_modes}"));
+                }
+                if actual_columns != columns {
+                    return Err(format!(
+                        "Cauchy complete mode columns: mode={retained_modes}"
+                    ));
+                }
+                retained_modes = retained_modes
+                    .checked_add(1)
+                    .ok_or_else(|| "Cauchy retained-mode count".to_string())?;
+                mode_rows = mode_rows
+                    .checked_add(actual_rows.len())
+                    .ok_or_else(|| "Cauchy complete row count".to_string())?;
+                mode_columns = mode_columns
+                    .checked_add(actual_columns.len())
+                    .ok_or_else(|| "Cauchy complete column count".to_string())?;
+            }
+        }
+    }
+    if retained_modes != certificate.modes.len() {
+        return Err("Cauchy mode coverage extra".into());
+    }
+    Ok(CauchyModeCoverageSummary {
+        attempted_modes,
+        retained_modes,
         mode_rows,
         mode_columns,
     })

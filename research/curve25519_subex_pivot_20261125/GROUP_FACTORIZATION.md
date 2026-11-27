@@ -172,8 +172,10 @@ An independent verifier reconstructs all of them from `(a,i,t,z)`, checks each
 unit inverse, and recomputes every schema-2 packet weight and nonzero mode
 row/column. The verifier imports ring arithmetic and serialized certificate
 types, but not `deformation`, packing, child construction, or recursion. This
-binds the concrete native values to the displayed scalar formulas; a Lean
-refinement from the accepted witness and the all-mode/all-child object mapping
+binds the concrete native values to the displayed scalar formulas. Composing
+the separately accepted packet-pair provenance now also reconstructs the full
+mode list in packet/tile/weight order and checks every source zero-suppression.
+A Lean refinement from the accepted witness and the all-child object mapping
 remain open. `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

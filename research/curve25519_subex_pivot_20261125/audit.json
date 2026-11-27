@@ -305,11 +305,11 @@
     "verifier_source": "crates/hashed-ecdl-tensor/src/factorization_certificate.rs",
     "producer_control_source": "crates/hashed-ecdl-tensor/src/contraction/factorization_certificate.rs",
     "witness": "serializable a, active coordinate, center, extension sample, stored base, numerator unit and complete ordered difference/valuation/inverse factor map",
-    "checks": "independent signed grid and derivative-content reconstruction; exact unit factor inverses; stored base and numerator unit; every packet-matrix weight; every nonzero mode row and j^b column; executed-source JSON round trip before acceptance",
-    "mutations": "altered valuation, missing factor, altered inverse, altered numerator unit and wrong active coordinate",
+    "checks": "independent signed grid and derivative-content reconstruction; exact unit factor inverses; stored base and numerator unit; every packet-matrix weight; every nonzero mode row and j^b column; complete packet/tile/weight mode-list reconstruction from accepted packet-pair provenance with exact empty/zero suppression; executed-source JSON round trip before acceptance",
+    "mutations": "altered valuation, missing factor, altered inverse, altered numerator unit, wrong active coordinate and altered packet pair",
     "dependency_boundary": "verifier imports exact ring arithmetic and serialized schema-2 data only, not deformation, packing, child construction or recursive contraction code",
     "observed_gate": "L=4 witness reconstructs 8 grid points and 7 noncenter factors; all four factorization-certificate controls pass and the complete native library passes 202/202 tests",
-    "claim_boundary": "typed native scalar code-to-formula binding; Lean witness refinement and complete mode-to-child object mapping remain unverified"
+    "claim_boundary": "typed native scalar and complete-mode code-to-formula binding; Lean witness refinement and complete child-object mapping remain unverified"
   },
   "packet_entry_coefficient_control": {
     "source": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
@@ -518,5 +518,5 @@
     "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
     "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
   },
-  "next_gate": "bind native endpoint arrays and first-minimum replay to the formal class-cap theorem, bind arbitrary-size recursion histories to the formal precision theorem, instantiate the Lean scalar theorem from the accepted native Cauchy witness, and bind complete mode/child objects to the finite-factorization identities; the live usize branch cannot reach nonzero u, while schedule, nD, pu, combined npu, finite Fubini, weighted truncation and the Rust-shaped scalar cutoff are kernel-derived from typed premises; separately complete interpolation, Hermite and creation-precision refinement"
+  "next_gate": "bind native endpoint arrays and first-minimum replay to the formal class-cap theorem, bind arbitrary-size recursion histories to the formal precision theorem, instantiate the Lean scalar/mode theorem from the accepted native Cauchy and packet-pair witnesses, and bind complete child objects to the finite-factorization identities; the live usize branch cannot reach nonzero u, while schedule, nD, pu, combined npu, finite Fubini, weighted truncation and the Rust-shaped scalar cutoff are kernel-derived from typed premises; separately complete interpolation, Hermite and creation-precision refinement"
 }

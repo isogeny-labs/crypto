@@ -10,9 +10,10 @@ use crate::child_provenance_certificate::{
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, verify as standalone_verify, verify_cauchy_source,
-    verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness,
-    Certificate, CertifiedElement, CertifiedMode, EntryTable, SourceDimensionWitness, SCHEMA,
+    description_envelope, verify as standalone_verify, verify_cauchy_mode_coverage,
+    verify_cauchy_source, verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness,
+    CauchySourceWitness, Certificate, CertifiedElement, CertifiedMode, EntryTable,
+    SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
@@ -634,6 +635,14 @@ pub(super) fn capture_executed_source_checked(
         .map_err(|_| invalid("executed Cauchy witness parsing"))?;
     verify_cauchy_source(&certificate, &cauchy_witness, meter)
         .map_err(|_| integrity("executed Cauchy witness replay"))?;
+    let provenance = packing_provenance(graph, packing, parameters, coordinate, None);
+    verify_cauchy_mode_coverage(
+        &certificate,
+        &cauchy_witness,
+        &provenance.packet_pairs,
+        meter,
+    )
+    .map_err(|_| integrity("executed Cauchy mode coverage"))?;
     if !assert_source_count_bridge(&certificate, parameters, coordinate, false) {
         return Err(invalid("executed source certificate dimensions"));
     }
@@ -752,9 +761,30 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(provenance_summary.packet_length, 4);
     assert!(!provenance_summary.source_capacity_admitted);
     assert!(!provenance_summary.source_guard_closure_admitted);
+    let mode_summary = verify_cauchy_mode_coverage(
+        &certificate,
+        &cauchy_witness,
+        &provenance.packet_pairs,
+        &mut meter,
+    )
+    .unwrap();
+    assert!(mode_summary.attempted_modes >= mode_summary.retained_modes);
+    assert_eq!(mode_summary.retained_modes, certificate.modes.len());
+    assert_eq!(mode_summary.mode_rows, cauchy_summary.mode_rows);
+    assert_eq!(mode_summary.mode_columns, cauchy_summary.mode_columns);
 
     let mut bad_provenance = provenance;
     bad_provenance.packet_pairs[0][0].0 ^= 1;
+    assert_eq!(
+        verify_cauchy_mode_coverage(
+            &certificate,
+            &cauchy_witness,
+            &bad_provenance.packet_pairs,
+            &mut meter,
+        )
+        .unwrap_err(),
+        "Cauchy mode header: expected=0, packet=1, tile=0, weight=1"
+    );
     assert_eq!(
         verify_packing_provenance(&certificate, &bad_provenance, &mut meter).unwrap_err(),
         "packing provenance replay"

@@ -516,6 +516,9 @@ verifier reconstructs the signed grid, derivative content, unit factors and
 inverses, base, numerator unit, all packet weights, and every emitted nonzero
 mode coefficient from serialized `(a,i,t,z)` data. Its implementation imports
 the exact ring only, not the production deformation or recursion modules. The
+same verifier composes accepted packing-provenance packet pairs with the scalar
+witness to enumerate the complete mode vector in exact source-loop order,
+including all empty-tile, empty-row, zero-form, and zero-row suppressions. The
 remaining formal gap is to instantiate the Lean ring values and mode functions
 from this accepted witness and then bind complete child construction.
 `[pcc:unverified]`
