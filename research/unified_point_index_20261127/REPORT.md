@@ -1,6 +1,6 @@
 # Unifying exact point indexes for two-slot index calculus
 
-2026-11-27. Design and falsifiable cost plan; no experiment or speedup result. [pcc:unverified]
+2026-11-27. Design and falsifiable cost plan; no experiment or speedup result. The shared exact-index implementation was added later on this PR; see `IMPLEMENTATION.md`. The pair-sum plan remains a proposal. [pcc:unverified]
 
 ## Finding
 
@@ -8,7 +8,7 @@ The current collector builds several views of the **same validated factor-base p
 
 ![Existing and proposed lookup paths](point-index.svg)
 
-The diagram separates current solid paths from proposed dashed paths. Every successful route reaches the existing membership, sum, dependency and scalar replay. None is a certificate by itself.
+The diagram separates the former optimized lookup (gray dashed) from the implemented shared exact index (amber solid); pair-sum storage remains dashed and proposed. Every successful route reaches the existing membership, sum, dependency and scalar replay. None is a certificate by itself.
 
 ## Source audit and scope
 
@@ -27,7 +27,7 @@ Build one `PreparedBasis` per slot from the existing complete enumeration. Store
 
 The constructor checks the curve/base binding, selector range, uniqueness, column contiguity, duplicate points and resource limits before publishing the object. The original enumeration and validation remain the trust boundary. A lookup returns only a column/candidate; it never proves point validity or relation correctness. A public checked query still validates subgroup membership. A sealed internally generated query retains its existing provenance check. All witness replays and final certificate verification remain mandatory. [pcc:unverified]
 
-`PairTable`, `matrix_row`, and `RelationGraph` would consume that snapshot. With graph and LSH options off, a single exact map replaces the prepared membership set and the matrix tree map after conversion. With graph on, it also replaces the graph-specific map. LSH buckets can share point-array indices; they must finish with exact `Point` equality. Source changes in both still-open feature branches must be integrated only after their separate dispositions, then checked against both parents. This is an interface proposal, not code in this PR.
+The design calls for `PairTable`, `matrix_row`, and `RelationGraph` to consume that snapshot. With graph and LSH options off, a single exact map replaces the prepared membership set and the matrix tree map after conversion. With graph on, it also replaces the graph-specific map. LSH buckets can share point-array indices; they must finish with exact `Point` equality. Source changes in both still-open feature branches must be integrated only after their separate dispositions, then checked against both parents. The separate graph and LSH branches are not merged by this implementation.
 
 ## Two query plans from the same snapshot
 
