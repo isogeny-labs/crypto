@@ -164,7 +164,9 @@ impl Default for Fast2Options {
             batch_min: 32,
             batch_max: 256,
             target_pivots: 32,
-            interreduce: 0.25,
+            // 0.6 keeps the echelon much smaller on E2LOCMS45 P1 (≈20× wall vs 0.25)
+            // while preserving d_F; unit tests cover the interreduce equivalence.
+            interreduce: 0.6,
             interreduce_min: 256,
             interreduce_block: 256,
             rebucket: true,
@@ -2504,7 +2506,7 @@ fn cascade_blocked_gemm(
     let nr = fp_gemm::nr_for(simd);
     let k_safe = fp_gemm::k_safe_f64(p).max(1);
     let kc_max = 64usize.min(k_safe);
-    let nc = (256usize.div_ceil(nr) * nr).max(nr);
+    let nc = (512usize.div_ceil(nr) * nr).max(nr);
     let mut out_rows: Vec<Row> = vec![Vec::new(); prods.len()];
     let mut reds: Vec<Red> = plans
         .iter()
@@ -2557,97 +2559,135 @@ fn cascade_blocked_gemm(
         let mut j0 = g_first;
         while j0 <= g_last {
             let j1 = (j0 + nc).min(g_last + 1);
+            // Parallel in-tile scans (products independent). Factors keyed by
+            // absolute pivot-row index; remapped to a dense K list afterwards.
+            let j1_local = j1 - g_first;
+            let panel_ptr = panel.as_mut_ptr() as usize;
+            let tile_outs: Vec<(usize, Vec<(u32, u32)>, Vec<(usize, f64)>, usize, u32, u64)> =
+                (0..nprod)
+                    .into_par_iter()
+                    .map(|li| {
+                        let k = idxs[li];
+                        let mut emits: Vec<(u32, u32)> = Vec::new();
+                        let mut fac: Vec<(usize, f64)> = Vec::new();
+                        let mut nred = 0u32;
+                        let mut ops = 0u64;
+                        if plans[k].first == usize::MAX || lasts[k] < j0 {
+                            return (li, emits, fac, lasts[k], nred, ops);
+                        }
+                        // SAFETY: each li owns a disjoint panel row.
+                        let row_p = unsafe {
+                            std::slice::from_raw_parts_mut(
+                                (panel_ptr as *mut f64).add(li * width),
+                                width,
+                            )
+                        };
+                        let mut ci = j0 - g_first;
+                        let mut last_local = lasts[k] - g_first;
+                        while ci < j1_local && ci <= last_local {
+                            let mut raw = row_p[ci];
+                            if raw != 0.0 {
+                                let mut tmp = [raw];
+                                fp_gemm::reduce_f64_slice_mod_p(&mut tmp, p, bm_);
+                                raw = tmp[0];
+                                row_p[ci] = 0.0;
+                            }
+                            if raw == 0.0 {
+                                ci += 1;
+                                continue;
+                            }
+                            let v = raw as u64;
+                            let col = e.np_cols[g_first + ci];
+                            let piv = e.pivot[col as usize];
+                            if piv == NONE {
+                                emits.push((col, v as u32));
+                                ci += 1;
+                                continue;
+                            }
+                            let brow = &e.rows[piv as usize];
+                            nred += 1;
+                            ops += brow.nnz() as u64;
+                            let f = (p - v) as f64;
+                            match brow {
+                                RowS::Sparse(rr) => {
+                                    for &(jj, x) in &rr[1..] {
+                                        let ju = jj as usize;
+                                        if ju >= j1 {
+                                            break;
+                                        }
+                                        if ju > g_first + ci {
+                                            row_p[ju - g_first] += f * (x as f64);
+                                        }
+                                    }
+                                    if rr.len() > 1 {
+                                        last_local =
+                                            last_local.max(rr[rr.len() - 1].0 as usize - g_first);
+                                    }
+                                }
+                                RowS::Dense { lead, v: vv, .. } => {
+                                    let s = e.np_start(*lead);
+                                    let a = (g_first + ci + 1).max(s);
+                                    if a < j1 && vv.len() > 1 {
+                                        let src = &vv[1 + a - s..1 + j1 - s];
+                                        // SIMD f64 axpy when the in-tile span is long.
+                                        if src.len() >= 16 {
+                                            let mut src_f = vec![0.0f64; src.len()];
+                                            fp_gemm::cvt_u32_to_f64(simd, src, &mut src_f);
+                                            fp_gemm::axpy_f64(
+                                                simd,
+                                                &mut row_p[a - g_first..a - g_first + src.len()],
+                                                &src_f,
+                                                f,
+                                            );
+                                        } else {
+                                            for (off_j, &x) in src.iter().enumerate() {
+                                                row_p[a - g_first + off_j] += f * (x as f64);
+                                            }
+                                        }
+                                    }
+                                    last_local = width - 1;
+                                }
+                            }
+                            let extends = match brow {
+                                RowS::Sparse(rr) => {
+                                    rr.len() > 1 && (rr[rr.len() - 1].0 as usize) >= j1
+                                }
+                                RowS::Dense { lead, v: vv, .. } => {
+                                    vv.len() > 1 && e.np_start(*lead) + vv.len() - 1 > j1
+                                }
+                            };
+                            if extends {
+                                fac.push((piv as usize, f));
+                            }
+                            ci += 1;
+                        }
+                        let lo = (j0 - g_first + 1).min(width);
+                        let hi = j1_local.min(width);
+                        if lo < hi {
+                            fp_gemm::reduce_f64_slice_mod_p(&mut row_p[lo..hi], p, bm_);
+                        }
+                        (li, emits, fac, g_first + last_local, nred, ops)
+                    })
+                    .collect();
+
             let mut piv_rows: Vec<usize> = Vec::new();
             let mut piv_mark = vec![NONE; e.rows.len()];
             let mut factors: Vec<Vec<(u32, f64)>> = vec![Vec::new(); nprod];
-
-            // Classical in-tile scan on the f64 panel (Barrett before each decision).
-            for (li, &k) in idxs.iter().enumerate() {
-                if plans[k].first == usize::MAX || lasts[k] < j0 {
-                    continue;
-                }
-                let row_p = &mut panel[li * width..(li + 1) * width];
-                let mut ci = j0 - g_first;
-                let j1_local = j1 - g_first;
-                let mut last_local = lasts[k] - g_first;
-                while ci < j1_local && ci <= last_local {
-                    let mut raw = row_p[ci];
-                    if raw != 0.0 {
-                        let mut tmp = [raw];
-                        fp_gemm::reduce_f64_slice_mod_p(&mut tmp, p, bm_);
-                        raw = tmp[0];
-                        row_p[ci] = 0.0;
-                    }
-                    if raw == 0.0 {
-                        ci += 1;
-                        continue;
-                    }
-                    let v = raw as u64;
-                    let col = e.np_cols[g_first + ci];
-                    let piv = e.pivot[col as usize];
-                    if piv == NONE {
-                        out_rows[k].push((col, v as u32));
-                        ci += 1;
-                        continue;
-                    }
-                    let brow = &e.rows[piv as usize];
-                    reds[k].nred += 1;
-                    reds[k].ops += brow.nnz() as u64;
-                    let f = (p - v) as f64;
-                    // In-tile axpy only.
-                    match brow {
-                        RowS::Sparse(rr) => {
-                            for &(jj, x) in &rr[1..] {
-                                let ju = jj as usize;
-                                if ju >= j1 {
-                                    break;
-                                }
-                                if ju > g_first + ci {
-                                    row_p[ju - g_first] += f * (x as f64);
-                                }
-                            }
-                            if rr.len() > 1 {
-                                last_local = last_local.max(rr[rr.len() - 1].0 as usize - g_first);
-                            }
-                        }
-                        RowS::Dense { lead, v: vv, .. } => {
-                            let s = e.np_start(*lead);
-                            let a = (g_first + ci + 1).max(s);
-                            if a < j1 && vv.len() > 1 {
-                                let src = &vv[1 + a - s..1 + j1 - s];
-                                for (off_j, &x) in src.iter().enumerate() {
-                                    row_p[a - g_first + off_j] += f * (x as f64);
-                                }
-                            }
-                            last_local = width - 1;
-                        }
-                    }
-                    let extends = match brow {
-                        RowS::Sparse(rr) => rr.len() > 1 && (rr[rr.len() - 1].0 as usize) >= j1,
-                        RowS::Dense { lead, v: vv, .. } => {
-                            vv.len() > 1 && e.np_start(*lead) + vv.len() - 1 > j1
-                        }
-                    };
-                    if extends {
-                        let pm = &mut piv_mark[piv as usize];
-                        if *pm == NONE {
-                            *pm = piv_rows.len() as u32;
-                            piv_rows.push(piv as usize);
-                        }
-                        factors[li].push((*pm, f));
-                    }
-                    ci += 1;
-                }
-                // Reduce the in-tile dirty region.
-                if j0 < j1 {
-                    let lo = (j0 - g_first + 1).min(width);
-                    let hi = (j1 - g_first).min(width);
-                    if lo < hi {
-                        fp_gemm::reduce_f64_slice_mod_p(&mut row_p[lo..hi], p, bm_);
-                    }
-                }
-                lasts[k] = g_first + last_local;
+            for (li, emits, fac, last_k, nred, ops) in tile_outs {
+                let k = idxs[li];
+                out_rows[k].extend(emits);
+                reds[k].nred += nred;
+                reds[k].ops += ops;
+                lasts[k] = lasts[k].max(last_k);
                 g_last = g_last.max(lasts[k]);
+                for (pri, f) in fac {
+                    let pm = &mut piv_mark[pri];
+                    if *pm == NONE {
+                        *pm = piv_rows.len() as u32;
+                        piv_rows.push(pri);
+                    }
+                    factors[li].push((*pm, f));
+                }
             }
 
             // Trailing GEMM onto panel[:, j1 - g_first ..].
