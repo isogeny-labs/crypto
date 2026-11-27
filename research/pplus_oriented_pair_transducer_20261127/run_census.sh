@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
 study="$repo_root/research/pplus_oriented_pair_transducer_20261127"
-manifest="$study/SOURCE_MANIFEST_3.json"
+manifest="$study/SOURCE_MANIFEST_4.json"
 crate="$study/native/Cargo.toml"
 evidence="$study/evidence"
 source_commit="$(jq -er '.source_commit' "$manifest")"

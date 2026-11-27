@@ -29,8 +29,8 @@ The wrapper is orchestration only. All field/group arithmetic, exact support
 construction, independent replay, growth calculations, and promotion logic are
 implemented in the source-manifest-bound Rust binaries.
 
-The active custody record is `SOURCE_MANIFEST_3.json`; v1 and v2 are retained
-as historical pre-amendment records. If S3 transport later becomes available,
+The active custody record is `SOURCE_MANIFEST_4.json`; v1--v3 are retained as
+historical pre-amendment records. If S3 transport later becomes available,
 `PPLUS_CHECKPOINT_MODE=s3` selects the repository S3 gate explicitly.
 
 Failed attempt 1 is separately retained and hash-bound. It stopped before
