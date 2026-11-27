@@ -50,6 +50,10 @@ attempts = {
     'partial-v1': 'All212843distinct pair/tangent lines checked:212836at old support degree2,seven at degree4,none at degree3. No old flex. Hidden-support extraction and corruption controls pass;closed rank6.',
     'partial-audit-v1': 'Separate GMP prime-field arithmetic reproduces every ordered pair-line key,tangent contact and retained support. Geometry controls pass;closed rank6. This stage does not re-prove the parent elliptic map.',
     'graph-v1': 'Complete rational two-residual graph:106421new partial edges;106319rows peeled;102two-row core components. Full/auxiliary/closed ranks106427/106421/6,gain0. Eight graph fixtures match dense ranks;two invalid singleton witnesses reject.',
+    'mixed-v1': 'All101926aggregate pairs and212842individual residual-image slots checked:101701distinct signed aggregate labels,zero cross-aliases. Disjoint-block ranks208128/208122/6are derived from the saved graph and private aggregate pivots;no giant dense matrix was formed. Cached/full map,membership and matrix controls pass.',
+    'divided-v1': 'Strict build failed: unqualified helper SSL collides with the OpenSSL global typedef. No mathematical worker ran. Frozen source and diagnostics retained.',
+    'divided-v2': 'All three denominators1,2,3pass:101926pairs and226checked divisions each;305103distinct xlabels,zero unequal-expression aliases and zero candidate rows. Actual augmented ranks108/102/6,gain0. Nonempty G,2Gfixture finds primitive(2,-1),rank1;three identity branches and all corruption controls pass.',
+    'mixed-divided-v1': 'Both new divided families pass:203852pairs,203402distinct signed labels,212842individual residual-image slots,and zero cross-aliases. The full individual image stream matches mixed-v1. Derived disjoint-block ranks309829/309823/6,gain0;no giant dense matrix formed. All declared controls pass.',
 }
 
 figure_only = '--figure-only' in sys.argv[1:]
@@ -154,25 +158,31 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Fibre conics','fibre-conics-v2/calls/collect'),
                         ('Six225','six-v1/calls/full'),
                         ('Partial','partial-v1/calls/collect'),
-                        ('Residual graph','graph-v1/calls/collect')]:
+                        ('Residual graph','graph-v1/calls/collect'),
+                        ('Mixed (derived)','mixed-v1/calls/scan'),
+                        ('Divided','divided-v2/calls/scan'),
+                        ('Mixed /2,/3','mixed-divided-v1/calls/scan')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
-        cases.append((label,json.loads(source.read_text())))
+        record=json.loads(source.read_text())
+        if label in ('Mixed (derived)','Mixed /2,/3'):
+            record={key:record['combined_'+key] for key in metrics}
+        cases.append((label,record))
 data = {label:{k:record[k] for k in metrics} for label,record in cases}
 (ROOT/'rank-values.json').write_text(json.dumps(data, indent=2)+'\n')
-fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(8.5,4.5),sharex=True,
+fig, (axis,closed_axis) = plt.subplots(2,1,figsize=(9,4.6),sharex=True,
                                      gridspec_kw={'height_ratios':[2,1]},layout='constrained')
 for position, key in enumerate(metrics[:2]):
     x = [i+(position-.5)*.36 for i in range(len(cases))]
     values=[record[key] for _,record in cases]
     bars=axis.bar(x,values,width=.33,label=key.replace('_',' '))
     axis.bar_label(bars,labels=[str(v) if 0<v<1000 else '' for v in values],padding=2,fontsize=6.5)
-    for at,value in zip(x,values):
+    for case_index,(at,value) in enumerate(zip(x,values)):
         if not value:
             axis.text(at,.9,'0',ha='center',va='bottom',fontsize=7)
         elif value>=1000:
-            axis.annotate(f'{value:,}',(at,value),xytext=(-2 if position==0 else 2,2),
+            axis.annotate(f'{value:,}',(at,value),xytext=(-2 if position==0 else 2,2+24*(case_index%2)),
                           textcoords='offset points',ha='right' if position==0 else 'left',
                           va='bottom',fontsize=6.5)
 axis.set_yscale('log')
@@ -185,7 +195,7 @@ closed_axis.bar_label(bars,padding=2,fontsize=8)
 closed_axis.set_ylim(0,max(closed_values)*1.5)
 closed_axis.set_ylabel('Closed rank')
 closed_axis.set_xticks(range(len(cases)),[label for label,_ in cases])
-closed_axis.tick_params(axis='x',labelsize=8)
+closed_axis.tick_params(axis='x',labelsize=7,labelrotation=28)
 for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)

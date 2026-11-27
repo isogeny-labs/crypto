@@ -1,11 +1,11 @@
 # P-192 closed-rank search, 27 November 2026
 
-The completed old-base fibre saturation and fixed-column signed-norm test
+The completed fibre, section, norm, residual graph and cross-image tests
 give **zero additional rank** on the unchanged original 225 elliptic columns.
 The positive-rank objective remains open. These are finite component results
 for the recorded P-192 d7/kernel3 construction. [pcc:unverified]
 
-![Recorded full/auxiliary ranks above (log scale) and closed rank below. Norm225 uses the225-column diagnostic; other cases retain the original tangent matrix,with new auxiliary columns added for the residual graph. One finite-domain evaluation per case; no statistical error bars.](ranks.pdf)
+![Recorded full/auxiliary ranks above (log scale) and closed rank below. Norm225 uses the225-column diagnostic. Residual graph adds auxiliary columns;Mixed ranks are derived disjoint-block bounds,not a dense recomputation. One finite-domain evaluation per case; no statistical error bars.](ranks.pdf)
 
 ## Frozen question and inputs
 
@@ -42,6 +42,9 @@ this study does not change those maps.
 | Three-old-slot partial lines | 212843distinct pair/tangent lines | No partial section;seven complete sections |
 | Separate GMP geometry replay | All pair-line keys,tangent contacts and retained supports | Exact match;closed6 |
 | Two-residual graph | 106421new partial edges plus102seeds | Full106427,auxiliary106421,closed6,gain0 |
+| Aggregate/individual cross-images | 101701signed aggregate labels;212842individual slots | Zero cross-aliases;derived208128/208122/6 |
+| Divided aggregate aliases | m=1,2,3;101926pairs each | Zero unequal-expression aliases;actual108/102/6 |
+| Divided/individual cross-images | 203402signed labels;212842individual slots | Zero cross-aliases;derived309829/309823/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -170,6 +173,55 @@ triangles,opposite aliases,loops and zero-auxiliary rows;two corrupted singleton
 witnesses reject. Fixture rows never enter the actual matrix. See
 GRAPH_PROTOCOL.md and evidence/graph-v1/. [pcc:unverified]
 
+## Aggregate and divided-image comparisons
+
+For every signed old pair A,B,form the aggregate T=kappa-A-B. The complete
+101926-pair enumeration reproduces the frozen old norm digest with both
+arithmetic implementations. After sign folding,101701distinct labels remain;
+225duplicates have exactly the same old-point expression. No aggregate is O
+or an original429-column label. [pcc:unverified]
+
+The mixed test compares these labels against every individual rational
+residual image from the completed graph:212842slots over106421partial
+sections. It reconstructs the previously unretained image observable,with
+cost charged to this test. There are zero cross-aliases. Cached X-evaluation
+agrees with full map evaluation on all652old points,including two exceptional
+cases,and the first64new slots. A separate actual-point fixture exercises
+membership;changed coordinates/expressions reject,and small dense matrices
+distinguish disjoint and coupled pins. [pcc:unverified]
+
+Thus aggregate constraints form a disjoint auxiliary block with one private
+pivot per distinct label. Adding that block to the saved graph gives the
+**derived** full/auxiliary/closed bounds208128/208122/6. No dense matrix of
+this size was constructed. The aggregate set is a necessary superset;the
+zero-cross result also bounds any geometrically realized subset. See
+MIXED_PROTOCOL.md and evidence/mixed-v1/. [pcc:unverified]
+
+The divided test compares (kappa-A-B)/m for m=1,2,3. A degree-m closed
+divisor whose images all equal a rational Q would have aggregate mQ;these
+families test possible aliases without asserting that arbitrary labels are
+realized on the cover. Inverse multiplication is unique in the prime-order
+elliptic group;division by3does not supply rational3-torsion. Each family
+checks226divisions by multiplication back with both GMP and OpenSSL,then
+enumerates101926pairs with matching arithmetic. Across305103distinct
+xlabels,there are no unequal-expression aliases and no candidate rows.
+Each family has225formal duplicates. Actual elimination remains108full,
+102auxiliary,6closed. The separate G,2Gfixture detects primitive(2,-1),rank1,
+and exercises three identity labels;changed divisions,coefficients and missing
+pairs reject. See DIVIDED_PROTOCOL.md and evidence/divided-v2/.
+[pcc:unverified]
+
+The last comparison checks the two divided families against every individual
+graph image. All203852pairs reproduce the divided stream digests. After
+450formal duplicates,203402signed labels remain. None equals O,an original
+column or any of the212842individual residual slots. The complete individual
+Xstream digest matches mixed-v1. All cached/full-map and matrix controls pass.
+The **derived** disjoint-block ranks are309829/309823/6;each pin has auxiliary
+coefficient6,a unit modulo r. Together,the three divided families are mutually
+disjoint and have no image alias coupling to the saved graph. This is a bound
+for this particular pin/graph model. See MIXED_DIVIDED_PROTOCOL.md and
+evidence/mixed-divided-v1/. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
@@ -180,14 +232,19 @@ failed old audit build1.642; corrected old audit5.887; lifted audit6.236;
 failed norm build1.583; corrected norm test17.734; failed trace build6.502;
 corrected trace test40.438; conic search27.453; signed-six171.878;
 same-image conic extension42.602;partial lines22.842;separate geometry6.555;
-coupled residual graph277.788. The graph collector itself takes265.461seconds.
+coupled residual graph277.788;mixed comparison92.381;failed divided build2.212;
+corrected divided15.373;divided/individual comparison96.061.
+The graph collector itself takes265.461seconds;mixed build13.501and scan78.801.
+The divided/individual build takes14.143seconds and scan81.873seconds.
 The same-image conic wrapper first failed before build in0.012seconds.
 These are feasibility
 cost receipts, not speed comparisons or repeated timing estimates.
 
-Three build failures are preserved: audit-old-v1 lacked iostream; norms-v1
+Four build failures are preserved: audit-old-v1 lacked iostream; norms-v1
 had an SSL type-name ambiguity and strict indentation warning; trace-v1
-used multiplication in a boolean condition under strict warnings. A separate
+used multiplication in a boolean condition under strict warnings;divided-v1
+had an unqualified SSL helper type. Its build stopped after2.191seconds;
+the corrected divided-v2worker takes7.985seconds. A separate
 same-image conic wrapper failed during input copy, before any build or worker.
 Fresh attempts
 fixed those integration defects. No mathematical worker failed or timed out.
@@ -197,23 +254,34 @@ source snapshots and hashes identify the exact executed source.
 
 ## Next discriminating work
 
-The residual graph now covers every rationally split pair/tangent section
-on this652-point pool. A successor needs additional anchor points,a genuinely
-different function family,or nonrational residual-image information outside
-the tested domains. These possibilities remain unestablished. Repeating the
-same fixed inputs and relation families cannot produce a different rank.
+The residual graph covers every rationally split pair/tangent section on
+this652-point pool. The aggregate labels are disjoint from its individual
+images,and the three divided aggregate families are mutually disjoint and
+disjoint from the individual graph images. A concrete successor is to select
+a bounded,deterministic set of newly encountered rational residual images,
+compute their actual cover fibres,and search sections involving those new
+curve anchors. The original225columns must stay fixed;new image columns stay
+auxiliary throughout elimination. Such a search needs a separate frozen
+protocol and is not executed here. Different function families and nonrational
+residual-image information are other open directions. Repeating these same
+fixed relation families cannot produce a different rank.
 Any positive candidate still needs actual cover/KM and separate
 elliptic/elimination replay.
 [pcc:unverified]
 
 ## Sources and reproduction
 
-- Frozen protocols: PROTOCOL.md, SECTION_PROTOCOL.md, NORM_PROTOCOL.md,
-  TRACE_PROTOCOL.md, CONIC_PROTOCOL.md, FIBRE_CONIC_PROTOCOL.md, SIX_PROTOCOL.md,
-  PARTIAL_PROTOCOL.md and GRAPH_PROTOCOL.md.
+- Frozen protocols: [initial fibre lift](PROTOCOL.md),
+  [sections](SECTION_PROTOCOL.md), [norms](NORM_PROTOCOL.md),
+  [traces](TRACE_PROTOCOL.md), [conics](CONIC_PROTOCOL.md),
+  [same-image conics](FIBRE_CONIC_PROTOCOL.md), [signed six](SIX_PROTOCOL.md),
+  [partial lines](PARTIAL_PROTOCOL.md), [residual graph](GRAPH_PROTOCOL.md),
+  [mixed images](MIXED_PROTOCOL.md), [divided images](DIVIDED_PROTOCOL.md)
+  and [divided/individual images](MIXED_DIVIDED_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
-  run-audit-partial.sh and run-graph.sh.
+  run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
+  run-mixed-divided.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.
