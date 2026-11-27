@@ -207,8 +207,100 @@ fn sha256(path: &Path) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
 
+fn point_value(point: Point) -> Value {
+    json!({"x":point.x,"y":point.y,"infinity":point.infinity})
+}
+
+fn fixture_control(
+    label: &str,
+    curve: Curve,
+    depth: u32,
+    group_order: u64,
+    generator: Point,
+) -> Value {
+    let base = carrier(curve, depth);
+    let reachable = exact_reachability(curve, &base);
+    let planted_indices = vec![0usize; ARITY];
+    let planted = replay(curve, &base, &planted_indices);
+    let planted_control = reachable
+        .get(&planted)
+        .expect("independent planted target must be reachable");
+    assert_eq!(replay(curve, &base, planted_control), planted);
+
+    let miss = (1..group_order).find_map(|scalar| {
+        let point = (0..scalar).fold(Point::INFINITY, |sum, _| curve.add(sum, generator));
+        (!point.infinity && !reachable.contains_key(&point)).then_some((scalar, point))
+    });
+    let mut xs: Vec<u64> = base.iter().map(|point| point.x).collect();
+    xs.sort_unstable();
+    xs.dedup();
+    json!({
+        "fixture":label,
+        "p":curve.p,
+        "curve_a":curve.a,
+        "curve_b":curve.b,
+        "depth":depth,
+        "group_order":group_order,
+        "factor_base_abscissae":xs.len(),
+        "factor_base_points":base.iter().copied().map(point_value).collect::<Vec<_>>(),
+        "exact_seven_sum_states":reachable.len(),
+        "infinity_reachable":reachable.contains_key(&Point::INFINITY),
+        "planted_target":point_value(planted),
+        "planted_control_witness":planted_control,
+        "first_generator_multiple_miss":miss.map(|(scalar, point)| json!({
+            "scalar":scalar,
+            "point":point_value(point),
+        })),
+    })
+}
+
+fn print_fixture_controls() {
+    let controls = vec![
+        fixture_control(
+            "f7-depth1-full-carrier",
+            Curve { p: 7, a: 0, b: 3 },
+            1,
+            13,
+            Point {
+                x: 4,
+                y: 2,
+                infinity: false,
+            },
+        ),
+        fixture_control(
+            "f31-depth2-sparse-carrier",
+            Curve { p: 31, a: 0, b: 12 },
+            2,
+            43,
+            Point {
+                x: 2,
+                y: 12,
+                infinity: false,
+            },
+        ),
+    ];
+    assert!(controls[0]["first_generator_multiple_miss"].is_null());
+    assert!(!controls[1]["first_generator_multiple_miss"].is_null());
+    println!(
+        "{}",
+        serde_json::to_string(&json!({
+            "schema":"isogeny-labs/pplus-dickson-m7-independent-controls/v1",
+            "arity":ARITY,
+            "controls":controls,
+            "cross_target_amortization":false,
+            "verdict":"public carriers and exact seven-sum controls reconstructed independently",
+        }))
+        .expect("serialize finite controls")
+    );
+}
+
 fn main() {
-    let mut inputs: Vec<PathBuf> = std::env::args().skip(1).map(PathBuf::from).collect();
+    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    if arguments.as_slice() == ["--fixture-controls"] {
+        print_fixture_controls();
+        return;
+    }
+    let mut inputs: Vec<PathBuf> = arguments.into_iter().map(PathBuf::from).collect();
     if inputs.is_empty() {
         inputs.push(Path::new(DEFAULT_DIR).join("depth1.jsonl"));
         let depth2 = Path::new(DEFAULT_DIR).join("depth2.jsonl");
