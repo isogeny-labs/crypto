@@ -595,9 +595,11 @@ typed record's polynomial field. An independent algebraic proof then exhausts
 the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
 `U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
 that polynomial. The combined theorem therefore pairs selection with genuine
-irreducibility for this fixture. This closes the degree-four algebraic check,
-while general packed-predicate correctness is proved separately below; a Rust
-compiler refinement of `Ring::new` remains.
+irreducibility for this fixture. This closes the degree-four algebraic check.
+The general result below additionally certifies the degree and irreducibility
+of every successful deterministic search result at degree at least two; it
+does not prove that a result exists for every degree. A Rust compiler
+refinement of `Ring::new` remains.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
@@ -660,7 +662,14 @@ irreducibility rules out divisibility by every lower Frobenius polynomial,
 which reconstructs each native GCD guard, while the finite-field divisibility
 theorem supplies the terminal native equality. Hence
 `gf2PackedIrreducible_iff_irreducible` gives a full equivalence on matching
-packed degree at least two.
+packed degree at least two. An induction over
+`firstIrreducibleBinaryPolynomialAux` preserves the candidate-window invariant
+and proves that any returned value has the requested `log2` and passed the
+packed predicate. Therefore
+`firstIrreducibleBinaryPolynomial_some_irreducible` certifies every successful
+public search result of degree at least two as an exact-degree irreducible
+polynomial. No theorem here asserts that the bounded search returns `some` at
+every degree, and the compiler refinement remains separate.
 Sources checked: the all-half-degree loop in
 `crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
 `Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X` theorem in

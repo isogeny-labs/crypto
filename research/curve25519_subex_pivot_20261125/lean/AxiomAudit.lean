@@ -171,6 +171,8 @@ open Curve25519ExtensionRingModel
 #print axioms gf2Polynomial_irreducible_guard
 #print axioms gf2PackedIrreducible_complete
 #print axioms gf2PackedIrreducible_iff_irreducible
+#print axioms firstIrreducibleBinaryPolynomialAux_some
+#print axioms firstIrreducibleBinaryPolynomial_some_irreducible
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

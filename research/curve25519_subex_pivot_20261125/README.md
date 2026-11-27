@@ -523,7 +523,8 @@ the arbitrary-degree endpoint. The fixed `Fin 4` theorem is therefore no longer
 the only path from the shared bytes to quotient multiplication.
 `[pcc:unverified]`
 
-The remaining deterministic-polynomial gap is narrowed for this fixture too.
+The deterministic-polynomial boundary is narrowed both generically and for
+this fixture.
 A transparent packed-`GF(2)` model follows the native remainder, carryless
 product, Euclidean gcd, Rabin squaring, and odd-lower-pattern search order. It
 kernel-checks that degree-four candidate `17` is reducible, candidate `19` is
@@ -532,10 +533,12 @@ field is then proved equal to that selected value. Separately, Lean classifies
 every relevant monic factor over `GF(2)` as one of two linear or four quadratic
 shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
 is proved to decode to that polynomial, so packed-search acceptance is paired
-with an independent algebraic irreducibility certificate. This remains a
-degree-four finite selection result; the general packed-predicate correctness
-theorem appears below, while a Rust compiler refinement of the search remains
-separate.
+with an independent algebraic irreducibility certificate. The finite claim
+that degree four returns `19` remains fixture-specific; the general theorem
+below now proves that every successful deterministic search at degree at least
+two returns a packed value of exactly the requested degree whose decoded
+polynomial is irreducible. It does not yet prove that the search succeeds for
+every degree, and a Rust compiler refinement of the search remains separate.
 `[pcc:unverified]`
 
 The packed-search model now also has a general coefficient-level semantics
@@ -595,7 +598,12 @@ predicate is now proved sound whenever `log2(polynomial)=degree` and
 Frobenius polynomial coprime, reconstructs every native guard, and makes the
 terminal `X^(2^degree)=X` comparison pass. Therefore the public packed Boolean
 is now proved equivalent to genuine polynomial irreducibility on its native
-exact-degree domain.
+exact-degree domain. Finally, induction over the odd-candidate search proves
+that every returned value passed this Boolean predicate and has the requested
+packed degree. Composing the two results certifies every successful public
+search result as an exact-degree irreducible polynomial for `degree>=2`.
+Search existence for every degree and compiler refinement to concrete Rust
+execution remain separate obligations.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

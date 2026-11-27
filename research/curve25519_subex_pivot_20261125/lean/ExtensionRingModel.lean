@@ -3200,6 +3200,64 @@ def firstIrreducibleBinaryPolynomial (degree : ℕ) : Option ℕ :=
   if degree == 0 then none
   else firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1))
 
+/-- Under the search-window invariant, every successful auxiliary search
+result has the requested leading degree and passed the packed Rabin predicate. -/
+theorem firstIrreducibleBinaryPolynomialAux_some
+    (degree lower remaining polynomial : ℕ)
+    (hbound : lower + 2 * remaining ≤ 2 ^ degree + 1)
+    (hresult : firstIrreducibleBinaryPolynomialAux degree lower remaining =
+      some polynomial) :
+    Nat.log2 polynomial = degree ∧
+      gf2PackedIrreducible polynomial degree = true := by
+  induction remaining generalizing lower polynomial with
+  | zero =>
+      simp [firstIrreducibleBinaryPolynomialAux] at hresult
+  | succ prior ih =>
+      rw [firstIrreducibleBinaryPolynomialAux] at hresult
+      let candidate := 2 ^ degree + lower
+      by_cases haccepted : gf2PackedIrreducible candidate degree = true
+      · simp [candidate, haccepted] at hresult
+        subst polynomial
+        have hlower : lower < 2 ^ degree := by omega
+        have hcandidate : candidate ≠ 0 := by
+          dsimp [candidate]
+          omega
+        have hlog : Nat.log2 candidate = degree := by
+          apply (Nat.log2_eq_iff hcandidate).2
+          constructor
+          · dsimp [candidate]
+            omega
+          · dsimp [candidate]
+            rw [Nat.pow_succ]
+            omega
+        exact ⟨hlog, haccepted⟩
+      · have hacceptedFalse : gf2PackedIrreducible candidate degree = false :=
+          Bool.eq_false_of_not_eq_true haccepted
+        simp [candidate, hacceptedFalse] at hresult
+        apply ih (lower + 2) polynomial
+        · omega
+        · exact hresult
+
+/-- Every successful public deterministic search at degree at least two
+returns an exact-degree irreducible polynomial over `GF(2)`. -/
+theorem firstIrreducibleBinaryPolynomial_some_irreducible
+    (degree polynomial : ℕ) (hdegree : 2 ≤ degree)
+    (hresult : firstIrreducibleBinaryPolynomial degree = some polynomial) :
+    Nat.log2 polynomial = degree ∧
+      Irreducible
+        (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial) := by
+  unfold firstIrreducibleBinaryPolynomial at hresult
+  have hdegree0 : ¬degree = 0 := by omega
+  simp [hdegree0] at hresult
+  have hbound : 1 + 2 * 2 ^ (degree - 1) ≤ 2 ^ degree + 1 := by
+    rw [two_mul, Nat.two_pow_pred_add_two_pow_pred (by omega)]
+    omega
+  have htrace := firstIrreducibleBinaryPolynomialAux_some
+    degree 1 (2 ^ (degree - 1)) polynomial hbound hresult
+  exact ⟨htrace.1,
+    (gf2PackedIrreducible_iff_irreducible
+      polynomial degree htrace.1 hdegree).1 htrace.2⟩
+
 /-- At degree four the first odd candidate `U^4+1` is rejected while
 `U^4+U+1` is accepted by the native-shaped Rabin predicate. -/
 theorem degreeFourIrreducibilityBoundary :
