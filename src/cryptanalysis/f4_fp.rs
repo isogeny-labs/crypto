@@ -3740,6 +3740,16 @@ fn reduce_chunk_by_known_gemm_par(
         .collect()
 }
 
+/// How many unnormalised `add_lazy` updates may land on one accumulator
+/// before a full [`normalize_lazy`].  Bounded by the exact `u64` product
+/// limit for `p`, clamped to `[256, 4096]` so NTT primes (~3×10⁷ headroom)
+/// spend far less time in Barrett than the old fixed 256.
+#[inline]
+fn normalize_after_for(p: u64) -> usize {
+    let lim = ((u64::MAX - p) / (p - 1).saturating_mul(p - 1).max(1)) as usize;
+    lim.clamp(256, 4096)
+}
+
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
 /// increasing pivot column, with the bounded normalisation that keeps the
 /// accumulators far below `u64` overflow; `pending` carries the count of
@@ -3755,13 +3765,13 @@ fn reduce_lazy_by(
     if mem_site(0) {
         return reduce_lazy_by_fused(acc, known, fp, simd, pending);
     }
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     for (c, pivot) in known {
         let f = fp.reduce(acc[*c]);
         if f != 0 {
             add_lazy(acc, pivot, *c, fp.p - f, simd);
             *pending += 1;
-            if *pending == NORMALIZE_AFTER {
+            if *pending == normalize_after {
                 normalize_lazy(acc, fp);
                 *pending = 0;
             }
@@ -4322,7 +4332,7 @@ fn reduce_pairs_fl(
     }
     let fuse = mem_site(1);
     const NONE: u32 = u32::MAX;
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     let simd = lazy_simd_kind();
     let n_free = free_cols.len();
     if fuse && mem_stats() {
@@ -4379,7 +4389,7 @@ fn reduce_pairs_fl(
     // first when the group would take the unnormalised updates past the
     // bound
     let flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize, st: &mut (u64, u64)| {
-        if *pending + g.n > NORMALIZE_AFTER {
+        if *pending + g.n > normalize_after {
             normalize_lazy(acc, fp);
             *pending = 0;
         }
@@ -4429,7 +4439,7 @@ fn reduce_pairs_fl(
                 if position[j] < block_start {
                     add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                     pending += 1;
-                    if pending == NORMALIZE_AFTER {
+                    if pending == normalize_after {
                         normalize_lazy(&mut acc, fp);
                         pending = 0;
                     }
@@ -4546,7 +4556,7 @@ fn reduce_pairs_fl(
                 debug_assert!(position[j] < position[k]);
                 add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
                 *pending += 1;
-                if *pending == NORMALIZE_AFTER {
+                if *pending == normalize_after {
                     normalize_lazy(acc, fp);
                     *pending = 0;
                 }
@@ -4603,7 +4613,7 @@ fn reduce_pairs_fl(
                 let j = reducer_at[c as usize] as usize;
                 add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                 pending += 1;
-                if pending == NORMALIZE_AFTER {
+                if pending == normalize_after {
                     normalize_lazy(&mut acc, fp);
                     pending = 0;
                 }
@@ -5250,25 +5260,22 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
 // exact integer sums, one accumulator pass per group instead of one per
 // update.
 //
-// Opt-in: `F4_FP_MEM=1` turns the fused path on; it is off by default.  In
-// the serial interleaved A/B (research/f4_groebner_speed_leads_20261116)
-// its pre-registered endpoint (quad_n9, 1.2-1.4x) was not met (0.97-1.06),
-// its significant gains (overdet_n10/n12 at 4 threads, 1.22x/1.67x) were not
-// predicted, and it slowed small systems at 1 thread (quad_n5 0.80x), so it
-// stays off until a pre-registered confirmation passes.  With it on,
-// `F4_FP_MEM_A=0`, `F4_FP_MEM_B=0`, `F4_FP_MEM_C=0` turn off one site each
-// (the deferred reduction, the `B'` build, the blocked pair rows), and
-// `F4_FP_MEM_OLD=1` still forces the one-update path.
+// Default on: fused multi-pivot updates for deferred reduction, `B'` build,
+// and blocked pair rows.  On NTT `pkm_symmetric_tower` m=3 t=5 the fused
+// path cut wall another ~1.2× on top of wide FL + deferred lazy (three
+// matched repeats).  `F4_FP_MEM=0` or `F4_FP_MEM_OLD=1` restores the
+// one-update path; `F4_FP_MEM_A=0` / `B=0` / `C=0` turn off one site each.
 
-/// Updates of one accumulator applied together.
+/// Updates of one accumulator applied together.  Capped at 8: the AVX-512
+/// fused kernel is instantiated only for `n ≤ 8` ([`fused_apply`]).
 const MEM_K: usize = 8;
 
 /// Whether fused site `site` (0 deferred reduction, 1 `B'` build, 2
-/// blocked pair rows) is on.  Off unless `F4_FP_MEM=1`.
+/// blocked pair rows) is on.  Default on; `F4_FP_MEM=0` disables.
 fn mem_site(site: usize) -> bool {
     static ON: std::sync::OnceLock<[bool; 3]> = std::sync::OnceLock::new();
     ON.get_or_init(|| {
-        let on = std::env::var("F4_FP_MEM").as_deref() == Ok("1")
+        let on = std::env::var("F4_FP_MEM").as_deref() != Ok("0")
             && std::env::var("F4_FP_MEM_OLD").as_deref() != Ok("1");
         let off = |v: &str| std::env::var(v).as_deref() == Ok("0");
         [
@@ -5493,12 +5500,12 @@ fn reduce_lazy_by_fused(
     simd: u8,
     pending: &mut usize,
 ) {
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     let len = acc.len();
     let mut g = MemGroup::new();
     let (mut ops, mut touched, mut flushes) = (0usize, 0u64, 0u64);
     let mut flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize| {
-        if *pending + g.n > NORMALIZE_AFTER {
+        if *pending + g.n > normalize_after {
             normalize_lazy(acc, fp);
             *pending = 0;
         }
