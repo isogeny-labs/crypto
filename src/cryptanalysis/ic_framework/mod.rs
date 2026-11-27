@@ -3658,11 +3658,10 @@ mod tests {
             let planted = 1 + planted_seed % (inst.r - 1);
             let ctx = binary_ctx_and_planted(&inst, &group, planted);
             let build = |lean_layout: u8, extra: &str| {
-                let (_, params) =
-                    Params::parse_spec(&format!(
-                        "compact-orbit-scan:{fbspec},lean_layout={lean_layout}{extra}"
-                    ))
-                    .unwrap();
+                let (_, params) = Params::parse_spec(&format!(
+                    "compact-orbit-scan:{fbspec},lean_layout={lean_layout}{extra}"
+                ))
+                .unwrap();
                 let mut ops = GroupOps::default();
                 base.build(&ctx, &params, &mut ops).map(|fb| (fb, ops))
             };
