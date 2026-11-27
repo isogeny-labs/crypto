@@ -228,6 +228,35 @@ if (bitangent_source.parent/'exit-code.txt').exists() and (bitangent_source.pare
         f"{bitangent['core_full_rank']}/{bitangent['core_auxiliary_rank']}/{bitangent['closed_rank']}; "
         f"restored {bitangent['full_rank']}/{bitangent['auxiliary_rank']} counts are derived. "
         "Separate numerical rank-seven control enters no actual matrix.")
+high_controls_source=ROOT/'evidence/high-contact-controls-v1/calls/preflight/stdout.json'
+if (high_controls_source.parent/'exit-code.txt').exists() and (high_controls_source.parent/'exit-code.txt').read_text().strip()=='0':
+    high_controls=json.loads(high_controls_source.read_text())
+    attempts['high-contact-controls-v1']=(
+        "Control-only preflight passes; no actual rank-search pencils ran. "
+        f"Seed {high_controls['selected_seed']} provides a split tangent at old anchor "
+        f"{high_controls['anchor']}. Separate pool expands to {high_controls['control_pool_size']} "
+        f"points/{high_controls['control_columns']} columns, then restores exact 1434/481 subjects. "
+        "Same-collector fixtures recover nonzero product rows with prescribed contacts three "
+        "and four, matching tangent-plus-seed and twice-tangent decompositions. "
+        f"Higher-contact parameter orders are {high_controls['fixtures'][0]['higher_contact_orders']} "
+        f"and {high_controls['fixtures'][1]['higher_contact_orders']}. All geometry, group, basis, selector, "
+        "support, row, factor and state-restoration controls pass. Fixture row rank two is "
+        "control evidence only; no fixture row enters actual data. Actual core remains 134/128/6.")
+high_scan_source=ROOT/'evidence/high-contact-scan-v1/calls/combine/stdout.json'
+if (high_scan_source.parent/'exit-code.txt').exists() and (high_scan_source.parent/'exit-code.txt').read_text().strip()=='0':
+    high_scan=json.loads(high_scan_source.read_text())
+    attempts['high-contact-scan-v1']=(
+        f"Actual higher-contact domain completes {high_scan['raw_choices']} raw choices: "
+        f"{high_scan['pencil_count']} pencils, {high_scan['candidate_occurrences']} candidate occurrences, "
+        f"{high_scan['contact_branches_verified']} contact branches. "
+        f"{high_scan['supported_conics']} supported conics and "
+        f"{high_scan['independent_additional_rows']} independent added rows. "
+        "Every normalized parameter/order witness replays against the original homogeneous "
+        "evaluator; full batch/branch coverage and all declared corruption controls pass. "
+        "Control workspace restores exactly and contributes no actual row. Computed core "
+        f"{high_scan['core_full_rank']}/{high_scan['core_auxiliary_rank']}/{high_scan['closed_rank']}; "
+        f"restored {high_scan['full_rank']}/{high_scan['auxiliary_rank']} counts are derived. "
+        "Contact-order histogram is retained in the synthesis with exact branch witnesses.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -239,7 +268,7 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
-    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1','tangent-conics-v1','bitangent-conics-v1'):
+    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1','tangent-conics-v1','bitangent-conics-v1','high-contact-scan-v1'):
         def call_order(call):
             if call.name=='build': return (0,0)
             if call.name=='plan': return (1,0)
@@ -307,6 +336,33 @@ interpretation and follow-up; no positive additional rank is established.
     (destination/'REPORT.md').write_text(text)
     pdf(destination/'REPORT.md')
 
+if 'high_controls' in globals():
+    dot=(
+        'digraph G {rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];'
+        f'a[label="Actual pool\\n{high_controls["actual_pool_size"]} points / '
+        f'{high_controls["actual_working_columns"]} columns"];'
+        f'b[label="Control workspace\\n{high_controls["control_pool_size"]} points / '
+        f'{high_controls["control_columns"]} columns\\n3+1 and 4 fixtures"];'
+        f'c[label="Exact restoration\\n{high_controls["actual_pool_size"]} points / '
+        f'{high_controls["actual_working_columns"]} columns\\n0 fixture rows in actual data"];'
+        'a->b;b->c[label="matching subject digest"];}'
+    )
+    (ROOT/'control-isolation.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'control-isolation.dot','-o','control-isolation.'+suffix],cwd=ROOT,check=True)
+if 'high_scan' in globals():
+    histogram=high_scan['contact_histogram']
+    (ROOT/'contact-orders.json').write_text(json.dumps({
+        'source':'evidence/high-contact-scan-v1/calls/combine/stdout.json',
+        'pencil_count':high_scan['pencil_count'],
+        'verified_branches':high_scan['contact_branches_verified'],
+        'fixture_rows_in_actual_matrix':high_scan['fixture_rows_entering_actual_matrix'],
+        'histogram':histogram},indent=2)+'\n')
+    plot(ROOT/'contact-orders',
+         [f"{r['profile']}: {r['prescribed']} → {r['observed']}" for r in histogram],
+         [r['count'] for r in histogram], 'First unfixed contact parameters: actual 512-pencil domain',
+         'Verified branches (count)')
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -331,7 +387,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Old-pair*','mixed-image-extension-v1/calls/combine'),
                         ('Four-line*','four-line-conics-v1/calls/combine'),
                         ('Tangent*','tangent-conics-v1/calls/combine'),
-                        ('Bitangent*','bitangent-conics-v1/calls/combine')]:
+                        ('Bitangent*','bitangent-conics-v1/calls/combine'),
+                        ('Higher contact*','high-contact-scan-v1/calls/combine')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -370,5 +427,5 @@ for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
