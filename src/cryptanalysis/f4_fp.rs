@@ -3592,11 +3592,10 @@ fn deferred_parallel() -> bool {
     *PAR.get_or_init(|| std::env::var("F4_FP_DEFERRED_PAR").as_deref() != Ok("0"))
 }
 
-/// Exact `f64` SpMM/GEMM trailing updates in deferred RREF and wide FL
-/// blocked pair updates (`p` with [`fp_gemm::supports_f64_gemm`]).  Opt-in
-/// (`F4_FP_GEMM=1`): on NTT cells the parallel AVX `add_lazy` path is
-/// faster until panels are large enough that packing amortises; default
-/// off keeps that path.  Same-binary control: unset vs `=1`.
+/// Exact `f64` SpMM/GEMM trailing updates in deferred RREF
+/// (`p` with [`fp_gemm::supports_f64_gemm`]).  Opt-in (`F4_FP_GEMM=1`):
+/// on NTT free-column cells packing still loses to parallel AVX `add_lazy`
+/// even without strip-splitting; default off.  Same-binary control: `=1`.
 fn f4_fp_gemm_env_on() -> bool {
     static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() == Ok("1"))
@@ -3721,23 +3720,15 @@ fn reduce_chunk_by_known_gemm(
     accs.into_iter().map(|a| (a, 0usize)).collect()
 }
 
-/// Parallel strip wrapper around [`reduce_chunk_by_known_gemm`]: when the
-/// chunk is wide enough that the lazy path would have used rayon, split into
-/// row strips so packing stays concurrent with other strips.
+/// GEMM on the full chunk (do not strip-parallelize): B-panel packing is the
+/// dominant cost, so one pack over `m = chunk` rows beats many small packs.
 fn reduce_chunk_by_known_gemm_par(
     sources: &[Vec<u32>],
     known: &[(usize, Vec<u32>)],
     fp: Barrett,
-    spread: bool,
+    _spread: bool,
 ) -> Vec<(Vec<u64>, usize)> {
-    const STRIP: usize = 16;
-    if !spread || sources.len() <= STRIP {
-        return reduce_chunk_by_known_gemm(sources, known, fp);
-    }
-    sources
-        .par_chunks(STRIP)
-        .flat_map_iter(|sub| reduce_chunk_by_known_gemm(sub, known, fp))
-        .collect()
+    reduce_chunk_by_known_gemm(sources, known, fp)
 }
 
 /// How many unnormalised `add_lazy` updates may land on one accumulator
