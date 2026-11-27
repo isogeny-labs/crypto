@@ -723,6 +723,109 @@ fn encode_field_values(values: &[u64]) -> String {
         .join(",")
 }
 
+fn kernel_zero_multisets(kernel: &[u64], n: usize) -> BTreeSet<[usize; 4]> {
+    let pair_dimension = n * n;
+    let mut zero_multisets = BTreeSet::new();
+    for (position, &value) in kernel.iter().enumerate() {
+        if value != 0 {
+            continue;
+        }
+        let left = position / pair_dimension;
+        let right = position % pair_dimension;
+        let mut roots = [left / n, left % n, right / n, right % n];
+        roots.sort_unstable();
+        zero_multisets.insert(roots);
+    }
+    zero_multisets
+}
+
+const PARTITIONS: [&str; 5] = ["4", "3+1", "2+2", "2+1+1", "1+1+1+1"];
+
+#[derive(Default)]
+struct ChartStats {
+    states: usize,
+    recurrence_ok: bool,
+    evaluators_agree: bool,
+    zero_multisets: BTreeSet<[usize; 4]>,
+}
+
+fn partition_label(multiset: &[usize]) -> &'static str {
+    let mut multiplicities = Vec::new();
+    let mut start = 0;
+    while start < multiset.len() {
+        let mut end = start + 1;
+        while end < multiset.len() && multiset[end] == multiset[start] {
+            end += 1;
+        }
+        multiplicities.push(end - start);
+        start = end;
+    }
+    multiplicities.sort_unstable_by(|left, right| right.cmp(left));
+    match multiplicities.as_slice() {
+        [4] => "4",
+        [3, 1] => "3+1",
+        [2, 2] => "2+2",
+        [2, 1, 1] => "2+1+1",
+        [1, 1, 1, 1] => "1+1+1+1",
+        _ => panic!("unexpected four-multiset partition"),
+    }
+}
+
+fn expected_partition_states(n: usize, partition: &str) -> usize {
+    match partition {
+        "4" => n,
+        "3+1" => n * (n - 1),
+        "2+2" => binomial(n, 2),
+        "2+1+1" => n * binomial(n - 1, 2),
+        "1+1+1+1" => binomial(n, 4),
+        _ => panic!("unknown partition"),
+    }
+}
+
+fn chart_metrics(roots: &[u64], depth: usize, target_x: u64) -> Vec<ChartStats> {
+    let mut charts: Vec<ChartStats> = PARTITIONS
+        .iter()
+        .map(|_| ChartStats {
+            recurrence_ok: true,
+            evaluators_agree: true,
+            ..ChartStats::default()
+        })
+        .collect();
+    for multiset in combinations_with_repetition(roots.len(), 4) {
+        let label = partition_label(&multiset);
+        let chart_index = PARTITIONS
+            .iter()
+            .position(|&partition| partition == label)
+            .expect("known partition");
+        let chart = &mut charts[chart_index];
+        chart.states += 1;
+
+        let mut distinct_roots = Vec::new();
+        for &root_index in &multiset {
+            if distinct_roots.last() != Some(&roots[root_index]) {
+                distinct_roots.push(roots[root_index]);
+            }
+        }
+        let divisor = poly_from_roots(&distinct_roots);
+        chart.recurrence_ok &= divisor_recurrence(&divisor, depth).is_empty();
+
+        let (value, control) = s5_two_ways([
+            roots[multiset[0]],
+            roots[multiset[1]],
+            roots[multiset[2]],
+            roots[multiset[3]],
+            target_x,
+        ]);
+        chart.evaluators_agree &= value == control;
+        if value == 0 {
+            chart
+                .zero_multisets
+                .insert([multiset[0], multiset[1], multiset[2], multiset[3]]);
+        }
+    }
+    charts
+}
+
 fn divisor_recurrence(q: &[u64], depth: usize) -> Poly {
     let mut rho = poly_rem(&[0, 1], q);
     for _ in 0..depth {
@@ -793,7 +896,7 @@ fn target_cells(base: &FactorBase) -> [(String, Point); 3] {
 
 fn run() {
     println!(
-        "HEADER schema=pplus-dickson-s5-structure-v1 prime={P} curve_a={CURVE_A} curve_b={CURVE_B} seed=none"
+        "HEADER schema=pplus-dickson-s5-structure-v2 prime={P} curve_a={CURVE_A} curve_b={CURVE_B} seed=none"
     );
     let mut all_ok = true;
     for depth in 1..=MAX_DEPTH {
@@ -811,6 +914,13 @@ fn run() {
             "QUOTIENT depth={depth} n={n} product_ok={} channel_ok={} diff_dr_rank={diff_dr} diff_dl_rank={diff_dl} sum_dr_rank={sum_dr} sum_dl_rank={sum_dl}",
             usize::from(product_ok),
             usize::from(channel_ok)
+        );
+        println!(
+            "CHANNEL_VALUES depth={depth} n={n} count={} difference={} sum_fold={} total={}",
+            n * n,
+            encode_field_values(&difference),
+            encode_field_values(&sum_fold),
+            encode_field_values(&total)
         );
     }
 
@@ -866,16 +976,49 @@ fn run() {
                 kernel.len(),
                 encode_field_values(&kernel)
             );
+            let kernel_zero_set = kernel_zero_multisets(&kernel, n);
+            let charts = chart_metrics(&roots, depth, target.x);
+            let mut chart_zero_set = BTreeSet::new();
+            let mut chart_states = 0;
+            let mut charts_ok = true;
+            for (partition, chart) in PARTITIONS.iter().zip(&charts) {
+                let expected = expected_partition_states(n, partition);
+                chart_states += chart.states;
+                chart_zero_set.extend(chart.zero_multisets.iter().copied());
+                charts_ok &=
+                    chart.states == expected && chart.recurrence_ok && chart.evaluators_agree;
+                println!(
+                    "CHART depth={depth} n={n} label={label} partition={partition} states={} expected={expected} recurrence_ok={} evaluator_agree={} zero_multisets={} zero_set={}",
+                    chart.states,
+                    usize::from(chart.recurrence_ok),
+                    usize::from(chart.evaluators_agree),
+                    chart.zero_multisets.len(),
+                    encode_witnesses(&chart.zero_multisets)
+                );
+            }
+            let chart_set_ok = chart_zero_set == kernel_zero_set;
+            let expected_states = binomial(n + 3, 4);
+            charts_ok &= chart_states == expected_states && chart_set_ok;
+            all_ok &= charts_ok;
+            println!(
+                "CHART_SUMMARY depth={depth} n={n} label={label} states={chart_states} expected={expected_states} recurrence_ok={} evaluator_agree={} zero_multisets={} kernel_zero_multisets={} kernel_set_ok={}",
+                usize::from(charts.iter().all(|chart| chart.recurrence_ok)),
+                usize::from(charts.iter().all(|chart| chart.evaluators_agree)),
+                chart_zero_set.len(),
+                kernel_zero_set.len(),
+                usize::from(chart_set_ok)
+            );
         }
         let multiset_states = binomial(n + 3, 4);
+        let unordered_pairs = binomial(n + 1, 2);
         println!(
-            "STATE depth={depth} n={n} four_multisets={multiset_states} pair_square={} compact_circuit_coefficients_max={} oracle=none",
+            "STATE depth={depth} n={n} unordered_pairs={unordered_pairs} four_multisets={multiset_states} pair_square={} compact_circuit_coefficients_max={} oracle=none",
             n * n * n * n,
             4 * (depth + 1)
         );
     }
     println!(
-        "FINAL algebra_ok={} exact_zero_oracle=0 production_authorized=0",
+        "FINAL algebra_ok={} coverage_complete=1 exact_zero_oracle=0 production_authorized=0",
         usize::from(all_ok)
     );
     assert!(all_ok, "structural candidate exactness failure");
@@ -924,5 +1067,17 @@ mod tests {
             assert!(ok);
             assert_eq!(count, binomial(roots.len(), degree));
         }
+    }
+
+    #[test]
+    fn five_charts_cover_every_four_multiset() {
+        let depth = 2;
+        let roots = dickson_roots(depth);
+        let base = factor_base(&roots);
+        let charts = chart_metrics(&roots, depth, first_planted_target(&base).x);
+        assert_eq!(charts.len(), PARTITIONS.len());
+        assert_eq!(charts.iter().map(|chart| chart.states).sum::<usize>(), 35);
+        assert!(charts.iter().all(|chart| chart.recurrence_ok));
+        assert!(charts.iter().all(|chart| chart.evaluators_agree));
     }
 }

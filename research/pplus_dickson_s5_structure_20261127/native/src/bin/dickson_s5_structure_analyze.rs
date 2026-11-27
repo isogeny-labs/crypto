@@ -34,6 +34,13 @@ fn number(fields: &Fields, key: &str) -> Option<usize> {
     value(fields, key)?.parse().ok()
 }
 
+fn choose(n: usize, k: usize) -> usize {
+    let k = k.min(n - k);
+    (0..k).fold(1, |accumulator, index| {
+        accumulator * (n - index) / (index + 1)
+    })
+}
+
 fn main() {
     let arguments: Vec<_> = env::args().collect();
     assert_eq!(
@@ -48,41 +55,65 @@ fn main() {
 
     let candidate_final = find(&candidate, "FINAL");
     let verifier_final = find(&verifier, "VERIFY");
+    let cells = find(&candidate, "CELL");
+    let states = find(&candidate, "STATE");
     let exactness_ok = candidate_final.len() == 1
         && verifier_final.len() == 1
         && value(candidate_final[0], "algebra_ok") == Some("1")
+        && value(candidate_final[0], "coverage_complete") == Some("1")
         && value(candidate_final[0], "production_authorized") == Some("0")
+        && value(verifier_final[0], "schema") == Some("pplus-dickson-s5-verify-v2")
         && value(verifier_final[0], "candidate_match") == Some("1")
         && value(verifier_final[0], "exactness_ok") == Some("1")
-        && value(verifier_final[0], "errors") == Some("0");
+        && value(verifier_final[0], "coverage_complete") == Some("1")
+        && value(verifier_final[0], "errors") == Some("0")
+        && cells.len() == 9
+        && states.len() == 3
+        && find(&candidate, "CHANNEL_VALUES").len() == 6
+        && find(&candidate, "KERNEL_VALUES").len() == 9
+        && find(&candidate, "CHART").len() == 45
+        && find(&candidate, "CHART_SUMMARY").len() == 9;
     let exact_zero_oracle = candidate_final
         .first()
         .and_then(|fields| value(fields, "exact_zero_oracle"))
         == Some("1");
 
     let mut structure_cells = 0;
-    let cells = find(&candidate, "CELL");
+    let mut predicate_disagreements = 0;
     for cell in &cells {
         let n = number(cell, "n").unwrap_or(0);
         let pair_dimension = number(cell, "pair_dimension").unwrap_or(0);
+        let zero_operator_dimension = number(cell, "zero_operator_dimension").unwrap_or(0);
         let kernel_rank = number(cell, "kernel_rank").unwrap_or(usize::MAX);
         let delta_s_rank = number(cell, "delta_s_rank").unwrap_or(usize::MAX);
         let delta_p_rank = number(cell, "delta_p_rank").unwrap_or(usize::MAX);
+        let zero_entry = number(cell, "zero_count").is_some_and(|count| count > 0);
+        let singular = kernel_rank < pair_dimension;
+        let predicate_agrees = singular == zero_entry;
+        predicate_disagreements += usize::from(!predicate_agrees);
         let low_displacement = delta_s_rank < pair_dimension || delta_p_rank < pair_dimension;
         structure_cells += usize::from(low_displacement);
         println!(
-            "ANALYSIS_CELL depth={} n={n} label={} pair_dimension={pair_dimension} kernel_rank={kernel_rank} delta_s_rank={delta_s_rank} delta_p_rank={delta_p_rank} structure_present={} zero_oracle=0",
+            "ANALYSIS_CELL depth={} n={n} label={} pair_dimension={pair_dimension} zero_operator_dimension={zero_operator_dimension} unordered_pairs={} four_multisets={} kernel_rank={kernel_rank} delta_s_rank={delta_s_rank} delta_p_rank={delta_p_rank} structure_present={} zero_entry={} det_zero={} rank_deficient={} det_predicate_agrees={} rank_predicate_agrees={} zero_oracle=0",
             value(cell, "depth").unwrap_or("missing"),
             value(cell, "label").unwrap_or("missing"),
-            usize::from(low_displacement)
+            choose(n + 1, 2),
+            choose(n + 3, 4),
+            usize::from(low_displacement),
+            usize::from(zero_entry),
+            usize::from(singular),
+            usize::from(singular),
+            usize::from(predicate_agrees),
+            usize::from(predicate_agrees)
         );
     }
 
-    for state in find(&candidate, "STATE") {
+    for state in &states {
         println!(
-            "ANALYSIS_STATE depth={} n={} four_multisets={} pair_square={} compact_circuit_coefficients_max={} explicit_state_subquadratic=0",
+            "ANALYSIS_STATE depth={} n={} unordered_pairs={} four_multisets={} pair_square={} compact_circuit_coefficients_max={} explicit_state_subquadratic=0",
             value(state, "depth").unwrap_or("missing"),
             value(state, "n").unwrap_or("missing"),
+            value(state, "unordered_pairs").unwrap_or("missing"),
             value(state, "four_multisets").unwrap_or("missing"),
             value(state, "pair_square").unwrap_or("missing"),
             value(state, "compact_circuit_coefficients_max").unwrap_or("missing")
@@ -100,7 +131,8 @@ fn main() {
         "INVALID_STOP"
     };
     println!(
-        "ANALYSIS schema=pplus-dickson-s5-analysis-v1 exactness_ok={} cells={} structure_cells={structure_cells} exact_zero_oracle={} oracle_contract_ok={} cross_target_amortization=0 production_authorized=0 verdict={verdict}",
+        "ANALYSIS schema=pplus-dickson-s5-analysis-v2 exactness_ok={} coverage_complete={} cells={} structure_cells={structure_cells} predicate_disagreements={predicate_disagreements} exact_zero_oracle={} oracle_contract_ok={} cross_target_amortization=0 production_authorized=0 verdict={verdict}",
+        usize::from(exactness_ok),
         usize::from(exactness_ok),
         cells.len(),
         usize::from(exact_zero_oracle),

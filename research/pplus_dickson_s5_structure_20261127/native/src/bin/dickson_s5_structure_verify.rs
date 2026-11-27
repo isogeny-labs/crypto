@@ -716,6 +716,103 @@ fn encoded_field_values(values: &[u64]) -> String {
         .join(",")
 }
 
+fn kernel_zero_multisets(kernel: &[u64], n: usize) -> BTreeSet<[usize; 4]> {
+    let pair_count = n * n;
+    let mut output = BTreeSet::new();
+    for (position, &value) in kernel.iter().enumerate() {
+        if value != 0 {
+            continue;
+        }
+        let left = position / pair_count;
+        let right = position % pair_count;
+        let mut roots = [left / n, left % n, right / n, right % n];
+        roots.sort_unstable();
+        output.insert(roots);
+    }
+    output
+}
+
+const PARTITIONS: [&str; 5] = ["4", "3+1", "2+2", "2+1+1", "1+1+1+1"];
+
+#[derive(Default)]
+struct IndependentChart {
+    states: usize,
+    membership_ok: bool,
+    zero_multisets: BTreeSet<[usize; 4]>,
+}
+
+fn independent_partition(multiset: &[usize]) -> &'static str {
+    let mut counts = Vec::new();
+    let mut cursor = 0;
+    while cursor < multiset.len() {
+        let value = multiset[cursor];
+        let count = multiset[cursor..]
+            .iter()
+            .take_while(|&&candidate| candidate == value)
+            .count();
+        counts.push(count);
+        cursor += count;
+    }
+    counts.sort_unstable_by(|left, right| right.cmp(left));
+    match counts.as_slice() {
+        [4] => "4",
+        [3, 1] => "3+1",
+        [2, 2] => "2+2",
+        [2, 1, 1] => "2+1+1",
+        [1, 1, 1, 1] => "1+1+1+1",
+        _ => panic!("unexpected partition"),
+    }
+}
+
+fn expected_partition_states(n: usize, partition: &str) -> usize {
+    match partition {
+        "4" => n,
+        "3+1" => n * (n - 1),
+        "2+2" => choose(n, 2),
+        "2+1+1" => n * choose(n - 1, 2),
+        "1+1+1+1" => choose(n, 4),
+        _ => panic!("unknown partition"),
+    }
+}
+
+fn independent_charts(roots: &[u64], target_x: u64) -> Vec<IndependentChart> {
+    let n = roots.len();
+    let mut charts: Vec<IndependentChart> = PARTITIONS
+        .iter()
+        .map(|_| IndependentChart {
+            membership_ok: true,
+            ..IndependentChart::default()
+        })
+        .collect();
+    for multiset in multisets(n, 4) {
+        let label = independent_partition(&multiset);
+        let chart_index = PARTITIONS
+            .iter()
+            .position(|&partition| partition == label)
+            .expect("known partition");
+        let chart = &mut charts[chart_index];
+        chart.states += 1;
+
+        let distinct: BTreeSet<_> = multiset.iter().copied().collect();
+        chart.membership_ok &= distinct
+            .iter()
+            .all(|&index| dickson_value(n, roots[index]) == 0);
+        let value = independent_s5([
+            roots[multiset[0]],
+            roots[multiset[1]],
+            roots[multiset[2]],
+            roots[multiset[3]],
+            target_x,
+        ]);
+        if value == 0 {
+            chart
+                .zero_multisets
+                .insert([multiset[0], multiset[1], multiset[2], multiset[3]]);
+        }
+    }
+    charts
+}
+
 fn choose(n: usize, k: usize) -> usize {
     let k = k.min(n - k);
     (0..k).fold(1, |accumulator, index| {
@@ -736,20 +833,6 @@ fn parse_records(text: &str) -> Vec<(String, Fields)> {
             (tag, fields)
         })
         .collect()
-}
-
-fn find_record<'a>(
-    records: &'a [(String, Fields)],
-    tag: &str,
-    selectors: &[(&str, String)],
-) -> Option<&'a Fields> {
-    records.iter().find_map(|(record_tag, fields)| {
-        (record_tag == tag
-            && selectors
-                .iter()
-                .all(|(key, value)| fields.get(*key) == Some(value)))
-        .then_some(fields)
-    })
 }
 
 fn check_field(
@@ -774,11 +857,40 @@ fn require_record<'a>(
     tag: &str,
     selectors: &[(&str, String)],
 ) -> Option<&'a Fields> {
-    let record = find_record(records, tag, selectors);
-    if record.is_none() {
-        errors.push(format!("missing tag={tag} selectors={selectors:?}"));
+    let matching: Vec<_> = records
+        .iter()
+        .filter_map(|(record_tag, fields)| {
+            (record_tag == tag
+                && selectors
+                    .iter()
+                    .all(|(key, value)| fields.get(*key) == Some(value)))
+            .then_some(fields)
+        })
+        .collect();
+    if matching.len() != 1 {
+        errors.push(format!(
+            "record multiplicity tag={tag} selectors={selectors:?} count={}",
+            matching.len()
+        ));
     }
-    record
+    matching.first().copied()
+}
+
+fn check_tag_count(
+    errors: &mut Vec<String>,
+    records: &[(String, Fields)],
+    tag: &str,
+    expected: usize,
+) {
+    let observed = records
+        .iter()
+        .filter(|(record_tag, _)| record_tag == tag)
+        .count();
+    if observed != expected {
+        errors.push(format!(
+            "tag count tag={tag} expected={expected} observed={observed}"
+        ));
+    }
 }
 
 fn verify(candidate_text: &str) -> Vec<String> {
@@ -790,7 +902,7 @@ fn verify(candidate_text: &str) -> Vec<String> {
             header,
             "HEADER",
             "schema",
-            "pplus-dickson-s5-structure-v1",
+            "pplus-dickson-s5-structure-v2",
         );
         check_field(&mut errors, header, "HEADER", "prime", MODULUS);
         check_field(&mut errors, header, "HEADER", "seed", "none");
@@ -830,6 +942,37 @@ fn verify(candidate_text: &str) -> Vec<String> {
             check_field(&mut errors, fields, &context, "diff_dl_rank", diff_dl);
             check_field(&mut errors, fields, &context, "sum_dr_rank", sum_dr);
             check_field(&mut errors, fields, &context, "sum_dl_rank", sum_dl);
+        }
+        let channel_context = format!("CHANNEL_VALUES depth={depth}");
+        if let Some(fields) = require_record(
+            &mut errors,
+            &records,
+            "CHANNEL_VALUES",
+            &[("depth", depth.to_string())],
+        ) {
+            check_field(&mut errors, fields, &channel_context, "n", n);
+            check_field(&mut errors, fields, &channel_context, "count", n * n);
+            check_field(
+                &mut errors,
+                fields,
+                &channel_context,
+                "difference",
+                encoded_field_values(&difference),
+            );
+            check_field(
+                &mut errors,
+                fields,
+                &channel_context,
+                "sum_fold",
+                encoded_field_values(&sum_fold),
+            );
+            check_field(
+                &mut errors,
+                fields,
+                &channel_context,
+                "total",
+                encoded_field_values(&_exact),
+            );
         }
     }
 
@@ -971,6 +1114,99 @@ fn verify(candidate_text: &str) -> Vec<String> {
                     encoded_field_values(&kernel),
                 );
             }
+            let kernel_zero_set = kernel_zero_multisets(&kernel, n);
+            let charts = independent_charts(&roots, target.x);
+            let mut chart_zero_set = BTreeSet::new();
+            let mut chart_states = 0;
+            for (partition, chart) in PARTITIONS.iter().zip(&charts) {
+                let expected = expected_partition_states(n, partition);
+                chart_states += chart.states;
+                chart_zero_set.extend(chart.zero_multisets.iter().copied());
+                let chart_context =
+                    format!("CHART depth={depth} label={label} partition={partition}");
+                if let Some(fields) = require_record(
+                    &mut errors,
+                    &records,
+                    "CHART",
+                    &[
+                        ("depth", depth.to_string()),
+                        ("label", label.to_owned()),
+                        ("partition", (*partition).to_owned()),
+                    ],
+                ) {
+                    check_field(&mut errors, fields, &chart_context, "n", n);
+                    check_field(&mut errors, fields, &chart_context, "states", chart.states);
+                    check_field(&mut errors, fields, &chart_context, "expected", expected);
+                    check_field(
+                        &mut errors,
+                        fields,
+                        &chart_context,
+                        "recurrence_ok",
+                        chart.membership_ok as usize,
+                    );
+                    check_field(&mut errors, fields, &chart_context, "evaluator_agree", 1);
+                    check_field(
+                        &mut errors,
+                        fields,
+                        &chart_context,
+                        "zero_multisets",
+                        chart.zero_multisets.len(),
+                    );
+                    check_field(
+                        &mut errors,
+                        fields,
+                        &chart_context,
+                        "zero_set",
+                        encoded_witnesses(&chart.zero_multisets),
+                    );
+                }
+            }
+            let summary_context = format!("CHART_SUMMARY depth={depth} label={label}");
+            if let Some(fields) = require_record(
+                &mut errors,
+                &records,
+                "CHART_SUMMARY",
+                &[("depth", depth.to_string()), ("label", label.to_owned())],
+            ) {
+                check_field(&mut errors, fields, &summary_context, "n", n);
+                check_field(
+                    &mut errors,
+                    fields,
+                    &summary_context,
+                    "states",
+                    chart_states,
+                );
+                check_field(
+                    &mut errors,
+                    fields,
+                    &summary_context,
+                    "expected",
+                    choose(n + 3, 4),
+                );
+                check_field(&mut errors, fields, &summary_context, "recurrence_ok", 1);
+                check_field(&mut errors, fields, &summary_context, "evaluator_agree", 1);
+                check_field(
+                    &mut errors,
+                    fields,
+                    &summary_context,
+                    "zero_multisets",
+                    chart_zero_set.len(),
+                );
+                check_field(
+                    &mut errors,
+                    fields,
+                    &summary_context,
+                    "kernel_zero_multisets",
+                    kernel_zero_set.len(),
+                );
+                check_field(
+                    &mut errors,
+                    fields,
+                    &summary_context,
+                    "kernel_set_ok",
+                    usize::from(chart_zero_set == kernel_zero_set),
+                );
+            }
         }
         let context = format!("STATE depth={depth}");
         if let Some(fields) = require_record(
@@ -984,6 +1220,13 @@ fn verify(candidate_text: &str) -> Vec<String> {
                 &mut errors,
                 fields,
                 &context,
+                "unordered_pairs",
+                choose(n + 1, 2),
+            );
+            check_field(
+                &mut errors,
+                fields,
+                &context,
                 "four_multisets",
                 choose(n + 3, 4),
             );
@@ -993,6 +1236,7 @@ fn verify(candidate_text: &str) -> Vec<String> {
     }
     if let Some(final_record) = require_record(&mut errors, &records, "FINAL", &[]) {
         check_field(&mut errors, final_record, "FINAL", "algebra_ok", 1);
+        check_field(&mut errors, final_record, "FINAL", "coverage_complete", 1);
         check_field(&mut errors, final_record, "FINAL", "exact_zero_oracle", 0);
         check_field(
             &mut errors,
@@ -1001,6 +1245,21 @@ fn verify(candidate_text: &str) -> Vec<String> {
             "production_authorized",
             0,
         );
+    }
+    for (tag, expected) in [
+        ("HEADER", 1),
+        ("QUOTIENT", 6),
+        ("CHANNEL_VALUES", 6),
+        ("DIVISOR", 12),
+        ("INFINITY", 3),
+        ("CELL", 9),
+        ("KERNEL_VALUES", 9),
+        ("CHART", 45),
+        ("CHART_SUMMARY", 9),
+        ("STATE", 3),
+        ("FINAL", 1),
+    ] {
+        check_tag_count(&mut errors, &records, tag, expected);
     }
     errors
 }
@@ -1015,7 +1274,8 @@ fn main() {
         println!("MISMATCH {error}");
     }
     println!(
-        "VERIFY schema=pplus-dickson-s5-verify-v1 candidate_match={} exactness_ok={} errors={}",
+        "VERIFY schema=pplus-dickson-s5-verify-v2 candidate_match={} exactness_ok={} coverage_complete={} errors={}",
+        usize::from(errors.is_empty()),
         usize::from(errors.is_empty()),
         usize::from(errors.is_empty()),
         errors.len()
@@ -1061,5 +1321,15 @@ mod tests {
             assert_eq!(roots.iter().copied().collect::<BTreeSet<_>>().len(), n);
             assert!(roots.iter().all(|&root| dickson_value(n, root) == 0));
         }
+    }
+
+    #[test]
+    fn independent_charts_cover_all_partitions() {
+        let roots = backward_fibre(2);
+        let base = rational_base(&roots);
+        let charts = independent_charts(&roots, planted_target(&base).x);
+        assert_eq!(charts.len(), PARTITIONS.len());
+        assert_eq!(charts.iter().map(|chart| chart.states).sum::<usize>(), 35);
+        assert!(charts.iter().all(|chart| chart.membership_ok));
     }
 }
