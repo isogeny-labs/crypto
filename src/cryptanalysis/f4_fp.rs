@@ -9617,6 +9617,7 @@ struct VisitAccountingSession<'a> {
 }
 
 impl<'a> VisitAccountingSession<'a> {
+    #[allow(clippy::result_large_err)]
     fn begin(
         mut builder: VisitAccountingBuilder,
         context: &'a VisitAccountingContext,
@@ -10937,6 +10938,7 @@ fn visit_disposition(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 fn solve_visit_accounted_impl<F, S>(
     input: &[Poly],
     n_vars: usize,
@@ -11052,8 +11054,10 @@ where
                 .stopped()
         });
     if initial_accounting_stopped || account.control().stopped() {
-        let mut report = VisitReport::default();
-        report.accounting_v1 = Some(Box::new(session.finish(VisitDispositionV1::Incomplete)));
+        let report = VisitReport {
+            accounting_v1: Some(Box::new(session.finish(VisitDispositionV1::Incomplete))),
+            ..VisitReport::default()
+        };
         return Ok(report);
     }
     let empty_domain = domains.iter().flatten().any(Vec::is_empty);
@@ -11116,6 +11120,7 @@ impl VisitAccountingExecutorV1 {
     /// solves through this API.  The report remains call-scoped; construction,
     /// replay, persistence, and whole-collector work need outer accounting.
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::result_large_err)]
     pub fn solve_first(
         &mut self,
         input: &[Poly],
@@ -11157,6 +11162,7 @@ impl VisitAccountingExecutorV1 {
 /// one-thread Rayon pool.  The returned record covers only this solver call;
 /// public-system construction, arbitrary callback work, replay, storage and
 /// the enclosing relation collector require their own ledger.
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_accounted_v1(
     input: &[Poly],
     n_vars: usize,
@@ -11183,6 +11189,7 @@ pub fn solve_visit_accounted_v1(
 /// sink's own persistence/storage implementation remains outer work.  Trace
 /// reuse is intentionally unsupported by v1.
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
 pub fn solve_visit_traced_accounted_v1(
     input: &[Poly],
     n_vars: usize,
