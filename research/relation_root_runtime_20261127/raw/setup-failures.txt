@@ -1,0 +1,5 @@
+All are setup failures, no numerical or timing observations:
+1. GitHub compare HTTP422: oversized diff. Recovered actual merge ancestor with filtered dated history.
+2. New wrapper lock copied from root needed normalization because this historical integration uses default-features=false. Original root and historical integration locks are unchanged; initial wrapper copy retained.
+3. Offline dependency resolution normalized that new lock, then failed before compiler execution because rustc was absent from PATH. Subsequent commands specify the existing rustc binary explicitly.
+4. Original metadata hydrator restored exact tracked literal inputs, then GitHub promisor fetch returned HTTP503 on gpu/certicom/arithmetic.h (blob97094e0b673c8b94917274fe6df822d7634faca6). Its frozen INCLUDE_HYDRATION_436.json was never replaced. The copied helper now writes a fresh receipt in this study.
