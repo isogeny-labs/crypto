@@ -1271,7 +1271,7 @@ fn check_strict_source_guard_exact_boundary(
     packet_exponent: usize,
     edges: usize,
     expected_projection: Option<&str>,
-) {
+) -> (usize, usize, u64) {
     let mut meter = Meter::new(Limits {
         steps: 100_000_000,
         ..Limits::default()
@@ -1329,11 +1329,12 @@ fn check_strict_source_guard_exact_boundary(
             .collect();
         assert_eq!(projection, fixture_values);
     }
+    (summary.packets, summary.maximum_class, meter.used)
 }
 
 #[test]
 fn strict_source_guard_projection_accepts_nontrivial_exact_boundary() {
-    check_strict_source_guard_exact_boundary(
+    let _ = check_strict_source_guard_exact_boundary(
         1,
         32,
         Some(include_str!(concat!(
@@ -1341,6 +1342,20 @@ fn strict_source_guard_projection_accepts_nontrivial_exact_boundary() {
             "/../../research/curve25519_subex_pivot_20261125/packing_label_source_guard_witness.csv"
         ))),
     );
+}
+
+#[test]
+fn strict_source_guard_projection_accepts_larger_exact_boundaries() {
+    for (packet_exponent, edges) in [(2, 512), (3, 8_192), (4, 131_072)] {
+        let (packets, maximum_class, steps) =
+            check_strict_source_guard_exact_boundary(packet_exponent, edges, None);
+        let label_classes = 2usize.pow((2 * packet_exponent) as u32);
+        assert_eq!(maximum_class, edges / label_classes);
+        eprintln!(
+            "exact-boundary a={packet_exponent} M={edges} D={label_classes} \
+             max_class={maximum_class} packets={packets} charged_steps={steps}"
+        );
+    }
 }
 
 #[test]

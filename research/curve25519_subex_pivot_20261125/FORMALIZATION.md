@@ -233,9 +233,14 @@ passing local first-minimum steps equals the recursive executable schedule. A
 shared degree-one, two-label, 32-edge projection satisfies the strongest guard
 at equality and is accepted by both the native verifier and Lean strict parser,
 while the finite three-edge fixture is kernel-proved to be rejected. The
-remaining boundary is to lift these finite code-to-model controls to every
-arbitrary-size producer
-object semantically and to every live recursive history.
+independent native importer now evaluates the same proved row-bucket and
+column-profile auxiliary-state schedule, with its former quadratic objective
+retained only as a differential test oracle. Exact-boundary matching controls
+pass at packet exponents `a=1,2,3,4`; the largest has `M=131072`, `D=256`,
+maximum class 512, and 8192 packets. The three new rungs complete in 0.71
+seconds after compilation. The remaining boundary is to lift these finite
+code-to-model controls to every arbitrary-size producer object semantically
+and to every live recursive history.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

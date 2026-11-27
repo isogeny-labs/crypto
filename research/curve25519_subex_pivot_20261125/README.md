@@ -439,6 +439,17 @@ code-to-model controls plus generic native export and checked-import endpoints,
 not a uniform arbitrary-size Rust-to-Lean semantic refinement.
 `[pcc:unverified]`
 
+The independent native importer now uses the same auxiliary-state schedule as
+the formal replay instead of its former quadratic edge-pair objective: row
+degree/right-endpoint buckets followed by column row-label profiles. Its
+test-only quadratic oracle agrees on isolate, parallel-edge, shared-endpoint,
+and 1/2/4-label controls. The exact strongest-boundary degree-one matching
+family now passes natively at `a=1,2,3,4`, reaching `M=131072`, `D=256`,
+maximum class 512, and 8192 packets at the largest rung. The three new rungs
+take 0.71 seconds together after compilation and use 15,810, 450,038, and
+13,496,226 charged steps. This remains finite scaling evidence rather than a
+uniform producer-family theorem. `[pcc:unverified]`
+
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
 group child. From schema-3 parent provenance and the accepted factorization
 object, its schema-2 verifier reconstructs retained old vertices including

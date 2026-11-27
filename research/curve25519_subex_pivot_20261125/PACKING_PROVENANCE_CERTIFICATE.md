@@ -91,6 +91,18 @@ recursive executable schedule by well-founded induction. The separate shared
 `packing_label_source_guard_witness.csv` is a degree-one matching with two
 labels and 32 edges, exactly `M=2(q^2)^2 delta`; the native verifier reports
 source-guard closure and Lean's strict parser accepts the same projection.
+The independent native verifier now replays the same proved auxiliary-state
+schedule instead of reevaluating every edge pair: row labels use degree and
+right-endpoint incidence buckets, then column labels use row-label incidence
+profiles. A test-only quadratic oracle agrees on isolates, parallel edges,
+shared endpoints, and label alphabets 1, 2, and 4. Exact-boundary degree-one
+matching controls also pass at `a=2,3,4`, respectively
+`(M,D)=(512,16),(8192,64),(131072,256)`, with maximum classes
+`32,128,512`, packet counts `128,1024,8192`, and charged-step counts
+`15810,450038,13496226`. The three new rungs complete together in 0.71 seconds
+after compilation. This is finite scaling evidence for the proved score
+interface, not a uniform code-to-Lean refinement theorem.
+`[pcc:unverified]`
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
 The formal replay no longer reevaluates candidate-independent terms: an exact

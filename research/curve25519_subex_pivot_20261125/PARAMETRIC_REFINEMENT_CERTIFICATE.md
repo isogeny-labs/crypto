@@ -193,7 +193,11 @@ evidence for two independent claims:
    three-edge control is correctly rejected by that stronger parser. A shared
    degree-one, two-label, 32-edge control now meets the source-class guard at
    equality and passes both native verification and the formal strict parser;
-   uniform producer-family binding remains open. The first replay-compression
+   the same native exact-boundary matching family now passes at packet
+   exponents `a=2,3,4`, reaching 131,072 edges and 256 label classes at the
+   largest rung through an independent sparse auxiliary-state replay. This is
+   finite scaling evidence; uniform producer-family binding remains open. The
+   first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a
    fixed offset plus `2q` times a directed interaction score. The formal
