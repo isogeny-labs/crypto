@@ -14,9 +14,10 @@ module defines that quotient, decodes fixed-length serialized coordinate
 vectors into it, proves the coefficientwise additive operations, and closes
 the `2^precision = 0` premise needed by the exact Cauchy series theorem.
 
-It does not yet prove that the Rust convolution/reduction loop implements the
-quotient multiplication or that its deterministic irreducibility search
-selects a particular formal bit vector.
+It also proves that a source-shaped model of Rust's convolution, retained-high
+reduction rows, reverse schedule, and truncation implements quotient
+multiplication. A mechanized binding from the concrete `Vec<BigUint>` code and
+its deterministic irreducibility search to these definitions remains separate.
 -/
 
 open scoped BigOperators
@@ -66,6 +67,59 @@ noncomputable def coordinatePolynomial
     (coordinates : Fin degree → ZMod (2 ^ precision)) :
     Polynomial (ZMod (2 ^ precision)) :=
   ∑ index : Fin degree, monomial (index : ℕ) (coordinates index)
+
+/-- Every in-range coefficient of a coordinate polynomial is the corresponding
+serialized coordinate. -/
+theorem coordinatePolynomial_coeff
+    (precision degree : ℕ)
+    (coordinates : Fin degree → ZMod (2 ^ precision)) (index : Fin degree) :
+    (coordinatePolynomial precision degree coordinates).coeff index =
+      coordinates index := by
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  rw [coordinatePolynomial]
+  change coefficient
+    (∑ coordinateIndex : Fin degree,
+      monomial (coordinateIndex : ℕ) (coordinates coordinateIndex)) = _
+  rw [map_sum]
+  have hself :
+      coefficient (monomial (index : ℕ) (coordinates index)) =
+        coordinates index := by
+    simp [coefficient]
+  rw [← hself]
+  apply Finset.sum_eq_single index
+  · intro coordinateIndex _ hne
+    have hcoe : (coordinateIndex : ℕ) ≠ (index : ℕ) := by
+      intro heq
+      exact hne (Fin.ext heq)
+    simp [coefficient, coeff_monomial, hcoe]
+  · simp
+
+/-- Coordinate polynomials have no coefficient at or above their fixed vector
+length. -/
+theorem coordinatePolynomial_coeff_eq_zero_of_le
+    (precision degree index : ℕ)
+    (coordinates : Fin degree → ZMod (2 ^ precision)) (hindex : degree ≤ index) :
+    (coordinatePolynomial precision degree coordinates).coeff index = 0 := by
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  rw [coordinatePolynomial]
+  change coefficient
+    (∑ coordinateIndex : Fin degree,
+      monomial (coordinateIndex : ℕ) (coordinates coordinateIndex)) = 0
+  rw [map_sum]
+  apply Finset.sum_eq_zero
+  intro coordinateIndex _
+  have hne : (coordinateIndex : ℕ) ≠ index := by
+    have hlt : (coordinateIndex : ℕ) < degree := coordinateIndex.isLt
+    omega
+  simp [coefficient, coeff_monomial, hne]
 
 /-- Power-basis decoding is exactly projection of the coordinate polynomial
 into the quotient. -/
@@ -358,6 +412,49 @@ theorem nativeReductionBufferRow_high
     simp [hne]
   rw [hsum, add_zero]
 
+/-- Polynomial carrying exactly the lower-slot mutations performed by one
+native reduction row while retaining the processed high coefficient. -/
+noncomputable def nativeReductionPolynomialStep
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    Polynomial (ZMod (2 ^ precision)) :=
+  polynomial + ∑ j : Fin degree,
+    if lowerCoefficient j then
+      monomial (offset + (j : ℕ)) (-polynomial.coeff (degree + offset))
+    else 0
+
+/-- Coefficients of the retained-high polynomial step are exactly the contents
+of the source-shaped mutable reduction row started from polynomial coefficients. -/
+theorem nativeReductionPolynomialStep_coeff
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    (nativeReductionPolynomialStep precision degree lowerCoefficient polynomial
+        offset).coeff index =
+      nativeReductionBufferRow precision degree lowerCoefficient
+        (fun k => polynomial.coeff k) offset index := by
+  rw [nativeReductionPolynomialStep, coeff_add,
+    nativeReductionBufferRow_apply]
+  congr 1
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun value => value.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  change coefficient
+      (∑ j : Fin degree,
+        if lowerCoefficient j then
+          monomial (offset + (j : ℕ))
+            (-polynomial.coeff (degree + offset))
+        else 0) = _
+  rw [map_sum]
+  apply Finset.sum_congr rfl
+  intro j _
+  by_cases hbit : lowerCoefficient j
+  · by_cases hindex : offset + (j : ℕ) = index
+    · simp [coefficient, hbit, hindex]
+    · simp [coefficient, hbit, coeff_monomial, hindex]
+  · simp [coefficient, hbit]
+
 /-- Multiplication of decoded coordinate vectors is projection of the ordinary
 coordinate-polynomial convolution product. -/
 theorem decodePowerBasis_mul_eq_mk
@@ -541,6 +638,96 @@ theorem binaryReductionStep_mk
       AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient) polynomial := by
   simp [binaryReductionStep]
 
+/-- The source-shaped polynomial step differs from the logical clearing step
+only by the high monomial that Rust retains until the buffer is truncated. -/
+theorem nativeReductionPolynomialStep_eq
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    nativeReductionPolynomialStep precision degree lowerCoefficient polynomial
+        offset =
+      binaryReductionStep precision degree lowerCoefficient polynomial offset +
+        monomial (degree + offset) (polynomial.coeff (degree + offset)) := by
+  let coefficient := polynomial.coeff (degree + offset)
+  have hnegative :
+      (∑ j : Fin degree,
+        if lowerCoefficient j then
+          monomial (offset + (j : ℕ)) (-coefficient)
+        else 0) =
+      -(∑ j : Fin degree,
+        if lowerCoefficient j then
+          monomial (offset + (j : ℕ)) coefficient
+        else 0) := by
+    rw [← Finset.sum_neg_distrib]
+    apply Finset.sum_congr rfl
+    intro j _
+    by_cases hbit : lowerCoefficient j
+    · simp [hbit, monomial_neg]
+    · simp [hbit]
+  rw [nativeReductionPolynomialStep, binaryReductionStep, binaryPolynomial,
+    mul_add, monomial_mul_X_pow, Finset.mul_sum]
+  simp_rw [mul_ite, mul_zero, monomial_mul_monomial, mul_one]
+  change polynomial +
+      (∑ j : Fin degree,
+        if lowerCoefficient j then
+          monomial (offset + (j : ℕ)) (-coefficient)
+        else 0) = _
+  rw [hnegative]
+  simp [coefficient, Nat.add_comm]
+  abel
+
+/-- Below the processed high slot, one complete mutable native reduction row
+has exactly the coefficients of one logical clearing step. -/
+theorem nativeReductionBufferRow_refines_coefficients
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ)
+    (hindex : index < degree + offset) :
+    nativeReductionBufferRow precision degree lowerCoefficient
+        (fun k => polynomial.coeff k) offset index =
+      (binaryReductionStep precision degree lowerCoefficient polynomial offset).coeff
+        index := by
+  rw [← nativeReductionPolynomialStep_coeff,
+    nativeReductionPolynomialStep_eq, coeff_add, coeff_monomial]
+  have hne : degree + offset ≠ index := Nat.ne_of_gt hindex
+  simp [hne]
+
+/-- The same one-row refinement holds for any mutable buffer agreeing with the
+logical polynomial through the current processed high slot. -/
+theorem nativeReductionBufferRow_refines
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision))
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ)
+    (hbuffer : ∀ k, k ≤ degree + offset → buffer k = polynomial.coeff k)
+    (hindex : index < degree + offset) :
+    nativeReductionBufferRow precision degree lowerCoefficient buffer offset
+        index =
+      (binaryReductionStep precision degree lowerCoefficient polynomial offset).coeff
+        index := by
+  calc
+    nativeReductionBufferRow precision degree lowerCoefficient buffer offset index =
+        polynomial.coeff index + ∑ j : Fin degree,
+          if lowerCoefficient j then
+            if offset + (j : ℕ) = index then
+              -polynomial.coeff (degree + offset) else 0
+          else 0 := by
+      rw [nativeReductionBufferRow_apply, hbuffer index (by omega),
+        hbuffer (degree + offset) (by omega)]
+    _ = nativeReductionBufferRow precision degree lowerCoefficient
+          (fun k => polynomial.coeff k) offset index := by
+      rw [nativeReductionBufferRow_apply]
+    _ = (binaryReductionStep precision degree lowerCoefficient polynomial offset).coeff
+          index := nativeReductionBufferRow_refines_coefficients precision degree
+            index lowerCoefficient polynomial offset hindex
+
+/-- Apply the complete source-shaped mutable reduction rows in descending order
+`count-1,...,0`, retaining processed high slots until final truncation. -/
+noncomputable def nativeReduceBufferDescending
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    ℕ → (ℕ → ZMod (2 ^ precision)) → (ℕ → ZMod (2 ^ precision))
+  | 0, buffer => buffer
+  | count + 1, buffer =>
+      nativeReduceBufferDescending precision degree lowerCoefficient count
+        (nativeReductionBufferRow precision degree lowerCoefficient buffer count)
+
 /-- Apply a caller-supplied finite schedule of logical reduction offsets. The
 native loop uses the descending offsets of its high convolution buffer. -/
 noncomputable def binaryReduceOffsets
@@ -638,6 +825,51 @@ theorem binaryReduceDescending_mk
   | succ count ih =>
       rw [binaryReduceDescending, ih, binaryReductionStep_mk]
 
+/-- If a mutable buffer initially agrees with a polynomial through the active
+range, the full descending native fold agrees with the logical schedule on all
+returned low coordinates. -/
+theorem nativeReduceBufferDescending_refines
+    (precision degree count : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (buffer : ℕ → ZMod (2 ^ precision))
+    (polynomial : Polynomial (ZMod (2 ^ precision)))
+    (hbuffer : ∀ index, index < degree + count →
+      buffer index = polynomial.coeff index)
+    (index : ℕ) (hindex : index < degree) :
+    nativeReduceBufferDescending precision degree lowerCoefficient count buffer
+        index =
+      (binaryReduceDescending precision degree lowerCoefficient count polynomial).coeff
+        index := by
+  induction count generalizing buffer polynomial with
+  | zero =>
+      rw [nativeReduceBufferDescending, binaryReduceDescending]
+      exact hbuffer index (by omega)
+  | succ count ih =>
+      rw [nativeReduceBufferDescending, binaryReduceDescending]
+      apply ih
+      intro k hk
+      apply nativeReductionBufferRow_refines precision degree k lowerCoefficient
+        buffer polynomial count
+      · intro sourceIndex hsourceIndex
+        exact hbuffer sourceIndex (by omega)
+      · exact hk
+
+/-- Starting from the proved mutable convolution buffer, the complete native
+descending reduction fold returns exactly the low coefficients of the proved
+logical descending reduction polynomial. -/
+theorem nativeConvolutionReduceDescending_refines
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) (index : Fin degree) :
+    nativeReduceBufferDescending precision degree lowerCoefficient (degree - 1)
+        (convolutionBuffer precision degree left right) index =
+      (binaryReduceDescending precision degree lowerCoefficient (degree - 1)
+        (convolutionPolynomial precision degree left right)).coeff index := by
+  apply nativeReduceBufferDescending_refines precision degree (degree - 1)
+    lowerCoefficient (convolutionBuffer precision degree left right)
+      (convolutionPolynomial precision degree left right)
+  · intro sourceIndex _
+    rw [convolutionBuffer_apply, convolutionPolynomial_coeff]
+  · exact index.isLt
+
 /-- For positive degree, the native `d-1` descending offsets clear every high
 coefficient of the `2d-1` coordinate convolution, so only indices below `d`
 remain for truncation. -/
@@ -658,6 +890,71 @@ theorem convolutionReduction_coeff_eq_zero
       (degree - 1) index _ (by omega), convolutionPolynomial_coeff]
     exact convolutionCoefficient_eq_zero_of_bound precision degree index left right
       (by omega)
+
+/-- The fixed-length coordinate vector returned by the complete source-shaped
+mutable multiplication buffer after descending reduction and truncation. -/
+noncomputable def nativeProductCoordinates
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) :
+    Fin degree → ZMod (2 ^ precision) :=
+  fun index =>
+    nativeReduceBufferDescending precision degree lowerCoefficient (degree - 1)
+      (convolutionBuffer precision degree left right) index
+
+/-- The returned native coordinate polynomial is exactly the fully reduced
+logical convolution polynomial. -/
+theorem nativeProductPolynomial_eq
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) (hdegree : 0 < degree) :
+    coordinatePolynomial precision degree
+        (nativeProductCoordinates precision degree lowerCoefficient left right) =
+      binaryReduceDescending precision degree lowerCoefficient (degree - 1)
+        (convolutionPolynomial precision degree left right) := by
+  ext index
+  by_cases hindex : index < degree
+  · let coordinateIndex : Fin degree := ⟨index, hindex⟩
+    change
+      (coordinatePolynomial precision degree
+          (nativeProductCoordinates precision degree lowerCoefficient left right)).coeff
+          coordinateIndex = _
+    rw [coordinatePolynomial_coeff, nativeProductCoordinates,
+      nativeConvolutionReduceDescending_refines]
+  · have hge : degree ≤ index := by omega
+    rw [coordinatePolynomial_coeff_eq_zero_of_le precision degree index _ hge,
+      convolutionReduction_coeff_eq_zero precision degree index lowerCoefficient
+        left right hdegree hge]
+
+/-- The complete zero-initialized convolution, descending native reduction, and
+truncation loop decodes to multiplication in the formal native quotient ring. -/
+theorem decodeNativeProductCoordinates
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (left right : Fin degree → ZMod (2 ^ precision)) (hdegree : 0 < degree) :
+    decodePowerBasis precision degree lowerCoefficient
+        (nativeProductCoordinates precision degree lowerCoefficient left right) =
+      decodePowerBasis precision degree lowerCoefficient left *
+        decodePowerBasis precision degree lowerCoefficient right := by
+  calc
+    decodePowerBasis precision degree lowerCoefficient
+        (nativeProductCoordinates precision degree lowerCoefficient left right) =
+        AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+          (coordinatePolynomial precision degree
+            (nativeProductCoordinates precision degree lowerCoefficient left right)) :=
+      (coordinatePolynomial_mk precision degree lowerCoefficient _).symm
+    _ = AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+          (binaryReduceDescending precision degree lowerCoefficient (degree - 1)
+            (convolutionPolynomial precision degree left right)) := by
+      rw [nativeProductPolynomial_eq precision degree lowerCoefficient left right
+        hdegree]
+    _ = AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+          (convolutionPolynomial precision degree left right) :=
+      binaryReduceDescending_mk precision degree lowerCoefficient (degree - 1) _
+    _ = AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+          (coordinatePolynomial precision degree left *
+            coordinatePolynomial precision degree right) := by
+      rw [coordinatePolynomial_mul]
+    _ = decodePowerBasis precision degree lowerCoefficient left *
+          decodePowerBasis precision degree lowerCoefficient right :=
+      (decodePowerBasis_mul_eq_mk precision degree lowerCoefficient left right).symm
 
 /-- Coordinate-polynomial convolution followed by any finite logical reduction
 schedule represents the product of the decoded inputs. -/

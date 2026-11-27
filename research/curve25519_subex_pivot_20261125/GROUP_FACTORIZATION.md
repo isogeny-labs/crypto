@@ -201,16 +201,19 @@ loops; every buffer coefficient equals its source-shaped conditional pair sum,
 and all coefficients beyond the native `2d-1` support vanish. The
 zero-initialized mutable nested loops, including both zero-coordinate fast paths
 and each `i+j` update, now provably finish with exactly those buffer values.
-Matching mutable native high-degree reduction updates to the polynomial steps,
-deterministic irreducible-polynomial selection, and accepted-vector elaboration
-remain open. At the polynomial level the exact source offsets `d-2,...,0` now
+At the polynomial level the exact source offsets `d-2,...,0` now
 preserve the quotient, clear every targeted coefficient without later
 reintroduction, and leave every coefficient at index at least `d` equal to zero
 for the `2d-1` convolution. The mutable source inner row is also formal: it
 clones the high coefficient, follows the zero fast path, subtracts only at set
 lower bits, and provably leaves the processed high slot and every higher slot
-unchanged pending truncation. Composing that row formula with the logical
-polynomial step over the full descending fold remains open.
+unchanged pending truncation. The coefficient invariant now composes those rows
+over the full reverse range: every returned low slot equals the exact reduced
+polynomial coefficient, the truncated coordinate polynomial is that reduced
+polynomial, and decoding the returned coordinates equals quotient-ring
+multiplication. A mechanized binding from concrete `Vec<BigUint>` execution to
+this source-shaped model, deterministic irreducible-polynomial selection, and
+accepted-vector elaboration remain open.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

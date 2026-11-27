@@ -83,6 +83,8 @@ open Curve25519ExtensionRingModel
 #print axioms binaryReduceDescending_mk
 #print axioms convolutionReduction_coeff_eq_zero
 #print axioms coordinatePolynomial_mk
+#print axioms coordinatePolynomial_coeff
+#print axioms coordinatePolynomial_coeff_eq_zero_of_le
 #print axioms coordinatePolynomial_mul
 #print axioms convolutionPolynomial_coeff
 #print axioms convolutionCoefficient_eq_zero_of_bound
@@ -92,6 +94,14 @@ open Curve25519ExtensionRingModel
 #print axioms nativeReductionBufferStep_apply
 #print axioms nativeReductionBufferRow_apply
 #print axioms nativeReductionBufferRow_high
+#print axioms nativeReductionPolynomialStep_coeff
+#print axioms nativeReductionPolynomialStep_eq
+#print axioms nativeReductionBufferRow_refines_coefficients
+#print axioms nativeReductionBufferRow_refines
+#print axioms nativeReduceBufferDescending_refines
+#print axioms nativeConvolutionReduceDescending_refines
+#print axioms nativeProductPolynomial_eq
+#print axioms decodeNativeProductCoordinates
 #print axioms decodePowerBasis_mul_eq_mk
 #print axioms decodePowerBasis_mul_eq_reduced_mk
 #print axioms nativeExtension_pow_two_zero

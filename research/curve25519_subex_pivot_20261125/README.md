@@ -490,9 +490,11 @@ clear every target without later reintroduction, and leave no coefficient at
 index at least `d`. One complete mutable reduction inner row is formal too: its
 cloned-coefficient zero fast path and set-bit subtractions have exact slot
 formulas, and the retained target plus all higher slots stay unchanged until
-truncation. Composing those rows with the logical descending schedule and final
-truncation, deterministic polynomial selection, and accepted-vector elaboration
-still require concrete refinement.
+truncation. The complete reverse fold is now composed: every returned low slot
+equals the logical reduced coefficient, the truncated coordinate polynomial is
+the reduced convolution, and decoding it gives the quotient product. A
+mechanized concrete-`Vec<BigUint>` binding, deterministic polynomial selection,
+and accepted-vector elaboration still require concrete refinement.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

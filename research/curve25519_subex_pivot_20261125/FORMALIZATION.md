@@ -535,20 +535,24 @@ coordinate-polynomial projection theorem additionally identifies decoded
 multiplication with ordinary polynomial convolution followed by any verified
 reduction schedule. That convolution is now kernel-expanded into the same
 nested finite `i,j` monomial sum as the Rust loops, with the exact conditional
-pair sum for every buffer slot and zero support beyond `2d-1`. The remaining
-formal fold models the zero-initialized mutable loop, both zero-coordinate fast
+pair sum for every buffer slot and zero support beyond `2d-1`. The formal fold
+models the zero-initialized mutable loop, both zero-coordinate fast
 paths, and each `i+j` slot update, proving that every final slot equals that
-conditional pair sum. The remaining scalar gap is the mutable native
-high-degree reduction/truncation invariant, plus deterministic polynomial
-selection and accepted witness instantiation. The exact polynomial schedule is
-no longer a gap: offsets `d-2,...,0` preserve the quotient, each cleared high
+conditional pair sum. The exact polynomial schedule is no longer a gap:
+offsets `d-2,...,0` preserve the quotient, each cleared high
 coefficient stays cleared through all later lower steps, and every coefficient
 at index at least `d` vanishes after reducing a `2d-1` convolution.
 The mutable reduction inner row is source-shaped as well: it clones the current
 high coefficient, preserves its zero fast path, subtracts it exactly at each set
 lower-polynomial bit, and changes no slot at or above the processed target. The
-remaining reduction obligation is to compose that coefficient formula with the
-logical step invariant through the full descending fold and final truncation.
+retained-high polynomial differs from the logical clearing step only by the
+processed monomial that truncation discards. Induction over the complete reverse
+range now proves every returned low slot equals the logical reduced coefficient;
+the returned coordinate polynomial equals the reduced convolution, and its
+power-basis decoding is exactly the product of the decoded inputs. The remaining
+boundary is a mechanized binding from concrete Rust `Vec<BigUint>` code to this
+source-shaped transition system, plus deterministic polynomial selection and
+accepted witness instantiation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
