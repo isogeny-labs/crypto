@@ -70,6 +70,14 @@ for name in baseline candidate panel optimized-options.json build-info.json SHA2
 cp "$scratch/study/fresh-inputs-20261127/inputs.sha256" "$scratch/payload/inputs.sha256"
 cp -R "$scratch/study/fresh-inputs-20261127/panel" "$scratch/payload/inputs"
 "$scratch/study/run-pair.sh" --check-only "$scratch/payload" > "$scratch/runner-check.out"
+ISOLAB_JOB_ID=point-index-test POD_UID=pod-123 NODE_NAME=node-1 \
+  ISOLAB_RESULTS_URI=s3://isolab-results-104186811093-us-east-2/runs/point-index-test/pod-123/ \
+  "$scratch/study/run-pair.sh" --check-env "$scratch/payload" > "$scratch/runner-env-check.out"
+if ISOLAB_JOB_ID=point-index-test POD_UID=pod-123 NODE_NAME=node-1 \
+  ISOLAB_RESULTS_URI=s3://setec-astronomy-artifacts/runs/point-index-test/pod-123/ \
+  "$scratch/study/run-pair.sh" --check-env "$scratch/payload" > "$scratch/runner-env-reject.out" 2>&1; then
+  echo 'runner accepted wrong result bucket' >&2; exit 1
+fi
 "$publisher" "$scratch/bundle" "$driver_revision" "$scratch/image.json" > "$scratch/success.out"
 [[ ! -e $TEST_EXECUTED ]]
 jq -e --arg base "$base_revision" --arg candidate "$candidate_revision" --arg driver "$driver_revision" '

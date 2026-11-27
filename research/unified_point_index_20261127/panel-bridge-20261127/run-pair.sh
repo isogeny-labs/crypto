@@ -3,15 +3,17 @@
 # must separately admit the checkpoint, image digest, source and L2 request.
 set -euo pipefail
 image_root=/opt/isolab/point-index
-if [[ $# == 2 && $1 == --check-only ]]; then
+if [[ $# == 2 && ( $1 == --check-only || $1 == --check-env ) ]]; then
   root=$(realpath -- "$2")
   check_only=true
+  check_env=$([[ $1 == --check-env ]] && echo true || echo false)
 elif [[ $# == 2 && $1 == --run && $2 =~ ^[012]$ ]]; then
   root=$image_root
   schedule_index=$2
   check_only=false
+  check_env=true
 else
-  echo 'usage: run-pair.sh --check-only ROOT | --run SCHEDULE_INDEX_0_TO_2' >&2
+  echo 'usage: run-pair.sh --check-only ROOT | --check-env ROOT | --run SCHEDULE_INDEX_0_TO_2' >&2
   exit 2
 fi
 [[ -d $root && ! -L $root ]] || { echo 'missing image payload' >&2; exit 2; }
@@ -41,15 +43,19 @@ grep -Fq "\"baseline\": \"$baseline_revision\"" "$root/inputs/manifest.json" \
   || { echo 'panel baseline source mismatch' >&2; exit 2; }
 grep -Fq "\"paired_baseline\": \"$candidate_revision\"" "$root/inputs/manifest.json" \
   || { echo 'panel candidate source mismatch' >&2; exit 2; }
+check_runtime_identity() {
+  [[ -n ${ISOLAB_JOB_ID:-} && $ISOLAB_JOB_ID =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]] \
+    || { echo 'missing native job identity' >&2; return 2; }
+  [[ -n ${POD_UID:-} && -n ${NODE_NAME:-} ]] \
+    || { echo 'missing pod/node identity' >&2; return 2; }
+  [[ ${ISOLAB_RESULTS_URI:-} == "s3://isolab-results-104186811093-us-east-2/runs/$ISOLAB_JOB_ID/$POD_UID/" ]] \
+    || { echo 'unexpected result destination' >&2; return 2; }
+}
+if [[ $check_env == true ]]; then check_runtime_identity; fi
 if [[ $check_only == true ]]; then
   echo 'Native pair payload and frozen public inputs verified; no solver executed.'
   exit 0
 fi
-[[ -n ${ISOLAB_JOB_ID:-} && $ISOLAB_JOB_ID =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]] \
-  || { echo 'missing native job identity' >&2; exit 2; }
-[[ ${ISOLAB_RESULTS_URI:-} == "s3://setec-astronomy-artifacts/runs/$ISOLAB_JOB_ID/"* ]] \
-  || { echo 'unexpected result destination' >&2; exit 2; }
-[[ -n ${POD_UID:-} && -n ${NODE_NAME:-} ]] || { echo 'missing pod/node identity' >&2; exit 2; }
 [[ ! -e /work/results ]] || { echo 'result path already exists' >&2; exit 2; }
 mkdir -p /work/results
 export RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1
