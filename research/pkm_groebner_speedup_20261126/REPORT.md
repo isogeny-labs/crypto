@@ -61,3 +61,34 @@ The native reproduction is **27.33x** lower in counted F4 work.  The example
 asserts the matched cardinality and shape, both scalar checks, the exact 6->5
 ordinary-degree change, and a conservative >=20x operation gate before it
 prints success.  Receipt: `NATIVE_RESULT.json`.
+
+## Complete native pipeline continuation
+
+The 2026-11-27 frozen continuation ran two serialized balanced pairs in the
+order interval / degree-32 Velu / degree-32 Velu / interval. Each observation
+rebuilt its arm and ran from factor-base construction through verified scalar
+recovery. All eight runs recovered scalar 2261, had no cost qualification,
+and reconciled their five phase charges exactly to `total_gae`.
+
+| arm | observations | summed total GAE | summed cold wall | per-run F4 work | ordinary solving degree |
+|:--|--:|--:|--:|--:|--:|
+| interval | 4 | 283,364,531.60 | 22.613 s | 14,012,270,724 | 6 |
+| degree-32 five-Velu | 4 | 94,799,783.67 | 7.575 s | 512,636,229 | 5 |
+
+The candidate used **0.33455x** the complete charged work, a **2.989x**
+selected-fixture end-to-end reduction, and passed the preregistered <=0.5x
+gate. Its factor-base construction added 1,143 GAE per run versus zero for
+the interval, while the relations-and-solver phase fell from 69.65--71.89M
+GAE to 23.02--24.39M GAE. Linear algebra and verification were retained.
+
+Summed cold wall was **0.33500x**, or **2.985x** faster. That wall result is
+descriptive: the shared host was serialized for this run but not formally
+load-isolated. The F4 unit in `total_gae` is also host-measured because this
+generated curve has no pinned `ns_per_f4_muladd`; every receipt records
+`solver_priced_by = measured`.
+
+This promotes the result from a relation-extraction counter win to a complete
+native-pipeline win only on the selected 13-bit fixture. It remains neither a
+random-instance result, an asymptotic improvement nor a Pollard-rho crossover.
+Frozen receipt: `NATIVE_E2E_RESULT.json`; protocol commit `49f652707f`;
+release binary SHA-256 `5be9a8ce836f33d1a7d20683e7753565e5669ae963226cd5273148b3c5ef07e7`.
