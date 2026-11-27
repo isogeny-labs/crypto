@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "IC-S59-coordinate-rosetta-20261127",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-27",
   "repository": "crypto",
   "study_dir": "research/ic_coordinate_rosetta_20261127",
@@ -77,7 +77,7 @@
       "description": "Affine x-coordinate factor base, the degree-2 Kummer reference.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -87,7 +87,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate x --samples 262144 --seed SEED"
         },
@@ -108,7 +108,7 @@
       "description": "Byte-for-byte repeated x-coordinate extraction under a distinct arm identifier.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -118,7 +118,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate x_aa --samples 262144 --seed SEED"
         },
@@ -140,7 +140,7 @@
       "description": "Projective X normalized by Z squared; mathematically the same affine x function with explicit inversion cost.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -150,7 +150,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate jacobian_x_normalized --samples 262144 --seed SEED"
         },
@@ -172,7 +172,7 @@
       "description": "Raw projective X with independently varied scale; it must fail scale invariance and is not a curve function.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -182,7 +182,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate jacobian_X_raw_negative_control --samples 262144 --seed SEED"
         },
@@ -204,7 +204,7 @@
       "description": "Fractional-linear reparameterization (7x+11)/(13x+17) of affine x.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -214,7 +214,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate mobius_x --samples 262144 --seed SEED"
         },
@@ -236,7 +236,7 @@
       "description": "Affine y-coordinate, a degree-3 curve function with different negation behavior.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -246,7 +246,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate y --samples 262144 --seed SEED"
         },
@@ -268,7 +268,7 @@
       "description": "Affine x+y, a degree-3 curve function.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -278,7 +278,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate x_plus_y --samples 262144 --seed SEED"
         },
@@ -300,7 +300,7 @@
       "description": "The degree-4 composition x squared, included to expose image collisions and extraction cost.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -310,7 +310,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate x_squared --samples 262144 --seed SEED"
         },
@@ -332,7 +332,7 @@
       "description": "The rational function x/y, with poles recorded explicitly.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -342,7 +342,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "relations --coordinate x_over_y --samples 262144 --seed SEED"
         },
@@ -364,7 +364,7 @@
       "description": "All 33 supported prime-field EFD charts across ten models; only exact round-trip, affine-oracle agreement, and straight-line counts are cross-chart evidence.",
       "instrument": {
         "repo": "crypto",
-        "commit": null,
+        "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
         "build": [
           [
             "cargo",
@@ -374,7 +374,7 @@
             "ic_coordinate_rosetta"
           ]
         ],
-        "binary_sha256": null,
+        "binary_sha256": "af6ef75bc26176385ff9d339e2d790579b520077812bcaa80b1d993230a94977",
         "flags": {
           "command": "chart-all --workers 4 --iterations 20000"
         },
@@ -541,10 +541,19 @@
     "arm_order": "interleaved",
     "arm_order_reason": "counting rows are deterministic; isolated timed rows alternate arm order within each seed to limit drift",
     "seed_derivation": {
-      "method": "protocol_hash_sha256",
-      "seeds": [],
+      "method": "explicit_list",
+      "seeds": [
+        "5995792941424594770",
+        "11400714819323198485",
+        "13787848793156543929",
+        "10723151780598845931",
+        "15111065706836454659",
+        "7640891576956012809",
+        "13503953896175478587",
+        "4354685564936845354"
+      ],
       "nonce": null,
-      "note": "seed = first 8 bytes of sha256(protocol_sha256, arm-independent instance index), with the resulting eight values recorded in the export"
+      "note": "eight fixed u64 seeds chosen before affected data; every coordinate arm receives the same seed at a given instance index"
     },
     "instance_sampling": {
       "rule": "eight deterministic P,Q traces derived from the protocol seed; each trace advances P by 2G and Q by 3G for exactly 262144 samples",
@@ -809,12 +818,28 @@
       "verified_by": "cargo check and source inspection on 2026-11-27"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1-shared-seeds",
+      "filed": "2026-11-27",
+      "filed_before_affected_data": true,
+      "reason": "The initial protocol-hash seed method includes the arm identifier, contradicting the matched-trace design. No instrument sample had run when this was detected.",
+      "changes": [
+        "replace protocol_hash_sha256 seed derivation with an explicit list of eight u64 seeds",
+        "state that the seed at each instance index is shared by every coordinate arm",
+        "increment protocol version from 1 to 2"
+      ],
+      "supersedes_fields": [
+        "version",
+        "randomization.seed_derivation"
+      ]
+    }
+  ],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "49730a13d2e769868dbd20c85d529cd4eb58ce6090937f08810ec17ab08b54e4",
+    "commit": "557938934909ee0d7ba2c7e77a811b7305acac58",
+    "frozen_at": "2026-11-27T01:03:29Z",
+    "filed_before_affected_data": true
   }
 }
