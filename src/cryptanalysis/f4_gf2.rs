@@ -468,7 +468,10 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, e as usize, |s, _| {
-                if p.terms.iter().any(|t| (mask_low64(t.mask) | s).count_ones() > e) {
+                if p.terms
+                    .iter()
+                    .any(|t| (mask_low64(t.mask) | s).count_ones() > e)
+                {
                     return;
                 }
                 ws.clear();
@@ -508,7 +511,11 @@ impl F5Plan {
                 continue;
             }
             for_each_multiplier(&layout.bits, (e - d) as usize, |u, _| {
-                let mut row: Vec<u32> = p.terms.iter().map(|t| layout.rank(mask_low64(t.mask) | u)).collect();
+                let mut row: Vec<u32> = p
+                    .terms
+                    .iter()
+                    .map(|t| layout.rank(mask_low64(t.mask) | u))
+                    .collect();
                 row.sort_unstable();
                 let mut kept = Vec::with_capacity(row.len());
                 let mut k = 0;
@@ -836,7 +843,8 @@ fn exact_reference_rows_exceed(
                 return;
             }
             s.row_buf.clear();
-            s.row_buf.extend(p.terms.iter().map(|t| mask_low64(t.mask) | u));
+            s.row_buf
+                .extend(p.terms.iter().map(|t| mask_low64(t.mask) | u));
             s.row_buf.sort_unstable();
             let mut i = 0;
             let mut nonempty = false;
