@@ -10,7 +10,7 @@ digraph p61_dickson_m7 {
   oracle [label="Exact target-specific 7SUM\nmisses + signed witness + cost\nMISSING", style="rounded,dashed,filled", fillcolor="#fff0da", color="#cc7722"];
   relation [label="487 relation outputs\nthen left kernel + replay\nNOT RUN", style="rounded,dashed,filled", fillcolor="#f1f2f4", color="#7b838e"];
   coverage [label="Random-model coverage\nproposed lower bound δ ≥ 2.18×10^-15\nNOT a measured yield", style="rounded,dashed,filled", fillcolor="#fff8d9", color="#ae8b20"];
-  nulls [label="No pair x in T\nno 3-leaf zero sum\nD2 does not merge pair x", fontsize=10];
+  nulls [label="No pair x in T\nno 3-leaf zero sum\nNo D_2^j fold merges pair x (j ≤ 10)", fontsize=10];
 
   curve -> selector [label="norm-one torus"];
   selector -> leaves [label="curve lift"];

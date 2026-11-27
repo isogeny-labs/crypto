@@ -107,8 +107,10 @@ unrestricted sums; it does not guarantee the generic partial-sum
 conditions of the candidate decomposition oracle. Neither bound
 measures actual yield. [pcc:unverified]
 The 236,196 nonzero pair abscissae are disjoint from T, so this base
-has no signed three-leaf zero sum. The map x↦x²−2 is injective on
-the pair abscissae, so one direct Dickson fold compresses none of them.
+has no signed three-leaf zero sum. Every fold D_(2^j), j=0,...,10,
+is injective on the pair abscissae, so none of the selector's ten
+direct folds compresses them on this fixed model. This does not
+exclude implicit joint elimination.
 For B=486, B^(4/3)≈3,821; the selector size q=1024 gives
 q^(4/3)≈10,321. Merely scanning the D=236,196 pair abscissae on
 each target takes about 62 times the B-based reference or 23 times
@@ -228,9 +230,27 @@ Therefore neither that claim nor the present Dickson reduction
 establishes a measured M61-1 end-to-end speed or a practical gain.
 [pcc:unverified]
 
+The short-interval Theorem 1, if accepted, already gives an asymptotic
+O(p^(1/3)) route for m=7 by taking its exponent slack 1/21; P-61 meets
+its floor(p^(1/7))>=300 hypothesis with floor(p^(1/7))=420. The route
+does not use Dickson roots and has no explicit finite running-time
+constant at L=61. A literal attempt to add the Dickson predicate to
+the paper's §3.1 Boolean network needs k=log2(q) modular squares per
+leaf. Equations (1)-(2) and Lemma 3.2(S3) give at least 16mk(L+2)
+extra unclustered shared bits and 8mk(L+2) extra held bits for its
+same multiplication gadgets. Under the paper's product-setting
+clustering, gP is at least the latter, or Ω(mL²) when q≈p^(1/7),
+outside the proved O(mL) condition. For m=7,q=1024,L=61, the 70
+extra gadget terms contribute 151,900 shared and 77,280 held bits.
+This only rejects that literal transfer, not every possible Dickson
+network or a cheap direct test of D_q at a known x. Any alternate
+network must certify its count for empty targets and every prefix,
+then bound U,gP,B and local evaluation cost before an oracle rate can
+be inferred. [pcc:unverified]
+
 ## Sources and reproducibility
 
-Kaarelson v2, Sections 5–6:
+Kaarelson v2, Sections 3–6 and 10–11:
 https://github.com/kaarelkaarelson/fast-ecdlp/blob/main/v2/paper.pdf
 Xylouris, Acta Arithmetica 150 (2011), Theorem 1.1:
 https://www.impan.pl/en/publishing-house/journals-and-series/acta-arithmetica/all/150/1/83078/on-the-least-prime-in-an-arithmetic-progression-and-estimates-for-the-zeros-of-dirichlet-l-functions

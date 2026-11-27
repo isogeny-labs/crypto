@@ -292,9 +292,22 @@ fn main() -> io::Result<()> {
         .filter(|&&x| pair_x.contains(&sub(0, x)))
         .count()
         / 2;
-    let d2_image: HashSet<u64> = pair_x.iter().map(|&x| sub(mul(x, x), 2)).collect();
+    // Check every fold through the selector depth, not only D_2. A collision
+    // at any depth would give a direct compression of this pair-x spectrum.
+    let mut fold_values: Vec<u64> = pair_x.iter().copied().collect();
+    let mut fold_image_sizes = Vec::with_capacity(11);
+    for depth in 0..=10 {
+        let image_size = fold_values.iter().copied().collect::<HashSet<_>>().len();
+        assert_eq!(image_size, pair_x.len(), "pair-x fold collision at depth {depth}");
+        fold_image_sizes.push(image_size);
+        if depth < 10 {
+            for x in &mut fold_values {
+                *x = sub(mul(*x, *x), 2);
+            }
+        }
+    }
     assert_eq!(
-        (root_intersection, negative_pairs, d2_image.len()),
+        (root_intersection, negative_pairs, fold_image_sizes[1]),
         (0, 0, 236_196)
     );
 
@@ -336,6 +349,6 @@ fn main() -> io::Result<()> {
         }
         return Ok(());
     }
-    println!("{{\"curve\":\"P-61\",\"p\":{P},\"group_order\":{R},\"dickson_degree\":{Q},\"dickson_root_count\":{},\"lifted_leaf_abscissae\":{},\"unoriented_pair_charts\":{charts},\"zero_pair_charts\":{zero_charts},\"duplicate_pair_x_charts\":{duplicate_charts},\"distinct_pair_abscissae_D\":{},\"pair_x_intersect_dickson_roots\":{root_intersection},\"negative_pair_x_pairs\":{negative_pairs},\"D2_image_size\":{},\"signed_seven_multisets\":\"{signed_seven_multisets}\",\"uniform_query_lower_num\":\"{expected_query_lower_num}\",\"uniform_query_lower_den\":\"{expected_query_lower_den}\",\"full_pair_scan_lower_num\":\"{full_pair_scan_lower_num}\",\"unrestricted_seven_sum_support_lower\":{unrestricted_seven_sum_support_lower},\"proposed_generic_covered_targets_at_least\":{generic_covered_targets_at_least},\"proposed_good_model_prob_num\":\"{good_model_prob_num}\",\"proposed_good_model_prob_den\":\"{good_model_prob_den}\"}}", root_x.len(), leaves.len(), pair_x.len(), d2_image.len());
+    println!("{{\"curve\":\"P-61\",\"p\":{P},\"group_order\":{R},\"dickson_degree\":{Q},\"dickson_root_count\":{},\"lifted_leaf_abscissae\":{},\"unoriented_pair_charts\":{charts},\"zero_pair_charts\":{zero_charts},\"duplicate_pair_x_charts\":{duplicate_charts},\"distinct_pair_abscissae_D\":{},\"pair_x_intersect_dickson_roots\":{root_intersection},\"negative_pair_x_pairs\":{negative_pairs},\"D2_image_size\":{},\"pair_x_dickson_fold_image_sizes\":{fold_image_sizes:?},\"signed_seven_multisets\":\"{signed_seven_multisets}\",\"uniform_query_lower_num\":\"{expected_query_lower_num}\",\"uniform_query_lower_den\":\"{expected_query_lower_den}\",\"full_pair_scan_lower_num\":\"{full_pair_scan_lower_num}\",\"unrestricted_seven_sum_support_lower\":{unrestricted_seven_sum_support_lower},\"proposed_generic_covered_targets_at_least\":{generic_covered_targets_at_least},\"proposed_good_model_prob_num\":\"{good_model_prob_num}\",\"proposed_good_model_prob_den\":\"{good_model_prob_den}\"}}", root_x.len(), leaves.len(), pair_x.len(), fold_image_sizes[1]);
     Ok(())
 }

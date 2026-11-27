@@ -23,7 +23,7 @@ with prime order $r=2305843010027268529$ and cofactor one. These parameters come
 
 | Source | Consequence for this audit |
 | --- | --- |
-| [Kaarelson v2, §§3, 5–6](https://github.com/kaarelkaarelson/fast-ecdlp/blob/main/v2/paper.pdf) | Defines *generic* chord-only decompositions and claims $p^{2/m+o(1)}$ for a short-interval $x$ predicate. Its oracle bound is not a bound for Dickson-root membership. The interval-to-arbitrary-selector coverage adaptation below is proposed separately. |
+| [Kaarelson v2, Theorems 1–3, §§3–4, 10–11](https://github.com/kaarelkaarelson/fast-ecdlp/blob/main/v2/paper.pdf) | Claims $p^{2/m+o(1)}$ end-to-end for a short-interval $x$ base and an exact $p^{o(1)}$ decomposition count. Its oracle theorem and Lean network count only the interval predicate. Section 11 leaves analogous root-of-unity network compression open. The interval-to-arbitrary-selector coverage adaptation below is proposed separately. |
 | [P-61 testbed record](https://github.com/isogeny-labs/crypto/blob/main/docs/curves/testbed/testbed.json) | Fixes $p$, coefficients, prime order, cofactor, and curve identity. |
 | [Kaarelson coverage reproduction](https://github.com/isogeny-labs/crypto/blob/main/research/kaarelson_coverage_20261118/RESULT.md) | Reproduces the paper's engine-free coverage mechanism at small primes for interval bases; it does not validate this P-61 selector adaptation. |
 | [Equal-size torus comparison](https://github.com/isogeny-labs/crypto/blob/main/research/norm_one_torus_base_compare_20261126/REPORT.md) | In a Prime31 streamed $2+3$ collector, the torus and ordinary bases incurred equal full-scan work. Structure alone did not accelerate the query. |
@@ -35,15 +35,23 @@ The shared research-KB MCP was absent in this runtime. The repository wrapper wa
 
 The cited repository outcomes retain their source's unverified standing; the present PR introduces no PCC claim. [pcc:unverified]
 
+**Known asymptotic route, distinct from this structured selector.** Kaarelson v2 Theorem 1 claims expected $p^{2/7+o(1)}$ bit operations on every eligible prime-field curve when $m=7$, using the short-interval base. In particular, choosing the theorem's exponent slack $1/21$ gives an asymptotic $O(p^{1/3})$ bound if its paper-level ECDLP argument stands. P-61 satisfies its stated size hypothesis: $\lfloor p^{1/7}\rfloor=420\ge300$. The theorem's constants are not explicit, and §10 places its proved engine crossover far beyond a 61-bit field. It therefore supplies no measured or bounded finite P-61 attack time. This audit asks separately whether the **Dickson-root** base has a fast complete query and a useful cold one-target cost. [pcc:unverified]
+
 ## Exact fixed-model finite results
 
-Let $T=\{x\in\mathbb F_p:D_{1024}(x)=0\}$. Its 1,024 elements are distinct and nonzero. Let $A$ be the signed rational curve points with $x\in T$. The deterministic census finds 486 lifting $x$-coordinates, hence $|A|=972$ signed points. The complete unoriented pair-chart set has $486^2=236196$ members, all nonzero with distinct $x$-coordinates. Its $x$-image is disjoint from $T$, so no three signed leaves sum to zero. The map $x\mapsto x^2-2$ is injective on these pair abscissae, so one direct Dickson fold does not compress this pair spectrum. [pcc:unverified]
+Let $T=\{x\in\mathbb F_p:D_{1024}(x)=0\}$. Its 1,024 elements are distinct and nonzero. Let $A$ be the signed rational curve points with $x\in T$. The deterministic census finds 486 lifting $x$-coordinates, hence $|A|=972$ signed points. The complete unoriented pair-chart set has $486^2=236196$ members, all nonzero with distinct $x$-coordinates. Its $x$-image is disjoint from $T$, so no three signed leaves sum to zero. For every $j=0,\ldots,10$, the Dickson fold $D_{2^j}$ is injective on all 236,196 pair abscissae. Thus none of the selector's ten direct folds compresses this fixed pair spectrum; an implicit joint elimination could still differ. [pcc:unverified]
 
 The exact pair census implies $|2A|=2(236196)+1=472393$. Cauchy–Davenport in the prime-order group then gives $|7A|\ge 1418148$, or a uniform-target hit fraction of at least $6.1502366\times10^{-13}$. This counts **unrestricted** seven-sums. It does not certify a generic chord-only decomposition or give a practical yield estimate. [pcc:unverified]
 
 There are at most $\binom{972+7-1}{7}=\binom{978}{7}$ signed seven-leaf multisets. For a uniformly random nonidentity target, the expected number of represented multisets is at most $0.0720718453$. This upper bound is independent of a decomposition implementation; it does not measure the true success probability. [pcc:unverified]
 
-The native Rust replay source and exact output are [p61_audit.rs](p61_audit.rs) and [pair_spectrum.json](pair_spectrum.json). The sorted 64-bit big-endian pair-$x$ list hashes to `319d587d42bc0846929749fa065005baea993fbc49f8fc16a9585c4075efac2f`, so a second implementation can check the entire set rather than only the counts. These are correctness counts, not a timing experiment. [pcc:unverified]
+The native Rust replay source and exact output are [p61_audit.rs](p61_audit.rs) and [pair_spectrum.json](pair_spectrum.json), including all eleven fold-image sizes. The sorted 64-bit big-endian pair-$x$ list has this SHA-256 digest:
+
+```text
+319d587d42bc0846929749fa065005baea993fbc49f8fc16a9585c4075efac2f
+```
+
+A second implementation can check the entire set rather than only the counts. These are correctness counts, not a timing experiment. [pcc:unverified]
 
 ## Proposed random-scaling coverage argument
 
@@ -60,6 +68,14 @@ $$\delta=\frac{h^{2m}}{2^{2m+2}\kappa\mu\,\#E(\mathbb F_p)}.$$
 Here *generic* is exactly Kaarelson v2 Definition 3.1: for $S_1=P_1$ and $S_k=S_{k-1}+P_k$, every prior partial sum $S_{k-1}$ is affine and $x(S_{k-1})\ne x(P_k)$. Each step is a chord addition; doubling, cancellation, infinity partial sums, and final $R=O$ are excluded. [pcc:unverified]
 
 The proof sketch uses character-sum variance for the factor-base size, a nonzero Semaev dilation polynomial for nontrivial tuples, an additive-energy estimate, and Cauchy–Schwarz. The $AB\ne0$ condition is proposed to remove the exceptional coordinate-dilation ratios that obstruct a direct extension to arbitrary $T$. The written argument is in [PROOF_NOTE.md](PROOF_NOTE.md) and remains to be externally reviewed or formalized. In particular, the short-interval oracle of Kaarelson v2 is **not** transferred by this coverage calculation. [pcc:unverified]
+
+### Exact-count network transfer gate
+
+Kaarelson v2 Proposition 3.7 proves that its Boolean network value equals the number of generic decompositions for every **interval** $x$/sign prefix, including zero-count targets. Its engine analysis needs total shared information $U=O(mL)$ and clustered setting budget $gP=O(mL)$, where $L=\lceil\log_2p\rceil$; Proposition 3.7 supplies those bounds for its $6m-4$ group-law identities. Neither its count theorem nor its bounds include the predicate $D_q(x)=0$. [pcc:unverified]
+
+The direct transfer has a quantifiable obstruction. For $q=2^k$, checking $D_q(x)=0$ by $t_0=x$, $t_{i+1}=t_i^2-2\pmod p$ adds $mk$ modular-square identities for $m$ unknown leaves. Appending the *same* multiplication gadget used in the paper's §3.1 to each identity gives, from its equations (1)–(2) and Lemma 3.2(S3), at least $16mk(L+2)$ extra unclustered shared bits and $8mk(L+2)$ extra held bits. The paper's product-setting clustering preserves those held bits, so this literal construction has $gP=\Omega(mkL)=\Omega(mL^2)$ when $q\asymp p^{1/7}$. At P-61, $m=7,k=10,L=61$: the 70 additional gadgets bring the 38 group-law identities to 108, and their gadget terms alone are 151,900 shared and 77,280 held bits. These are **network-size counts, not runtime measurements or a lower bound on every Dickson encoding**. Root testing on a supplied coordinate remains cheap; the missing step is an exact low-width count over all unknown coordinates and all misses. [pcc:unverified]
+
+Section 11 of the same paper leaves an $O(L)$ shared-bit network for $x^k=1$ open. The Dickson trace recurrence is related but distinct, so that observation is a warning about the direct construction, not an impossibility result. At $L=61$, Proposition 3.7's condition $g^4\le L$ permits only $g\le2$, while the cited engine's first recursive case requires $g=3K^8\ge768$ for $K\ge2$; its asymptotic bound thus cannot be read as a finite P-61 oracle timing. A candidate transfer must prove an exact count for every target and prefix, including empty answers, and report $U,P,B,\tau$ with scalable clustering bounds. Using full 61-bit $x$ labels would require 435 prefix-count calls to recover one seven-leaf witness; a shorter index label needs its own exact network proof. [pcc:unverified]
 
 For $h=1024$, $m=7$, and $\kappa=4$, the proposed formula evaluates to $\Theta_7=2214051840$, $D'=53248$, $\mu\approx1.05729919\times10^{33}$, and $V\approx1024.00758846$. Conditional on the proof sketch, at least $0.746093721$ of scalings are good and each covers at least 5,029 generic targets, a fraction $\delta\ge2.18088033\times10^{-15}$. The exact rational evaluation is in [coverage_bound.json](coverage_bound.json), generated by native [p61_bounds.cpp](p61_bounds.cpp). These are deliberately weak **proof-bound values**, not a measurement of yield at $u=1$. [pcc:unverified]
 
@@ -88,7 +104,7 @@ At the absolute lower query count, beating that ideal rho count would require th
 
 ## Reproduction and remaining checks
 
-The PR's native sources regenerate the fixed-model census and rational-bound arithmetic. The published JSON values are data, not timing records. The producer replay used source commit `c2b6b21c53` and these commands from the study directory: [pcc:unverified]
+The PR's native sources regenerate the fixed-model census and rational-bound arithmetic. The published JSON values are data, not timing records. These commands replay the sources at this PR's head from the study directory; `SHA256SUMS` pins the tracked inputs and outputs. [pcc:unverified]
 
 ```sh
 rustc --edition=2021 -D warnings -O p61_audit.rs -o /tmp/p61_audit
@@ -103,6 +119,6 @@ cmp /tmp/coverage_bound.replay.json coverage_bound.json
 
 The pair-list digest above and both JSON comparisons passed in the source-pinned rerun. The arithmetic is self-checked; the proposed general coverage proof still needs independent review and formalization. [pcc:unverified]
 
-The next discriminating result is a complete, failed-query-inclusive $m=7$ Dickson decomposition algorithm with a charged cost for one unseen public target. It must collect relations, solve the matrix, recover and verify the scalar, then run against a matched cold rho baseline. The currently published subquadratic pair primitive in #5275 is useful prior art, but its reported depth-six cost and missing seven-sum composition leave this gate open. [pcc:unverified]
+The next discriminating result is a complete, failed-query-inclusive $m=7$ Dickson decomposition algorithm with a charged cost for one unseen public target. A proposed Boolean-network route first has to pass the exact-count and size gate above; a direct list route must also avoid explicitly testing the $\binom{974}{3}=153{,}527{,}724$ signed triple residuals per target before a four-leaf query. It must then collect relations, solve the matrix, recover and verify the scalar, and run against a matched cold rho baseline. The currently published subquadratic pair primitive in #5275 is useful prior art, but its reported depth-six cost and missing seven-sum composition leave this gate open. [pcc:unverified]
 
 No canonical performance graph is updated: this PR adds no measured P-61 timing or verified speedup. The canonical P-61 record remains the parameter source. A Lean formalization and independent proof review of the arbitrary-selector coverage lemma remain open. [pcc:unverified]
