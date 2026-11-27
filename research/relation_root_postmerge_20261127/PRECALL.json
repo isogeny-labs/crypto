@@ -1,0 +1,41 @@
+{
+  "schema": "postmerge-immutable-workers-precall/v1",
+  "source": "SOURCE.sha256",
+  "source_roster_sha256": "b9ba596301f2684ebe9024127ebf25837fa929f473385f1d6ceecfbf2b417359",
+  "workers": {
+    "original": {
+      "path": "/dev/shm/relation-root-workers-20261127/postmerge-original",
+      "sha256": "0aa94e02185d7459aae2dd9fddd3702b652b7c294ff92f3250c796960d389d6d",
+      "bytes": 20815168
+    },
+    "pairgraph": {
+      "path": "/dev/shm/relation-root-workers-20261127/postmerge-pairgraph",
+      "sha256": "4507212bdbfbfc2b253e266e11179d385dc8927239222768b7452004fc78c230",
+      "bytes": 20744712
+    }
+  },
+  "auditors": {
+    "baseline-audit": {
+      "path": "/dev/shm/relation-root-workers-20261127/baseline-audit",
+      "sha256": "6051ee5140695d766774079c8e70e6032536a60b27a14acb4d8f303e61014b92"
+    },
+    "pairgraph-audit": {
+      "path": "/dev/shm/relation-root-workers-20261127/pairgraph-audit",
+      "sha256": "c89f58f446c43f6c1b69ecd0c5b1718783773e41a19f976ad2afde9e38791f19"
+    }
+  },
+  "metadata_scripts_sha256": {
+    "run.sh": "8c76513764c003803d3a74f7911abe354e51bf6bd30bfeac76f17d2e5f0d1959",
+    "freeze-workers.py": "4f265f5c5384888306bfc77f782202bc380419b7da97b08fc53d1283ef646637"
+  },
+  "cpu": 0,
+  "numerical_threads": 1,
+  "outputs": [
+    "/dev/shm/relation-postmerge-original-20261127",
+    "/dev/shm/relation-postmerge-pairgraph-20261127"
+  ],
+  "native_cases": 36,
+  "native_matched_pairs": 108,
+  "benchmark": false,
+  "signed_execution": false
+}
