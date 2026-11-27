@@ -236,6 +236,45 @@ def firstMinimumLabel {q : ℕ} (hq : 0 < q)
     (cost : Fin q → ℕ) : Fin q :=
   firstMinimumFrom cost ⟨0, hq⟩ (List.finRange q)
 
+private theorem firstMinimumFrom_affine
+    {q : ℕ} (cost : Fin q → ℕ) (offset scale : ℕ)
+    (hscale : 0 < scale) (best : Fin q) (candidates : List (Fin q)) :
+    firstMinimumFrom (fun label => offset + scale * cost label) best candidates =
+      firstMinimumFrom cost best candidates := by
+  induction candidates generalizing best with
+  | nil => rfl
+  | cons candidate candidates ih =>
+      simp only [firstMinimumFrom]
+      have hcomparison :
+          offset + scale * cost candidate < offset + scale * cost best ↔
+            cost candidate < cost best := by
+        rw [Nat.add_lt_add_iff_left, Nat.mul_lt_mul_left hscale]
+      simp only [hcomparison]
+      exact ih _
+
+/-- Strict first-minimum selection is invariant under a label-independent
+offset and positive scale, including its first-label tie rule. -/
+theorem firstMinimumLabel_affine
+    {q : ℕ} (hq : 0 < q) (cost : Fin q → ℕ)
+    (offset scale : ℕ) (hscale : 0 < scale) :
+    firstMinimumLabel hq (fun label => offset + scale * cost label) =
+      firstMinimumLabel hq cost := by
+  unfold firstMinimumLabel
+  exact firstMinimumFrom_affine cost offset scale hscale _ _
+
+/-- Any exact positive-affine score decomposition can replace the original
+candidate cost without changing the strict first-minimum result. -/
+theorem firstMinimumLabel_eq_of_affine
+    {q : ℕ} (hq : 0 < q) (objective score : Fin q → ℕ)
+    (offset scale : ℕ) (hscale : 0 < scale)
+    (hobjective : ∀ label, objective label = offset + scale * score label) :
+    firstMinimumLabel hq objective = firstMinimumLabel hq score := by
+  have hfunctions : objective = fun label => offset + scale * score label := by
+    funext label
+    exact hobjective label
+  rw [hfunctions]
+  exact firstMinimumLabel_affine hq score offset scale hscale
+
 /-- The executable first-minimum selector has cost no larger than every
 candidate in the alphabet. -/
 theorem firstMinimumLabel_le
@@ -377,6 +416,29 @@ def firstMinimumRowLabel
     conditionalObjective q left right
       (Function.update rows vertex (some label)) columns
 
+/-- Replace a row candidate's quadratic objective by any exact positive-affine
+score decomposition while preserving strict first-minimum tie breaking. -/
+theorem firstMinimumRowLabel_eq_of_affine_score
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Row) (score : Fin q → ℕ)
+    (offset scale : ℕ) (hscale : 0 < scale)
+    (hobjective : ∀ label,
+      conditionalObjective q left right
+          (Function.update rows vertex (some label)) columns =
+        offset + scale * score label) :
+    firstMinimumRowLabel hq left right rows columns vertex =
+      firstMinimumLabel hq score := by
+  unfold firstMinimumRowLabel
+  exact firstMinimumLabel_eq_of_affine hq _ score offset scale hscale hobjective
+
 /-- The executable first-minimum row choice discharges the abstract minimizer
 premise and cannot increase the exact conditional objective. -/
 theorem firstMinimumRowLabel_nonincreasing
@@ -417,6 +479,30 @@ def firstMinimumColumnLabel
   firstMinimumLabel hq fun label =>
     conditionalObjective q left right rows
       (Function.update columns vertex (some label))
+
+/-- Replace a column candidate's quadratic objective by any exact
+positive-affine score decomposition while preserving strict first-minimum tie
+breaking. -/
+theorem firstMinimumColumnLabel_eq_of_affine_score
+    {q : ℕ} (hq : 0 < q)
+    {Edge Row Column : Type*}
+    [Fintype Edge]
+    [DecidableEq Row]
+    [DecidableEq Column]
+    (left : Edge → Row)
+    (right : Edge → Column)
+    (rows : Row → Option (Fin q))
+    (columns : Column → Option (Fin q))
+    (vertex : Column) (score : Fin q → ℕ)
+    (offset scale : ℕ) (hscale : 0 < scale)
+    (hobjective : ∀ label,
+      conditionalObjective q left right rows
+          (Function.update columns vertex (some label)) =
+        offset + scale * score label) :
+    firstMinimumColumnLabel hq left right rows columns vertex =
+      firstMinimumLabel hq score := by
+  unfold firstMinimumColumnLabel
+  exact firstMinimumLabel_eq_of_affine hq _ score offset scale hscale hobjective
 
 /-- The executable first-minimum column choice discharges the abstract minimizer
 premise and cannot increase the exact conditional objective. -/

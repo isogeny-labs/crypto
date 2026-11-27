@@ -1,6 +1,7 @@
 module
 
 public import ObjectiveBoundary
+public import SparseLabelScore
 
 @[expose] public section
 
@@ -17,6 +18,7 @@ namespace Curve25519PackingLabelArtifact
 open Curve25519LabelSequence
 open Curve25519ConditionalObjective
 open Curve25519ObjectiveBoundary
+open Curve25519SparseLabelScore
 
 /-- Shared native projection: schema/radix/context, endpoint quadruples, then
 row and column labels. -/
@@ -279,17 +281,19 @@ def PackingLabelArtifact.traceMatches (artifact : PackingLabelArtifact) : Bool :
       if hcolumns : 0 < artifact.columnCount then
         (List.finRange artifact.rowCount).all (fun row =>
           decide (artifact.rowLabel hlabels row =
-            firstMinimumRowLabel hlabels (artifact.leftEndpoint hrows)
-              (artifact.rightEndpoint hcolumns)
-              (prefixAssignment (artifact.rowLabel hlabels) row.val)
-              (fun _ => none) row)) &&
+            firstMinimumLabel hlabels
+              (rowCandidateScore artifact.labelCount
+                (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+                (prefixAssignment (artifact.rowLabel hlabels) row.val)
+                (fun _ => none) row))) &&
         (List.finRange artifact.columnCount).all (fun column =>
           decide (artifact.columnLabel hlabels column =
-            firstMinimumColumnLabel hlabels (artifact.leftEndpoint hrows)
-              (artifact.rightEndpoint hcolumns)
-              (fun row => some (artifact.rowLabel hlabels row))
-              (prefixAssignment (artifact.columnLabel hlabels) column.val)
-              column))
+            firstMinimumLabel hlabels
+              (columnCandidateScore artifact.labelCount
+                (artifact.leftEndpoint hrows) (artifact.rightEndpoint hcolumns)
+                (fun row => some (artifact.rowLabel hlabels row))
+                (prefixAssignment (artifact.columnLabel hlabels) column.val)
+                column)))
       else false
     else false
   else false
@@ -403,7 +407,7 @@ theorem parseReplayedPackingLabelArtifact_rows
           (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
         (artifact.rightEndpoint
           (parseReplayedPackingLabelArtifact_columnCount_pos hparse)) row := by
-  rw [executableRowLabels_eq]
+  rw [executableRowLabels_eq, firstMinimumRowLabel_eq_sparseScore]
   have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
   have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
   have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse
@@ -422,7 +426,7 @@ theorem parseReplayedPackingLabelArtifact_rows
     · congr 1
       exact parseReplayedPackingLabelArtifact_rows hparse vertex
     · rfl
-  rw [← hprefix]
+  rw [hprefix] at hlocal
   exact hlocal
 termination_by row.val
 
@@ -446,7 +450,7 @@ theorem parseReplayedPackingLabelArtifact_columns
             (parseReplayedPackingLabelArtifact_rowCount_pos hparse))
           (artifact.rightEndpoint
             (parseReplayedPackingLabelArtifact_columnCount_pos hparse))) column := by
-  rw [executableColumnLabels_eq]
+  rw [executableColumnLabels_eq, firstMinimumColumnLabel_eq_sparseScore]
   have htrace := (parseReplayedPackingLabelArtifact_components hparse).2
   have hlabels := parseReplayedPackingLabelArtifact_labelCount_pos hparse
   have hrows := parseReplayedPackingLabelArtifact_rowCount_pos hparse

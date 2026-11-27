@@ -3,6 +3,7 @@ module
 import ParametricRefinement
 import ConditionalVariance
 import ConditionalObjective
+import SparseLabelScore
 import LabelSequence
 import PackingLabelArtifact
 import ObjectiveBoundary
@@ -12,6 +13,7 @@ import ExtensionRingModel
 open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
 open Curve25519ConditionalObjective
+open Curve25519SparseLabelScore
 open Curve25519LabelSequence
 open Curve25519PackingLabelArtifact
 open Curve25519ObjectiveBoundary
@@ -42,8 +44,19 @@ open Curve25519ExtensionRingModel
 #print axioms minimum_row_label_nonincreasing
 #print axioms minimum_column_label_nonincreasing
 #print axioms firstMinimumLabel_le
+#print axioms firstMinimumLabel_affine
+#print axioms firstMinimumLabel_eq_of_affine
 #print axioms firstMinimumRowLabel_nonincreasing
+#print axioms firstMinimumRowLabel_eq_of_affine_score
 #print axioms firstMinimumColumnLabel_nonincreasing
+#print axioms firstMinimumColumnLabel_eq_of_affine_score
+#print axioms equalityPotential_comm
+#print axioms conditionalObjective_swap
+#print axioms equalityPotential_update_decomposition
+#print axioms rowCandidateObjective_eq_affineScore
+#print axioms columnCandidateObjective_eq_affineScore
+#print axioms firstMinimumRowLabel_eq_sparseScore
+#print axioms firstMinimumColumnLabel_eq_sparseScore
 #print axioms prefixAssignment_step
 #print axioms row_sequence_nonincreasing
 #print axioms column_sequence_nonincreasing

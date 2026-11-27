@@ -374,6 +374,18 @@ minimizer premise. A generic theorem proves the selected cost is at most every
 candidate cost; exact row and column corollaries feed that receipt into the
 conditional-objective averaging proof and show each executable choice is
 nonincreasing. Equal costs retain the earlier label by construction.
+`SparseLabelScore.lean` now proves the first compression layer used by the
+native incidence labeler. Strict first-minimum selection is invariant under a
+label-independent offset and positive scale; updating either side splits every
+equality potential into a fixed term plus two directed selected-label
+interactions; and the full row or column candidate objective is exactly its
+fixed offset plus `2q` times the directed interaction score. The checked
+artifact replay evaluates that score and uses the proved affine identity to
+recover the original quadratic first minimum, including ties. On the shared
+32-edge strict fixture this reduced the best observed cold artifact-module
+build from 229 seconds to 145 seconds (about 37%); the sub-30-second target now
+requires proving and executing the next incidence-bucket compression.
+`[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,
 then labels columns from the fixed rows and preceding column prefix. The

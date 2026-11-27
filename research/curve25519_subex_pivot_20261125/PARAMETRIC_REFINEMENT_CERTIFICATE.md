@@ -193,7 +193,14 @@ evidence for two independent claims:
    three-edge control is correctly rejected by that stronger parser. A shared
    degree-one, two-label, 32-edge control now meets the source-class guard at
    equality and passes both native verification and the formal strict parser;
-   uniform producer-family binding remains open; and
+   uniform producer-family binding remains open. The first replay-compression
+   layer is also kernel checked: positive-affine transforms preserve the
+   strict first-minimum tie rule, and each row/column candidate objective is a
+   fixed offset plus `2q` times a directed interaction score. The formal
+   artifact checker now evaluates that score and derives equality with the
+   original quadratic schedule. Proving that the native incidence buckets
+   compute the same score, with replayable bucket-state auxiliaries, remains
+   open; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
    active leaf cutoff, exact source quotient, and the exact root square-root

@@ -177,7 +177,15 @@ label. `firstMinimumLabel_le` proves its selected cost is no greater than every
 candidate; `firstMinimumRowLabel_nonincreasing` and
 `firstMinimumColumnLabel_nonincreasing` instantiate the exact conditional
 objective and eliminate the abstract minimizer premise for each executable
-step. `executableRowLabels` and `executableColumnLabels` now use well-founded
+step. `SparseLabelScore.lean` proves that positive affine score transforms
+preserve the strict first-minimum result and that each full row or column
+candidate objective is a label-independent offset plus `2q` times its directed
+selected-label interaction score. The artifact checker evaluates this smaller
+score, while the theorem recovers the exact quadratic objective and first-label
+tie rule. The best observed cold artifact build fell from 229 seconds to 145
+seconds; the remaining optimization target is a formal refinement from this
+edge-pair score to the native incidence buckets. `[pcc:unverified]`
+`executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact
 prefix-minimum receipts prove the fully labeled objective nonincreasing, and
 `class_cap_for_executable_labels` carries those constructed labels through the

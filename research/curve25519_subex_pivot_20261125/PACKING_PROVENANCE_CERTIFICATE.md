@@ -93,6 +93,12 @@ labels and 32 edges, exactly `M=2(q^2)^2 delta`; the native verifier reports
 source-guard closure and Lean's strict parser accepts the same projection.
 The native verifier also now requires `conditional_labels` to equal cap
 presence in both directions; a missing-cap mutation fails at the context gate.
+The formal replay no longer reevaluates candidate-independent terms: an exact
+affine decomposition proves that the quadratic objective is an offset plus
+`2q` times a directed interaction score for rows and columns. Computing that
+proved score reduced the best observed cold 32-edge artifact build from 229 to
+145 seconds. The next target is the native incidence-bucket compression of the
+same score.
 `[pcc:unverified]`
 
 ## Remaining boundary
