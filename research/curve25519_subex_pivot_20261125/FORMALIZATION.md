@@ -596,8 +596,8 @@ the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
 `U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
 that polynomial. The combined theorem therefore pairs selection with genuine
 irreducibility for this fixture. This closes the degree-four algebraic check,
-while the general acceptance-soundness theorem is proved separately below;
-converse completeness and a Rust compiler refinement of `Ring::new` remain.
+while general packed-predicate correctness is proved separately below; a Rust
+compiler refinement of `Ring::new` remains.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
@@ -648,14 +648,19 @@ closed `x^(2^degree)=x mod f` condition for every nonzero packed modulus.
 Minimal-window XOR is additionally identified with polynomial addition, and
 GCD invariance removes the inner `modByMonic` from every active guard. Since
 addition equals subtraction over `GF(2)`, each indexed guard now has the exact
-standard form `gcd(f, x^(2^(offset+1))-x)=1`. The remaining boundary is the
-converse/completeness direction. For soundness, the implementation's stronger
-all-half-degree family is enough: in any nontrivial factorization, an
+standard form `gcd(f, x^(2^(offset+1))-x)=1`. For soundness, the
+implementation's stronger all-half-degree family is enough: in any nontrivial
+factorization, an
 irreducible factor of degree at most half would divide both the modulus and its
 own `X^(2^i)-X`, contradicting the corresponding GCD-one guard. Thus
 `gf2PackedIrreducible_sound` proves accepted packed polynomials irreducible
 whenever their packed `log2` equals the supplied degree and that degree is at
-least two.
+least two. Completeness is now proved in the reverse direction as well:
+irreducibility rules out divisibility by every lower Frobenius polynomial,
+which reconstructs each native GCD guard, while the finite-field divisibility
+theorem supplies the terminal native equality. Hence
+`gf2PackedIrreducible_iff_irreducible` gives a full equivalence on matching
+packed degree at least two.
 Sources checked: the all-half-degree loop in
 `crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
 `Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X` theorem in

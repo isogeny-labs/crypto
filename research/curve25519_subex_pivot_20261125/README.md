@@ -533,9 +533,9 @@ every relevant monic factor over `GF(2)` as one of two linear or four quadratic
 shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
 is proved to decode to that polynomial, so packed-search acceptance is paired
 with an independent algebraic irreducibility certificate. This remains a
-degree-four finite selection result; the general acceptance-soundness theorem
-appears below, while converse completeness and a Rust compiler refinement of
-the search remain separate.
+degree-four finite selection result; the general packed-predicate correctness
+theorem appears below, while a Rust compiler refinement of the search remains
+separate.
 `[pcc:unverified]`
 
 The packed-search model now also has a general coefficient-level semantics
@@ -591,7 +591,11 @@ factorization argument shows those guards alone imply irreducibility: every
 nontrivial factorization has an irreducible factor of degree at most half,
 which would divide a guard declared coprime. Consequently a true public packed
 predicate is now proved sound whenever `log2(polynomial)=degree` and
-`degree>=2`. The converse/completeness direction remains separate.
+`degree>=2`. Conversely, irreducibility makes every positive subdegree
+Frobenius polynomial coprime, reconstructs every native guard, and makes the
+terminal `X^(2^degree)=X` comparison pass. Therefore the public packed Boolean
+is now proved equivalent to genuine polynomial irreducibility on its native
+exact-degree domain.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

@@ -256,8 +256,8 @@ record's polynomial field equals that result. Independently of that predicate,
 Lean rules out both monic linear factors and all four monic quadratic factor
 shapes over `GF(2)`, proving `U^4+U+1` irreducible; the artifact lower bits are
 proved to decode to the same polynomial. This is a degree-four selection and
-algebraic certificate; general packed acceptance soundness is proved below,
-while converse completeness and compiler refinement remain separate.
+algebraic certificate; general packed-predicate correctness is proved below,
+while compiler refinement remains separate.
 `[pcc:unverified]`
 
 For arbitrary fixed widths, the packed natural representation now decodes to a
@@ -302,8 +302,11 @@ the implementation's all-half-degree guards give a stronger soundness route.
 Any reducible exact-degree polynomial has an irreducible factor of degree at
 most half, contradicting its matching GCD-one guard. The public packed
 predicate therefore implies polynomial irreducibility when its packed `log2`
-matches the supplied degree and the degree is at least two; converse
-completeness remains unclaimed.
+matches the supplied degree and the degree is at least two. Conversely, an
+irreducible exact-degree packed polynomial makes every lower Frobenius guard
+coprime and the terminal `X^(2^degree)=X` comparison succeed. The public packed
+Boolean is therefore equivalent to polynomial irreducibility on that native
+domain.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

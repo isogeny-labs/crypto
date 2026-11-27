@@ -3042,6 +3042,149 @@ theorem gf2PackedIrreducible_sound
     have hoffset : index - 1 + 1 = index := by omega
     simpa only [hoffset] using hguard
 
+/-- Every unit polynomial over `GF(2)` is one: the coefficient field has only
+one nonzero scalar. -/
+theorem gf2Polynomial_eq_one_of_isUnit
+    (polynomial : Polynomial (ZMod 2)) (hunit : IsUnit polynomial) :
+    polynomial = 1 := by
+  obtain ⟨coefficient, hcoefficient, heq⟩ := Polynomial.isUnit_iff.mp hunit
+  subst polynomial
+  have hcoefficient0 : coefficient ≠ 0 := hcoefficient.ne_zero
+  have hcoefficient1 : coefficient = 1 := by
+    fin_cases coefficient
+    · exfalso
+      exact hcoefficient0 rfl
+    · rfl
+  rw [hcoefficient1, map_one]
+
+/-- An irreducible exact-degree polynomial is coprime to every
+`X^(2^i)-X` with `0 < i < degree`. -/
+theorem gf2Polynomial_irreducible_guard
+    (polynomial : Polynomial (ZMod 2)) (degree index : ℕ)
+    (hirreducible : Irreducible polynomial)
+    (hdegree : polynomial.natDegree = degree)
+    (hindex : 0 < index) (hlt : index < degree) :
+    EuclideanDomain.gcd polynomial (X ^ (2 ^ index) - X) = 1 := by
+  have hnotDvd : ¬polynomial ∣ X ^ (2 ^ index) - X := by
+    intro hdvd
+    have hdegreeDvd : polynomial.natDegree ∣ index :=
+      (Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X
+        hirreducible).2 (by simpa using hdvd)
+    rw [hdegree] at hdegreeDvd
+    exact (Nat.not_le_of_gt hlt) (Nat.le_of_dvd hindex hdegreeDvd)
+  apply gf2Polynomial_eq_one_of_isUnit
+  exact EuclideanDomain.gcd_isUnit_iff.mpr
+    (hirreducible.coprime_iff_not_dvd.mpr hnotDvd)
+
+/-- Completeness of the public packed Rabin predicate: an irreducible packed
+polynomial of matching degree at least two makes every native GCD guard and the
+terminal Frobenius comparison succeed. -/
+theorem gf2PackedIrreducible_complete
+    (polynomial degree : ℕ) (hlog : Nat.log2 polynomial = degree)
+    (hdegreeTwo : 2 ≤ degree)
+    (hirreducible : Irreducible
+      (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial)) :
+    gf2PackedIrreducible polynomial degree = true := by
+  let modulusPolynomial :=
+    packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial
+  let x := gf2PackedRemainder 2 polynomial
+  let xPolynomial := packedGF2Polynomial (Nat.log2 x + 1) x
+  have hpolynomial : polynomial ≠ 0 := by
+    intro hzero
+    subst polynomial
+    simp at hlog
+    omega
+  have hx : x = 2 :=
+    gf2PackedRemainder_two_of_log2 polynomial degree hlog hdegreeTwo
+  have hxPolynomial : xPolynomial = X := by
+    dsimp [xPolynomial]
+    rw [hx, packedGF2Polynomial_two]
+  have hstartPolynomial :
+      packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder 2 polynomial) + 1)
+        (gf2PackedRemainder 2 polynomial) = X := by
+    change xPolynomial = X
+    exact hxPolynomial
+  have hdegree : modulusPolynomial.natDegree = degree :=
+    (packedGF2Polynomial_natDegree
+      (Nat.log2 polynomial + 1) polynomial hpolynomial (by omega)).trans hlog
+  have hmonic : modulusPolynomial.Monic :=
+    packedGF2Polynomial_monic (Nat.log2 polynomial + 1) polynomial
+      hpolynomial (by omega)
+  apply (gf2PackedIrreducible_iff_closed polynomial degree).2
+  unfold gf2PackedRabinClosed gf2PackedRabinClosedAux
+  change (∀ offset, offset < degree → 0 + offset + 1 ≤ degree / 2 →
+      EuclideanDomain.gcd modulusPolynomial
+        (packedGF2Polynomial
+          (Nat.log2
+            (Nat.xor
+              (gf2PackedFrobeniusIterate polynomial (offset + 1) x) x) + 1)
+          (Nat.xor
+            (gf2PackedFrobeniusIterate polynomial (offset + 1) x) x)) = 1) ∧
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedFrobeniusIterate polynomial degree x) + 1)
+        (gf2PackedFrobeniusIterate polynomial degree x) = xPolynomial
+  refine ⟨?_, ?_⟩
+  · intro offset hoffset hactive
+    let value := gf2PackedFrobeniusIterate polynomial (offset + 1) x
+    have hstandard := gf2Polynomial_irreducible_guard modulusPolynomial degree
+      (offset + 1) hirreducible hdegree (by omega) (by omega)
+    have hplus : EuclideanDomain.gcd modulusPolynomial
+        (X ^ (2 ^ (offset + 1)) + X) = 1 := by
+      rw [gf2Polynomial_add_eq_sub]
+      exact hstandard
+    have hreduced : EuclideanDomain.gcd modulusPolynomial
+        (((X ^ (2 ^ (offset + 1))) %ₘ modulusPolynomial) + X) = 1 := by
+      rw [gf2Polynomial_gcd_modByMonic_add
+        (X ^ (2 ^ (offset + 1))) X modulusPolynomial hmonic]
+      exact hplus
+    have hxor := packedGF2Polynomial_minimal_xor value x
+    have htrace := packedGF2Polynomial_frobeniusIterate_from_remainder
+      (offset + 1) 2 polynomial hpolynomial
+    change packedGF2Polynomial (Nat.log2 (Nat.xor value x) + 1)
+      (Nat.xor value x) = _ at hxor
+    change packedGF2Polynomial (Nat.log2 value + 1) value = _ at htrace
+    rw [hxor, htrace]
+    rw [hstartPolynomial]
+    exact hreduced
+  · have htrace := packedGF2Polynomial_frobeniusIterate_from_remainder
+      degree 2 polynomial hpolynomial
+    have hfinalDvd : modulusPolynomial ∣ X ^ (2 ^ degree) - X := by
+      have hpower :=
+        (Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X
+          hirreducible).1 dvd_rfl
+      rw [hdegree] at hpower
+      simpa using hpower
+    have hXReduced : X %ₘ modulusPolynomial = X := by
+      apply (Polynomial.modByMonic_eq_self_iff hmonic).2
+      rw [degree_X, degree_eq_natDegree hmonic.ne_zero, hdegree]
+      exact_mod_cast (show 1 < degree by omega)
+    have hfinal : (X ^ (2 ^ degree)) %ₘ modulusPolynomial = X := by
+      calc
+        (X ^ (2 ^ degree)) %ₘ modulusPolynomial = X %ₘ modulusPolynomial :=
+          Polynomial.modByMonic_eq_of_dvd_sub hmonic hfinalDvd
+        _ = X := hXReduced
+    change packedGF2Polynomial
+      (Nat.log2 (gf2PackedFrobeniusIterate polynomial degree x) + 1)
+      (gf2PackedFrobeniusIterate polynomial degree x) = xPolynomial
+    rw [htrace]
+    rw [hstartPolynomial]
+    rw [hxPolynomial]
+    exact hfinal
+
+/-- Full correctness of the public packed Rabin predicate for its native
+domain: at matching packed degree at least two, the Boolean returns true
+exactly for irreducible `GF(2)` polynomials. -/
+theorem gf2PackedIrreducible_iff_irreducible
+    (polynomial degree : ℕ) (hlog : Nat.log2 polynomial = degree)
+    (hdegreeTwo : 2 ≤ degree) :
+    gf2PackedIrreducible polynomial degree = true ↔
+      Irreducible
+        (packedGF2Polynomial (Nat.log2 polynomial + 1) polynomial) := by
+  constructor
+  · exact gf2PackedIrreducible_sound polynomial degree hlog hdegreeTwo
+  · exact gf2PackedIrreducible_complete polynomial degree hlog hdegreeTwo
+
 /-- Search odd constant-one lower patterns in the exact native order. -/
 def firstIrreducibleBinaryPolynomialAux (degree : ℕ) : ℕ → ℕ → Option ℕ
   | _, 0 => none
