@@ -191,8 +191,11 @@ addition and negation, derives `2^p=0` in every such extension, and instantiates
 the exact Cauchy cutoff without an abstract modulus premise. It also proves the
 root relation `U^d=-sum_j f_j U^j` and the exact one-step identity used when
 the native loop subtracts one high coefficient into every set lower bit. A
-full loop induction, the deterministic irreducible-polynomial selection, and
-automatic elaboration of an accepted serialized vector remain open.
+logical polynomial reduction step clears its targeted coefficient and preserves
+the quotient value; induction now proves preservation for every finite offset
+schedule. Matching the native in-place array to that polynomial schedule,
+proving the descending schedule leaves only low coordinates, deterministic
+irreducible-polynomial selection, and accepted-vector elaboration remain open.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

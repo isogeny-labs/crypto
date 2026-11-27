@@ -72,6 +72,10 @@ open Curve25519ExtensionRingModel
 #print axioms cauchy_weight_mode_series_at_precision
 #print axioms nativeExtension_root_relation
 #print axioms nativeExtension_reduce_high_power
+#print axioms binaryPolynomial_coeff_degree
+#print axioms binaryReductionStep_coeff
+#print axioms binaryReductionStep_mk
+#print axioms binaryReduceOffsets_mk
 #print axioms nativeExtension_pow_two_zero
 #print axioms decodePowerBasis_add
 #print axioms decodePowerBasis_neg

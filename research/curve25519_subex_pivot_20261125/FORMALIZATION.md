@@ -527,11 +527,14 @@ formal `ExtensionRingModel` now supplies the exact quotient type
 `(Z/2^p)[U]/f`, power-basis coordinate decoding, additive operations,
 extension nilpotence, and a Cauchy-series specialization with the modulus
 premise discharged. It also proves the binary root relation and one exact
-high-power subtraction step matching the native reduction loop. The remaining
-scalar gap is induction over the complete convolution/reduction array and
-deterministic polynomial selection, followed by instantiation of every
-accepted witness value and mode function. Complete child construction remains
-a separate concrete binding.
+high-power subtraction step matching the native reduction loop. The formal
+layer now represents each reduction as subtraction of a shifted modulus,
+proves that it clears the targeted coefficient, and proves by induction that
+every finite reduction-offset schedule preserves the quotient value. The
+remaining scalar gap is the native array-to-polynomial invariant and proof that
+the actual descending schedule leaves only the returned low coordinates,
+plus deterministic polynomial selection and accepted witness instantiation.
+Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

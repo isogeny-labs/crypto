@@ -474,9 +474,12 @@ The formal coefficient ring is no longer left wholly abstract.
 vectors, proves coordinatewise addition and negation, proves `2^p=0` in the
 quotient, and specializes the exact Cauchy cutoff with that premise discharged.
 It also proves `U^d=-sum_j f_j U^j` and the exact one-step high-coefficient
-subtraction performed by the native reduction loop. The full loop induction,
-deterministic polynomial selection, and accepted-vector elaboration still
-require a concrete refinement proof.
+subtraction performed by the native reduction loop. The loop induction is now
+formal at the polynomial level: every logical step clears its targeted
+coefficient, and every finite offset schedule preserves the quotient value.
+The native in-place array correspondence, schedule-completeness/low-coordinate
+theorem, deterministic polynomial selection, and accepted-vector elaboration
+still require concrete refinement.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

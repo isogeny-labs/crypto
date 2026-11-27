@@ -128,6 +128,85 @@ theorem nativeExtension_reduce_high_power
         ring
       · simp [h]
 
+/-- The leading degree coefficient of the binary polynomial is one, including
+in degenerate coefficient rings. -/
+theorem binaryPolynomial_coeff_degree
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    (binaryPolynomial precision degree lowerCoefficient).coeff degree = 1 := by
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun polynomial : Polynomial (ZMod (2 ^ precision)) =>
+        polynomial.coeff degree
+      map_zero' := coeff_zero degree
+      map_add' := fun left right => coeff_add left right degree }
+  rw [binaryPolynomial, coeff_add, coeff_X_pow_self]
+  change 1 + coefficient
+    (∑ index, if lowerCoefficient index then monomial (index : ℕ) 1 else 0) = 1
+  rw [map_sum]
+  have hsum :
+      ∑ index, coefficient
+        (if lowerCoefficient index then monomial (index : ℕ) 1 else 0) = 0 := by
+    apply Finset.sum_eq_zero
+    intro index _
+    by_cases h : lowerCoefficient index
+    · simp [coefficient, h, coeff_monomial, ne_of_lt index.isLt]
+    · simp [coefficient, h]
+  rw [hsum, add_zero]
+
+/-- Logical polynomial form of one descending native reduction update. It
+subtracts the targeted coefficient times a shifted copy of the modulus. -/
+noncomputable def binaryReductionStep
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    Polynomial (ZMod (2 ^ precision)) :=
+  polynomial -
+    monomial offset (polynomial.coeff (degree + offset)) *
+      binaryPolynomial precision degree lowerCoefficient
+
+/-- One logical reduction step clears its targeted high coefficient. -/
+theorem binaryReductionStep_coeff
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    (binaryReductionStep precision degree lowerCoefficient polynomial offset).coeff
+      (degree + offset) = 0 := by
+  rw [binaryReductionStep, coeff_sub, coeff_monomial_mul,
+    binaryPolynomial_coeff_degree]
+  simp
+
+/-- One logical reduction step preserves the represented quotient value. -/
+theorem binaryReductionStep_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (polynomial : Polynomial (ZMod (2 ^ precision))) (offset : ℕ) :
+    AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (binaryReductionStep precision degree lowerCoefficient polynomial offset) =
+      AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient) polynomial := by
+  simp [binaryReductionStep]
+
+/-- Apply a caller-supplied finite schedule of logical reduction offsets. The
+native loop uses the descending offsets of its high convolution buffer. -/
+noncomputable def binaryReduceOffsets
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool) :
+    List ℕ → Polynomial (ZMod (2 ^ precision)) →
+      Polynomial (ZMod (2 ^ precision))
+  | [], polynomial => polynomial
+  | offset :: offsets, polynomial =>
+      binaryReduceOffsets precision degree lowerCoefficient offsets
+        (binaryReductionStep precision degree lowerCoefficient polynomial offset)
+
+/-- Every finite schedule of logical modulus-subtraction steps preserves the
+quotient value. Schedule completeness and its in-place Rust array refinement
+are separate obligations. -/
+theorem binaryReduceOffsets_mk
+    (precision degree : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (offsets : List ℕ) (polynomial : Polynomial (ZMod (2 ^ precision))) :
+    AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient)
+        (binaryReduceOffsets precision degree lowerCoefficient offsets polynomial) =
+      AdjoinRoot.mk (binaryPolynomial precision degree lowerCoefficient) polynomial := by
+  induction offsets generalizing polynomial with
+  | nil => rfl
+  | cons offset offsets ih =>
+      rw [binaryReduceOffsets, ih, binaryReductionStep_mk]
+
 /-- The base characteristic relation survives in every polynomial quotient:
 the formal native extension satisfies the modulus premise used by the Cauchy
 series theorem. -/
