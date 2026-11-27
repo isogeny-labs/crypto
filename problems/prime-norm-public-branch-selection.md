@@ -470,3 +470,23 @@ algebradimension/surjectivity beforebranchonlyconstraintsreplaceoriginal
 mixedjetpremises. Thenactualgrowingbasis/kernel/nonzeroimage/degree/
 knownscalarfinder/coverage/retry/full expectedbitcost. Originalcriteria,
 nonscalarorigin/rank-directedWjet and allpriorfailurehistory unchanged.
+
+## 2026-11-27: actual growing point-jet kernel, function and residual
+
+Actual branch-to-polynomial-jet maps now have derived kernel I^n and
+branch-order equivalence (092/098/local048/PCC-20261127-230077). The
+actual growing coefficient map has dimension2d+1 and injective coordinate
+image; strict sumlevels<2d+1 derives nonzero constrained h and actual norm
+degree<=2d+1 (094/100/local049/PCC-20261127-134586). Pair-injective
+actual point families yield coprime powers, principal containment and CRT
+quotient dimension=sumlevels (095/101/local050/PCC-20261127-e3c997).
+Constructed integral residual J satisfies (h)=product(I_i^n_i)*J and
+sumlevels+dim(R/J)<=2d+1 (096/102/local051/PCC-20261127-379167).
+Final252 printed/35new since217/zero warnings/standard foundations;
+all unsigned local outside historical shared audit/fresh. [pcc:unverified]
+
+Next executable useful known-label relation construction, residual point
+representation/logarithms, support density/retry and complete expected bit
+cost remain open. These existence proofs use noncomputable choice. Distinct
+pairs, not merely distinct indices, are required for the product argument.
+Original criteria and nonscalar-origin/rank-directed W-jet interfaces unchanged.
