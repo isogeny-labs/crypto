@@ -79,7 +79,7 @@ mod homogeneous_quotient;
 mod extension_remainder_dlp;
 #[allow(clippy::duplicate_mod)] // Also loaded by jv_forced_graph.
 #[path = "jv_principal_relation.rs"]
-mod principal_relation;
+pub mod principal_relation;
 pub use extension_remainder_dlp::{run_extension_remainder_dlp_on, ExtensionRemainderDlpOptions};
 
 /// Distinct roots of a nonzero polynomial of degree <= 2, or refusal.
