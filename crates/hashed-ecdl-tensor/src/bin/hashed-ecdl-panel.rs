@@ -8,6 +8,7 @@
 //! paired analysis from retained rows.
 
 use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 use std::fs::{self, OpenOptions};
 use std::io::Write;
@@ -179,6 +180,83 @@ fn panel() -> Result<Vec<Case>> {
     Ok(cases)
 }
 
+const FRESH_STUDY: &str = "crypto-point-index-fresh-panel-20261127";
+const FRESH_MASTER_DOMAIN: &[u8] = b"isogeny-labs/crypto/point-index/fresh-panel/2026-11-27/v1";
+
+fn fresh_panel() -> Result<(Vec<Case>, Value)> {
+    // Public, deterministic selection fixed before any timing. SHA-256 uses
+    // separate byte domains for per-case fixture and schedule streams.
+    let master = Sha256::digest(FRESH_MASTER_DOMAIN);
+    let master_hex = driver::sha256_hex(FRESH_MASTER_DOMAIN);
+    let derive = |domain: &[u8], suffix: &[u8]| -> u64 {
+        let mut hash = Sha256::new();
+        hash.update(domain);
+        hash.update(master.as_slice());
+        hash.update(suffix);
+        let digest = hash.finalize();
+        u64::from_be_bytes(digest[..8].try_into().unwrap())
+    };
+    let mut cases = Vec::new();
+    let mut seed_rows = Vec::new();
+    let mut used = BTreeSet::new();
+    for curve in CURVES {
+        let orbit = curve.validate()?;
+        for (split, split_tag, count) in [("development", b'd', 10u8), ("holdout", b'h', 4u8)] {
+            for replicate in 0..count {
+                for (target_index, scalar) in [2, curve.r - 3].into_iter().enumerate() {
+                    let mut key = Vec::with_capacity(11);
+                    key.extend_from_slice(&curve.p.to_be_bytes());
+                    key.push(split_tag);
+                    key.push(replicate);
+                    key.push(target_index as u8);
+                    let seed = derive(b"point-index/fixture/v1\0", &key);
+                    if !used.insert(seed) || matches!(seed, 1..=10 | 101..=104) {
+                        return Err(
+                            "fresh panel fixture seed collision with old or new panel".into()
+                        );
+                    }
+                    let id = format!("p{}-{split}-f{replicate:02}-t{target_index}", curve.p);
+                    cases.push(Case {
+                        id: id.clone(),
+                        split,
+                        curve,
+                        seed,
+                        scalar,
+                        target: orbit[scalar as usize],
+                    });
+                    seed_rows.push(json!({
+                        "id": id, "curve_p": curve.p, "split": split,
+                        "replicate_id": replicate, "target_index": target_index,
+                        "fixture_seed": seed, "expected_scalar": scalar.to_string(),
+                    }));
+                }
+            }
+        }
+    }
+    let schedule_seeds: Vec<_> = (0u8..3)
+        .map(|replicate| derive(b"point-index/schedule/v1\0", &[replicate]))
+        .collect();
+    if schedule_seeds.iter().collect::<BTreeSet<_>>().len() != 3
+        || schedule_seeds.iter().any(|seed| used.contains(seed))
+    {
+        return Err("fresh panel schedule seed collision".into());
+    }
+    let seeds = json!({
+        "schema": "point-index-fresh-seeds/v1", "study_id": FRESH_STUDY,
+        "master_seed_hex": master_hex,
+        "master_derivation": "SHA256(UTF-8 isogeny-labs/crypto/point-index/fresh-panel/2026-11-27/v1)",
+        "child_derivation": "SHA256(domain || master_bytes || suffix), first 8 bytes as unsigned big-endian u64; fixture suffix = p:u64BE || split_tag:ASCII(d/h) || replicate_id:u8 || target_index:u8; schedule suffix = replicate_id:u8",
+        "fixture_domain": "point-index/fixture/v1 followed by a NUL byte",
+        "schedule_domain": "point-index/schedule/v1 followed by a NUL byte",
+        "solver_prng": "crates/hashed-ecdl-tensor/src/arithmetic.rs Seeded SplitMix64, u64 state, wrapping increment then standard SplitMix64 mixing, output little-endian chunks",
+        "schedule_prng": "crates/hashed-ecdl-tensor/src/panel_driver.rs SplitMix64, u64 state, wrapping increment then standard SplitMix64 mixing",
+        "pairing": "same public problem and fixture seed for both arms; distinct fixture seeds for every case; three independent public schedule seeds",
+        "schedule_seeds": schedule_seeds,
+        "cases": seed_rows,
+    });
+    Ok((cases, seeds))
+}
+
 fn write_new(path: &Path, value: &Value) -> Result<()> {
     let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
     serde_json::to_writer_pretty(&mut file, value)?;
@@ -223,6 +301,46 @@ fn prepare(output: &Path) -> Result<()> {
     Ok(())
 }
 
+fn prepare_fresh(output: &Path) -> Result<()> {
+    let (cases, seeds) = fresh_panel()?;
+    let seeds_bytes = format!("{}\n", serde_json::to_string_pretty(&seeds)?).into_bytes();
+    let seed_sha256 = driver::sha256_hex(&seeds_bytes);
+    fs::create_dir(output)?;
+    fs::create_dir(output.join("problems"))?;
+    let mut seed_file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output.join("seed-manifest.json"))?;
+    seed_file.write_all(&seeds_bytes)?;
+    seed_file.sync_all()?;
+    for case in &cases {
+        write_new(&output.join(case.relative_path()), &case.problem())?;
+    }
+    let entries: Vec<_> = cases
+        .iter()
+        .map(|case| {
+            json!({
+                "id": case.id, "split": case.split, "problem": case.relative_path(),
+                "expected_scalar": case.scalar.to_string(), "full_cardinality": case.curve.r,
+            })
+        })
+        .collect();
+    write_new(
+        &output.join("manifest.json"),
+        &json!({
+            "schema": driver::FRESH_PANEL_SCHEMA, "status": "prepared",
+            "protocol": "crypto:research/unified_point_index_20261127/panel-bridge-20261127/FRESH_PROTOCOL.md",
+            "baseline": "pending-final-source-freeze",
+            "paired_baseline": "pending-final-source-freeze",
+            "seed_manifest_sha256": seed_sha256,
+            "development_inputs": 60, "holdout_inputs": 24,
+            "repetitions": 3, "required_aa_rounds": 5, "required_ab_rounds": 5,
+            "execution": "not_run", "measurements": null, "cases": entries,
+        }),
+    )?;
+    Ok(())
+}
+
 fn run() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match args.first().map(String::as_str) {
@@ -232,12 +350,16 @@ fn run() -> Result<()> {
                 "Prepared 60 development and 24 holdout problems; no solver or benchmark ran."
             );
         }
+        Some("prepare-fresh") if args.len() == 2 => {
+            prepare_fresh(Path::new(&args[1]))?;
+            println!("Prepared 60 development and 24 fresh holdout problems; no solver or benchmark ran.");
+        }
         Some("run") => driver::cli_run(&args[1..])?,
         Some("analyze") => driver::cli_analyze(&args[1..])?,
         Some("hash") if args.len() == 2 => print!("{}", driver::hash_list(Path::new(&args[1]))?),
         _ => {
             return Err(format!(
-                "usage: hashed-ecdl-panel prepare NEW_DIRECTORY\n{}",
+                "usage: hashed-ecdl-panel prepare NEW_DIRECTORY\n       hashed-ecdl-panel prepare-fresh NEW_DIRECTORY\n{}",
                 driver::USAGE
             )
             .into())
@@ -260,7 +382,6 @@ mod tests {
     use hashed_ecdl_tensor::{Limits, Meter};
     #[cfg(unix)]
     use std::os::unix::fs::PermissionsExt;
-    #[cfg(unix)]
     use std::time::Duration;
 
     #[cfg(unix)]
@@ -423,6 +544,12 @@ mod tests {
         fs::create_dir(&dir).unwrap();
         let output = dir.join("panel");
         prepare(&output).unwrap();
+        fs::write(
+            dir.join("inputs.sha256"),
+            driver::hash_list(&output).unwrap(),
+        )
+        .unwrap();
+        driver::load_panel(&output, &dir.join("inputs.sha256")).unwrap();
         let manifest_bytes = fs::read(output.join("manifest.json")).unwrap();
         let manifest: Value = serde_json::from_slice(&manifest_bytes).unwrap();
         assert_eq!(manifest["execution"], "not_run");
@@ -444,6 +571,63 @@ mod tests {
         let before = fs::read(&existing).unwrap();
         assert!(write_new(&existing, &json!({"replaced": true})).is_err());
         assert_eq!(fs::read(existing).unwrap(), before);
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn fresh_panel_has_independent_seeds_and_oracle_targets() {
+        let (cases, seeds) = fresh_panel().unwrap();
+        assert_eq!(cases.len(), 84);
+        assert_eq!(cases.iter().filter(|c| c.split == "holdout").count(), 24);
+        assert_eq!(
+            cases.iter().map(|c| c.seed).collect::<BTreeSet<_>>().len(),
+            84
+        );
+        assert_eq!(seeds["schedule_seeds"].as_array().unwrap().len(), 3);
+        for case in &cases {
+            assert!(!matches!(case.seed, 1..=10 | 101..=104));
+            assert!(case.id.contains("-f"));
+            assert!(case.scalar == 2 || case.scalar == case.curve.r - 3);
+            assert_eq!(
+                case.curve.validate().unwrap()[case.scalar as usize],
+                case.target
+            );
+        }
+        let dir =
+            std::env::temp_dir().join(format!("hashed-ecdl-panel-fresh-{}", std::process::id()));
+        fs::create_dir(&dir).unwrap();
+        let output = dir.join("panel");
+        prepare_fresh(&output).unwrap();
+        fs::write(
+            dir.join("inputs.sha256"),
+            driver::hash_list(&output).unwrap(),
+        )
+        .unwrap();
+        driver::load_panel(&output, &dir.join("inputs.sha256")).unwrap();
+        let blocked = driver::RunOptions {
+            panel: output.clone(),
+            inputs_sha256: dir.join("inputs.sha256"),
+            baseline: dir.join("unfrozen-baseline"),
+            candidate: dir.join("unfrozen-candidate"),
+            optimized_options: None,
+            out: dir.join("unrun"),
+            seed: 1,
+            aa_rounds: 5,
+            ab_rounds: 5,
+            deadline: Duration::from_secs(1800),
+            case_limit: Duration::from_secs(1800),
+            cases: None,
+            allow_incomplete_panel: false,
+            label: "not-admitted".into(),
+        };
+        assert!(driver::run(&blocked)
+            .unwrap_err()
+            .to_string()
+            .contains("final source freeze"));
+        assert!(!blocked.out.exists());
+        fs::write(output.join("seed-manifest.json"), b"{}\n").unwrap();
+        assert!(driver::load_panel(&output, &dir.join("inputs.sha256")).is_err());
+        assert!(prepare_fresh(&output).is_err());
         fs::remove_dir_all(dir).unwrap();
     }
 }

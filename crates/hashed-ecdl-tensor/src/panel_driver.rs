@@ -32,6 +32,7 @@ pub const ROW_SCHEMA: &str = "hashed-ecdl-panel.run-row/v1";
 pub const ANALYSIS_SCHEMA: &str = "hashed-ecdl-panel.analysis/v1";
 const RECEIPT_SCHEMA: &str = "hashed-ecdl-tensor/v1";
 const PANEL_SCHEMA: &str = "hashed-ecdl-panel/v1";
+pub const FRESH_PANEL_SCHEMA: &str = "hashed-ecdl-panel/v2";
 const RECEIPT_LIMIT: u64 = 16 * 1024 * 1024;
 /// Frozen protocol minimums (PROTOCOL.md "Measurement and execution").
 pub const MIN_AA_ROUNDS: usize = 5;
@@ -75,6 +76,7 @@ pub struct Manifest {
     pub execution: String,
     pub measurements: Value,
     pub cases: Vec<ManifestCase>,
+    pub seed_manifest_sha256: Option<String>,
 }
 json_record!(
     Manifest,
@@ -93,7 +95,9 @@ json_record!(
         measurements,
         cases
     },
-    optional {}
+    optional {
+        seed_manifest_sha256
+    }
 );
 
 /// The union of the baseline and candidate runners' problem fields. The
@@ -263,10 +267,14 @@ pub fn parse_sha256_list(text: &str) -> Result<BTreeMap<String, String>> {
     Ok(map)
 }
 
-/// `sha256sum`-format list of a prepared panel: manifest.json and every
-/// problems/*.json, sorted bytewise by path. Other files are not inputs.
+/// `sha256sum`-format list of a prepared panel: manifest.json, every
+/// problems/*.json, and the v2 seed manifest, sorted bytewise by path.
 pub fn hash_list(panel: &Path) -> Result<String> {
     let mut paths = vec![String::from("manifest.json")];
+    let manifest: Manifest = serde_json::from_slice(&fs::read(panel.join("manifest.json"))?)?;
+    if manifest.schema == FRESH_PANEL_SCHEMA {
+        paths.push(String::from("seed-manifest.json"));
+    }
     for entry in fs::read_dir(panel.join("problems"))? {
         let name = entry?
             .file_name()
@@ -869,8 +877,10 @@ pub fn load_panel(panel: &Path, hashes: &Path) -> Result<LoadedPanel> {
         return Err("manifest.json is not pinned by the input hash list".into());
     }
     let manifest: Manifest = serde_json::from_slice(&manifest_bytes)?;
-    if manifest.schema != PANEL_SCHEMA || manifest.status != "prepared" {
-        return Err("manifest schema/status is not a prepared hashed-ecdl-panel/v1".into());
+    if !matches!(manifest.schema.as_str(), PANEL_SCHEMA | FRESH_PANEL_SCHEMA)
+        || manifest.status != "prepared"
+    {
+        return Err("manifest schema/status is not a prepared hashed-ecdl-panel/v1 or v2".into());
     }
     let mut ids = BTreeSet::new();
     let mut problems = Vec::new();
@@ -898,6 +908,49 @@ pub fn load_panel(panel: &Path, hashes: &Path) -> Result<LoadedPanel> {
         }
         let problem: PanelProblem = serde_json::from_slice(&bytes)?;
         problems.push((problem, hash, path));
+    }
+    if manifest.schema == FRESH_PANEL_SCHEMA {
+        let seed_bytes = fs::read(panel.join("seed-manifest.json"))?;
+        let seed_hash = sha256_hex(&seed_bytes);
+        if manifest.seed_manifest_sha256.as_deref() != Some(seed_hash.as_str())
+            || pinned.get("seed-manifest.json") != Some(&seed_hash)
+        {
+            return Err(
+                "fresh seed manifest is not pinned by both panel manifest and input hash list"
+                    .into(),
+            );
+        }
+        let seeds: Value = serde_json::from_slice(&seed_bytes)?;
+        if seeds["schema"] != "point-index-fresh-seeds/v1"
+            || seeds["cases"].as_array().map(Vec::len) != Some(manifest.cases.len())
+            || seeds["schedule_seeds"].as_array().map(Vec::len) != Some(3)
+        {
+            return Err("fresh seed manifest has unexpected schema or panel dimensions".into());
+        }
+        let mut unique_seeds = BTreeSet::new();
+        for ((case, (problem, _, _)), row) in manifest
+            .cases
+            .iter()
+            .zip(&problems)
+            .zip(seeds["cases"].as_array().unwrap())
+        {
+            let seed = row["fixture_seed"]
+                .as_u64()
+                .ok_or("fresh seed manifest has a missing fixture seed")?;
+            if row["id"] != case.id
+                || row["split"] != case.split
+                || row["expected_scalar"] != case.expected_scalar
+                || row["curve_p"].as_u64().map(|p| p.to_string()).as_deref()
+                    != Some(problem.p.as_str())
+                || problem.fixture_seed != Some(seed)
+                || !unique_seeds.insert(seed)
+                || matches!(seed, 1..=10 | 101..=104)
+            {
+                return Err("fresh seed manifest differs from the public problem panel".into());
+            }
+        }
+    } else if manifest.seed_manifest_sha256.is_some() {
+        return Err("v1 panel cannot claim a fresh seed manifest".into());
     }
     Ok(LoadedPanel {
         manifest,
@@ -949,8 +1002,17 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     if selected.iter().collect::<BTreeSet<_>>().len() != selected.len() {
         return Err("--cases lists a case id more than once".into());
     }
+    let source_freeze_pending = panel.manifest.schema == FRESH_PANEL_SCHEMA
+        && (panel.manifest.baseline == "pending-final-source-freeze"
+            || panel.manifest.paired_baseline == "pending-final-source-freeze");
+    if source_freeze_pending && !options.allow_incomplete_panel {
+        return Err(
+            "fresh panel needs a reviewed final source freeze before a complete run".into(),
+        );
+    }
     let protocol_complete = options.cases.is_none()
         && panel.manifest.cases.len() == PANEL_CASES
+        && !source_freeze_pending
         && options.aa_rounds >= MIN_AA_ROUNDS
         && options.ab_rounds >= MIN_AB_ROUNDS.max(PROTOCOL_REPETITIONS)
         && options.deadline.as_secs() <= PROTOCOL_DEADLINE_SECS;
