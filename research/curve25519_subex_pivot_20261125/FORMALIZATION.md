@@ -183,7 +183,10 @@ prefix-minimum receipts prove the fully labeled objective nonincreasing, and
 `class_cap_for_executable_labels` carries those constructed labels through the
 strongest source guard to the final real-valued class cap without a caller-
 supplied label or minimizer family. `PackingLabelArtifact.lean` now parses a
-shared flat projection of the admitted three-edge schema-3 native control,
+shared flat projection of the admitted three-edge schema-3 native control. The
+same overflow-checked native projection function runs at every producer
+certificate round trip, including all 596 three- through five-edge corpus
+cases. The formal importer
 checks its exact lengths and endpoint/label bounds, proves its typed endpoints
 and typed labels are their exact serialized natural values rather than modulo
 representatives, and replays the complete nontrivial native trace: rows
@@ -192,7 +195,7 @@ representatives, and replays the complete nontrivial native trace: rows
 serialized label arrays to that executable schedule and feeds them directly
 into the strongest source-guard class-cap theorem. The remaining boundary is
 to lift this finite code-to-model control to every arbitrary-size producer
-object and live recursive history.
+object semantically and to every live recursive history.
 `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a

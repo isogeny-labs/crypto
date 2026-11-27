@@ -184,8 +184,10 @@ evidence for two independent claims:
 1. a typed code-to-model binding, or replayable proof object, showing that the
    native endpoint arrays and first-minimum traces instantiate the formal
    graph theorem at each active call. One admitted three-edge control now has
-   that binding through `packing_label_witness.csv`; the remaining goal is the
-   arbitrary-size producer family; and
+   that binding through `packing_label_witness.csv`; a single size-generic
+   native exporter now constructs the same canonical projection on every
+   producer round trip, but semantic binding of the arbitrary-size producer
+   family remains open; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,
    active leaf cutoff, exact source quotient, and the exact root square-root

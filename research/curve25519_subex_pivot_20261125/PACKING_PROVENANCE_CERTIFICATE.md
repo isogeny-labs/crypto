@@ -67,10 +67,12 @@ source-bound replays pass. A label mutation fails with
 actual degree fails with `packing provenance source degree cap`.
 `[pcc:unverified]`
 
-The admitted control also exports `packing_label_witness.csv`, a compact
-projection of the actual schema-3 context, endpoint quadruples, and selected
-label arrays. The native test compares every projected field to the produced
-certificate. The transparent Lean parser in `lean/PackingLabelArtifact.lean`
+The verifier exposes one overflow-checked `label_projection` function with a
+canonical header, four fields per edge, then all row and column labels. Every
+producer path constructs the projection before accepting the schema-3 JSON
+round trip; this includes all 596 three- through five-edge corpus cases. The
+admitted control exports `packing_label_witness.csv` from the same function.
+The transparent Lean parser in `lean/PackingLabelArtifact.lean`
 checks exact lengths and bounds, proves typed endpoint values are the serialized
 indices, proves typed row and column labels equal the serialized naturals
 without modulo wrapping, and replays the same strict-first-minimum algorithm. The
@@ -84,6 +86,8 @@ source-guard class cap from caller-supplied degree caps and guard alone.
 
 This closes finite replay from an edge skeleton through conditional label
 selection, source packing bounds, packet slots, and active factorization groups.
+The native flat-export path is now size-generic; semantic Rust-to-Lean binding
+still has only the admitted three-edge control.
 The endpoint ports and source creation precisions also feed the separate
 schema-2 child provenance replay in `CHILD_PROVENANCE_CERTIFICATE.md`.
 `PROVENANCE_DESCRIPTION_ENVELOPE.md` gives the checked structural description

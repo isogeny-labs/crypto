@@ -22,7 +22,8 @@ use crate::node_refinement_certificate::{
     Certificate as NodeRefinementCertificate, SCHEMA as NODE_REFINEMENT_SCHEMA,
 };
 use crate::packing_provenance_certificate::{
-    description_envelope as packing_description_envelope, verify as verify_packing_provenance,
+    description_envelope as packing_description_envelope,
+    label_projection as packing_label_projection, verify as verify_packing_provenance,
     Certificate as PackingProvenanceCertificate, EdgeEndpoints,
     SCHEMA as PACKING_PROVENANCE_SCHEMA,
 };
@@ -560,6 +561,13 @@ fn produce(
             {
                 return Err(integrity("packing provenance round trip"));
             }
+            if packing_label_projection(&parsed_provenance)
+                .map_err(|_| integrity("packing label projection"))?
+                != packing_label_projection(&provenance)
+                    .map_err(|_| integrity("packing label projection"))?
+            {
+                return Err(integrity("packing label projection"));
+            }
             verify_packing_provenance(&certificate, &parsed_provenance, meter)
                 .map_err(|_| integrity("packing provenance replay"))?;
             if serialized_provenance.len()
@@ -932,22 +940,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     .split(',')
     .map(|value| value.parse().unwrap())
     .collect();
-    let mut observed_label_values = vec![
-        usize::try_from(conditional_provenance.schema).unwrap(),
-        conditional_provenance.radix,
-        usize::try_from(conditional_provenance.packet_exponent).unwrap(),
-        usize::try_from(conditional_provenance.coordinate).unwrap(),
-        usize::from(conditional_provenance.conditional_labels),
-        conditional_provenance.source_degree_cap.unwrap(),
-        conditional_provenance.edges.len(),
-        conditional_provenance.row_labels.len(),
-        conditional_provenance.column_labels.len(),
-    ];
-    for edge in &conditional_provenance.edges {
-        observed_label_values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
-    }
-    observed_label_values.extend(&conditional_provenance.row_labels);
-    observed_label_values.extend(&conditional_provenance.column_labels);
+    let observed_label_values = packing_label_projection(&conditional_provenance).unwrap();
     assert_eq!(observed_label_values, label_fixture_values);
     let mut bad_degree_cap = conditional_provenance.clone();
     bad_degree_cap.source_degree_cap = Some(0);

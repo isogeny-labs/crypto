@@ -122,6 +122,54 @@ fn bit_width(value: usize) -> usize {
     (usize::BITS as usize - value.leading_zeros() as usize).max(1)
 }
 
+/// Flatten the label-selection boundary in the canonical order consumed by
+/// the checked Lean importer.
+///
+/// The header is schema, radix, packet exponent, active coordinate,
+/// conditional-label flag, source degree cap (zero when absent), edge count,
+/// row count, and column count. It is followed by four fields per edge, then
+/// every row label and every column label.
+pub fn label_projection(certificate: &Certificate) -> Result<Vec<usize>, String> {
+    let edge_fields = checked_product(
+        &[4, certificate.edges.len()],
+        "packing label projection edge fields",
+    )?;
+    let length = checked_sum(
+        &[
+            9,
+            edge_fields,
+            certificate.row_labels.len(),
+            certificate.column_labels.len(),
+        ],
+        "packing label projection length",
+    )?;
+    let mut values = Vec::new();
+    values
+        .try_reserve_exact(length)
+        .map_err(|_| "packing label projection allocation".to_string())?;
+    values.extend([
+        usize::try_from(certificate.schema)
+            .map_err(|_| "packing label projection schema".to_string())?,
+        certificate.radix,
+        usize::try_from(certificate.packet_exponent)
+            .map_err(|_| "packing label projection packet exponent".to_string())?,
+        usize::try_from(certificate.coordinate)
+            .map_err(|_| "packing label projection coordinate".to_string())?,
+        usize::from(certificate.conditional_labels),
+        certificate.source_degree_cap.unwrap_or(0),
+        certificate.edges.len(),
+        certificate.row_labels.len(),
+        certificate.column_labels.len(),
+    ]);
+    for edge in &certificate.edges {
+        values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
+    }
+    values.extend(certificate.row_labels.iter().copied());
+    values.extend(certificate.column_labels.iter().copied());
+    debug_assert_eq!(values.len(), length);
+    Ok(values)
+}
+
 fn verify_source_guard_closure(
     edges: usize,
     label_classes: usize,
@@ -661,6 +709,33 @@ mod tests {
         assert_eq!(
             verify_source_guard_closure(512, 16, 2, Some(1), 64, 4, 257).unwrap_err(),
             "packing provenance source guard group cap"
+        );
+    }
+
+    #[test]
+    fn label_projection_has_canonical_flat_order() {
+        let certificate = Certificate {
+            schema: SCHEMA,
+            radix: 2,
+            packet_exponent: 1,
+            coordinate: 0,
+            conditional_labels: false,
+            source_degree_cap: None,
+            edges: vec![EdgeEndpoints {
+                left: 1,
+                left_port: 2,
+                right: 3,
+                right_port: 4,
+            }],
+            row_labels: vec![0, 1],
+            column_labels: vec![1, 0, 1, 0],
+            row_creation_precisions: vec![1, 1],
+            column_creation_precisions: vec![1, 1, 1, 1],
+            packet_pairs: Vec::new(),
+        };
+        assert_eq!(
+            label_projection(&certificate).unwrap(),
+            vec![3, 2, 1, 0, 0, 0, 1, 2, 4, 1, 2, 3, 4, 0, 1, 1, 0, 1, 0]
         );
     }
 }

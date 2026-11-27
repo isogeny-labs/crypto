@@ -379,18 +379,21 @@ well-founded recursion labels rows in native order from their exact prefixes,
 then labels columns from the fixed rows and preceding column prefix. The
 complete executable schedule is proved nonincreasing and feeds directly into a
 new class-cap endpoint under the strongest source guard, with no supplied label
-or minimum-family premise. A shared flat projection of the admitted native
-three-edge schema-3 control now binds endpoint quadruples and selected labels
-to that executable model. Rust checks the projection against the produced
-certificate; Lean parses and bounds it, proves the typed endpoints are the
+or minimum-family premise. The native schema-3 verifier now exposes one
+overflow-checked canonical flat-projection function and constructs that
+projection before accepting every producer round trip in the 596-case corpus.
+The admitted three-edge projection binds endpoint quadruples and selected
+labels from that same function to the executable model. Lean parses and bounds it,
+proves the typed endpoints are the
 serialized indices, proves the typed row and column labels retain their exact
 serialized natural values without modulo wrapping, and kernel-replays the
 nontrivial row `[0,1,0]` and column `[0,0,1]` traces. For every successfully
 replayed artifact, the parsed label arrays now feed directly into the strongest
 source-guard class-cap theorem; the caller supplies only degree caps and the
 guard. This is one finite
-code-to-model control plus a generic checked-import endpoint, not a uniform
-arbitrary-size Rust refinement. `[pcc:unverified]`
+code-to-model control plus generic native export and checked-import endpoints,
+not a uniform arbitrary-size Rust-to-Lean semantic refinement.
+`[pcc:unverified]`
 
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
 group child. From schema-3 parent provenance and the accepted factorization
