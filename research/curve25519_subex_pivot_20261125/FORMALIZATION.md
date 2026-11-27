@@ -615,8 +615,12 @@ Each packed remainder step is also transported to addition by `U^shift` times
 the decoded modulus and proved to preserve `modByMonic`. The proof composes over
 arbitrary bounded shift lists; a transparent shift trace exactly replays
 `gf2PackedRemainderFuel`, yielding a conditional semantic theorem for the
-public remainder. The remaining obligations are to derive the trace-window
-bound and the final reduced-degree property from the native control flow.
+public remainder. A bit-level leading-term proof now shows every aligned step
+clears the current top bit and introduces nothing higher. Consequently every
+emitted shift fits the input `log2+1` window, the configured fuel suffices, and
+the result is zero or has packed `log2` below a nonzero modulus. The remaining
+normal-form bridge is to identify packed `log2` with the decoded polynomial's
+`natDegree` under the explicit width hypotheses.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

@@ -1435,6 +1435,198 @@ theorem packedGF2Polynomial_remainder_residue
     (Nat.log2 value + 1) modulusWidth extra value modulus
     hshifts hmodulus hmonic
 
+/-- An aligned nonzero-modulus XOR step clears the current leading bit and has
+no coefficient at or above that bit afterward. -/
+theorem gf2PackedRemainderStep_lt_pow_log2
+    (value modulus : ℕ) (hvalue : value ≠ 0) (hmodulus : modulus ≠ 0)
+    (hdegree : Nat.log2 modulus ≤ Nat.log2 value) :
+    Nat.xor value
+        (modulus * 2 ^ (Nat.log2 value - Nat.log2 modulus)) <
+      2 ^ Nat.log2 value := by
+  let valueDegree := Nat.log2 value
+  let modulusDegree := Nat.log2 modulus
+  let shift := valueDegree - modulusDegree
+  have hshiftDegree : shift ≤ valueDegree := Nat.sub_le _ _
+  have hdegreeShift : modulusDegree + shift = valueDegree := by
+    dsimp [shift, valueDegree, modulusDegree]
+    omega
+  have hvalueTop : value.testBit valueDegree = true := by
+    exact Nat.testBit_log2 hvalue
+  have hmodulusTop : modulus.testBit modulusDegree = true := by
+    exact Nat.testBit_log2 hmodulus
+  have hshiftedTop : (modulus * 2 ^ shift).testBit valueDegree = true := by
+    rw [← Nat.shiftLeft_eq_mul_pow, Nat.testBit_shiftLeft]
+    have hsub : valueDegree - shift = modulusDegree := by omega
+    simp [hshiftDegree, hsub, hmodulusTop]
+  apply Nat.lt_pow_two_of_testBit
+  intro index hindex
+  have hxor :
+      (Nat.xor value (modulus * 2 ^ shift)).testBit index =
+        (value.testBit index ^^ (modulus * 2 ^ shift).testBit index) := by
+    change (value ^^^ (modulus * 2 ^ shift)).testBit index = _
+    exact Nat.testBit_xor value (modulus * 2 ^ shift) index
+  rw [hxor]
+  by_cases heq : index = valueDegree
+  · subst index
+    simp [hvalueTop, hshiftedTop]
+  · have hgt : valueDegree < index := by omega
+    have hvalueUpper : value < 2 ^ (valueDegree + 1) := by
+      exact ((Nat.log2_eq_iff hvalue).mp rfl).2
+    have hvaluePow : value < 2 ^ index :=
+      lt_of_lt_of_le hvalueUpper
+        (Nat.pow_le_pow_right (by decide) (by omega))
+    have hvalueBit := Nat.testBit_eq_false_of_lt hvaluePow
+    have hmodulusUpper : modulus < 2 ^ (modulusDegree + 1) := by
+      exact ((Nat.log2_eq_iff hmodulus).mp rfl).2
+    have hshiftedUpper : modulus * 2 ^ shift < 2 ^ (valueDegree + 1) := by
+      calc
+        modulus * 2 ^ shift < 2 ^ (modulusDegree + 1) * 2 ^ shift :=
+          Nat.mul_lt_mul_of_pos_right hmodulusUpper (Nat.two_pow_pos shift)
+        _ = 2 ^ ((modulusDegree + 1) + shift) := by rw [← pow_add]
+        _ = 2 ^ (valueDegree + 1) := by
+          apply congrArg (fun exponent => 2 ^ exponent)
+          omega
+    have hshiftedPow : modulus * 2 ^ shift < 2 ^ index :=
+      lt_of_lt_of_le hshiftedUpper
+        (Nat.pow_le_pow_right (by decide) (by omega))
+    have hshiftedBit := Nat.testBit_eq_false_of_lt hshiftedPow
+    simp [hvalueBit, hshiftedBit]
+
+/-- With a nonzero modulus the aligned clearing step strictly decreases the
+packed natural value. -/
+theorem gf2PackedRemainderStep_lt
+    (value modulus : ℕ) (hvalue : value ≠ 0) (hmodulus : modulus ≠ 0)
+    (hdegree : Nat.log2 modulus ≤ Nat.log2 value) :
+    Nat.xor value
+        (modulus * 2 ^ (Nat.log2 value - Nat.log2 modulus)) < value := by
+  exact lt_of_lt_of_le
+    (gf2PackedRemainderStep_lt_pow_log2 value modulus
+      hvalue hmodulus hdegree)
+    ((Nat.log2_eq_iff hvalue).mp rfl).1
+
+/-- The aligned clearing step never increases the packed value; this includes
+the degenerate zero-modulus case. -/
+theorem gf2PackedRemainderStep_le
+    (value modulus : ℕ) (hvalue : value ≠ 0)
+    (hdegree : Nat.log2 modulus ≤ Nat.log2 value) :
+    Nat.xor value
+        (modulus * 2 ^ (Nat.log2 value - Nat.log2 modulus)) ≤ value := by
+  by_cases hmodulus : modulus = 0
+  · simp [hmodulus]
+  · exact (gf2PackedRemainderStep_lt value modulus
+      hvalue hmodulus hdegree).le
+
+/-- Every shift emitted by the exact remainder trace fits the uniform input
+window `log2 value + 1`. -/
+theorem gf2PackedRemainderShiftsFuel_lt_log2_succ
+    (fuel value modulus : ℕ) :
+    ∀ shift ∈ gf2PackedRemainderShiftsFuel fuel value modulus,
+      shift < Nat.log2 value + 1 := by
+  have haux : ∀ remaining current : ℕ, current ≤ value →
+      ∀ shift ∈ gf2PackedRemainderShiftsFuel remaining current modulus,
+        shift < Nat.log2 value + 1 := by
+    intro remaining
+    induction remaining with
+    | zero => simp [gf2PackedRemainderShiftsFuel]
+    | succ prior ih =>
+        intro current hcurrent shift hmem
+        rw [gf2PackedRemainderShiftsFuel] at hmem
+        split at hmem
+        next hstop => simp at hmem
+        next hcontinue =>
+          simp only [List.mem_cons] at hmem
+          have hcurrent0 : current ≠ 0 := by
+            intro hzero
+            subst current
+            simp at hcontinue
+          have hdegree : Nat.log2 modulus ≤ Nat.log2 current := by
+            by_contra hnot
+            have hlt : Nat.log2 current < Nat.log2 modulus :=
+              Nat.lt_of_not_ge hnot
+            simp [hlt] at hcontinue
+          have hvalue0 : value ≠ 0 := by
+            intro hzero
+            subst value
+            omega
+          have hlog : Nat.log2 current ≤ Nat.log2 value := by
+            apply (Nat.le_log2 hvalue0).mpr
+            exact le_trans ((Nat.log2_eq_iff hcurrent0).mp rfl).1 hcurrent
+          rcases hmem with rfl | htail
+          · omega
+          · apply ih
+              (Nat.xor current
+                (modulus * 2 ^ (Nat.log2 current - Nat.log2 modulus)))
+              (le_trans
+                (gf2PackedRemainderStep_le current modulus hcurrent0 hdegree)
+                hcurrent)
+              shift htail
+  exact haux fuel value (le_refl value)
+
+/-- The trace-window hypothesis of the public residue theorem is discharged by
+the uniform input-logarithm bound. -/
+theorem packedGF2Polynomial_remainder_residue_log2
+    (modulusWidth value modulus : ℕ)
+    (hmodulus : modulus < 2 ^ modulusWidth)
+    (hmonic : (packedGF2Polynomial modulusWidth modulus).Monic) :
+    (packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1))
+        (gf2PackedRemainder value modulus)) %ₘ
+          packedGF2Polynomial modulusWidth modulus =
+      (packedGF2Polynomial (modulusWidth + (Nat.log2 value + 1)) value) %ₘ
+        packedGF2Polynomial modulusWidth modulus := by
+  exact packedGF2Polynomial_remainder_residue
+    modulusWidth (Nat.log2 value + 1) value modulus
+    (gf2PackedRemainderShiftsFuel_lt_log2_succ
+      (Nat.log2 value + 1) value modulus)
+    hmodulus hmonic
+
+/-- If the initial degree fits in the supplied fuel, the remainder loop returns
+zero or a packed value of degree below the nonzero modulus. -/
+theorem gf2PackedRemainderFuel_stops_below_modulus
+    (fuel value modulus : ℕ) (hmodulus : modulus ≠ 0)
+    (hfuel : Nat.log2 value < fuel) :
+    gf2PackedRemainderFuel fuel value modulus = 0 ∨
+      Nat.log2 (gf2PackedRemainderFuel fuel value modulus) <
+        Nat.log2 modulus := by
+  induction fuel generalizing value with
+  | zero => omega
+  | succ remaining ih =>
+      rw [gf2PackedRemainderFuel]
+      split
+      next hstop =>
+        simpa using hstop
+      next hcontinue =>
+        have hvalue : value ≠ 0 := by
+          intro hzero
+          subst value
+          simp at hcontinue
+        have hdegree : Nat.log2 modulus ≤ Nat.log2 value := by
+          by_contra hnot
+          have hlt : Nat.log2 value < Nat.log2 modulus :=
+            Nat.lt_of_not_ge hnot
+          simp [hlt] at hcontinue
+        let nextValue := Nat.xor value
+          (modulus * 2 ^ (Nat.log2 value - Nat.log2 modulus))
+        by_cases hnext : nextValue = 0
+        · left
+          change gf2PackedRemainderFuel remaining nextValue modulus = 0
+          rw [hnext]
+          cases remaining <;> rfl
+        · apply ih nextValue
+          have hnextDegree : Nat.log2 nextValue < Nat.log2 value := by
+            apply (Nat.log2_lt hnext).mpr
+            exact gf2PackedRemainderStep_lt_pow_log2 value modulus
+              hvalue hmodulus hdegree
+          omega
+
+/-- The public fuel choice `log2 value + 1` is sufficient: the packed
+remainder is zero or has degree below every nonzero modulus. -/
+theorem gf2PackedRemainder_stops_below_modulus
+    (value modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    gf2PackedRemainder value modulus = 0 ∨
+      Nat.log2 (gf2PackedRemainder value modulus) < Nat.log2 modulus := by
+  exact gf2PackedRemainderFuel_stops_below_modulus
+    (Nat.log2 value + 1) value modulus hmodulus (by omega)
+
 /-- Unreduced carryless product of two packed `GF(2)` polynomials. -/
 def gf2PackedRawProduct (left right : ℕ) : ℕ :=
   (List.range (Nat.log2 right + 1)).foldl

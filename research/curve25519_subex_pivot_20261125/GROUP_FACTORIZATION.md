@@ -270,8 +270,11 @@ with ordinary polynomial multiplication under an explicit left-width bound;
 each packed remainder XOR step is likewise proved to preserve `modByMonic`,
 arbitrary bounded shift lists compose, and a transparent trace replays the
 fuel recursion exactly. The public remainder theorem remains conditional on
-monicity, modulus width, and a trace-window bound; deriving that bound and the
-reduced-degree normal form is the remaining packed arithmetic bridge.
+monicity and modulus width, while the trace-window condition is now discharged
+by a leading-bit cancellation proof. The same proof establishes fuel
+sufficiency and a returned packed `log2` below every nonzero modulus. Converting
+that numeric degree statement to decoded-polynomial `natDegree` is the remaining
+normal-form bridge.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

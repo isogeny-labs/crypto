@@ -117,6 +117,13 @@ open Curve25519ExtensionRingModel
 #print axioms gf2PackedRemainderFuel_eq_fold_shifts
 #print axioms packedGF2Polynomial_remainderFuel_residue
 #print axioms packedGF2Polynomial_remainder_residue
+#print axioms gf2PackedRemainderStep_lt_pow_log2
+#print axioms gf2PackedRemainderStep_lt
+#print axioms gf2PackedRemainderStep_le
+#print axioms gf2PackedRemainderShiftsFuel_lt_log2_succ
+#print axioms packedGF2Polynomial_remainder_residue_log2
+#print axioms gf2PackedRemainderFuel_stops_below_modulus
+#print axioms gf2PackedRemainder_stops_below_modulus
 #print axioms packedGF2Polynomial_rawProduct_fold
 #print axioms packedGF2Polynomial_rawProduct_eq_mul
 #print axioms degreeFourIrreducibilityBoundary

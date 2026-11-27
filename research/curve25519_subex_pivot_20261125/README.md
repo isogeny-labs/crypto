@@ -551,8 +551,11 @@ is proved to add a monomial multiple of the decoded modulus and preserve
 `modByMonic`; arbitrary bounded shift lists compose, and a transparent trace
 replays the exact fuel recursion. The public remainder therefore preserves the
 polynomial residue under explicit monicity, modulus-width, and trace-window
-hypotheses. Automatically deriving the trace bound and reduced-degree normal
-form remains open.
+hypotheses. The aligned step is now also proved to clear the current top bit;
+this discharges the trace-window hypothesis, proves `log2(value)+1` fuel is
+sufficient, and shows the returned packed value is zero or has `log2` below a
+nonzero modulus. Relating packed `log2` to decoder `natDegree` is the remaining
+step before a direct polynomial normal-form equality.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
