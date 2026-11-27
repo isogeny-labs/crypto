@@ -164,8 +164,9 @@ impl Default for Fast2Options {
             batch_min: 32,
             batch_max: 256,
             target_pivots: 32,
-            // 0.65 with lead-cover skip: E2LOCMS45 P2 ≈153s (was ~256s at 0.6),
-            // P1 still ≈18–19s; unit tests cover the interreduce equivalence.
+            // 0.65 with lead-cover skip + κ-wave batches: E2LOCMS45 P2 ≈33–52s
+            // / ~88B muladds (was ~153s / 1.17T before κ-waves; baseline 620.6s /
+            // 4.45T), P1 ≈2.3s; closures without 1 verify_closed clean.
             interreduce: 0.65,
             interreduce_min: 256,
             interreduce_block: 256,
@@ -182,8 +183,9 @@ impl Default for Fast2Options {
             sweep_ratio: 1,
             sweep_tile_bytes: 1 << 20,
             sweep_max_words: 1 << 28,
-            // Lead-cover skip is exact (PROOF.md); on E2LOCMS45 P2 it cut wall
-            // ~256s → ~153s at ir=0.6/0.65 with unchanged d_F.
+            // Lead-cover skip is exact (PROOF.md). Forming products in
+            // ascending-κ waves within a batch lets a cover mint skip a
+            // higher-κ sibling before it is formed (same span, fewer products).
             skip: true,
             skip_order: 1,
             skip_witness: 1,
@@ -3204,111 +3206,181 @@ pub fn closure_fast2(
         if batch.is_empty() {
             continue 'outer;
         }
-        let take = batch.len();
         stats.batches += 1;
         let t0 = Instant::now();
-        let ech_ref = &ech;
-        let cov = &cover;
-        let kappa = &kappa;
-        let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = batch
-            .par_iter()
-            .with_max_len(1)
-            .map(|item| {
-                let mut o = ItemOut {
-                    cands: Vec::new(),
-                    ops: 0,
-                    nred: 0,
-                    formed: 0,
-                    prod_nnz: 0,
-                    src_deg: 0,
-                    src_age: 0,
-                    src_nnz: 0,
-                    max_task: 0,
-                    ops0: 0,
-                    zero_ops: 0,
-                    core: Vec::new(),
-                    cls: 31,
-                    coverable: false,
-                    covers: Vec::new(),
-                };
-                let mut formed: Vec<(u8, Row)> = Vec::new();
-                match item {
-                    Item::Row(q, r) => formed.push((*q, r.clone())),
-                    Item::Prod { part, row, var } => {
-                        let e = &ech_ref[*part as usize];
-                        let src = &e.rows[*row as usize];
-                        // products are formed in the part's columns
-                        let full = RowS::Sparse(e.row_full(*row as usize));
-                        o.ops += space.multiply(*part as usize, &full, *var as usize, &mut formed);
-                        // PROOF.md: covers given by this product, and whether
-                        // the criterion covers it (counted when formed)
-                        let ld = lead_of(src);
-                        let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
-                        let ka = kappa[*var as usize];
-                        o.coverable = covered(cov, *part, ld, ka, opts.fault);
-                        o.cls = (2 * ds.min(14) as u8
-                            + u8::from(covered(cov, *part, ld, NO_COVER, 0)))
-                        .min(30);
-                        {
-                            for (q, r) in &formed {
-                                if let Some(&(pl, _)) = r.first() {
-                                    let dp = u32::from(space.parts[*q as usize].deg[pl as usize]);
-                                    if (dp == ds + 1 && ds + 2 <= c) || opts.fault == 7 {
-                                        o.covers.push((*q, pl, ka));
+        // When lead-cover skip is on, form products in ascending-κ waves so a
+        // cover minted by a lower-κ product in this batch can skip a higher-κ
+        // sibling before it is formed (PROOF.md; same span, fewer products).
+        // Off: one wave = the whole batch (previous schedule).
+        let mut pending: Vec<Item> = batch;
+        let mut outs: Vec<ItemOut> = Vec::with_capacity(pending.len());
+        let mut take = 0usize;
+        loop {
+            if pending.is_empty() {
+                break;
+            }
+            let wave: Vec<Item> = if opts.skip {
+                let mut kept: Vec<Item> = Vec::with_capacity(pending.len());
+                for it in pending.drain(..) {
+                    if let Item::Prod { part, row, var } = &it {
+                        let ld = lead_of(&ech[*part as usize].rows[*row as usize]);
+                        if covered(&cover, *part, ld, kappa[*var as usize], opts.fault) {
+                            stats.skipped_items += 1;
+                            continue;
+                        }
+                    }
+                    kept.push(it);
+                }
+                if kept.is_empty() {
+                    break;
+                }
+                let min_k = kept
+                    .iter()
+                    .map(|it| match it {
+                        Item::Row(..) => 0u16,
+                        Item::Prod { var, .. } => kappa[*var as usize],
+                    })
+                    .min()
+                    .unwrap_or(0);
+                let mut wave = Vec::new();
+                let mut rest = Vec::new();
+                for it in kept {
+                    let k = match &it {
+                        Item::Row(..) => 0u16,
+                        Item::Prod { var, .. } => kappa[*var as usize],
+                    };
+                    if k == min_k {
+                        wave.push(it);
+                    } else {
+                        rest.push(it);
+                    }
+                }
+                pending = rest;
+                wave
+            } else {
+                std::mem::take(&mut pending)
+            };
+            if wave.is_empty() {
+                break;
+            }
+            take += wave.len();
+            let ech_ref = &ech;
+            let cov = &cover;
+            let kappa_ref = &kappa;
+            let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = wave
+                .par_iter()
+                .with_max_len(1)
+                .map(|item| {
+                    let mut o = ItemOut {
+                        cands: Vec::new(),
+                        ops: 0,
+                        nred: 0,
+                        formed: 0,
+                        prod_nnz: 0,
+                        src_deg: 0,
+                        src_age: 0,
+                        src_nnz: 0,
+                        max_task: 0,
+                        ops0: 0,
+                        zero_ops: 0,
+                        core: Vec::new(),
+                        cls: 31,
+                        coverable: false,
+                        covers: Vec::new(),
+                    };
+                    let mut formed: Vec<(u8, Row)> = Vec::new();
+                    match item {
+                        Item::Row(q, r) => formed.push((*q, r.clone())),
+                        Item::Prod { part, row, var } => {
+                            let e = &ech_ref[*part as usize];
+                            let src = &e.rows[*row as usize];
+                            // products are formed in the part's columns
+                            let full = RowS::Sparse(e.row_full(*row as usize));
+                            o.ops +=
+                                space.multiply(*part as usize, &full, *var as usize, &mut formed);
+                            // PROOF.md: covers given by this product, and whether
+                            // the criterion covers it (counted when formed)
+                            let ld = lead_of(src);
+                            let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
+                            let ka = kappa_ref[*var as usize];
+                            o.coverable = covered(cov, *part, ld, ka, opts.fault);
+                            o.cls = (2 * ds.min(14) as u8
+                                + u8::from(covered(cov, *part, ld, NO_COVER, 0)))
+                            .min(30);
+                            {
+                                for (q, r) in &formed {
+                                    if let Some(&(pl, _)) = r.first() {
+                                        let dp =
+                                            u32::from(space.parts[*q as usize].deg[pl as usize]);
+                                        if (dp == ds + 1 && ds + 2 <= c) || opts.fault == 7 {
+                                            o.covers.push((*q, pl, ka));
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if tracing {
-                            o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
-                            o.src_age = (e.rows.len() - *row as usize) as u64;
-                            o.src_nnz = src.nnz() as u64;
-                        }
-                    }
-                }
-                o.formed = formed.len() as u32;
-                if tracing {
-                    for (q, r) in &formed {
-                        let e = &ech_ref[*q as usize];
-                        for &(col, _) in r {
-                            if e.of_col[col as usize] == NONE {
-                                o.core
-                                    .push(u64::from(*q) << 32 | u64::from(e.pivot[col as usize]));
+                            if tracing {
+                                o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
+                                o.src_age = (e.rows.len() - *row as usize) as u64;
+                                o.src_nnz = src.nnz() as u64;
                             }
                         }
                     }
-                }
-                (o, formed)
-            })
-            .collect();
-        // Reduce every product of the batch (alone, or by the sweep).
-        let mut prods: Vec<(u8, Row)> = Vec::new();
-        let mut items: Vec<ItemOut> = Vec::with_capacity(formed_items.len());
-        for (o, formed) in formed_items {
-            prods.extend(formed);
-            items.push(o);
-        }
-        let (done, swept) = reduce_products(&ech, &cx, &prods, &pool, &mut sweep_buf, opts);
-        stats.swept_batches += u64::from(swept);
-        let mut done = done.into_iter().zip(prods);
-        let outs: Vec<ItemOut> = items
-            .into_iter()
-            .map(|mut o| {
-                for ((red, rd), (q, r)) in done.by_ref().take(o.formed as usize) {
-                    o.prod_nnz += r.len() as u64;
-                    o.ops += rd.ops;
-                    o.max_task = o.max_task.max(rd.ops);
-                    o.nred += u64::from(rd.nred);
-                    o.ops0 += rd.ops0;
-                    if red.is_empty() {
-                        o.zero_ops += rd.ops;
-                    } else {
-                        o.cands.push((q, red));
+                    o.formed = formed.len() as u32;
+                    if tracing {
+                        for (q, r) in &formed {
+                            let e = &ech_ref[*q as usize];
+                            for &(col, _) in r {
+                                if e.of_col[col as usize] == NONE {
+                                    o.core.push(
+                                        u64::from(*q) << 32 | u64::from(e.pivot[col as usize]),
+                                    );
+                                }
+                            }
+                        }
                     }
+                    (o, formed)
+                })
+                .collect();
+            // Reduce every product of the wave (alone, or by the sweep).
+            let mut prods: Vec<(u8, Row)> = Vec::new();
+            let mut items: Vec<ItemOut> = Vec::with_capacity(formed_items.len());
+            for (o, formed) in formed_items {
+                prods.extend(formed);
+                items.push(o);
+            }
+            let (done, swept) = reduce_products(&ech, &cx, &prods, &pool, &mut sweep_buf, opts);
+            stats.swept_batches += u64::from(swept);
+            let mut done = done.into_iter().zip(prods);
+            let wave_outs: Vec<ItemOut> = items
+                .into_iter()
+                .map(|mut o| {
+                    for ((red, rd), (q, r)) in done.by_ref().take(o.formed as usize) {
+                        o.prod_nnz += r.len() as u64;
+                        o.ops += rd.ops;
+                        o.max_task = o.max_task.max(rd.ops);
+                        o.nred += u64::from(rd.nred);
+                        o.ops0 += rd.ops0;
+                        if red.is_empty() {
+                            o.zero_ops += rd.ops;
+                        } else {
+                            o.cands.push((q, red));
+                        }
+                    }
+                    o
+                })
+                .collect();
+            // Mint covers before the next higher-κ wave so siblings can skip.
+            for o in &wave_outs {
+                for &(q, col, ka) in &o.covers {
+                    let x = &mut cover[q as usize][col as usize];
+                    *x = (*x).min(ka);
                 }
-                o
-            })
-            .collect();
+            }
+            outs.extend(wave_outs);
+            if !opts.skip {
+                break;
+            }
+        }
         let par_dt = t0.elapsed().as_secs_f64();
         stats.parallel_s += par_dt;
         let t1 = Instant::now();
@@ -3358,10 +3430,7 @@ pub fn closure_fast2(
                 stats.coverable_items += 1;
                 stats.coverable_ops += o.ops;
             }
-            for &(q, col, ka) in &o.covers {
-                let x = &mut cover[q as usize][col as usize];
-                *x = (*x).min(ka);
-            }
+            // covers already applied per wave above; still collect cands
             cands.extend(o.cands);
         }
         stats.muladds += b_ops;
