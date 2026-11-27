@@ -53,6 +53,21 @@ The native Rust replay source and exact output are [p61_audit.rs](p61_audit.rs) 
 
 A second implementation can check the entire set rather than only the counts. These are correctness counts, not a timing experiment. [pcc:unverified]
 
+### Bounded four-sum scalar-norm control
+
+A separate native control tests a proposed shortcut through the four-leaf summation polynomial $S_5$ on the **nested** $D_n$ fibres of this same P-61 curve. Let $N=\binom{n+1}{2}$ be the number of unordered pairs of all $n$ selector roots, including nonlifting roots. The tested row-wise scalar norm multiplies $S_5$ over both pair schemes. A nonzero product certifies an algebraic miss; a zero product still needs rational lifts, signs, and direct group replay. The producer snapshots a frozen $n^2$ target-dependent $S_5$-call budget, then continues the full product only as a correctness diagnostic. [pcc:unverified]
+
+| $n$ | Lifted $x$ | $N$ | $n^2$ call budget | Full diagnostic calls $N^2$ | Control result |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 4 | 0 | 10 | 16 | no query | No rational planted target |
+| 8 | 2 | 36 | 64 | 1,296 | Budget reached in second pair row |
+| 16 | 10 | 136 | 256 | 18,496 | Budget reached in second pair row |
+| 32 | 23 | 528 | 1,024 | 278,784 | Budget reached in second pair row |
+
+At each eligible size, the deterministic planted target has one algebraic zero and one replayed signed rational four-sum; $G$ and $[17]G$ have neither. The full $n=32$ **dual-determinant diagnostic** counted 445,953,552 field multiplications on a miss, including both Gaussian and Bareiss evaluations of each $S_5$. A naive rational pair-table comparator counted 130,272 setup and 130,134 online multiplications for the same miss, including the multiplication work inside per-entry inversions. These are charged operation counts for the named implementations, not a matched wall-time speed ratio or a bound on a compressed resultant. The two reported norm accumulators exclude determinant scratch and the target-independent pair catalogue. [pcc:unverified]
+
+The deterministic [native source](p61_four_sum_norm_preflight.rs) and [raw JSONL](four_sum_norm_preflight.jsonl) record the cutoff, diagnostic, algebraic zeros, signed witnesses, and direct pair-index control. Strict Rust builds and a second run match all output fields. The control checks rational four-sums, **not** generic chord-only decompositions, and reuses the producer's field arithmetic rather than providing an independent PCC replay. It rejects this row-wise scalar product only; a nested scalar resultant or gcd that skips the pair-pair product remains an open component, and no seven-sum oracle follows. [pcc:unverified]
+
 ## Proposed random-scaling coverage argument
 
 For a nonsingular curve $y^2=x^3+Ax+B$ with $AB\ne0$, let $T\subset\mathbb F_p^*$ contain $h$ distinct coordinates with $12m\le h\le\sqrt p$. Keep $T$ fixed while choosing $u\in\mathbb F_p^*$ uniformly and replacing the model by $E_u:y^2=x^3+u^4Ax+u^6B$. Write $F_u$ for its signed rational points over $T$ and $f(u)=|F_u|$. The proposed adaptation of Kaarelson v2 §5 uses
@@ -97,10 +112,11 @@ The proposed coverage lemma gives $N=O(q)$ across capped random-model rounds. **
 | Rows needed by the simple left-kernel route | 487 | Counting requirement |
 | Expected uniform nonidentity target queries | at least 6,757.15 | Lower bound even if all witnesses are returned |
 | Full pair entries inspected over those calls | at least $1.596\times10^9$ | Only if every call scans all 236,196 entries; remaining five-sum work excluded |
+| Triple residuals inspected on empty calls in explicit $3+4$ | at least $9.626\times10^{11}$ | Only if each empty call exhausts all $\binom{974}{3}=153{,}527{,}724$ signed triples; four-sum work excluded |
 | Proposed random-good-model capped round | up to $9.40\times10^{17}$ calls | Very loose sufficient proof cap, **not** observed cost |
 | Ideal negation-quotient rho | about $1.346\times10^9$ group steps | Random-walk model; not a matched benchmark |
 
-At the absolute lower query count, beating that ideal rho count would require the **entire** attack to average below about 199,157 rho-step equivalents per query, including setup and matrix work. Pair-entry inspections, field operations, and elliptic group steps are distinct units; this threshold is an accounting target, not a measured comparison. This audit has not solved a target $Q$. [pcc:unverified]
+At the absolute lower query count, beating that ideal rho count would require the **entire** attack to average below about 199,157 rho-step equivalents per query, including setup and matrix work. The triple row charges at least 6,270.15 empty calls in the named explicit $3+4$ route; a different exact miss certificate could avoid this enumeration. Pair and triple inspections, field operations, and elliptic group steps are distinct units; these thresholds are accounting targets, not measured comparisons. This audit has not solved a target $Q$. [pcc:unverified]
 
 ## Reproduction and remaining checks
 
@@ -115,6 +131,10 @@ g++ -std=c++20 -O2 -Wall -Wextra -Werror p61_bounds.cpp \
 /tmp/p61_bounds 486 236196 > /tmp/coverage_bound.replay.json
 cmp /tmp/pair_spectrum.replay.json pair_spectrum.json
 cmp /tmp/coverage_bound.replay.json coverage_bound.json
+rustc --edition=2021 -D warnings -O p61_four_sum_norm_preflight.rs \
+  -o /tmp/p61_four_sum_norm_preflight
+/tmp/p61_four_sum_norm_preflight > /tmp/four_sum_norm_preflight.replay.jsonl
+cmp /tmp/four_sum_norm_preflight.replay.jsonl four_sum_norm_preflight.jsonl
 ```
 
 The pair-list digest above and both JSON comparisons passed in the source-pinned rerun. The arithmetic is self-checked; the proposed general coverage proof still needs independent review and formalization. [pcc:unverified]
