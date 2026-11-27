@@ -144,11 +144,13 @@ lake env lean AxiomAudit.lean
 lake env lean PrecisionAxiomAudit.lean
 ```
 
-The build completes 9,057 jobs. `#print axioms` reports only `propext`,
+The build completes 9,058 jobs. `#print axioms` reports only `propext`,
 `Classical.choice`, and `Quot.sound` for each exported theorem; there are no
-project axioms or admitted proofs. There are 53 explicitly audited declarations,
-including four reused precision declarations and fifteen new precision/schedule
-bridge declarations plus the natural-number mode/precision cancellation theorem.
+project axioms or admitted proofs. There are 63 explicitly audited declarations,
+including four reused precision declarations, fifteen new precision/schedule
+bridges, the natural-number mode/precision cancellation theorem, and seven
+generic finite mode-to-group factorization identities plus three nilpotent
+scalar-series lemmas.
 The frozen pre-module precision-history source emits six Lean
 module-compatibility warnings when imported into this project; its bytes are
 unchanged.

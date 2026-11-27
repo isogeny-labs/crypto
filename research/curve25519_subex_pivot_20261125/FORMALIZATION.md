@@ -498,8 +498,14 @@ tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
 It now also gives the quantified producer proof from the direct deformation
 sum to the product of child contractions: whole-vertex port correlation,
 packet ownership, isolated vertices, target/source placement, finite Fubini,
-and weighted truncation are explicit. The remaining gap is independent or
-kernel-checked Rust refinement rather than an unstated composition step.
+and weighted truncation are explicit. `lean/GroupFactorization.lean`
+kernel-checks the generic row expansion, finite fiber regrouping, disjoint
+group-assignment Fubini identity, exact addition of 2-adic weights, and
+high-weight vanishing modulo `2^p`. It also proves the nilpotent truncated
+geometric inverse used by the scalar mode series. The remaining gap is the
+code-to-model link from Rust Cauchy valuations, units, modes, and child objects
+to these generic inputs, rather than the finite rearrangement or geometric
+series algebra itself.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

@@ -5,12 +5,14 @@ import ConditionalVariance
 import ConditionalObjective
 import LabelSequence
 import ObjectiveBoundary
+import GroupFactorization
 
 open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
 open Curve25519ConditionalObjective
 open Curve25519LabelSequence
 open Curve25519ObjectiveBoundary
+open Curve25519GroupFactorization
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
@@ -46,3 +48,13 @@ open Curve25519ObjectiveBoundary
 #print axioms final_objective_eq_class_squares
 #print axioms scaled_class_collision_bound
 #print axioms class_cap_for_minimum_labels
+#print axioms row_choice_expansion
+#print axioms packet_row_choice_expansion
+#print axioms partitioned_assignment_factorization
+#print axioms sum_regroup_by_fibers
+#print axioms product_pow_two_weight
+#print axioms pow_two_multiple_vanishes
+#print axioms high_weight_sum_vanishes
+#print axioms shifted_power_nilpotent
+#print axioms nilpotent_geometric_inverse
+#print axioms inverse_eq_nilpotent_geometric

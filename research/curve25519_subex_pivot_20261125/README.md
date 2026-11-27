@@ -437,10 +437,14 @@ positive-dimension cancellation conditions explicit. It also derives
 `nD<=6M` from `KL<=3M` and the exact power-of-two tile/distance identity for
 every admitted coordinate and composes the existing finite precision-history
 theorem with uniform absorption to obtain `pu<=34MD` from explicit path facts;
-its axiom audits contain only Lean/mathlib's standard `propext`,
+it also checks the generic packet row expansion, mode-fiber regrouping,
+group-assignment Fubini identity, 2-adic weight product, and high-weight
+truncation used in C1, together with the nilpotent truncated geometric inverse
+behind the scalar mode expansion. Its axiom audits contain only Lean/mathlib's standard `propext`,
 `Classical.choice`, and `Quot.sound`. Native graph and history bindings, finite
-factorization realization, and the external theorem are not discharged by this
-replay. `[pcc:unverified]`
+factorization realization, Rust-specific scalar valuation mapping, and the
+remaining external theorem refinements are not discharged by this replay.
+`[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled

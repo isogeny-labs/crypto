@@ -2,8 +2,10 @@
 
 This note isolates the algebra implemented by `modes`, `child`,
 `PacketTensor::entry`, and the product over radix groups in `evaluate_at`.
-It is a producer proof target, not an independent or kernel-checked
-refinement. `[pcc:unverified]`
+The finite expansion/Fubini/truncation skeleton and abstract nilpotent
+geometric inverse are kernel-checked separately; mapping the Rust valuations,
+units, and mode coefficients to those inputs remains a refinement target.
+`[pcc:unverified]`
 
 ## Direct deformation semantics
 
@@ -146,16 +148,28 @@ The producer proof is the following finite rearrangement.
    omitted vector has total 2-adic weight at least `p`, so its complete term is
    zero in the working ring.
 
+`lean/GroupFactorization.lean` now kernel-checks the reusable algebra in these
+steps over arbitrary finite types: product-of-row-sums expansion, regrouping by
+finite key fibers, exact addition of powers-of-two weights, equivalence between
+global incidence assignments and dependent group-fiber assignments, finite
+Fubini factorization, and high-weight vanishing in `ZMod (2^p)`. These theorems
+also derive nilpotence from accumulated powers-of-two valuation and prove the
+truncated geometric inverse in an arbitrary commutative ring. They do not
+identify a Rust mode with an algebraic coefficient, bind the Cauchy factor
+valuations and units to that inverse theorem, or show that constructed child
+objects supply the required group-local functions. `[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a
 separate semantic premise, covered by its own native mutation controls.
 `[pcc:unverified]`
 
-This closes the producer-side algebraic composition of C1 items 1–3. What
+This closes the abstract finite rearrangement skeleton of C1 items 1–3. What
 remains is an independent or kernel-checked refinement showing that every
-live Rust object and loop implements the stated finite rearrangement, plus the
-separate interpolation, Hermite, and creation-precision refinements.
+relevant Rust object and loop implements its inputs, plus the scalar mode
+valuation mapping and separate interpolation, Hermite, and creation-precision
+refinements.
 `[pcc:unverified]`
 
 ## Evidence and remaining gate
