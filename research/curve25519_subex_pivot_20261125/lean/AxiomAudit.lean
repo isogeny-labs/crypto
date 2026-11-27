@@ -105,6 +105,7 @@ open Curve25519ExtensionRingModel
 #print axioms degreeFourWitnessArtifactValues
 #print axioms parseRingMultiplicationArtifact_wellFormed
 #print axioms parseCanonicalRingMultiplicationArtifact_canonical
+#print axioms parsedCanonicalRingMultiplicationArtifact_decodes_mul
 #print axioms degreeFourWitnessRecordValues
 #print axioms degreeFourWitnessRecordCanonical
 #print axioms degreeFourPolynomialBits

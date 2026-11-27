@@ -234,6 +234,14 @@ finite sample, not the remaining mechanized Rust compiler refinement or
 authenticated general witness binding.
 `[pcc:unverified]`
 
+The same typed interface projects arbitrary canonical records into dependent
+`Fin degree` lower-bit and coordinate functions. A generic theorem carries any
+successful canonical import to quotient-ring multiplication, conditional only
+on the explicit equality of its product coordinates with the formal native
+transition function. This isolates the remaining arbitrary-record gap as the
+native compiler/replay equality rather than parsing or finite-vector transport.
+`[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a

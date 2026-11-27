@@ -509,6 +509,15 @@ transfer for the fixed sample; it does not authenticate arbitrary
 serialized witnesses into Lean or prove Rust compiler refinement.
 `[pcc:unverified]`
 
+The canonical record interface is also no longer fixed to degree four. Generic
+projections turn any imported lists into `Fin artifact.degree` lower-bit and
+left/right/product coordinate functions over `ZMod (2^artifact.precision)`.
+`parsedCanonicalRingMultiplicationArtifact_decodes_mul` proves that a successful
+canonical import reaches quotient multiplication once an independent replay
+supplies the remaining equality between the serialized product and
+`nativeProductCoordinates`. That equality is precisely the compiler/replay
+binding still missing for arbitrary native records. `[pcc:unverified]`
+
 The formal coefficient ring is no longer left wholly abstract.
 `lean/ExtensionRingModel.lean` defines the native power-basis shape
 `(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate

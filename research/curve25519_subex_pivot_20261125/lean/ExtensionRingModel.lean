@@ -1128,6 +1128,54 @@ theorem parseCanonicalRingMultiplicationArtifact_canonical
   next =>
     simp at hvalidate
 
+/-- Degree-indexed lower-polynomial view of an arbitrary typed artifact. -/
+def RingMultiplicationArtifact.lowerCoefficient
+    (artifact : RingMultiplicationArtifact) (index : Fin artifact.degree) : Bool :=
+  artifact.lowerCoefficients.getD index.val false
+
+/-- Degree-indexed canonical left coordinates of an arbitrary typed artifact. -/
+def RingMultiplicationArtifact.leftCoordinates
+    (artifact : RingMultiplicationArtifact)
+    (index : Fin artifact.degree) : ZMod (2 ^ artifact.precision) :=
+  artifact.left.getD index.val 0
+
+/-- Degree-indexed canonical right coordinates of an arbitrary typed artifact. -/
+def RingMultiplicationArtifact.rightCoordinates
+    (artifact : RingMultiplicationArtifact)
+    (index : Fin artifact.degree) : ZMod (2 ^ artifact.precision) :=
+  artifact.right.getD index.val 0
+
+/-- Degree-indexed canonical product coordinates of an arbitrary typed artifact. -/
+def RingMultiplicationArtifact.productCoordinates
+    (artifact : RingMultiplicationArtifact)
+    (index : Fin artifact.degree) : ZMod (2 ^ artifact.precision) :=
+  artifact.product.getD index.val 0
+
+/-- Generic checked-import endpoint. Once an independent replay establishes that
+the serialized product equals the universal native transition function, the
+imported coordinates decode as quotient-ring multiplication. -/
+theorem parsedCanonicalRingMultiplicationArtifact_decodes_mul
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseCanonicalRingMultiplicationArtifact values = some artifact)
+    (hdegree : 0 < artifact.degree)
+    (hproduct : artifact.productCoordinates =
+      nativeProductCoordinates artifact.precision artifact.degree
+        artifact.lowerCoefficient artifact.leftCoordinates
+        artifact.rightCoordinates) :
+    artifact.canonical = true ∧
+      decodePowerBasis artifact.precision artifact.degree
+          artifact.lowerCoefficient artifact.productCoordinates =
+        decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.leftCoordinates *
+          decodePowerBasis artifact.precision artifact.degree
+            artifact.lowerCoefficient artifact.rightCoordinates := by
+  constructor
+  · exact parseCanonicalRingMultiplicationArtifact_canonical hparse
+  · rw [hproduct]
+    exact decodeNativeProductCoordinates artifact.precision artifact.degree
+      artifact.lowerCoefficient artifact.leftCoordinates
+      artifact.rightCoordinates hdegree
+
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=
   (parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers).getD default

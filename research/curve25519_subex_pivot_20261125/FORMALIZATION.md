@@ -577,6 +577,12 @@ left and right coordinates. The remaining boundary is a mechanized compiler
 refinement from concrete Rust `Vec<BigUint>` execution to the model and an
 authenticated general serialized-witness-to-Lean binding; the current degree-4
 agreement is one finite shared-artifact sample.
+For arbitrary degree and precision, the typed interface now packages imported
+lists as `Fin degree` functions and proves the same decoded quotient-product
+conclusion conditionally on one explicit product-replay equality. Thus parsing,
+shape, polynomial packing, coordinate canonicality, dependent indexing, and
+universal decoding are generic; connecting native execution to that replay
+equality remains the compiler-refinement obligation.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
