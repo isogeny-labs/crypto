@@ -568,6 +568,44 @@ theorem binaryPolynomial_coeff_degree
     · simp [coefficient, h]
   rw [hsum, add_zero]
 
+/-- Every coefficient below the declared degree is exactly its corresponding
+Boolean lower-polynomial bit. -/
+theorem binaryPolynomial_coeff_of_lt
+    (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
+    (hindex : index < degree) :
+    (binaryPolynomial precision degree lowerCoefficient).coeff index =
+      if lowerCoefficient ⟨index, hindex⟩ then 1 else 0 := by
+  let bounded : Fin degree := ⟨index, hindex⟩
+  let coefficient :
+      Polynomial (ZMod (2 ^ precision)) →+ ZMod (2 ^ precision) :=
+    { toFun := fun polynomial => polynomial.coeff index
+      map_zero' := coeff_zero index
+      map_add' := fun left right => coeff_add left right index }
+  have hne : index ≠ degree := Nat.ne_of_lt hindex
+  have hx : (X ^ degree : Polynomial (ZMod (2 ^ precision))).coeff index = 0 := by
+    rw [coeff_X_pow]
+    simp [hne]
+  rw [binaryPolynomial, coeff_add, hx, zero_add]
+  change coefficient
+    (∑ candidate : Fin degree,
+      if lowerCoefficient candidate then monomial (candidate : ℕ) 1 else 0) = _
+  rw [map_sum]
+  have hself :
+      coefficient
+          (if lowerCoefficient bounded then monomial (bounded : ℕ) 1 else 0) =
+        (if lowerCoefficient bounded then 1 else 0) := by
+    by_cases hbit : lowerCoefficient bounded <;>
+      simp [bounded, hbit, coefficient]
+  rw [← hself]
+  apply Finset.sum_eq_single bounded
+  · intro candidate _ hcandidate
+    have hcoe : (candidate : ℕ) ≠ index := by
+      intro heq
+      exact hcandidate (Fin.ext heq)
+    by_cases hbit : lowerCoefficient candidate <;>
+      simp [hbit, coefficient, coeff_monomial, hcoe]
+  · simp
+
 /-- The binary modulus has no coefficient above its declared monic degree. -/
 theorem binaryPolynomial_coeff_eq_zero_of_lt
     (precision degree index : ℕ) (lowerCoefficient : Fin degree → Bool)
@@ -3484,6 +3522,75 @@ theorem firstIrreducibleBinaryPolynomial_exists
       firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1)) with
   | none => exact False.elim (hauxiliary hresult)
   | some result => exact ⟨result, rfl⟩
+
+/-- Lower-bit function used by the extension-ring presentation for a packed
+binary polynomial. -/
+def packedLowerCoefficient (degree packed : ℕ) (index : Fin degree) : Bool :=
+  packed.testBit index
+
+/-- At precision one, the extension-ring modulus built from a packed value's
+lower bits is exactly that value's packed `GF(2)` polynomial. -/
+theorem binaryPolynomial_packedLowerCoefficient
+    (degree packed : ℕ) (hdegree : 0 < degree)
+    (hlog : Nat.log2 packed = degree) :
+    binaryPolynomial 1 degree (packedLowerCoefficient degree packed) =
+      packedGF2Polynomial (degree + 1) packed := by
+  ext index
+  rcases lt_trichotomy index degree with hlt | heq | hgt
+  · let lower : Fin degree := ⟨index, hlt⟩
+    let wide : Fin (degree + 1) := ⟨index, by omega⟩
+    have hleft := binaryPolynomial_coeff_of_lt 1 degree index
+      (packedLowerCoefficient degree packed) hlt
+    have hright := packedGF2Polynomial_coeff (degree + 1) packed wide
+    change (binaryPolynomial 1 degree
+      (packedLowerCoefficient degree packed)).coeff index = _ at hleft
+    change (packedGF2Polynomial (degree + 1) packed).coeff index = _ at hright
+    rw [hleft, hright]
+    rfl
+  · subst index
+    rw [binaryPolynomial_coeff_degree]
+    let top : Fin (degree + 1) := ⟨degree, by omega⟩
+    have hright := packedGF2Polynomial_coeff (degree + 1) packed top
+    dsimp [top] at hright
+    change (packedGF2Polynomial (degree + 1) packed).coeff degree = _ at hright
+    rw [hright]
+    have hpacked : packed ≠ 0 := by
+      intro hzero
+      simp [hzero] at hlog
+      omega
+    have hbit : packed.testBit degree = true := by
+      rw [← hlog]
+      exact Nat.testBit_log2 hpacked
+    simp [hbit]
+  · rw [binaryPolynomial_coeff_eq_zero_of_lt 1 degree index
+      (packedLowerCoefficient degree packed) hgt]
+    rw [packedGF2Polynomial_coeff_eq_zero_of_le
+      (degree + 1) packed index (by omega)]
+
+/-- Every selected packed search result makes the actual precision-one
+extension-ring modulus irreducible. -/
+theorem selectedBinaryPolynomial_irreducible
+    (degree packed : ℕ) (hdegree : 2 ≤ degree)
+    (hselected : firstIrreducibleBinaryPolynomial degree = some packed) :
+    Irreducible (binaryPolynomial 1 degree
+      (packedLowerCoefficient degree packed)) := by
+  have hresult := firstIrreducibleBinaryPolynomial_some_irreducible
+    degree packed hdegree hselected
+  rw [binaryPolynomial_packedLowerCoefficient degree packed (by omega) hresult.1]
+  simpa [hresult.1] using hresult.2
+
+/-- For every degree at least two, the deterministic selector supplies a
+packed value whose lower bits define an irreducible extension-ring modulus. -/
+theorem exists_selectedBinaryPolynomial_irreducible
+    (degree : ℕ) (hdegree : 2 ≤ degree) :
+    ∃ packed,
+      firstIrreducibleBinaryPolynomial degree = some packed ∧
+        Irreducible (binaryPolynomial 1 degree
+          (packedLowerCoefficient degree packed)) := by
+  obtain ⟨packed, hselected⟩ :=
+    firstIrreducibleBinaryPolynomial_exists degree hdegree
+  exact ⟨packed, hselected,
+    selectedBinaryPolynomial_irreducible degree packed hdegree hselected⟩
 
 /-- At degree four the first odd candidate `U^4+1` is rejected while
 `U^4+U+1` is accepted by the native-shaped Rabin predicate. -/

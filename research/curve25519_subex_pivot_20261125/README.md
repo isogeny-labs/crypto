@@ -540,7 +540,11 @@ packs bit-for-bit into an odd natural in the exact enumerated window. Predicate
 completeness and an induction through the bounded search therefore prove that
 the public search returns a result at every degree at least two, and that every
 returned result has exactly the requested degree and is irreducible. A Rust
-compiler refinement of the search remains separate.
+compiler refinement of the search remains separate. The packed lower bits are
+now also proved coefficient-for-coefficient equal to the precision-one
+`binaryPolynomial` used by the extension-ring presentation, so every selected
+value defines an irreducible actual ring modulus, not only an irreducible
+parallel packed decoder.
 `[pcc:unverified]`
 
 The packed-search model now also has a general coefficient-level semantics
@@ -608,7 +612,10 @@ existence, Lean constructs a primitive element of `GF(2^degree)`, proves its
 minimal polynomial monic, irreducible, and of exact degree, packs its support
 into a natural with exact decoder inverse, and places that odd value inside the
 enumerated window. The search is therefore proved to return `some` for every
-`degree>=2`; compiler refinement to concrete Rust execution remains separate.
+`degree>=2`. A generic coefficient bridge identifies those selected bits with
+`binaryPolynomial 1 degree`, and hence proves the modulus used by the formal
+extension-ring type irreducible for every selected result. Compiler refinement
+to concrete Rust execution remains separate.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

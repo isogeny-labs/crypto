@@ -316,7 +316,10 @@ an exact-degree irreducible polynomial. A primitive element of
 degree; support packing proves its bits decode back to that polynomial and its
 nonzero constant coefficient places it in the enumerated odd window. Predicate
 completeness and the bounded-search induction therefore prove that the public
-search succeeds for every degree at least two.
+search succeeds for every degree at least two. The selected packed bits are
+also proved coefficientwise equal to the precision-one `binaryPolynomial` in
+the extension-ring presentation, transferring irreducibility to the actual
+formal modulus at every selected degree.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

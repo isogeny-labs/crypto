@@ -672,7 +672,11 @@ polynomial. Existence is now closed too: the primitive-element theorem for
 support packing and its decoder inverse put that polynomial at an odd index in
 the exact bounded candidate window. Predicate completeness and a second search
 induction prove `firstIrreducibleBinaryPolynomial_exists` for every degree at
-least two. The concrete Rust compiler refinement remains separate.
+least two. `binaryPolynomial_packedLowerCoefficient` then proves the packed
+decoder equals the precision-one `binaryPolynomial` used by `NativeExtension`,
+and `selectedBinaryPolynomial_irreducible` transfers irreducibility to that
+actual modulus for every selected value. The concrete Rust compiler refinement
+remains separate.
 Sources checked: the all-half-degree loop in
 `crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
 `Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X`,

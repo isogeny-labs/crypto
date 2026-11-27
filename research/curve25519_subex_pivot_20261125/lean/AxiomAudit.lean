@@ -73,6 +73,7 @@ open Curve25519ExtensionRingModel
 #print axioms nativeExtension_root_relation
 #print axioms nativeExtension_reduce_high_power
 #print axioms binaryPolynomial_coeff_degree
+#print axioms binaryPolynomial_coeff_of_lt
 #print axioms binaryPolynomial_coeff_eq_zero_of_lt
 #print axioms binaryReductionStep_coeff
 #print axioms binaryReductionStep_coeff_of_lt
@@ -182,6 +183,9 @@ open Curve25519ExtensionRingModel
 #print axioms firstIrreducibleBinaryPolynomialAux_some
 #print axioms firstIrreducibleBinaryPolynomial_some_irreducible
 #print axioms firstIrreducibleBinaryPolynomial_exists
+#print axioms binaryPolynomial_packedLowerCoefficient
+#print axioms selectedBinaryPolynomial_irreducible
+#print axioms exists_selectedBinaryPolynomial_irreducible
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible
