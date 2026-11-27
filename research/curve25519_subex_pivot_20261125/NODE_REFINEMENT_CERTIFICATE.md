@@ -44,8 +44,11 @@ normalized-precision flag rejects at the context gate.
 The checker is generic over finite certificate size: any supplied radix-64
 node satisfying every interface and both source guards is accepted by the same
 code. `PACKING_GUARD_CLOSURE.md` gives the uniform producer induction, while
-the strict root and schema-6 transcript supply compatible schedules. Their
-composition is not yet independently formalized, the live `usize` branch
-cannot allocate such a bundle, and the external contraction theorem remains
-unproved. No practical Curve25519 attack follows.
+the strict root and schema-6 transcript supply compatible schedules.
+`COMPOSITION_BOUNDARY_CERTIFICATE.md` now checks that compatibility and
+falsifies the stronger identification: the schema-6 normalized local witness
+has different `M,K` from the strict root. A parametric implication from generic
+node premises into the history ledger is still needed, the live `usize` branch
+cannot allocate a strict-root bundle, and the external contraction theorem
+remains unproved. No practical Curve25519 attack follows.
 `[pcc:unverified]`

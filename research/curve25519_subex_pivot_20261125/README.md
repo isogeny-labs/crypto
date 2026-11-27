@@ -411,6 +411,15 @@ schema-6 threshold and larger even root exponents. Children do not need to
 retain this symmetric shape: the generic source-guard argument below closes
 their packing and shrink bounds. `[pcc:unverified]`
 
+`COMPOSITION_BOUNDARY_CERTIFICATE.md` independently replays that root beside
+the symbolic-history transcript. It confirms the shared `lambda,u,a` schedule
+and that exact `M/32` source children satisfy the history's `M/8` bound. It
+also exposes the decisive non-identity: the root uses
+`(M,K)=(2^lambda,2^(lambda-a))`, while normalized history rows use
+`(M_norm,K_norm)=(u*2^a,3u)`. The standalone native checker rejects attempts
+to promote schedule compatibility into dimension equality, graph realization,
+external-theorem verification, or a total-work conclusion. `[pcc:unverified]`
+
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
 `M=32<LD=512` child fails exactly at packet padding, while all four two-group
@@ -447,9 +456,11 @@ most `3M`. Each coordinate/group on either side sums `D/64` classes and hence
 has load at most `2M/64`, so a child has at most `M/16` edges. Old degrees are
 preserved and packet degrees are at most `2L<=delta`. At the next call, either
 `Setup` rechecks the same guards or production falls back exactly. Thus child
-symmetry is unnecessary. The remaining boundary is independent refinement of
-this composition and the external factorization/contraction theorem, not
-packing closure. `[pcc:unverified]`
+symmetry is unnecessary. The remaining local boundary is a parametric
+refinement proof connecting generic node premises to the history ledger
+without identifying its normalized exemplar with the strict root; the
+external factorization/contraction theorem remains separate.
+`[pcc:unverified]`
 
 The same certificate now charges the schema-2 factorization-description
 envelope. After the tuple factor, it bounds every remaining JSON/canonical

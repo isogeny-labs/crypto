@@ -21,6 +21,7 @@ pub mod canonical;
 pub mod census;
 pub mod child_provenance_certificate;
 mod collector_metrics;
+pub mod composition_boundary_certificate;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;

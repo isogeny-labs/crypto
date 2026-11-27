@@ -449,6 +449,15 @@
     "observed_gate": "lambda=2^26 transcript passes with a=1024, log2N=33553920, log2degree=33554944, delta exponents [60397977,60397978] and child exponent lambda-5; larger checked even exponents pass; altered degree and odd vertex parity fail",
     "claim_boundary": "explicit infinite parity-compatible strict root family and packing proof; generic child closure is supplied separately by the source-guard lemma; no independent formal composition, external contraction proof or practical Curve25519 attack"
   },
+  "composition_boundary_control": {
+    "note": "research/curve25519_subex_pivot_20261125/COMPOSITION_BOUNDARY_CERTIFICATE.md",
+    "verifier_source": "crates/hashed-ecdl-tensor/src/composition_boundary_certificate.rs",
+    "wire_format": "schema-1 JSON bundle of the symmetric-source and symbolic-history certificates plus six explicit boundary assertions",
+    "checks": "independent component replay; equal lambda/u/a schedule; exact M/32 source shrink implies M/8 history bound; strict-root M=2^lambda,K=2^(lambda-a) is distinct from normalized M=u*2^a,K=3u; unsupported graph, external-theorem and total-work assertions remain false",
+    "observed_gate": "8318-byte threshold transcript reports conditional_premises_only; five focused tests pass for the accepted boundary, component schedule mismatch, source mutations, history mutations and every unsupported promotion",
+    "dependency_boundary": "imports the two standalone component verifiers only, not graph, packing, factorization, contraction or producer implementations",
+    "claim_boundary": "exact schedule and one-step shrink-bound composition plus an executable counterexample to dimension identification; no strict recursion graph realization, external theorem proof, unconditional subexponential bound or practical Curve25519 attack"
+  },
   "symmetric_child_closure_control": {
     "note": "research/curve25519_subex_pivot_20261125/SYMMETRIC_CHILD_CLOSURE.md",
     "source": "crates/hashed-ecdl-tensor/src/contraction/symmetric_child_controls.rs",
@@ -480,5 +489,5 @@
     "complete_library_result": "191 passed; 0 failed in 288.34 seconds; warnings-denied Clippy passes",
     "claim_boundary": "graph-generic producer-side packing/capacity/shrink/degree closure; independent formal refinement, factorization theorem and external contraction theorem remain unverified"
   },
-  "next_gate": "compose the strict root family and graph-generic source-guard closure through the schema-1 node interface and symbolic history as one independently checkable theorem; separately rederive the external factorization/contraction theorem"
+  "next_gate": "build an independently checked parametric one-step refinement from symbolic M,K,L,D,delta,u,a premises into source caps, strict child/fallback guards and the history cost ledger without equating the normalized exemplar to the strict root; separately rederive the external factorization/contraction theorem"
 }
