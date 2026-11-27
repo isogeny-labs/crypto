@@ -196,14 +196,15 @@ native-order fold now threads those states through rows and columns; its
 soundness theorem maintains the exact prefix assignment, and strong induction
 proves accepted arrays equal the original recursive schedule. The artifact
 checker uses this fold, reducing the best observed cold build to 52 seconds.
-The exact-boundary CSV parse, row replay, column replay, and source-guard checks
-now use kernel-only decision reduction in separate modules, joined by separate
-trace and parser receipts. A forced rebuild of the complete path took 40.94
-seconds wall clock, while every individual module meets the original
-sub-30-second module target: the CSV parse is the largest at 23 seconds,
-row/column replay takes 9.5 seconds each, and every remaining stage is under 5
-seconds. The theorem statements and strict-parser claim boundary are unchanged;
-sub-30-second end-to-end wall time remains open.
+The exact-boundary CSV is now embedded as bounded elaboration-time chunks and
+reassembled into the same public string view. Kernel reduction over that
+chunked character view cuts the parse receipt from 23 seconds to 8.6 seconds.
+The parse, row replay, column replay, and source-guard checks remain separate
+parallel modules, while a single final join replaces the former serial
+trace/parser pair. A forced rebuild of the complete path took 27.82 seconds
+wall clock, down from 40.94 seconds (32.0%), meeting the sub-30-second
+end-to-end target. The theorem statements and strict-parser claim boundary are
+unchanged.
 `[pcc:unverified]`
 `executableRowLabels` and `executableColumnLabels` now use well-founded
 prefix recursion to construct the complete native-order schedule. Its exact

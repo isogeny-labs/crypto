@@ -5,6 +5,30 @@ public import BucketStateReplay
 
 @[expose] public section
 
+namespace Curve25519PackingLabelSourceEmbedding
+
+open Lean Elab Term Meta
+
+syntax (name := includeStrChunks) "include_str_chunks " str : term
+
+meta partial def chunkCharacters : List Char → List String
+  | [] => []
+  | characters =>
+      let (chunk, rest) := characters.splitAt 56
+      String.ofList chunk :: chunkCharacters rest
+
+@[term_elab includeStrChunks] meta def elabIncludeStrChunks : TermElab
+  | `(include_str_chunks $path:str), _ => do
+      let context ← readThe Core.Context
+      let sourcePath := System.FilePath.mk context.fileName
+      let sourceDirectory := sourcePath.parent.getD "."
+      let contents ← IO.FS.readFile (sourceDirectory / path.getString)
+      Meta.mkListLit (Lean.mkConst ``String)
+        ((chunkCharacters contents.toList).map Lean.mkStrLit)
+  | _, _ => throwUnsupportedSyntax
+
+end Curve25519PackingLabelSourceEmbedding
+
 /-!
 # Executable packing-label artifact
 
@@ -13,7 +37,7 @@ provenance fixture.  It checks the projection's shape and bounds, then replays
 the exact row-then-column strict-first-minimum schedule from `LabelSequence`.
 The exact-boundary parse, row, column, and source-guard receipts live in
 separate kernel-reduction modules so their independent certificates can build
-in parallel before the final parser receipt is joined.
+in parallel before the final certificate joins them.
 -/
 
 namespace Curve25519PackingLabelArtifact
@@ -28,9 +52,27 @@ row and column labels. -/
 def packingLabelWitnessArtifact : String :=
   include_str ".." / "packing_label_witness.csv"
 
+/-- Dependency anchor for the native exact-boundary projection. -/
+private def packingLabelSourceGuardWitnessRawArtifact : String :=
+  include_str ".." / "packing_label_source_guard_witness.csv"
+
+/-- Bounded elaboration-time chunks of the exact-boundary projection. -/
+def packingLabelSourceGuardWitnessArtifactChunks : List String :=
+  include_str_chunks "../packing_label_source_guard_witness.csv"
+
+/-- Character representation used by kernel replay. -/
+def packingLabelSourceGuardWitnessArtifactCharacters : List Char :=
+  packingLabelSourceGuardWitnessArtifactChunks.flatMap String.toList
+
 /-- Shared native projection at the exact strongest source-class boundary. -/
 def packingLabelSourceGuardWitnessArtifact : String :=
-  include_str ".." / "packing_label_source_guard_witness.csv"
+  String.ofList packingLabelSourceGuardWitnessArtifactCharacters
+
+/-- The public string view and chunked kernel view are exactly the same source. -/
+theorem packingLabelSourceGuardWitnessArtifact_toList :
+    packingLabelSourceGuardWitnessArtifact.toList =
+      packingLabelSourceGuardWitnessArtifactCharacters := by
+  exact String.toList_ofList
 
 /-- Transparent decimal digit parser for the shared projection. -/
 def packingLabelWitnessDigit : Char → Option ℕ
@@ -63,7 +105,7 @@ def packingLabelWitnessNumbers : List ℕ :=
 /-- Parse the exact source-class-boundary projection transparently. -/
 def packingLabelSourceGuardWitnessNumbers : List ℕ :=
   (parsePackingLabelWitness
-    packingLabelSourceGuardWitnessArtifact.toList 0 []).getD []
+    packingLabelSourceGuardWitnessArtifactCharacters 0 []).getD []
 
 /-- Named representation of the compact native projection. -/
 structure PackingLabelArtifact where

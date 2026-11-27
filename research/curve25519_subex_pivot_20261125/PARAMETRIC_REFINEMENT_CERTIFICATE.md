@@ -207,11 +207,11 @@ evidence for two independent claims:
    maintains those invariants and is proved equal to the original recursive
    schedule. Exact-boundary parsing, row replay, column replay, and source-guard
    computation now use kernel-only decision reduction; the independent checks
-   build in parallel and separate trace/parser receipts join the same strict
-   theorem. A forced rebuild took 40.94 seconds wall clock, while the largest
-   individual module took 23 seconds and therefore meets the original
-   sub-30-second module target. End-to-end sub-30-second wall time remains open,
-   and the change does not strengthen the attack claim
+   build in parallel. Bounded elaboration-time CSV chunks cut the kernel parse
+   receipt from 23 seconds to 8.6 seconds, and one final join replaces the
+   former serial trace/parser pair. A forced rebuild took 27.82 seconds wall
+   clock, down from 40.94 seconds (32.0%), meeting the sub-30-second end-to-end
+   target. The change does not strengthen the attack claim
    `[pcc:unverified]`; and
 2. a replayable native path witness instantiating the checked precision theorem:
    initial precision, exact `childPrecision` recurrence, eightfold shrink,

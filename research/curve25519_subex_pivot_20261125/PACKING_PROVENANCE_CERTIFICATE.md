@@ -107,14 +107,14 @@ phases: empty state, exact row/column insertion, and equality of every
 state-derived candidate score with its extensional incidence formula. A
 fuel-bounded single-pass fold now maintains that invariant and is proved equal
 to the original recursive schedule; artifact replay uses it, reducing the best
-observed cold build to 52 seconds. The exact-boundary CSV parse, row replay,
-column replay, and source-guard checks now use Lean's kernel-only decision
-reduction in separate modules. The independent checks build in parallel, while
-separate trace and strict-parser modules retain the original joined acceptance
-statement. A forced complete rebuild took 40.94 seconds wall clock; the largest
-individual module is the 23-second CSV parse, so the original sub-30-second
-module target is met without changing the formal claim boundary. Sub-30-second
-end-to-end wall time remains open.
+observed cold build to 52 seconds. The exact-boundary CSV is now embedded as
+bounded elaboration-time chunks and reassembled into the same public string
+view. Kernel reduction over the chunked character view cuts the parse receipt
+from 23 seconds to 8.6 seconds. Parse, row replay, column replay, and
+source-guard checks remain separate parallel modules, while a single final join
+replaces the former serial trace/parser pair. A forced complete rebuild took
+27.82 seconds wall clock, down from 40.94 seconds (32.0%), meeting the
+sub-30-second end-to-end target without changing the formal claim boundary.
 `[pcc:unverified]`
 
 ## Remaining boundary

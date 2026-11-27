@@ -400,15 +400,14 @@ once through all rows and then all columns; its soundness theorem maintains
 the prefix invariant at every step, and strong induction proves its accepted
 arrays equal the original recursive executable schedule. The artifact checker
 uses that fold, reducing the best observed cold module build to 52 seconds.
-The exact-boundary CSV parse, row replay, column replay, and source guard now
-use Lean's kernel-only decision reduction in separate modules. The independent
-checks build in parallel, then separate trace and parser receipts join the same
-strict acceptance theorem. A forced rebuild of that complete certificate path
-took 40.94 seconds wall clock, but every individual module meets the original
-sub-30-second module target: 23 seconds for the CSV parse, 9.5 seconds for each
-row/column replay, and under 5 seconds for the remaining stages. This is a
-proof-build optimization, not a stronger attack claim; sub-30-second
-end-to-end wall time remains open.
+The exact-boundary CSV is embedded as bounded elaboration-time chunks and
+reassembled into the same public string view. Kernel reduction over the
+chunked character view cuts the parse receipt from 23 seconds to 8.6 seconds.
+The parse, row replay, column replay, and source guard remain separate parallel
+modules, while one final join module replaces the former serial trace/parser
+pair. A forced rebuild of the complete certificate path took 27.82 seconds wall
+clock, down from 40.94 seconds (32.0%), meeting the sub-30-second end-to-end
+target. This is a proof-build optimization, not a stronger attack claim.
 `[pcc:unverified]`
 The formal layer now constructs that complete arbitrary-finite sequence itself:
 well-founded recursion labels rows in native order from their exact prefixes,
