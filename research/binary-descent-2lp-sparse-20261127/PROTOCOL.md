@@ -87,3 +87,24 @@ instances only.
 Pilot outputs: `data/pilot_alpha.jsonl`, `data/pilot_rho_60.jsonl`. They are
 not evaluation data. Part B (arms, rungs, references, predictions, analysis)
 is written and frozen after the pilot and before any evaluation data.
+
+### Amendment A1 (recorded after the first pilot attempt, before its rerun and before any evaluation data)
+
+- **Defect seen in the first pilot attempt** (`data/pilot_alpha_v0_defect.jsonl`,
+  70 records, n = 42 complete and n = 48 34/36; stopped by hand during n = 48/54):
+  on one held-out case (n = 42, ci = 1, ti = 1) at α = 0.045 and 0.067 the
+  solve needed 230 and 67 LA calls. Diagnosis on the same held-out case: one
+  cycle combination cancels completely (an empty row `0 = 0`, i.e. the same
+  relation stored twice); the empty row is a permanent kernel vector of the
+  LA input, #5290's excess pruning never removes it (it drops the heaviest
+  rows), so every Wiedemann attempt returned it (`den = 0`).
+- **Fix:** empty cycle combinations are dropped before the LA (one `h` each,
+  counted as `graph.empty_dropped`); the yield-count identity against #5291's
+  `LpGraph` becomes `yields + empty_dropped = LpGraph yields`. Full rows are
+  untouched, so D2Sall ≡ D-S is unaffected (re-checked: 6/6 identical,
+  `data/selftest_prefreeze_A1.log`). `sparse_la.rs` is unchanged.
+- The pilot is **rerun from scratch** with the fixed binary under the same
+  part A rule; only the rerun (`data/pilot_alpha.jsonl`) chooses β, θ. The
+  defective attempt is kept as a record and chooses nothing. Observed in it
+  (not used): at n = 42 and 48 the cost falls monotonically with α, with
+  α = 1 (the full base, i.e. D-S) cheapest.

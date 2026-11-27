@@ -68,6 +68,10 @@ pub struct Build {
     pub weight_max: u64,
     pub cycle_len_sum: u64,
     pub cycle_len_max: u64,
+    /// cycle combinations that cancel completely (0 = 0, e.g. the same
+    /// decomposition stored twice): carry no information and are dropped
+    /// (amendment A1: kept, they are a permanent useless kernel vector)
+    pub empty_dropped: u64,
 }
 
 pub struct BfsLp {
@@ -282,6 +286,12 @@ impl BfsLp {
                         assert!(acc.cols.iter().all(|&(c, _)| self.is_small(c)));
                     }
                 }
+            }
+            cf.hash();
+            if acc.cols.is_empty() {
+                debug_assert!(acc.b == 0 && acc.a == 0, "an empty combination is 0 = 0");
+                b.empty_dropped += 1;
+                continue;
             }
             b.yields_cycle += 1;
             b.cycle_len_sum += clen;

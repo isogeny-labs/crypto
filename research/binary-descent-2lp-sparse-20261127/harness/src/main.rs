@@ -220,7 +220,7 @@ pub fn run_d2s(c: &Curve, g: Pt, q: Pt, sub: &Sub, np: u32, stream: &[&str], la_
                 let tc = std::time::Instant::now();
                 lp_cmp += 1;
                 let s = l.st;
-                if s.full + s.yields_cycle + s.yields_join != bstat.yields_full + bstat.yields_cycle {
+                if s.full + s.yields_cycle + s.yields_join != bstat.yields_full + bstat.yields_cycle + bstat.empty_dropped {
                     lp_bad += 1;
                 }
                 w_chk += tc.elapsed().as_nanos();
@@ -243,7 +243,7 @@ pub fn run_d2s(c: &Curve, g: Pt, q: Pt, sub: &Sub, np: u32, stream: &[&str], la_
                 }
                 let mut rep = sparse_la::LaReport::default();
                 let dd = sparse_la::solve(&cf_la, &mut cnt, &rows, fs + 1, ell, &mut la_rng, &prm, track, &mut rep);
-                check_log.push(json!({"yields": rows.len(), "y_ub": gr.y_ub(), "targets": ntargets, "core_excess": ex, "core_rows": cr, "core_cols": cc, "la": dd.is_some(),
+                check_log.push(json!({"yields": rows.len(), "yields_b0": ys.iter().filter(|y| y.b == 0).count(), "yields_empty": ys.iter().filter(|y| y.cols.is_empty()).count(), "y_ub": gr.y_ub(), "targets": ntargets, "core_excess": ex, "core_rows": cr, "core_cols": cc, "la": dd.is_some(),
                     "rows_out": rep.rows_out, "cols_out": rep.cols_out, "att": rep.wiedemann_attempts, "den0": rep.wiedemann_den_zero, "fail": rep.wiedemann_fail, "useless": rep.sge_empty_useless}));
                 if let (Some(dv), true) = (dd, track) {
                     let tc = std::time::Instant::now();
@@ -321,6 +321,7 @@ pub fn run_d2s(c: &Curve, g: Pt, q: Pt, sub: &Sub, np: u32, stream: &[&str], la_
             "reduce_steps": b.reduce_steps, "max_reduce_steps": b.max_reduce_steps,
             "yield_weight_mean": b.weight_sum as f64 / (b.yields_full + b.yields_cycle).max(1) as f64, "yield_weight_max": b.weight_max,
             "cycle_len_mean": b.cycle_len_sum as f64 / b.yields_cycle.max(1) as f64, "cycle_len_max": b.cycle_len_max,
+            "empty_dropped": b.empty_dropped,
         },
         "phases": phases_json(&ph), "total": tot.json(), "cost": cost,
         "wall_ns": wall as u64, "check_wall_ns": w_chk as u64,
@@ -397,7 +398,7 @@ fn graph_selftest() {
             if k % (f / 2) == f / 2 - 1 {
                 builds += 1;
                 let (ys, bs) = gr.build(&cf);
-                assert_eq!(ys.len() as u64, lpy, "BFS yields = LpGraph yields (rank identity)");
+                assert_eq!(ys.len() as u64 + bs.empty_dropped, lpy, "BFS yields = LpGraph yields (rank identity)");
                 assert!(ys.len() as u64 <= gr.y_ub());
                 for y in &ys {
                     assert!(y.cols.iter().all(|e| gr.is_small(e.0)));
