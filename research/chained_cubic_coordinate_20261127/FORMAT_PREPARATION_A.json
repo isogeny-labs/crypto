@@ -1,0 +1,53 @@
+{
+  "schema": "chained-format-preparation/v1",
+  "attempt": "A",
+  "exit": 1,
+  "diagnostic": "unclosed curve_identity delimiter in cubic.rs; no compiler or native call yet",
+  "whole_post_attempt_files": {
+    "accounting.rs": {
+      "bytes": 4075,
+      "sha256": "845417b0945cd29d0555a2aed18b234f31a187244bea641e494f04751399da53"
+    },
+    "cubic.rs": {
+      "bytes": 8511,
+      "sha256": "01bdc4b2b11f1fefe7e731f2078f678ce5e2c597022c468f9ef36e5e31c4b8d6"
+    },
+    "field_d.rs": {
+      "bytes": 404,
+      "sha256": "e4f9e13d17dacac315b2d3b2948cb5e9f139de60180324a2b4c4e5e6731c05a7"
+    },
+    "format-edit.stderr": {
+      "bytes": 320,
+      "sha256": "6a3592cc682cb2f9c0da7f4cb3b91300564ce23704c91c6e392fc61066ad283b"
+    },
+    "format-edit.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "main.rs": {
+      "bytes": 11709,
+      "sha256": "0860758c9ff4b480f18b98f55dbcf01ad5d7b2b9766f414c030efd483dab0885"
+    },
+    "rational.rs": {
+      "bytes": 3250,
+      "sha256": "494a3a749d45cfae89aee545c6dbb7d0268ed4997ffff3126fb23993b5e1782c"
+    },
+    "rho.rs": {
+      "bytes": 7919,
+      "sha256": "5a045f158b3aa0a509999b39b7991dde9956e0a9c3af218c61b1bff7c2b67208"
+    }
+  },
+  "corrected_attempt": {
+    "name": "format-edit-v2",
+    "exit": 0,
+    "change": "added the missing curve_identity closing brace; normal formatting only",
+    "stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}
