@@ -258,8 +258,8 @@ shapes over `GF(2)`, proving `U^4+U+1` irreducible; the artifact lower bits are
 proved to decode to the same polynomial. This is the concrete degree-four
 selection and algebraic certificate; the general result below now certifies
 the degree and irreducibility of every successful search result at degree at
-least two, while search existence at every degree and compiler refinement
-remain separate.
+least two and proves that such a result exists at every one of those degrees.
+Compiler refinement remains separate.
 `[pcc:unverified]`
 
 For arbitrary fixed widths, the packed natural representation now decodes to a
@@ -311,8 +311,12 @@ Boolean is therefore equivalent to polynomial irreducibility on that native
 domain. A separate induction through the bounded odd-candidate search proves
 that every returned value has the requested packed degree and passed that
 Boolean. Thus every successful public search result at degree at least two is
-an exact-degree irreducible polynomial. This does not establish that the
-bounded search succeeds for every degree.
+an exact-degree irreducible polynomial. A primitive element of
+`GF(2^degree)` now supplies a monic irreducible minimal polynomial of the exact
+degree; support packing proves its bits decode back to that polynomial and its
+nonzero constant coefficient places it in the enumerated odd window. Predicate
+completeness and the bounded-search induction therefore prove that the public
+search succeeds for every degree at least two.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

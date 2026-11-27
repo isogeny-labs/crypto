@@ -107,6 +107,13 @@ open Curve25519ExtensionRingModel
 #print axioms parseCanonicalRingMultiplicationArtifact_canonical
 #print axioms packedGF2Polynomial_coeff
 #print axioms packedGF2Polynomial_coeff_eq_zero_of_le
+#print axioms gf2PolynomialPacking_testBit
+#print axioms zmodTwo_eq_one_of_ne_zero
+#print axioms packedGF2Polynomial_packing
+#print axioms exists_irreducible_gf2_polynomial
+#print axioms gf2PolynomialPacking_log2
+#print axioms irreducible_coeff_zero_ne
+#print axioms gf2PolynomialPacking_testBit_zero
 #print axioms packedGF2Polynomial_natDegree
 #print axioms packedGF2Polynomial_ne_zero
 #print axioms packedGF2Polynomial_monic
@@ -171,8 +178,10 @@ open Curve25519ExtensionRingModel
 #print axioms gf2Polynomial_irreducible_guard
 #print axioms gf2PackedIrreducible_complete
 #print axioms gf2PackedIrreducible_iff_irreducible
+#print axioms firstIrreducibleBinaryPolynomialAux_ne_none_of_accepts
 #print axioms firstIrreducibleBinaryPolynomialAux_some
 #print axioms firstIrreducibleBinaryPolynomial_some_irreducible
+#print axioms firstIrreducibleBinaryPolynomial_exists
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

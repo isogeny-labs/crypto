@@ -596,10 +596,9 @@ the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
 `U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
 that polynomial. The combined theorem therefore pairs selection with genuine
 irreducibility for this fixture. This closes the degree-four algebraic check.
-The general result below additionally certifies the degree and irreducibility
-of every successful deterministic search result at degree at least two; it
-does not prove that a result exists for every degree. A Rust compiler
-refinement of `Ring::new` remains.
+The general result below additionally proves that the deterministic search
+returns a result at every degree at least two and certifies each result's exact
+degree and irreducibility. A Rust compiler refinement of `Ring::new` remains.
 Complete child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
@@ -668,12 +667,19 @@ and proves that any returned value has the requested `log2` and passed the
 packed predicate. Therefore
 `firstIrreducibleBinaryPolynomial_some_irreducible` certifies every successful
 public search result of degree at least two as an exact-degree irreducible
-polynomial. No theorem here asserts that the bounded search returns `some` at
-every degree, and the compiler refinement remains separate.
+polynomial. Existence is now closed too: the primitive-element theorem for
+`GF(2^degree)` supplies a monic irreducible minimal polynomial of exact degree;
+support packing and its decoder inverse put that polynomial at an odd index in
+the exact bounded candidate window. Predicate completeness and a second search
+induction prove `firstIrreducibleBinaryPolynomial_exists` for every degree at
+least two. The concrete Rust compiler refinement remains separate.
 Sources checked: the all-half-degree loop in
 `crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
-`Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X` theorem in
-`Mathlib.FieldTheory.Finite.Extension`. The repository KB wrapper was
+`Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X`,
+`Field.exists_primitive_element_of_finite_bot`, and
+`Field.primitive_element_iff_minpoly_natDegree_eq` theorems in
+`Mathlib.FieldTheory.Finite.Extension` and
+`Mathlib.FieldTheory.PrimitiveElement`. The repository KB wrapper was
 unavailable because no `research-kb` executable was installed.
 `[pcc:unverified]`
 

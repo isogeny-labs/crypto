@@ -4,7 +4,9 @@ public import GroupFactorization
 public import Mathlib.Data.Fintype.Basic
 public import Mathlib.Data.Nat.Bitwise
 public import Mathlib.Algebra.Polynomial.Degree.IsMonicOfDegree
+public import Mathlib.Combinatorics.Colex
 public import Mathlib.FieldTheory.Finite.Extension
+public import Mathlib.FieldTheory.PrimitiveElement
 public import Mathlib.RingTheory.Polynomial.UniqueFactorization
 
 @[expose] public section
@@ -1186,6 +1188,125 @@ theorem packedGF2Polynomial_coeff_eq_zero_of_le
     omega
   by_cases hbit : value.testBit candidate <;>
     simp [hbit, coefficient, coeff_monomial, hne]
+
+/-- Pack the support of a `GF(2)` polynomial into the corresponding natural
+number bitset. -/
+noncomputable def gf2PolynomialPacking (polynomial : Polynomial (ZMod 2)) : ℕ :=
+  ∑ index ∈ polynomial.support, 2 ^ index
+
+/-- The support packing has a set bit exactly at each nonzero coefficient. -/
+theorem gf2PolynomialPacking_testBit
+    (polynomial : Polynomial (ZMod 2)) (index : ℕ) :
+    (gf2PolynomialPacking polynomial).testBit index = true ↔
+      polynomial.coeff index ≠ 0 := by
+  rw [← Nat.mem_bitIndices]
+  rw [← List.mem_toFinset]
+  rw [gf2PolynomialPacking, Finset.toFinset_bitIndices_sum_two_pow]
+  exact mem_support_iff
+
+/-- Every nonzero element of `GF(2)` is one. -/
+theorem zmodTwo_eq_one_of_ne_zero (value : ZMod 2) (hne : value ≠ 0) :
+    value = 1 := by
+  rcases eq_zero_or_one_of_sq_eq_self (ZMod.pow_card value) with hzero | hone
+  · exact False.elim (hne hzero)
+  · exact hone
+
+/-- Packing and then decoding a `GF(2)` polynomial recovers it exactly. -/
+theorem packedGF2Polynomial_packing
+    (polynomial : Polynomial (ZMod 2)) :
+    packedGF2Polynomial (polynomial.natDegree + 1)
+        (gf2PolynomialPacking polynomial) = polynomial := by
+  ext index
+  by_cases hindex : index < polynomial.natDegree + 1
+  · let bounded : Fin (polynomial.natDegree + 1) := ⟨index, hindex⟩
+    rw [show index = (bounded : ℕ) from rfl]
+    rw [packedGF2Polynomial_coeff]
+    by_cases hcoeff : polynomial.coeff index = 0
+    · have hbit : (gf2PolynomialPacking polynomial).testBit index = false := by
+        apply Bool.eq_false_of_not_eq_true
+        intro htrue
+        exact ((gf2PolynomialPacking_testBit polynomial index).1 htrue) hcoeff
+      rw [hbit]
+      simp only [Bool.false_eq_true, ↓reduceIte]
+      exact hcoeff.symm
+    · have hbit : (gf2PolynomialPacking polynomial).testBit index = true :=
+        (gf2PolynomialPacking_testBit polynomial index).2 hcoeff
+      rw [hbit]
+      simp only [↓reduceIte]
+      exact (zmodTwo_eq_one_of_ne_zero (polynomial.coeff index) hcoeff).symm
+  · have hle : polynomial.natDegree + 1 ≤ index := by omega
+    rw [packedGF2Polynomial_coeff_eq_zero_of_le
+      (polynomial.natDegree + 1) (gf2PolynomialPacking polynomial) index hle]
+    exact (Polynomial.coeff_eq_zero_of_natDegree_lt
+      (p := polynomial) (by omega)).symm
+
+/-- There is a monic irreducible polynomial of every positive degree over
+`GF(2)`, obtained as the minimal polynomial of a primitive element of the
+corresponding Galois field. -/
+theorem exists_irreducible_gf2_polynomial
+    (degree : ℕ) (hdegree : 0 < degree) :
+    ∃ polynomial : Polynomial (ZMod 2),
+      polynomial.Monic ∧ Irreducible polynomial ∧
+        polynomial.natDegree = degree := by
+  let _ : NeZero degree := ⟨hdegree.ne'⟩
+  obtain ⟨generator, hgenerator⟩ :=
+    Field.exists_primitive_element_of_finite_bot (ZMod 2)
+      (GaloisField 2 degree)
+  let polynomial := minpoly (ZMod 2) generator
+  have hintegral : IsIntegral (ZMod 2) generator := IsIntegral.of_finite _ _
+  refine ⟨polynomial, minpoly.monic hintegral, minpoly.irreducible hintegral, ?_⟩
+  have hminpoly :=
+    (Field.primitive_element_iff_minpoly_natDegree_eq (ZMod 2) generator).1
+      hgenerator
+  exact hminpoly.trans (GaloisField.finrank 2 hdegree.ne')
+
+/-- A monic polynomial's support packing has the same leading degree. -/
+theorem gf2PolynomialPacking_log2
+    (polynomial : Polynomial (ZMod 2)) (degree : ℕ)
+    (hmonic : polynomial.Monic) (hdegree : polynomial.natDegree = degree) :
+    Nat.log2 (gf2PolynomialPacking polynomial) = degree := by
+  have hleading : polynomial.coeff degree ≠ 0 := by
+    rw [← hdegree, hmonic.coeff_natDegree]
+    exact one_ne_zero
+  have hbitleading :
+      (gf2PolynomialPacking polynomial).testBit degree = true :=
+    (gf2PolynomialPacking_testBit polynomial degree).2 hleading
+  have hlower : 2 ^ degree ≤ gf2PolynomialPacking polynomial :=
+    Nat.ge_two_pow_of_testBit hbitleading
+  have hupper : gf2PolynomialPacking polynomial < 2 ^ (degree + 1) := by
+    rw [gf2PolynomialPacking]
+    apply Nat.geomSum_lt (by omega)
+    intro index hindex
+    rw [← hdegree]
+    exact Nat.lt_succ_of_le
+      (le_natDegree_of_ne_zero (mem_support_iff.1 hindex))
+  apply (Nat.log2_eq_iff (by omega)).2
+  exact ⟨hlower, hupper⟩
+
+/-- An irreducible polynomial of degree at least two over `GF(2)` has nonzero
+constant coefficient. -/
+theorem irreducible_coeff_zero_ne
+    (polynomial : Polynomial (ZMod 2)) (degree : ℕ)
+    (hirreducible : Irreducible polynomial)
+    (hdegree : polynomial.natDegree = degree) (hdegreeTwo : 2 ≤ degree) :
+    polynomial.coeff 0 ≠ 0 := by
+  intro hzero
+  have hdvd : X ∣ polynomial := Polynomial.X_dvd_iff.mpr hzero
+  have hassociated : Associated X polynomial :=
+    irreducible_X.associated_of_dvd hirreducible hdvd
+  have hdegreeEqual := degree_eq_degree_of_associated hassociated
+  rw [degree_X, degree_eq_natDegree hirreducible.ne_zero, hdegree] at hdegreeEqual
+  have hone : (1 : ℕ) = degree := by exact_mod_cast hdegreeEqual
+  omega
+
+/-- Hence the support packing of such an irreducible polynomial is odd. -/
+theorem gf2PolynomialPacking_testBit_zero
+    (polynomial : Polynomial (ZMod 2)) (degree : ℕ)
+    (hirreducible : Irreducible polynomial)
+    (hdegree : polynomial.natDegree = degree) (hdegreeTwo : 2 ≤ degree) :
+    (gf2PolynomialPacking polynomial).testBit 0 = true :=
+  (gf2PolynomialPacking_testBit polynomial 0).2
+    (irreducible_coeff_zero_ne polynomial degree hirreducible hdegree hdegreeTwo)
 
 /-- If a nonzero packed value's leading bit is inside the decoder window, the
 decoded polynomial degree is exactly the native `log2`. -/
@@ -3200,6 +3321,39 @@ def firstIrreducibleBinaryPolynomial (degree : ℕ) : Option ℕ :=
   if degree == 0 then none
   else firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1))
 
+/-- If any indexed candidate in the remaining odd-pattern window passes the
+packed predicate, the auxiliary search cannot return `none`. -/
+theorem firstIrreducibleBinaryPolynomialAux_ne_none_of_accepts
+    (degree lower remaining offset : ℕ)
+    (hoffset : offset < remaining)
+    (haccepted :
+      gf2PackedIrreducible (2 ^ degree + lower + 2 * offset) degree = true) :
+    firstIrreducibleBinaryPolynomialAux degree lower remaining ≠ none := by
+  induction offset generalizing lower remaining with
+  | zero =>
+      cases remaining with
+      | zero => omega
+      | succ prior =>
+          rw [firstIrreducibleBinaryPolynomialAux]
+          simp only [mul_zero, add_zero] at haccepted
+          simp [haccepted]
+  | succ offset ih =>
+      cases remaining with
+      | zero => omega
+      | succ prior =>
+          rw [firstIrreducibleBinaryPolynomialAux]
+          let candidate := 2 ^ degree + lower
+          by_cases hcurrent : gf2PackedIrreducible candidate degree = true
+          · simp [candidate, hcurrent]
+          · have hcurrentFalse :
+                gf2PackedIrreducible candidate degree = false :=
+              Bool.eq_false_of_not_eq_true hcurrent
+            simp [candidate, hcurrentFalse]
+            apply ih (lower + 2) prior
+            · exact Nat.lt_of_succ_lt_succ hoffset
+            · simpa [Nat.mul_succ, add_assoc, add_left_comm, add_comm] using
+                haccepted
+
 /-- Under the search-window invariant, every successful auxiliary search
 result has the requested leading degree and passed the packed Rabin predicate. -/
 theorem firstIrreducibleBinaryPolynomialAux_some
@@ -3257,6 +3411,79 @@ theorem firstIrreducibleBinaryPolynomial_some_irreducible
   exact ⟨htrace.1,
     (gf2PackedIrreducible_iff_irreducible
       polynomial degree htrace.1 hdegree).1 htrace.2⟩
+
+/-- The public bounded search returns an irreducible polynomial at every degree
+at least two. The proof packs a primitive-element minimal polynomial into the
+exact odd-candidate window and applies predicate completeness. -/
+theorem firstIrreducibleBinaryPolynomial_exists
+    (degree : ℕ) (hdegreeTwo : 2 ≤ degree) :
+    ∃ polynomial,
+      firstIrreducibleBinaryPolynomial degree = some polynomial := by
+  obtain ⟨source, hmonic, hirreducible, hsourceDegree⟩ :=
+    exists_irreducible_gf2_polynomial degree (by omega)
+  let packed := gf2PolynomialPacking source
+  have hlog : Nat.log2 packed = degree :=
+    gf2PolynomialPacking_log2 source degree hmonic hsourceDegree
+  have hpackedNe : packed ≠ 0 := by
+    intro hzero
+    simp [hzero] at hlog
+    omega
+  have hpowers := (Nat.log2_eq_iff hpackedNe).1 hlog
+  have hdecoded :
+      packedGF2Polynomial (Nat.log2 packed + 1) packed = source := by
+    simpa [packed, hlog, hsourceDegree] using packedGF2Polynomial_packing source
+  have haccepted : gf2PackedIrreducible packed degree = true := by
+    apply (gf2PackedIrreducible_iff_irreducible
+      packed degree hlog hdegreeTwo).2
+    rw [hdecoded]
+    exact hirreducible
+  have hbitZero : packed.testBit 0 = true := by
+    dsimp [packed]
+    exact gf2PolynomialPacking_testBit_zero source degree hirreducible
+      hsourceDegree hdegreeTwo
+  have hbodd : packed.bodd = true := by
+    cases hparity : packed.bodd with
+    | false =>
+        have hmod : packed % 2 = 0 := by
+          rw [Nat.mod_two_of_bodd, hparity]
+          rfl
+        have : packed.testBit 0 = false := by
+          simp [Nat.testBit_zero, hmod]
+        exact False.elim (Bool.false_ne_true (this.symm.trans hbitZero))
+    | true => rfl
+  have hdecomposition := Nat.bodd_add_div2 packed
+  rw [hbodd] at hdecomposition
+  simp only [Bool.toNat_true] at hdecomposition
+  have hdegreePower : 2 * 2 ^ (degree - 1) = 2 ^ degree := by
+    rw [two_mul, Nat.two_pow_pred_add_two_pow_pred (by omega)]
+  have hsuccessorPower : 2 ^ (degree + 1) = 2 * 2 ^ degree := by
+    rw [pow_succ]
+    omega
+  have hhalfLower : 2 ^ (degree - 1) ≤ packed.div2 := by
+    omega
+  have hhalfUpper : packed.div2 < 2 ^ degree := by
+    omega
+  let offset := packed.div2 - 2 ^ (degree - 1)
+  have hoffset : offset < 2 ^ (degree - 1) := by
+    dsimp [offset]
+    omega
+  have hpacked : packed = 2 ^ degree + 1 + 2 * offset := by
+    dsimp [offset]
+    omega
+  have hauxiliary :
+      firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1)) ≠
+        none := by
+    apply firstIrreducibleBinaryPolynomialAux_ne_none_of_accepts
+      degree 1 (2 ^ (degree - 1)) offset hoffset
+    rw [← hpacked]
+    exact haccepted
+  unfold firstIrreducibleBinaryPolynomial
+  have hdegreeZero : ¬degree = 0 := by omega
+  simp [hdegreeZero]
+  cases hresult :
+      firstIrreducibleBinaryPolynomialAux degree 1 (2 ^ (degree - 1)) with
+  | none => exact False.elim (hauxiliary hresult)
+  | some result => exact ⟨result, rfl⟩
 
 /-- At degree four the first odd candidate `U^4+1` is rejected while
 `U^4+U+1` is accepted by the native-shaped Rabin predicate. -/

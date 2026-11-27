@@ -534,11 +534,13 @@ every relevant monic factor over `GF(2)` as one of two linear or four quadratic
 shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
 is proved to decode to that polynomial, so packed-search acceptance is paired
 with an independent algebraic irreducibility certificate. The finite claim
-that degree four returns `19` remains fixture-specific; the general theorem
-below now proves that every successful deterministic search at degree at least
-two returns a packed value of exactly the requested degree whose decoded
-polynomial is irreducible. It does not yet prove that the search succeeds for
-every degree, and a Rust compiler refinement of the search remains separate.
+that degree four returns `19` remains fixture-specific. Generically, a primitive
+element of `GF(2^degree)` supplies an irreducible minimal polynomial; its support
+packs bit-for-bit into an odd natural in the exact enumerated window. Predicate
+completeness and an induction through the bounded search therefore prove that
+the public search returns a result at every degree at least two, and that every
+returned result has exactly the requested degree and is irreducible. A Rust
+compiler refinement of the search remains separate.
 `[pcc:unverified]`
 
 The packed-search model now also has a general coefficient-level semantics
@@ -601,9 +603,12 @@ is now proved equivalent to genuine polynomial irreducibility on its native
 exact-degree domain. Finally, induction over the odd-candidate search proves
 that every returned value passed this Boolean predicate and has the requested
 packed degree. Composing the two results certifies every successful public
-search result as an exact-degree irreducible polynomial for `degree>=2`.
-Search existence for every degree and compiler refinement to concrete Rust
-execution remain separate obligations.
+search result as an exact-degree irreducible polynomial for `degree>=2`. For
+existence, Lean constructs a primitive element of `GF(2^degree)`, proves its
+minimal polynomial monic, irreducible, and of exact degree, packs its support
+into a natural with exact decoder inverse, and places that odd value inside the
+enumerated window. The search is therefore proved to return `some` for every
+`degree>=2`; compiler refinement to concrete Rust execution remains separate.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.
