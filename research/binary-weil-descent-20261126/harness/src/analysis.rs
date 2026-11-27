@@ -422,7 +422,7 @@ fn figure(s: &Value) -> String {
     let (x0, x1, y0, y1) = (70.0, 600.0, 30.0, 400.0);
     let rungs = s["rungs"].as_array().unwrap();
     let nmin = 18.0;
-    let nmax = rungs.iter().map(|r| r["n"].as_f64().unwrap()).fold(33.0, f64::max).max(48.0);
+    let nmax = rungs.iter().map(|r| r["n"].as_f64().unwrap()).fold(33.0, f64::max).max(84.0);
     let (lmin, lmax) = (-1.0f64, 6.0f64); // log10 range
     let px = |n: f64| x0 + (n - nmin) / (nmax - nmin) * (x1 - x0);
     let py = |v: f64| y1 - (v.log10().clamp(lmin, lmax) - lmin) / (lmax - lmin) * (y1 - y0);
@@ -439,9 +439,9 @@ fn figure(s: &Value) -> String {
     let mut n = nmin;
     while n <= nmax {
         o += &format!("<text x='{}' y='{}' text-anchor='middle'>{}</text>", px(n), y1 + 16.0, n);
-        n += 3.0;
+        n += 6.0;
     }
-    o += &format!("<text x='{}' y='{}' text-anchor='middle'>n (field F_2^n, subfield n' = n/3)</text>", (x0 + x1) / 2.0, y1 + 34.0);
+    o += &format!("<text x='{}' y='{}' text-anchor='middle'>n (field F_2^n, subfield n' = n/3); right of the last measured rung: model only</text>", (x0 + x1) / 2.0, y1 + 34.0);
     let series = [("D/rho", "#d62728", "D (Weil descent)"), ("M2/rho", "#1f77b4", "M2 (hash MITM, #5253)"), ("F/rho", "#7f7f7f", "F (tuned S4 root finder, #5253)")];
     for (k, (key, col, lab)) in series.iter().enumerate() {
         let mut pts = vec![];
