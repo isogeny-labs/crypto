@@ -744,10 +744,26 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     let serialized_multiplication = serde_json::to_vec(&multiplication_witness).unwrap();
     let multiplication_witness: RingMultiplicationWitness =
         serde_json::from_slice(&serialized_multiplication).unwrap();
+    assert_eq!(multiplication_witness.polynomial, BigUint::from(19u8));
+    assert_eq!(
+        multiplication_witness.lower_coefficients,
+        vec![true, true, false, false]
+    );
+    assert_eq!(multiplication_witness.left, vec![BigUint::from(1u8); 4]);
+    assert_eq!(multiplication_witness.right, vec![BigUint::from(1u8); 4]);
+    assert_eq!(
+        multiplication_witness.product,
+        vec![
+            BigUint::from(30u8),
+            BigUint::from(29u8),
+            BigUint::from(0u8),
+            BigUint::from(3u8),
+        ]
+    );
     let multiplication_summary =
         verify_ring_multiplication_witness(&multiplication_witness, &mut meter).unwrap();
-    assert!(multiplication_summary.convolution_products > 0);
-    assert!(multiplication_summary.reductions > 0);
+    assert_eq!(multiplication_summary.convolution_products, 16);
+    assert_eq!(multiplication_summary.reductions, 6);
     let mut bad_multiplication = multiplication_witness.clone();
     bad_multiplication.product[0] ^= BigUint::from(1u8);
     assert_eq!(

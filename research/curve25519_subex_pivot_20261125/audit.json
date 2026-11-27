@@ -319,7 +319,7 @@
     "checks": "independent Ring::new replay; exact polynomial and lower-bit expansion; canonical coordinate bounds; metered zero-fast-path nested convolution; metered reverse retained-high set-bit reduction; truncation; exact product-vector equality",
     "mutations": "altered product coordinate rejects",
     "formal_checks": "degreeFourPolynomialBits proves packed polynomial 19 equals the monic degree-four bit plus lower bits [1,1,0,0]; degreeFourDenseNativeProduct evaluates the audited source-shaped transitions and proves [1,1,1,1]^2=[30,29,0,3] over ZMod 32",
-    "observed_gate": "dense degree-4 precision-5 inputs round-trip through JSON and replay with positive convolution and reduction counts; the focused exact test, warnings-denied production Clippy and complete native library pass; the 9059-job Lean build and 113-declaration axiom audit pass",
+    "observed_gate": "dense degree-4 precision-5 inputs round-trip through JSON and assert packed polynomial 19, lower bits [1,1,0,0], inputs [1,1,1,1], product [30,29,0,3], 16 convolution products and 6 reductions; the focused exact test, warnings-denied production Clippy and complete 202-test release library pass; the 9059-job Lean build and 113-declaration axiom audit pass",
     "claim_boundary": "bounded native and manually instantiated Lean code-to-transition agreement for one accepted sample; not a mechanized Rust compiler refinement, authenticated automatic witness import, or universal theorem"
   },
   "packet_entry_coefficient_control": {

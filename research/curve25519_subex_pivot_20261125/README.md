@@ -478,7 +478,9 @@ independently replays the zero-fast-path nested convolution, retained-high
 reverse reduction, and final truncation before comparing every product
 coordinate, charging each executed product and reduction. The dense degree-4,
 precision-5 control exercises both convolution and reduction, round-trips
-through JSON, and rejects an altered output coordinate. This is bounded
+through JSON, asserts polynomial `19`, lower bits `[1,1,0,0]`, product
+`[30,29,0,3]`, and exact transition counts `16/6`, and rejects an altered
+output coordinate. This is bounded
 concrete `Vec<BigUint>` code-to-transition
 evidence; it is not a mechanized Rust compiler refinement or a universal Lean
 instantiation. `[pcc:unverified]`
