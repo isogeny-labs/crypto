@@ -88,10 +88,17 @@ impl Transcript {
     }
     fn append_scalar(&mut self, label: &str, s: &BigUint) {
         self.append_label(label);
-        let mut buf = [0u8; 32];
-        let bytes = s.to_bytes_be();
-        buf[32 - bytes.len()..].copy_from_slice(&bytes);
-        self.state.extend_from_slice(&buf);
+        let reduced = s % &self.n;
+        let bytes = reduced.to_bytes_be();
+        if bytes.len() <= 32 {
+            let mut buf = [0u8; 32];
+            buf[32 - bytes.len()..].copy_from_slice(&bytes);
+            self.state.extend_from_slice(&buf);
+        } else {
+            self.state
+                .extend_from_slice(&(bytes.len() as u64).to_be_bytes());
+            self.state.extend_from_slice(&bytes);
+        }
     }
     fn challenge(&mut self, label: &str) -> BigUint {
         self.append_label(label);
@@ -323,6 +330,10 @@ fn ipa_prove(
     }
 }
 
+fn ipa_point_ok(curve: &CurveParams, p: &Point) -> bool {
+    matches!(p, Point::Infinity) || curve.is_valid_public_point(p)
+}
+
 fn ipa_verify(
     curve: &CurveParams,
     p_initial: &Point,
@@ -334,9 +345,32 @@ fn ipa_verify(
 ) -> bool {
     let n = &curve.n;
     let a_fe = curve.a_fe();
+    let n_size = g_vec.len();
+    if n_size == 0 || !n_size.is_power_of_two() || h_vec.len() != n_size {
+        return false;
+    }
+    let k = n_size.trailing_zeros() as usize;
+    if k >= usize::BITS as usize || proof.l_vec.len() != k || proof.r_vec.len() != k {
+        return false;
+    }
+    if &proof.a_final >= n || &proof.b_final >= n {
+        return false;
+    }
+    if !ipa_point_ok(curve, p_initial)
+        || !curve.is_valid_public_point(u)
+        || !g_vec.iter().all(|p| curve.is_valid_public_point(p))
+        || !h_vec.iter().all(|p| curve.is_valid_public_point(p))
+        || !proof
+            .l_vec
+            .iter()
+            .chain(proof.r_vec.iter())
+            .all(|p| ipa_point_ok(curve, p))
+    {
+        return false;
+    }
 
     // Replay challenges.
-    let mut challenges = Vec::with_capacity(proof.l_vec.len());
+    let mut challenges = Vec::with_capacity(k);
     for (l, r) in proof.l_vec.iter().zip(&proof.r_vec) {
         transcript.append_point("L", l);
         transcript.append_point("R", r);
@@ -353,12 +387,11 @@ fn ipa_verify(
 
     // Compute scalars s_i for G basis: s_i = ∏ x_j^{b_ij} where
     // b_ij ∈ {+1, -1} per the bit decomposition of i.
-    let n_size = g_vec.len();
     let mut s: Vec<BigUint> = vec![BigUint::one(); n_size];
-    for i in 0..n_size {
+    for (i, si) in s.iter_mut().enumerate() {
         let mut acc = BigUint::one();
-        for j in 0..challenges.len() {
-            let bit = (i >> (challenges.len() - 1 - j)) & 1;
+        for j in 0..k {
+            let bit = (i >> (k - 1 - j)) & 1;
             let factor = if bit == 1 {
                 &challenges[j]
             } else {
@@ -366,7 +399,7 @@ fn ipa_verify(
             };
             acc = sc_mul(&acc, factor, n);
         }
-        s[i] = acc;
+        *si = acc;
     }
     // s' (for H) = reversed s.
     let s_prime: Vec<BigUint> = s.iter().rev().cloned().collect();
@@ -853,5 +886,95 @@ mod tests {
         let gamma = BigUint::one();
         let proof = range_prove(7, &gamma, &params);
         assert!(!range_verify(&Point::Infinity, &proof, &params));
+    }
+
+    /// Regression tests for VULN-2: `ipa_verify` and `range_verify` must reject
+    /// empty (`k = 0`) rank-1 collapse proofs, mismatched `l_vec`/`r_vec` lengths,
+    /// `k >= usize::BITS` shift-underflow inputs, and oversized scalars without panicking.
+    #[test]
+    fn ipa_verify_rejects_malformed_round_lengths_and_scalars() {
+        let curve = CurveParams::secp256k1();
+        let g_vec = nums_generators(&curve, "test/G", 8);
+        let h_vec = nums_generators(&curve, "test/H", 8);
+        let u = pedersen_second_generator(&curve);
+        let a_fe = curve.a_fe();
+
+        // Rank-1 k = 0 forgery attempt: P = 2·(Σ G_i) + 3·(Σ H_i) + 6·u with empty L/R.
+        let ones = vec![BigUint::one(); 8];
+        let sum_g = msm(&g_vec, &ones, &a_fe);
+        let sum_h = msm(&h_vec, &ones, &a_fe);
+        let p_forged = sum_g
+            .scalar_mul(&BigUint::from(2u32), &a_fe)
+            .add(&sum_h.scalar_mul(&BigUint::from(3u32), &a_fe), &a_fe)
+            .add(&u.scalar_mul(&BigUint::from(6u32), &a_fe), &a_fe);
+        let zero_round = InnerProductProof {
+            l_vec: vec![],
+            r_vec: vec![],
+            a_final: BigUint::from(2u32),
+            b_final: BigUint::from(3u32),
+        };
+        assert!(!ipa_verify(
+            &curve,
+            &p_forged,
+            &g_vec,
+            &h_vec,
+            &u,
+            &zero_round,
+            &mut Transcript::new(&curve)
+        ));
+
+        // Mismatched L/R vector lengths must fail.
+        let a: Vec<BigUint> = (1..=8).map(|i| BigUint::from(i as u32)).collect();
+        let b: Vec<BigUint> = (1..=8).map(|i| BigUint::from((i * 2) as u32)).collect();
+        let c = vec_inner(&a, &b, &curve.n);
+        let p = msm(&g_vec, &a, &a_fe)
+            .add(&msm(&h_vec, &b, &a_fe), &a_fe)
+            .add(&u.scalar_mul(&c, &a_fe), &a_fe);
+        let mut honest = ipa_prove(
+            &curve,
+            g_vec.clone(),
+            h_vec.clone(),
+            &u,
+            a,
+            b,
+            &mut Transcript::new(&curve),
+        );
+        honest.r_vec.push(g_vec[0].clone());
+        assert!(!ipa_verify(
+            &curve,
+            &p,
+            &g_vec,
+            &h_vec,
+            &u,
+            &honest,
+            &mut Transcript::new(&curve)
+        ));
+
+        // 65 rounds (usize shift-underflow trigger) must return false without panicking.
+        let huge_rounds = InnerProductProof {
+            l_vec: vec![g_vec[0].clone(); 65],
+            r_vec: vec![h_vec[0].clone(); 65],
+            a_final: BigUint::one(),
+            b_final: BigUint::one(),
+        };
+        assert!(!ipa_verify(
+            &curve,
+            &p,
+            &g_vec,
+            &h_vec,
+            &u,
+            &huge_rounds,
+            &mut Transcript::new(&curve)
+        ));
+
+        // Oversized (>32-byte) scalar in RangeProof must return false without panicking.
+        let params = PedersenParams::standard(CurveParams::secp256k1());
+        let gamma = BigUint::one();
+        let v_commit = v_commitment(7, &gamma, &params);
+        let mut rproof = range_prove(7, &gamma, &params);
+        rproof.ipa.a_final = BigUint::one() << 300;
+        assert!(!range_verify(&v_commit, &rproof, &params));
+        let mut t = Transcript::new(&curve);
+        t.append_scalar("oversized", &(BigUint::one() << 300));
     }
 }
