@@ -237,6 +237,7 @@ mod trace_zero_word_field;
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
 pub use ecdl_tensor_ic as tensor_ic;
 pub mod binary_radical_root;
+pub mod binary_factored_wide;
 pub mod dreg_forecast;
 pub mod dreg_prior_table;
 pub mod fp_gemm;
