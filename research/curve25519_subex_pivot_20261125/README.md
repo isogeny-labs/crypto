@@ -440,10 +440,14 @@ theorem with uniform absorption to obtain `pu<=34MD` from explicit path facts;
 it also checks the generic packet row expansion, mode-fiber regrouping,
 group-assignment Fubini identity, 2-adic weight product, and high-weight
 truncation used in C1, together with the nilpotent truncated geometric inverse
-behind the scalar mode expansion. Its axiom audits contain only Lean/mathlib's standard `propext`,
-`Classical.choice`, and `Quot.sound`. Native graph and history bindings, finite
-factorization realization, Rust-specific scalar valuation mapping, and the
-remaining external theorem refinements are not discharged by this replay.
+behind the scalar mode expansion. The scalar proof now retains the exact
+geometric remainder, derives the normalized tile shift `2^(i+1-v)j`, and proves
+that Rust's outer `2^(a+1-v)` factor kills the first omitted coefficient under
+the source guard `v<=i<=a`. Its axiom audits contain only Lean/mathlib's
+standard `propext`, `Classical.choice`, and `Quot.sound`. Native graph and
+history bindings, finite factorization realization, concrete Rust-object to
+formal-value bindings, and the remaining external theorem refinements are not
+discharged by this replay.
 `[pcc:unverified]`
 
 The formal replay also covers the `2M delta` bipartite degree-square budget,

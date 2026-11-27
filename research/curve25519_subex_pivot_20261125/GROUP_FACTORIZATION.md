@@ -154,10 +154,17 @@ finite key fibers, exact addition of powers-of-two weights, equivalence between
 global incidence assignments and dependent group-fiber assignments, finite
 Fubini factorization, and high-weight vanishing in `ZMod (2^p)`. These theorems
 also derive nilpotence from accumulated powers-of-two valuation and prove the
-truncated geometric inverse in an arbitrary commutative ring. They do not
-identify a Rust mode with an algebraic coefficient, bind the Cauchy factor
-valuations and units to that inverse theorem, or show that constructed child
-objects supply the required group-local functions. `[pcc:unverified]`
+truncated geometric inverse in an arbitrary commutative ring. The scalar bridge
+also proves the exact normalized tile identity
+`2^v(base-2^(i+1-v)j)=2^v base-2^(i+1)j`. Rather than assuming the inverse
+ratio is already nilpotent, it retains the next-power geometric remainder and
+proves that Rust's outer `2^(a+1-v)` shift kills that remainder when
+`v<=i<=a` and the coefficient ring satisfies `2^p=0`. Thus the exact
+`b=0..p-2` coefficient shape and cutoff used by `mode_coefficient` are
+kernel-checked. These theorems still do not identify a concrete Rust factor or
+inverse with the formal ring values, identify every Rust mode with an
+algebraic coefficient, or show that constructed child objects supply the
+required group-local functions. `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
@@ -168,7 +175,7 @@ separate semantic premise, covered by its own native mutation controls.
 This closes the abstract finite rearrangement skeleton of C1 items 1–3. What
 remains is an independent or kernel-checked refinement showing that every
 relevant Rust object and loop implements its inputs, plus the scalar mode
-valuation mapping and separate interpolation, Hermite, and creation-precision
+object binding and separate interpolation, Hermite, and creation-precision
 refinements.
 `[pcc:unverified]`
 

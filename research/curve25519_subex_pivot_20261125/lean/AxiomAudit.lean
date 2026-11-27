@@ -56,5 +56,12 @@ open Curve25519GroupFactorization
 #print axioms pow_two_multiple_vanishes
 #print axioms high_weight_sum_vanishes
 #print axioms shifted_power_nilpotent
+#print axioms shifted_power_nilpotent_of_pow_eq_zero
+#print axioms shifted_power_with_base_vanishes_of_pow_eq_zero
+#print axioms cauchy_tile_denominator_identity
+#print axioms geometric_inverse_partial_product
 #print axioms nilpotent_geometric_inverse
 #print axioms inverse_eq_nilpotent_geometric
+#print axioms inverse_eq_geometric_add_remainder
+#print axioms cauchy_weight_mode_series
+#print axioms cauchy_weight_mode_series_at_precision
