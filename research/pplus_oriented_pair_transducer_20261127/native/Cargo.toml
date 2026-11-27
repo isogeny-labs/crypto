@@ -1,0 +1,19 @@
+[package]
+name = "pplus-oriented-pair-transducer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "pair-transducer"
+path = "src/bin/pair_transducer.rs"
+
+[[bin]]
+name = "pair-transducer-verify"
+path = "src/bin/pair_transducer_verify.rs"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[workspace]
