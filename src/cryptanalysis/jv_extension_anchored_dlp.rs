@@ -28,9 +28,10 @@ use super::quadratic_pair_relation::{self as pair, Certificate as PairCert, Spli
 use super::quartic_discriminant as discriminant;
 use super::sparse_collection_rank::{Options as RankOptions, Tracker};
 use crate::cryptanalysis::jv_anchored_descent::{
-    count_quadratic_universe, decompose_residual_anchored_ref, harvest_frustrated_cycle_anchors,
-    AnchorRecord, AnchorTable, AnchoredDescentCert, CycleHarvestStats, DescentMode,
-    LocalTraceState, PatternHistogram, UnanchoredEdge, UniverseCensus,
+    count_quadratic_universe, decompose_residual_anchored_with_knobs,
+    harvest_frustrated_cycle_anchors, AnchorRecord, AnchorTable, AnchoredDescentCert,
+    CycleHarvestStats, DescentKnobs, DescentMode, LocalTraceState, PatternHistogram,
+    UnanchoredEdge, UniverseCensus,
 };
 use crate::cryptanalysis::jv_bitops::{self as work, Kind, OpTally, Phase};
 use crate::cryptanalysis::jv_cover::{self as cover, Ctx, EllE, Fld, Fq, Spec, E2};
@@ -42,9 +43,15 @@ use crate::cryptanalysis::jv_sieve::{
     two_large_prime::{CountedRelationSystem, TwoLargePrimeSieve},
     Counters, FpRing, HitBuckets, Line,
 };
+use crate::cryptanalysis::jv_sieve_fast_m9::{
+    build_inv_2w_sq_table, build_inv_table, extract_2lp_source_fast,
+    lines_for_b_frob_stickelberger_m9, lines_for_b_partition_m9, sieve_line_buckets_fast,
+    sieve_line_buckets_zero_mul, FastSieveScratch, SharedBFast,
+};
 use crate::cryptanalysis::jv_signed_matroid_graph::{
     MatroidOptions, MatroidStats, SignedMatroidGraph,
 };
+use crate::cryptanalysis::jv_sparse_markowitz::{SparseMarkowitzTracker, WiedemannTracker};
 use crate::cryptanalysis::large_prime_filter::{
     filter_large_primes, filter_large_primes_mst_with, LargePrimeFilterOptions, MstLimits,
     MstStrategy, PartialRelation,
@@ -138,6 +145,78 @@ impl Default for AnchoredPipelineOptions {
             sparse_rank: RankOptions::default(),
             split: SplitOptions::default(),
         }
+    }
+}
+
+/// Composable algorithmic levers for the multi-round hillclimb study.
+/// `HillclimbConfig::round1_default()` reproduces Round 1 bit-for-bit.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HillclimbConfig {
+    /// Optional explicit arm label override in the output bundle.
+    pub custom_label: Option<&'static str>,
+    /// Phase-2 LA: use Online Incremental Minimum-Markowitz SGE instead of Lanczos checkpoints.
+    pub sparse_markowitz_la: bool,
+    /// Phase-1 Line Enumeration & Sieve: use Partition-Direct `m = 9` line factorization
+    /// + precomputed `F_p` inverse table + single-flush stack `sieve_line_buckets_fast`.
+    pub partition_fast_sieve: bool,
+    /// Phase-1 Extraction: use Stickelberger-screened stack `extract_2lp_source_fast`
+    /// with deferred ordinate checks and zero `FieldInv`s.
+    pub stickelberger_fast_extract: bool,
+    /// Phase-1/2 Batching: widen `roots_by_incidence` batch (`e.g. 4096`) while checking
+    /// incremental Markowitz rank at fine sub-batch cadence (`e.g. 64` planes, `surplus = 1`).
+    pub incidence_batch_size: usize,
+    pub rank_check_subbatch: usize,
+    pub markowitz_surplus: Option<usize>,
+    pub markowitz_stride: Option<usize>,
+    /// Phase-3 Descent: stack/table sextic post-screening + deterministic resolvent `(2, 2)` split.
+    pub descent_fast_sextic: bool,
+    /// Phase-3 Descent: flat-array 5-variable unit elimination (`d_0` linear substitution).
+    pub descent_unit_five: bool,
+    /// Phase-3 Descent: optional `StopMode::Hilbert(c)` override (`None` => `Staircase(64)`).
+    pub descent_hilbert_stop: Option<usize>,
+    /// Phase-1/3 Balance: scan `extra_b_after_rank` extra `B`-planes after rank certification
+    /// to harvest additional anchors before starting Phase-3 descent.
+    pub extra_b_after_rank: u64,
+    /// Phase-1/3 Balance: sub-sample rational factor base to `factor_base_pct` percent (`100` => full).
+    pub factor_base_pct: u8,
+    /// Graph Hyperedge Extension: test up to `N` `cnt == 3` (`3-LP`) candidates on lines that
+    /// already produced at least one `cnt >= 5` hit.
+    pub selective_3lp_on_productive_lines: usize,
+    /// Phase-2 LA: Addition-chain Scalar Wiedemann homogeneous kernel solver (`0` fill-in, `0` ModrMuls on small entries).
+    pub wiedemann_la: bool,
+    /// Phase-1 Sieve: `inv_2w_sq[A_1'(x)]` lookup + degree-4 `A_1'` forward differences + pre-scaled `SharedBFast`.
+    pub zero_mul_sieve: bool,
+    /// Phase-1 Line Enumeration: Stickelberger G-discriminant character filter + squaring-built Frobenius matrix.
+    pub frob_stickelberger_sieve: bool,
+}
+
+impl HillclimbConfig {
+    pub const fn round1_default() -> Self {
+        Self {
+            custom_label: None,
+            sparse_markowitz_la: false,
+            partition_fast_sieve: false,
+            stickelberger_fast_extract: false,
+            incidence_batch_size: 1024,
+            rank_check_subbatch: 1024,
+            markowitz_surplus: None,
+            markowitz_stride: None,
+            descent_fast_sextic: false,
+            descent_unit_five: false,
+            descent_hilbert_stop: None,
+            extra_b_after_rank: 0,
+            factor_base_pct: 100,
+            selective_3lp_on_productive_lines: 0,
+            wiedemann_la: false,
+            zero_mul_sieve: false,
+            frob_stickelberger_sieve: false,
+        }
+    }
+}
+
+impl Default for HillclimbConfig {
+    fn default() -> Self {
+        Self::round1_default()
     }
 }
 
@@ -1178,7 +1257,23 @@ pub fn run_anchored_ic_dlp_on(
     seed: u64,
     options: AnchoredPipelineOptions,
 ) -> Result<AnchoredSolveBundle, String> {
+    run_anchored_ic_dlp_with_config(spec, seed, options, HillclimbConfig::round1_default())
+}
+
+/// Execute one cold, end-to-end extension-field graph-IC discrete-logarithm solve
+/// under an explicit [`HillclimbConfig`].
+///
+/// `spec.d` is never read anywhere in this function.
+pub fn run_anchored_ic_dlp_with_config(
+    spec: &Spec,
+    seed: u64,
+    options: AnchoredPipelineOptions,
+    hc: HillclimbConfig,
+) -> Result<AnchoredSolveBundle, String> {
     options.sparse_rank.validate()?;
+    if !(10..=100).contains(&hc.factor_base_pct) {
+        return Err("factor_base_pct must lie in 10..=100".into());
+    }
     if !(101..=1511).contains(&spec.p)
         || !(3..1u64 << 63).contains(&spec.l)
         || !is_prime_u64(spec.p)
@@ -1233,8 +1328,16 @@ pub fn run_anchored_ic_dlp_on(
         let (base, config, base_by_x, by_x_map) = {
             let _fb = work::enter(Phase::FactorBase);
             let mut base_rng = StdRng::seed_from_u64(seed ^ 0xBACE_0001);
-            let base = cover::factor_base(&ctx, &mut base_rng);
-            let config = TwoLargePrimeSieve::new(&ctx, &base, base.len(), 9)?;
+            let full_base = cover::factor_base(&ctx, &mut base_rng);
+            let keep_len = if hc.factor_base_pct < 100 {
+                ((full_base.len() * hc.factor_base_pct as usize) / 100)
+                    .max(16)
+                    .min(full_base.len())
+            } else {
+                full_base.len()
+            };
+            let config = TwoLargePrimeSieve::new(&ctx, &full_base, keep_len, 9)?;
+            let base = config.base().to_vec();
             let mut base_by_x = vec![u32::MAX; spec.p as usize];
             let mut by_x_map = HashMap::with_capacity(base.len());
             for (i, b) in base.iter().enumerate() {
@@ -1250,6 +1353,22 @@ pub fn run_anchored_ic_dlp_on(
         let t_rel = Instant::now();
         let relation_guard = work::enter(Phase::Relations);
         let ring = FpRing::new(spec.p);
+        let inv_fp = (hc.partition_fast_sieve
+            || hc.zero_mul_sieve
+            || hc.frob_stickelberger_sieve
+            || hc.stickelberger_fast_extract
+            || hc.descent_fast_sextic
+            || hc.descent_unit_five)
+            .then(|| build_inv_table(spec.p));
+        let inv_2w_sq = hc.zero_mul_sieve.then(|| {
+            build_inv_2w_sq_table(
+                spec.p,
+                config.setup().w,
+                inv_fp.as_deref().expect("inv_fp built"),
+            )
+        });
+        let mut fast_sieve_scratch =
+            (hc.partition_fast_sieve && !hc.zero_mul_sieve).then(|| FastSieveScratch::new(spec.p));
         let screen_ctx = (options.collector.is_two_lp() || options.collector.is_matroid())
             .then(|| discriminant::Context::new(&ring))
             .transpose()?;
@@ -1277,6 +1396,31 @@ pub fn run_anchored_ic_dlp_on(
             seed ^ 0x5A46_4B45_524E_454C,
             options.sparse_rank,
         )?;
+        let mut wiedemann = if hc.wiedemann_la {
+            Some(WiedemannTracker::new(
+                spec.l,
+                base.len(),
+                seed ^ 0x5749_4544_454D_414E,
+                hc.markowitz_surplus.unwrap_or(4),
+                hc.markowitz_stride.unwrap_or(8),
+                options.sparse_rank.max_checkpoints.max(32),
+            )?)
+        } else {
+            None
+        };
+        let mut markowitz = if !hc.wiedemann_la && hc.sparse_markowitz_la {
+            Some(SparseMarkowitzTracker::new(
+                spec.l,
+                base.len(),
+                hc.markowitz_surplus.unwrap_or(options.sparse_rank.surplus),
+                hc.markowitz_stride
+                    .unwrap_or(options.sparse_rank.failed_checkpoint_stride),
+                options.sparse_rank.max_checkpoints.max(32),
+            )?)
+        } else {
+            None
+        };
+        let mut rank_certified_at_b: Option<u64> = None;
 
         let mut all_sources: Vec<ReferencedSource> = Vec::new();
         let mut projections: Vec<Vec<(usize, u64)>> = Vec::new();
@@ -1318,9 +1462,15 @@ pub fn run_anchored_ic_dlp_on(
         let mut proj_small_buf = Vec::<(usize, i64)>::with_capacity(256);
         let mut proj_large_buf = Vec::<([u64; 6], i64)>::with_capacity(64);
 
+        let inc_batch = hc.incidence_batch_size.max(64) as u128;
+        let subbatch = hc
+            .rank_check_subbatch
+            .max(1)
+            .min(hc.incidence_batch_size.max(64));
+
         'collect: while (b_scanned as u128) < b_budget {
             let begin = b_scanned;
-            let end = ((begin as u128 + 1024).min(b_budget)) as u64;
+            let end = ((begin as u128 + inc_batch).min(b_budget)) as u64;
             let batch: Vec<_> = (begin..end)
                 .map(|k| sieve::b_from_index(config.setup(), k as u128, scramble))
                 .collect();
@@ -1328,16 +1478,44 @@ pub fn run_anchored_ic_dlp_on(
             let hints = sieve::roots_by_incidence(spec.p, &nu, &ab, &mut slot).0;
 
             for (offset, b) in batch.iter().enumerate() {
-                let found = sieve::lines_for_b_hint(
-                    &ring,
-                    &ctx.f.f,
-                    config.setup(),
-                    b,
-                    &mut enum_rng,
-                    true,
-                    hints[offset].as_deref(),
-                );
-                let shared = if found.len() >= 2 {
+                let found = if hc.frob_stickelberger_sieve {
+                    lines_for_b_frob_stickelberger_m9(
+                        &ring,
+                        &ctx.f.f,
+                        config.setup(),
+                        b,
+                        inv_fp.as_deref().expect("inv_fp built"),
+                        &mut enum_rng,
+                        hints[offset].as_deref(),
+                    )
+                } else if hc.partition_fast_sieve {
+                    lines_for_b_partition_m9(
+                        &ring,
+                        &ctx.f.f,
+                        config.setup(),
+                        b,
+                        inv_fp.as_deref().expect("inv_fp built"),
+                        &mut enum_rng,
+                        hints[offset].as_deref(),
+                    )
+                } else {
+                    sieve::lines_for_b_hint(
+                        &ring,
+                        &ctx.f.f,
+                        config.setup(),
+                        b,
+                        &mut enum_rng,
+                        true,
+                        hints[offset].as_deref(),
+                    )
+                };
+                let use_zero_mul_sieve = hc.zero_mul_sieve && options.collector.is_matroid();
+                let shared_fast = if use_zero_mul_sieve && found.len() >= 2 {
+                    Some(SharedBFast::build(config.setup(), &found[0]))
+                } else {
+                    None
+                };
+                let shared = if !use_zero_mul_sieve && found.len() >= 2 {
                     Some(sieve::shared_for_b(&ring, &found[0], &mut 0))
                 } else {
                     None
@@ -1346,57 +1524,114 @@ pub fn run_anchored_ic_dlp_on(
                     lines_tested += 1;
                     if options.collector.is_matroid() {
                         let max_arity = options.collector.max_arity();
-                        let min_hits = if max_arity >= 3 { 3u8 } else { 5u8 };
+                        let allow_selective_3lp = hc.selective_3lp_on_productive_lines > 0;
+                        let min_hits = if max_arity >= 3 || allow_selective_3lp {
+                            3u8
+                        } else {
+                            5u8
+                        };
                         let buckets = hit_buckets.as_mut().expect("matroid hit buckets");
-                        let (mut hits, _) = sieve::sieve_line_buckets(
-                            &ring,
-                            config.setup(),
-                            &line,
-                            buckets,
-                            shared.as_ref(),
-                            min_hits,
-                        );
+                        let (mut hits, _) = if hc.zero_mul_sieve {
+                            sieve_line_buckets_zero_mul(
+                                config.setup(),
+                                &line,
+                                inv_fp.as_deref().expect("inv_fp built"),
+                                inv_2w_sq.as_deref().expect("inv_2w_sq built"),
+                                buckets,
+                                shared_fast.as_ref(),
+                                min_hits,
+                            )
+                        } else if hc.partition_fast_sieve {
+                            sieve_line_buckets_fast(
+                                config.setup(),
+                                &line,
+                                inv_fp.as_deref().expect("inv_fp built"),
+                                buckets,
+                                fast_sieve_scratch.as_mut().expect("sieve scratch"),
+                                shared.as_ref(),
+                                min_hits,
+                            )
+                        } else {
+                            sieve::sieve_line_buckets(
+                                &ring,
+                                config.setup(),
+                                &line,
+                                buckets,
+                                shared.as_ref(),
+                                min_hits,
+                            )
+                        };
                         hits.sort_unstable();
                         work::words((hits.len() * 2) as u64);
                         let mut three_lp_tested_on_line = 0usize;
+                        let mut line_yielded_2lp = false;
                         for pass in 0..2 {
                             for &s in &hits {
                                 let raw_xs = buckets.hits_for(s);
                                 let cnt = raw_xs.len();
-                                if pass == 0 {
+                                let eff_max_arity = if pass == 0 {
                                     if !matches!(cnt, 5 | 7 | 9) {
                                         continue;
                                     }
+                                    2usize
                                 } else {
-                                    if max_arity < 3 || cnt != 3 || three_lp_tested_on_line >= 2 {
+                                    let cap_3lp = if max_arity >= 3 {
+                                        2usize
+                                    } else if allow_selective_3lp && line_yielded_2lp {
+                                        hc.selective_3lp_on_productive_lines
+                                    } else {
+                                        0usize
+                                    };
+                                    if cnt != 3 || three_lp_tested_on_line >= cap_3lp {
                                         continue;
                                     }
                                     three_lp_tested_on_line += 1;
-                                }
+                                    3usize
+                                };
                                 candidates_tested += 1;
                                 if screen_refusals as usize >= options.max_screen_refusals {
                                     stop_reason = "discriminant refusal resource cap".into();
                                     b_scanned = begin + offset as u64;
                                     break 'collect;
                                 }
-                                let Ok(mut src) = extract_partial_source_matroid(
-                                    &ctx,
-                                    &ring,
-                                    &config,
-                                    &base_by_x,
-                                    &line,
-                                    s,
-                                    raw_xs,
-                                    max_arity,
-                                    options.split,
-                                    &mut split_rng,
-                                    screen_ctx.as_ref(),
-                                    &mut screen_calls,
-                                    &mut screen_refusals,
-                                ) else {
+                                let src_res = if pass == 0 && hc.stickelberger_fast_extract {
+                                    extract_2lp_source_fast(
+                                        &ctx,
+                                        &config,
+                                        &base,
+                                        &base_by_x,
+                                        inv_fp.as_deref().expect("inv_fp built"),
+                                        &line,
+                                        s,
+                                        raw_xs,
+                                        screen_ctx.as_ref(),
+                                        &mut screen_calls,
+                                        &mut screen_refusals,
+                                    )
+                                } else {
+                                    extract_partial_source_matroid(
+                                        &ctx,
+                                        &ring,
+                                        &config,
+                                        &base_by_x,
+                                        &line,
+                                        s,
+                                        raw_xs,
+                                        eff_max_arity,
+                                        options.split,
+                                        &mut split_rng,
+                                        screen_ctx.as_ref(),
+                                        &mut screen_calls,
+                                        &mut screen_refusals,
+                                    )
+                                };
+                                let Ok(mut src) = src_res else {
                                     candidates_refused += 1;
                                     continue;
                                 };
+                                if pass == 0 {
+                                    line_yielded_2lp = true;
+                                }
                                 if all_sources.len() >= options.max_sources {
                                     stop_reason = "source resource cap".into();
                                     b_scanned = begin + offset as u64;
@@ -1620,26 +1855,90 @@ pub fn run_anchored_ic_dlp_on(
                         }
                     }
                 }
+                if let Some(wd) = wiedemann.as_mut() {
+                    let cur_b = begin + offset as u64 + 1;
+                    let at_sub = (offset + 1) % subbatch == 0 || offset + 1 == batch.len();
+                    if at_sub && rank_certified_at_b.is_none() && wd.due(projections.len()) {
+                        let t_la_chk = Instant::now();
+                        let _la = work::enter(Phase::LinearAlgebra);
+                        wd.check(cur_b, &projections)?;
+                        la_wall_during_rel += t_la_chk.elapsed().as_secs_f64() * 1e3;
+                        if wd.kernel.is_some() {
+                            rank_certified_at_b = Some(cur_b);
+                        } else if wd.exhausted() {
+                            b_scanned = cur_b;
+                            stop_reason = "sparse Wiedemann checkpoint cap".into();
+                            break 'collect;
+                        }
+                    }
+                    if let Some(b_cert) = rank_certified_at_b {
+                        if cur_b >= b_cert.saturating_add(hc.extra_b_after_rank) {
+                            b_scanned = cur_b;
+                            stop_reason = if hc.extra_b_after_rank > 0 {
+                                "sparse Wiedemann rank certified plus post-rank anchor margin"
+                                    .into()
+                            } else {
+                                "sparse Wiedemann homogeneous rank certified".into()
+                            };
+                            break 'collect;
+                        }
+                    }
+                } else if let Some(mk) = markowitz.as_mut() {
+                    let cur_b = begin + offset as u64 + 1;
+                    let at_sub = (offset + 1) % subbatch == 0 || offset + 1 == batch.len();
+                    if at_sub && rank_certified_at_b.is_none() && mk.due(projections.len()) {
+                        let t_la_chk = Instant::now();
+                        let _la = work::enter(Phase::LinearAlgebra);
+                        mk.check(cur_b, &projections)?;
+                        la_wall_during_rel += t_la_chk.elapsed().as_secs_f64() * 1e3;
+                        if mk.kernel.is_some() {
+                            rank_certified_at_b = Some(cur_b);
+                        } else if mk.exhausted() {
+                            b_scanned = cur_b;
+                            stop_reason = "sparse Markowitz checkpoint cap".into();
+                            break 'collect;
+                        }
+                    }
+                    if let Some(b_cert) = rank_certified_at_b {
+                        if cur_b >= b_cert.saturating_add(hc.extra_b_after_rank) {
+                            b_scanned = cur_b;
+                            stop_reason = if hc.extra_b_after_rank > 0 {
+                                "sparse Markowitz rank certified plus post-rank anchor margin"
+                                    .into()
+                            } else {
+                                "sparse Markowitz homogeneous rank certified".into()
+                            };
+                            break 'collect;
+                        }
+                    }
+                }
             }
             b_scanned = end;
-            if rank.due(projections.len()) {
-                let t_la_chk = Instant::now();
-                let _la = work::enter(Phase::LinearAlgebra);
-                let rows = projections.clone();
-                if end as u128 == b_budget {
-                    rank.check_at_budget_end(end, rows)?;
-                } else {
-                    rank.check(end, rows)?;
+            if wiedemann.is_none() && markowitz.is_none() {
+                if rank_certified_at_b.is_none() && rank.due(projections.len()) {
+                    let t_la_chk = Instant::now();
+                    let _la = work::enter(Phase::LinearAlgebra);
+                    let rows = projections.clone();
+                    if end as u128 == b_budget {
+                        rank.check_at_budget_end(end, rows)?;
+                    } else {
+                        rank.check(end, rows)?;
+                    }
+                    la_wall_during_rel += t_la_chk.elapsed().as_secs_f64() * 1e3;
+                    if rank.kernel.is_some() {
+                        rank_certified_at_b = Some(end);
+                    }
                 }
-                la_wall_during_rel += t_la_chk.elapsed().as_secs_f64() * 1e3;
-            }
-            if rank.kernel.is_some() {
-                stop_reason = "sparse homogeneous rank certified at complete batch".into();
-                break;
-            }
-            if rank.exhausted() {
-                stop_reason = "sparse kernel checkpoint cap".into();
-                break;
+                if let Some(b_cert) = rank_certified_at_b {
+                    if end >= b_cert.saturating_add(hc.extra_b_after_rank) {
+                        stop_reason = "sparse homogeneous rank certified at complete batch".into();
+                        break;
+                    }
+                }
+                if rank_certified_at_b.is_none() && rank.exhausted() {
+                    stop_reason = "sparse kernel checkpoint cap".into();
+                    break;
+                }
             }
         }
 
@@ -1721,13 +2020,20 @@ pub fn run_anchored_ic_dlp_on(
 
         // 4. Homogeneous quotient construction & orthogonality verification.
         let t_la_post = Instant::now();
-        let ready = rank.kernel.is_some();
+        let certified_kernel_vec = if let Some(wd) = &wiedemann {
+            wd.kernel.clone()
+        } else if let Some(mk) = &markowitz {
+            mk.kernel.clone()
+        } else {
+            rank.kernel.clone()
+        };
+        let ready = certified_kernel_vec.is_some();
         let mut kernel_orthogonality_verified_rows = 0usize;
         let mut basis = if ready {
             let _la = work::enter(Phase::LinearAlgebra);
             let q = Quotient::from_rank_certified_kernel(
                 spec.l,
-                rank.kernel.clone().ok_or("missing certified kernel")?,
+                certified_kernel_vec.ok_or("missing certified kernel")?,
                 rank_target,
             )
             .map_err(String::from)?;
@@ -1792,11 +2098,19 @@ pub fn run_anchored_ic_dlp_on(
             let mut b = work::uniform_mod_u64(&mut stream, 1, spec.l);
             let mut residual =
                 jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
-            let opts = cover::opts_for_mode(24, 600.0, cover::StopMode::Staircase(64));
+            let stop_mode = match hc.descent_hilbert_stop {
+                Some(c) => cover::StopMode::Hilbert(c),
+                None => cover::StopMode::Staircase(64),
+            };
+            let opts = cover::opts_for_mode(24, 600.0, stop_mode);
+            let descent_knobs = DescentKnobs {
+                unit_five_elim: hc.descent_unit_five,
+                fast_sextic_post: hc.descent_fast_sextic,
+            };
 
             for i in 0..options.max_descent_residuals {
                 let mut rng = StdRng::seed_from_u64(seed ^ i.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-                let (maybe_cert, cost, hist) = decompose_residual_anchored_ref(
+                let (maybe_cert, cost, hist) = decompose_residual_anchored_with_knobs(
                     &ctx,
                     &base,
                     &base_by_x,
@@ -1809,6 +2123,9 @@ pub fn run_anchored_ic_dlp_on(
                     &residual,
                     &opts,
                     options.descent,
+                    descent_knobs,
+                    inv_fp.as_deref(),
+                    Some(&config.setup().sqrt),
                     &mut trace_state,
                     &mut rng,
                 );
@@ -1966,7 +2283,9 @@ pub fn run_anchored_ic_dlp_on(
             1.0
         };
 
-        let arm_label = if options.harvest_odd_cycles {
+        let arm_label = if let Some(lbl) = hc.custom_label {
+            lbl.to_string()
+        } else if options.harvest_odd_cycles {
             format!(
                 "{}-cycle:{}",
                 options.collector.label(),
@@ -1974,6 +2293,14 @@ pub fn run_anchored_ic_dlp_on(
             )
         } else {
             format!("{}:{}", options.collector.label(), options.descent.label())
+        };
+
+        let rank_achieved_val = if let Some(wd) = &wiedemann {
+            wd.rank()
+        } else if let Some(mk) = &markowitz {
+            mk.rank()
+        } else {
+            rank.rank_lower_bound()
         };
 
         Ok(AnchoredSolveBundle {
@@ -2008,7 +2335,7 @@ pub fn run_anchored_ic_dlp_on(
                 discriminant_screen_calls: screen_calls,
                 discriminant_screen_refusals: screen_refusals,
                 projections_emitted: projections.len(),
-                rank_achieved: rank.rank_lower_bound(),
+                rank_achieved: rank_achieved_val,
                 rank_target,
                 rank_ready: ready,
                 stop_reason,

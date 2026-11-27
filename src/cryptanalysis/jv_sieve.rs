@@ -1176,6 +1176,13 @@ pub struct SharedB {
     n4: Vec<u64>,
 }
 
+impl SharedB {
+    #[inline]
+    pub fn at(&self, x: usize) -> (u64, u64) {
+        (self.re[x], self.n4[x])
+    }
+}
+
 /// `poly(x)` for every `x ∈ F_p` by forward differences (the same table and
 /// advances as [`sieve_line`], `adds` counting each).
 fn value_array(ring: &FpRing, poly: &[u64], adds: &mut u64) -> Vec<u64> {
@@ -1446,6 +1453,50 @@ impl HitBuckets {
         }
         let c = (self.cnt[i] as usize).min(9);
         &self.xs[i][..c]
+    }
+
+    #[inline]
+    pub fn advance_line_id(&mut self) {
+        self.id = self.id.wrapping_add(1);
+        if self.id == u32::MAX {
+            self.tag.fill(u32::MAX);
+            self.id = 0;
+        }
+    }
+
+    #[inline]
+    pub fn current_id(&self) -> u32 {
+        self.id
+    }
+
+    #[inline]
+    pub fn record_hit(
+        &mut self,
+        id: u32,
+        s: u64,
+        x_u16: u16,
+        m: u8,
+        hits: &mut Vec<u64>,
+        cost: &mut SieveCost,
+    ) {
+        if s == 0 {
+            return;
+        }
+        let i = s as usize;
+        cost.lookups += 1;
+        cost.roots += 1;
+        if self.tag[i] != id {
+            self.tag[i] = id;
+            self.cnt[i] = 0;
+        }
+        let c = self.cnt[i] as usize;
+        if c < 9 {
+            self.xs[i][c] = x_u16;
+        }
+        self.cnt[i] += 1;
+        if self.cnt[i] == m {
+            hits.push(s);
+        }
     }
 }
 

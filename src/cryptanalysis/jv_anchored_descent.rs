@@ -23,14 +23,16 @@ use rand::rngs::StdRng;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-use super::f4_fp::{self, F4Options, F4Trace};
-use super::gaudry_cubic::{PolyRing, UPoly};
+use super::f4_fp::{self, F4Options, F4Trace, Ordering as F4Ordering};
+use super::gaudry_cubic::{am, mm, sm, PolyRing, UPoly};
 use super::jv_bitops::{self as work};
 use super::jv_cover::{
     self as cover, peval, verify_dec, BaseEl, Ctx, Dec6, Div, Fld, Fq, Hyp, LinMode, NagaoCost,
     ZeroDimStats, E2,
 };
 use super::jv_sieve::{fdeg, FpPoly, FpRing};
+use super::jv_sieve_fast_m9::{split_quartic_from_xp_resolvent_stack, table_inv, StackPoly};
+use super::residual_walk::inv_mod;
 
 /// Exact census of the admissible degree-2 `F_p`-irreducible divisor universe on `C / F_{p^2}`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -487,13 +489,208 @@ impl DescentMode {
     }
 }
 
+/// Optional Phase-3 optimization levers evaluated during the hillclimb ladder.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DescentKnobs {
+    /// Eliminate unit linear pivot `d_0` (`x_5`) from `polys[5]` into a 5-variable
+    /// system using a flat 126-monomial accumulator (`0` `BTreeMap` probes), then lift
+    /// and check all 6 original equations.
+    pub unit_five_elim: bool,
+    /// Use `StackPoly` + `inv_fp` table + Frobenius composition `xp_q(xp_q)` + deterministic
+    /// resolvent splitting in sextic post-screening (`0` `FieldInv`s).
+    pub fast_sextic_post: bool,
+}
+
 /// Process-isolated cold F4 trace owned by a single discrete-log invocation.
 #[derive(Default)]
 pub struct LocalTraceState {
     trace: Option<F4Trace>,
+    trace_5var: Option<F4Trace>,
     pub recorded: u64,
     pub replayed: u64,
     pub fallbacks: u64,
+}
+
+struct Monom5Table {
+    monoms: [[u32; 5]; 126],
+}
+
+fn monom5_table() -> &'static Monom5Table {
+    static TBL: std::sync::OnceLock<Monom5Table> = std::sync::OnceLock::new();
+    TBL.get_or_init(|| {
+        let mut list = Vec::with_capacity(126);
+        for d in 0..=4u32 {
+            for e0 in 0..=d {
+                for e1 in 0..=(d - e0) {
+                    for e2 in 0..=(d - e0 - e1) {
+                        for e3 in 0..=(d - e0 - e1 - e2) {
+                            let e4 = d - e0 - e1 - e2 - e3;
+                            list.push([e0, e1, e2, e3, e4]);
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(list.len(), 126);
+        let mut monoms = [[0u32; 5]; 126];
+        monoms.copy_from_slice(&list);
+        Monom5Table { monoms }
+    })
+}
+
+#[inline]
+fn monom5_index(e: &[u32; 5]) -> usize {
+    let tbl = monom5_table();
+    // 126-element binary search on exact generation order `(total_deg, e0, e1, e2, e3)`.
+    let d = e[0] + e[1] + e[2] + e[3] + e[4];
+    let key = (d, e[0], e[1], e[2], e[3]);
+    tbl.monoms
+        .binary_search_by_key(&key, |m| {
+            (m[0] + m[1] + m[2] + m[3] + m[4], m[0], m[1], m[2], m[3])
+        })
+        .expect("degree <= 4 5-var monomial index")
+}
+
+/// Zero-map flat-array elimination of `x_5` (`d_0`) from `input[5]`.
+fn flat_unit5_reduce(
+    input: &[f4_fp::Poly],
+    p: u64,
+    inv_fp: Option<&[u64]>,
+) -> Option<(Vec<f4_fp::Poly>, Vec<([u32; 5], u64)>)> {
+    if input.len() != 6 {
+        return None;
+    }
+    let pivot = &input[5];
+    let mut coef_x5 = 0u64;
+    for (e, c) in pivot {
+        work::words(3);
+        if e.len() != 6 || e.iter().sum::<u32>() > 2 {
+            return None;
+        }
+        if e[5] != 0 {
+            if e[5] != 1 || e[..5].iter().any(|&v| v != 0) {
+                return None;
+            }
+            coef_x5 = am(coef_x5, *c, p);
+        }
+    }
+    if coef_x5 == 0 {
+        return None;
+    }
+    let inv_c = match inv_fp {
+        Some(tbl) if (coef_x5 as usize) < tbl.len() => table_inv(tbl, coef_x5),
+        _ => inv_mod(coef_x5, p),
+    };
+    let mut rep: Vec<([u32; 5], u64)> = Vec::with_capacity(pivot.len());
+    for (e, c) in pivot {
+        if e[5] == 0 && *c != 0 {
+            let neg_c = sm(p, *c, p);
+            let sc = mm(neg_c, inv_c, p);
+            if sc != 0 {
+                rep.push(([e[0], e[1], e[2], e[3], e[4]], sc));
+            }
+        }
+    }
+    // `rep_sq = rep * rep` accumulated in `[u64; 126]`.
+    let mut sq_acc = [0u64; 126];
+    let mut sq_nz = Vec::<usize>::with_capacity(rep.len() * rep.len());
+    for &(ea, ca) in &rep {
+        for &(eb, cb) in &rep {
+            let em = [
+                ea[0] + eb[0],
+                ea[1] + eb[1],
+                ea[2] + eb[2],
+                ea[3] + eb[3],
+                ea[4] + eb[4],
+            ];
+            let idx = monom5_index(&em);
+            if sq_acc[idx] == 0 {
+                sq_nz.push(idx);
+            }
+            sq_acc[idx] = am(sq_acc[idx], mm(ca, cb, p), p);
+            work::words(4);
+        }
+    }
+    let tbl = monom5_table();
+    let mut rep_sq: Vec<([u32; 5], u64)> = Vec::with_capacity(sq_nz.len());
+    for &idx in &sq_nz {
+        let v = sq_acc[idx];
+        if v != 0 {
+            rep_sq.push((tbl.monoms[idx], v));
+        }
+    }
+
+    let mut reduced = Vec::with_capacity(5);
+    let mut acc = [0u64; 126];
+    let mut touched = Vec::<usize>::with_capacity(32);
+    for poly in &input[..5] {
+        touched.clear();
+        for (e, c) in poly {
+            if e.len() != 6 || e.iter().sum::<u32>() > 2 {
+                return None;
+            }
+            let base_e = [e[0], e[1], e[2], e[3], e[4]];
+            match e[5] {
+                0 => {
+                    let idx = monom5_index(&base_e);
+                    if acc[idx] == 0 {
+                        touched.push(idx);
+                    }
+                    acc[idx] = am(acc[idx], *c, p);
+                    work::words(2);
+                }
+                1 => {
+                    for &(re, rc) in &rep {
+                        let em = [
+                            base_e[0] + re[0],
+                            base_e[1] + re[1],
+                            base_e[2] + re[2],
+                            base_e[3] + re[3],
+                            base_e[4] + re[4],
+                        ];
+                        let idx = monom5_index(&em);
+                        if acc[idx] == 0 {
+                            touched.push(idx);
+                        }
+                        acc[idx] = am(acc[idx], mm(*c, rc, p), p);
+                        work::words(3);
+                    }
+                }
+                2 => {
+                    for &(re, rc) in &rep_sq {
+                        let em = [
+                            base_e[0] + re[0],
+                            base_e[1] + re[1],
+                            base_e[2] + re[2],
+                            base_e[3] + re[3],
+                            base_e[4] + re[4],
+                        ];
+                        let idx = monom5_index(&em);
+                        if acc[idx] == 0 {
+                            touched.push(idx);
+                        }
+                        acc[idx] = am(acc[idx], mm(*c, rc, p), p);
+                        work::words(3);
+                    }
+                }
+                _ => return None,
+            }
+        }
+        let mut raw_terms: Vec<(Vec<u32>, u64)> = Vec::with_capacity(touched.len());
+        for &idx in &touched {
+            let v = acc[idx];
+            acc[idx] = 0;
+            if v != 0 {
+                raw_terms.push((tbl.monoms[idx].to_vec(), v));
+            }
+        }
+        work::words((raw_terms.len() * 2) as u64);
+        let norm = f4_fp::normalise(&raw_terms, p, F4Ordering::Grevlex);
+        if !norm.is_empty() {
+            reduced.push(norm);
+        }
+    }
+    Some((reduced, rep))
 }
 
 impl LocalTraceState {
@@ -511,9 +708,14 @@ impl LocalTraceState {
         use_trace: bool,
     ) -> (Vec<Vec<u64>>, ZeroDimStats) {
         let mut st = ZeroDimStats::default();
+        let trace_slot = if n == 5 {
+            &mut self.trace_5var
+        } else {
+            &mut self.trace
+        };
         let r = if !use_trace {
             f4_fp::f4(input, n, p, opts)
-        } else if let Some(trace) = &self.trace {
+        } else if let Some(trace) = trace_slot.as_ref() {
             let rep = f4_fp::f4_replay(input, n, p, opts, trace);
             if rep.trace_mismatch {
                 self.fallbacks += 1;
@@ -526,7 +728,7 @@ impl LocalTraceState {
         } else {
             let (rep, recorded) = f4_fp::f4_record(input, n, p, opts);
             if !rep.timed_out && !rep.inconsistent && rep.pairs_above_bound == 0 {
-                self.trace = Some(recorded);
+                *trace_slot = Some(recorded);
                 self.recorded += 1;
             }
             rep
@@ -821,6 +1023,65 @@ pub fn decompose_residual_anchored_ref<'a>(
     trace_state: &mut LocalTraceState,
     rng: &mut StdRng,
 ) -> (Option<AnchoredDescentCert>, NagaoCost, PatternHistogram) {
+    decompose_residual_anchored_with_knobs(
+        ctx,
+        base,
+        base_by_x,
+        by_x_map,
+        anchors,
+        source_small,
+        residual_index,
+        a_scalar,
+        b_scalar,
+        r,
+        opts,
+        mode,
+        DescentKnobs::default(),
+        None,
+        None,
+        trace_state,
+        rng,
+    )
+}
+
+#[inline]
+fn eval_rep5(rep: &[([u32; 5], u64)], x5: &[u64], p: u64) -> u64 {
+    let mut sum = 0u64;
+    for &(e, c) in rep {
+        let mut t = c;
+        for k in 0..5 {
+            for _ in 0..e[k] {
+                t = mm(t, x5[k], p);
+            }
+        }
+        sum = am(sum, t, p);
+        work::words(2);
+    }
+    sum
+}
+
+/// Knob-parameterized variant of [`decompose_residual_anchored_ref`] supporting
+/// flat-array 5-variable unit elimination (`d_0`) and stack/table sextic post-screening.
+#[allow(clippy::too_many_arguments)]
+pub fn decompose_residual_anchored_with_knobs<'a>(
+    ctx: &Ctx,
+    base: &[BaseEl],
+    base_by_x: &[u32],
+    by_x_map: &HashMap<u64, usize>,
+    anchors: &AnchorTable,
+    source_small: &dyn Fn(usize) -> &'a [(usize, i8)],
+    residual_index: u64,
+    a_scalar: u64,
+    b_scalar: u64,
+    r: &Div<E2>,
+    opts: &F4Options,
+    mode: DescentMode,
+    knobs: DescentKnobs,
+    inv_fp: Option<&[u64]>,
+    sqrt_fp: Option<&[u64]>,
+    trace_state: &mut LocalTraceState,
+    rng: &mut StdRng,
+) -> (Option<AnchoredDescentCert>, NagaoCost, PatternHistogram) {
     let f = &ctx.f.f;
     let p = f.p;
     let mut cost = NagaoCost::default();
@@ -839,7 +1100,33 @@ pub fn decompose_residual_anchored_ref<'a>(
     f.count_public(6 * 10 * 8);
     cost.weil_muls = f.muls() - m0;
 
-    let (sols, st) = trace_state.solve_zero_dim(&polys, 6, p, opts, rng, mode.uses_trace());
+    let (sols, st) = if knobs.unit_five_elim {
+        if let Some((reduced5, rep5)) = flat_unit5_reduce(&polys, p, inv_fp) {
+            let (sols5, st5) =
+                trace_state.solve_zero_dim(&reduced5, 5, p, opts, rng, mode.uses_trace());
+            let mut lifted = Vec::with_capacity(sols5.len());
+            'lift: for s5 in sols5 {
+                if s5.len() != 5 {
+                    continue;
+                }
+                let x5_val = eval_rep5(&rep5, &s5, p);
+                let mut root6 = Vec::with_capacity(6);
+                root6.extend_from_slice(&s5);
+                root6.push(x5_val);
+                for orig in &polys {
+                    if f4_fp::eval(orig, &root6, p) != 0 {
+                        continue 'lift;
+                    }
+                }
+                lifted.push(root6);
+            }
+            (lifted, st5)
+        } else {
+            trace_state.solve_zero_dim(&polys, 6, p, opts, rng, mode.uses_trace())
+        }
+    } else {
+        trace_state.solve_zero_dim(&polys, 6, p, opts, rng, mode.uses_trace())
+    };
     cost.f4_muls = st.f4_muls;
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;
@@ -1017,67 +1304,124 @@ pub fn decompose_residual_anchored_ref<'a>(
         coeffs[6] = 1;
         hist.fp_sextics_tested += 1;
 
-        // 1. Distinct-factor screen: `gcd(S, S') == 1`.
-        let deriv = poly_deriv_fp(&fp_ring, &coeffs);
-        if fdeg(&fp_ring.gcd(&coeffs, &deriv)) != 0 {
-            hist.non_squarefree_refused += 1;
-            continue 'sol;
-        }
-
-        // 2. Linear factor part `g1 = gcd(S, x^p - x)`.
-        let xp_mod_s = fp_ring.powmod_x(p as u128, &coeffs);
-        let xp_minus_x = fp_ring.sub(&xp_mod_s, &[0, 1]);
-        let g1 = if xp_minus_x.is_empty() {
-            coeffs.to_vec()
-        } else {
-            fp_ring.gcd(&coeffs, &xp_minus_x)
-        };
-        let d1 = fdeg(&g1) as usize;
-        let dq = 6usize.saturating_sub(d1);
-        if !matches!(dq, 0 | 2 | 4 | 6) {
-            hist.odd_remainder_refused += 1;
-            continue 'sol;
-        }
-
-        let q_rem = if dq == 0 {
-            vec![1u64]
-        } else {
-            fp_ring.exact_div(&coeffs, &g1)
-        };
-
-        // 3. For `dq in {4, 6}`, require `x^{p^2} == x (mod q_rem)` so `q_rem` splits into quadratics.
-        if dq >= 4 {
-            let xp_q = fp_ring.rem(&xp_mod_s, &q_rem);
-            let xp2_q = powmod_poly_fp(&fp_ring, &xp_q, p as u128, &q_rem);
-            if xp2_q != vec![0, 1] {
-                hist.higher_degree_refused += 1;
+        // 1..4. Sextic distinct-factor screen, linear split, quadratic-pattern screen, and quadratic extraction.
+        let (d1, dq, g1, quads) = if let (true, Some(inv_tbl), Some(sqrt_tbl)) =
+            (knobs.fast_sextic_post, inv_fp, sqrt_fp)
+        {
+            let s_sp = StackPoly::from_slice(&coeffs);
+            let deriv_sp = s_sp.deriv(p);
+            if !s_sp.gcd_monic(&deriv_sp, p, inv_tbl).is_one() {
+                hist.non_squarefree_refused += 1;
                 continue 'sol;
             }
-        }
-
-        let pattern = match dq {
-            0 => {
-                hist.seen_p1_6 += 1;
-                SexticPattern::P1_6
+            let xp_sp = StackPoly::powmod_x(p as u128, &s_sp, p);
+            let xp_m_x = xp_sp.sub_x(p);
+            let g1_sp = if xp_m_x.len == 0 {
+                s_sp
+            } else {
+                s_sp.gcd_monic(&xp_m_x, p, inv_tbl)
+            };
+            let d1_val = g1_sp.deg() as usize;
+            let dq_val = 6usize.saturating_sub(d1_val);
+            if !matches!(dq_val, 0 | 2 | 4 | 6) {
+                hist.odd_remainder_refused += 1;
+                continue 'sol;
             }
-            2 => {
-                hist.seen_p1_4_2 += 1;
-                SexticPattern::P1_4_2
+            let q_rem_sp = if dq_val == 0 {
+                StackPoly::from_slice(&[1])
+            } else {
+                s_sp.divrem_gen(&g1_sp, p, inv_tbl).0
+            };
+            let quads_vec: Vec<[u64; 3]> = match dq_val {
+                0 => Vec::new(),
+                2 => vec![[q_rem_sp.c[0], q_rem_sp.c[1], 1]],
+                4 => {
+                    let xp_q = xp_sp.rem_monic(&q_rem_sp, p);
+                    let xp2_q = xp_q.compose_mod(&xp_q, &q_rem_sp, p);
+                    if !xp2_q.is_x() {
+                        hist.higher_degree_refused += 1;
+                        continue 'sol;
+                    }
+                    let Ok(pair) = split_quartic_from_xp_resolvent_stack(
+                        &q_rem_sp, &xp_q, p, inv_tbl, sqrt_tbl,
+                    ) else {
+                        continue 'sol;
+                    };
+                    vec![pair[0], pair[1]]
+                }
+                6 => {
+                    let xp2_q = xp_sp.compose_mod(&xp_sp, &s_sp, p);
+                    if !xp2_q.is_x() {
+                        hist.higher_degree_refused += 1;
+                        continue 'sol;
+                    }
+                    let Some(q_vec) = split_even_quadratics(&fp_ring, q_rem_sp.as_slice(), rng, 32)
+                    else {
+                        continue 'sol;
+                    };
+                    q_vec
+                }
+                _ => unreachable!(),
+            };
+            match dq_val {
+                0 => hist.seen_p1_6 += 1,
+                2 => hist.seen_p1_4_2 += 1,
+                4 => hist.seen_p1_2_2_2 += 1,
+                6 => hist.seen_p2_3 += 1,
+                _ => unreachable!(),
             }
-            4 => {
-                hist.seen_p1_2_2_2 += 1;
-                SexticPattern::P1_2_2_2
+            (d1_val, dq_val, g1_sp.to_vec(), quads_vec)
+        } else {
+            let deriv = poly_deriv_fp(&fp_ring, &coeffs);
+            if fdeg(&fp_ring.gcd(&coeffs, &deriv)) != 0 {
+                hist.non_squarefree_refused += 1;
+                continue 'sol;
             }
-            6 => {
-                hist.seen_p2_3 += 1;
-                SexticPattern::P2_3
+            let xp_mod_s = fp_ring.powmod_x(p as u128, &coeffs);
+            let xp_minus_x = fp_ring.sub(&xp_mod_s, &[0, 1]);
+            let g1 = if xp_minus_x.is_empty() {
+                coeffs.to_vec()
+            } else {
+                fp_ring.gcd(&coeffs, &xp_minus_x)
+            };
+            let d1 = fdeg(&g1) as usize;
+            let dq = 6usize.saturating_sub(d1);
+            if !matches!(dq, 0 | 2 | 4 | 6) {
+                hist.odd_remainder_refused += 1;
+                continue 'sol;
             }
-            _ => unreachable!(),
+            let q_rem = if dq == 0 {
+                vec![1u64]
+            } else {
+                fp_ring.exact_div(&coeffs, &g1)
+            };
+            if dq >= 4 {
+                let xp_q = fp_ring.rem(&xp_mod_s, &q_rem);
+                let xp2_q = powmod_poly_fp(&fp_ring, &xp_q, p as u128, &q_rem);
+                if xp2_q != vec![0, 1] {
+                    hist.higher_degree_refused += 1;
+                    continue 'sol;
+                }
+            }
+            match dq {
+                0 => hist.seen_p1_6 += 1,
+                2 => hist.seen_p1_4_2 += 1,
+                4 => hist.seen_p1_2_2_2 += 1,
+                6 => hist.seen_p2_3 += 1,
+                _ => unreachable!(),
+            }
+            let Some(quads) = split_even_quadratics(&fp_ring, &q_rem, rng, 32) else {
+                continue 'sol;
+            };
+            (d1, dq, g1, quads)
         };
 
-        // 4. Split `q_rem` into `dq / 2` monic irreducible quadratics (`dq == 2` needs zero CZ work).
-        let Some(quads) = split_even_quadratics(&fp_ring, &q_rem, rng, 32) else {
-            continue 'sol;
+        let pattern = match dq {
+            0 => SexticPattern::P1_6,
+            2 => SexticPattern::P1_4_2,
+            4 => SexticPattern::P1_2_2_2,
+            6 => SexticPattern::P2_3,
+            _ => unreachable!(),
         };
 
         // Build `A(x)` (`deg <= 4`) once; `C(x) = lam[2] + x`.
@@ -1279,7 +1623,7 @@ mod tests {
             let mut irred = 0u64;
             for u0 in 0..p {
                 for u1 in 0..p {
-                    let disc = ((u1 * u1 + 4 * p * p - 4 * u0) % p) as u64;
+                    let disc = (u1 * u1 + 4 * p * p - 4 * u0) % p;
                     if disc == 0 || (0..p).any(|t| (t * t) % p == disc) {
                         continue;
                     }

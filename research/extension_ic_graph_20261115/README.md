@@ -540,3 +540,41 @@ descent with cold F4 trace replay (`src/cryptanalysis/jv_anchored_descent.rs`). 
   [Panel B part 1](anchored_multi_pattern_20261126/qualification_panel_b_part1.json),
   [Panel B part 2](anchored_multi_pattern_20261126/qualification_panel_b_part2.json))
   passes `73 / 73` bundles (`failed_bundles == 0`). [pcc:unverified]
+
+## Multi-round algorithmic hillclimb until frontier stall (26 November continuation)
+
+The [16-round hillclimb continuation](hillclimb_until_stall_20261126/report.pdf)
+([frozen protocol](hillclimb_until_stall_20261126/protocol.json),
+[trajectory summary](hillclimb_until_stall_20261126/results/hillclimb_rounds.json),
+[multi-prime frontier](hillclimb_until_stall_20261126/results/multiprime_frontier.json),
+[standalone qualification](hillclimb_until_stall_20261126/results/qualification_report.json))
+executes 16 successive single-mechanism hypotheses (`R0..R15`) across frozen seeds `{389, 101, 211, 307}`
+at `p = 1009` under a frozen `<= -1.00%` 4-seed `bitop/v1` promotion gate (`foreign_hook_calls == 0`),
+continuing until five consecutive orthogonal frontier candidates stall. [pcc:unverified]
+
+- **Eight promoted steps beyond Round-1 (`R2..R5, R7..R10`, `mean4`: `1,925.05G -> 1,045.54G`, `1.841x` beyond `R1`, `3.915x` beyond `R0`):**
+  Online minimum-Markowitz SGE (`R2: -9.25%`) and factored addition-chain Scalar Wiedemann (`R8: -13.60%`,
+  `src/cryptanalysis/jv_sparse_markowitz.rs`) cut Phase-2 homogeneous LA `bitop/v1` by `90.31%`
+  (`447.35G -> 43.35G`, `10.32x`) by keeping rows in sparse `+-1, +-2` form with pure `ModrAdd` chains
+  (`0` `ModrMul`s on `|c| <= 8`) and `{-1, +1}^N` projections. [pcc:unverified]
+  Root-free `m=9` partition line splitting (`R3: -2.24%`), stack-array Stickelberger quartic extraction
+  (`R4: -1.14%`), `4096/64` incidence/sub-rank cadence (`R5: -2.97%`), zero-multiplication `inv_2w_sq`
+  lookup with degree-4 $A_1'(x)$ forward differences (`R9: -15.89%`), and Euclidean-fused `disc(rest)`
+  Stickelberger screening with a squaring-built Frobenius matrix (`R10: -5.70%`,
+  `src/cryptanalysis/jv_sieve_fast_m9.rs`) cut Phase-1 relation `bitop/v1` to `770.48G` (`Run50 = 767.81G`),
+  while switching cold-traced F4 from `Staircase(64)` to `Hilbert(8)` (`R7: -6.86%`) cuts Phase-3 descent
+  `bitop/v1` by `32.74%` (`343.68G -> 230.94G`; `Run50`: `1,141.61G` total, `8.36s` wall). [pcc:unverified]
+- **Intermediate falsification (`R6`) and 5-round frontier stall (`R11..R15`):**
+  Linear $d_0$ elimination (`R6: +0.76%`, `STALL #1`) increases Macaulay degree-4 fill; at the `R10`
+  frontier, post-rank anchor margins (`R11: +0.48%`, `R12: +1.10%`), conditional `3-LP` on productive
+  `2-LP` lines (`R13: +6.30%`), `92%` small-FB restriction (`R14: +211.88%`, `0/4` rank-capped at `467/508`),
+  and narrow `512/16` batch cadence (`R15: +4.96%`) produce five consecutive stalls (`STALL #1..#5`),
+  confirming local slope exhaustion across Phase-1/2/3 balance, hypergraph arity, factor-base size, and
+  batch cadence. [pcc:unverified]
+- **Multi-prime scaling (`p in {307, 383, 503, 661, 1009}`), overflow & standalone qualification:**
+  `R10` lowers the 5-prime log-slope `d(log cost)/d(log p)` from `1.391` (`R1`) to `1.280` (`1.59x` at
+  `p = 383` rising monotonically to `1.85x` at `p = 1009`, standing `129.0x` below analytical Karatsuba
+  Pollard rho on fresh seeds at `p = 1009`), matches runtime-verified `overflow-checks = true` bit-for-bit
+  across `(307,101), (383,211), (503,307)`, and passes `17 / 17` pre-sealed standalone bundle qualifications
+  (`failed_bundles == 0`), scoped strictly to the degree-2 genus-3 Weil-cover family over $\mathbb{F}_{p^6}$.
+  [pcc:unverified]

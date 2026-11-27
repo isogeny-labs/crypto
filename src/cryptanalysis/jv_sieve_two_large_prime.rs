@@ -75,7 +75,7 @@ mod homogeneous_quotient;
 #[path = "jv_extension_remainder_dlp.rs"]
 mod extension_remainder_dlp;
 #[path = "jv_principal_relation.rs"]
-mod principal_relation;
+pub(crate) mod principal_relation;
 pub use extension_remainder_dlp::{run_extension_remainder_dlp_on, ExtensionRemainderDlpOptions};
 
 #[path = "jv_extension_anchored_dlp.rs"]
