@@ -9,7 +9,7 @@ and m=7 remain unauthorized. See `REPORT.md` for scope and next work.
 [pcc:unverified]
 
 For Git-only custody without the unavailable artifact store, `candidate.txt`
-is stored losslessly as deterministic `candidate.txt.gz`. `SHA256SUMS` retains
+is stored losslessly as deterministic `candidate.txt.gzip`. `SHA256SUMS` retains
 the original uncompressed digest; `PACKAGE_SHA256SUMS` binds the stored bytes,
 and `./verify_evidence_package.sh evidence-v2` checks both layers from the study
 directory.

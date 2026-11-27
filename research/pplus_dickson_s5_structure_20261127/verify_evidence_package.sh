@@ -13,7 +13,7 @@ evidence_dir=$1
 )
 
 expected=$(awk '$2 == "candidate.txt" { print $1 }' "$evidence_dir/SHA256SUMS")
-actual=$(gzip --decompress --stdout "$evidence_dir/candidate.txt.gz" | sha256sum | awk '{ print $1 }')
+actual=$(gzip --decompress --stdout "$evidence_dir/candidate.txt.gzip" | sha256sum | awk '{ print $1 }')
 if [[ -z "$expected" || "$actual" != "$expected" ]]; then
   echo "decompressed candidate digest mismatch" >&2
   exit 2
