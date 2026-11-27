@@ -13919,7 +13919,7 @@ mod tests {
     use super::*;
     use std::collections::BTreeMap;
 
-    fn lcg(state: &mut u64) -> u64 {
+    fn roots_test_rng(state: &mut u64) -> u64 {
         *state = state
             .wrapping_mul(6364136223846793005)
             .wrapping_add(1442695040888963407);
@@ -13931,11 +13931,13 @@ mod tests {
         let mut state = 7u64;
         for p in [3u64, 5, 7, 101, 10_007, 65_537] {
             for trial in 0..60 {
-                let deg = 1 + (lcg(&mut state) % 12) as u32;
-                let mut coeffs: Vec<(u32, u64)> = (0..=deg)
-                    .filter(|_| lcg(&mut state) % 3 != 0)
-                    .map(|k| (k, lcg(&mut state) % p))
-                    .collect();
+                let deg = 1 + (roots_test_rng(&mut state) % 12) as u32;
+                let mut coeffs: Vec<(u32, u64)> = Vec::new();
+                for k in 0..=deg {
+                    if roots_test_rng(&mut state) % 3 != 0 {
+                        coeffs.push((k, roots_test_rng(&mut state) % p));
+                    }
+                }
                 if trial % 4 == 0 {
                     // Force several roots, a repeated one and zero.
                     let mut f = vec![1u64];
