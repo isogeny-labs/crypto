@@ -1,0 +1,15 @@
+[package]
+name = "pplus-dickson-norm-gcd"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "dickson-norm-gcd"
+path = "src/bin/dickson_norm_gcd.rs"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[workspace]
