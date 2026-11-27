@@ -332,6 +332,25 @@ if (trace3_source.parent/'exit-code.txt').exists() and (trace3_source.parent/'ex
         "Combined with the completed kappa six-symbol bound, all signed three-whole-trace "
         "closures add no rank in the original image domain. This does not bound cycles "
         "involving selected individual residual points or longer trace combinations.")
+closed_residual_source=ROOT/'evidence/closed-residual-v1/calls/full/stdout.json'
+if (closed_residual_source.parent/'exit-code.txt').exists() and (closed_residual_source.parent/'exit-code.txt').read_text().strip()=='0':
+    closed_residual=json.loads(closed_residual_source.read_text())
+    attempts['closed-residual-v1']=(
+        f"Degree-five/six same-image residual bound: one reconstructed stream of "
+        f"{closed_residual['pair_records_reconstructed_once']} pairs and "
+        f"{closed_residual['query_records']} queries mP. Both arithmetic streams and "
+        f"lookup/sorted joins agree. Raw matches by degree: "
+        f"{[f['raw_matches'] for f in closed_residual['families']]}; distinct rows "
+        f"{closed_residual['distinct_rows_including_zero']}; independent additions "
+        f"{closed_residual['independent_added_rows']}. Actual ranks "
+        f"{closed_residual['full_rank']}/{closed_residual['auxiliary_rank']}/{closed_residual['closed_rank']}. "
+        "H/R map and factor bindings, all seven imported kappa rows and exact baseline "
+        "representations pass. No old six-symbol enumeration runs. Public G/2G controls "
+        f"find nonzero matches {closed_residual['nonzero_fixture_matches']} and identity-query "
+        f"matches {closed_residual['identity_fixture_identity_matches']}; rank one, separate "
+        "from actual data. Brute small-domain comparisons and all query/row/missing-data "
+        "corruptions pass. Combining the earlier kappa bound covers residue degrees "
+        "one through six for this one same-image residual pattern in the fixed domain.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -476,6 +495,22 @@ if 'triple_trace' in globals():
     for suffix in ('svg','pdf'):
         subprocess.run(['dot','-T'+suffix,'three-trace.dot','-o','three-trace.'+suffix],cwd=ROOT,check=True)
 
+if 'closed_residual' in globals():
+    (ROOT/'closed-residual-values.json').write_text(json.dumps({
+        'new_source':'evidence/closed-residual-v1/calls/full/stdout.json','new_result':closed_residual,
+        'prior_source':'evidence/canonical-six-v1/calls/full/stdout.json',
+        'prior_kappa_rows':canonical['distinct_rows_including_zero'],
+        'derived_low_degree_reduction':'A+B+mP is a signed word of length<=6 for m=1..4; pad by O'},indent=2)+'\n')
+    dot=('digraph G {rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];'
+         'a[label="Two old image slots A,B\\nSame-image residual trace mP"];'
+         'b[label="m=1..4: reuse kappa six-word bound\\n7 known rows; original span"];'
+         f'c[label="m=5,6: shared {closed_residual["pair_records_reconstructed_once"]:,} pairs\\n{closed_residual["query_records"]} signed multiple queries\\n0 matches in each degree"];'
+         f'd[label="Closed rank {closed_residual["closed_rank"]}\\nAll admissible single-point\\nresidue degrees 1..6 covered"];'
+         'a->b;a->c;b->d;c->d;}')
+    (ROOT/'closed-residual.dot').write_text(dot+'\n')
+    for suffix in ('svg','pdf'):
+        subprocess.run(['dot','-T'+suffix,'closed-residual.dot','-o','closed-residual.'+suffix],cwd=ROOT,check=True)
+
 old = json.loads((ROOT/'evidence/norms-v2/calls/old/stdout.json').read_text())
 aug = json.loads((ROOT/'evidence/norms-v2/calls/augmented/stdout.json').read_text())
 metrics = ('full_rank','auxiliary_rank','closed_rank')
@@ -505,7 +540,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('2Eref six','shifted-six-v2/calls/full'),
                         ('H+2R six','canonical-six-v1/calls/full'),
                         ('2H-2R six','exceptional-conic-six-v1/calls/full'),
-                        ('Three traces','three-trace-six-v1/calls/full')]:
+                        ('Three traces','three-trace-six-v1/calls/full'),
+                        ('Closed m5/m6','closed-residual-v1/calls/full')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -545,7 +581,7 @@ for suffix in ('svg','pdf'):
     fig.savefig(ROOT/('ranks.'+suffix))
 plt.close(fig)
 pdf(ROOT/'REPORT.md')
-for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
+for svg in [ROOT/'ranks.svg', ROOT/'control-isolation.svg', ROOT/'contact-orders.svg', *([ROOT/'degree-six.svg'] if (ROOT/'degree-six.svg').exists() else []), *([ROOT/'three-trace.svg'] if (ROOT/'three-trace.svg').exists() else []), *([ROOT/'closed-residual.svg'] if (ROOT/'closed-residual.svg').exists() else []), *(ROOT/'reports').glob('*/calls.svg')]:
     svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
 
 # Compact only the editable rank SVG; source values and all sealed evidence stay exact.

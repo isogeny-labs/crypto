@@ -62,6 +62,7 @@ this study does not change those maps.
 | Degree-six poles H+2R | 15,390,826 shifted triples at target kappa | Exactly seven known rows; direct 108/102/6 |
 | Conics tangent at exceptional R | 15,390,826 shifted triples at target 2kappa | No six-image word; direct 108/102/6 |
 | Three whole residual traces | 15,390,826 shifted triples at target 3kappa | No word; combined signed-case bound leaves 108/102/6 |
+| Same-image residual m=5,6 | Shared 101,926 pairs; 902 multiple queries | No matches in either degree; direct 108/102/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -752,11 +753,64 @@ See [the frozen protocol](THREE_TRACE_PROTOCOL.md),
 `evidence/three-trace-six-v1/` for exact target coordinates, actual trace
 witnesses, controls, hashes, argv, exits and resource costs.
 
+## Same-image residual degrees five and six
+
+For $m=5,6$, a function with poles bounded by $H+(m-2)R$ and two
+old image slots $A,B$ leaves effective residual degree $m$. If all its
+residual images equal a rational old point $P$, its trace is $mP$ and
+$\kappa-A-B=mP$ is necessary. In particular a closed source point of
+residue degree $m$ mapping to rational $P$ has that trace. Existence of
+such a closed point or principal divisor is not assumed. [pcc:unverified]
+
+The native test reconstructs 101,926 signed unordered pair records once.
+Every sum/trace agrees between GMP and named OpenSSL, and the ordered
+digest matches the saved original norm receipt. It then checks 902 query
+records: all 451 signed labels, including $O$, multiplied by five and
+six. Both native query streams agree, and there are 901 distinct query
+points, with $O$ shared between the families. Lookup and sorted-merge
+joins compare every raw match and normalized coefficient witness.
+They find **zero matches in each degree** and zero candidate rows.
+Actual full/auxiliary/closed ranks remain 108/102/6. [pcc:unverified]
+
+The exact query stream digest is:
+
+```
+fba19f52794e1b667f7a8acef287ddae0ac1ac2be616df70fd7ff7ec3bafa963
+```
+
+Fresh map/factor checks bind $H$ and exceptional $R$. All seven retained
+rows from the earlier target-$\kappa$ result pass both group checks and
+exact representation in the frozen six-row span. No completed six-symbol
+enumeration is repeated. Public $G,2G$ controls with $\kappa=12G$ detect
+primitive row $(2,-1)$ in both new families: raw match counts are two and
+three. A second control exercises $P=O$ twice in each family. Both
+collectors equal independent small-domain brute evaluation; coefficient,
+query, missing-pair/query and missing-candidate corruptions reject.
+Each fixture has rank one and enters no actual matrix. [pcc:unverified]
+
+For $m=1,2,3,4$, the image word $A+B+mP$ has length at most six and
+can be padded by $O$. The prior complete target-$\kappa$ bound already
+puts every such row in the original rank-six span. Combined with the
+new degree-five/six nulls, this covers **every possible residue degree
+of one closed source point mapping to a rational old image under this
+degree-six map**, for the stated reference divisors and two old slots.
+For $m=1$, interpret $H-R$ as an RR divisor with a required zero at $R$.
+This is degree coverage of this same-image pattern, not a classification
+of all closed divisors or all pole classes. Multiple residual image
+labels, higher multiplicities with larger total degree and other anchor
+or image domains remain outside the bound. [pcc:unverified]
+
+![Closed-residual degree coverage. Counts for m=5,6 copy the new native result. Reduction of m=1..4 to the earlier kappa six-symbol domain is algebraic. Exact finite domains, no statistical uncertainty.](closed-residual.pdf)
+
+See [the frozen protocol](CLOSED_RESIDUAL_PROTOCOL.md),
+[the immutable attempt report](reports/closed-residual-v1/REPORT.pdf) and
+`evidence/closed-residual-v1/` for witnesses, hashes, exits and costs.
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s,with one allowed CPU and1GiB virtual address space.
-Each of42immutable attempt reports retains complete per-call and wrapper
+Each of43immutable attempt reports retains complete per-call and wrapper
 costs,including historical failures. The new control preflight takes17.989
 build,10.875worker and28.931wrapper seconds. The actual higher-contact
 pipeline takes21.747build,46.623plan,
@@ -767,7 +821,8 @@ The H+2R build, full worker and wrapper take 14.526, 178.044 and
 192.615 seconds respectively. The exceptional tangent-conic build, full
 worker and wrapper take 14.459, 175.874 and 190.378 seconds respectively.
 The three-trace build, full worker and wrapper take 14.425, 175.104 and
-189.579 seconds respectively.
+189.579 seconds respectively. The same-image closed-residual build, full
+worker and wrapper take 15.062, 8.122 and 23.229 seconds respectively.
 Earlier costs remain in their unchanged attempt reports.
 
 Four build failures are preserved: audit-old-v1 lacked iostream; norms-v1
@@ -824,18 +879,23 @@ The three-whole-trace successor now completes with no $3\kappa$ word.
 Together with the prior $\kappa$ six-symbol bound it closes every signed
 three-whole-trace combination at the current projected span.
 
-Next proposed work tests degree-five and degree-six residual divisors
-whose individual images all equal a rational old image $P$. A function
-with poles bounded by $H+(m-2)R$ and two old zeros $A,B$ leaves effective
-residual degree $m$ and requires $\kappa-A-B=mP$. A closed point mapping
-to rational $P$ contributes its residue degree times $P$; degrees five
-and six are admissible component degrees for the verified degree-six map.
-These image constraints can be tested by a direct pair-to-multiple join
-for $m=5,6$. The $m=4$ condition is already contained in the completed
-six-symbol target-$\kappa$ bound and should be reused, not rerun.
-This successor has not run. Freeze its protocol and use a nonempty control
-before execution. Any positive row needs actual closed-fibre or RR/KM
-realization and separate elliptic/elimination replay. [pcc:unverified]
+The degree-five/six same-image successor now completes with no match;
+together with the prior target-$\kappa$ result it covers residue degrees
+one through six for the stated one-point residual pattern.
+
+The next structural step will reuse the actual retained differential
+$f^*\omega_E=L(x,y)\,dx/F_y$. Parent composition verification already
+checks this identity exactly, and `backmap.json` retains its linear $L$.
+Locate the intersection of that canonical line with $C$, classify its
+ramification and branch supports, and use those supports to select a
+cover-specific RR family. If appropriate, test for a compatible
+bielliptic involution with that ramification axis using exact polynomial
+conditions. No ramification factorization, symmetry or quotient is
+established by the present source review. Freeze a protocol before new
+execution; reuse completed differential evidence rather than repeating
+its full composition experiment. Positive old-base rank still requires
+actual support/KM validity and separate elliptic/elimination replay.
+[pcc:unverified]
 
 ## Sources and reproduction
 
@@ -863,7 +923,8 @@ realization and separate elliptic/elimination replay. [pcc:unverified]
   [reference-shifted six symbols](SHIFTED_SIX_PROTOCOL.md),
   [canonical-plus-exceptional six symbols](CANONICAL_SIX_PROTOCOL.md) and
   [exceptional tangent-conic images](EXCEPTIONAL_CONIC_SIX_PROTOCOL.md) and
-  [three whole residual traces](THREE_TRACE_PROTOCOL.md).
+  [three whole residual traces](THREE_TRACE_PROTOCOL.md) and
+  [same-image closed residuals](CLOSED_RESIDUAL_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
@@ -872,12 +933,14 @@ realization and separate elliptic/elimination replay. [pcc:unverified]
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
   and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh,run-high-contact-controls.sh and
   run-high-contact-scan.sh, run-shifted-six.sh, run-canonical-six.sh and
-  run-exceptional-conic-six.sh and run-three-trace-six.sh.
+  run-exceptional-conic-six.sh, run-three-trace-six.sh and run-closed-residual.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Noncanonical reference source: ../km_pushforward_20261126/REPORT.md,
   its frozen pushforward/verify sources,and ../correspondence_audit_20261124/REPORT.md
   specify the degree-three reference;scoped construction-source reads found
   no established target-automorphism result.
+- Retained differential source: ../composition_verification_20261126/REPORT.md,
+  its frozen check.cpp:110--119, and the existing L record in backmap.json.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.
 - Diem, *On the discrete logarithm problem in class groups of curves*,
@@ -899,3 +962,6 @@ terminal results; earlier parent-map and scoreboard figures remain unchanged.
 The signed three-trace diagram combines the new native target3kappa receipt
 with the earlier native targetkappa receipt; its sign reduction is derived
 algebraically. Other parent-map and scoreboard graphs remain unchanged.
+
+The closed-residual diagram copies new native degree-five/six counts and
+identifies the reused low-degree bound; other completed figures remain unchanged.
