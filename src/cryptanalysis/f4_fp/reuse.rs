@@ -236,6 +236,18 @@ fn reduces_to_zero(
     true
 }
 
+/// Existing acyclic product/chain checker; the call owns a fresh graph.
+pub(super) fn certify_pair_graph(
+    input: &[Poly],
+    basis: &[Poly],
+    p: u64,
+    opts: &F4Options,
+    stats: &mut TraceStats,
+) -> bool {
+    stats.pair_graph = Some(PairCertificateStats::default());
+    pair_certificate::certify(input, basis, p, opts, stats)
+}
+
 pub(super) fn certify(
     input: &[Poly],
     basis: &[Poly],
