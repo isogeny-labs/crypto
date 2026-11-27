@@ -1,0 +1,20 @@
+{
+  "schema": "repaired-root-default-unit-plan/v1",
+  "source": "ROOT_UNIT_SOURCE.sha256",
+  "literal_audit": "hydration-repair/POST_AUDIT.json",
+  "extra_compile_and_runtime_literal_files": "hydration-repair/UNIT_CONCAT_RECEIPT.json",
+  "previous_unexecuted_plan": "ROOT_UNIT_PLAN.json retained; its old source context is superseded",
+  "command": "cargo test --release --locked --offline --lib --no-run -j1",
+  "default_features": true,
+  "test_or_algorithm_exclusions": false,
+  "cpu": 0,
+  "jobs_and_threads": 1,
+  "build_wall_seconds": 1800,
+  "build_address_space_bytes": 12884901888,
+  "file_limit_bytes": 1073741824,
+  "profile": "opt0/LTOoff/debug0/codegen16; never a performance control",
+  "after_compile": "copy and hash/list the root worker before a separately pinned whole-suite runtime call",
+  "failure_policy": "retain every source/dependency/compiler/resource failure; no test removal or alternate historical source; full-root runtime stays unqualified unless complete passing execution",
+  "benchmark": false,
+  "signed_verdict": false
+}
