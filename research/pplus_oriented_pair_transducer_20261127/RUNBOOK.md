@@ -17,8 +17,9 @@ binaries with `cargo --locked --release`, refuses to overwrite any existing
 2. independently coded flat-support verifier;
 3. preregistered promotion analyzer.
 
-Candidate and verifier standard error, elapsed time, peak resident memory,
-environment metadata, and SHA-256 for every evidence file are retained. A
+Candidate and verifier standard error, elapsed nanoseconds, explicit
+`max_rss_kib=unavailable`, environment metadata, and SHA-256 for every evidence
+file are retained. A
 failed stage leaves its temporary `.census.*` directory in place for diagnosis;
 it is not silently retried. A successful run atomically renames that directory
 to `evidence/`. There is no random seed: the protocol fixes every input and
@@ -31,3 +32,7 @@ implemented in the source-manifest-bound Rust binaries.
 The active custody record is `SOURCE_MANIFEST_3.json`; v1 and v2 are retained
 as historical pre-amendment records. If S3 transport later becomes available,
 `PPLUS_CHECKPOINT_MODE=s3` selects the repository S3 gate explicitly.
+
+Failed attempt 1 is separately retained and hash-bound. It stopped before
+candidate execution because `/usr/bin/time` was unavailable; amendment 4
+replaced that non-scientific dependency before the single permitted retry.

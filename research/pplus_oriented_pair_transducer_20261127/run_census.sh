@@ -68,6 +68,26 @@ for binary in "$candidate" "$verifier" "$analyzer"; do
   fi
 done
 
+run_with_diagnostics() {
+  local label="$1"
+  local stdout_path="$2"
+  local stderr_path="$3"
+  shift 3
+  local started_ns finished_ns status
+  started_ns="$(date +%s%N)"
+  set +e
+  "$@" > "$stdout_path" 2> "$stderr_path"
+  status=$?
+  set -e
+  finished_ns="$(date +%s%N)"
+  {
+    echo "elapsed_nanoseconds=$((finished_ns - started_ns))"
+    echo "max_rss_kib=unavailable"
+    echo "exit_status=$status"
+  } > "$temporary/$label-time.txt"
+  return "$status"
+}
+
 temporary="$(mktemp -d "$study/.census.XXXXXXXX")"
 trap 'status=$?; if [[ $status -ne 0 ]]; then echo "run-census: failed evidence retained at '"$temporary"'" >&2; fi' EXIT
 
@@ -83,14 +103,13 @@ trap 'status=$?; if [[ $status -ne 0 ]]; then echo "run-census: failed evidence 
   echo "kernel=$(uname -srm)"
 } > "$temporary/run-metadata.txt"
 
-/usr/bin/time -f 'elapsed_seconds=%e\nmax_rss_kib=%M\nexit_status=%x' \
-  -o "$temporary/candidate-time.txt" \
-  "$candidate" > "$temporary/candidate.txt" 2> "$temporary/candidate.stderr"
+run_with_diagnostics candidate \
+  "$temporary/candidate.txt" "$temporary/candidate.stderr" \
+  "$candidate"
 
-/usr/bin/time -f 'elapsed_seconds=%e\nmax_rss_kib=%M\nexit_status=%x' \
-  -o "$temporary/verifier-time.txt" \
-  "$verifier" "$temporary/candidate.txt" \
-  > "$temporary/verifier.txt" 2> "$temporary/verifier.stderr"
+run_with_diagnostics verifier \
+  "$temporary/verifier.txt" "$temporary/verifier.stderr" \
+  "$verifier" "$temporary/candidate.txt"
 
 "$analyzer" "$temporary/candidate.txt" "$temporary/verifier.txt" \
   > "$temporary/analysis.json"

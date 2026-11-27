@@ -8,9 +8,9 @@ subquadratic-growth, and cold one-target budget gate passes.
 
 ## Frozen inputs
 
-- Protocol plus amendments 1--3 in this directory.
+- Protocol plus amendments 1--4 in this directory.
 - Curve `icv1-fp31-tm3989-ae9db972`.
-- Active source custody: `SOURCE_MANIFEST_3.json`.
+- Active source custody: `SOURCE_MANIFEST_4.json`.
 - Deterministic targets: first finite planted four-leaf multiset, `[k]G` for
   `k=1..8`, and infinity at each depth. There is no random seed.
 - Projection: 27,370 residual queries, with no cross-target amortization.
@@ -21,7 +21,9 @@ Candidate, independently coded direct-state verifier, and frozen analyzer are
 implemented in dependency-free Rust. The verifier independently recomputes
 every level's support, semantic circuit totals, and exact `GF(2)` incidence
 rank, plus all fixed queries, witnesses, and misses. Formatting, strict Clippy,
-and all nine development tests pass. No admitted census output exists.
+and all nine development tests pass. Failed attempt 1 stopped before candidate
+execution because `/usr/bin/time` was absent; its empty output and shell error
+are retained and hash-bound. No admitted census output exists.
 
 ## Sole launch command
 
