@@ -211,6 +211,23 @@ if (tangent_source.parent/'exit-code.txt').exists() and (tangent_source.parent/'
         f"{tangent['core_full_rank']}/{tangent['core_auxiliary_rank']}/{tangent['closed_rank']}; "
         f"restored {tangent['full_rank']}/{tangent['auxiliary_rank']} counts are derived. "
         "Separate numerical rank-seven control enters no actual matrix.")
+bitangent_source=ROOT/'evidence/bitangent-conics-v1/calls/combine/stdout.json'
+if (bitangent_source.parent/'exit-code.txt').exists() and (bitangent_source.parent/'exit-code.txt').read_text().strip()=='0':
+    bitangent=json.loads(bitangent_source.read_text())
+    attempts['bitangent-conics-v1']=(
+        f"Two-point/bitangent selection completes {bitangent['raw_choices']} raw choices: "
+        f"{bitangent['bitangent_pencils']} admitted pencils. "
+        f"{bitangent['candidate_occurrences']} candidate occurrences yield "
+        f"{bitangent['supported_conics']} supported conics and "
+        f"{bitangent['independent_additional_rows']} independent added rows. "
+        f"All {bitangent['forced_contact_candidates_verified']} higher-contact branches are checked. "
+        "The same-collector known-line-square fixture recovers a nonzero row; its "
+        f"higher-contact orders are {bitangent['control_higher_contact_orders']}. "
+        "Both contact constraints, exact product exclusion, local multiplicities, "
+        "selector/profile/origin/support/row and coverage controls pass. Computed core "
+        f"{bitangent['core_full_rank']}/{bitangent['core_auxiliary_rank']}/{bitangent['closed_rank']}; "
+        f"restored {bitangent['full_rank']}/{bitangent['auxiliary_rank']} counts are derived. "
+        "Separate numerical rank-seven control enters no actual matrix.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -222,7 +239,7 @@ for name, outcome in attempts.items():
     destination = ROOT/'reports'/name
     destination.mkdir(parents=True, exist_ok=True)
     calls = sorted((raw/'calls').iterdir())
-    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1','tangent-conics-v1'):
+    if name in ('mixed-sign-conics-v1','mixed-image-conics-v1','mixed-image-extension-v1','four-line-conics-v1','tangent-conics-v1','bitangent-conics-v1'):
         def call_order(call):
             if call.name=='build': return (0,0)
             if call.name=='plan': return (1,0)
@@ -313,7 +330,8 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Union685','full-image-bound-v1/calls/scan'),
                         ('Old-pair*','mixed-image-extension-v1/calls/combine'),
                         ('Four-line*','four-line-conics-v1/calls/combine'),
-                        ('Tangent*','tangent-conics-v1/calls/combine')]:
+                        ('Tangent*','tangent-conics-v1/calls/combine'),
+                        ('Bitangent*','bitangent-conics-v1/calls/combine')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':

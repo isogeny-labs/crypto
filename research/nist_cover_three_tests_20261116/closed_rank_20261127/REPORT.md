@@ -56,6 +56,7 @@ this study does not change those maps.
 | Complete old-pair strata | 168choices for seeds0,32,64,96;164new pencils | 28distinct known products;zero additional conics;core134/128/6 |
 | Product-free four-line pencils | 512new pencils;734208candidate occurrences | Zero supported conics;core134/128/6 |
 | Three-point/tangent pencils | 384new pencils;550656candidate occurrences | Zero supported conics;384higher-contact parameters checked;core134/128/6 |
+| Two-point/bitangent pencils | 128new pencils;183552candidate occurrences | Zero supported conics;256higher-contact branches checked;core134/128/6 |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -459,6 +460,38 @@ closed7is a separate synthetic control. This completes the fixed384choices,
 not all tangent conics. See TANGENT_CONIC_PROTOCOL.md and
 evidence/tangent-conics-v1/. [pcc:unverified]
 
+## Two-point conics with tangency at both anchors
+
+The next base scheme is2+2. For s0..31,the experiment takes one residual
+point on each of seeds s,s+64,using all four choices:128raw pairs. Every
+pair passes mutual C-tangent exclusion and four independent point/value
+and derivative constraints,giving a verified two-vector nullspace. No other
+pool point is a base point. All pairs are mixed and have nonzero weighted
+base image sum. [pcc:unverified]
+
+At two anchors,one point per known line does not by itself exclude a
+product. The planner verifies every incident known line has contact one,
+then checks every unordered pair of known lines,including repetitions,
+against both required contact orders. None of the9180known products meets
+2+2at an actual pair. The same test rejects a squared-known-line control
+from the actual domain. [pcc:unverified]
+
+The collector checks second local coefficients at both forced anchors,
+in addition to every other pool point. Both first derivatives vanish
+identically. All256higher-contact branches select order at least three;
+branches count separately even if coefficient keys coincide. The separate
+same-collector fixture uses nonreference line1squared and two of its support
+points. It recovers a nonzero actual row;the two higher-contact parameters
+have orders3and3. Zero selectors,omitted parameters,bad basis/contact
+profile/origin/support/row and coverage reject. [pcc:unverified]
+
+One native128pencil batch and final combine cover183552candidate occurrences
+and find no supported conic or independent row. Core ranks remain134/128/6;
+restored236/230are derived. The numerical closed7fixture never enters actual
+data. This completes only the fixed128choices. See
+BITANGENT_CONIC_PROTOCOL.md and evidence/bitangent-conics-v1/.
+[pcc:unverified]
+
 ## Full retained-image union with active auxiliaries
 
 The combined685-image domain contains all429original images plus256new
@@ -492,7 +525,7 @@ evidence/full-image-bound-v1/. [pcc:unverified]
 
 All mathematical computation is native C++. Each build is limited to300s,
 each worker to600s, with one allowed CPU and1GiB virtual address space.
-Each of the34attempt reports retains its complete per-call and wrapper
+Each of the35attempt reports retains its complete per-call and wrapper
 costs,including failures. The mixed-image pipeline takes19.449build,
 9.890plan,62.225/50.167batch and13.691combine seconds;wrapper155.498seconds.
 The old-pair extension takes94.880wrapper seconds.
@@ -500,6 +533,8 @@ The product-free four-line pipeline takes19.159build,10.483plan,
 38.878/38.587/37.997/38.333batch and11.871combine seconds;wrapper195.405seconds.
 The tangent pipeline takes19.239build,9.777plan,
 32.980/32.903/33.684batch and11.780combine seconds;wrapper140.437seconds.
+The bitangent pipeline takes18.618build,9.608plan,
+48.965batch and11.973combine seconds;wrapper89.224seconds.
 The full685-image test takes15.501build,77.388worker and92.937wrapper
 seconds. The earlier mixed-sign pipeline takes17.343build,
 8.924plan,39.634/40.567/43.650/41.493/19.973batch and9.979combine seconds;
@@ -543,14 +578,16 @@ conic pencil types remain outside those finite domains.
 
 The three-point/one-tangent successor has now completed384pencils and
 550656candidate occurrences,including the forced higher-contact branch,
-with no supported conic. A proposed next base scheme is2+2:two points with
-tangency at both. It uses four linear constraints distributed differently.
-A native planner must exclude a point on the other anchor's C-tangent,
-check rank4and complete parameter coverage using the next coefficient at
-both anchors. A nonempty same-collector fixture can use a nonreference
-known line squared with two of its support points. This successor has not
-run;first freeze a bounded domain and exact product-exclusion checks.
-No new fibres are needed. Nonrational individual elliptic traces and other higher-degree function
+with no supported conic. The2+2bitangent successor has also completed128pencils and256higher-
+contact branches,with no supported conic. Remaining degree-four base
+partitions are3+1and4. Before a scan,generalize the jet constraints and
+establish nonempty fixtures at those orders. One possible construction
+uses a split C-tangent T at an ordinary point A:its product with a known
+seed line through A has contact3at A,and T squared has contact4. Any extra
+residual points/images needed for these fixtures must stay in a separately
+verified control pool and be removed before actual collection. These
+higher-contact successors have not run. No new fibre solve is proposed.
+Nonrational individual elliptic traces and other higher-degree function
 relations remain open directions. Any positive candidate needs actual
 cover/KM and separate elliptic/elimination replay. [pcc:unverified]
 
@@ -572,7 +609,8 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   [mixed-image pencils](MIXED_IMAGE_CONIC_PROTOCOL.md),
   [old-pair extension](MIXED_IMAGE_EXTENSION_PROTOCOL.md),
   [four-line pencils](FOUR_LINE_CONIC_PROTOCOL.md),
-  [tangent pencils](TANGENT_CONIC_PROTOCOL.md) and
+  [tangent pencils](TANGENT_CONIC_PROTOCOL.md),
+  [bitangent pencils](BITANGENT_CONIC_PROTOCOL.md) and
   [full retained-image union](FULL_IMAGE_BOUND_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
@@ -580,7 +618,7 @@ cover/KM and separate elliptic/elimination replay. [pcc:unverified]
   run-mixed-divided.sh,run-anchors.sh,run-anchors-expanded.sh,
   run-expanded-conics.sh,run-all-expanded-conics.sh,run-mixed-sign-conics.sh
   and run-expanded-balanced.sh,run-mixed-image-conics.sh,run-full-image-bound.sh,run-mixed-image-extension.sh
-  and run-four-line-conics.sh,run-tangent-conics.sh.
+  and run-four-line-conics.sh,run-tangent-conics.sh,run-bitangent-conics.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.
