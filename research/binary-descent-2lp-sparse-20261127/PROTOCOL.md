@@ -108,3 +108,149 @@ is written and frozen after the pilot and before any evaluation data.
   defective attempt is kept as a record and chooses nothing. Observed in it
   (not used): at n = 42 and 48 the cost falls monotonically with α, with
   α = 1 (the full base, i.e. D-S) cheapest.
+
+### Pilot outcome (recorded before part B was frozen)
+
+- **Small-base pilot** (`data/pilot_alpha.jsonl`, 108 records, all correct;
+  rule output `data/pilot_alpha_summary.txt`):
+  - n = 42: cost falls monotonically with α; argmin α = 1 (edge) → fs* = F − 1.
+  - n = 48: monotone again; argmin α = 1 (edge) → fs* = F − 1.
+  - n = 54: argmin α = 0.15 (1.578·10¹⁰ Meq; α = 1: 1.665·10¹⁰; 0.22:
+    1.657·10¹⁰; 0.1: 1.923·10¹⁰); parabola α̂ = 0.1675, fs* = 22,022.
+    One case at α = 0.75 needed 4 LA calls (Wiedemann found only useless
+    dependencies three times; inherited #5290 behaviour, no empty rows) and
+    costs 1.9·10¹¹; it does not touch the argmin or its neighbours.
+  - OLS: raw β = 0.359 (outside [0.5, 1], because two rungs sit at the edge
+    α = 1) → **D2S: β = 0.5, θ = 99.589**; **D2S23: β = 2/3, θ = 17.616**.
+- **Rho lanes at n = 60** (`data/pilot_rho_60_complete.jsonl`, 48 records, all
+  correct; `data/pilot_rho_60_summary.txt`): W = 128: 4.150·10⁹, **W = 256:
+  3.731·10⁹**, W = 512: 3.883·10⁹ → **W = 256**.
+- **Interruption.** A container restart killed the rho pilot at 43 of 48
+  records (cell W = 512, ci = 1 had 3 of 8) and both prediction simulations
+  before n = 60. The W = 512 cells were rerun from the same streams
+  (`data/pilot_rho_60_resume.jsonl`): the 11 overlapping records are identical
+  in every field but wall time, and the 5 missing ones complete the cell.
+  The simulations were resumed for n = 60 only (deterministic per (n, rep)).
+- Binaries: pilot and simulations ran `b2lsp_harness` sha256 `90a70114…`
+  (amendment A1). The run binary adds only the analysis guard and is hashed
+  in `SEEDS.sha256`; `run_d2s`, `bfs.rs` and every `#[path]` module are
+  unchanged between the two.
+
+## Part B — evaluation protocol (frozen before any evaluation data)
+
+### Question
+
+On binary composite `F_{2^n}`, n = 3n′, with #5261's oracle unchanged: does
+combining #5291's 2LP relation phase with a BFS (shortest-path) forest and
+#5290's sparse LA lower the cold single-target cost against D-S (#5290), D2
+(#5291) and matched negation-map rho, and does its whole-solve slope fall below
+rho's?
+
+### Arms and references
+
+- **D2S** (primary): `fs = min(F − 1, ⌈99.589·F^{0.5}⌉)`. Saturated (all
+  classes small, i.e. the D-S relation set) at n ≤ 42; fs/F ≈ 0.78, 0.55,
+  0.39, 0.28, 0.20, 0.14 at n = 45, 48, 51, 54, 57, 60.
+- **D2S23** (secondary): `fs = min(F − 1, ⌈17.616·F^{2/3}⌉)`; fs/F ≈ 0.88,
+  0.70, 0.55, 0.44, 0.35, 0.28, 0.22 at n = 42..60.
+- **D2Sall** (control, n ≤ 39): every class small on #5290's LA stream; must
+  equal D-S bitwise.
+- **References, reused unchanged**: D-S (#5290 `runs_ds.jsonl`, arm DS), D2
+  (#5291 `runs_d2.jsonl`, arm D2), rho as listed in `protocol.json`
+  (`references`): n = 51 W = 128 (the wider-grid pilot argmin of #5291; 4
+  cases from #5291, the other 8 of #5290's 12 cases run here), n = 54 W = 64
+  (#5290, 4 cases), n = 57 W = 256, n = 60 W = 256 (new). #5290's n = 51
+  W = 64 rho is a sensitivity (`D2S_over_rho_W64`).
+
+### Rungs and cases
+
+n = 18..48: #5261's 116 cases (4 curves × 3 targets; 2 × 2 at n = 33, 48);
+n = 51: 4 × 3 (= #5290's cases); n = 54, 57, 60: 2 × 2. D2S and D2S23 at every
+rung; D2Sall at n ≤ 39. One process per rung, 3 threads, `prlimit --as`
+12 GiB, wall budgets in `protocol.json`; a killed process is a resource-limit
+record and the run goes on. D-S and D2 are not run at n ≥ 57 (no reference
+there: D-S would need its F² LA at F ≈ 2.6·10⁵, D2 its echelon).
+
+### Checks (frozen)
+
+As `protocol.json` → `checks`: every log (`[d]G = Q` in-solve, `d = d_true`);
+D2S/D2S23 d = D-S d and = D2 d on shared cases; every row of every LA call
+group-law checked; the yield-count identity against #5291's `LpGraph` at every
+checkpoint; n ≤ 30: the dependency traced to the input rows and the echelon on
+the same rows give the same d; D2Sall ≡ D-S (n ≤ 39); replay n = 30, ci = 0,
+ti = 0, arm D2S, compared bitwise but wall times.
+
+### Cost unit and band
+
+#5253's Meq unchanged; mod-ℓ work as #5290 (u = 1 primary). Band per §5a:
+non-field units at u ∈ {0, 0.1, 1}, squarings s ∈ {1, 0.25}; also the
+±1-products-charged and ±1-plus-LA-bookkeeping-charged readings. Orders
+between arms only where they hold across the band.
+
+### Analysis (frozen; `b2lsp_harness analyze`)
+
+Per case D2S/rho, D2S23/rho, DS/rho, D2/rho, D2S/DS, D2S/D2, D2S23/DS,
+D2S23/D2S, D2Sall/DS (rho = mean of 16 runs); per rung geometric mean with a
+95% hierarchical bootstrap (curves, targets, rho seeds), B = 10000 primary,
+2000 band, stream `boot|b2lsp|main`; rho A/A (seeds 0–7 vs 8–15); phase split
+(relation / graph / LA) and relation phase over rho; census (fs/F,
+targets/q′, LA rows, yield weight, cycle length mean/max, BFS depth, LA/fs²,
+LA calls); exponent fits (OLS of log₂ cost on log₂ ℓ, bootstrap within rung)
+for rho, DS, D2, D2S, D2S23 on all rungs, n ≥ 36, n ≥ 48, and n = 36..54,
+plus the slope difference D2S − rho (n ≥ 36, n ≥ 48) with a bootstrap CI;
+crossover projection (a model, labelled so): targets/F = K(c + α)/(1 −
+(1 − α)³) fitted on unsaturated D2S/D2S23 rows, relation + graph per target
+linear in n′, LA either the fitted `2^{l₀}·fs^γ` or `κ·fs²`, rho
+`S_top·√(2^{3n′}/h̄)`; first n′ ≤ 64 with ratio ≤ 1 for the frozen rules and
+a base re-optimised per n′; straight-line extrapolation of measured slopes.
+The gap is reported as the remaining distance, never as pass/fail.
+
+### Predictions (written before evaluation data)
+
+From the abstract simulation (`b2lsp_harness predict`, Poisson(1/6)
+decompositions of uniform classes, the same `BfsLp`, stopping rule and
+sparse LA; `data/predict.jsonl`, `data/predict23.jsonl`, table
+`data/predict_summary.md`) priced with #5291's measured relation Meq per
+target and rho S, and from the held-out pilot:
+
+| n | D2S fs/F | pred D2S/rho | pred D2S/DS | pred weight | pred cycle len mean/max |
+|---|---|---|---|---|---|
+| ≤ 42 | 1 | = DS/rho (±2%) | 1.00 ± 0.02 | 3.0 | — |
+| 45 | 0.78 | 21 | 1.00–1.15 | 3.5 | 2.4/6 |
+| 48 | 0.55 | 23 | 1.05–1.25 | 4.3 | 2.9/8 |
+| 51 | 0.39 | 29 | 1.1–1.5 | 5.1 | 3.6/11 |
+| 54 | 0.28 | 29 | 0.9–1.25 | 6.0 | 4.4/15 |
+| 57 | 0.20 | 32 | — | 7.1 | 5.4/17 |
+| 60 | 0.14 | 32 | — | 8.3 | 6.5/22 |
+
+D2S23 (simulation): 27, 22, 23, 29, 31, 36, 41 at n = 42..60.
+
+- **H1 (exactness).** Every D2S, D2S23, D2Sall log correct; 0 group-law
+  failures; 0 yield-identity mismatches; all track and echelon cross-checks
+  pass; D2Sall ≡ D-S on every case n ≤ 39; replay identical.
+- **H2 (row weight).** BFS keeps combined rows light: D2S mean yield weight
+  ≤ 9 and mean cycle length ≤ 7 at every rung n ≤ 60, maximum cycle length
+  ≤ 30 (D2 at n = 54: weight 81, paths 360–650).
+- **H3 (LA).** LA/fs² for D2S rises with the row weight: 0.7–1.5 where
+  saturated, 2–20 at n = 48..57 (simulation 2.9 → 14; the pilot's real rows
+  are heavier at small α).
+- **H4 (gap).** No parity anywhere: D2S/rho between 15 and 45 at every rung
+  n ≥ 36. D2S/DS within the table's ranges; no rung n ≤ 54 where D2S beats D-S
+  by more than 15% (u = 1).
+- **H5 (D2).** D2S/D2 ≤ 0.35 at n = 48 and ≤ 0.2 at n = 51, 54 (the sparse LA
+  removes D2's echelon cost).
+- **H6 (exponent).** D2S's whole-solve slope on n ≥ 36 is 0.45–0.52
+  (simulation 0.497; D2S23 0.509); its difference from rho's slope has a CI that includes 0
+  — i.e. the slope does **not** measurably fall below rho's on these rungs.
+- **H7 (crossover, model).** No frozen-rule crossover for n ≤ 90; any
+  re-balanced crossover beyond n ≈ 100.
+
+**Falsifier.** Parity at a rung if the upper 95% bound of D2S/rho or
+D2S23/rho is ≤ 1 there (then the rho A/A floor and full verification are
+required before it is stated). H2–H7 are falsified by their stated ranges.
+
+### Not tested
+
+Multi-target amortisation (excluded by instruction); block Wiedemann/Lanczos;
+SGE tuned for heavy rows; a depth cap on cycles (BFS only); D-S and D2 at
+n ≥ 57; isolab/L2; Koblitz rungs; GHS.

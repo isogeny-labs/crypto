@@ -462,6 +462,9 @@ fn projection(proto: &Value, rows: &[Value], fits: &serde_json::Map<String, Valu
         c += 0.005;
     }
     let (sse, cc, kk) = best;
+    if unsat.len() < 2 {
+        return json!({"model": "not fitted: fewer than 2 unsaturated D2S/D2S23 rows"});
+    }
     // graph Meq per target, LA = 2^l0 fs^gamma (fs >= 256), and LA = kappa fs^2 (gamma fixed at 2)
     let gpt = mean(&d2.iter().map(|r| g(r, "graph") / g(r, "targets")).collect::<Vec<_>>());
     let big: Vec<&&Value> = d2.iter().filter(|r| g(r, "fs") >= 256.0 && g(r, "la") > 0.0).collect();
