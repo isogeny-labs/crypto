@@ -12,6 +12,7 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 VERIFY = HERE / "verify-result-readback.py"
+VERIFY_SET = HERE / "verify-result-set.py"
 loader = importlib.util.spec_from_file_location("point_index_result_replay", VERIFY)
 replay_module = importlib.util.module_from_spec(loader)
 loader.loader.exec_module(replay_module)
@@ -32,6 +33,18 @@ def checksum(root, output):
 
 
 def main():
+    schedule_seeds = [16818245236990737041, 14481075801228219236, 1511192426156936103]
+    schedule = {"seed": str(schedule_seeds[0]), "aa_rounds": 5, "ab_rounds": 5,
+                "deadline_ms": 1800000, "executions": 1682}
+    replay_module.check_schedule(schedule, {"schedule_seeds": schedule_seeds}, 0)
+    for bad_schedule, bad_seeds in (({**schedule, "seed": "17"}, schedule_seeds),
+                                    (schedule, [schedule_seeds[0]] * 3)):
+        try:
+            replay_module.check_schedule(bad_schedule, {"schedule_seeds": bad_seeds}, 0)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("invalid or repeated public schedule seed accepted")
     receipt = json.loads((HERE.parents[2] / "crates/hashed-ecdl-tensor/tests/data/panel-receipt-p5-development-s001-t0.json").read_text())
     canonical = json.dumps(receipt["certificate"], separators=(",", ":"), ensure_ascii=False).encode()
     assert hashlib.sha256(canonical).hexdigest() == "992ede1c21f04ab882e9da167041f75fa14b37c3075abcaff6aa839220d94a45"
@@ -99,6 +112,32 @@ def main():
             return result
 
         assert json.loads(run(True).stdout)["scope"] == "structure_only"
+        result_trees = [raw]
+        uris = [uri]
+        for slot in (1, 2):
+            extra = base / f"download-{slot}"
+            shutil.copytree(raw, extra)
+            (extra / "job-id.txt").write_text(f"point-index-{driver[:8]}-s{slot}-a0\n")
+            (extra / "schedule-index.txt").write_text(f"{slot}\n")
+            checksum(extra, extra / "SHA256SUMS")
+            result_trees.append(extra)
+            uris.append(f"s3://isolab-results-104186811093-us-east-2/runs/point-index-{driver[:8]}-s{slot}-a0/{pod}/")
+
+        def run_set(raws, destinations, accepted):
+            set_command = [str(VERIFY_SET), "--image", str(base / "image.json"),
+                           "--checkpoint", str(base / "checkpoint.json"),
+                           "--inputs", str(inputs), "--structure-only"]
+            for tree, destination in zip(raws, destinations):
+                set_command += ["--raw", str(tree), "--s3-uri", destination]
+            result = subprocess.run(set_command, capture_output=True, text=True, check=False)
+            if (result.returncode == 0) != accepted:
+                raise AssertionError(f"unexpected result-set status: {result.returncode} {result.stdout} {result.stderr}")
+            return result
+
+        assert json.loads(run_set(result_trees, uris, True).stdout)["schedule_slots"] == [0, 1, 2]
+        run_set(result_trees[:2], uris[:2], False)
+        run_set([raw, raw, result_trees[2]], [uri, uri, uris[2]], False)
+        run_set([raw, result_trees[1], result_trees[1]], [uri, uris[1], uris[1]], False)
         full_command = [arg for arg in command if arg != "--structure-only"] + [
             "--panel-bin", "/bin/false", "--baseline-bin", "/bin/false",
             "--candidate-bin", "/bin/false"]
@@ -120,7 +159,7 @@ def main():
         checkpoint["inputs_sha256"] = "0" * 64
         write_json(base / "checkpoint.json", checkpoint)
         run(False)
-        print("Result readback closure: exact files and identities accepted; altered file, unlisted file, public input, S3 URI and checkpoint rejected. No solver, benchmark or S3 call ran.")
+        print("Result readback closure: exact files and all three structural schedule slots accepted; missing/repeated slot, altered file, unlisted file, public input, S3 URI and checkpoint rejected. No solver, benchmark or S3 call ran.")
 
 
 if __name__ == "__main__":

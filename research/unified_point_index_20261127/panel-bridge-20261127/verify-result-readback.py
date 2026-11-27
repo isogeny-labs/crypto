@@ -157,6 +157,18 @@ def check_scalar(problem, expected):
         fail("independent toy group replay disagrees with target")
 
 
+def check_schedule(schedule, seeds, slot):
+    declared = seeds.get("schedule_seeds")
+    if (not isinstance(declared, list) or len(declared) != 3
+            or any(type(seed) is not int or seed < 0 or seed >= 2**64 for seed in declared)
+            or len(set(declared)) != 3):
+        fail("public schedule seeds are absent, repeated or out of range")
+    if (schedule.get("seed") != str(declared[slot]) or
+            schedule.get("aa_rounds") != 5 or schedule.get("ab_rounds") != 5 or
+            schedule.get("deadline_ms") != 1800000 or schedule.get("executions") != 1682):
+        fail("analysis schedule differs from frozen plan")
+
+
 def verify(args):
     raw, inputs = Path(args.raw), Path(args.inputs)
     files = check_result_tree(raw)
@@ -228,11 +240,7 @@ def verify(args):
                                 "optimized_options_sha256": image["optimized_options_sha256"],
                                 "unchanged_after_run": True}:
         fail("analysis arm identities changed")
-    schedule = analysis.get("schedule", {})
-    if (schedule.get("seed") != str(seeds["schedule_seeds"][int(slot)]) or
-            schedule.get("aa_rounds") != 5 or schedule.get("ab_rounds") != 5 or
-            schedule.get("deadline_ms") != 1800000 or schedule.get("executions") != 1682):
-        fail("analysis schedule differs from frozen plan")
+    check_schedule(analysis.get("schedule", {}), seeds, int(slot))
     cases = {case["id"]: case for case in manifest["cases"]}
     if files["panel-run/rows.jsonl"].stat().st_size > 128 * 1024 * 1024:
         fail("panel rows exceed readback bound")
@@ -254,6 +262,8 @@ def verify(args):
         case = cases.get(row.get("case_id"))
         if case is None or row.get("command") != "solve-hashed-optimized":
             fail(f"row {index} uses an unexpected case or command")
+        if row.get("split") != case["split"]:
+            fail(f"row {index} has a split that differs from its public case")
         if (not re.fullmatch(r"[a-zA-Z0-9-]+", row["case_id"])
                 or not re.fullmatch(r"problems/[a-zA-Z0-9-]+[.]json", case["problem"])):
             fail(f"row {index} has an unsafe public case path")
