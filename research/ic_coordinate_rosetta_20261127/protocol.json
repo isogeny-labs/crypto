@@ -1,0 +1,820 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "IC-S59-coordinate-rosetta-20261127",
+  "version": 1,
+  "created": "2026-11-27",
+  "repository": "crypto",
+  "study_dir": "research/ic_coordinate_rosetta_20261127",
+  "authors": [
+    "Codex coordinate-comparison lane"
+  ],
+  "links": {
+    "pull_request": "https://github.com/isogeny-labs/crypto/pull/5260",
+    "source_manifest": "research/ic_coordinate_rosetta_20261127/source_manifest.json",
+    "coordinate_matrix": "research/ic_coordinate_rosetta_20261127/COORDINATE_MATRIX.md"
+  },
+  "question": "On the S59 prime and the fixed NIST-shaped curve y^2=x^3-3x+11, how do intrinsic coordinate-defined factor bases differ in planted-relation admission, coordinate-evaluation cost, invariance, and isolated wall time; and how do all supported prime-field EFD model charts differ in exact straight-line arithmetic cost and round-trip support?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every admitted input triple is a planted zero-sum relation, the deliberately wrong triple is rejected, every reported chart round-trips, and every reported applicable addition or doubling agrees with the affine oracle.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "The nine fixed-curve coordinate arms have measurably different factor-base density, planted-relation admission rate, invariance, or coordinate-evaluation cost on the frozen S59 fixture.",
+      "class": "comparative",
+      "decided_by": [
+        "C-coordinates"
+      ],
+      "if_supported": "report the paired effect for each arm versus x, with algebraic degree and invariance shown beside the rate",
+      "if_not_supported": "report the arms as indistinguishable at this fixture and resolution; do not claim equivalence"
+    },
+    {
+      "id": "C3",
+      "text": "The supported EFD charts differ in exact straight-line field-operation counts; those counts describe representation engineering and do not by themselves establish a better index-calculus surface.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C4",
+      "text": "Plane-quartic and hyperelliptic coordinates are not compared as alternate coordinates of this elliptic-curve group without an explicit subgroup-preserving transfer, recovery map, and cost ledger.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Degree-2 Kummer-equivalent x, normalized Jacobian x, and Mobius-x arms will have comparable density-adjusted planted-relation admission; differences should be constant-factor extraction cost or threshold placement rather than a new asymptotic surface.",
+      "mechanism": "They represent the same degree-2 quotient function up to normalization or a fractional-linear change of variable.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "density-adjusted-rate",
+          "direction": "equal_within",
+          "minimum_effect": "a Holm-corrected paired 95% interval excluding ratio 1 and exceeding the x/x_aa control spread",
+          "provenance": {
+            "written_at": "2026-11-27",
+            "data_seen": [
+              {
+                "path": "crypto-autoresearcher:knowledge/leads/ecdlp/exotic/LEAD-EXO-curve-model-representation.yaml",
+                "measured": "prior literature/lead synthesis only; no output from this Rust instrument"
+              }
+            ],
+            "sample_status": "out_of_sample"
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "x",
+      "role": "reference",
+      "description": "Affine x-coordinate factor base, the degree-2 Kummer reference.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate x --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "x",
+        "algebraic_degree": 2
+      }
+    },
+    {
+      "id": "x-aa",
+      "role": "control_aa",
+      "description": "Byte-for-byte repeated x-coordinate extraction under a distinct arm identifier.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate x_aa --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "x_aa",
+        "algebraic_degree": 2
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "jacobian-x-normalized",
+      "role": "candidate",
+      "description": "Projective X normalized by Z squared; mathematically the same affine x function with explicit inversion cost.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate jacobian_x_normalized --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "jacobian_x_normalized",
+        "algebraic_degree": 2
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "jacobian-X-raw",
+      "role": "control_negative",
+      "description": "Raw projective X with independently varied scale; it must fail scale invariance and is not a curve function.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate jacobian_X_raw_negative_control --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "jacobian_X_raw_negative_control",
+        "algebraic_degree": null
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "mobius-x",
+      "role": "candidate",
+      "description": "Fractional-linear reparameterization (7x+11)/(13x+17) of affine x.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate mobius_x --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "mobius_x",
+        "algebraic_degree": 2
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "y",
+      "role": "candidate",
+      "description": "Affine y-coordinate, a degree-3 curve function with different negation behavior.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate y --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "y",
+        "algebraic_degree": 3
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "x-plus-y",
+      "role": "candidate",
+      "description": "Affine x+y, a degree-3 curve function.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate x_plus_y --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "x_plus_y",
+        "algebraic_degree": 3
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "x-squared",
+      "role": "candidate",
+      "description": "The degree-4 composition x squared, included to expose image collisions and extraction cost.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate x_squared --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "x_squared",
+        "algebraic_degree": 4
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "x-over-y",
+      "role": "candidate",
+      "description": "The rational function x/y, with poles recorded explicitly.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "relations --coordinate x_over_y --samples 262144 --seed SEED"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate": "x_over_y",
+        "algebraic_degree": "model-dependent rational degree"
+      },
+      "same_instrument_as": "x"
+    },
+    {
+      "id": "efd-chart-matrix",
+      "role": "baseline",
+      "description": "All 33 supported prime-field EFD charts across ten models; only exact round-trip, affine-oracle agreement, and straight-line counts are cross-chart evidence.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--bin",
+            "ic_coordinate_rosetta"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "command": "chart-all --workers 4 --iterations 20000"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 4
+      },
+      "parameters": {
+        "efd_models": 10,
+        "efd_charts": 33,
+        "formulae": 471
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "every sampled row constructs R=-(P+Q) and the harness verifies (P+Q)+R is infinity, so the positive detector is exercised on every arm rather than as a separate arm"
+    },
+    "negative": {
+      "present": true,
+      "arm": "jacobian-X-raw",
+      "null_population": {
+        "description": "the same affine points re-encoded under two independently derived nonzero projective scales",
+        "generator": "splitmix64(seed, sample index, domain separator) modulo p, with zero replaced by one",
+        "n": 6291456,
+        "why_n": "8 seeds times 262144 triples times 3 points gives exact scale-invariance resolution below one part per million",
+        "matched_on": [
+          "affine point",
+          "field",
+          "curve",
+          "sample index",
+          "factor-base threshold"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "coordinate",
+        "levels": [
+          "x",
+          "x_aa",
+          "jacobian_x_normalized",
+          "jacobian_X_raw_negative_control",
+          "mobius_x",
+          "y",
+          "x_plus_y",
+          "x_squared",
+          "x_over_y"
+        ]
+      },
+      {
+        "name": "EFD chart",
+        "levels": [
+          "all catalogue charts"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "field",
+        "treatment": "fixed",
+        "value": "S59 p=288230445959117953",
+        "how": "one registry prime shared by all arms"
+      },
+      {
+        "name": "primary curve",
+        "treatment": "fixed",
+        "value": "y^2=x^3-3x+11 with known point (1,3)",
+        "how": "one NIST-shaped short-Weierstrass fixture; no curve-order or subgroup-order claim"
+      },
+      {
+        "name": "seeded traces",
+        "treatment": "randomized",
+        "how": "eight protocol-hash-derived seeds, shared across coordinate arms"
+      },
+      {
+        "name": "coordinate arm",
+        "treatment": "crossed",
+        "how": "every seeded trace is evaluated under all nine coordinate definitions"
+      },
+      {
+        "name": "factor-base threshold",
+        "treatment": "fixed",
+        "value": "floor(p/16)",
+        "how": "identical numeric threshold for all coordinate images"
+      },
+      {
+        "name": "chart parameter fixture",
+        "treatment": "crossed",
+        "how": "one explicit valid parameter set per EFD model/chart; the birationally produced short-Weierstrass curve is recorded"
+      },
+      {
+        "name": "host load",
+        "treatment": "measured",
+        "how": "CPU, kernel, isolation, steal, PSI, worker count, and binary hash are recorded for timed rows"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-coordinates",
+        "arms": [
+          "x",
+          "jacobian-x-normalized",
+          "jacobian-X-raw",
+          "mobius-x",
+          "y",
+          "x-plus-y",
+          "x-squared",
+          "x-over-y"
+        ],
+        "differs_in": [
+          "coordinate"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "x",
+          "x-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-efd-counts",
+        "arms": [
+          "efd-chart-matrix"
+        ],
+        "differs_in": [
+          "EFD chart"
+        ],
+        "design": "factorial"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "scope": "plane quartic and hyperelliptic representations",
+        "required_before_comparison": [
+          "explicit subgroup-preserving map from the elliptic target group",
+          "recovery map back to the elliptic target",
+          "kernel, image, exceptional-set, and cofactor accounting",
+          "transfer and recovery cost included in every metric"
+        ]
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "counting rows are deterministic; isolated timed rows alternate arm order within each seed to limit drift",
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "seeds": [],
+      "nonce": null,
+      "note": "seed = first 8 bytes of sha256(protocol_sha256, arm-independent instance index), with the resulting eight values recorded in the export"
+    },
+    "instance_sampling": {
+      "rule": "eight deterministic P,Q traces derived from the protocol seed; each trace advances P by 2G and Q by 3G for exactly 262144 samples",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "not masked because invariance and algebraic degree are explicit coordinate properties and exact counters dominate the engineering comparison",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 8,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 7,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "each arm receives 6291456 coordinate evaluations per eight-seed pass and roughly 512 admitted triples at density 1/16; this resolves large admission effects, while exact invariance and operation counts need no sampling inference"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 4,
+      "estimated_total_seconds": 1800,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "correctness",
+        "name": "relation and chart correctness",
+        "unit": "pass/fail per check",
+        "kind": "exact",
+        "definition": "planted and wrong relation oracles, chart encode/decode/re-encode equality, and applicable chart arithmetic equality with the affine oracle",
+        "source": "relation rows planted_zero_sum_passes and negative_zero_sum_failures; chart rows status and verified_cases",
+        "aggregation": "per_row",
+        "resolution": "one check",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "relation-rate",
+        "name": "planted-relation admission rate",
+        "unit": "admitted triples / sampled triples",
+        "kind": "rate",
+        "definition": "a triple is admitted only when all three coordinate images are defined and below floor(p/16)",
+        "source": "relation rows relation_rate",
+        "aggregation": "paired_ratio",
+        "resolution": "1/262144 per seed",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "density-adjusted-rate",
+        "name": "density-adjusted relation admission",
+        "unit": "relation_rate / factor_base_density^3",
+        "kind": "derived",
+        "definition": "observed planted-relation admission divided by the cube of the observed single-coordinate density; descriptive dependence diagnostic, not a full relation-generation success rate",
+        "source": "relation rows independence_ratio",
+        "formula": "relation_rate / factor_base_density^3",
+        "aggregation": "paired_ratio",
+        "resolution": "set by 1/262144 relation-rate resolution",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "coordinate-work",
+        "name": "coordinate extraction field operations",
+        "unit": "field operations by class",
+        "kind": "counted",
+        "definition": "multiplications, squarings, inversions, and additions required to extract the coordinate value; elliptic point generation and factor-base comparison are excluded",
+        "source": "relation rows counted_coordinate_work",
+        "aggregation": "per_row",
+        "resolution": "one field operation",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "efd-formula-work",
+        "name": "EFD straight-line field operations",
+        "unit": "field operations by class per formula",
+        "kind": "counted",
+        "definition": "compiled straight-line formula multiplications, squarings, inversions, and additions; chart conversion, qualification, and validation are excluded",
+        "source": "chart rows addition/doubling/best_diffadd/best_ladder straight_line_counts",
+        "aggregation": "per_row",
+        "resolution": "one field operation",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall-time",
+        "name": "isolated wall time",
+        "unit": "nanoseconds per fixed batch",
+        "kind": "timed",
+        "definition": "monotonic time around the frozen relation or chart batch after one warmup; admissible only for a single-worker arm in an L2 isolated run",
+        "source": "relation rows wall_ns and chart formula wall_ns",
+        "aggregation": "median",
+        "resolution": "one nanosecond clock tick",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "coordinate evaluations",
+      "factor-base hits",
+      "admitted relations",
+      "excluded poles or infinity",
+      "negation-invariance matches",
+      "scale-invariance matches",
+      "field multiplications",
+      "field squarings",
+      "field inversions",
+      "field additions"
+    ],
+    "record": [
+      "git commit",
+      "binary sha256",
+      "Rust version",
+      "CPU model",
+      "kernel release",
+      "isolation level and blockers",
+      "steal ticks",
+      "PSI",
+      "workers and threads",
+      "seed",
+      "samples"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "mixed",
+    "queue": "isolab",
+    "placement": {
+      "counting": "local or throughput workers; four workers per batch",
+      "timing": "IsoLab/EKS L2 isolated pods; one worker per arm, pods parallel across seeds and arms",
+      "timing_parallelism": 8,
+      "budget_usd": 10
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "fixed counting design: eight seeds times nine coordinate arms at 262144 triples per arm, plus all EFD chart rows, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "fixed timing design: one warmup and five measured repetitions per seed and arm, then stop",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "stop and classify the affected arm invalid if a planted relation fails, a wrong relation is accepted, a chart reports a false verified status, or a binary/commit mismatch is observed",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a wall-time row with workers other than one or isolation below L2 is descriptive only and cannot support a speed claim",
+    "an arm with any planted relation failure or wrong-relation acceptance is invalid rather than slow",
+    "a chart without a valid parameter fixture or supported round-trip is reported inapplicable/unsupported and excluded from arithmetic ranking",
+    "any row whose binary hash or commit differs from the frozen instrument is invalid",
+    "counted units remain valid across hosts when the binary and input hashes match"
+  ],
+  "decision_rule": {
+    "text": "C2 is supported descriptively for an arm when its paired effect versus x on relation rate or density-adjusted rate has a Holm-corrected 95% bootstrap interval excluding ratio 1 and exceeds the x/x_aa control spread, or when its exact extraction-cost or invariance vector differs. Algebraic-degree and invariance differences must be reported and forbid a blanket superiority claim.",
+    "comparison_ids": [
+      "C-coordinates"
+    ],
+    "threshold": "Holm-corrected interval excludes 1 and effect exceeds A/A for sampled rates; any nonzero exact difference for counts or invariance",
+    "statistic": "paired candidate/x ratio by seed for rates; exact vector difference for operation counts and invariance",
+    "interval": "paired bootstrap across eight seeded traces, 95%, with x/x_aa as the control distribution",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "rate ratio and absolute percentage-point difference; field-operation vector; invariance-match fraction",
+    "verdict_vocabulary": [
+      "supported_within_fixture",
+      "within_control_distribution",
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "artifacts/relations/*.json",
+      "artifacts/charts/*.json",
+      "artifacts/environment/*.json"
+    ],
+    "outputs": [
+      "artifacts/coordinate_summary.json",
+      "artifacts/chart_summary.json",
+      "REPORT.md",
+      "figures/coordinate_rate_and_cost.svg",
+      "figures/efd_operation_counts.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "coordinate relation rate and density-adjusted rate with x/x_aa control",
+      "coordinate extraction operation vectors",
+      "EFD addition and doubling straight-line operation counts",
+      "invariance matrix"
+    ],
+    "report_dir": "research/ic_coordinate_rosetta_20261127"
+  },
+  "inadmissible": [
+    "changing seeds, threshold, curve, coordinate definitions, sample count, or stopping rule after seeing affected data",
+    "quoting local or multi-worker wall time as a benchmark result",
+    "calling raw projective X an intrinsic coordinate or factor-base function",
+    "treating projective storage charts as new index-calculus surfaces",
+    "ranking different curve models as the same ECDLP target when no explicit isomorphism or subgroup-preserving transfer is included",
+    "including plane-quartic or hyperelliptic results in the elliptic fixed-group comparison without the registered transfer obligations",
+    "claiming a sub-square-root ECDLP algorithm or extrapolating the S59 fixture to NIST security sizes",
+    "using a different-language compute implementation for new experiment code"
+  ],
+  "literature": [
+    {
+      "ref": "research/ic_coordinate_rosetta_20261127/source_manifest.json",
+      "provenance": "retrieved",
+      "claim": "coordinate/model inventory and attack-oriented representation taxonomy",
+      "verified_by": "SHA-256 manifest and extracted-text review on 2026-11-27"
+    },
+    {
+      "ref": "crypto-autoresearcher:knowledge/leads/ecdlp/exotic/LEAD-EXO-curve-model-representation.yaml",
+      "provenance": "kb",
+      "claim": "prior evidence says Weierstrass and twisted-Edwards model-native PDP solving retain degree of regularity two, leaving constant-factor differences",
+      "verified_by": "lead record read before protocol freeze on 2026-11-27"
+    },
+    {
+      "ref": "src/prime_ecc/efd and src/cryptanalysis/efd_representations.rs",
+      "provenance": "internal",
+      "claim": "pinned EFD catalogue, model charts, formula programs, and conversion checks used by the Rust instrument",
+      "verified_by": "cargo check and source inspection on 2026-11-27"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
