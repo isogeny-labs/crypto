@@ -45,6 +45,8 @@ this study does not change those maps.
 | Aggregate/individual cross-images | 101701signed aggregate labels;212842individual slots | Zero cross-aliases;derived208128/208122/6 |
 | Divided aggregate aliases | m=1,2,3;101926pairs each | Zero unequal-expression aliases;actual108/102/6 |
 | Divided/individual cross-images | 203402signed labels;212842individual slots | Zero cross-aliases;derived309829/309823/6 |
+| First residual-fibre expansion | 16new image labels;39new curve points | Computed116/110/6;all15necessary image rows |
+| Diversified residual-fibre expansion | 256new image labels;782new curve points | Computed236/230/6;all135necessary image rows |
 
 Fibre solving uses projective Macaulay quotients, stable-image extraction,
 finite-field root extraction and actual map evaluation, including Laurent
@@ -222,6 +224,49 @@ disjoint and have no image alias coupling to the saved graph. This is a bound
 for this particular pin/graph model. See MIXED_DIVIDED_PROTOCOL.md and
 evidence/mixed-divided-v1/. [pcc:unverified]
 
+## Actual residual-fibre anchor expansion
+
+The first expansion selects eight complete split sections after26old-pool
+attempts. Their sixteen residual image labels lie outside every original429
+column. Solving all sixteen signed target fibres with the complete existing
+Macaulay/root/exceptional-map routines gives39new rational curve points,
+bringing the pool to691. All sixteen known residual witnesses are recovered.
+The116886signed-pair norm test over225old+16new image columns returns15rows
+including zero. Both arithmetic streams and both joins agree;every actual
+seed row appears. After embedding all rows in original429+16columns,the
+computed ranks are116full,110auxiliary,6closed. See ANCHOR_PROTOCOL.md and
+evidence/anchors-v1/. [pcc:unverified]
+
+Those eight seed sections share source anchor0. The diversified expansion
+keeps them and adds one first-qualifying section for each old anchor1..120.
+In321selection attempts it obtains128sections and256distinct new image labels.
+It revalidates/reuses the sixteen complete saved fibres and solves only240new
+ones. The inventory has782new rational curve points,1434total;all256known
+residual witnesses are recovered. Every new image remains auxiliary.
+[pcc:unverified]
+
+The complete464166-pair stream has digest
+
+```
+2429ab291e249e72dcc03e41b0c5f80fbf7504bf8f4549915827351c22c976bb
+```
+
+Both joins retain135necessary image rows including zero and recover all128
+actual seed rows. Every retained row and all108original rows pass GMP and
+OpenSSL group checks. The full243by685matrix respects the original256row/
+1024column dense caps. Direct elimination gives236full,230auxiliary,6closed.
+Known-witness omission,changed target,changed characteristic constant and
+changed row controls reject;the public nonempty relation fixture passes.
+See ANCHOR_EXPANDED_PROTOCOL.md and evidence/anchors-expanded-v1/.
+[pcc:unverified]
+
+These are actual fibre expansions with a complete necessary image-level
+bound. Every fully supported canonical line in the declared expanded image
+domain is a subset of the tested norm rows,and therefore cannot add old-base
+rank. No expensive repeat of the geometric all-pair line scan is needed.
+The conclusion does not cover other images,nonrational elliptic traces or
+higher-degree function relations. [pcc:unverified]
+
 ## Resource and failure record
 
 All mathematical computation is native C++. Each build is limited to300s,
@@ -234,6 +279,8 @@ corrected trace test40.438; conic search27.453; signed-six171.878;
 same-image conic extension42.602;partial lines22.842;separate geometry6.555;
 coupled residual graph277.788;mixed comparison92.381;failed divided build2.212;
 corrected divided15.373;divided/individual comparison96.061.
+The initial actual-anchor expansion takes29.979wrapper seconds;the larger
+diversified expansion takes131.444wrapper seconds and reuses16fibre solves.
 The graph collector itself takes265.461seconds;mixed build13.501and scan78.801.
 The divided/individual build takes14.143seconds and scan81.873seconds.
 The same-image conic wrapper first failed before build in0.012seconds.
@@ -255,15 +302,15 @@ source snapshots and hashes identify the exact executed source.
 ## Next discriminating work
 
 The residual graph covers every rationally split pair/tangent section on
-this652-point pool. The aggregate labels are disjoint from its individual
-images,and the three divided aggregate families are mutually disjoint and
-disjoint from the individual graph images. A concrete successor is to select
-a bounded,deterministic set of newly encountered rational residual images,
-compute their actual cover fibres,and search sections involving those new
-curve anchors. The original225columns must stay fixed;new image columns stay
-auxiliary throughout elimination. Such a search needs a separate frozen
-protocol and is not executed here. Different function families and nonrational
-residual-image information are other open directions. Repeating these same
+the652-point old pool. Aggregate/divided labels do not couple to its individual
+images. Actual cover-anchor expansion now reaches1434curve points and256new
+auxiliary images,but the complete necessary canonical-line image condition
+still retains closed rank6. A distinct successor is to assess higher-degree
+sections,such as conic pencils through the newly recovered fibre points.
+The saved actual pool can be reused without another fibre solve. All images
+outside the original225must remain auxiliary,and all execution/dense caps
+remain fixed. This higher-degree successor is not executed here. Nonrational
+elliptic traces remain another open direction. Repeating the completed
 fixed relation families cannot produce a different rank.
 Any positive candidate still needs actual cover/KM and separate
 elliptic/elimination replay.
@@ -277,11 +324,13 @@ elliptic/elimination replay.
   [same-image conics](FIBRE_CONIC_PROTOCOL.md), [signed six](SIX_PROTOCOL.md),
   [partial lines](PARTIAL_PROTOCOL.md), [residual graph](GRAPH_PROTOCOL.md),
   [mixed images](MIXED_PROTOCOL.md), [divided images](DIVIDED_PROTOCOL.md)
-  and [divided/individual images](MIXED_DIVIDED_PROTOCOL.md).
+  and [divided/individual images](MIXED_DIVIDED_PROTOCOL.md),
+  [actual anchors](ANCHOR_PROTOCOL.md),
+  [diversified anchors](ANCHOR_EXPANDED_PROTOCOL.md).
 - Run wrappers: run-fibres.sh, run-sections.sh, run-audit.sh, run-norms.sh,
   run-trace.sh, run-conics.sh, run-fibre-conics.sh, run-six.sh,run-partial.sh,
   run-audit-partial.sh, run-graph.sh, run-mixed.sh, run-divided.sh and
-  run-mixed-divided.sh.
+  run-mixed-divided.sh,run-anchors.sh and run-anchors-expanded.sh.
 - Immutable attempt reports and diagrams are in reports/.
 - Prior finite-domain results: ../recorded_pool_20261123/REPORT.md and
   ../closure_20261123/REPORT.md; the signed-pair helper is copied with provenance.

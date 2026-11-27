@@ -77,6 +77,23 @@ if fibre_exit.exists() and fibre_exit.read_text().strip() == '0':
         f"{fibre['pencil_count']} pencils;{fibre['candidate_occurrences']} candidate occurrences;"
         f"{fibre['supported_conics']} supported conics;closed rank{fibre['closed_rank']};"
         f"gain{fibre['candidate_gain']}. All declared controls passed.")
+for anchor_attempt in ('anchors-v1','anchors-expanded-v1'):
+    source=ROOT/'evidence'/anchor_attempt/'calls/scan/stdout.json'
+    terminal=source.parent/'exit-code.txt'
+    if terminal.exists() and terminal.read_text().strip()=='0':
+        anchor=json.loads(source.read_text())
+        attempts[anchor_attempt]=(
+            f"Actual fibre expansion passed:{anchor['selected_sections']}selected sections,"
+            f"{anchor['new_auxiliary_columns']}new auxiliary image columns,"
+            f"{anchor['new_curve_points']}new rational curve points,"
+            f"{anchor['expanded_curve_pool']}total curve points. "
+            f"{anchor['signed_norm_pairs']}signed pairs yield"
+            f"{anchor['distinct_norm_rows_including_zero']}necessary image rows;"
+            f"computed full/auxiliary/closed ranks{anchor['full_rank']}/"
+            f"{anchor['auxiliary_rank']}/{anchor['closed_rank']},gain{anchor['candidate_gain']}. "
+            f"Reused{anchor.get('reused_fibres',0)}frozen complete fibres;"
+            f"solved{anchor.get('freshly_solved_fibres',anchor['new_auxiliary_columns'])}fresh fibres. "
+            "Both elliptic streams/joins,actual witness recovery and corruption controls pass.")
 if selected - attempts.keys():
     raise SystemExit('Unknown attempt selected')
 for name, outcome in attempts.items():
@@ -161,7 +178,9 @@ for label, relative in [('Trace429','trace-v2/calls/augmented'),
                         ('Residual graph','graph-v1/calls/collect'),
                         ('Mixed (derived)','mixed-v1/calls/scan'),
                         ('Divided','divided-v2/calls/scan'),
-                        ('Mixed /2,/3','mixed-divided-v1/calls/scan')]:
+                        ('Mixed /2,/3','mixed-divided-v1/calls/scan'),
+                        ('Anchor16','anchors-v1/calls/scan'),
+                        ('Anchor256','anchors-expanded-v1/calls/scan')]:
     source = ROOT/'evidence'/relative/'stdout.json'
     terminal = source.parent/'exit-code.txt'
     if terminal.exists() and terminal.read_text().strip() == '0':
@@ -186,7 +205,7 @@ for position, key in enumerate(metrics[:2]):
                           textcoords='offset points',ha='right' if position==0 else 'left',
                           va='bottom',fontsize=6.5)
 axis.set_yscale('log')
-axis.set_ylim(.7,max(record['full_rank'] for _,record in cases)*8)
+axis.set_ylim(.7,max(record['full_rank'] for _,record in cases)*64)
 axis.set_ylabel('Full / auxiliary rank (log scale)')
 axis.legend(loc='upper left',bbox_to_anchor=(0,1.25),ncol=2,fontsize=9)
 closed_values=[record['closed_rank'] for _,record in cases]
