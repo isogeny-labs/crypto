@@ -183,6 +183,17 @@ mode list in packet/tile/weight order and checks every source zero-suppression.
 A Lean refinement from the accepted witness and a concrete all-child
 Rust-to-typed-function mapping remain open. `[pcc:unverified]`
 
+`lean/ExtensionRingModel.lean` now fixes the formal coefficient type to the
+same power-basis shape as native `Ring`: a quotient
+`(Z/2^p)[U]/f` for a monic binary-coefficient polynomial. It decodes a
+fixed-length coordinate function into the quotient, proves coordinatewise
+addition and negation, derives `2^p=0` in every such extension, and instantiates
+the exact Cauchy cutoff without an abstract modulus premise. This does not yet
+prove that Rust's convolution/reduction loop implements quotient
+multiplication, bind the deterministic irreducible-polynomial search to the
+formal Boolean coefficients, or turn an accepted serialized vector into a
+Lean term automatically. `[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a

@@ -6,6 +6,7 @@ import ConditionalObjective
 import LabelSequence
 import ObjectiveBoundary
 import GroupFactorization
+import ExtensionRingModel
 
 open Curve25519ParametricRefinement
 open Curve25519ConditionalVariance
@@ -13,6 +14,7 @@ open Curve25519ConditionalObjective
 open Curve25519LabelSequence
 open Curve25519ObjectiveBoundary
 open Curve25519GroupFactorization
+open Curve25519ExtensionRingModel
 
 #print axioms class_cap_of_scaled_variance
 #print axioms padded_capacity
@@ -68,3 +70,7 @@ open Curve25519GroupFactorization
 #print axioms inverse_eq_geometric_add_remainder
 #print axioms cauchy_weight_mode_series
 #print axioms cauchy_weight_mode_series_at_precision
+#print axioms nativeExtension_pow_two_zero
+#print axioms decodePowerBasis_add
+#print axioms decodePowerBasis_neg
+#print axioms nativeExtension_cauchy_weight_mode_series_at_precision

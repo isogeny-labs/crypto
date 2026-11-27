@@ -468,6 +468,15 @@ empty/zero suppression; a mutated packet pair changes the first expected mode
 header and is rejected. This is native code-to-formula evidence, not yet a Lean
 refinement theorem. `[pcc:unverified]`
 
+The formal coefficient ring is no longer left wholly abstract.
+`lean/ExtensionRingModel.lean` defines the native power-basis shape
+`(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate
+vectors, proves coordinatewise addition and negation, proves `2^p=0` in the
+quotient, and specializes the exact Cauchy cutoff with that premise discharged.
+The native convolution/reduction loop, deterministic polynomial selection,
+and accepted-vector elaboration still require a concrete refinement proof.
+`[pcc:unverified]`
+
 The formal replay also covers the `2M delta` bipartite degree-square budget,
 the centered class-variance identity, and the conversion from the scaled
 collision objective to every per-class cap, with isolates and parallel ports

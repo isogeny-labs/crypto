@@ -523,8 +523,13 @@ the exact ring only, not the production deformation or recursion modules. The
 same verifier composes accepted packing-provenance packet pairs with the scalar
 witness to enumerate the complete mode vector in exact source-loop order,
 including all empty-tile, empty-row, zero-form, and zero-row suppressions. The
-remaining formal gap is to instantiate the Lean ring values and mode functions
-from this accepted witness and then bind complete child construction.
+formal `ExtensionRingModel` now supplies the exact quotient type
+`(Z/2^p)[U]/f`, power-basis coordinate decoding, additive operations,
+extension nilpotence, and a Cauchy-series specialization with the modulus
+premise discharged. The remaining scalar gap is native-to-formal refinement of
+the deterministic polynomial and multiplication/reduction loop, followed by
+instantiation of every accepted witness value and mode function. Complete
+child construction remains a separate concrete binding.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in
