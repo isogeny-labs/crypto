@@ -222,8 +222,10 @@ canonical `Vec<BigUint>` inputs and output. A dense degree-4 control exercises
 both arithmetic phases, compares every flattened field and transition count
 with one committed CSV artifact, and rejects a changed product coordinate. Lean
 reads the same artifact with a transparent kernel-reducible parser, proves that
-every successful typed parse has four degree-sized vectors, proves that this
-record's lower bits pack to polynomial `19`, and proves that the exact formal
+every successful typed parse has four degree-sized vectors, and then passes it
+through a canonical importer that recomputes the packed polynomial and checks
+all coordinate bounds. The committed record passes that boundary; its lower
+bits pack to polynomial `19`, and the exact formal
 transition evaluator maps its named left/right vectors to `[30,29,0,3]` at
 precision five. Composing that result with the universal decoder theorem proves
 that the named product coordinates represent multiplication in the quotient

@@ -1073,9 +1073,64 @@ theorem parseRingMultiplicationArtifact_wellFormed
   next =>
     simp at hvalidate
 
+/-- Recompute the packed monic binary polynomial from the named lower bits. -/
+def RingMultiplicationArtifact.expectedPolynomial
+    (artifact : RingMultiplicationArtifact) : ℕ :=
+  (List.range artifact.degree).foldl
+    (fun polynomial index =>
+      if artifact.lowerCoefficients.getD index false then
+        polynomial + 2 ^ index
+      else
+        polynomial)
+    (2 ^ artifact.degree)
+
+/-- Every serialized coordinate is canonical modulo `2^precision`. -/
+def RingMultiplicationArtifact.canonicalCoordinates
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  let modulus := 2 ^ artifact.precision
+  artifact.left.all (fun coordinate => decide (coordinate < modulus)) &&
+    artifact.right.all (fun coordinate => decide (coordinate < modulus)) &&
+    artifact.product.all (fun coordinate => decide (coordinate < modulus))
+
+/-- Shape, packed-polynomial consistency, and canonical coordinate bounds. -/
+def RingMultiplicationArtifact.canonical
+    (artifact : RingMultiplicationArtifact) : Bool :=
+  artifact.wellFormed &&
+    artifact.polynomial == artifact.expectedPolynomial &&
+    artifact.canonicalCoordinates
+
+/-- Fail closed unless a shaped record is also algebraically canonical. -/
+def validateCanonicalRingMultiplicationArtifact
+    (artifact : RingMultiplicationArtifact) : Option RingMultiplicationArtifact :=
+  if artifact.canonical then some artifact else none
+
+/-- Checked import boundary for an algebraically canonical multiplication
+record. -/
+def parseCanonicalRingMultiplicationArtifact
+    (values : List ℕ) : Option RingMultiplicationArtifact := do
+  let artifact ← parseRingMultiplicationArtifact values
+  validateCanonicalRingMultiplicationArtifact artifact
+
+/-- Every successfully imported canonical record has consistent polynomial bits
+and coordinate representatives as well as exact vector lengths. -/
+theorem parseCanonicalRingMultiplicationArtifact_canonical
+    {values : List ℕ} {artifact : RingMultiplicationArtifact}
+    (hparse : parseCanonicalRingMultiplicationArtifact values = some artifact) :
+    artifact.canonical = true := by
+  unfold parseCanonicalRingMultiplicationArtifact at hparse
+  rcases Option.bind_eq_some_iff.mp hparse with
+    ⟨candidate, _, hvalidate⟩
+  unfold validateCanonicalRingMultiplicationArtifact at hvalidate
+  split at hvalidate
+  next hcanonical =>
+    have hartifact : candidate = artifact := Option.some.inj hvalidate
+    simpa only [hartifact] using hcanonical
+  next =>
+    simp at hvalidate
+
 /-- Typed, length-checked view of the committed degree-four artifact. -/
 def degreeFourWitnessRecord : RingMultiplicationArtifact :=
-  (parseRingMultiplicationArtifact degreeFourWitnessNumbers).getD default
+  (parseCanonicalRingMultiplicationArtifact degreeFourWitnessNumbers).getD default
 
 /-- The shared bytes decode to every named witness field, including both input
 vectors and the exact transition counts. -/
@@ -1091,6 +1146,11 @@ theorem degreeFourWitnessRecordValues :
       convolutionProducts := 16
       reductions := 6
     } := by
+  decide
+
+/-- The committed record passes the generic canonical import boundary. -/
+theorem degreeFourWitnessRecordCanonical :
+    degreeFourWitnessRecord.canonical = true := by
   decide
 
 /-- The exact lower-bit vector selected by native `Ring::new(4, 5)`: the

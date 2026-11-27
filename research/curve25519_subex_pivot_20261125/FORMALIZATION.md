@@ -564,8 +564,11 @@ then derives all four degree-sized vector boundaries into a typed record and
 rejects malformed lengths or non-Boolean lower-bit fields. It kernel-checks the
 generic successful-parse implication from the Boolean shape validator, proving
 that every exposed record has four vectors of exactly its encoded degree. It
-also kernel-checks the complete named sample, then uses its packed polynomial
-`19`, lower bits
+then recomputes the monic packed polynomial from the lower-bit vector and checks
+every left, right, and product coordinate against `2^precision`; a second
+generic implication proves every successful canonical import satisfies all of
+those checks. The committed record kernel-checks through that boundary, then
+uses its packed polynomial `19`, lower bits
 `[1,1,0,0]`, separate dense left/right inputs, and product `[30,29,0,3]` in the
 exact source-shaped evaluation without positional field offsets. The concrete
 evaluation is composed with `decodeNativeProductCoordinates`, so the typed
