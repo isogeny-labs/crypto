@@ -1237,7 +1237,7 @@ mod tests {
         for _ in 0..2000 {
             let rnd = |rng: &mut rand::rngs::StdRng| {
                 let mask = rng.gen::<u64>() & 0xff;
-                let free = [rng.gen_range(0..3), rng.gen_range(0..3), 0, 0];
+                let free = [rng.gen_range(0..3), rng.gen_range(0..3), 0, 0, 0];
                 mono(mask, free)
             };
             let (a, b) = (rnd(&mut rng), rnd(&mut rng));

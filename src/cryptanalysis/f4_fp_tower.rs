@@ -25,7 +25,7 @@
 //! This engine is Faugère's F4 on `R`, built like
 //! [`pq_f4_f2`](crate::cryptanalysis::pq_f4_f2), which is F4 on the boolean
 //! ring. Its parts:
-//! - **Monomials** are a 64-bit tower mask plus up to four free exponents,
+//! - **Monomials** are a 64-bit tower mask plus up to five free exponents,
 //!   packed into one `u128` whose integer order is grevlex with variable 0
 //!   largest, the order [`f4_fp`](crate::cryptanalysis::f4_fp) uses.
 //! - **Products are rewritten by the tower as they are formed**, so the
@@ -197,9 +197,9 @@ impl Fp {
 /// Layout, least significant first:
 /// - bits `0..64`: the complement of the tower mask. Bit `j` of the mask is
 ///   `y_j`, variable `j`.
-/// - bits `64..96`: for free variable `f` (global index `n_tower + f`), the
+/// - bits `64..104`: for free variable `f` (global index `n_tower + f`), the
 ///   byte `255 − e_f` at bit `64 + 8f`.
-/// - bits `96..104`: the total degree.
+/// - bits `104..128`: the total degree.
 ///
 /// Grevlex compares degrees first, then the exponent of the *last*
 /// variable, smaller winning, then the one before it, and so on. The last
@@ -211,9 +211,9 @@ impl Fp {
 pub type Mono = u128;
 
 const FREE_SHIFT: u32 = 64;
-const DEG_SHIFT: u32 = 96;
+const DEG_SHIFT: u32 = 104;
 /// Free variables a monomial can carry.
-pub const MAX_FREE: usize = 4;
+pub const MAX_FREE: usize = 5;
 
 /// Positive integer weights `1..=8` on the tower variables: the grading of
 /// a weighted run ([`TowerF4Options::weights`]).
@@ -378,7 +378,7 @@ pub fn degree_of(m: Mono) -> u32 {
 }
 
 /// The monomial `1`.
-pub const ONE: Mono = (0xffff_ffffu128 << FREE_SHIFT) | (u64::MAX as u128);
+pub const ONE: Mono = (0xffff_ffffffu128 << FREE_SHIFT) | (u64::MAX as u128);
 
 /// `a | b` in the polynomial ring.
 #[inline]
@@ -5677,8 +5677,15 @@ mod tests {
                 rng.gen_range(0..9),
                 0,
                 rng.gen_range(0..3),
+                rng.gen_range(0..5),
             ];
-            let fb = [rng.gen_range(0..9u8), 0, rng.gen_range(0..4), 0];
+            let fb = [
+                rng.gen_range(0..9u8),
+                0,
+                rng.gen_range(0..4),
+                0,
+                rng.gen_range(0..5),
+            ];
             let (a, b) = (mono(ma, fa), mono(mb, fb));
             assert_eq!(a, unit_key_reference(ma, fa));
             assert_eq!(mono_w(ma, fa, TowerWeights::UNIT), a);
@@ -6347,7 +6354,10 @@ mod tests {
         let mut frontier = Vec::new();
         let mut seen: Vec<Mono> = Vec::new();
         for _ in 0..3000 {
-            let m = mono(rng.gen_range(0..64u64), [rng.gen_range(0..3), 0, 0, 0]);
+            let m = mono(
+                rng.gen_range(0..64u64),
+                [rng.gen_range(0..3), 0, 0, 0, 0],
+            );
             let n = number_of(&mut examined, &mut frontier, m);
             match seen.iter().position(|&x| x == m) {
                 Some(k) => assert_eq!(n as usize, k, "a repeat keeps its number"),

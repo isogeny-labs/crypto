@@ -2674,7 +2674,7 @@ mod tests {
         };
         // The degree bits rank these differently from the original odometer.
         for e in [[3, 0, 0, 0], [0, 0, 0, 1], [0, 2, 0, 0], [3, 0, 0, 0]] {
-            let m = mono(0, e);
+            let m = mono(0, [e[0], e[1], e[2], e[3], 0]);
             let p = GPoly::from_terms(&ring.field, vec![(m, ring.field.one())]);
             let g = s.polys.len() as u32;
             s.polys.push(Elem::from_poly(p));
@@ -2682,12 +2682,15 @@ mod tests {
             s.active.push(true);
             s.lm_index.insert(m, g);
         }
-        assert_eq!(s.reducer_for_bounded_four(mono(0, [3, 2, 0, 1])), Some(3));
+        assert_eq!(
+            s.reducer_for_bounded_four(mono(0, [3, 2, 0, 1, 0])),
+            Some(3)
+        );
         // Cached nonzero count, not dense-tail length, determines shortest.
         let tail: Arc<[Mono]> = vec![
-            mono(0, [3, 0, 0, 0]),
-            mono(0, [1, 0, 0, 0]),
-            mono(0, [0; 4]),
+            mono(0, [3, 0, 0, 0, 0]),
+            mono(0, [1, 0, 0, 0, 0]),
+            mono(0, [0; 5]),
         ]
         .into();
         s.polys[3] = Elem::new(
@@ -2696,7 +2699,7 @@ mod tests {
             0,
             vec![ring.field.one(), ring.field.zero(), ring.field.zero()],
         );
-        let query = mono(0, [3, 0, 0, 1]);
+        let query = mono(0, [3, 0, 0, 1, 0]);
         assert_eq!(s.reducer_for_bounded_four(query), Some(3));
         assert_eq!(s.reducer_for_bounded_four(query), s.reducer_for(query));
         s.polys[3] = Elem::new(
@@ -2710,18 +2713,18 @@ mod tests {
         for a in 0..=3 {
             for b in 0..=2 {
                 for d in 0..=1 {
-                    let m = mono(0, [a, b, 0, d]);
+                    let m = mono(0, [a, b, 0, d, 0]);
                     assert_eq!(s.reducer_for_bounded_four(m), s.reducer_for(m));
                 }
             }
         }
-        let lo = mono(0, [1, 0, 0, 1]);
-        let hi = mono(0, [3, 2, 1, 2]);
+        let lo = mono(0, [1, 0, 0, 1, 0]);
+        let hi = mono(0, [3, 2, 1, 2, 0]);
         for keys in [
             vec![hi],
             vec![lo],
-            vec![mono(0, [2, 1, 0, 1])],
-            vec![mono(0, [0, 1, 0, 1])],
+            vec![mono(0, [2, 1, 0, 1, 0])],
+            vec![mono(0, [0, 1, 0, 1, 0])],
         ] {
             assert_eq!(
                 bounded_four_between(lo, hi, keys.iter().copied()),
@@ -2790,7 +2793,7 @@ mod tests {
     #[test]
     fn bounded_four_coordinate_three_checks_precede_product_work() {
         let (ring, mut input, opts) = bounded_four_fixture(17, 1);
-        input[0].monos[0] = mono(0, [0, 0, 0, 32]) & ((1u128 << 96) - 1);
+        input[0].monos[0] = mono(0, [0, 0, 0, 32, 0]) & ((1u128 << 104) - 1);
         let mut calls = 0;
         let r = f4_tower_generic_bounded(
             &input,
@@ -2806,11 +2809,11 @@ mod tests {
         assert_eq!(calls, 0);
         let p = GPoly::from_terms(
             &ring.field,
-            vec![(mono(0, [0, 0, 0, 32]), ring.field.one())],
+            vec![(mono(0, [0, 0, 0, 32, 0]), ring.field.one())],
         );
         let s = State {
             polys: vec![Elem::from_poly(p)],
-            lm: vec![mono(0, [0, 0, 0, 32])],
+            lm: vec![mono(0, [0, 0, 0, 32, 0])],
             active: vec![true],
             lm_index: MonoMap::default(),
             pairs: vec![],
@@ -2828,10 +2831,10 @@ mod tests {
             invoked: false,
             selected_pending: 0,
         };
-        assert!(gate.products(&s, &[(mono(0, [0, 0, 0, 32]), 0)], 0, 0, 0));
+        assert!(gate.products(&s, &[(mono(0, [0, 0, 0, 32, 0]), 0)], 0, 0, 0));
         // A rejected subsequent batch cannot reserve product buffers.
         let admitted_bytes = gate.peak;
-        assert!(!gate.products(&s, &[(mono(0, [0, 0, 0, 33]), 0)], 0, 0, 0));
+        assert!(!gate.products(&s, &[(mono(0, [0, 0, 0, 33, 0]), 0)], 0, 0, 0));
         assert_eq!(gate.stop, Some(BoundedF4Stop::StorageAdmission));
         assert_eq!(gate.peak, admitted_bytes);
     }
@@ -3067,7 +3070,7 @@ mod tests {
     fn bounded_rejects_forged_packed_degree_before_any_observer() {
         let (ring, mut input, opts) = bounded_fixture(17, 1);
         // Preserve exponent 255 but replace the high packed degree with zero.
-        let legitimate = mono(0, [255, 0, 0, 0]);
+        let legitimate = mono(0, [255, 0, 0, 0, 0]);
         let forged = legitimate & ((1u128 << 96) - 1);
         assert_ne!(forged, mono(mask_of(forged), free_of(forged)));
         input[0] = GPoly {
@@ -3702,7 +3705,10 @@ mod tests {
                     .collect::<Vec<_>>(),
             );
             assert_eq!(got.to_rpoly(&f).unwrap(), want);
-            let u = mono(rng.gen_range(0..64), [rng.gen_range(0..2), 0, 0, 0]);
+            let u = mono(
+                rng.gen_range(0..64),
+                [rng.gen_range(0..2), 0, 0, 0, 0],
+            );
             assert_eq!(
                 gring.mul_mono(&got, u).to_rpoly(&f).unwrap(),
                 ring.mul_mono(&want, u)

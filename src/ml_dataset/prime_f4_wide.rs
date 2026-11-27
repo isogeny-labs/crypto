@@ -488,7 +488,7 @@ pub(super) fn solve(
                 poly.iter()
                     .map(|t| {
                         Ok((
-                            mono(0, [t.exponents[0], t.exponents[1], 0, 0]),
+                            mono(0, [t.exponents[0], t.exponents[1], 0, 0, 0]),
                             ring.field.from_u64(number(&t.coefficient)?),
                         ))
                     })

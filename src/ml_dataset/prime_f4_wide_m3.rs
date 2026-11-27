@@ -212,7 +212,19 @@ pub(super) fn solve(
                             .collect::<Result<Vec<_>, _>>()?
                             .try_into()
                             .map_err(|_| "chain variable count")?;
-                        Ok((mono(0, exponents), ring.field.from_u64(*c)))
+                        Ok((
+                            mono(
+                                0,
+                                [
+                                    exponents[0],
+                                    exponents[1],
+                                    exponents[2],
+                                    exponents[3],
+                                    0,
+                                ],
+                            ),
+                            ring.field.from_u64(*c),
+                        ))
                     })
                     .collect::<Result<Vec<_>, String>>()?,
             ))
@@ -348,8 +360,11 @@ pub(super) fn solve(
                 return Err("wide native basis contains tower monomial".into());
             }
             let e = free_of(m);
+            if e[4] != 0 {
+                return Err("wide native basis exceeds four chain variables".into());
+            }
             row.push(Term {
-                exponents: e,
+                exponents: [e[0], e[1], e[2], e[3]],
                 coefficient: ring
                     .field
                     .to_u64(c)
