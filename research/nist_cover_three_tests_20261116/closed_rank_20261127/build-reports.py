@@ -523,4 +523,4 @@ s=re.sub(r'(?<![A-Za-z0-9_])(-?\d+\.\d{4,})',
 refs=set(re.findall(r'(?:url\(#|href="#)([^)" ]+)',s))
 s=re.sub(r' id="([^"]+)"',lambda m:m.group() if m[1] in refs else '',s)
 s=re.sub(r'style="([^"]*)"',lambda m:'style="'+re.sub(r'\s*([:;])\s*',r'\1',m[1])+'"',s)
-rank_svg.write_text(s+'\n')
+rank_svg.write_text(s.rstrip()+'\n')
