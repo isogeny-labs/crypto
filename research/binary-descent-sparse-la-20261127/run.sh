@@ -30,7 +30,7 @@ run_ref() { # n lanes threads
 case "${1:-}" in
   panel) for n in 18 21 24 27 30 33; do run_ds $n 2; done ;;
   ext) for n in 36 39 42 45 48 51 54; do run_ds $n 2; done ;;
-  ref) w=${2:?rho lanes from the n=51 pilot}; run_ref 51 "$w" 2; run_ref 54 "$w" 2 ;;
+  ref) w=${2:?rho lanes from the n=51 pilot}; run_ref 51 "$w" ${3:-2}; run_ref 54 "$w" ${3:-2} ;;
   replay) # n=39 ci=0 ti=0 from the frozen manifest
     tmp=$(mktemp); jq '.rungs=[.rungs[]|select(.n==39)|.curves=1|.targets=1]' protocol.json > "$tmp"
     $D run "$tmp" data/replay_ds.jsonl 1 2>> data/run_ds.log; rm -f "$tmp" ;;
