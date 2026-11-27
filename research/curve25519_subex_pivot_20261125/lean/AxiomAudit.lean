@@ -131,6 +131,11 @@ open Curve25519ExtensionRingModel
 #print axioms packedGF2Polynomial_remainder_eq_modByMonic
 #print axioms packedGF2Polynomial_rawProduct_fold
 #print axioms packedGF2Polynomial_rawProduct_eq_mul
+#print axioms gf2PackedRawProduct_lt_two_pow
+#print axioms packedGF2Polynomial_rawProduct_eq_mul_extended
+#print axioms packedGF2Polynomial_product_eq_mul_modByMonic
+#print axioms packedGF2Polynomial_product_eq_mul_modByMonic_log2
+#print axioms packedGF2Polynomial_product_eq_mul_modByMonic_all
 #print axioms degreeFourIrreducibilityBoundary
 #print axioms degreeFourDeterministicPolynomialSelection
 #print axioms degreeFourPolynomialGF2_irreducible

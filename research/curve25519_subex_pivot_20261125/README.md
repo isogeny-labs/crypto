@@ -558,7 +558,11 @@ nonzero modulus. Finally, packed decoding is proved to have
 `natDegree=log2(value)` whenever the nonzero leading bit lies inside its window;
 such a decoded binary polynomial is automatically monic. These facts upgrade
 the residue theorem to an exact identity between the decoded native remainder
-and mathlib `modByMonic`.
+and mathlib `modByMonic`. A numeric bound on the native carryless fold then
+aligns arbitrary wider windows, and its leading degree is proved additive for
+nonzero inputs. The resulting endpoint covers zero and nonzero operands and
+shows `gf2PackedProduct` decodes to polynomial multiplication followed by
+`modByMonic` for every nonzero packed modulus.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

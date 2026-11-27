@@ -622,7 +622,12 @@ the result is zero or has packed `log2` below a nonzero modulus. The remaining
 normal-form bridge is now closed: for nonzero values whose leading bit lies in
 the window, the packed decoder has `natDegree=log2(value)`, is nonzero, and is
 monic. Composing degree, residue, and termination proves that the decoded public
-remainder equals `modByMonic` exactly.
+remainder equals `modByMonic` exactly. The raw carryless fold is additionally
+bounded by the sum of the left and right windows, so the multiplication theorem
+extends to every wider decoder. For nonzero inputs its packed leading degree is
+additive; zero inputs close separately. Thus `gf2PackedProduct` now decodes
+exactly to polynomial multiplication followed by `modByMonic` for every
+nonzero packed modulus.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in

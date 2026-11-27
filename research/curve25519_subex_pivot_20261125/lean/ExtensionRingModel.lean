@@ -1859,9 +1859,181 @@ theorem packedGF2Polynomial_rawProduct_eq_mul
   · simp [hbit, monomial_one_right_eq_X_pow, mul_comm]
   · simp [hbit]
 
+/-- The native carryless fold fits in the sum of the declared left width and
+the exact native right loop width. -/
+theorem gf2PackedRawProduct_lt_two_pow
+    (leftWidth left right : ℕ) (hleft : left < 2 ^ leftWidth) :
+    gf2PackedRawProduct left right <
+      2 ^ (leftWidth + (Nat.log2 right + 1)) := by
+  let rightWidth := Nat.log2 right + 1
+  let bound := 2 ^ (leftWidth + rightWidth)
+  have hterm : ∀ index < rightWidth, left * 2 ^ index < bound := by
+    intro index hindex
+    have hmul : left * 2 ^ index < 2 ^ leftWidth * 2 ^ index :=
+      Nat.mul_lt_mul_of_pos_right hleft (Nat.two_pow_pos index)
+    have hpow : 2 ^ leftWidth * 2 ^ index ≤
+        2 ^ leftWidth * 2 ^ rightWidth :=
+      Nat.mul_le_mul_left _ (Nat.pow_le_pow_right (by decide) hindex.le)
+    exact lt_of_lt_of_le hmul (by simpa [bound, pow_add] using hpow)
+  have hfold : ∀ indices : List ℕ, ∀ product < bound,
+      (∀ index ∈ indices, index < rightWidth) →
+      indices.foldl
+          (fun current index =>
+            if right.testBit index then
+              Nat.xor current (left * 2 ^ index)
+            else current)
+          product < bound := by
+    intro indices
+    induction indices with
+    | nil => simp
+    | cons head tail ih =>
+        intro product hproduct hindices
+        simp only [List.foldl_cons]
+        apply ih
+        · by_cases hbit : right.testBit head
+          · simp only [hbit, ite_true]
+            exact Nat.xor_lt_two_pow hproduct
+              (hterm head (hindices head (by simp)))
+          · simpa [hbit] using hproduct
+        · intro index hmem
+          exact hindices index (by simp [hmem])
+  unfold gf2PackedRawProduct
+  change (List.range rightWidth).foldl
+      (fun current index =>
+        if right.testBit index then Nat.xor current (left * 2 ^ index)
+        else current)
+      0 < bound
+  apply hfold (List.range rightWidth) 0 (Nat.two_pow_pos _)
+  intro index hmem
+  simpa using hmem
+
+/-- The raw-product multiplication identity remains exact in every wider output
+window. -/
+theorem packedGF2Polynomial_rawProduct_eq_mul_extended
+    (leftWidth extra left right : ℕ) (hleft : left < 2 ^ leftWidth) :
+    packedGF2Polynomial
+        ((leftWidth + (Nat.log2 right + 1)) + extra)
+        (gf2PackedRawProduct left right) =
+      packedGF2Polynomial leftWidth left *
+        packedGF2Polynomial (Nat.log2 right + 1) right := by
+  rw [packedGF2Polynomial_extend
+    (leftWidth + (Nat.log2 right + 1)) extra
+    (gf2PackedRawProduct left right)
+    (gf2PackedRawProduct_lt_two_pow leftWidth left right hleft)]
+  exact packedGF2Polynomial_rawProduct_eq_mul leftWidth left right hleft
+
 /-- Carryless product reduced by a packed modulus. -/
 def gf2PackedProduct (left right modulus : ℕ) : ℕ :=
   gf2PackedRemainder (gf2PackedRawProduct left right) modulus
+
+/-- End-to-end packed-product correctness with an explicit common-window
+condition: decoding native carryless multiplication plus reduction equals
+polynomial multiplication followed by `modByMonic`. -/
+theorem packedGF2Polynomial_product_eq_mul_modByMonic
+    (leftWidth modulusWidth left right modulus : ℕ)
+    (hleft : left < 2 ^ leftWidth) (hmodulus : modulus ≠ 0)
+    (hmodulusLead : Nat.log2 modulus < modulusWidth)
+    (hwindow : leftWidth + (Nat.log2 right + 1) ≤
+      modulusWidth + (Nat.log2 (gf2PackedRawProduct left right) + 1)) :
+    packedGF2Polynomial
+        (modulusWidth + (Nat.log2 (gf2PackedRawProduct left right) + 1))
+        (gf2PackedProduct left right modulus) =
+      (packedGF2Polynomial leftWidth left *
+        packedGF2Polynomial (Nat.log2 right + 1) right) %ₘ
+          packedGF2Polynomial modulusWidth modulus := by
+  let raw := gf2PackedRawProduct left right
+  let baseWidth := leftWidth + (Nat.log2 right + 1)
+  let remainderWidth := modulusWidth + (Nat.log2 raw + 1)
+  change baseWidth ≤ remainderWidth at hwindow
+  have hwidth : baseWidth + (remainderWidth - baseWidth) = remainderWidth := by
+    omega
+  have hraw : packedGF2Polynomial remainderWidth raw =
+      packedGF2Polynomial leftWidth left *
+        packedGF2Polynomial (Nat.log2 right + 1) right := by
+    rw [← hwidth]
+    exact packedGF2Polynomial_rawProduct_eq_mul_extended
+      leftWidth (remainderWidth - baseWidth) left right hleft
+  unfold gf2PackedProduct
+  change packedGF2Polynomial remainderWidth (gf2PackedRemainder raw modulus) = _
+  rw [packedGF2Polynomial_remainder_eq_modByMonic
+    modulusWidth raw modulus hmodulus hmodulusLead]
+  rw [hraw]
+
+/-- For nonzero inputs, minimal `log2+1` windows satisfy the common-window
+condition automatically because carryless-product degree is additive. -/
+theorem packedGF2Polynomial_product_eq_mul_modByMonic_log2
+    (left right modulus : ℕ)
+    (hleft : left ≠ 0) (hright : right ≠ 0) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        ((Nat.log2 modulus + 1) +
+          (Nat.log2 (gf2PackedRawProduct left right) + 1))
+        (gf2PackedProduct left right modulus) =
+      (packedGF2Polynomial (Nat.log2 left + 1) left *
+        packedGF2Polynomial (Nat.log2 right + 1) right) %ₘ
+          packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  have hleftBound : left < 2 ^ (Nat.log2 left + 1) :=
+    ((Nat.log2_eq_iff hleft).mp rfl).2
+  have hleftPolynomial :
+      packedGF2Polynomial (Nat.log2 left + 1) left ≠ 0 :=
+    packedGF2Polynomial_ne_zero (Nat.log2 left + 1) left hleft (by omega)
+  have hrightPolynomial :
+      packedGF2Polynomial (Nat.log2 right + 1) right ≠ 0 :=
+    packedGF2Polynomial_ne_zero (Nat.log2 right + 1) right hright (by omega)
+  have hrawEquation := packedGF2Polynomial_rawProduct_eq_mul
+    (Nat.log2 left + 1) left right hleftBound
+  have hrawPolynomial :
+      packedGF2Polynomial
+        ((Nat.log2 left + 1) + (Nat.log2 right + 1))
+        (gf2PackedRawProduct left right) ≠ 0 := by
+    rw [hrawEquation]
+    exact mul_ne_zero hleftPolynomial hrightPolynomial
+  have hraw : gf2PackedRawProduct left right ≠ 0 := by
+    intro hzero
+    rw [hzero] at hrawPolynomial
+    exact hrawPolynomial (by simp [packedGF2Polynomial])
+  have hrawBound := gf2PackedRawProduct_lt_two_pow
+    (Nat.log2 left + 1) left right hleftBound
+  have hrawLead : Nat.log2 (gf2PackedRawProduct left right) <
+      (Nat.log2 left + 1) + (Nat.log2 right + 1) :=
+    (Nat.log2_lt hraw).mpr hrawBound
+  have hrawDegree : Nat.log2 (gf2PackedRawProduct left right) =
+      Nat.log2 left + Nat.log2 right := by
+    have hdegree := congrArg Polynomial.natDegree hrawEquation
+    rw [packedGF2Polynomial_natDegree
+          ((Nat.log2 left + 1) + (Nat.log2 right + 1))
+          (gf2PackedRawProduct left right) hraw hrawLead,
+      Polynomial.natDegree_mul hleftPolynomial hrightPolynomial,
+      packedGF2Polynomial_natDegree (Nat.log2 left + 1) left hleft (by omega),
+      packedGF2Polynomial_natDegree (Nat.log2 right + 1) right hright (by omega)]
+      at hdegree
+    exact hdegree
+  apply packedGF2Polynomial_product_eq_mul_modByMonic
+    (Nat.log2 left + 1) (Nat.log2 modulus + 1)
+    left right modulus hleftBound hmodulus (by omega)
+  rw [hrawDegree]
+  omega
+
+/-- Minimal `log2+1` packed decoding implements polynomial multiplication
+modulo every nonzero packed modulus, including zero left or right inputs. -/
+theorem packedGF2Polynomial_product_eq_mul_modByMonic_all
+    (left right modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        ((Nat.log2 modulus + 1) +
+          (Nat.log2 (gf2PackedRawProduct left right) + 1))
+        (gf2PackedProduct left right modulus) =
+      (packedGF2Polynomial (Nat.log2 left + 1) left *
+        packedGF2Polynomial (Nat.log2 right + 1) right) %ₘ
+          packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  by_cases hleft : left = 0
+  · subst left
+    simp [gf2PackedProduct, gf2PackedRawProduct, gf2PackedRemainder,
+      gf2PackedRemainderFuel, packedGF2Polynomial]
+  by_cases hright : right = 0
+  · subst right
+    simp [gf2PackedProduct, gf2PackedRawProduct, gf2PackedRemainder,
+      gf2PackedRemainderFuel, packedGF2Polynomial]
+  exact packedGF2Polynomial_product_eq_mul_modByMonic_log2
+    left right modulus hleft hright hmodulus
 
 /-- Fuel-bounded Euclidean gcd over packed `GF(2)` polynomials. -/
 def gf2PackedGcdFuel : ℕ → ℕ → ℕ → ℕ

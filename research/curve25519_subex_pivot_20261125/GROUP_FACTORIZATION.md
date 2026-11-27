@@ -276,7 +276,11 @@ sufficiency and a returned packed `log2` below every nonzero modulus. Converting
 that numeric degree statement to decoded-polynomial `natDegree` is now proved
 for every nonzero value whose leading bit is in the window; the decoder is also
 proved nonzero and monic. The resulting endpoint identifies the decoded native
-remainder with `modByMonic` exactly.
+remainder with `modByMonic` exactly. A carryless-fold bit-width bound and
+additivity of its nonzero leading degree align the raw-product and remainder
+windows; zero inputs are handled directly. The complete `gf2PackedProduct`
+therefore decodes as polynomial multiplication followed by `modByMonic` for
+every nonzero packed modulus.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or
