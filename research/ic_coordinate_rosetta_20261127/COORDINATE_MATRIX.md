@@ -32,7 +32,10 @@ an asymptotic complexity exponent.
 
 The executable catalogue contains the following 33 charts. Each is checked
 against the model-independent affine short-Weierstrass oracle produced by its
-registered birational conversion; the oracle is not counted as a chart arm.
+registered birational conversion. The emitted artifact also includes one
+synthetic affine round-trip baseline per model, so it has 43 rows total: 33
+catalogue chart rows and 10 conversion/oracle controls. Affine baselines have
+no EFD formula-count point and are never presented as catalogue charts.
 
 | model | charts | Rosetta interpretation |
 | --- | --- | --- |

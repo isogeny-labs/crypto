@@ -26,10 +26,28 @@ level and that model changes can alter constants. This work makes those
 constants and applicability boundaries reproducible in Rust on S59; it does
 not claim a sub-square-root prime-field ECDLP algorithm.
 
+## Counted outcome
+
+The frozen counting pass evaluated 2,097,152 planted triples per arm. All hard
+controls passed: 18,874,368 planted zero-sum checks succeeded, no deliberately
+wrong relation was accepted, affine `x`, its A/A repeat, and normalized
+Jacobian `x` agreed exactly, and raw projective `X` failed the registered scale
+invariance control. None of the seven registered admission-rate comparisons
+against `x` survived Holm correction. The useful differences are therefore
+algebraic class, invariance, and exact extraction cost—not demonstrated
+relation-yield superiority.
+
+The chart pass emitted and verified 43 rows: 33 maintained EFD catalogue
+charts and 10 synthetic affine conversion/oracle baselines. See
+[REPORT.md](REPORT.md), the printable [REPORT.pdf](REPORT.pdf), and the JSON
+artifacts under `artifacts/`.
+
 ## Instrument
 
-`src/bin/ic_coordinate_rosetta.rs` is the only new research implementation.
-It emits versioned JSON and has no Python/Sage/Magma compute path.
+`src/bin/ic_coordinate_rosetta.rs` is the measurement instrument. It emits
+versioned JSON and has no Python/Sage/Magma compute path. The deterministic
+summary, bootstrap, multiplicity correction, and report tables are also
+implemented in Rust by `src/bin/ic_coordinate_rosetta_report.rs`.
 
 ```text
 cargo run --release --bin ic_coordinate_rosetta -- inventory
@@ -42,6 +60,13 @@ cargo run --release --bin ic_coordinate_rosetta -- \
 Parallel batches are correctness/counting throughput runs; their wall fields
 are explicitly inadmissible. Admitted wall measurements use one worker per
 isolated EKS execution, interleaved arms, one warm-up and five measured rounds.
+
+The canonical exporter later exposed that `explicit_list` seeds are cycled
+globally across arm/instance/replicate tuples, whereas amendment A1 and the
+instrument use the same explicit trace at a given instance for every arm. The
+raw counted rows retain the intended matched traces and their seed values, but
+no canonical full export or L2 timing claim is made from protocol v2. A future
+timing protocol must correct that administrative mapping before submission.
 
 ## Frozen boundary
 
