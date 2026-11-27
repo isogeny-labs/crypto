@@ -164,9 +164,9 @@ impl Default for Fast2Options {
             batch_min: 32,
             batch_max: 256,
             target_pivots: 32,
-            // 0.6 keeps the echelon much smaller on E2LOCMS45 P1 (≈20× wall vs 0.25)
-            // while preserving d_F; unit tests cover the interreduce equivalence.
-            interreduce: 0.6,
+            // 0.65 with lead-cover skip: E2LOCMS45 P2 ≈153s (was ~256s at 0.6),
+            // P1 still ≈18–19s; unit tests cover the interreduce equivalence.
+            interreduce: 0.65,
             interreduce_min: 256,
             interreduce_block: 256,
             rebucket: true,
