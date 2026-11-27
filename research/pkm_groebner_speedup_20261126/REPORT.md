@@ -92,3 +92,33 @@ native-pipeline win only on the selected 13-bit fixture. It remains neither a
 random-instance result, an asymptotic improvement nor a Pollard-rho crossover.
 Frozen receipt: `NATIVE_E2E_RESULT.json`; protocol commit `49f652707f`;
 release binary SHA-256 `5be9a8ce836f33d1a7d20683e7753565e5669ae963226cd5273148b3c5ef07e7`.
+
+## Three-fixture source-pinned replication
+
+The next continuation reused the three exact-18 seeds selected by the earlier
+size-only scan, fixed scalar 2261 before execution, and ran two balanced pairs
+per fixture from one frozen binary. No curve, target or failed fixture was
+replaced. All 24 runs recovered and verified the scalar, exposed the same
+matched system shape, reconciled phase charges to `total_gae`, and retained
+ordinary solving degree 6 versus 5.
+
+| seed | interval GAE | degree-32 Velu GAE | candidate / interval | reduction | cold-wall reduction |
+|--:|--:|--:|--:|--:|--:|
+| 20261185 | 312,174,772.62 | 96,729,067.18 | 0.30986 | 3.227x | 3.222x |
+| 20261221 | 273,602,466.91 | 51,091,627.79 | 0.18674 | 5.355x | 5.348x |
+| 20261276 | 405,920,957.00 | 120,600,622.84 | 0.29710 | 3.366x | 3.360x |
+| **combined** | **991,698,196.53** | **268,421,317.81** | **0.27067** | **3.695x** | **3.692x** |
+
+Every fixture passed the preregistered <=0.75x individual gate and the
+combined panel passed the unchanged <=0.5x complete-cost gate. The spread is
+real: the middle seed needed only 65 candidate solver calls per run versus
+102 interval calls, while the other two candidate arms needed more calls than
+their interval arms. The lower degree and smaller F4 systems still carried
+the complete total on all three fixtures.
+
+This removes dependence on one target curve within the preselected equal-18
+panel, but it is not an unselected random-instance experiment: the three
+curves came from the earlier 100-seed size scan. F4 pricing remains
+host-measured and wall remains descriptive. Receipt:
+`NATIVE_E2E_PANEL_RESULT.json`; protocol commit `0d4020c697`; binary SHA-256
+`0b4cb2c690ca46a953e2cddc06454060b937e0360251e32c3b53975797fe5d13`.
