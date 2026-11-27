@@ -1,0 +1,24 @@
+{
+  "schema": "optimized-build-sources-reviewed/v1",
+  "reviewed": [
+    "research/relation_scan_call_instrument_20261127/build-v2.sh",
+    "research/relation_scan_call_instrument_20261127/PLAN_V2.json",
+    "research/relation_scan_call_instrument_20261127/src/bin/root-worker.rs",
+    "research/relation_root_call_instrument_20261127/SOURCE_V2.sha256",
+    "research/relation_canonical_scan_20261127/run-candidate.sh",
+    "research/relation_root_runtime_20261127/harness/tests/flat_constructor.rs",
+    "research/relation_root_runtime_20261127/harness/tests/native_pairgraph.rs",
+    "Cargo.toml profile.lab and unchanged release policy"
+  ],
+  "official_reference": {
+    "url": "https://doc.rust-lang.org/cargo/reference/profiles.html",
+    "sha256": "8ec081e473b74d6b73b5b587ed6e2e7e9f586b9788c905e5949c5bfae2c1d51a",
+    "excerpt": "The default settings for the release profile are:\n[profile.release]\nopt-level = 3\ndebug = false\nsplit-debuginfo = '...'  # Platform-specific.\nstrip = \"none\"\ndebug-assertions = false\noverflow-checks = false\nlto = false\npanic = 'unwind'\nincremental = false\ncodegen-units = 16\nrpath = false\n\ntest\nThe test profile is the default profile used by cargo test.\nThe default settings for the test profile are:\n[profile.test]\ninherits = \"dev\"\n\nbench\nThe b"
+  },
+  "KB": "tools and repository wrapper unavailable; bounded source and official Cargo documentation review only; no novelty claim",
+  "setup_gaps": [
+    "Local installed Cargo HTML documentation absent; read official reference normally over HTTPS.",
+    "No .cargo/config.toml exists in this sparse source; inspected wrapper/flags environment: no RUSTC_WRAPPER/RUSTFLAGS/CARGO_ENCODED_RUSTFLAGS.",
+    "Initial guessed harness filename original.rs absent; actual tests are flat_constructor.rs and native_pairgraph.rs."
+  ]
+}
