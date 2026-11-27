@@ -280,7 +280,12 @@ remainder with `modByMonic` exactly. A carryless-fold bit-width bound and
 additivity of its nonzero leading degree align the raw-product and remainder
 windows; zero inputs are handled directly. The complete `gf2PackedProduct`
 therefore decodes as polynomial multiplication followed by `modByMonic` for
-every nonzero packed modulus.
+every nonzero packed modulus. The theorem is additionally transported to the
+result's minimal decoding window and iterated through every native
+square-and-reduce step. Reduction idempotence and compatibility with powers
+then identify a reduced start with its exact `2^steps` power modulo the packed
+modulus; packed remainders supply such starts automatically. This authenticates
+the Rabin value trace but not its packed Euclidean-gcd guards.
 `[pcc:unverified]`
 
 The argument is insensitive to whether an old tensor is Boolean, equality, or

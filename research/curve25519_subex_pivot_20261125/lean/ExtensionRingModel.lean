@@ -2035,6 +2035,215 @@ theorem packedGF2Polynomial_product_eq_mul_modByMonic_all
   exact packedGF2Polynomial_product_eq_mul_modByMonic_log2
     left right modulus hleft hright hmodulus
 
+/-- The native product theorem can be stated in the result's minimal decoding
+window: termination below the nonzero modulus makes every wider high
+coefficient vanish. -/
+theorem packedGF2Polynomial_product_minimal_eq_mul_modByMonic
+    (left right modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedProduct left right modulus) + 1)
+        (gf2PackedProduct left right modulus) =
+      (packedGF2Polynomial (Nat.log2 left + 1) left *
+        packedGF2Polynomial (Nat.log2 right + 1) right) %ₘ
+          packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  let product := gf2PackedProduct left right modulus
+  let raw := gf2PackedRawProduct left right
+  let minimumWidth := Nat.log2 product + 1
+  let wideWidth := (Nat.log2 modulus + 1) + (Nat.log2 raw + 1)
+  have hminimum : minimumWidth ≤ Nat.log2 modulus + 1 := by
+    rcases gf2PackedRemainder_stops_below_modulus raw modulus hmodulus with
+      hzero | hdegree
+    · have hproductZero : product = 0 := by
+        simpa [product, gf2PackedProduct, raw] using hzero
+      dsimp [minimumWidth]
+      rw [hproductZero]
+      simp
+    · change Nat.log2 product < Nat.log2 modulus at hdegree
+      omega
+  have hwidth : minimumWidth + (wideWidth - minimumWidth) = wideWidth := by
+    dsimp [wideWidth]
+    omega
+  have hfit : product < 2 ^ minimumWidth := by
+    by_cases hproduct : product = 0
+    · simp [hproduct, minimumWidth]
+    · exact ((Nat.log2_eq_iff hproduct).mp rfl).2
+  have hextend : packedGF2Polynomial wideWidth product =
+      packedGF2Polynomial minimumWidth product := by
+    rw [← hwidth]
+    exact packedGF2Polynomial_extend minimumWidth
+      (wideWidth - minimumWidth) product hfit
+  rw [← hextend]
+  exact packedGF2Polynomial_product_eq_mul_modByMonic_all
+    left right modulus hmodulus
+
+/-- Repeated native Frobenius squaring, separated from the Rabin gcd guards so
+its exact value trace can be refined independently. -/
+def gf2PackedFrobeniusIterate (modulus : ℕ) : ℕ → ℕ → ℕ
+  | 0, value => value
+  | steps + 1, value =>
+      gf2PackedFrobeniusIterate modulus steps
+        (gf2PackedProduct value value modulus)
+
+/-- Polynomial repeated squaring and reduction in the same update order as the
+native packed iterator. -/
+noncomputable def gf2PolynomialFrobeniusIterate
+    (modulus : Polynomial (ZMod 2)) :
+    ℕ → Polynomial (ZMod 2) → Polynomial (ZMod 2)
+  | 0, value => value
+  | steps + 1, value =>
+      gf2PolynomialFrobeniusIterate modulus steps
+        ((value * value) %ₘ modulus)
+
+/-- Every repeated native square-and-reduce update decodes as the corresponding
+polynomial square followed by `modByMonic`. -/
+theorem packedGF2Polynomial_frobeniusIterate
+    (steps value modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedFrobeniusIterate modulus steps value) + 1)
+        (gf2PackedFrobeniusIterate modulus steps value) =
+      gf2PolynomialFrobeniusIterate
+        (packedGF2Polynomial (Nat.log2 modulus + 1) modulus) steps
+        (packedGF2Polynomial (Nat.log2 value + 1) value) := by
+  induction steps generalizing value with
+  | zero => rfl
+  | succ remaining ih =>
+      rw [gf2PackedFrobeniusIterate, gf2PolynomialFrobeniusIterate]
+      rw [ih (gf2PackedProduct value value modulus)]
+      rw [packedGF2Polynomial_product_minimal_eq_mul_modByMonic
+        value value modulus hmodulus]
+
+/-- Reduction by a monic GF(2) polynomial is idempotent. -/
+theorem gf2Polynomial_modByMonic_idem
+    (value modulus : Polynomial (ZMod 2)) (hmonic : modulus.Monic) :
+    (value %ₘ modulus) %ₘ modulus = value %ₘ modulus := by
+  apply (modByMonic_eq_self_iff hmonic).2
+  exact degree_modByMonic_lt value hmonic
+
+/-- Reducing a GF(2) polynomial before exponentiation does not change the
+reduced power. -/
+theorem gf2Polynomial_pow_modByMonic
+    (value modulus : Polynomial (ZMod 2)) (exponent : ℕ)
+    (hmonic : modulus.Monic) :
+    (value ^ exponent) %ₘ modulus =
+      ((value %ₘ modulus) ^ exponent) %ₘ modulus := by
+  induction exponent with
+  | zero => rfl
+  | succ prior ih =>
+      simp only [pow_succ]
+      calc
+        (value ^ prior * value) %ₘ modulus =
+            (value ^ prior %ₘ modulus) * (value %ₘ modulus) %ₘ modulus :=
+          Polynomial.mul_modByMonic _ _ _
+        _ = ((value %ₘ modulus) ^ prior %ₘ modulus) *
+            (value %ₘ modulus) %ₘ modulus := by rw [ih]
+        _ = ((value %ₘ modulus) ^ prior %ₘ modulus) *
+            ((value %ₘ modulus) %ₘ modulus) %ₘ modulus := by
+          exact congrArg
+            (fun right : Polynomial (ZMod 2) =>
+              ((value %ₘ modulus) ^ prior %ₘ modulus) * right %ₘ modulus)
+            (gf2Polynomial_modByMonic_idem value modulus hmonic).symm
+        _ = ((value %ₘ modulus) ^ prior * (value %ₘ modulus)) %ₘ
+            modulus := (Polynomial.mul_modByMonic _ _ _).symm
+
+/-- Starting from a reduced polynomial, the abstract Frobenius iterator is the
+exact `2^steps` power modulo the monic modulus. -/
+theorem gf2PolynomialFrobeniusIterate_eq_pow_modByMonic
+    (steps : ℕ) (value modulus : Polynomial (ZMod 2))
+    (hmonic : modulus.Monic) (hreduced : value %ₘ modulus = value) :
+    gf2PolynomialFrobeniusIterate modulus steps value =
+      (value ^ (2 ^ steps)) %ₘ modulus := by
+  induction steps generalizing value with
+  | zero => simpa [gf2PolynomialFrobeniusIterate] using hreduced.symm
+  | succ remaining ih =>
+      rw [gf2PolynomialFrobeniusIterate]
+      rw [ih ((value * value) %ₘ modulus)
+        (gf2Polynomial_modByMonic_idem (value * value) modulus hmonic)]
+      rw [← gf2Polynomial_pow_modByMonic
+        (value * value) modulus (2 ^ remaining) hmonic]
+      apply congrArg (fun polynomial : Polynomial (ZMod 2) =>
+        polynomial %ₘ modulus)
+      calc
+        (value * value) ^ (2 ^ remaining) =
+            (value ^ 2) ^ (2 ^ remaining) := by rw [pow_two]
+        _ = value ^ (2 * 2 ^ remaining) := by rw [pow_mul]
+        _ = value ^ (2 ^ (remaining + 1)) := by
+          congr 1
+          simp [pow_succ, mul_comm]
+
+/-- Every native packed remainder is a reduced polynomial in its minimal
+decoding window. -/
+theorem packedGF2Polynomial_remainder_minimal_reduced
+    (value modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    (packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder value modulus) + 1)
+        (gf2PackedRemainder value modulus)) %ₘ
+          packedGF2Polynomial (Nat.log2 modulus + 1) modulus =
+      packedGF2Polynomial
+        (Nat.log2 (gf2PackedRemainder value modulus) + 1)
+        (gf2PackedRemainder value modulus) := by
+  let result := gf2PackedRemainder value modulus
+  let resultPolynomial := packedGF2Polynomial (Nat.log2 result + 1) result
+  let modulusPolynomial :=
+    packedGF2Polynomial (Nat.log2 modulus + 1) modulus
+  have hmonic : modulusPolynomial.Monic :=
+    packedGF2Polynomial_monic (Nat.log2 modulus + 1) modulus
+      hmodulus (by omega)
+  change resultPolynomial %ₘ modulusPolynomial = resultPolynomial
+  rcases gf2PackedRemainder_stops_below_modulus value modulus hmodulus with
+    hzero | hdegree
+  · have hresult : result = 0 := by simpa [result] using hzero
+    simp [resultPolynomial, hresult, packedGF2Polynomial]
+  · by_cases hresult : result = 0
+    · simp [resultPolynomial, hresult, packedGF2Polynomial]
+    · apply (modByMonic_eq_self_iff hmonic).2
+      have hresultPolynomial : resultPolynomial ≠ 0 :=
+        packedGF2Polynomial_ne_zero (Nat.log2 result + 1) result
+          hresult (by omega)
+      apply (natDegree_lt_natDegree_iff hresultPolynomial).mp
+      rw [packedGF2Polynomial_natDegree
+            (Nat.log2 result + 1) result hresult (by omega),
+        packedGF2Polynomial_natDegree
+          (Nat.log2 modulus + 1) modulus hmodulus (by omega)]
+      exact hdegree
+
+/-- For any reduced packed start value, the native Frobenius iterator decodes
+as the exact `2^steps` power modulo the packed modulus. -/
+theorem packedGF2Polynomial_frobeniusIterate_eq_pow_modByMonic
+    (steps value modulus : ℕ) (hmodulus : modulus ≠ 0)
+    (hreduced :
+      (packedGF2Polynomial (Nat.log2 value + 1) value) %ₘ
+          packedGF2Polynomial (Nat.log2 modulus + 1) modulus =
+        packedGF2Polynomial (Nat.log2 value + 1) value) :
+    packedGF2Polynomial
+        (Nat.log2 (gf2PackedFrobeniusIterate modulus steps value) + 1)
+        (gf2PackedFrobeniusIterate modulus steps value) =
+      ((packedGF2Polynomial (Nat.log2 value + 1) value) ^ (2 ^ steps)) %ₘ
+        packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  rw [packedGF2Polynomial_frobeniusIterate steps value modulus hmodulus]
+  exact gf2PolynomialFrobeniusIterate_eq_pow_modByMonic steps
+    (packedGF2Polynomial (Nat.log2 value + 1) value)
+    (packedGF2Polynomial (Nat.log2 modulus + 1) modulus)
+    (packedGF2Polynomial_monic (Nat.log2 modulus + 1) modulus
+      hmodulus (by omega)) hreduced
+
+/-- The value trace used by the Rabin loop starts from a native remainder, so
+its `2^steps`-power semantics needs no extra normalization premise. -/
+theorem packedGF2Polynomial_frobeniusIterate_from_remainder
+    (steps value modulus : ℕ) (hmodulus : modulus ≠ 0) :
+    packedGF2Polynomial
+        (Nat.log2
+          (gf2PackedFrobeniusIterate modulus steps
+            (gf2PackedRemainder value modulus)) + 1)
+        (gf2PackedFrobeniusIterate modulus steps
+          (gf2PackedRemainder value modulus)) =
+      ((packedGF2Polynomial
+          (Nat.log2 (gf2PackedRemainder value modulus) + 1)
+          (gf2PackedRemainder value modulus)) ^ (2 ^ steps)) %ₘ
+        packedGF2Polynomial (Nat.log2 modulus + 1) modulus := by
+  exact packedGF2Polynomial_frobeniusIterate_eq_pow_modByMonic steps
+    (gf2PackedRemainder value modulus) modulus hmodulus
+    (packedGF2Polynomial_remainder_minimal_reduced value modulus hmodulus)
+
 /-- Fuel-bounded Euclidean gcd over packed `GF(2)` polynomials. -/
 def gf2PackedGcdFuel : ℕ → ℕ → ℕ → ℕ
   | 0, left, _ => left

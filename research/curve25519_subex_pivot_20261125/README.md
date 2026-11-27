@@ -562,7 +562,14 @@ and mathlib `modByMonic`. A numeric bound on the native carryless fold then
 aligns arbitrary wider windows, and its leading degree is proved additive for
 nonzero inputs. The resulting endpoint covers zero and nonzero operands and
 shows `gf2PackedProduct` decodes to polynomial multiplication followed by
-`modByMonic` for every nonzero packed modulus.
+`modByMonic` for every nonzero packed modulus. The result is now collapsed back
+to its minimal `log2+1` decoding window and iterated: every native
+square-and-reduce trace equals the matching polynomial Frobenius trace. A
+separate reduction-power induction identifies that trace with the exact
+`2^steps` power modulo the decoded monic modulus whenever the start is reduced;
+the Rabin start is a native remainder, so that premise is discharged. This
+proves the Rabin value trace, not the Euclidean-gcd guards or general predicate
+correctness.
 `[pcc:unverified]`
 
 The formal coefficient ring is no longer left wholly abstract.

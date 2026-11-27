@@ -627,7 +627,13 @@ bounded by the sum of the left and right windows, so the multiplication theorem
 extends to every wider decoder. For nonzero inputs its packed leading degree is
 additive; zero inputs close separately. Thus `gf2PackedProduct` now decodes
 exactly to polynomial multiplication followed by `modByMonic` for every
-nonzero packed modulus.
+nonzero packed modulus. Minimal-window decoding is then proved equivalent to
+the wider product window and composed through an arbitrary number of native
+square-and-reduce steps. The resulting Frobenius iterator theorem identifies a
+reduced start with its exact `2^steps` power modulo the decoded modulus. Since
+the Rabin start is itself a packed remainder, its normalization premise is
+kernel-derived. The packed gcd guards and their equivalence to polynomial gcd
+remain outside this value-trace theorem.
 `[pcc:unverified]`
 
 Production `next_tuple` also matches an independent Cartesian enumeration in
