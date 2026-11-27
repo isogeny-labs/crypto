@@ -73,6 +73,7 @@ pub mod indexed_resultant;
 pub mod large_prime;
 pub mod linalg;
 pub mod linalg_mixed;
+pub mod parity_guard;
 pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
@@ -722,6 +723,14 @@ fn run_pipeline_inner<G: CountedGroup>(
         )
     {
         return Err("rank audit requires an incremental Gaussian solver".into());
+    }
+    // Coset-parity admission check (the K1 odd-m parity trap): an oracle
+    // whose relations are exactly m unit summands cannot reach a target
+    // in 2E from a single-class base when m times that class is odd.
+    // Cheap (one trace per base point, stops at a second class), outside
+    // the counted ledger, and only for oracles that opt in.
+    if let Some(m) = oracle.exact_unit_summands(&spec.oracle_params) {
+        parity_guard::check_coset_parity(ctx, &fb, m, base_builder.name(), oracle.name())?;
     }
     let mut fb_cost = fb.cost.clone();
     fb_cost.group_ops.merge(fb_ops);
