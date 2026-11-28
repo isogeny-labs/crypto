@@ -1,0 +1,26 @@
+one query (q2 - q1), exclusive; total 1.898 G instructions
+   820.4 M  43.2%  __umodti3
+   750.8 M  39.6%  <Arithmetic>::add
+   153.9 M   8.1%  <hash::random::DefaultHasher as hash::Hasher>::write
+    97.0 M   5.1%  <hash::random::RandomState as hash::BuildHasher>::hash_one::<&option::Option<(u64, u64)>>
+    74.1 M   3.9%  prime31_graph_mitm_control::main
+     0.3 M   0.0%  ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:__memset_avx2_unaligned_erms
+     0.3 M   0.0%  ./malloc/./malloc/malloc.c:_int_malloc
+     0.2 M   0.0%  ./malloc/./malloc/malloc.c:_int_free
+     0.1 M   0.0%  ./malloc/./malloc/malloc.c:malloc
+     0.1 M   0.0%  ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms
+     0.1 M   0.0%  <&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyFormatter> as serde_ser::Serializer>::collect_seq::<&vec::Vec<se
+     0.1 M   0.0%  ./malloc/./malloc/malloc.c:free
+     0.1 M   0.0%  <hash::random::RandomState as hash::BuildHasher>::hash_one::<&vec::Vec<(u16, i8)>>
+     0.1 M   0.0%  ptr::drop_glue::<serde_json::value::Value>'2
+     0.0 M   0.0%  <serde_json::de::Deserializer<serde_json::read::StrRead>>::parse_any_number
+     0.0 M   0.0%  <serde_json::value::Value as serde_ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyF
+     0.0 M   0.0%  <map::HashMap<vec::Vec<(u16, i8)>, (), hash::random::RandomState>>::insert
+     0.0 M   0.0%  <serde_json::value::ser::NumberValueEmitter as serde_ser::Serializer>::serialize_str
+     0.0 M   0.0%  <serde_json::de::Deserializer<serde_json::read::StrRead>>::scan_integer
+     0.0 M   0.0%  __rustc::__rdl_alloc
+     0.0 M   0.0%  <serde_json::value::ser::SerializeMap as serde_ser::SerializeStruct>::serialize_field::<string::String>
+     0.0 M   0.0%  <&serde_json::value::Value as serde_ser::Serialize>::serialize::<serde_json::value::ser::Serializer>'2
+     0.0 M   0.0%  <serde_json::value::ser::Serializer as serde_ser::Serializer>::collect_seq::<&vec::Vec<serde_json::value::Value>>'2
+     0.0 M   0.0%  <serde_json::number::Number as convert::From<serde_json::de::ParserNumber>>::from
+     0.0 M   0.0%  <u64 as itoa::Unsigned>::fmt
