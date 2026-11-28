@@ -1,0 +1,8 @@
+digraph G {
+ rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#eef5fb",fontname="Helvetica",fontsize=11];
+ p[label="ACTUAL NONZERO h AND TARGET UNIT u\nv(h) = principal(h) * u^-4"];
+ f[label="ACTUAL EXACT span(h) = I(P)^4 J\nDerived coercion of v(h) is actual integral J"];
+ c[label="DERIVED ACTUAL RESIDUAL CLASS\nclass(v(h)) = class(u)^(-4)\nindependent of nonzero witness h"];
+ o[label="OPEN USEFUL SCALAR / FINDER BRIDGE\nRepresentative changes do not supply known logs\nSurviving support and full expected cost required",style="rounded,dashed,filled",fillcolor="#fff3df"];
+ p->f;p->c;f->c;c->o[style=dashed];
+}

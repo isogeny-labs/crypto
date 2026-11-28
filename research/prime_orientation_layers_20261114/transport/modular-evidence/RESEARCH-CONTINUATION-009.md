@@ -1,0 +1,3 @@
+# Active next proof: identity-origin dense deformation
+
+Resume PROTOCOL-028 from accepted171/094 and169/093. General-a full crossing content and actual inverse residue support are checked. Next construct J=K*C(S^-1) with existing square-matrix ring maps, prove actual J0=I/changed node values and transfer crossing Content via content_sum and inverse bits. Then actual Boolean target/group locality and dense leading-local child/mode costs. Scalar dummy payload is not free preparation/caching or full ring representation. Original public finder/extraction/expected cost open. No proof job running at this checkpoint; maintenance cadence is not research action. [pcc:unverified]

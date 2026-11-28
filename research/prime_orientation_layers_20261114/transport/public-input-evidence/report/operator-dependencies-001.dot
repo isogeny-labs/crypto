@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",ranksep=.3];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa"];
+ inputs [label="PUBLIC INPUT\nOne target + three opposite branch pairs\nFull mixed Taylor multiplicity 4"];
+ encode [label="ACTUAL COEFFICIENT ENCODING\n72 slots: i+2j<16, j<8\nDouble coefficient recovery proves injectivity"];
+ operator [label="ACTUAL FINITE MAP\n7 positions x 10 mixed jets = 70 rows\nExact strict budget a=2, ell=7, r=4"];
+ kernel [label="CHECKED CLASSICAL EXISTENCE\n72 > 70 gives nonzero kernel\nInjection gives nonzero polynomial Q"];
+ filter [label="ACTUAL CURVE FILTER\nRemainder of Q modulo Y^2-f(X)\nZero iff curve equation divides Q"];
+ next [label="OPEN: image of actual kernel under remainder\nValid curve inputs; nonzero remainder?\nThen rational norm / useful scalar / full cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ inputs -> operator; encode -> operator; operator -> kernel; kernel -> filter;
+ filter -> next [style=dashed,label="not inferred"];
+}
