@@ -1,0 +1,12 @@
+[package]
+name="relation-heap-replay-probe"
+version="0.1.0"
+edition="2021"
+publish=false
+[workspace]
+exclude=["candidate"]
+[dependencies]
+original={package="relation-replay-checker",path="../../crates/relation-replay-checker"}
+candidate={package="relation-replay-checker-heap-prototype",path="candidate"}
+serde_json="1"
+sha2="0.10"

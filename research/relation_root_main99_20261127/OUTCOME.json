@@ -1,0 +1,68 @@
+{
+  "schema": "main99-root-native-build-outcome/v1",
+  "source_commit": "3ddaa65f2d2f528d69c642c4bde3183e1bcbfb28",
+  "contexts": [
+    {
+      "name": "build",
+      "root_codegen_units": 16,
+      "declared_profile": "opt0/LTOoff/debug0/incrementalfalse/defaultfeaturesfalse",
+      "exit": 143,
+      "resource_refusal": {
+        "refused": true,
+        "target_bytes": 2703063242,
+        "cgroup_memory_bytes": 15087357952,
+        "tmpfs_free_bytes": 4237565952
+      },
+      "source_manifest": "SOURCE.sha256",
+      "source_postcheck_pass": true,
+      "mathematical_calls": 0
+    },
+    {
+      "name": "build-v2",
+      "root_codegen_units": 256,
+      "declared_profile": "opt0/LTOoff/debug0/incrementalfalse/defaultfeaturesfalse",
+      "exit": 143,
+      "resource_refusal": {
+        "refused": true,
+        "target_bytes": 3073430292,
+        "cgroup_memory_bytes": 15120109568,
+        "tmpfs_free_bytes": 3826118656
+      },
+      "source_manifest": "SOURCE_V2.sha256",
+      "source_postcheck_pass": true,
+      "mathematical_calls": 0
+    }
+  ],
+  "fresh_root_workers_built": false,
+  "native_original36_run": false,
+  "native_matched108_run": false,
+  "independent144proof_audits_run": false,
+  "native_mutation1116_checks_run": false,
+  "full_root_libtest_attempted": false,
+  "timing_observations": 0,
+  "original_15x_achieved": false,
+  "all_frozen_worker_bytes_unchanged": true,
+  "protected_workers": 36,
+  "old_cache_backup_retained": "/dev/shm/relation-opt-cache-backup-20261127.tar.xz",
+  "new_failed_cache_backup_retained": "/dev/shm/relation-main99-failed-root16-cache-20261127.tar.xz",
+  "current_failed_root256_cache": "retained, unqualified rebuildable intermediates; not an executable or scientific pass",
+  "compiler_trials_closed": true,
+  "separate_heap_prototype": "independent component study only, never replacement qualification",
+  "root256_observed_flags": {
+    "schema": "observed-root-compiler-profile/v1",
+    "pid": 47751,
+    "process_group": 47735,
+    "crate": "crypto_lib",
+    "flags": [
+      "lto=off",
+      "embed-bitcode=no",
+      "codegen-units=256"
+    ],
+    "root_is_libtest": false,
+    "optimization_level": "0",
+    "optimization_option_omitted_defaults_to_zero": true,
+    "declared_profile_matches": true,
+    "environment_values_collected": false
+  },
+  "cgroup_memory_events_after": "low 0\nhigh 0\nmax 771\noom 0\noom_kill 0\noom_group_kill 0\n"
+}
