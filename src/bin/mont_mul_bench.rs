@@ -38,12 +38,15 @@ const ARMS: &[&str] = &[
     "adx_sqr",
     "mulx",
     "adx_wnaf",
+    "adx6",
+    "adx6_mul",
 ];
 const BASELINE: &str = "pad9_cios";
 const AA: &str = "pad9_cios#aa";
 const KERNEL_OPS: &[&str] = &[
     "cios_mul",
     "adx_mul",
+    "adx6_mul",
     "mulx_mul",
     "sos_mul",
     "karatsuba_mul",
@@ -73,6 +76,7 @@ fn fields() -> Vec<(&'static str, BigUint)> {
         ("p192_nist", two(192) - two(64) - 1u32),
         ("p255_25519", two(255) - 19u32),
         ("p320_pmax", prime_below_pow2(320)),
+        ("p352_pmax", prime_below_pow2(352)),
         ("p384_nist", two(384) - two(128) - two(96) + two(32) - 1u32),
         ("p448_goldilocks", two(448) - two(224) - 1u32),
         ("p512_pmax", prime_below_pow2(512)),
@@ -160,7 +164,7 @@ fn main() {
                     "inv_fermat" | "inv_bingcd" => kernel_iters / 1000,
                     _ => kernel_iters,
                 };
-                // `adx_mul` exists only at 4 limbs (and `*_mulx` only with ADX).
+                // `adx_mul` / `adx6_mul` exist only at 4 / 6 limbs (and `*_mulx` only with ADX).
                 let Some((ns, _)) = field_kernel_probe(op, p, &ka, &kb, iters) else {
                     continue;
                 };
@@ -343,8 +347,8 @@ mod analyze {
         for op in KERNEL_OPS {
             write!(md, " {op} |").unwrap();
         }
-        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | mulx / cios_mul | bingcd / fermat |\n|:--|--:|");
-        for _ in 0..KERNEL_OPS.len() + 6 {
+        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | adx6 / cios_mul | mulx / cios_mul | adx6 / mulx | bingcd / fermat |\n|:--|--:|");
+        for _ in 0..KERNEL_OPS.len() + 8 {
             md.push_str("--:|");
         }
         md.push('\n');
@@ -374,12 +378,14 @@ mod analyze {
             };
             writeln!(
                 md,
-                " {} | {} | {} | {} | {} | {} |",
+                " {} | {} | {} | {} | {} | {} | {} | {} |",
                 ratio("sqr", "cios_sqr"),
                 ratio("karatsuba_mul", "cios_mul"),
                 ratio("sos_mul", "cios_mul"),
                 ratio("adx_mul", "cios_mul"),
+                ratio("adx6_mul", "cios_mul"),
                 ratio("mulx_mul", "cios_mul"),
+                ratio("adx6_mul", "mulx_mul"),
                 ratio("inv_bingcd", "inv_fermat")
             )
             .unwrap();

@@ -18,8 +18,8 @@
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use super::mont_vt::{
-    AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel,
-    ProdAdxKernel, ProdKernel, SqrKernel, TunedKernel,
+    Adx6Kernel, Adx6MulKernel, AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont,
+    MulKernel, MulxKernel, ProdAdxKernel, ProdKernel, SqrKernel, TunedKernel,
 };
 use num_bigint::BigUint;
 
@@ -212,7 +212,11 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
             mont_dispatch::<TunedKernel>(x, y, k, a, Wnaf(w), true, false)
         }
         // ADX kernels are dispatched only after the CPU check.
-        "adx" | "adx_sqr" | "adx_wnaf" if !super::mont_vt::has_adx() => None,
+        "adx" | "adx_sqr" | "adx_wnaf" | "adx6" | "adx6_mul" if !super::mont_vt::has_adx() => None,
+        // Six-limb asm product (products and squares / products only);
+        // other widths fall through to the production ADX kernel.
+        "adx6" => mont_dispatch::<Adx6Kernel>(x, y, k, a, Binary, false, false),
+        "adx6_mul" => mont_dispatch::<Adx6MulKernel>(x, y, k, a, Binary, false, false),
         "adx" => mont_dispatch::<AdxKernel>(x, y, k, a, Binary, false, false),
         "adx_sqr" => mont_dispatch::<AdxSqrKernel>(x, y, k, a, Binary, false, false),
         "mulx" => mont_dispatch::<MulxKernel>(x, y, k, a, Binary, false, false),
@@ -231,7 +235,8 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
 /// Field-kernel latency probe for the multiplication ablation: runs
 /// `iters` dependent operations `acc ← op(acc, b)` mod `p` and returns
 /// nanoseconds per operation and the final residue (so the work cannot be
-/// elided).  `op` is `cios_mul`, `cios_sqr` (CIOS `a·a`), `sqr`
+/// elided).  `op` is `cios_mul`, `adx_mul` / `adx6_mul` (inline-asm ADX
+/// product, 4 / 6 limbs only), `mulx_mul`, `cios_sqr` (CIOS `a·a`), `sqr`
 /// (dedicated squaring), `karatsuba_mul`, `sos_mul` (schoolbook product
 /// then separate reduction), `inv_bingcd` / `inv_fermat` (one inversion),
 /// or `biguint_mul` (`num-bigint` `a·b mod p`).  Benchmark use only; `None` for an unknown op or width.
@@ -265,6 +270,11 @@ pub fn field_kernel_probe(
                 ctx.mul_adx4(&acc, &bm)?;
                 (0..iters)
                     .for_each(|_| acc = ctx.mul_adx4(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx6_mul" => {
+                ctx.mul_adx6(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx6(std::hint::black_box(&acc), &bm).unwrap())
             }
             "mulx_mul" => {
                 if !super::mont_vt::has_adx() {
@@ -2103,7 +2113,9 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 13] = [
+    const ARMS: [&str; 15] = [
+        "adx6",
+        "adx6_mul",
         "adx",
         "adx_sqr",
         "mulx",
