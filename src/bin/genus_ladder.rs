@@ -253,6 +253,8 @@ fn parse() -> Result<Cfg, String> {
                         "2lp-sfb",
                         "2lp-sfb-sge",
                         "2lp-sfb-sge-nofb",
+                        "2lp-sfb-sge-p0",
+                        "2lp-sfb-sge-p0i3",
                     ]
                     .contains(&a.as_str())
                     {
@@ -408,7 +410,7 @@ fn main() -> ExitCode {
         if cfg
             .quartic_arms
             .iter()
-            .any(|a| a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb")
+            .any(|a| a.starts_with("2lp-sfb-sge"))
         {
             config["quartic_sge"] = json!({"w_max": cfg.quartic_sge.0,
                 "fill_max": cfg.quartic_sge.1, "excess": cfg.quartic_sge.2});
@@ -915,11 +917,11 @@ fn main() -> ExitCode {
             let sfb_any = cfg
                 .quartic_arms
                 .iter()
-                .any(|a| a == "2lp-sfb" || a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb");
+                .any(|a| a.starts_with("2lp-sfb"));
             let sge_arm = cfg
                 .quartic_arms
                 .iter()
-                .any(|a| a == "2lp-sfb-sge" || a == "2lp-sfb-sge-nofb");
+                .any(|a| a.starts_with("2lp-sfb-sge"));
             if sfb_any {
                 // the instance in full, so certificates can be re-checked independently
                 head["f"] = json!(inst.f.to_vec());
@@ -948,15 +950,23 @@ fn main() -> ExitCode {
                         true,
                         "_sfb_sge_nofb",
                     ),
+                    "2lp-sfb-sge-p0" => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_sfb_sge_p0"),
+                    "2lp-sfb-sge-p0i3" => (
+                        A::DoubleLp,
+                        nb2,
+                        D::Algebraic,
+                        S::Linked,
+                        true,
+                        "_sfb_sge_p0i3",
+                    ),
                     _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
                 };
-                let fb = if name == "2lp-sfb" || name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb"
-                {
+                let fb = if name.starts_with("2lp-sfb") {
                     ql::QFactorBase::Sampled
                 } else {
                     ql::QFactorBase::Enumerated
                 };
-                let la = if name == "2lp-sfb-sge" || name == "2lp-sfb-sge-nofb" {
+                let la = if name.starts_with("2lp-sfb-sge") {
                     ql::QLinAlg::SgeCoord {
                         sge: gl::SgeParams {
                             w_max: cfg.quartic_sge.0,
@@ -981,7 +991,9 @@ fn main() -> ExitCode {
                         descent,
                         solve,
                         diag: cfg.quartic_diag,
-                        inhom_rows: if solve == ql::QSolve::Linked {
+                        inhom_rows: if name == "2lp-sfb-sge-p0i3" {
+                            3
+                        } else if solve == ql::QSolve::Linked {
                             cfg.quartic_inhom
                         } else {
                             8
@@ -989,6 +1001,7 @@ fn main() -> ExitCode {
                         kick_t,
                         fb,
                         la,
+                        p0_lines: name.starts_with("2lp-sfb-sge-p0"),
                     },
                 );
                 let mut rec = head.clone();
@@ -1017,7 +1030,9 @@ fn main() -> ExitCode {
                     rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
                     rec["inhom_linked"] = json!(o.inhom_linked);
                     rec["la_skipped"] = json!(o.la_skipped);
-                    rec["inhom_rows"] = json!(if solve == ql::QSolve::Linked {
+                    rec["inhom_rows"] = json!(if name == "2lp-sfb-sge-p0i3" {
+                        3
+                    } else if solve == ql::QSolve::Linked {
                         cfg.quartic_inhom
                     } else {
                         8
@@ -1054,6 +1069,8 @@ fn main() -> ExitCode {
                         rec["la_fallbacks"] = json!(o.la_fallbacks);
                         rec["la_fallbacks_skipped"] = json!(o.la_fallbacks_skipped);
                         rec["la_fallback_rescues"] = json!(o.la_fallback_rescues);
+                        rec["p0_lines"] = json!(o.p0_lines);
+                        rec["p0_line_relations"] = json!(o.p0_line_relations);
                         rec["core_nnz"] = json!(o.core_nnz);
                         rec["sq_dim"] = json!(o.sq_dim);
                         rec["sq_nnz"] = json!(o.sq_nnz);

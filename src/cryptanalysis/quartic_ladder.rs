@@ -1521,6 +1521,9 @@ pub struct QIcResult {
     /// [`QLinAlg::SgeCoord`] with the fallback: attempts the full-core
     /// fallback certified, i.e. the attempts a skipping arm would give up.
     pub la_fallback_rescues: u32,
+    /// [`QDiemOpts::p0_lines`]: lines through `P0` tried / kept as relations.
+    pub p0_lines: u32,
+    pub p0_line_relations: u32,
     /// [`QLinAlg::SgeCoord`]: size and non-zeros of the square system of
     /// the last attempt (0 when none was formed).
     pub sq_dim: usize,
@@ -1731,6 +1734,18 @@ pub struct QDiemOpts {
     pub fb: QFactorBase,
     /// Linear-algebra stage.
     pub la: QLinAlg,
+    /// Before the relation loop, add the lines through `P0` and every
+    /// factor-base point (`DoubleLp` only; counted like every line).
+    ///
+    /// Why: a core with no line through `P0` leaves the base-point shift
+    /// `v_deg` (every `lambda_P + 1`, `lambda_kappa + 4`) in the kernel of the
+    /// line rows, and one linked decomposition row is spent removing it.
+    /// A line row through `P0` holds three factor-base terms and `-kappa`,
+    /// so it is not orthogonal to `v_deg`; once one reaches the core,
+    /// two decomposition rows in general position determine `t`.
+    /// One line costs a few hundred counted operations, one linked
+    /// decomposition row about a thousand times more.
+    pub p0_lines: bool,
 }
 
 /// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
@@ -2048,6 +2063,43 @@ fn run_diem_inner(
         rel.nfb += 1;
         Some((rel, lps))
     };
+
+    if opts.p0_lines && prm.arm == QArm::DoubleLp {
+        ctx.taylor(p0i, &mut res.rel);
+        for &bj in &base {
+            if bj == p0i {
+                continue;
+            }
+            res.lines_tried += 1;
+            res.p0_lines += 1;
+            let (p3, p4) = match ctx.line(p0i, bj, &mut res.rel) {
+                LineRes::Split(a, b) => (a, b),
+                LineRes::Bad => {
+                    res.bad_relations += 1;
+                    continue;
+                }
+                _ => continue,
+            };
+            let mut key = [p0i as u32, bj as u32, p3, p4];
+            key.sort_unstable_by_key(|&k| ctx.order_key(k));
+            if !seen_lines.insert(key) {
+                continue;
+            }
+            let Some((rel, lps)) = make_rel(&key, 0, 0, &col) else {
+                continue;
+            };
+            if prm.verify_relations {
+                let kap = ver.kappa(&pq, &mut ctx);
+                if !ver.check(&pq, &mut ctx, &key, false, &kap) {
+                    res.bad_relations += 1;
+                    continue;
+                }
+            }
+            push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
+            res.line_relations += 1;
+            res.p0_line_relations += 1;
+        }
+    }
 
     'outer: while !solved {
         // ── line relations ──
@@ -3209,6 +3261,7 @@ mod tests {
                         kick_t: true,
                         fb: QFactorBase::Enumerated,
                         la: QLinAlg::Wiedemann,
+                        p0_lines: false,
                     },
                 );
                 assert!(o.certified, "q={q} seed={seed}: {o:?}");
@@ -3227,6 +3280,7 @@ mod tests {
             kick_t: true,
             fb,
             la: QLinAlg::Wiedemann,
+            p0_lines: false,
         }
     }
 
@@ -3676,6 +3730,7 @@ mod tests {
                                 kick_t: solve == QSolve::Linked,
                                 fb: QFactorBase::Enumerated,
                         la: QLinAlg::Wiedemann,
+                        p0_lines: false,
                             },
                         );
                         eprintln!(
