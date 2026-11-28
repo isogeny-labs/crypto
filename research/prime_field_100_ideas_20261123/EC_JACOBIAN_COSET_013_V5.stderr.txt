@@ -1,0 +1,151 @@
+warning: struct `BitSampleIndex` is never constructed
+  --> crates/hashed-ecdl-tensor/src/factor_base_lsh.rs:14:19
+   |
+14 | pub(crate) struct BitSampleIndex {
+   |                   ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `new`, `signature`, and `contains_exact` are never used
+  --> crates/hashed-ecdl-tensor/src/factor_base_lsh.rs:21:19
+   |
+20 | impl BitSampleIndex {
+   | ------------------- associated items in this implementation
+21 |     pub(crate) fn new(
+   |                   ^^^
+...
+79 |     fn signature(&self, point: &Point) -> Option<u32> {
+   |        ^^^^^^^^^
+...
+97 |     pub(crate) fn contains_exact(
+   |                   ^^^^^^^^^^^^^^
+
+warning: `hashed-ecdl-tensor` (lib) generated 2 warnings
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/crypto-ec100-jacobian-slice-20261128)
+warning: variable does not need to be mutable
+   --> src/cryptanalysis/trace_zero_linearized.rs:630:17
+    |
+630 |             let mut consumed_by_vector = false;
+    |                 ----^^^^^^^^^^^^^^^^^^
+    |                 |
+    |                 help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `simd`
+   --> src/cryptanalysis/fp_gemm.rs:197:26
+    |
+197 | pub fn reduce_f64_to_u32(simd: GemmSimd, src: &[f64], dst: &mut [u32], p: u64, bm: u64) -> u32 {
+    |                          ^^^^ help: if this is intentional, prefix it with an underscore: `_simd`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `simd`
+   --> src/cryptanalysis/fp_gemm.rs:549:23
+    |
+549 | pub fn cvt_u32_to_f64(simd: GemmSimd, src: &[u32], dst: &mut [f64]) {
+    |                       ^^^^ help: if this is intentional, prefix it with an underscore: `_simd`
+
+warning: unused variable: `b_pack`
+   --> src/cryptanalysis/fp_gemm.rs:603:5
+    |
+603 |     b_pack: &mut Vec<f64>,
+    |     ^^^^^^ help: if this is intentional, prefix it with an underscore: `_b_pack`
+
+warning: unused variable: `simd`
+   --> src/cryptanalysis/fp_gemm.rs:979:17
+    |
+979 | pub fn axpy_f64(simd: GemmSimd, dst: &mut [f64], src: &[f64], f: f64) {
+    |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_simd`
+
+warning: function `reduce_mod131_product` is never used
+    --> src/binary_ecc/f2m.rs:1992:4
+     |
+1992 | fn reduce_mod131_product(p: [u64; 6]) -> [u64; 3] {
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `has_bmi2` is never read
+   --> src/cryptanalysis/certicom131_symlp/gf2w.rs:131:5
+    |
+124 | pub struct Gf2W {
+    |            ---- field in this struct
+...
+131 |     has_bmi2: bool,
+    |     ^^^^^^^^
+    |
+    = note: `Gf2W` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: field `hardware131` is never read
+  --> src/cryptanalysis/trace_zero_word_field.rs:47:5
+   |
+40 | pub struct WordField {
+   |            --------- field in this struct
+...
+47 |     hardware131: bool,
+   |     ^^^^^^^^^^^
+
+warning: function `inv_p_lo` is never used
+  --> src/cryptanalysis/fp_gemm.rs:84:4
+   |
+84 | fn inv_p_lo(p: u64) -> f64 {
+   |    ^^^^^^^^
+
+warning: constant `KC` is never used
+   --> src/cryptanalysis/fp_gemm.rs:608:11
+    |
+608 |     const KC: usize = 256;
+    |           ^^
+
+warning: constant `NC512` is never used
+   --> src/cryptanalysis/fp_gemm.rs:609:11
+    |
+609 |     const NC512: usize = 240; // 10 * NR512; 256 * 240 * 8 = 480 KiB (fits in 2 MiB L2)
+    |           ^^^^^
+
+warning: constant `NC256` is never used
+   --> src/cryptanalysis/fp_gemm.rs:610:11
+    |
+610 |     const NC256: usize = 192; // 16 * NR256; 256 * 192 * 8 = 384 KiB
+    |           ^^^^^
+
+warning: method `lookup_x_canon` is never used
+   --> src/cryptanalysis/ic_framework/rootfind_floor.rs:839:8
+    |
+611 | impl RootfindFloorOracle<'_> {
+    | ---------------------------- method in this implementation
+...
+839 |     fn lookup_x_canon(
+    |        ^^^^^^^^^^^^^^
+
+warning: method `lookup_canon_into` is never used
+    --> src/cryptanalysis/ic_framework/rootfind_kmitm.rs:1291:8
+     |
+1090 | impl RootfindKMitmOracle<'_> {
+     | ---------------------------- method in this implementation
+...
+1291 |     fn lookup_canon_into(&mut self, x: u64) -> bool {
+     |        ^^^^^^^^^^^^^^^^^
+
+warning: field `pn0` is never read
+  --> src/ecc/mont_vt.rs:39:5
+   |
+23 | pub(crate) struct Mont<const N: usize> {
+   |                   ---- field in this struct
+...
+39 |     pn0: [u64; 20],
+   |     ^^^
+   |
+   = note: `Mont` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: `crypto` (lib) generated 15 warnings (run `cargo fix --lib -p crypto` to apply 5 suggestions)
+warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
+  |
+  = note: dyld[84286]: Library not loaded: @rpath/libLLVM.dylib
+            Referenced from: <D6B3C499-A2AF-3E42-8F77-C42BD658AAB5> /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/rust-objcopy
+            Reason: tried: '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Volumes/SSD990-2/crypto-ec100-jacobian-slice-20261128/target/release/deps/libLLVM.dylib' (no such file), '/Users/adamburan/lib/libLLVM.dylib' (no such file), '/usr/local/lib/libLLVM.dylib' (no such file), '/usr/lib/libLLVM.dylib' (no such file, not in dyld cache)
+          
+
+warning: `crypto` (example "ec100_jacobian_coset_slice_013") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 5m 43s
