@@ -914,10 +914,7 @@ fn main() -> ExitCode {
                 .expect("admitted quartic");
             let mut head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
                 "seed": seed, "r": inst.r, "h": inst.h});
-            let sfb_any = cfg
-                .quartic_arms
-                .iter()
-                .any(|a| a.starts_with("2lp-sfb"));
+            let sfb_any = cfg.quartic_arms.iter().any(|a| a.starts_with("2lp-sfb"));
             let sge_arm = cfg
                 .quartic_arms
                 .iter()
@@ -950,7 +947,14 @@ fn main() -> ExitCode {
                         true,
                         "_sfb_sge_nofb",
                     ),
-                    "2lp-sfb-sge-p0" => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_sfb_sge_p0"),
+                    "2lp-sfb-sge-p0" => (
+                        A::DoubleLp,
+                        nb2,
+                        D::Algebraic,
+                        S::Linked,
+                        true,
+                        "_sfb_sge_p0",
+                    ),
                     "2lp-sfb-sge-p0i3" => (
                         A::DoubleLp,
                         nb2,
