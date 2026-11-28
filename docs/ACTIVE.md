@@ -19,6 +19,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Screen exact pair support of the held-out selected PKM maps against equal-size intervals (Codex, started 2026-11-28, branch codex/pkm-z2xz8-pair-support-20261128)
 - [ ] Require independent held-out price selection before the next PKM primitive series (Codex, started 2026-11-28, branch codex/pkm-primitive-selection-gate-20261128)
 - [ ] Implement and replay selected PKM primitive calibration (Codex, started 2026-11-28, branch codex/pkm-selected-primitive-replay-20261128, PR #5393; runner prepared, live series waits for prior calibration and quiet host)
 - [x] Freeze source-specific arithmetic calibration for the selected PKM map (Codex, completed 2026-11-28, branch codex/pkm-selected-primitive-price-20261128, PR #5390)
