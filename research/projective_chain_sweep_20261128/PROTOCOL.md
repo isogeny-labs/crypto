@@ -89,3 +89,28 @@ Compile with warnings and sanitizers for a separate verification build,
 retain source and executable hashes, command, raw rows, host/compiler
 metadata and any failures. If the native implementation or exactness
 check cannot be completed, report the blocker instead of a result.
+
+## Post-primary addendum: fixed-leaf identity stress panel
+
+Frozen before this second run. The primary 144 target cases all matched the
+reference, and the affine arm had no target-verdict misses despite reaching
+infinity in every cell. This separately labeled diagnostic deliberately fixes
+leaf order to test that chart. It is an adaptive follow-up, not part of the
+original 144-case panel or a fresh validation set.
+
+Use the same 36 `(p,t,m)` cells. In each cell choose `P` as the first
+factor-base point in ascending `x,y` order and `Q` as the first point
+with a *different* abscissa. Fix the ordered leaf abscissae to
+`(x(P),x(P),x(Q),…,x(Q))`, with `m−2` copies of `x(Q)`.
+The target is `x([m−2]Q)`, planted by the signed witness
+`P,−P,Q,…,Q`. If fewer than two lifted abscissae exist or the target
+is infinity, retain a censored row with a reason. There is no search for
+a pair giving an affine miss, no replacement cell, and no reroll.
+
+Run the same `F_p`-projective and affine S3 root propagation on the
+fixed ordered leaves, and an independent signed group-addition reference.
+Rebuild the base independently for each arm and cell. Record the
+projective/affine/reference verdicts, infinity-step mask, S3 counts,
+and group-addition count. Any projective/reference mismatch stops the
+run and is retained. A separate sanitizer build and byte-identical
+deterministic replay check are required. No wall-time or F4 claim follows.
