@@ -1,0 +1,11 @@
+callgrind Ir per process; per query = Ir[2 queries] - Ir[1 query]; 915,304 probes per query.
+
+arm        Ir q=1          Ir q=2          per query        per probe
+baseline   4,223,971,218   6,121,537,068   1,897,565,850    2,073
+1          2,893,398,102   3,475,749,576     582,351,474      636
+12         2,810,989,309   3,310,709,935     499,720,626      545
+13         2,395,318,919   2,730,482,845     335,163,926      366
+123        2,312,941,109   2,565,727,522     252,786,413      276
+
+Fixed part (fixture + pair table + setup) = Ir[q=1] - per query:
+baseline 2.326 G, levers 123 2.060 G (lever 3 also speeds table inserts).
