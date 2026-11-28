@@ -10,6 +10,7 @@ relevant execution path of the historical Python/C++ diagnostics.
 | Component | Contract |
 |---|---|
 | `src/quotient.rs` | Exact normal forms for every chart relation; complete bounded quotient-multiplier row construction |
+| `src/graph_quotient.rs` | Tensor-basis representatives and cubic preclosure for monic-square graphs on the four-point section |
 | `src/f4.rs` | Bounded quotient-aware F4 reference prototype, with required chart critical pairs; separate ordinary Buchberger ideal-equality checker |
 | `src/f4/projection.rs` | Checked exact geometric projection on the prescribed four-point parameter section, with elimination-ideal generators |
 | `src/systems.rs` | Fixed-degree monolithic Semaev construction, preclosed sequential/balanced tensors, guarded multiplicity branch; exact geometric-to-quotient adapter |
@@ -34,6 +35,31 @@ Its [qualification report](projection_20261124/REPORT.md) records 40 library
 and five CLI tests, and the existing coupled fixture's complete projected
 set `{(0,0)}`. The data statement `PCC-20261124-3de82e` has unverified standing.
 [pcc:unverified]
+
+## Monic-square graph quotients
+
+Each square lift takes coefficients in the order `[1, t, u, g]`.
+The ambient variable order is `[t, u, g, z0]` for one lift and
+`[t, u, g, z0, z1, h]` for two. The representative lies in the
+`C·W` basis of the base quotient. The preclosed input includes every
+cubic relation and the representative of the terminal equation.
+[Basis and degree argument](https://github.com/isogeny-labs/crypto/pull/5285)
+
+```rust
+use m31_projective_preclosure::f4::{self, Limits};
+use m31_projective_preclosure::graph_quotient::GraphQuotient;
+use m31_projective_preclosure::{Error, Poly, Ring};
+
+fn main() -> Result<(), Error> {
+    let graph = GraphQuotient::new(&[[0, 0, 0, 1], [1, 0, 0, 0]])?;
+    let terminal = Poly::variable(graph.nvars(), 3);
+    let inputs = graph.preclosed_generators(&terminal)?;
+    let ambient = Ring::new(0, graph.nvars())?;
+    let report = f4::compute(&ambient, &inputs, Limits::default())?;
+    assert!(report.is_complete());
+    Ok(())
+}
+```
 
 ## Development qualification
 
