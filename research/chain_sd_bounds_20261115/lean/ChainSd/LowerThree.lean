@@ -8,7 +8,7 @@ At degree 2 no shift is admitted to an element of `span {g}` unless it is zero, 
 coefficient of `g` at the weight-2 character `x₁² x₂²` is `1`.  Hence `V_2 = span {g}`, and `1`
 is not a multiple of `g` (compare the coefficients at `x₁² x₂²`).  This holds for every
 `(A, B, t)` and every depth `k ≥ 2` (for `k ≥ 2` the exponents `0, 1, 2` are distinct mod `2^k`).
-The sharper bound `LFD(k) ≥ 4` (Theorem 6 of the report) is a paper proof.
+The sharper bound `LFD(k) ≥ 4` (Theorem 6 of the report) is in `ChainSd.LowerFour`.
 -/
 
 namespace ChainSd
