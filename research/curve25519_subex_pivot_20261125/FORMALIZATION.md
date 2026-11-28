@@ -647,10 +647,13 @@ Boolean entry tables and opaque retained-old-tensor terms. The remaining gap
 is narrowed by `GroupAssignmentArtifact.lean`, a checked native-order importer
 for the actual left/right group arrays. It preserves exact typed lookup values
 and instantiates the generic endpoint-fiber theorem at those arrays, giving
-total mass `2M`. Packet ownership, coefficient values, complete child tensors, and
-the external contraction theorem are still not refined by that compact
-artifact. The remaining gap is the code-to-model link from concrete Rust
-Cauchy modes and child arrays to
+total mass `2M`. `PacketAssignmentArtifact.lean` then imports one native packet
+owner per edge, aligns the packet and group artifacts internally, preserves
+exact typed ownership, and instantiates the complete packet/group child-family
+factorization at those functions. Packet entry values, coefficient values,
+complete child tensors, and the external contraction theorem are still not
+refined by these compact artifacts. The remaining gap is the code-to-model
+link from concrete Rust Cauchy modes and child arrays to
 these typed inputs, rather than the finite rearrangement, child-interface,
 shift, cutoff, or geometric-series algebra itself.
 `[pcc:unverified]`

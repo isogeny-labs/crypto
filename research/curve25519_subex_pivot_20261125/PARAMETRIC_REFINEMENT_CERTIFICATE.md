@@ -155,8 +155,13 @@ extension-ring decoding, source-shaped mutable convolution, reduction,
 nilpotence, and Cauchy-instantiation lemmas.
 The native endpoint-group projection and `GroupAssignmentArtifact.lean` now
 bind the concrete row/column group arrays to exact typed lookups and the formal
-`2M` endpoint-fiber identity; packet ownership and tensor-value refinement
-remain open. `[pcc:unverified]`
+`2M` endpoint-fiber identity; tensor-value refinement remains open.
+`[pcc:unverified]`
+The joint packet-assignment projection and checked Lean bundle now derive one
+exact packet owner per edge, align it with the endpoint-group artifact, and
+instantiate the complete packet/group child-family factorization. Packet table
+values, scalar modes, child tensors, and execution refinement remain open.
+`[pcc:unverified]`
 The frozen pre-module precision-history source emits six Lean
 module-compatibility warnings when imported into this project; its bytes are
 unchanged.

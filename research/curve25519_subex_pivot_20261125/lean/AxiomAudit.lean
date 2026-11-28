@@ -12,6 +12,7 @@ import NodeShrinkArtifact
 import ObjectiveBoundary
 import GroupFactorization
 import GroupAssignmentArtifact
+import PacketAssignmentArtifact
 import ExtensionRingModel
 
 open Curve25519ParametricRefinement
@@ -26,6 +27,7 @@ open Curve25519NodeShrinkArtifact
 open Curve25519ObjectiveBoundary
 open Curve25519GroupFactorization
 open Curve25519GroupAssignmentArtifact
+open Curve25519PacketAssignmentArtifact
 open Curve25519ExtensionRingModel
 
 #print axioms class_cap_of_scaled_variance
@@ -189,6 +191,17 @@ open Curve25519ExtensionRingModel
 #print axioms GroupAssignmentArtifact.rowGroup_val
 #print axioms GroupAssignmentArtifact.columnGroup_val
 #print axioms GroupAssignmentArtifact.completeEndpointIncidenceCount
+#print axioms PacketAssignmentArtifact.wellFormed_eq_true_iff
+#print axioms parsePacketAssignmentArtifactUnchecked_projectionValues
+#print axioms parsePacketAssignmentArtifact_projectionValues
+#print axioms parsePacketAssignmentArtifact_wellFormed
+#print axioms PacketAssignmentArtifact.edgePacket_val
+#print axioms IncidenceAssignmentBundle.valid_eq_true_iff
+#print axioms parseIncidenceAssignmentBundle_projectionValues
+#print axioms parseIncidenceAssignmentBundle_valid
+#print axioms IncidenceAssignmentBundle.packetOfIncidence_val
+#print axioms IncidenceAssignmentBundle.endpointPacket_pair
+#print axioms IncidenceAssignmentBundle.completeChildFamilyFactorization
 #print axioms complete_child_family_factorization
 #print axioms sum_regroup_by_fibers
 #print axioms product_pow_two_weight

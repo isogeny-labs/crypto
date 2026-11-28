@@ -238,8 +238,17 @@ projection: schema/radix/counts followed by the exact row and column group of
 every parent edge. `GROUP_ASSIGNMENT_ARTIFACT.md` and the matching Lean module
 check shape and ranges, preserve exact typed lookup values, and instantiate the
 formal group-fiber split to prove total endpoint mass `2M` for the imported
-arrays. Packet ownership, scalar/mode values, and child tensor semantics remain
-separate. `[pcc:unverified]`
+arrays. That first artifact deliberately leaves packet ownership, scalar/mode
+values, and child tensor semantics separate. `[pcc:unverified]`
+
+`PACKET_ASSIGNMENT_ARTIFACT.md` now closes the next finite indexing layer. A
+native projection derives one packet owner per parent edge and rejects missing,
+duplicate, or out-of-range ownership. Its joint projection with the group
+artifact has a checked Lean importer that aligns edge counts, preserves exact
+typed packet owners, proves both endpoint incidences share their edge owner,
+and instantiates the generic complete packet/group child-family factorization.
+Concrete packet entry values, modes, tensors, and contraction semantics remain
+outside this artifact. `[pcc:unverified]`
 
 An object-level cross-check now makes the packing boundary explicit. Of those
 596 partition certificates, 285 satisfy `K L<=3M` and match the independent

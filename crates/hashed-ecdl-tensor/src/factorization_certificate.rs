@@ -77,6 +77,10 @@ pub struct Certificate {
 
 /// Wire schema for the compact endpoint-group assignment projection.
 pub const GROUP_ASSIGNMENT_PROJECTION_SCHEMA: u32 = 1;
+/// Wire schema for the compact packet-owner projection.
+pub const PACKET_ASSIGNMENT_PROJECTION_SCHEMA: u32 = 1;
+/// Wire schema for the joint endpoint-group and packet-owner projection.
+pub const INCIDENCE_ASSIGNMENT_BUNDLE_SCHEMA: u32 = 1;
 
 /// Canonical projection of the row and column group selected for every parent
 /// edge. The header is projection schema, radix, edge count, left-group count,
@@ -110,6 +114,67 @@ pub fn group_assignment_projection(
     ]);
     values.extend_from_slice(&certificate.left_groups);
     values.extend_from_slice(&certificate.right_groups);
+    Ok(values)
+}
+
+/// Canonical packet owner for every parent edge. The header is projection
+/// schema, packet count, edge count, and owner count, followed by one packet
+/// index per edge. Packet slots are accepted only when they cover every edge
+/// exactly once.
+pub fn packet_assignment_projection(
+    certificate: &Certificate,
+) -> std::result::Result<Vec<usize>, String> {
+    if certificate.schema != SCHEMA || certificate.packets.is_empty() {
+        return Err("factorization packet projection context".into());
+    }
+    let mut owners = Vec::new();
+    owners
+        .try_reserve_exact(certificate.edge_count)
+        .map_err(|_| "factorization packet projection length".to_string())?;
+    owners.resize(certificate.edge_count, None);
+    for (packet, slots) in certificate.packets.iter().enumerate() {
+        for &edge in slots.iter().flatten() {
+            let Some(owner) = owners.get_mut(edge) else {
+                return Err("factorization packet projection context".into());
+            };
+            if owner.replace(packet).is_some() {
+                return Err("factorization packet projection context".into());
+            }
+        }
+    }
+    if owners.iter().any(Option::is_none) {
+        return Err("factorization packet projection context".into());
+    }
+    let capacity = 4usize
+        .checked_add(owners.len())
+        .ok_or_else(|| "factorization packet projection length".to_string())?;
+    let mut values = Vec::with_capacity(capacity);
+    values.extend([
+        PACKET_ASSIGNMENT_PROJECTION_SCHEMA as usize,
+        certificate.packets.len(),
+        certificate.edge_count,
+        owners.len(),
+    ]);
+    values.extend(owners.into_iter().map(Option::unwrap));
+    Ok(values)
+}
+
+/// Joint canonical projection used by the formal incidence-assignment bundle.
+/// The two-field header contains the bundle schema and exact group-projection
+/// length, followed by the complete group and packet-owner projections.
+pub fn incidence_assignment_bundle_projection(
+    certificate: &Certificate,
+) -> std::result::Result<Vec<usize>, String> {
+    let groups = group_assignment_projection(certificate)?;
+    let packets = packet_assignment_projection(certificate)?;
+    let capacity = 2usize
+        .checked_add(groups.len())
+        .and_then(|value| value.checked_add(packets.len()))
+        .ok_or_else(|| "factorization incidence bundle length".to_string())?;
+    let mut values = Vec::with_capacity(capacity);
+    values.extend([INCIDENCE_ASSIGNMENT_BUNDLE_SCHEMA as usize, groups.len()]);
+    values.extend(groups);
+    values.extend(packets);
     Ok(values)
 }
 

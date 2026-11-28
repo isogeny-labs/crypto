@@ -10,11 +10,12 @@ use crate::child_provenance_certificate::{
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, group_assignment_projection, verify as standalone_verify,
-    verify_cauchy_mode_coverage, verify_cauchy_source, verify_ring_multiplication_witness,
-    verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness,
-    Certificate, CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness,
-    SourceDimensionWitness, SCHEMA,
+    description_envelope, group_assignment_projection, incidence_assignment_bundle_projection,
+    packet_assignment_projection, verify as standalone_verify, verify_cauchy_mode_coverage,
+    verify_cauchy_source, verify_ring_multiplication_witness, verify_source_dimensions,
+    verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness, Certificate,
+    CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness, SourceDimensionWitness,
+    SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
@@ -952,6 +953,47 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(
         group_assignment_projection(&invalid_group_projection).unwrap_err(),
         "factorization group projection context"
+    );
+    let packet_projection = packet_assignment_projection(&conditional_certificate).unwrap();
+    assert_eq!(packet_projection[0], 1);
+    assert_eq!(packet_projection[1], conditional_certificate.packets.len());
+    assert_eq!(packet_projection[2], conditional_certificate.edge_count);
+    assert_eq!(packet_projection[3], conditional_certificate.edge_count);
+    let mut expected_owners = vec![usize::MAX; conditional_certificate.edge_count];
+    let occupied_slots: Vec<_> = conditional_certificate
+        .packets
+        .iter()
+        .enumerate()
+        .flat_map(|(packet, slots)| {
+            slots
+                .iter()
+                .enumerate()
+                .filter_map(move |(slot, edge)| edge.map(|edge| (packet, slot, edge)))
+        })
+        .collect();
+    for &(packet, _, edge) in &occupied_slots {
+        expected_owners[edge] = packet;
+    }
+    assert_eq!(&packet_projection[4..], expected_owners.as_slice());
+    let incidence_projection =
+        incidence_assignment_bundle_projection(&conditional_certificate).unwrap();
+    assert_eq!(incidence_projection[0], 1);
+    assert_eq!(incidence_projection[1], group_projection.len());
+    assert_eq!(
+        &incidence_projection[2..2 + group_projection.len()],
+        group_projection.as_slice()
+    );
+    assert_eq!(
+        &incidence_projection[2 + group_projection.len()..],
+        packet_projection.as_slice()
+    );
+    let mut invalid_packet_projection = conditional_certificate.clone();
+    let (_, _, first_edge) = occupied_slots[0];
+    let (second_packet, second_slot, _) = occupied_slots[1];
+    invalid_packet_projection.packets[second_packet][second_slot] = Some(first_edge);
+    assert_eq!(
+        packet_assignment_projection(&invalid_packet_projection).unwrap_err(),
+        "factorization packet projection context"
     );
     let mut missing_degree_cap = conditional_provenance.clone();
     missing_degree_cap.source_degree_cap = None;
