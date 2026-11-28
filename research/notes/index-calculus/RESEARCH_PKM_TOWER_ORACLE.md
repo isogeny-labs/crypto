@@ -3302,7 +3302,7 @@ identity. The `pkm-semaev` oracle currently offers the affine chain through
 
 **Would a smoother auxiliary curve help?** The isogeny tower of §2.1
 already uses degree-two maps, the smallest nontrivial degree, and obtains a
-fully split `2^t)-point preimage on an auxiliary curve `E'`. Making
+fully split `2^t`-point preimage on an auxiliary curve `E'`. Making
 `#E'(F_p)` more smooth could reduce the search and construction cost, which
 must be rebuilt for each target under the no-preprocessing rule. It does
 not add summation constraints or reduce the chain's separator width. In
