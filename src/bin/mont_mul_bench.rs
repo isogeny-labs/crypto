@@ -20,6 +20,10 @@
 //! `--batch`: eight `Point::scalar_mul` calls vs one
 //! `Point::scalar_mul_batch` (AVX-512 IFMA, eight lanes) on the same points
 //! and scalars, interleaved rounds, `batch` rows (ns per point).
+//!
+//! `--rho`: marginal cost per step of the `ecdlp_nist` rho walk, one walk
+//! per worker (`lanes = 1`) vs lockstep walks (`--lanes`, batched on IFMA),
+//! `rho` rows.
 
 use crypto_lib::ecc::endo_generic_chain_set::is_probable_prime;
 use crypto_lib::ecc::field::FieldElement;
@@ -112,6 +116,10 @@ fn main() {
         let input = args.get(i + 1).expect("--analyze FILE");
         let dir: String = arg(&args, "--report-dir", ".".to_string());
         analyze::run(input, &dir);
+        return;
+    }
+    if args.iter().any(|a| a == "--rho") {
+        rho_mode(&args);
         return;
     }
     if args.iter().any(|a| a == "--batch") {
@@ -653,6 +661,95 @@ fn batch_mode(args: &[String]) {
             ratios[0],
             ratios[ratios.len() - 1],
             ratios.len()
+        );
+    }
+}
+
+/// `--rho`: per curve and round, four budget-capped rho runs in a seeded
+/// shuffled order: `lanes ∈ {1, L}` × budget `{B, 2B}` (one thread, same
+/// target and seed).  The marginal cost per step is
+/// `(t(2B) − t(B)) / B` per arm, which removes walk start-up (each walk
+/// starts with two scalar multiplications).  Writes `rho` rows and prints
+/// the median marginal ns per step per arm and their paired ratio.
+fn rho_mode(args: &[String]) {
+    use crypto_lib::cryptanalysis::ecdlp_nist::rho::{pollard_rho, RhoOptions};
+    use crypto_lib::cryptanalysis::ecdlp_nist::{EcdlpGroup, PrimeGroup};
+    use crypto_lib::ecc::curve::CurveParams;
+    let rounds: usize = arg(args, "--rounds", 9);
+    let budget: u64 = arg(args, "--budget", 1u64 << 15);
+    let lanes: usize = arg(args, "--lanes", 256);
+    let seed: u64 = arg(args, "--seed", 0x7268_6f6c);
+    let out_path: String = arg(args, "--out", "mont_mul_rho.jsonl".to_string());
+    let only: Option<String> = args
+        .iter()
+        .position(|a| a == "--fields")
+        .and_then(|i| args.get(i + 1).cloned());
+    let mut out = std::fs::File::create(&out_path).expect("create --out");
+    let curves = [
+        ("eccp131", CurveParams::eccp131()),
+        ("secp256k1", CurveParams::secp256k1()),
+        ("p256", CurveParams::p256()),
+        ("gost512_test", CurveParams::gost_3410_2012_512_test()),
+    ];
+    for (ci, (name, curve)) in curves
+        .into_iter()
+        .filter(|(n, _)| only.as_ref().is_none_or(|o| o.split(',').any(|x| x == *n)))
+        .enumerate()
+    {
+        let g = PrimeGroup::new(curve);
+        let mut rng = StdRng::seed_from_u64(seed ^ ci as u64);
+        let k = rng.gen_biguint_below(g.order());
+        let q = g.mul(&g.generator(), &k);
+        let mut marg: std::collections::BTreeMap<usize, Vec<f64>> = Default::default();
+        let mut ratios = Vec::new();
+        for round in 0..rounds {
+            let mut runs = vec![
+                (1usize, budget),
+                (1, 2 * budget),
+                (lanes, budget),
+                (lanes, 2 * budget),
+            ];
+            let mut orng = StdRng::seed_from_u64(seed ^ ((ci as u64) << 32) ^ round as u64);
+            runs.shuffle(&mut orng);
+            let mut t = std::collections::BTreeMap::new();
+            for (pos, &(ln, b)) in runs.iter().enumerate() {
+                let opts = RhoOptions {
+                    threads: 1,
+                    seed: seed ^ round as u64,
+                    max_iterations: Some(b),
+                    lanes: ln,
+                    ..RhoOptions::default()
+                };
+                let t0 = std::time::Instant::now();
+                let rep = pollard_rho(&g, &q, &opts);
+                let ns = t0.elapsed().as_nanos() as f64;
+                t.insert((ln, b), (ns, rep.iterations));
+                writeln!(
+                    out,
+                    "{{\"kind\":\"rho\",\"curve\":\"{name}\",\"round\":{round},\"pos\":{pos},\"lanes\":{ln},\"budget\":{b},\"iterations\":{},\"ns\":{ns:.0}}}",
+                    rep.iterations
+                )
+                .unwrap();
+            }
+            let m = |ln: usize| {
+                let (t1, i1) = t[&(ln, budget)];
+                let (t2, i2) = t[&(ln, 2 * budget)];
+                (t2 - t1) / (i2 - i1).max(1) as f64
+            };
+            let (m1, ml) = (m(1), m(lanes));
+            marg.entry(1).or_default().push(m1);
+            marg.entry(lanes).or_default().push(ml);
+            ratios.push(m1 / ml);
+        }
+        let med = |v: &mut Vec<f64>| {
+            v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            v[v.len() / 2]
+        };
+        let m1 = med(marg.get_mut(&1).unwrap());
+        let ml = med(marg.get_mut(&lanes).unwrap());
+        let r = med(&mut ratios);
+        println!(
+            "{name}: marginal ns/step lanes=1 {m1:.0}, lanes={lanes} {ml:.0}; paired ratio median {r:.3} ({rounds} rounds)"
         );
     }
 }

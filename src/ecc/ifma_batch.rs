@@ -72,6 +72,25 @@ impl<const L: usize> F8<L> {
         Fe(out)
     }
 
+    /// `x − p` if `x ≥ p`, else `x`, for normalized `x < 2p`.
+    #[inline(always)]
+    unsafe fn reduce_p(&self, x: &Fe<L>) -> Fe<L> {
+        let z = _mm512_setzero_si512();
+        let mut d = [z; L];
+        let mut br = z;
+        for k in 0..L {
+            let v = _mm512_sub_epi64(_mm512_sub_epi64(x.0[k], self.p[k]), br);
+            br = _mm512_srli_epi64(v, 63);
+            d[k] = _mm512_and_si512(v, self.mask);
+        }
+        let ge = _mm512_cmpeq_epi64_mask(br, z);
+        let mut out = [z; L];
+        for k in 0..L {
+            out[k] = _mm512_mask_blend_epi64(ge, x.0[k], d[k]);
+        }
+        Fe(out)
+    }
+
     #[inline(always)]
     unsafe fn add(&self, x: &Fe<L>, y: &Fe<L>) -> Fe<L> {
         let z = _mm512_setzero_si512();
@@ -558,11 +577,264 @@ pub(crate) fn scalar_mul_batch(
     Some(out)
 }
 
+/// Batched affine addition `(x1, y1) + (x2, y2)` over `n = 8·G` lanes
+/// (`G` vector groups), inputs and outputs as 52-bit limbs `[walk][limb]`
+/// in plain (non-Montgomery) form, `< p`.  One vector Fermat inversion is
+/// shared by the `G` walks of each lane (Montgomery's simultaneous
+/// inversion).  Returns per walk whether it was exceptional (`x1 = x2`:
+/// doubling or a sum at infinity); those outputs are garbage.
+///
+/// # Safety
+/// The CPU must support AVX-512F and AVX-512 IFMA.
+#[target_feature(enable = "avx512f,avx512ifma")]
+#[allow(clippy::too_many_arguments)]
+unsafe fn affine_add_lanes<const L: usize>(
+    p: &[u64; 8],
+    p2: &[u64; 8],
+    n0: u64,
+    r2: &[u64; 8],
+    pm2_bits: &[bool],
+    x1: &[[u64; 8]],
+    y1: &[[u64; 8]],
+    x2: &[[u64; 8]],
+    y2: &[[u64; 8]],
+    x3: &mut [[u64; 8]],
+    y3: &mut [[u64; 8]],
+) -> Vec<bool> {
+    let bc = |w: &[u64; 8]| -> [__m512i; L] { lanes::<L>(&[*w; 8]) };
+    let f = F8::<L> {
+        p: bc(p),
+        p2: bc(p2),
+        n0: _mm512_set1_epi64(n0 as i64),
+        a: Fe(bc(&[0; 8])),
+        mask: _mm512_set1_epi64(MASK52 as i64),
+    };
+    let n = x1.len();
+    let groups = n.div_ceil(8);
+    let z = _mm512_setzero_si512();
+    let r2v = Fe(bc(r2));
+    let mut one_plain = [0u64; 8];
+    one_plain[0] = 1;
+    let onev = Fe(bc(&one_plain));
+    let load = |src: &[[u64; 8]], g: usize| -> Fe<L> {
+        let block: [[u64; 8]; 8] =
+            std::array::from_fn(|l| src.get(8 * g + l).copied().unwrap_or([0; 8]));
+        Fe(lanes::<L>(&block))
+    };
+    // To the R' domain: v·R'² ·R'⁻¹ = v·R'.
+    let mut xa = Vec::with_capacity(groups);
+    let mut ya = Vec::with_capacity(groups);
+    let mut xb = Vec::with_capacity(groups);
+    let mut yb = Vec::with_capacity(groups);
+    let mut d = Vec::with_capacity(groups);
+    let mut bad = vec![false; n];
+    let one_m = f.mul(&onev, &r2v); // R' mod p (Montgomery one)
+    for g in 0..groups {
+        let (a1, b1, a2, b2) = (load(x1, g), load(y1, g), load(x2, g), load(y2, g));
+        let (a1, b1, a2, b2) = (
+            f.mul(&a1, &r2v),
+            f.mul(&b1, &r2v),
+            f.mul(&a2, &r2v),
+            f.mul(&b2, &r2v),
+        );
+        let mut dg = f.sub(&a2, &a1);
+        let zm = f.is_zero(&dg);
+        for l in 0..8 {
+            if zm >> l & 1 == 1 && 8 * g + l < n {
+                bad[8 * g + l] = true;
+            }
+        }
+        // padding lanes and exceptional lanes: d := 1 so the product stays invertible
+        let pad: __mmask8 = if 8 * g + 8 <= n {
+            0
+        } else {
+            !((1u16 << (n - 8 * g)) as u8).wrapping_sub(1)
+        };
+        dg = F8::<L>::blend(zm | pad, &dg, &one_m);
+        xa.push(a1);
+        ya.push(b1);
+        xb.push(a2);
+        yb.push(b2);
+        d.push(dg);
+    }
+    // prefix products
+    let mut c = Vec::with_capacity(groups);
+    let mut acc = d[0];
+    c.push(acc);
+    for g in 1..groups {
+        acc = f.mul(&acc, &d[g]);
+        c.push(acc);
+    }
+    // inv = acc^(p-2) (square-and-multiply, MSB first)
+    let mut inv = one_m;
+    for &bit in pm2_bits {
+        inv = f.sqr(&inv);
+        if bit {
+            inv = f.mul(&inv, &acc);
+        }
+    }
+    // back substitution and the addition
+    for g in (0..groups).rev() {
+        let ig = if g == 0 { inv } else { f.mul(&inv, &c[g - 1]) };
+        if g > 0 {
+            inv = f.mul(&inv, &d[g]);
+        }
+        let lam = f.mul(&f.sub(&yb[g], &ya[g]), &ig);
+        let xs = f.sub(&f.sub(&f.sqr(&lam), &xa[g]), &xb[g]);
+        let ys = f.sub(&f.mul(&lam, &f.sub(&xa[g], &xs)), &ya[g]);
+        // out of the R' domain and into [0, p)
+        let xo = f.reduce_p(&f.mul(&xs, &onev));
+        let yo = f.reduce_p(&f.mul(&ys, &onev));
+        let (xr, yr) = (unlanes(&xo), unlanes(&yo));
+        for l in 0..8 {
+            if 8 * g + l < n {
+                x3[8 * g + l] = xr[l];
+                y3[8 * g + l] = yr[l];
+            }
+        }
+    }
+    let _ = z;
+    bad
+}
+
+/// Batched affine addition `P_i + Q_i` for affine points with coordinates
+/// in `[0, p)`, on IFMA: eight walks per vector, one vector Fermat inversion
+/// shared by all walks of a lane (Montgomery's simultaneous inversion).
+/// Per pair `Some((x, y))`, or `None` when `x_P = x_Q` (doubling or a sum at
+/// infinity: the caller adds those itself).  `None` overall without IFMA or
+/// for an unsupported modulus (even, below 3, or `≥ 2^414`).
+pub(crate) fn add_affine_batch(
+    pts1: &[(&BigUint, &BigUint)],
+    pts2: &[(&BigUint, &BigUint)],
+    p: &BigUint,
+) -> Option<Vec<Option<(BigUint, BigUint)>>> {
+    if !has_ifma() || !p.bit(0) || *p < BigUint::from(3u8) || pts1.len() != pts2.len() {
+        return None;
+    }
+    if pts1.is_empty() {
+        return Some(Vec::new());
+    }
+    let l = limbs_for(p.bits())?;
+    macro_rules! go {
+        ($l:literal) => {
+            // SAFETY: has_ifma() checked above.
+            unsafe { add_run::<$l>(pts1, pts2, p) }
+        };
+    }
+    Some(match l {
+        3 => go!(3),
+        4 => go!(4),
+        5 => go!(5),
+        6 => go!(6),
+        7 => go!(7),
+        _ => go!(8),
+    })
+}
+
+/// 52-bit limbs `< 2^(52·8)` back to a `BigUint`.
+fn big_from52<const L: usize>(l: &[u64; 8]) -> BigUint {
+    let (w, _) = super::mont_ifma::unpack52::<7>(l, L);
+    let mut d = Vec::with_capacity(14);
+    for x in w {
+        d.push(x as u32);
+        d.push((x >> 32) as u32);
+    }
+    BigUint::new(d)
+}
+
+/// # Safety
+/// The CPU must support AVX-512F and AVX-512 IFMA.
+#[target_feature(enable = "avx512f,avx512ifma")]
+unsafe fn add_run<const L: usize>(
+    pts1: &[(&BigUint, &BigUint)],
+    pts2: &[(&BigUint, &BigUint)],
+    p: &BigUint,
+) -> Vec<Option<(BigUint, BigUint)>> {
+    let rp = BigUint::from(1u8) << (52 * L);
+    let pk = |x: &BigUint| pack52::<L>(&words8(x), 0);
+    let p0 = p.iter_u64_digits().next().unwrap_or(1);
+    let mut inv: u64 = 1;
+    for _ in 0..6 {
+        inv = inv.wrapping_mul(2u64.wrapping_sub(p0.wrapping_mul(inv)));
+    }
+    let n0 = inv.wrapping_neg() & MASK52;
+    let pm2 = p - 2u32;
+    let bits: Vec<bool> = (0..pm2.bits()).rev().map(|i| pm2.bit(i)).collect();
+    let r2 = pk(&((&rp * &rp) % p));
+    let x1: Vec<_> = pts1.iter().map(|q| pk(q.0)).collect();
+    let y1: Vec<_> = pts1.iter().map(|q| pk(q.1)).collect();
+    let x2: Vec<_> = pts2.iter().map(|q| pk(q.0)).collect();
+    let y2: Vec<_> = pts2.iter().map(|q| pk(q.1)).collect();
+    let mut x3 = vec![[0u64; 8]; x1.len()];
+    let mut y3 = x3.clone();
+    let bad = affine_add_lanes::<L>(
+        &pk(p),
+        &pk(&(p * 2u32)),
+        n0,
+        &r2,
+        &bits,
+        &x1,
+        &y1,
+        &x2,
+        &y2,
+        &mut x3,
+        &mut y3,
+    );
+    (0..x1.len())
+        .map(|i| (!bad[i]).then(|| (big_from52::<L>(&x3[i]), big_from52::<L>(&y3[i]))))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use num_bigint::RandBigInt;
     use rand::{rngs::StdRng, SeedableRng};
+
+    /// `add_affine_batch` equals `Point::add` pair by pair (odd counts,
+    /// `P = ±Q` flagged), at L = 3, 5, 8.
+    #[test]
+    fn affine_batch_matches_add() {
+        if !has_ifma() {
+            return;
+        }
+        let two = |e: u32| BigUint::from(1u8) << e;
+        let mut rng = StdRng::seed_from_u64(0x6166_6669);
+        for p in [
+            two(127) - 1u32,
+            two(255) - 19u32,
+            two(384) - two(128) - two(96) + two(32) - 1u32,
+        ] {
+            let a = FieldElement::new(BigUint::from(3u8), p.clone());
+            for cnt in [1usize, 9, 70] {
+                let r = |rng: &mut StdRng| (rng.gen_biguint_below(&p), rng.gen_biguint_below(&p));
+                let p1: Vec<(BigUint, BigUint)> = (0..cnt).map(|_| r(&mut rng)).collect();
+                let mut p2: Vec<(BigUint, BigUint)> = (0..cnt).map(|_| r(&mut rng)).collect();
+                if cnt > 3 {
+                    p2[1] = p1[1].clone();
+                    p2[2] = (p1[2].0.clone(), (&p - &p1[2].1) % &p);
+                }
+                let refs = |v: &[(BigUint, BigUint)]| -> Vec<(BigUint, BigUint)> { v.to_vec() };
+                let (v1, v2) = (refs(&p1), refs(&p2));
+                let r1: Vec<(&BigUint, &BigUint)> = v1.iter().map(|(x, y)| (x, y)).collect();
+                let r2: Vec<(&BigUint, &BigUint)> = v2.iter().map(|(x, y)| (x, y)).collect();
+                let got = add_affine_batch(&r1, &r2, &p).unwrap();
+                for i in 0..cnt {
+                    let pt = |(x, y): &(BigUint, BigUint)| Point::Affine {
+                        x: FieldElement::new(x.clone(), p.clone()),
+                        y: FieldElement::new(y.clone(), p.clone()),
+                    };
+                    if p1[i].0 == p2[i].0 {
+                        assert!(got[i].is_none(), "p={p} cnt {cnt} i {i} not flagged");
+                        continue;
+                    }
+                    let want = pt(&p1[i]).add(&pt(&p2[i]), &a);
+                    let (x, y) = got[i].clone().unwrap();
+                    assert_eq!(pt(&(x, y)), want, "p={p} cnt {cnt} i {i}");
+                }
+            }
+        }
+    }
 
     /// `Point::scalar_mul_batch` equals `scalar_mul` lane by lane, edge
     /// cases included (k = 0, 1, 16, 17, p − 1, the point at infinity, a
