@@ -4864,8 +4864,9 @@ mod tests {
                 // gcd with a planted common factor.
                 let lg = if round % 3 == 0 { 1 } else { rng.gen_range(1..120usize) };
                 let g = rand_poly(&mut rng, lg, p, true);
-                let u = rand_poly(&mut rng, rng.gen_range(2..500usize), p, true);
-                let v = rand_poly(&mut rng, rng.gen_range(1..700usize), p, false);
+                let (lu, lv) = (rng.gen_range(2..500usize), rng.gen_range(1..700usize));
+                let u = rand_poly(&mut rng, lu, p, true);
+                let v = rand_poly(&mut rng, lv, p, false);
                 let fa = ug_mul(&g, &u, p, &mut 0);
                 let fb = ug_mul(&g, &v, p, &mut 0);
                 let want = ug_gcd_monic(fa.clone(), fb.clone(), p, &mut 0);
