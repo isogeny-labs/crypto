@@ -1,0 +1,14 @@
+[package]
+name = "aimed-gather-registry-custody"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "verify-registry-binding"
+path = "verify_registry_binding.rs"
+
+[dependencies]
+serde_json = { version = "=1.0.151", features = ["arbitrary_precision", "float_roundtrip"] }
+sha2 = "=0.10.9"
+
+[workspace]
