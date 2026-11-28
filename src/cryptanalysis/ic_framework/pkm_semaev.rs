@@ -913,8 +913,8 @@ pub struct PkmSemaevOracle {
     /// Thull–Yap recursion) instead of classical Euclid.
     resgcd_half: bool,
     /// `mul=ntt`: `engine=resgcd` multiplies by multi-prime NTT (with
-    /// transform reuse in the half-GCD's matrix steps) above
-    /// `UG_NTT_MIN_PRODUCT` / `UG_NTT_MIN_MATRIX`.
+    /// transform reuse in the half-GCD's matrix steps) wherever the size-aware
+    /// cost model (`UG_NTT_CONSIDER_MIN`) prices it below Karatsuba.
     resgcd_ntt: bool,
     max_degree: u32,
     max_nnz: Option<u64>,
@@ -2459,7 +2459,9 @@ fn ug_deg(a: &[u64]) -> isize {
 }
 
 fn ug_mul(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
-    if ug_use_ntt(a.len().min(b.len()), UG_NTT_MIN_PRODUCT) {
+    if ug_ntt_enabled(a.len().min(b.len()))
+        && ug_ntt_sums_cost(&[vec![(0, 1)]], &[a.len(), b.len()], p) < ug_kar_cost(a.len(), b.len())
+    {
         return ug_mul_ntt(a, b, p, mults);
     }
     let mut r = ug_karatsuba(a, b, p, mults);
@@ -2600,15 +2602,24 @@ fn ug_mat_step(q: &[u64], m: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
     let la = a.iter().flatten().map(Vec::len).max().unwrap_or(0);
     let lb = b.iter().flatten().map(Vec::len).max().unwrap_or(0);
-    if ug_use_ntt(la.min(lb), UG_NTT_MIN_MATRIX) {
+    let polys: [&[u64]; 8] = [&a[0][0], &a[0][1], &a[1][0], &a[1][1], &b[0][0], &b[0][1], &b[1][0], &b[1][1]];
+    let terms = [
+        vec![(0, 4), (1, 6)],
+        vec![(0, 5), (1, 7)],
+        vec![(2, 4), (3, 6)],
+        vec![(2, 5), (3, 7)],
+    ];
+    if ug_ntt_enabled(la.min(lb)) && {
+        // Shared transforms against the best separate products.
+        let lens: Vec<usize> = polys.iter().map(|x| x.len()).collect();
+        let separate: u64 = terms
+            .iter()
+            .flatten()
+            .map(|&(i, j)| ug_mul_cost(lens[i], lens[j], p))
+            .sum();
+        ug_ntt_sums_cost(&terms, &lens, p) < separate
+    } {
         // One forward transform per entry, products summed before the inverse.
-        let polys: [&[u64]; 8] = [&a[0][0], &a[0][1], &a[1][0], &a[1][1], &b[0][0], &b[0][1], &b[1][0], &b[1][1]];
-        let terms = [
-            vec![(0, 4), (1, 6)],
-            vec![(0, 5), (1, 7)],
-            vec![(2, 4), (3, 6)],
-            vec![(2, 5), (3, 7)],
-        ];
         let mut o = ug_ntt_sums(&terms, &polys, p, mults).into_iter();
         let mut nx = || o.next().expect("four outputs");
         return [[nx(), nx()], [nx(), nx()]];
@@ -2625,9 +2636,17 @@ fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 
 fn ug_mat_apply(m: &UgMat, a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
     let lm = m.iter().flatten().map(Vec::len).max().unwrap_or(0);
-    if ug_use_ntt(lm.min(a.len().max(b.len())), UG_NTT_MIN_MATRIX) {
-        let polys: [&[u64]; 6] = [&m[0][0], &m[0][1], &m[1][0], &m[1][1], a, b];
-        let terms = [vec![(0, 4), (1, 5)], vec![(2, 4), (3, 5)]];
+    let polys: [&[u64]; 6] = [&m[0][0], &m[0][1], &m[1][0], &m[1][1], a, b];
+    let terms = [vec![(0, 4), (1, 5)], vec![(2, 4), (3, 5)]];
+    if ug_ntt_enabled(lm.min(a.len().max(b.len()))) && {
+        let lens: Vec<usize> = polys.iter().map(|x| x.len()).collect();
+        let separate: u64 = terms
+            .iter()
+            .flatten()
+            .map(|&(i, j)| ug_mul_cost(lens[i], lens[j], p))
+            .sum();
+        ug_ntt_sums_cost(&terms, &lens, p) < separate
+    } {
         let mut o = ug_ntt_sums(&terms, &polys, p, mults).into_iter();
         let c = o.next().expect("two outputs");
         return (c, o.next().expect("two outputs"));
@@ -2716,26 +2735,62 @@ fn ug_gcd_half(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
 
 /// `(prime, primitive root)`: 119·2^23 + 1, 5·2^25 + 1, 7·2^26 + 1.
 const UG_NTT_PRIMES: [(u64, u64); 3] = [(998_244_353, 3), (167_772_161, 3), (469_762_049, 3)];
-/// A single product goes to the NTT only when the shorter factor has at
-/// least this many coefficients. Counted per product (p = 65521): NTT /
-/// Karatsuba = 1.03 at 256, 0.70 at 512, 0.49 at 1024, so 256 lost slightly
-/// and filled the m = 3 product tree with losing products.
-const UG_NTT_MIN_PRODUCT: usize = 512;
-/// The half-GCD's 2×2 matrix steps reuse each transform, so they already
-/// gain at 256 (the joint threshold sweep: half-GCD / classical at degree
-/// 1024 is 1.05 with 256 against 1.13 with 512).
-const UG_NTT_MIN_MATRIX: usize = 256;
+/// With `mul=ntt`, a product or matrix step whose operands are at least this
+/// long is costed both ways and takes the cheaper path: `ug_kar_cost`
+/// against `ug_ntt_sums_cost`, which sees the padded transform length (a
+/// product of two length-(2^k + 1) factors pads to nearly 2× and loses to
+/// Karatsuba where a power-of-two-friendly one wins), the prime count and
+/// the transform reuse of the half-GCD's matrix steps. Replaces the fixed
+/// thresholds 512 (products) and 256 (matrix steps).
+const UG_NTT_CONSIDER_MIN: usize = 64;
+
+thread_local! {
+    static UG_KAR_COST_MEMO: std::cell::RefCell<HashMap<(usize, usize), u64>> =
+        std::cell::RefCell::new(HashMap::new());
+}
+
+/// Multiplications `ug_karatsuba` counts on factors of lengths `la`, `lb`
+/// when the first factor has no zero coefficient (the schoolbook base skips
+/// zero coefficients, so the real count can only be lower).
+fn ug_kar_cost(la: usize, lb: usize) -> u64 {
+    if la == 0 || lb == 0 {
+        return 0;
+    }
+    if la.min(lb) < UG_KARATSUBA_MIN {
+        return (la * lb) as u64;
+    }
+    if let Some(c) = UG_KAR_COST_MEMO.with(|m| m.borrow().get(&(la, lb)).copied()) {
+        return c;
+    }
+    let h = la.max(lb) / 2;
+    let split = |l: usize| if l <= h { (l, 0) } else { (h, l - h) };
+    let (a0, a1) = split(la);
+    let (b0, b1) = split(lb);
+    let c = ug_kar_cost(a0, b0) + ug_kar_cost(a1, b1) + ug_kar_cost(a0.max(a1), b0.max(b1));
+    UG_KAR_COST_MEMO.with(|m| m.borrow_mut().insert((la, lb), c));
+    c
+}
+
+/// Estimated cost of `ug_mul` on lengths `la × lb` under the current mode.
+fn ug_mul_cost(la: usize, lb: usize, p: u64) -> u64 {
+    let kar = ug_kar_cost(la, lb);
+    if la.min(lb) >= UG_NTT_CONSIDER_MIN && UG_USE_NTT.with(|c| c.get()) {
+        kar.min(ug_ntt_sums_cost(&[vec![(0, 1)]], &[la, lb], p))
+    } else {
+        kar
+    }
+}
 
 thread_local! {
     /// `mul=ntt` for the resgcd engine: products and the half-GCD's matrix
-    /// steps use the NTT above `UG_NTT_MIN_PRODUCT` / `UG_NTT_MIN_MATRIX`.
+    /// steps use the NTT where the cost model prices it lower.
     /// Set and restored around one
     /// solver call.
     static UG_USE_NTT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
-fn ug_use_ntt(len: usize, min: usize) -> bool {
-    len >= min && UG_USE_NTT.with(|c| c.get())
+fn ug_ntt_enabled(len: usize) -> bool {
+    len >= UG_NTT_CONSIDER_MIN && UG_USE_NTT.with(|c| c.get())
 }
 
 fn ug_ntt_pow(mut b: u64, mut e: u64, m: u64) -> u64 {
@@ -2805,20 +2860,28 @@ fn ug_ntt(a: &mut [u64], tw: &[u64], m: u64, mults: &mut u64) {
 }
 
 /// For each output `o`, `Σ_{(i, j) ∈ terms[o]} polys[i] · polys[j]` over F_p.
-fn ug_ntt_sums(terms: &[Vec<(usize, usize)>], polys: &[&[u64]], p: u64, mults: &mut u64) -> Vec<Vec<u64>> {
+/// Transform length `n`, prime count `k`, per-output lengths and the used
+/// inputs of `ug_ntt_sums` on inputs of lengths `lens`; `None` when every
+/// output is zero. Shared with `ug_ntt_sums_cost`, so the cost model and the
+/// computation cannot drift apart.
+fn ug_ntt_plan(
+    terms: &[Vec<(usize, usize)>],
+    lens: &[usize],
+    p: u64,
+) -> Option<(usize, usize, Vec<usize>, Vec<bool>)> {
     let out_len: Vec<usize> = terms
         .iter()
         .map(|t| {
             t.iter()
-                .filter(|&&(i, j)| !polys[i].is_empty() && !polys[j].is_empty())
-                .map(|&(i, j)| polys[i].len() + polys[j].len() - 1)
+                .filter(|&&(i, j)| lens[i] > 0 && lens[j] > 0)
+                .map(|&(i, j)| lens[i] + lens[j] - 1)
                 .max()
                 .unwrap_or(0)
         })
         .collect();
     let max_len = out_len.iter().copied().max().unwrap_or(0);
     if max_len == 0 {
-        return vec![Vec::new(); terms.len()];
+        return None;
     }
     let n = max_len.next_power_of_two();
     let c = terms.iter().map(|t| t.len()).max().unwrap_or(1) as f64;
@@ -2830,9 +2893,40 @@ fn ug_ntt_sums(terms: &[Vec<(usize, usize)>], polys: &[&[u64]], p: u64, mults: &
         prod *= UG_NTT_PRIMES[k].0 as f64;
         k += 1;
     }
-    let used: Vec<bool> = (0..polys.len())
-        .map(|i| !polys[i].is_empty() && terms.iter().any(|t| t.iter().any(|&(a, b)| a == i || b == i)))
+    let used: Vec<bool> = (0..lens.len())
+        .map(|i| lens[i] > 0 && terms.iter().any(|t| t.iter().any(|&(a, b)| a == i || b == i)))
         .collect();
+    Some((n, k, out_len, used))
+}
+
+/// The multiplications `ug_ntt_sums` counts on inputs of lengths `lens`,
+/// computed from the plan alone (an exact replica of its accounting).
+fn ug_ntt_sums_cost(terms: &[Vec<(usize, usize)>], lens: &[usize], p: u64) -> u64 {
+    let Some((n, k, out_len, used)) = ug_ntt_plan(terms, lens, p) else {
+        return 0;
+    };
+    let logn = n.trailing_zeros() as u64;
+    let n64 = n as u64;
+    let twiddles = 2 * ((n64 - 1) + 2 * UG_INV_MULTS * logn);
+    let forward = used.iter().filter(|&&u| u).count() as u64 * (n64 / 2) * logn;
+    let mut per_output = 0u64;
+    for t in terms {
+        let pairs = t.iter().filter(|&&(i, j)| used[i] && used[j]).count() as u64;
+        per_output += pairs * n64;
+        if pairs > 0 {
+            per_output += (n64 / 2) * logn + n64;
+        }
+    }
+    let per_prime = twiddles + UG_INV_MULTS + forward + per_output;
+    let crt = 2 * UG_INV_MULTS + 2 + [0u64, 0, 2, 5][k] * out_len.iter().sum::<usize>() as u64;
+    k as u64 * per_prime + crt
+}
+
+fn ug_ntt_sums(terms: &[Vec<(usize, usize)>], polys: &[&[u64]], p: u64, mults: &mut u64) -> Vec<Vec<u64>> {
+    let lens: Vec<usize> = polys.iter().map(|x| x.len()).collect();
+    let Some((n, k, out_len, used)) = ug_ntt_plan(terms, &lens, p) else {
+        return vec![Vec::new(); terms.len()];
+    };
     let mut res: Vec<Vec<Vec<u64>>> = Vec::with_capacity(k);
     for &(m, g) in &UG_NTT_PRIMES[..k] {
         let tw = ug_ntt_twiddles(n, m, g, false, mults);
@@ -5104,6 +5198,43 @@ mod tests {
     /// 16-bit p, three for a 31-bit p), the transform-sharing matrix steps
     /// equal their Karatsuba forms, and the half-GCD on NTT returns
     /// classical Euclid's gcd.
+    /// The dispatch cost models match the counted multiplications: the NTT
+    /// model exactly (any lengths, single products and the matrix shapes),
+    /// the Karatsuba model as an upper bound within 1 %.
+    #[test]
+    fn ntt_and_karatsuba_cost_models_match_counts() {
+        let mut rng = StdRng::seed_from_u64(4242);
+        for p in [65_521u64, 2_147_483_647] {
+            for _ in 0..40 {
+                let (la, lb) = (rng.gen_range(1..3000usize), rng.gen_range(1..3000usize));
+                let a: Vec<u64> = (0..la).map(|_| rng.gen_range(1..p)).collect();
+                let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(1..p)).collect();
+                let mut kar = 0u64;
+                ug_karatsuba(&a, &b, p, &mut kar);
+                // a0 + a1 sums can vanish mod p and the schoolbook base skips
+                // zero coefficients, so the count may fall slightly short.
+                let model = ug_kar_cost(la, lb);
+                assert!(kar <= model && model - kar <= model / 100, "karatsuba model {la} x {lb}: {model} vs {kar}");
+                let mut ntt = 0u64;
+                ug_mul_ntt(&a, &b, p, &mut ntt);
+                assert_eq!(ug_ntt_sums_cost(&[vec![(0, 1)]], &[la, lb], p), ntt, "ntt model {la} x {lb}");
+            }
+            // 2x2 matrix product shape, with one zero entry.
+            let lens = [700usize, 0, 300, 650, 512, 513, 1, 1000];
+            let polys: Vec<Vec<u64>> = lens.iter().map(|&l| (0..l).map(|_| rng.gen_range(1..p)).collect()).collect();
+            let refs: Vec<&[u64]> = polys.iter().map(|v| v.as_slice()).collect();
+            let terms = [
+                vec![(0, 4), (1, 6)],
+                vec![(0, 5), (1, 7)],
+                vec![(2, 4), (3, 6)],
+                vec![(2, 5), (3, 7)],
+            ];
+            let mut got = 0u64;
+            ug_ntt_sums(&terms, &refs, p, &mut got);
+            assert_eq!(ug_ntt_sums_cost(&terms, &lens, p), got, "ntt matrix model p = {p}");
+        }
+    }
+
     #[test]
     fn ntt_products_and_ntt_half_gcd_match_classical() {
         let mut rng = StdRng::seed_from_u64(1201);
