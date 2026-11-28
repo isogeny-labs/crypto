@@ -94,3 +94,21 @@ chains — `3·5`, `7·7`, `3·5·7` — at `p = 1009`:
 24/24 systems decided by F4, 15 of them with a relation, every relation set
 identical to the brute-force result. This is what the `B > 2` runs above stand
 on: without it the algebraic path had only been checked against itself.
+
+## Counted cost (the metric that is not load-sensitive)
+
+Wall clocks on this host swing by 8×; `field_ops` does not. The driver now
+accumulates `AlgebraicDecomposition::field_ops` (F4 row reductions plus the
+linear stage) and reports it. At `p = 3907`, 40 targets each:
+
+| B | degrees | n0 | relations | field ops / target |
+|--:|:--|--:|--:|--:|
+| 2 | 2⁶ | 6 | 19 | 118 170 313 |
+| 11 | 5,11 | 2 | 7 | 11 920 837 |
+| 61 | 61 | 1 | 18 | 1 428 701 |
+
+An 83× monotone spread across `B` — much sharper and cleaner than the wall
+times, and it says the same thing: the smoothness bound is the lever, and the
+level count is why. Rows: `results/p3907_ops_b*.json`. The `p = 2^12` B=11 and
+B=61 rows are rate runs (40 targets, target not yet pinned), which is why
+`verified` is false there; `B = 2` completed and verified.

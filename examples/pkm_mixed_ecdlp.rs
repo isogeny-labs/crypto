@@ -24,7 +24,7 @@ use std::time::{Duration, Instant};
 
 fn main() {
     let av: Vec<String> = std::env::args().collect();
-    if av.len() != 15 {
+    if av.len() < 15 {
         eprintln!(
             "usage: pkm_mixed_ecdlp P S degrees SEED MAX_CURVES A B GX GY R K DMAX BUDGET_S MAX_TRIALS"
         );
@@ -42,6 +42,7 @@ fn main() {
     let dmax: u32 = av[12].parse().unwrap();
     let budget: u64 = av[13].parse().unwrap();
     let max_trials: u64 = av[14].parse().unwrap();
+    let dense = av.get(15).is_some_and(|s| s == "dense");
     assert_eq!(degrees.iter().product::<u64>(), s, "degrees do not multiply to S");
 
     let e = st::Curve { p, a, b };
@@ -78,6 +79,7 @@ fn main() {
     let mut rows: Vec<Vec<u64>> = Vec::new();
     let mut rng = st::Rng(seed ^ 0x9e37_79b9_7f4a_7c15);
     let (mut trials, mut found_rel, mut undetermined) = (0u64, 0u64, 0u64);
+    let mut field_ops = 0u64;
     let t_rel = Instant::now();
     while rows.len() < c + 1 && trials < max_trials {
         trials += 1;
@@ -85,7 +87,12 @@ fn main() {
         let Some(rr) = e.add(e.mul(aa, Some(g)), e.mul(bb, Some(q_pt))) else {
             continue;
         };
-        let dec = st::algebraic_decompose(&e, &tower, 2, rr, dmax, Duration::from_secs(budget));
+        let dec = if dense {
+            st::algebraic_decompose_dense(&e, &tower.v, 2, rr, dmax, Duration::from_secs(budget))
+        } else {
+            st::algebraic_decompose(&e, &tower, 2, rr, dmax, Duration::from_secs(budget))
+        };
+        field_ops += dec.field_ops;
         if dec.undetermined {
             undetermined += 1;
             continue;
@@ -174,11 +181,13 @@ fn main() {
 \"trials\":{trials},\"relations\":{found_rel},\"undetermined\":{undetermined},\
 \"rank\":{rank},\"inconsistent\":{inconsistent},\"k\":{k},\"recovered\":{},\
 \"verified\":{verified},\"setup_s\":{setup_s:.1},\"relation_s\":{rel_s:.1},\
-\"aux_curves_tried\":{},\"dmax\":{dmax},\"budget_s\":{budget}}}",
+\"aux_curves_tried\":{},\"dmax\":{dmax},\"budget_s\":{budget},\"dense\":{dense},\
+\"field_ops\":{field_ops},\"ops_per_target\":{opt:.0}}}",
         av[3],
         degrees.len(),
         degrees.iter().copied().max().unwrap(),
         recovered.map(|d| d.to_string()).unwrap_or_else(|| "null".into()),
         found.curves_tried,
+        opt = field_ops as f64 / trials.max(1) as f64,
     );
 }
