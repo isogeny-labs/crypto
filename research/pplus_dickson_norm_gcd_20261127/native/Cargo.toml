@@ -1,0 +1,23 @@
+[package]
+name = "pplus-dickson-norm-gcd"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "dickson-norm-gcd"
+path = "src/bin/dickson_norm_gcd.rs"
+
+[[bin]]
+name = "dickson-norm-gcd-verify"
+path = "src/bin/dickson_norm_gcd_verify.rs"
+
+[[bin]]
+name = "dickson-norm-gcd-analyze"
+path = "src/bin/dickson_norm_gcd_analyze.rs"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[workspace]
