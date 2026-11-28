@@ -1,0 +1,22 @@
+module
+public import Mathlib.Data.ZMod.Basic
+public import Mathlib.Tactic.Nlinarith
+public section
+namespace CryptoLean.ResidueDivision
+
+theorem no_quotient_from_same_residue (m d : ℕ) (hm : 0 < m) (hd : 1 < d) :
+    ¬ ∃ f : ZMod (m*d) → ZMod (m*d),
+      ∀ n : ℕ,d ∣ n → f (n:ZMod (m*d))=((n/d:ℕ):ZMod (m*d)) := by
+  rintro ⟨f,hf⟩
+  have h0 := hf 0 (dvd_zero d)
+  simp only [Nat.cast_zero,Nat.zero_div] at h0
+  have hD : d ∣ m*d := ⟨m,mul_comm _ _⟩
+  have hN := hf (m*d) hD
+  rw [ZMod.natCast_self,h0,Nat.mul_div_cancel m (by omega : 0 < d)] at hN
+  have hlt : m < m*d := by nlinarith
+  have hne : (m:ZMod (m*d))≠0 :=
+    (ZMod.natCast_eq_zero_iff m (m*d)).not.mpr (Nat.not_dvd_of_pos_of_lt hm hlt)
+  exact hne hN.symm
+
+end CryptoLean.ResidueDivision
+#print axioms CryptoLean.ResidueDivision.no_quotient_from_same_residue

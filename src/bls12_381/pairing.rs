@@ -31,40 +31,23 @@
 //! implementations use Montgomery-form 64-bit limbs and special
 //! line-function evaluation tricks; see `blst`.
 //!
-//! ## Known issue: bilinearity not yet achieved
+//! ## Twist convention (M-twist)
 //!
-//! The current implementation passes the **`r`-th-root-of-unity
-//! test**: `e(G1, G2)^r = 1` (so the output sits in the correct
-//! target group `μ_r ⊂ Fq¹²`).  However, **bilinearity in either
-//! variable does not yet hold**: `e([2]P, Q) ≠ e(P, Q)²`.
-//!
-//! The line-function implementation is mathematically correct
-//! per the M-type sextic twist derivation:
-//! - Lift `T = (xT, yT) ∈ E'(Fq²)` to `T_lifted = (xT·w², yT·w³)
-//!   ∈ E(Fq¹²)` with `w⁶ = ξ = u + 1`.
-//! - Slope-in-Fq¹²: `λ_Fq¹² = λ_E' · w`.
-//! - Line: `l(P) = yP − yT·w³ − λ·w·(xP − xT·w²)`.
-//!
-//! Plausible remaining causes:
-//! 1. The optimal-Ate construction for BLS curves with negative
-//!    `u` may require either (a) negating `Q` in the prover (the
-//!    `f_{u, Q} = 1/f_{|u|, Q}` trick), or (b) a specific sign
-//!    convention on the Miller-loop output that interacts non-
-//!    trivially with the final exponentiation.
-//! 2. Vertical-line contributions that we currently omit may not
-//!    fully cancel under our final-exponent factorisation.
-//! 3. The Frobenius twist endomorphism (used in the final
-//!    exponentiation's hard part by Fuentes-Castañeda et al.) may
-//!    differ from the form embedded in the simple
-//!    `f.pow((p⁴ − p² + 1)/r)` we use.
-//!
-//! For applications requiring a bilinear pairing — KZG, Groth16,
-//! PLONK pairing-based opening — production code should bind to
-//! [`blst`](https://github.com/supranational/blst) via FFI.  The
-//! `zk::kzg` and `zk::groth16` modules in this codebase build
-//! their algebraic layers on top of the (correct) field tower,
-//! `G1`, and `G2` arithmetic; only the final pairing-equation
-//! verification is currently `#[ignore]`-d.
+//! The tower in [`super::fq2`], [`super::fq6`], [`super::fq12`] fixes
+//! `u² = −1`, `v³ = ξ = u + 1`, and `w² = v`, so `w⁶ = ξ = u + 1`.
+//! [`super::g2`] defines `E'(Fq²): y_T² = x_T³ + 4(u + 1) = x_T³ + 4·w⁶`,
+//! which is the **M-type** sextic twist of `E(Fp): y² = x³ + 4`.
+//! Dividing `y_T² = x_T³ + 4·w⁶` by `w⁶` yields the untwist map
+//! `ψ_M: E'(Fq²) → E(Fq¹²)`:
+//! - `ψ_M(x_T, y_T) = (x_T · w⁻², y_T · w⁻³) ∈ E(Fq¹²)`, where
+//!   `w⁻² = ξ⁻¹ · v²` and `w⁻³ = ξ⁻¹ · v · w`.
+//! - Slope on `E(Fq¹²)`: `λ_E = dy_E / dx_E = λ_{E'} · w⁻¹`, where
+//!   `w⁻¹ = ξ⁻¹ · v² · w`.
+//! - Untwisted chord/tangent line evaluated at `P = (x_P, y_P) ∈ E(Fp)`:
+//!   `l(P) = y_P − y_T · w⁻³ − λ_{E'} · w⁻¹ · (x_P − x_T · w⁻²)`.
+//! - Because the BLS12-381 parameter `x = −0xd201000000010000` is
+//!   negative, `f_{x, Q}(P)` is obtained from `f_{|x|, Q}(P)` by
+//!   unitary conjugation after final exponentiation.
 
 use super::fq::{modulus, Fq};
 use super::fq12::Fq12;
@@ -74,10 +57,18 @@ use super::g1::G1Point;
 use super::g2::G2Point;
 use num_bigint::BigUint;
 use num_traits::One;
+use std::sync::OnceLock;
 
 /// BLS12-381 parameter `|u|` (the bit string we loop over).
-fn u_abs() -> BigUint {
-    BigUint::parse_bytes(b"d201000000010000", 16).unwrap()
+fn u_abs() -> &'static BigUint {
+    static U_ABS: OnceLock<BigUint> = OnceLock::new();
+    U_ABS.get_or_init(|| BigUint::parse_bytes(b"d201000000010000", 16).unwrap())
+}
+
+/// Cached `ξ⁻¹ = (u + 1)⁻¹ ∈ F_{p²}` used by the M-twist untwist map.
+fn xi_inv() -> &'static Fq2 {
+    static XI_INV: OnceLock<Fq2> = OnceLock::new();
+    XI_INV.get_or_init(|| Fq2::new(Fq::one(), Fq::one()).inverse().unwrap())
 }
 
 /// Line function for doubling `T` evaluated at `P` (line through
@@ -95,6 +86,10 @@ fn line_double(t: &G2Point, p: &G1Point) -> (Fq12, G2Point) {
         G1Point::Affine { x, y } => (x.clone(), y.clone()),
         G1Point::Infinity => return (Fq12::one(), t.clone()),
     };
+    if ty.is_zero() {
+        let vertical = fq_to_fq12(&px).sub(&fq2_to_fq12_at_w_inv2(&tx));
+        return (vertical, G2Point::Infinity);
+    }
 
     // Slope λ = (3·x²) / (2·y).
     let three = Fq2::new(Fq::new(BigUint::from(3u32)), Fq::zero());
@@ -132,8 +127,9 @@ fn line_add(t: &G2Point, q: &G2Point, p: &G1Point) -> (Fq12, G2Point) {
         if ty == qy {
             return line_double(t, p);
         }
-        // T + (-T) = O; line equation passes vertically through tx.
-        return (Fq12::one(), G2Point::Infinity);
+        // T + (-T) = O; vertical line x_P − x_T·w⁻² through untwisted T.
+        let vertical = fq_to_fq12(&px).sub(&fq2_to_fq12_at_w_inv2(&tx));
+        return (vertical, G2Point::Infinity);
     }
 
     let lambda = qy.sub(&ty).mul(&qx.sub(&tx).inverse().unwrap());
@@ -145,77 +141,60 @@ fn line_add(t: &G2Point, q: &G2Point, p: &G1Point) -> (Fq12, G2Point) {
     (line, new_point)
 }
 
-/// **Direct (slow but unambiguous) line evaluation** in Fq12.
+/// **Direct M-twist line evaluation** in `Fq12`.
 ///
-/// We lift T to E(Fq12) via the M-type twist, lift P trivially via
-/// the Fp inclusion, and compute the line value as a full Fq12
-/// expression with no sparse tricks.  This is the reference
-/// implementation we use to validate bilinearity; a sparse-line
-/// optimisation is straightforward once the encoding is verified.
-///
-/// Steps:
-/// 1. `T_lifted = (xT · w², yT · w³) ∈ E(Fq12)` (M-type twist).
-/// 2. `slope_Fq12 = λ · w` (since the slope on E ⊂ Fq12 picks up
-///    one factor of `w` relative to the slope on E'(Fq2)).
-/// 3. `P_lifted = (xP, yP)` embedded trivially in Fq12.
-/// 4. `l(P) = P_lifted.y − T_lifted.y − slope_Fq12 · (P_lifted.x − T_lifted.x)`.
+/// Untwists `T ∈ E'(Fq²)` to `ψ_M(T) = (x_T · w⁻², y_T · w⁻³) ∈ E(Fq¹²)`,
+/// embeds `P ∈ E(Fp)` trivially, and evaluates
+/// `l(P) = y_P − y_T · w⁻³ − (λ · w⁻¹) · (x_P − x_T · w⁻²)`.
 fn line_value(lambda: &Fq2, p_x: &Fq, p_y: &Fq, t_x: &Fq2, t_y: &Fq2) -> Fq12 {
-    // Embed P into Fq12.
     let xp_fq12 = fq_to_fq12(p_x);
     let yp_fq12 = fq_to_fq12(p_y);
-    // Lift T to E(Fq12) via T_lifted = (xT · w², yT · w³).
-    let tx_fq12 = fq2_to_fq12_at_w2(t_x);
-    let ty_fq12 = fq2_to_fq12_at_w3(t_y);
-    // slope_Fq12 = λ · w.
-    let lambda_w = fq2_to_fq12_at_w(lambda);
-    // l(P) = yP_Fq12 − ty_Fq12 − λw · (xp_Fq12 − tx_Fq12).
+    let tx_fq12 = fq2_to_fq12_at_w_inv2(t_x);
+    let ty_fq12 = fq2_to_fq12_at_w_inv3(t_y);
+    let lambda_w_inv = fq2_to_fq12_at_w_inv(lambda);
     let dx = xp_fq12.sub(&tx_fq12);
-    let lambda_dx = lambda_w.mul(&dx);
+    let lambda_dx = lambda_w_inv.mul(&dx);
     let dy = yp_fq12.sub(&ty_fq12);
     dy.sub(&lambda_dx)
 }
 
-/// Embed `a ∈ Fp` into `Fq12` at the most-constant slot
-/// (`c0_fq6.c0.c0`).
+/// Embed `a ∈ Fp` into `Fq12` at the constant slot (`c0_fq6.c0.c0`).
 fn fq_to_fq12(a: &Fq) -> Fq12 {
     let a_fq2 = Fq2::new(a.clone(), Fq::zero());
     let c0_fq6 = Fq6::new(a_fq2, Fq2::zero(), Fq2::zero());
     Fq12::new(c0_fq6, Fq6::zero())
 }
 
-/// Embed `a ∈ Fq2` into `Fq12` at slot `c0_fq6.c1` (the `v`-slot
-/// of the `c0` part, which represents `a · w²` since `w² = v`).
-fn fq2_to_fq12_at_w2(a: &Fq2) -> Fq12 {
-    let c0_fq6 = Fq6::new(Fq2::zero(), a.clone(), Fq2::zero());
+/// Embed `a · w⁻²` into `Fq12`: since `w⁶ = ξ` and `w² = v`,
+/// `w⁻² = v⁻¹ = ξ⁻¹ · v²` (`c0_fq6.c2`).
+fn fq2_to_fq12_at_w_inv2(a: &Fq2) -> Fq12 {
+    let c0_fq6 = Fq6::new(Fq2::zero(), Fq2::zero(), a.mul(xi_inv()));
     Fq12::new(c0_fq6, Fq6::zero())
 }
 
-/// Embed `a ∈ Fq2` into `Fq12` at slot `c1_fq6.c1` (the `v`-slot
-/// of `c1`, which represents `a · w · v = a · w³`).
-fn fq2_to_fq12_at_w3(a: &Fq2) -> Fq12 {
-    let c1_fq6 = Fq6::new(Fq2::zero(), a.clone(), Fq2::zero());
+/// Embed `a · w⁻³` into `Fq12`: since `w⁶ = ξ`,
+/// `w⁻³ = ξ⁻¹ · w³ = ξ⁻¹ · v · w` (`c1_fq6.c1`).
+fn fq2_to_fq12_at_w_inv3(a: &Fq2) -> Fq12 {
+    let c1_fq6 = Fq6::new(Fq2::zero(), a.mul(xi_inv()), Fq2::zero());
     Fq12::new(Fq6::zero(), c1_fq6)
 }
 
-/// Embed `a ∈ Fq2` into `Fq12` at slot `c1_fq6.c0` (represents
-/// `a · w`).
-fn fq2_to_fq12_at_w(a: &Fq2) -> Fq12 {
-    let c1_fq6 = Fq6::new(a.clone(), Fq2::zero(), Fq2::zero());
+/// Embed `a · w⁻¹` into `Fq12`: since `w⁶ = ξ`,
+/// `w⁻¹ = ξ⁻¹ · w⁵ = ξ⁻¹ · v² · w` (`c1_fq6.c2`).
+fn fq2_to_fq12_at_w_inv(a: &Fq2) -> Fq12 {
+    let c1_fq6 = Fq6::new(Fq2::zero(), Fq2::zero(), a.mul(xi_inv()));
     Fq12::new(Fq6::zero(), c1_fq6)
 }
 
-/// Compute the Miller-loop value `f_{u, Q}(P)` for the BLS12-381
-/// parameter.  Iterates over the bits of `|u|`.
+/// Compute the Miller-loop value `f_{|u|, Q}(P)` for BLS12-381.
 fn miller_loop(p: &G1Point, q: &G2Point) -> Fq12 {
     if p.is_infinity() || q.is_infinity() {
         return Fq12::one();
     }
     let u = u_abs();
-    // Iterate over the bits of u from MSB-1 down to bit 0 (skip MSB).
     let bits = u.bits();
     let mut f = Fq12::one();
     let mut t = q.clone();
-    // Iterate bits from MSB-1 down to 0.
     for i in (0..(bits - 1)).rev() {
         f = f.square();
         let (line, new_t) = line_double(&t, p);
@@ -227,46 +206,48 @@ fn miller_loop(p: &G1Point, q: &G2Point) -> Fq12 {
             t = new_t;
         }
     }
-    // For negative BLS parameter u, the canonical relationship is
-    // `f_{u, T}(P) = f_{|u|, T}(P)^{-1}`.  Rather than performing
-    // a full Fq12 inversion before final exponentiation, we apply
-    // the conjugation *after* final exponentiation — the easy
-    // part of the final exponent forces the result into the
-    // cyclotomic subgroup where conjugation equals inversion.
     f
+}
+
+fn p_squared() -> &'static BigUint {
+    static P2: OnceLock<BigUint> = OnceLock::new();
+    P2.get_or_init(|| {
+        let p = modulus();
+        &p * &p
+    })
+}
+
+fn hard_part_exponent() -> &'static BigUint {
+    static EXP: OnceLock<BigUint> = OnceLock::new();
+    EXP.get_or_init(|| {
+        let p2 = p_squared();
+        let p4 = p2 * p2;
+        let r = super::fq::scalar_modulus();
+        (&p4 - p2 + BigUint::one()) / &r
+    })
 }
 
 /// Final exponentiation: `f^((p¹² − 1) / r)`.
 fn final_exponentiation(f: &Fq12) -> Fq12 {
-    let p = modulus();
-    let p2 = &p * &p;
-    let p4 = &p2 * &p2;
-    let p6 = &p4 * &p2;
-    let p12 = &p6 * &p6;
-
+    let Some(f_inv) = f.inverse() else {
+        return Fq12::zero();
+    };
     // Easy part: f^(p⁶ − 1) · f^(p² + 1).
-    let f_inv = f.inverse().unwrap();
-    let f_p6 = f.pow(&p6);
-    let f_easy_1 = f_p6.mul(&f_inv); // f^(p⁶ − 1)
-    let f_easy_p2 = f_easy_1.pow(&p2);
-    let f_easy = f_easy_p2.mul(&f_easy_1); // f^((p⁶ − 1)(p² + 1))
+    // Since Fq12 = Fq6[w]/(w² − v) is a quadratic extension of Fq6,
+    // raising to p⁶ is exact conjugation a + b·w ↦ a − b·w.
+    let f_p6 = f.conjugate();
+    let f_easy_1 = f_p6.mul(&f_inv);
+    let f_easy_p2 = f_easy_1.pow(p_squared());
+    let f_easy = f_easy_p2.mul(&f_easy_1);
 
     // Hard part: raise to (p⁴ − p² + 1) / r.
-    // We compute this exponent explicitly.  At BLS12-381 scale, the
-    // exponent is ~3000 bits but still tractable.
-    let r = super::fq::scalar_modulus();
-    let exponent = ((&p4 - &p2 + BigUint::one()) % (&p12 - BigUint::one())) / &r;
-
-    f_easy.pow(&exponent)
+    f_easy.pow(hard_part_exponent())
 }
 
 /// Compute `e(P, Q) ∈ F_{p¹²}` for `P ∈ G1, Q ∈ G2`.
 ///
-/// Final step: conjugate to handle the negative BLS parameter
-/// `u = −0xd201000000010000`.  Since the result lies in the
-/// cyclotomic subgroup after final exponentiation, conjugation
-/// equals inversion, which is the correct adjustment for negative
-/// `u` in the optimal-ate construction.
+/// Conjugates after final exponentiation to account for the negative
+/// BLS12-381 parameter `u = −0xd201000000010000`.
 pub fn pairing(p: &G1Point, q: &G2Point) -> Fq12 {
     let f = miller_loop(p, q);
     let f_exp = final_exponentiation(&f);
@@ -277,12 +258,25 @@ pub fn pairing(p: &G1Point, q: &G2Point) -> Fq12 {
 mod tests {
     use super::*;
 
-    /// **Pairing exists**: simply checks that `e(G1, G2)` produces a
-    /// non-trivial element of `F_{p¹²}`.  Full bilinearity tests are
-    /// expensive (multiple pairings × scalar mul) and gated under
-    /// `#[ignore]`.
+    /// Untwist sanity check: `ψ_M(G2) = (x_G2 · w⁻², y_G2 · w⁻³)` lies on
+    /// `E(Fq¹²): Y² = X³ + 4`.
     #[test]
-    #[ignore] // Pairing is expensive (~minutes) due to BigUint arithmetic.
+    fn untwisted_g2_generator_lies_on_e_fq12() {
+        let G2Point::Affine { x, y } = G2Point::generator() else {
+            panic!("G2 generator is affine");
+        };
+        let x_e = fq2_to_fq12_at_w_inv2(&x);
+        let y_e = fq2_to_fq12_at_w_inv3(&y);
+        let lhs = y_e.square();
+        let rhs = x_e
+            .square()
+            .mul(&x_e)
+            .add(&fq_to_fq12(&Fq::new(BigUint::from(4u32))));
+        assert_eq!(lhs, rhs, "ψ_M(G2) must satisfy Y² = X³ + 4 in Fq12");
+    }
+
+    /// Non-degeneracy and `r`-torsion: `e(G1, G2) ≠ 1` and `e(G1, G2)^r = 1`.
+    #[test]
     fn pairing_nonzero() {
         let g1 = G1Point::generator();
         let g2 = G2Point::generator();
@@ -292,7 +286,6 @@ mod tests {
             Fq12::one(),
             "e(G1, G2) should be a non-trivial root of unity"
         );
-        // It should be an r-th root of unity, i.e. f^r = 1 in Fq12.
         let r = super::super::fq::scalar_modulus();
         let test = e.pow(&r);
         assert_eq!(
@@ -302,43 +295,40 @@ mod tests {
         );
     }
 
-    /// Pairing of infinity is one.
+    /// Pairing of infinity is one in either argument.
     #[test]
     fn pairing_with_infinity_is_one() {
+        let g1 = G1Point::generator();
         let g2 = G2Point::generator();
-        let e = pairing(&G1Point::Infinity, &g2);
-        assert_eq!(e, Fq12::one());
+        assert_eq!(pairing(&G1Point::Infinity, &g2), Fq12::one());
+        assert_eq!(pairing(&g1, &G2Point::Infinity), Fq12::one());
     }
 
     /// **Bilinearity in G1**: `e([2]P, Q) == e(P, Q)²`.
-    ///
-    /// This is the load-bearing correctness check for the pairing.
-    /// Expensive: 2 full pairings + several field operations
-    /// (~minutes total).  Gated under `#[ignore]`.
     #[test]
-    #[ignore]
     fn pairing_bilinear_in_g1() {
         let g1 = G1Point::generator();
         let g2 = G2Point::generator();
         let g1_doubled = g1.double();
         let e_p_q = pairing(&g1, &g2);
         let e_2p_q = pairing(&g1_doubled, &g2);
-        let e_p_q_sq = e_p_q.mul(&e_p_q);
+        let e_p_q_sq = e_p_q.square();
+        assert_ne!(e_p_q, Fq12::one());
         assert_eq!(e_2p_q, e_p_q_sq, "e([2]P, Q) must equal e(P, Q)²");
     }
 
-    /// **Bilinearity in G2**: `e(P, [2]Q) == e(P, Q)²`.
-    /// Symmetric to the G1 test; both must hold for a true bilinear
-    /// pairing.
+    /// **Bilinearity in G2**: `e(P, [2]Q) == e(P, Q)²` and `e(P, −Q) == e(P, Q)⁻¹`.
     #[test]
-    #[ignore]
     fn pairing_bilinear_in_g2() {
         let g1 = G1Point::generator();
         let g2 = G2Point::generator();
         let g2_doubled = g2.double();
         let e_p_q = pairing(&g1, &g2);
         let e_p_2q = pairing(&g1, &g2_doubled);
-        let e_p_q_sq = e_p_q.mul(&e_p_q);
+        let e_p_q_sq = e_p_q.square();
+        assert_ne!(e_p_q, Fq12::one());
         assert_eq!(e_p_2q, e_p_q_sq, "e(P, [2]Q) must equal e(P, Q)²");
+        let e_p_neg_q = pairing(&g1, &g2.neg());
+        assert_eq!(e_p_q.mul(&e_p_neg_q), Fq12::one());
     }
 }

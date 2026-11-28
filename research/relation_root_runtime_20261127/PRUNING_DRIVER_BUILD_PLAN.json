@@ -1,0 +1,10 @@
+{
+  "source": "PRUNING_SOURCE.sha256",
+  "reason": "cargo test --no-run built only the libtest executable; a separate normal binary is required for scan/replay",
+  "same_unoptimized_profile": true,
+  "cpu": 0,
+  "jobs": 1,
+  "command": "cargo build --release --locked --offline --manifest-path research/relation_root_runtime_20261127/pruning/Cargo.toml --bin joint-pruning -j1",
+  "recorded_before_build": true,
+  "benchmark": false
+}

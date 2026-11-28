@@ -64,6 +64,9 @@ impl<G: EcdlpGroup> EcdlpGroup for SubgroupView<'_, G> {
     fn add(&self, p: &G::Elt, q: &G::Elt) -> G::Elt {
         self.inner.add(p, q)
     }
+    fn add_many(&self, ps: &[G::Elt], qs: &[&G::Elt]) -> Vec<G::Elt> {
+        self.inner.add_many(ps, qs)
+    }
     fn double(&self, p: &G::Elt) -> G::Elt {
         self.inner.double(p)
     }

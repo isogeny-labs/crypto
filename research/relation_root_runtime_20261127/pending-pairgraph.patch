@@ -1,0 +1,122 @@
+--- a/src/cryptanalysis/f4_fp/certified.rs
++++ b/src/cryptanalysis/f4_fp/certified.rs
+@@ -24,6 +24,28 @@
+     FlatDag,
+ }
+ 
++/// Equivalent native basis obligations; both variants require independent wire replay.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum NativeCertification {
++    Exhaustive,
++    PairGraph,
++}
++fn certify_native(
++    kind: NativeCertification,
++    input: &[Poly],
++    basis: &[Poly],
++    p: u64,
++    stats: &mut TraceStats,
++) -> bool {
++    let opts = F4Options::new(Ordering::Grevlex, 8);
++    match kind {
++        NativeCertification::Exhaustive => super::reuse::certify(input, basis, p, &opts, stats),
++        NativeCertification::PairGraph => {
++            super::reuse::certify_pair_graph(input, basis, p, &opts, stats)
++        }
++    }
++}
++
+ /// Accepted only after independent wire replay and the native representation check.
+ /// The serialized originals and proof remain available for separate execution.
+ pub struct PackedReplayBasis {
+@@ -36,6 +58,7 @@
+     prime: u64,
+     variables: usize,
+     form: ReplayForm,
++    native_certification: NativeCertification,
+ }
+ 
+ fn replay_system(original: &[algebra::Poly], n: usize, p: u64) -> algebra::System {
+@@ -90,6 +113,25 @@
+     form: ReplayForm,
+     kernels: ReplayKernels,
+ ) -> Result<PackedReplayBasis, String> {
++    try_packed_replay_basis_with_native_check(
++        input,
++        n,
++        p,
++        form,
++        kernels,
++        NativeCertification::Exhaustive,
++    )
++}
++/// Full construction and checking with explicit native certification; no retained cache.
++/// All setup and graph work belong to this call.
++pub fn try_packed_replay_basis_with_native_check(
++    input: &[Poly],
++    n: usize,
++    p: u64,
++    form: ReplayForm,
++    kernels: ReplayKernels,
++    native_certification: NativeCertification,
++) -> Result<PackedReplayBasis, String> {
+     let original = canonical_input(input, n, p)?;
+     let system = replay_system(&original, n, p);
+     let original_json = serde_json::to_vec(&system).map_err(|e| e.to_string())?;
+@@ -112,11 +154,11 @@
+         .map(|f| native_polynomial(f, p))
+         .collect::<Result<Vec<_>, _>>()?;
+     let mut native_checks = TraceStats::default();
+-    if !super::reuse::certify(
++    if !certify_native(
++        native_certification,
+         &native_input,
+         &basis,
+         p,
+-        &F4Options::new(Ordering::Grevlex, 8),
+         &mut native_checks,
+     ) {
+         return Err("packed replay basis failed native F4 representation checks".into());
+@@ -131,6 +173,7 @@
+         prime: p,
+         variables: n,
+         form,
++        native_certification,
+     })
+ }
+ 
+@@ -166,11 +209,11 @@
+         return false;
+     };
+     let mut native_checks = TraceStats::default();
+-    super::reuse::certify(
++    certify_native(
++        report.native_certification,
+         &native_input,
+         &basis,
+         report.prime,
+-        &F4Options::new(Ordering::Grevlex, 8),
+         &mut native_checks,
+     ) && native_checks == report.native_checks
+ }
+--- a/src/cryptanalysis/f4_fp/reuse.rs
++++ b/src/cryptanalysis/f4_fp/reuse.rs
+@@ -236,6 +236,18 @@
+     true
+ }
+ 
++/// Existing acyclic product/chain checker; the call owns a fresh graph.
++pub(super) fn certify_pair_graph(
++    input: &[Poly],
++    basis: &[Poly],
++    p: u64,
++    opts: &F4Options,
++    stats: &mut TraceStats,
++) -> bool {
++    stats.pair_graph = Some(PairCertificateStats::default());
++    pair_certificate::certify(input, basis, p, opts, stats)
++}
++
+ pub(super) fn certify(
+     input: &[Poly],
+     basis: &[Poly],

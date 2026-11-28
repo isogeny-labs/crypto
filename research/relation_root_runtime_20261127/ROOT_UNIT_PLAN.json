@@ -1,0 +1,19 @@
+{
+  "schema":"current-root-default-unit-qualification/v1",
+  "recorded_before_build_and_calls":true,
+  "source":"CANDIDATE_SOURCE.sha256",
+  "build":"cargo test --release --locked --offline --lib --no-run -j1",
+  "default_features":true,
+  "algorithm_or_test_exclusions":false,
+  "profile":"opt0/LTOoff/debug0/codegen16; correctness only",
+  "cpu":0,
+  "jobs_and_threads":1,
+  "build_wall_seconds":1800,
+  "address_space_bytes":12884901888,
+  "file_limit_bytes":1073741824,
+  "after_success":"copy immutable unit worker and hash/list before a separately recorded whole-library run",
+  "full_runtime":"all tests, one thread, bounded resource call; any failure or interruption leaves whole suite unqualified",
+  "failure_policy":"retain raw compiler/runtime/resource failures; no algorithm/test removal or weaker baseline; default-feature root scope remains separate from relation integration",
+  "benchmark":false,
+  "signed_verdict":false
+}

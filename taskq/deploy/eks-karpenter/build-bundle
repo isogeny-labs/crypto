@@ -35,7 +35,7 @@ owner_digest=$(sha256sum "$output/isolab-fresh-owner" | cut -d' ' -f1)
 digest=$(sha256sum "$output/ecbench" | cut -d' ' -f1)
 jq -n --arg owner_digest "$owner_digest" --arg revision "$revision" --arg digest "$digest" \
   --arg built "$(date -u +%FT%TZ)" --arg rustc "$(rustc +1.99.1 -Vv)" \
-  '{source_repository:"https://github.com/aburan28/crypto",source_revision:$revision,
+  '{source_repository:"https://github.com/isogeny-labs/crypto",source_revision:$revision,
     ecbench_sha256:$digest,fresh_owner_sha256:$owner_digest,built_at:$built,architecture:"linux/amd64",
     target:"x86_64-unknown-linux-musl",default_features:false,rustc:$rustc,
     rustflags:"-C target-cpu=x86-64"}' > "$output/build-info.json"

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>6-limb ADX kernel</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:10.5pt;line-height:1.45;color:#1d1d1f;max-width:900px;margin:0 auto}h1{font-size:17pt}h2{font-size:13pt;border-bottom:1px solid #ddd}table{border-collapse:collapse;font-size:9pt;margin:8px 0}th,td{border:1px solid #ccc;padding:3px 6px}th{background:#f3f3f3}td{text-align:right}td:first-child{text-align:left}code{font-size:9pt;background:#f5f5f5}img{max-width:100%;border:1px solid #eee}</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">6-limb ADX kernel</h1>
+</header>
+<h1 id="6-limb-adxmulx-inline-asm-montgomery-kernel-2026-11-28">6-limb
+ADX/MULX inline-asm Montgomery kernel (2026-11-28)</h1>
+<p>Branch <code>feat/lucid-cray-tckh5e</code>, PR
+isogeny-labs/crypto#5309 (follow-up to isogeny-labs/crypto#5209).
+Benchmark record
+<code>benchmarks/records/20261128T0035Z-adx6-kernel.json</code>. Every
+number below is an <strong>unverified assertion</strong>
+[pcc:unverified]: one local host (4-vCPU Intel Xeon @ 2.10 GHz cloud VM,
+no PMU, <code>taskset -c 3</code>), no independent replay, not run on
+Iso Lab EKS.</p>
+<h2 id="kernel-srceccmont_vtrs-mont_mul6_adx">Kernel
+(<code>src/ecc/mont_vt.rs</code>, <code>mont_mul6_adx</code>)</h2>
+<p><code>mont_mul4_adx</code> (isogeny-labs/crypto#5209) widened to six
+limbs: six unrolled CIOS rows. In each row the low halves of the
+<code>mulx</code> products go on the <code>adcx</code> (CF) chain and
+the high halves on the <code>adox</code> (OF) chain, then
+<code>m = t₀·n0</code> and <code>t += m·p</code> the same way. After the
+reduction the register holding t₀ is exactly zero and becomes the next
+row's top word, so the one-word shift is a register rotation.</p>
+<p>Six limbs need eight accumulator words (t₀..t₇), plus the
+<code>mulx</code> multiplier (<code>rdx</code>), two product halves, a
+zero register and three pointers (a, b, and <code>[p₀..p₅, n0]</code>):
+fifteen registers. Rust inline asm can name only thirteen general
+registers (<code>rbx</code> and <code>rbp</code> are reserved by LLVM),
+so the block pushes <code>rbx</code> and <code>rbp</code>, uses them as
+accumulators and pops them before it ends. No operand is addressed
+through either register, and the block is declared without
+<code>nostack</code>. The accumulators rotate through
+<code>r8..r13, rbx, rbp</code> (t_j of row i is register (i + j) mod 8).
+Result: t₆·2^384 + t &lt; 2p, then one conditional subtraction.</p>
+<p>Generated mechanically (six rows × two passes, 340 lines of asm) from
+the same pattern as the 4-limb kernel; the generator was a throwaway
+script and is not committed.</p>
+<h3 id="production-change">Production change</h3>
+<p><code>ProdAdxKernel</code> (chosen once per scalar multiplication
+after the runtime ADX+BMI2 check) now uses <code>mont_mul6_adx</code>
+for products <strong>and</strong> squares at <code>N = 6</code>. Before
+it used the <code>mulx</code>-intrinsic CIOS there. Other widths are
+unchanged: asm product + tuned squaring at 4 limbs, <code>mulx</code>
+CIOS at 7–9, the tuned kernel at 2–3 and 5. Without ADX nothing changes.
+This covers <code>Point::scalar_mul</code> and
+<code>scalar_mul_vartime</code> on 321–384-bit primes (P-384 among
+them).</p>
+<p>New benchmark arms: <code>adx6</code> (asm products and squares at 6
+limbs, else <code>ProdAdxKernel</code>), <code>adx6_mul</code> (asm
+products, <code>mulx</code> squares), kernel op <code>adx6_mul</code>,
+bench field <code>p352_pmax</code> (6 limbs, top bit clear; P-384 has it
+set).</p>
+<h2 id="correctness">Correctness</h2>
+<ul>
+<li>Standalone crate: <code>mont_mul6_adx</code> equals
+<code>a·b·R⁻¹ mod p</code> from <code>num-bigint</code> on 210,525
+products over five moduli (2^384 − 317, 2^383 + 231, 2^320 + 5·2^64 + 1,
+P-384, 2^384 − 1), operands including 0, 1, p − 1, p − 2 and p/2.</li>
+<li><code>adx_and_mulx_match_cios</code> (lib test) now also checks
+<code>mul_adx6</code> against CIOS on P-384 and three more 6-limb
+moduli.</li>
+<li>The benchmark gate checks every arm,
+<code>adx6</code>/<code>adx6_mul</code> included, against the
+<code>num-bigint</code> ladder on 38 scalars per field before timing;
+all three runs passed.</li>
+</ul>
+<h2 id="measurements">Measurements</h2>
+<p><code>mont_mul_bench --fields p320_pmax,p352_pmax,p384_nist,p448_goldilocks --rounds 41 --batch 30 --kernel-iters 2000000</code>,
+seeds 7885634870099998001 (run 1), …002 (run 2), …003 (run 3). Arms
+interleaved per round in a seeded shuffled order, the same scalars for
+every arm in a round, an A/A copy of the <code>pad9_cios</code>
+baseline. Runs 1–2 measured the kernel as an arm next to the 2026-11-25
+production; run 3 re-ran after production switched.</p>
+<h3 id="per-product-dependent-chain-latency-median-ns">Per product
+(dependent-chain latency, median ns)</h3>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">field</th>
+<th style="text-align: right;">run</th>
+<th style="text-align: right;">CIOS</th>
+<th style="text-align: right;"><code>mulx</code> CIOS</th>
+<th style="text-align: right;">asm 6-limb</th>
+<th style="text-align: right;">asm / mulx</th>
+<th style="text-align: right;">asm / CIOS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">p352_pmax</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">51.43</td>
+<td style="text-align: right;">58.34</td>
+<td style="text-align: right;">41.94</td>
+<td style="text-align: right;">0.719</td>
+<td style="text-align: right;">0.816</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">p352_pmax</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">51.35</td>
+<td style="text-align: right;">58.88</td>
+<td style="text-align: right;">41.79</td>
+<td style="text-align: right;">0.710</td>
+<td style="text-align: right;">0.814</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">p352_pmax</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">60.98</td>
+<td style="text-align: right;">45.79</td>
+<td style="text-align: right;">0.751</td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">p384_nist</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">52.11</td>
+<td style="text-align: right;">58.88</td>
+<td style="text-align: right;">42.51</td>
+<td style="text-align: right;">0.722</td>
+<td style="text-align: right;">0.816</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">p384_nist</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">54.74</td>
+<td style="text-align: right;">60.60</td>
+<td style="text-align: right;">45.62</td>
+<td style="text-align: right;">0.753</td>
+<td style="text-align: right;">0.833</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">p384_nist</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">61.01</td>
+<td style="text-align: right;">46.99</td>
+<td style="text-align: right;">0.770</td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>mulx</code> CIOS probe calls a
+<code>#[target_feature]</code> function that is not inlined, so its
+standalone latency is worse than in the point code; the end-to-end table
+is the one that matters.</p>
+<h3 id="end-to-end-kp-6-limbs">End to end (<code>k·P</code>, 6
+limbs)</h3>
+<p>Derived ratios of paired median speedups (each arm against
+<code>pad9_cios</code>, 41 rounds × 30 scalars):</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">p352 run 1</th>
+<th style="text-align: right;">p352 run 2</th>
+<th style="text-align: right;">p384 run 1</th>
+<th style="text-align: right;">p384 run 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>adx6</code> vs previous
+production</td>
+<td style="text-align: right;">1.085×</td>
+<td style="text-align: right;">1.080×</td>
+<td style="text-align: right;">1.079×</td>
+<td style="text-align: right;">1.084×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>adx6_mul</code> vs previous
+production</td>
+<td style="text-align: right;">1.032×</td>
+<td style="text-align: right;">1.046×</td>
+<td style="text-align: right;">1.041×</td>
+<td style="text-align: right;">1.033×</td>
+</tr>
+</tbody>
+</table>
+<p>Run 3 (production now on the asm kernel), same binary:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">p352</th>
+<th style="text-align: right;">p384</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">production vs <code>mulx</code> arm (=
+previous production kernel)</td>
+<td style="text-align: right;">1.067×</td>
+<td style="text-align: right;">1.067×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">production vs <code>adx6</code> arm
+(should be 1)</td>
+<td style="text-align: right;">0.988</td>
+<td style="text-align: right;">0.995</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">median ns per
+<code>Point::scalar_mul</code>, runs 1/2 → run 3</td>
+<td style="text-align: right;">356,138 / 355,454 → 326,115</td>
+<td style="text-align: right;">403,263 / 409,239 → 377,914</td>
+</tr>
+</tbody>
+</table>
+<p>The run-3 paired figure (1.067×) is lower than runs 1–2 (1.08×)
+because there the <code>prod</code> arm, which goes through
+<code>Point::scalar_mul</code>, measured 0.97–0.99 of the
+<code>mulx</code> arm (dispatch and conversion overhead), while the
+cross-run production medians fell by 1.07–1.09×. Routing squares through
+the asm as well is worth about 4% end to end over asm products
+alone.</p>
+<p><strong>Controls.</strong> At 5 and 7 limbs (p320, p448) the
+<code>adx6</code> arms fall back to the production kernel:
+<code>adx6</code>/<code>prod</code> = 1.004, 0.995 (p320) and 1.002,
+1.003 (p448) in runs 1/2. The A/A baseline copy is within 0.6% of 1.000
+in every run and field.</p>
+<p>Graphs: <code>run1/speedup.svg</code>, <code>run1/kernels.svg</code>
+(runs 1–2), <code>run3/</code> (after the switch); copies and PNGs in
+<code>benchmarks/20261128-adx6-kernel/</code>.</p>
+<h2 id="not-done--open">Not done / open</h2>
+<ul>
+<li>Iso Lab EKS rerun and an independent replay; no
+<code>VALIDATION.json</code>, so no row in
+<code>benchmarks/README.md</code> (validation gate).</li>
+<li>The <code>m = t₀·n0 → mulx</code> dependency still serializes rows;
+interleaving the next row's products under the reduction is the next
+step for both asm kernels.</li>
+<li>5-, 7- and 8-limb asm kernels: 7+ limbs need memory-resident
+accumulators.</li>
+<li>AVX-512 IFMA (52-bit limbs) on CPUs that have it.</li>
+</ul>
+<p>Raw data: <code>raw_run{1,2,3}.jsonl.gz</code> (in Git; the artifact
+store refuses this session's AWS identity, CI uploads files under 64
+KiB).</p>
+<h2 id="graphs">Graphs</h2>
+<p><img src="run1/speedup.svg" alt="run 1 speedups" /></p>
+<p><img src="run1/kernels.svg" alt="run 1 kernel latency" /></p>
+<p><img src="run3/speedup.svg"
+alt="run 3 speedups, production on the asm kernel" /></p>
+</body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "schema": "isogeny-labs/norm-one-torus-m7-deferred-y-analysis/v1",
+  "standing": "pcc:unverified",
+  "track": "generic decomposition",
+  "scope": "one public Prime31 target; every table rebuilt for every arm and round",
+  "decision": "exact_x_first_passes_frozen_operation_threshold",
+  "target": {
+    "x": 1494603465,
+    "y": 36811585,
+    "planted_indices": [8, 11, 12, 14, 23, 37, 66]
+  },
+  "accounting": {
+    "cross_target_amortization": false,
+    "setup_and_query_charged": true,
+    "target_cache_shared_between_arms": false,
+    "complete_scan_after_hit": true,
+    "rounds": 9
+  },
+  "exact_comparison": {
+    "original_baseline": "retain3-prefix16-centered",
+    "immediate_baseline": "retain3-prefix16-affine-leaf",
+    "candidate": "retain3-prefix16-affine-x-first",
+    "retained_states_each": 27370,
+    "distinct_keys_each": 26248,
+    "terminal_candidates_each": 971635,
+    "table_probes_each": 971635,
+    "key_comparisons_each": 388647,
+    "query_additions_each": 1028789,
+    "query_inversions_affine_each": 476,
+    "query_squarings_affine_each": 1254991,
+    "original_query_multiplications": 13029908,
+    "affine_leaf_query_multiplications": 5585265,
+    "x_first_query_multiplications": 4613665,
+    "affine_y_materializations": 35,
+    "terminal_y_materialization_fraction": 0.000036021757141313356,
+    "multiplications_removed_from_affine_leaf": 971600,
+    "multiplication_reduction_from_affine_leaf_fraction": 0.17395772626724068,
+    "affine_leaf_multiplication_ratio": 1.2105917963267814,
+    "multiplications_removed_from_original": 8416243,
+    "multiplication_reduction_from_original_fraction": 0.6459173004137865,
+    "original_multiplication_ratio": 2.824198982804343,
+    "squarings_removed_from_original": 3831800,
+    "squaring_reduction_from_original_fraction": 0.7532843397733463,
+    "original_squaring_ratio": 4.053248987442938
+  },
+  "archival_replay_local_medians_ms": {
+    "isolation": "none; producer diagnostic only",
+    "retain4_hash_sum_total": 99.674,
+    "retain4_hash_centered_total": 90.533,
+    "retain4_prefix16_centered_total": 85.357,
+    "retain3_prefix16_centered_total": 69.584,
+    "retain3_prefix16_affine_leaf_total": 57.803,
+    "retain3_prefix16_affine_x_first_total": 48.141,
+    "affine_leaf_over_x_first_ratio": 1.200702104235475,
+    "centered_over_x_first_ratio": 1.4454207432334184,
+    "retain4_hash_sum_over_x_first_ratio": 2.070459691323404
+  },
+  "independent_replay": {
+    "seed_replay": "pass",
+    "witness_replays": 6,
+    "triple_candidates": 54740,
+    "quadruple_candidates": 971635,
+    "affine_full_scan": "pass",
+    "result_digest": "95350a6f7b88d1dd9e06129fe8e6497539a4da3cbe377e82f9107dda7ab4e729"
+  },
+  "proof_boundary": "transparent public-seed and witness replay; not zero knowledge, signed attestation, or proof of producer-host execution"
+}

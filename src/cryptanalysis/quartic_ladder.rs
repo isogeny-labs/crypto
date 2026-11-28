@@ -1521,6 +1521,9 @@ pub struct QIcResult {
     /// [`QLinAlg::SgeCoord`] with the fallback: attempts the full-core
     /// fallback certified, i.e. the attempts a skipping arm would give up.
     pub la_fallback_rescues: u32,
+    /// [`QDiemOpts::p0_lines`]: lines through `P0` tried / kept as relations.
+    pub p0_lines: u32,
+    pub p0_line_relations: u32,
     /// [`QLinAlg::SgeCoord`]: size and non-zeros of the square system of
     /// the last attempt (0 when none was formed).
     pub sq_dim: usize,
@@ -1731,6 +1734,18 @@ pub struct QDiemOpts {
     pub fb: QFactorBase,
     /// Linear-algebra stage.
     pub la: QLinAlg,
+    /// Before the relation loop, add the lines through `P0` and every
+    /// factor-base point (`DoubleLp` only; counted like every line).
+    ///
+    /// Why: a core with no line through `P0` leaves the base-point shift
+    /// `v_deg` (every `lambda_P + 1`, `lambda_kappa + 4`) in the kernel of the
+    /// line rows, and one linked decomposition row is spent removing it.
+    /// A line row through `P0` holds three factor-base terms and `-kappa`,
+    /// so it is not orthogonal to `v_deg`; once one reaches the core,
+    /// two decomposition rows in general position determine `t`.
+    /// One line costs a few hundred counted operations, one linked
+    /// decomposition row about a thousand times more.
+    pub p0_lines: bool,
 }
 
 /// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
@@ -1750,6 +1765,11 @@ pub struct QAttemptDiag {
     /// cycle in the component of "1" when found.
     pub inhom: u64,
     pub inhom_linked: u64,
+    /// Rank of the core's `(rhs, t coefficient)` pairs.  When it is 1 the
+    /// inhomogeneous information is a single direction: the scaled true
+    /// solution plus a shift of `t` lies in the kernel, so `t` is not
+    /// determined whatever the factor-base part (diagnosis only).
+    pub ab_rank: usize,
 }
 
 /// Rank of `rows` (columns `0..ncols`, minus `skip`) over `F_r`, dense
@@ -2044,6 +2064,43 @@ fn run_diem_inner(
         Some((rel, lps))
     };
 
+    if opts.p0_lines && prm.arm == QArm::DoubleLp {
+        ctx.taylor(p0i, &mut res.rel);
+        for &bj in &base {
+            if bj == p0i {
+                continue;
+            }
+            res.lines_tried += 1;
+            res.p0_lines += 1;
+            let (p3, p4) = match ctx.line(p0i, bj, &mut res.rel) {
+                LineRes::Split(a, b) => (a, b),
+                LineRes::Bad => {
+                    res.bad_relations += 1;
+                    continue;
+                }
+                _ => continue,
+            };
+            let mut key = [p0i as u32, bj as u32, p3, p4];
+            key.sort_unstable_by_key(|&k| ctx.order_key(k));
+            if !seen_lines.insert(key) {
+                continue;
+            }
+            let Some((rel, lps)) = make_rel(&key, 0, 0, &col) else {
+                continue;
+            };
+            if prm.verify_relations {
+                let kap = ver.kappa(&pq, &mut ctx);
+                if !ver.check(&pq, &mut ctx, &key, false, &kap) {
+                    res.bad_relations += 1;
+                    continue;
+                }
+            }
+            push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
+            res.line_relations += 1;
+            res.p0_line_relations += 1;
+        }
+    }
+
     'outer: while !solved {
         // ── line relations ──
         while (rels.len() as u64) < next_check {
@@ -2246,6 +2303,43 @@ fn run_diem_inner(
             dg.rank_no_t = dense_rank(&core, cc, Some(ct), r);
             dg.inhom = res.decomp_relations;
             dg.inhom_linked = res.inhom_linked;
+            let ab: Vec<(Vec<(u32, u64)>, u64)> = core
+                .iter()
+                .map(|(t, rhs)| {
+                    let tc = t.iter().find(|&&(c, _)| c == ct).map_or(0, |&(_, v)| v);
+                    (vec![(0, *rhs % r), (1, tc % r)], 0)
+                })
+                .collect();
+            dg.ab_rank = dense_rank(&ab, 2, None, r);
+            // uncounted dump of the attempt's core for offline kernel analysis
+            if let Ok(path) = std::env::var("QL_CORE_DUMP") {
+                use std::io::Write;
+                let rows_s: Vec<String> = core
+                    .iter()
+                    .map(|(t, rhs)| {
+                        let e: Vec<String> =
+                            t.iter().map(|&(c, v)| format!("[{c},{}]", v % r)).collect();
+                        format!("[[{}],{}]", e.join(","), rhs % r)
+                    })
+                    .collect();
+                if let Ok(mut f) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(path)
+                {
+                    let _ = writeln!(
+                        f,
+                        "{{\"q\":{},\"seed\":{},\"attempt\":{},\"r\":{},\"cc\":{},\"ct\":{},\"rows\":[{}]}}",
+                        inst.q,
+                        prm.seed,
+                        res.attempts,
+                        r,
+                        cc,
+                        ct,
+                        rows_s.join(",")
+                    );
+                }
+            }
         }
         if core.len() >= cc + margin(cc) {
             // Linked: no core row holds t, so t is not determined (counted scan)
@@ -3169,6 +3263,7 @@ mod tests {
                         kick_t: true,
                         fb: QFactorBase::Enumerated,
                         la: QLinAlg::Wiedemann,
+                        p0_lines: false,
                     },
                 );
                 assert!(o.certified, "q={q} seed={seed}: {o:?}");
@@ -3187,6 +3282,7 @@ mod tests {
             kick_t: true,
             fb,
             la: QLinAlg::Wiedemann,
+            p0_lines: false,
         }
     }
 
@@ -3636,6 +3732,7 @@ mod tests {
                                 kick_t: solve == QSolve::Linked,
                                 fb: QFactorBase::Enumerated,
                         la: QLinAlg::Wiedemann,
+                        p0_lines: false,
                             },
                         );
                         eprintln!(

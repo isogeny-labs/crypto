@@ -1,0 +1,68 @@
+{
+  "schema": "scan-full-call-instrument-qualification-outcome/v1",
+  "source": "SOURCE_V2.sha256",
+  "runner_addendum": "RUNNER_SOURCE_V2.sha256",
+  "normal_build_exit": 0,
+  "unit_build_exit": 0,
+  "unit_functions": {
+    "worker": 2,
+    "transport": 9,
+    "collector": 9,
+    "analyzer": 16,
+    "fixture": 9
+  },
+  "unit_functions_total": 45,
+  "transport": {
+    "15x_admitted": false,
+    "canaries_rejected": 1728,
+    "complete_calls": 432,
+    "complete_parent_proof_replays": 432,
+    "performance_observations_collected": 0
+  },
+  "synthetic_analysis": {
+    "neutral": {
+      "all_complete": true,
+      "independent_whole_proof_replays": 15120,
+      "threshold_arithmetic_passes": false,
+      "primary_15x_admitted": false,
+      "input_declares_synthetic_fixture": true
+    },
+    "hypothetical20": {
+      "all_complete": true,
+      "independent_whole_proof_replays": 15120,
+      "threshold_arithmetic_passes": true,
+      "primary_15x_admitted": false,
+      "input_declares_synthetic_fixture": true
+    }
+  },
+  "synthetic_corruption_views": {
+    "clock": {
+      "exit": 1,
+      "reason": "Error: \"complete phase/boundary binding\"",
+      "analysis_report_created": false
+    },
+    "duplicate": {
+      "exit": 1,
+      "reason": "Error: \"missing/duplicate cell\"",
+      "analysis_report_created": false
+    }
+  },
+  "neutral_source_files_unchanged": 90743,
+  "source_and_frozen_tools_unchanged": true,
+  "production_code_changed_by_this_study": false,
+  "registry_versions_and_checksums_preserved": true,
+  "collector_guard": "COLLECTOR_GUARD.json",
+  "setup_errors": [
+    "SETUP_ERRORS.json",
+    "CANARY_PREFLIGHT_CORRECTION.json"
+  ],
+  "comparative_timing_run": false,
+  "actual_performance_observations": 0,
+  "15x_admitted": false,
+  "canonical_protocol_validation": "pending; required document encrypted; existing document-only question unanswered",
+  "whole_current_root_unit_pass": false,
+  "optimized_performance_build_qualified": false,
+  "intrinsic_regularity": null,
+  "actual_f4_solving_degree": null,
+  "independent_signed_execution_verdict": false
+}

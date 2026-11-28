@@ -1,0 +1,88 @@
+{
+  "study": "cayley-residual-transport-m31-v1",
+  "scope": "local native Rust development correctness only",
+  "date_local": "2026-11-25",
+  "timezone": "America/Los_Angeles",
+  "compile_exit_code": 0,
+  "run_exit_codes": [
+    0,
+    0
+  ],
+  "replay_script_exit_code": 0,
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "cpu_affinity": "0",
+  "resource_caps": {
+    "build_seconds": 120,
+    "build_virtual_memory_kib": 1048576,
+    "run_seconds_each": 60,
+    "run_virtual_memory_kib": 524288,
+    "cpu_count": 1
+  },
+  "binary_sha256": "f4a05b459d9c5889c6287759960333c5f191fc9f8354bf4fbc187207e51fa62c",
+  "protocol_sha256": "a6d5dcb105c1857c44a225cb9458317c8e3abb679abafbc7b0950746034f3c88",
+  "seed_manifest_sha256": "aec3c9b23958f450cd8cf5caebca107cecb8ad0b55c12e7209033ac14cc8840a",
+  "source_registration": "evidence/registration-before-build-v2.json",
+  "registered_sources_unchanged": true,
+  "precall_postcall_equal": [
+    true,
+    true
+  ],
+  "replay_bytes_equal": {
+    "cases.jsonl": true,
+    "intersections.jsonl": true,
+    "prefixes.jsonl": true,
+    "seeds.jsonl": true
+  },
+  "summary_bytes_equal": true,
+  "raw_record_counts": {
+    "cases.jsonl": 12288,
+    "intersections.jsonl": 1536,
+    "prefixes.jsonl": 256,
+    "seeds.jsonl": 40
+  },
+  "run1_sha256": {
+    "cases.jsonl": "0b4610bf5299faedade387a3f043360de47175df017a063cf654e5f2f833400f",
+    "intersections.jsonl": "1f30cd92ab96660a56a77429419f97104ba5140159c5c529382f188fd8c42a49",
+    "prefixes.jsonl": "4a879dd8d1bc7ffa76ad093f27683f70a2f58704863a4fb89f6357a9e17be9d3",
+    "seeds.jsonl": "56b3d47b760fcdac7e78d65636fdcfb24082eb730a2a4fa8f06243ba665e88e0"
+  },
+  "summary_sha256": "924d98eb080e27320c291e1c949762779df9b8769961435207834186d5a09cd9",
+  "result": {
+    "study": "cayley-residual-transport-m31-v1",
+    "field": 2147483647,
+    "fixtures": 2,
+    "targets": 128,
+    "frames": 512,
+    "paired_transport_extraction_cases": 12288,
+    "random_slope_cases": 8192,
+    "controlled_slope_cases": 4096,
+    "matched_empty_fibers_all_cases": 4949,
+    "matched_empty_fibers_random": 4096,
+    "matched_empty_fibers_controlled": 853,
+    "ordered_pair_occurrences_all_cases": 14166,
+    "ordered_pair_occurrences_random": 8192,
+    "ordered_pair_occurrences_controlled": 5974,
+    "coordinate_sqrt_calls": 11392,
+    "incompatible_labels_rejected_before_sqrt": 12288,
+    "positive_controls_recovered": 1024,
+    "set_queries": 1536,
+    "set_entries_visited": 8192,
+    "reference_cartesian_pair_checks": 125440,
+    "four_point_prefix_cases_constructed": 256,
+    "invalid_inputs_rejected": 52,
+    "matrix_sanity_cases": 16,
+    "distinct_child_seeds": 40,
+    "scope": "local development correctness only"
+  },
+  "historical_component_source_commit": "eb55e93110676c91213d91d6c8d00489311a4bd8",
+  "independent_review": "separately authored direct Fp2 reference plus separate mathematical/code review; not external signed validation",
+  "claim_standing": "producer correctness evidence; no new PCC claim; no Lean certificate",
+  "interpretation_limits": [
+    "random slopes are development inputs, not useful factor-base relation samples",
+    "all 256 four-point prefix cases are constructed positives",
+    "set panels contain designed overlap and have no performance meaning",
+    "set visit counts omit construction, field inversion, sorting, prefix setup and relation processing",
+    "no complete ECDLP solve or runtime comparison was executed"
+  ],
+  "impact_score": 5
+}

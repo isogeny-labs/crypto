@@ -722,7 +722,13 @@ impl RadixRing {
                 for j in 0..n_t.min(64) {
                     tw |= u128::from((mask >> j) & 1) << (2 * j);
                 }
-                (x_mono(tw, free_of(m)), u64::from(c))
+                let base_free = free_of(m);
+                assert!(
+                    base_free[MAX_XFREE..].iter().all(|&e| e == 0),
+                    "f4_fp_tower_radix: radix conversion takes at most {MAX_XFREE} free variables"
+                );
+                let free = std::array::from_fn(|k| base_free[k]);
+                (x_mono(tw, free), u64::from(c))
             })
             .collect();
         XPoly::from_terms(Fp::new(self.p), terms)

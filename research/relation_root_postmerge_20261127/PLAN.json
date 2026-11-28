@@ -1,0 +1,44 @@
+{
+  "schema": "postmerge-root-qualification-plan/v1",
+  "prior_evidence_commit": "153fbfb45c91ae2fec81368f078d0328f8dfe92a",
+  "merged_commit": "64856724f02a7819f5f407a9ce650292c576eca5",
+  "new_upstream": "addead2953bbe8b637351a0220f32a4e8a3d84d0",
+  "source": "SOURCE.sha256",
+  "literal_audit": "LITERAL_POST_AUDIT.json",
+  "cpu": 0,
+  "jobs_and_numerical_threads": 1,
+  "zero_new_cloud_compute": true,
+  "compile": {
+    "wall_seconds": 1800,
+    "address_space_bytes": 12884901888,
+    "file_bytes": 1073741824,
+    "default_features": false,
+    "profile": "release opt0 LTOoff debug0 incrementalfalse codegen16"
+  },
+  "native_calls": {
+    "wall_seconds_each": 1200,
+    "address_space_bytes": 2147483648,
+    "file_bytes": 134217728,
+    "old_cases": 36,
+    "matched_pairs": 108,
+    "mutations": 1116,
+    "unsupported_refusals": 6,
+    "new_output_paths": [
+      "/dev/shm/relation-postmerge-original-20261127",
+      "/dev/shm/relation-postmerge-pairgraph-20261127"
+    ],
+    "require_new_precall_and_frozen_workers": true
+  },
+  "audits": {
+    "complete_proofs": 144,
+    "old_semantic_canaries": 2,
+    "new_semantic_canaries": 5,
+    "unchanged_auditor_workers": true,
+    "native_operation_counters_independently_executed": false
+  },
+  "producer_checker_pruning_sources_unchanged_no_repeated_component_suite": true,
+  "do_not_repeat_known_failed_full_unit_configs": true,
+  "benchmark": false,
+  "15x_admitted": false,
+  "independent_signed_execution": false
+}
