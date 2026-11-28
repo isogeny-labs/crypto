@@ -5,7 +5,7 @@ use hashed_ecdl_tensor::contraction::Counter;
 use hashed_ecdl_tensor::curve::{Curve, Point};
 use hashed_ecdl_tensor::primality::PrimeCertificate;
 use hashed_ecdl_tensor::reduction::{self, Certificate, Config};
-use hashed_ecdl_tensor::{finite, optimized, prepared, width};
+use hashed_ecdl_tensor::{finite, metrics, optimized, prepared, width};
 use hashed_ecdl_tensor::{BigUint, Error, Limits, Meter};
 use serde_json::{json, Value};
 use std::io::Read;
@@ -148,6 +148,33 @@ fn read(path: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     read_input(std::fs::File::open(path)?)
 }
 
+fn metric_diagnostics(snapshot: metrics::Snapshot) -> Value {
+    let phases: serde_json::Map<String, Value> = snapshot
+        .phases
+        .into_iter()
+        .map(|(name, phase)| {
+            (
+                name,
+                json!({
+                    "adds": phase.adds,
+                    "doubles": phase.doubles,
+                    "scalar_mults": phase.scalar_mults,
+                    "meter_steps": phase.meter_steps,
+                    "wall_ns": phase.wall_ns,
+                }),
+            )
+        })
+        .collect();
+    json!({
+        "schema": "hashed-ecdl.native-metrics/v1",
+        "phases": phases,
+        "online_phases_ns": snapshot.online_phases_ns,
+        "online_start_phase": snapshot.online_start_phase,
+        "online_wall_ns": snapshot.online_wall_ns,
+        "calibrated_total_operations": Value::Null,
+    })
+}
+
 fn solve_command(
     command: &str,
     curve: &Curve,
@@ -216,6 +243,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 "challenge_solved":false}));
         }
         Some("solve-hashed-optimized") if args.len() == 5 => {
+            let session = metrics::Session::start()?;
             let problem: Problem = serde_json::from_slice(&read(&args[2])?)?;
             let options: optimized::Options = serde_json::from_slice(&read(&args[3])?)?;
             let (curve, target, config, mut meter) = prepare(&problem)?;
@@ -231,11 +259,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                     &mut statistics, &mut meter,
                 )?
             };
+            let native_metrics = metric_diagnostics(session.finish()?);
             let diagnostics = json!({
                 "backend": "PreparedOptimized",
                 "options": options,
                 "statistics": statistics.diagnostics(),
                 "charged_steps": meter.used,
+                "native_metrics": native_metrics,
                 "scalar_decimal": certificate.scalar.to_string(),
             });
             let receipt = Receipt {
