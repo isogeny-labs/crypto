@@ -1,14 +1,14 @@
 {
   "host": {
-    "commit": "fac19f1db6ba27c62ebf0ed6be3ab2c815f8907a",
-    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "commit": "7201056fa305a033c3c8338864d7c81f1422ebef",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
     "cpus": 4,
     "host": "runnervm3lb7s",
     "python": "3.12.16",
     "ref": "refs/heads/main",
-    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/46097857633",
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/46109106705",
     "rustc": "rustc 1.100.1 (20ddd0171 2026-11-25)",
-    "utc": "2026-11-28T02:37:57Z"
+    "utc": "2026-11-28T05:07:53Z"
   },
   "rows": [
     {
@@ -25,7 +25,7 @@
       "solving_degree_max": 4,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.0016937669999999999
+      "wall_s": 0.002115515
     },
     {
       "N": 6,
@@ -41,7 +41,7 @@
       "solving_degree_max": 5,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.01537563
+      "wall_s": 0.020909691
     },
     {
       "N": 8,
@@ -50,19 +50,19 @@
       "cost": 214289944,
       "cost_unit": "multiply-adds (F_p elimination)",
       "curve": "M31",
-      "elapsed_s": 0.214,
+      "elapsed_s": 0.265,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 4,
       "solving_degree_max": 6,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.178959048
+      "wall_s": 0.226671263
     },
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 5 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m5.jsonl",
       "curve": "M31",
-      "elapsed_s": 0.004,
+      "elapsed_s": 0.002,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 5,
@@ -72,7 +72,7 @@
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 6 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m6.jsonl",
       "curve": "M31",
-      "elapsed_s": 0.001,
+      "elapsed_s": 0.002,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 6,
@@ -82,7 +82,7 @@
     {
       "command": "pkm_tower_pilot --p 2147483647 --kinds dickson-torus --engine generic --m 7 --controls tower --t-min 2 --max-t 2 --max-t-m3 2 --max-t-m4 2 --planted 2 --random 2 --ladder-t none --budget 595 --out /tmp/gbb/raw/M31-m7.jsonl",
       "curve": "M31",
-      "elapsed_s": 0.001,
+      "elapsed_s": 0.002,
       "engine": "f4_tower_generic (F4 over F_p)",
       "harness": "pkm_tower_pilot",
       "m": 7,
@@ -117,11 +117,11 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 172032,
+        "build_ns": 193092,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 841,
+        "reduce_ns": 1109,
         "reductions": 4,
         "splits": 0
       },
@@ -132,7 +132,7 @@
       "matrix_cols": 144,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.000509654
+      "wall_s": 0.000612485
     },
     {
       "answer_digest": "10055e840b7b42c7",
@@ -142,22 +142,22 @@
       "curve": "N31",
       "decomposed": 0,
       "detail": {
-        "build_ns": 142865313,
+        "build_ns": 173060069,
         "ell": 5,
         "exhausted": 0,
         "factor_base_points": 63,
-        "reduce_ns": 1560637,
+        "reduce_ns": 2125360,
         "reductions": 568,
         "splits": 248
       },
-      "elapsed_s": 0.164,
+      "elapsed_s": 0.214,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 3,
       "matrix_cols": 443700,
       "status": "ok",
       "targets": 4,
-      "wall_s": 0.15936184
+      "wall_s": 0.195323796
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -182,7 +182,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.8096e-05
+      "wall_s": 4.0988e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -200,14 +200,14 @@
         "reductions": 0,
         "splits": 0
       },
-      "elapsed_s": 0.003,
+      "elapsed_s": 0.004,
       "engine": "koblitz_groebner (matrix-F4 over GF(2), Weil-restricted Semaev)",
       "harness": "groebner_stage_bench",
       "m": 5,
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.5903e-05
+      "wall_s": 2.6523e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -232,7 +232,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.034e-05
+      "wall_s": 2.6409e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -257,7 +257,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.7575e-05
+      "wall_s": 2.6095e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -282,7 +282,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 1.5653e-05
+      "wall_s": 2.3921e-05
     },
     {
       "answer_digest": "20b0fa11cd19564e",
@@ -307,7 +307,7 @@
       "matrix_cols": 0,
       "status": "ok",
       "targets": 4,
-      "wall_s": 2.1482e-05
+      "wall_s": 2.6297e-05
     }
   ],
   "schema": "gb-baseline.baseline/v1",
