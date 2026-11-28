@@ -1,0 +1,21 @@
+# Frozen online EC row-matroid test, #76
+
+Date: 2026-11-25. Conductor T-142 claimed before editing. Source `EC_MATROID_076.rs` SHA-256 `6756b72dabbd892336c63d1f56b0d3c5731fca9e402635c850e0af630b8a0c58`. Input `WS68_NATURAL_PARTIAL.stdout` SHA-256 `922945c9a81568d23a504e2d296ef6c468f8dd47738e9b9e8a303ce12246f2b3`. Use its exact 152 partial-filter rows in original source order, excluding the first 17 duplicate full-only lines. The producer's 512 candidate points, E/F1009 y²=x³+x+14, order 1013, G=(0,425), Q=(779,357), small base 8 and large base 16 remain unchanged. No relation search is launched.
+
+The literal #76 proposal names matroid decomposition of exponent vectors and early removal of redundant non-relations. This run instantiates the precise linear-matroid special case: verify every source EC point identity first, then incrementally retain a row iff its full augmented vector (24 factor coefficients, target coefficient, RHS) increases rank over F1013. The test never discards an unverified candidate. A rejected row is recorded by source ID; exact zero remainder certifies that it belongs to the retained row span. This rule has no spectral or probabilistic pruning claim. It is expected to preserve the complete span but may cost more than late elimination.
+
+Controls use the same 152 rows and source order: ordinary large-column elimination, and the frozen graph-cycle algorithm of `EC_GRAPH_CYCLE_V4.rs`. For each, independently replay all complete-row EC point identities, compare base rank, augmented rank and extracted scalar, check `[d]G=Q`, and count online update, filter and rank-stage modular additions, multiplications, inversions and cell scans. Preserve rejected IDs. This is a stage comparison; the producer's table/candidate costs and field arithmetic in point operations remain external and unpriced here. No whole-curve or cryptographic-size speed claim follows from this one stream.
+
+Checkpoint gate exit 2: `.resume/RESUME.md` missing. The user's explicit local-bypass authorization applies; no S3 write, cloud spend or third-party target. Run once, cap 60 seconds, preserve stdout/stderr/exit. Any failure remains and requires a separately frozen repair.
+
+`rustc -O research/prime_field_100_ideas_20261123/EC_MATROID_076.rs -o /tmp/ec_matroid_076_20261125.bin`
+
+`timeout 60 /tmp/ec_matroid_076_20261125.bin > research/prime_field_100_ideas_20261123/EC_MATROID_076.stdout.txt 2> research/prime_field_100_ideas_20261123/EC_MATROID_076.stderr.txt`
+
+## Post-run receipt
+
+The one native run exited 0. Stdout SHA-256 `b478e902ef56b5b8644764311c0e7139eb99e7a04644291a1639569393fabdd4`; stderr empty, SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; exit receipt SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. Compile exit 0 with unused-code and array-iteration warnings inherited from the V4 control source. Rejected and retained source IDs are in stdout and refer to the immutable WS68 input lines.
+
+All 152 source and all 9 retained-filter, 136 ordinary, and 126 graph-cycle complete-row EC point witnesses passed. The online rule retained 25 rows and dropped 127; its last retained source ID 71 occurs at producer trial 223. Every arm had small-base rank 8, augmented rank 9 and extracted scalar 701, checked by scalar multiplication against Q. Counted modular costs (adds/multiplies/inverses) were: online retention 15,392/16,042/25, retained large-column filtering 364/780/16, retained rank stage 1,014/1,456/17; ordinary filtering 4,862/5,278/16 and rank 16,640/17,082/17. Thus the online arm totals 16,770 adds, 18,278 multiplies, 58 inverses versus ordinary 21,502 adds, 22,360 multiplies, 33 inverses. Graph-cycle control results are in stdout. These counts omit source generation, point-verification field arithmetic, memory allocation and wall-time costs; the result is a fixed-stream arithmetic comparison, not an end-to-end cost result.
+
+Because the filter verifies each source before dropping it, this is a concrete linear-matroid row-span special case of #76. It does not validate dropping unverified candidate non-relations, nor any spectral or higher-level matroid decomposition. The last-retained trial is descriptive; the frozen producer still ran all 512 candidates, and no shortened producer experiment was run here.

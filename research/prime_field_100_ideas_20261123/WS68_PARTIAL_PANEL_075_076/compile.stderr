@@ -1,0 +1,13 @@
+warning: fields `a`, `b`, and `r` are never read
+  --> research/prime_field_100_ideas_20261123/WS68_PARTIAL_PANEL_075_076/run.rs:24:40
+   |
+24 | #[derive(Clone)]struct Source{id:usize,a:i64,b:i64,r:Pt,row:[i64;COLS],kind:Kind}
+   |                        ------          ^     ^     ^
+   |                        |
+   |                        fields in this struct
+   |
+   = note: `Source` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

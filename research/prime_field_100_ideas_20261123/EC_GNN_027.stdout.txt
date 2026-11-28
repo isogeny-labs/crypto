@@ -1,0 +1,40 @@
+train curve_p=1009 order=1013 targets=8 base=16 exact_label_comparisons=262144 label_group_adds=65536 positives=174 balanced_sgd_updates=1044 epochs=3 hidden_width=8 feature_dim=6 label_and_train_ms=4
+heldout_audit curve_p=1019 order=1033 targets=8 full_labels=262144 full_grid_group_adds=65536 full_grid_comparisons=262144 audit_ms=3
+selection model_scores=262144 cheap_scores=262144 random_hashes=262144 topk_each=8192 score_sort_ms=49
+arm_step name=message_passing target_x=38 selected=8192 hits=0
+arm_step name=message_passing target_x=39 selected=8192 hits=6
+arm_step name=message_passing target_x=41 selected=8192 hits=6
+arm_step name=message_passing target_x=46 selected=8192 hits=0
+arm_step name=message_passing target_x=49 selected=8192 hits=0
+arm_step name=message_passing target_x=53 selected=8192 hits=18
+arm_step name=message_passing target_x=54 selected=8192 hits=21
+arm_step name=message_passing target_x=56 selected=8192 hits=0
+arm_summary name=message_passing selected_total=65536 exact_hits=51 false_positive_checks=65485 false_negative_hits=172 covered=4/8 full_covered=7/8 rank=9/24 full_hits=223 full_rank=22 rank_loss=13 verification_adds=131072 verification_comparisons=65536
+arm_step name=cheap_xor target_x=38 selected=8192 hits=0
+arm_step name=cheap_xor target_x=39 selected=8192 hits=10
+arm_step name=cheap_xor target_x=41 selected=8192 hits=6
+arm_step name=cheap_xor target_x=46 selected=8192 hits=0
+arm_step name=cheap_xor target_x=49 selected=8192 hits=10
+arm_step name=cheap_xor target_x=53 selected=8192 hits=20
+arm_step name=cheap_xor target_x=54 selected=8192 hits=15
+arm_step name=cheap_xor target_x=56 selected=8192 hits=0
+arm_summary name=cheap_xor selected_total=65536 exact_hits=61 false_positive_checks=65475 false_negative_hits=162 covered=5/8 full_covered=7/8 rank=13/24 full_hits=223 full_rank=22 rank_loss=9 verification_adds=131072 verification_comparisons=65536
+arm_step name=static_block1 target_x=38 selected=8192 hits=9
+arm_step name=static_block1 target_x=39 selected=8192 hits=2
+arm_step name=static_block1 target_x=41 selected=8192 hits=10
+arm_step name=static_block1 target_x=46 selected=8192 hits=2
+arm_step name=static_block1 target_x=49 selected=8192 hits=6
+arm_step name=static_block1 target_x=53 selected=8192 hits=12
+arm_step name=static_block1 target_x=54 selected=8192 hits=20
+arm_step name=static_block1 target_x=56 selected=8192 hits=0
+arm_summary name=static_block1 selected_total=65536 exact_hits=61 false_positive_checks=65475 false_negative_hits=162 covered=7/8 full_covered=7/8 rank=22/24 full_hits=223 full_rank=22 rank_loss=0 verification_adds=131072 verification_comparisons=65536
+arm_step name=seeded_hash target_x=38 selected=8192 hits=5
+arm_step name=seeded_hash target_x=39 selected=8192 hits=3
+arm_step name=seeded_hash target_x=41 selected=8192 hits=9
+arm_step name=seeded_hash target_x=46 selected=8192 hits=5
+arm_step name=seeded_hash target_x=49 selected=8192 hits=7
+arm_step name=seeded_hash target_x=53 selected=8192 hits=17
+arm_step name=seeded_hash target_x=54 selected=8192 hits=14
+arm_step name=seeded_hash target_x=56 selected=8192 hits=0
+arm_summary name=seeded_hash selected_total=65536 exact_hits=60 false_positive_checks=65476 false_negative_hits=163 covered=7/8 full_covered=7/8 rank=22/24 full_hits=223 full_rank=22 rank_loss=0 verification_adds=131072 verification_comparisons=65536
+complete EC one-hop message passing screen total_ms=95

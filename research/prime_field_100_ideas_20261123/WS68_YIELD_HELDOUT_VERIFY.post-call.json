@@ -1,0 +1,14 @@
+{
+  "record_type":"post_call",
+  "parent_pre_call":"WS68_YIELD_HELDOUT_VERIFY.pre-call.json",
+  "executed_attempt_pre_call":"WS68_YIELD_HELDOUT_VERIFY.attempt2.pre-call.json",
+  "conductor_task":"T-150",
+  "attempts":[{"number":1,"compile_exit_code":1,"run_executed":false,"source":"WS68_YIELD_HELDOUT_VERIFY.attempt1.rs","stderr":"WS68_YIELD_HELDOUT_VERIFY.attempt1.stderr"},{"number":2,"compile_exit_code":0,"run_exit_code":0}],
+  "source_sha256_after":"baf4a36864b746506a62e183b0ed25e492883faadd752b13c04d4be3c5b77860",
+  "qualifier_sha256_after":"baf4a36864b746506a62e183b0ed25e492883faadd752b13c04d4be3c5b77860",
+  "binary":{"path":"WS68_YIELD_HELDOUT_VERIFY.bin","sha256":"201e972c39cf32e0c7e5a15461e13a5dbf143f8bdb8558b5a8fd0ddae586032","custody":"local_only_not_staged"},
+  "stdout":{"path":"WS68_YIELD_HELDOUT_VERIFY.stdout","bytes":2241,"sha256":"e7bd4e202f475fe9abfb7afac6a9af6ad5f792e8bc0ca514bca34ed6a9b070e9"},
+  "stderr":{"path":"WS68_YIELD_HELDOUT_VERIFY.stderr","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed":{"curve_group_count":1013,"arms_replayed":24,"target_points_verified":24,"candidate_prefixes_verified":24,"relation_hit_counts_verified":24,"rank_and_target_pin_states_verified":24,"censored_arms_preserved":2,"censored_target":887},
+  "limits":"Separately authored native parser and EC/rank reconstruction with no producer import. Reads the frozen eight raw shards. Independent of producer's point arithmetic code but shares public curve specification and policy rule. Local [pcc:unverified]."
+}

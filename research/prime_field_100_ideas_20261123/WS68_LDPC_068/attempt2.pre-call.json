@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-27",
+  "conductor_task": "T-13048",
+  "admission": "same bounded local user-authorized checkpoint bypass as pre-call.json",
+  "attempt1": {
+    "source_sha256": "a59b87c077c41af568acd47d936b4df3be5202311ee23ac1bfb26acda6d47bbc",
+    "stdout_sha256": "6f6d3051a660a1888faf708150aaf9a924603f98a5d7a76bf79adde8c1e0b51a",
+    "stderr_sha256": "e54fdabadbbaafb0f9a240cc779d16879eea079faa45982da9b522d8b9854d35",
+    "compile_exit": 0,
+    "run_exit": 101,
+    "reason": "source rows are interleaved by trial; false assertion that first 17 completed rows are all full-only"
+  },
+  "erratum": "PROTOCOL.md and pre-call.json said 'first 17 full rows'; corrected selection takes all completed rows with a one-source witness. This selects the original 17 Full rows without changing the source stream, solver, target, controls or caps.",
+  "attempt2_source_sha256": "cd2dcac8fbe8b629d6dd239cdf795d2dd2706c1206a8bd93f9fe11cc161e41d7",
+  "compile": "rustc --edition=2021 -O run.rs -o /tmp/ws68_ldpc_068.bin",
+  "run": "/tmp/ws68_ldpc_068.bin from parent research directory",
+  "acceptance": "same as pre-call.json; stdout terminal RUN_OK=1 and runtime stderr empty"
+}
