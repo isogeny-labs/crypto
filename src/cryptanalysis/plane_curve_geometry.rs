@@ -579,6 +579,34 @@ impl PlaneCurve {
         Ok(places)
     }
 
+    /// Check a degree-two place key by reconstructing its canonical line
+    /// section. This rejects malformed external keys before factor-base use.
+    pub fn valid_quadratic_line_place(&self, place: &QuadraticLinePlace) -> bool {
+        if place.line.iter().any(|&coefficient| coefficient >= self.p)
+            || place.polynomial[2] != 1
+            || place.polynomial[..2]
+                .iter()
+                .any(|&coefficient| coefficient >= self.p)
+        {
+            return false;
+        }
+        let Some(pivot) = place.line.iter().position(|&coefficient| coefficient != 0) else {
+            return false;
+        };
+        if place.line[pivot] != 1 {
+            return false;
+        }
+        let free: Vec<_> = (0..3).filter(|&axis| axis != pivot).collect();
+        let basis: [[u32; 3]; 2] = std::array::from_fn(|index| {
+            let mut point = [0; 3];
+            point[free[index]] = 1;
+            point[pivot] = sub(0, place.line[free[index]], self.p);
+            point
+        });
+        self.quadratic_line_places(basis[0], basis[1])
+            .is_ok_and(|places| places.iter().any(|(key, _)| key == place))
+    }
+
     /// Rational intersection parameters `[s:t]`, without multiplicities.
     pub fn rational_line_roots(&self, section: &[u32]) -> Result<Vec<[u32; 2]>, &'static str> {
         Ok(self
@@ -945,6 +973,10 @@ mod tests {
         assert_eq!(places[0].0.polynomial, [1, 0, 1]);
         assert_eq!(places[0].0.point, [[1, 0], [0, 2], [0, 0]]);
         assert_eq!(places[0].1, 1);
+        assert!(conic.valid_quadratic_line_place(&places[0].0));
+        let mut forged = places[0].0;
+        forged.point[1][1] = 1;
+        assert!(!conic.valid_quadratic_line_place(&forged));
         assert_eq!(
             conic.quadratic_line_places([1, 1, 0], [1, 2, 0]).unwrap(),
             places
