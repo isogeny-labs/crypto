@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-27",
+  "conductor_task": "T-13048",
+  "input_path": "../WS68_NATURAL_PARTIAL.stdout",
+  "input_sha256": "922945c9a81568d23a504e2d296ef6c468f8dd47738e9b9e8a303ce12246f2b3",
+  "source_sha256": "a59b87c077c41af568acd47d936b4df3be5202311ee23ac1bfb26acda6d47bbc",
+  "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11), arm64 Homebrew",
+  "rustc_sha256": "de09d555d0acd2d3c1b608ab369b20c6467aa9c5681c4194a9dd5ed1e84fa5f2",
+  "checkpoint_gate": {"command": "scripts/checkpoint.sh gate", "exit_code": 2, "reason": "missing .resume/RESUME.md", "admission": "previously user-authorized bounded local bypass"},
+  "compile": "rustc --edition=2021 -O run.rs -o /tmp/ws68_ldpc_068.bin",
+  "run": "/tmp/ws68_ldpc_068.bin from parent research directory",
+  "arms": ["full_only exact singleton message passing", "full_only Gaussian", "partial_filter exact singleton message passing", "partial_filter Gaussian"],
+  "acceptance": "152 source, 136 completed witness/point replay, 17 full-only, base/augmented rank 8/9 both arms, matching point-checked target where solved, terminal RUN_OK=1, empty runtime stderr",
+  "claim_boundary": "partial control for #68; no full LDPC BP or end-to-end performance claim"
+}

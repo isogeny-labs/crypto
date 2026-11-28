@@ -3266,6 +3266,83 @@ and 4 of the factor-base encyclopedia §8.
 
 ---
 
+## 18. Two-sided degree-for-variables split, 2026-11-28
+
+The proposed split of `S_q` for `q ≥ 4` is already the `chain` construction
+of §2.2, applied beside the PKM factor-base tower. Here `q = m + 1` when
+there are `m` factor-base summands and one target. A left chain replaces
+`S_q` by `q − 2 = m − 1` copies of `S₃` and adds
+`q − 3 = m − 2` intermediate abscissae. The PKM side has `mt` tower
+unknowns and `mt` quadratic equations. Thus the combined affine count is
+`mt + m − 2` unknowns and `mt + m − 1` equations: the summation side still
+adds **one net constraint**. Each `S₃` generator has total degree at most
+four, whereas the unsplit `S_q` has degree `2^(q−2)` in an individual
+abscissa. The lower generator degree is the intended trade for auxiliary
+variables; it is not a bound on F4 solving degree, intermediate width, or
+per-target work. Eliminating the intermediates can restore the high-degree
+summation condition. The independent summation-split work in
+`summation_split/DEGREE_BARRIER.md` makes this distinction explicit.
+
+**Exactness qualification for §2.2.** Its free affine `F_p` intermediates
+describe a sector, not the complete projection of `S_q=0` on
+`F_p` inputs. `summation_split/FINDINGS.md` gives two counterexamples over
+`F_5`: one requires an intermediate at infinity, and another requires a
+finite intermediate in `F_{25} \ F_5`. A set-theoretically complete
+summation-polynomial projection uses projective intermediates over
+`F_{p²}`, with the identity charts and field equations charged. The
+300/300 exact specialized root-set gates in that study support this statement
+at the tested sizes; they do not prove equality of elimination ideals or
+solver complexity. For a *genuine relation* whose leaf and target points all
+lie in `E(F_p)`, partial sums are in `E(F_p)`, so `F_p` projective
+intermediates suffice for a witness. Even in that narrower sector, an
+affine-only chain can lose a valid relation when a partial sum is the
+identity. The `pkm-semaev` oracle currently offers the affine chain through
+`m = 7` and a projective split only at `m = 3`; a general exact projective
+`m ≥ 4` oracle is not established by its existing chain mode.
+
+**Would a smoother auxiliary curve help?** The isogeny tower of §2.1
+already uses degree-two maps, the smallest nontrivial degree, and obtains a
+fully split `2^t`-point preimage on an auxiliary curve `E'`. A constructive
+family with prescribed `2^t`-torsion could reduce the auxiliary-curve
+search cost, which must be charged for each target under the no-preprocessing
+rule. Extra smooth factors in `#E'(F_p)` by themselves do not add summation
+constraints or reduce the chain's separator width. In the measured isogeny
+family, F4's solving degree rises from 5 to 6 at `m = 2, N = 20` (§11.7),
+so smooth preimages have not supplied a depth-independent solver bound.
+A nonconstant `F_p`-morphism `E' → E` between elliptic curves is a
+translation of an isogeny; isogenous curves have the same number of
+`F_p`-points. Thus an auxiliary curve with `2^t | #E'(F_p)` cannot have
+such a map into a prime-order target `E(F_p)`. A map that does not preserve
+the elliptic addition law can still supply factor-base abscissae, as PKM
+does, but its smoothness alone gives no cancellation in `S_q`. The
+distinction is also developed in `research/ic_tree_gluing_20261103/THEORY.md`
+§1; that note's broader dichotomy is explicitly heuristic.
+
+**Cold cost and rank boundary.** The target-specialized `m = 7` Dickson
+tower plus six-`S₃` left chain in
+`research/pplus_dickson_m7_elimination_20261127/REPORT.md` rebuilds the
+factor base and solver for every target, with no cross-target preprocessing.
+Its four-point depth-one carrier takes 558,571,973 `F_p`
+multiply-adds plus 1,433,122 extraction multiplications; the planted
+depth-two hit is resource-censored. The favorable depth-one lower bound
+is 86.47–182.63 times the complete cold control under the report's
+cost panel. That is a scoped null for this implementation, not a lower
+bound for other tree layouts or all primes. A balanced layout would need
+its own chart-complete construction, frozen cold cost protocol, F4 degree
+and width measurements, and independent relation-rank accounting.
+
+An exact projective split would preserve the decomposition set and therefore
+would not change the basic hit probability, about `|V|^m/(m!·r)` (§2.3).
+The current affine-only chain can miss valid witnesses, so this probability
+is an upper reference for that restricted solver. With fixed `m` and
+`|V| = p^{o(1)}`, that probability is `p^(−1+o(1))`; cheap individual
+attempts alone would still require `p^(1−o(1))` targets for hits. Varying
+`m` to raise the hit rate also raises the number of auxiliary variables and
+the solver width. The rank of collected coefficient rows must be measured
+separately from the number of hits. At present the two-sided split supplies
+neither a `p^{o(1)}` per-attempt bound nor the required total-relation-rank
+result.
+
 ## References
 
 - C. Petit, M. Kosters, A. Messeng, *Algebraic approaches for the elliptic curve

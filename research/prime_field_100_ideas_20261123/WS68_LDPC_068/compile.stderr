@@ -1,0 +1,17 @@
+warning: fields `matvec` and `nonzeros` are never read
+  --> research/prime_field_100_ideas_20261123/WS68_LDPC_068/run.rs:13:68
+   |
+13 | #[derive(Default,Clone,Copy)]struct Ops{adds:u64,muls:u64,invs:u64,matvec:u64,nonzeros:u64}
+   |                                     --- fields in this struct      ^^^^^^     ^^^^^^^^
+   |
+   = note: `Ops` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `matvec` is never used
+  --> research/prime_field_100_ideas_20261123/WS68_LDPC_068/run.rs:20:4
+   |
+20 | fn matvec(a:&[Vec<i64>],x:&[i64],o:&mut Ops)->Vec<i64>{o.matvec+=1;let n=x.len();let mut y=vec![0;n];for i in 0..n{for j in 0..n{if a[i][...
+   |    ^^^^^^
+
+warning: 2 warnings emitted
+

@@ -1,0 +1,17 @@
+# Frozen #39 spectral seeded-control V3
+
+Date 2026-11-27. Conductor T-13057 claimed. V1 and V2 sources, protocols and raw outputs remain unchanged. V2 passed all EC witness/rank/target checks but its `seeded_control` name referred to a hard-coded subset [0,2,5,7]; its protocol explicitly corrects the label. V3 source SHA-256 `0de3d113cbaf5c7aba58fa057fff9bfa34d7b6a5f850071d250aac0c6a5a22a1` substitutes a genuine Fisher–Yates balanced subset generated with xorshift64 seed `0x39020261127` and seven draws. It also makes exactly eight small-column tests per row in each cut arm, allowing exact cut-stage counts of 28 edge-pair tests and 8 × 136 row-column tests per partition. Spectral and fixed arms, natural EC source/input, all witness checks, Laplacian eigensolve, elimination and target checks are otherwise unchanged. V1 protocol contains the primary spectral references and full method; V2 protocol contains its exact receipt.
+
+Input `WS68_NATURAL_PARTIAL.stdout` SHA-256 `922945c9a81568d23a504e2d296ef6c468f8dd47738e9b9e8a303ce12246f2b3`. The 512-source-candidate producer is not rerun. Charge graph construction (3,808 co-occurrence tests), Jacobi rotations, 28 edge and 1,088 row-column cut tests per arm, and each exact modular solve separately. Check all 152 source and 136 complete EC witnesses, eigen residual, row equations and target scalar. No independent-block claim if cross rows remain. The checkpoint gate remains exit 2 for missing `.resume/RESUME.md`; this bounded local run uses the user's explicit bypass.
+
+Run once and preserve distinct stdout/stderr/exit; on failure stop and repair only in a separately frozen version:
+
+`rustc -O research/prime_field_100_ideas_20261123/EC_SPECTRAL_039_V3.rs -o /tmp/ec_spectral_039_v3_20261127.bin`
+
+`timeout 60 /tmp/ec_spectral_039_v3_20261127.bin > research/prime_field_100_ideas_20261123/EC_SPECTRAL_039_V3.stdout.txt 2> research/prime_field_100_ideas_20261123/EC_SPECTRAL_039_V3.stderr.txt`
+
+## Post-run receipt
+
+The single V3 compile exited 0 with unused-helper warnings; the single run exited 0. Stdout SHA-256 `dfb52d0183dc6ff06875187051811deec219d90e7157a695c27d3bccf268da11`; stderr empty, SHA-256 `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`; exit receipt SHA-256 `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`. All 152 source and 136 complete EC point identities passed. Every exact solve had rank 9, checked target scalar 701 and 136 verified row equations.
+
+Graph construction checked 3,808 row/column pairs and produced total edge weight 65. Jacobi took 82 rotations and had maximum eigenpair residual 8.155e-13. Each cut evaluated 28 edge pairs and 1,088 row-column entries. Spectral left [1,2,3,5] cut weight 39 and 39 crossing rows, all target-bearing; its modular solve used 3,440 adds, 3,530 multiplies, 9 inversions and 73 pivot scans. Fixed left [0,1,2,3] also cut 39 and solved with 3,840/3,930/9 and 67 scans. The actual seeded xorshift64 control (seed `0x39020261127`, final state 4264492163853479667) selected [2,3,4,6], cut weight 31 and 31 crossing target-bearing rows; it solved with 4,100/4,190/9 and 80 scans. Spectral reduced counted modular elimination operations on this column order but had a worse cut than the seeded control and paid graph/eigensolve setup. The 39 cross rows defeat a claim that these blocks can be processed independently. The producer, source verifier, and 136-row large-column filter costs are additional to each partition's solve.

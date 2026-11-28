@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-25",
+  "conductor_task": "T-174",
+  "admission": "same user-authorized bounded local checkpoint bypass",
+  "attempt2": {
+    "source_sha256": "759da0ef24f844d22712751051bbd8d85d9cf043d9a0af219cd1827a1f2def8a",
+    "stdout_sha256": "9efd874d957f9b5ced3175a6a351f33bec1364e2ccda163c1eb9bad59a33b5b3",
+    "stderr_sha256": "1802e07ed089cceb1a271f2dad04acc76727bf411f5f13a139e04bd08339332c",
+    "process_exit": 0,
+    "outcome": "failed rho x-coordinate conversion: PARI finite-field element remains t_FFELT under liftint; stderr has error and RUN_OK is absent"
+  },
+  "attempt3_source_sha256": "3e92a8a1e58d5b871a521279e8aeeb9f1f7e3ec12b1bc6149af9edd9f82b11af",
+  "change": "rho partition finds base-field x by equality against fixed 0..42 representatives; no change to target, control caps, or pairing route",
+  "command": "/usr/bin/time -p gp -q < solve.gp",
+  "acceptance": "stderr only time lines, RUN_OK=1, two checked scalar results equal"
+}

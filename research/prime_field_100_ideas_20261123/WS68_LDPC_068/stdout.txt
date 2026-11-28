@@ -1,0 +1,26 @@
+source_rows=152 complete_rows=136 witness_and_group_replays=136 large_pivots=16 filter_mod_adds=33286 filter_mod_muls=36134 filter_mod_invs=16
+arm=full_only source_completed=17 rows_with_anchor=18 rank_base=8 rank_aug=9 rank_adds=280 rank_muls=361 rank_invs=17
+peel arm=full_only assigned_col=0 assigned_value=1 round=1
+peel arm=full_only assigned_col=8 assigned_value=701 round=1
+peel arm=full_only assigned_col=1 assigned_value=868 round=1
+peel arm=full_only assigned_col=5 assigned_value=398 round=1
+peel arm=full_only assigned_col=2 assigned_value=129 round=1
+peel arm=full_only assigned_col=7 assigned_value=241 round=1
+peel arm=full_only assigned_col=6 assigned_value=186 round=1
+peel arm=full_only assigned_col=4 assigned_value=470 round=2
+peel arm=full_only assigned_col=3 assigned_value=828 round=2
+peel_summary arm=full_only assigned=9/9 rounds=3 target_pinned=true target=701 row_visits=54 nonzero_visits=138 field_adds=113 field_muls=122 field_invs=9 solve_wall_us=30
+gaussian arm=full_only rank=9 target=701 selected=9 selection_adds=602 selection_muls=1235 selection_invs=113 solve_adds=75 solve_muls=129 solve_invs=9 wall_us=23
+arm=partial_filter source_completed=136 rows_with_anchor=137 rank_base=8 rank_aug=9 rank_adds=2199 rank_muls=2280 rank_invs=17
+peel arm=partial_filter assigned_col=0 assigned_value=1 round=1
+peel arm=partial_filter assigned_col=8 assigned_value=701 round=1
+peel arm=partial_filter assigned_col=5 assigned_value=398 round=1
+peel arm=partial_filter assigned_col=1 assigned_value=868 round=1
+peel arm=partial_filter assigned_col=2 assigned_value=129 round=1
+peel arm=partial_filter assigned_col=6 assigned_value=186 round=1
+peel arm=partial_filter assigned_col=3 assigned_value=828 round=1
+peel arm=partial_filter assigned_col=4 assigned_value=470 round=1
+peel arm=partial_filter assigned_col=7 assigned_value=241 round=1
+peel_summary arm=partial_filter assigned=9/9 rounds=2 target_pinned=true target=701 row_visits=274 nonzero_visits=644 field_adds=627 field_muls=636 field_invs=9 solve_wall_us=30
+gaussian arm=partial_filter rank=9 target=701 selected=9 selection_adds=3687 selection_muls=6746 selection_invs=571 solve_adds=72 solve_muls=126 solve_invs=9 wall_us=62
+RUN_OK=1
