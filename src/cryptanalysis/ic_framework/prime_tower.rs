@@ -225,6 +225,7 @@ pub struct IsogenyTowerCost {
     pub selection_sqrt_muls: u64,
     pub selection_target_legendre: u64,
     pub selection_peak_frontier: u64,
+    pub selection_peak_coset_entries: u64,
 }
 
 /// One 2-isogeny step: kernel abscissa `ξ_j`, `τ_j = 3ξ_j² + a'_j`, and
@@ -613,6 +614,8 @@ pub fn z2xz8_equal_size_tower(
             if !seen.insert(v.clone()) {
                 continue;
             }
+            cost.selection_peak_coset_entries =
+                cost.selection_peak_coset_entries.max(seen.len() as u64);
             cost.selection_cosets_tested += 1;
             let columns = v
                 .iter()
@@ -1191,6 +1194,10 @@ fn build_isogeny_base(
         ("aux_selection_sqrt_muls", c.selection_sqrt_muls),
         ("aux_selection_target_legendre", c.selection_target_legendre),
         ("aux_selection_peak_frontier", c.selection_peak_frontier),
+        (
+            "aux_selection_peak_coset_entries",
+            c.selection_peak_coset_entries,
+        ),
         ("velu_evaluations_uncharged", c.velu_evaluations),
     ] {
         fb.cost.count(name, v);
@@ -1603,6 +1610,22 @@ mod tests {
             );
             assert!(selected.cost.selection_sqrt_calls > 0);
             assert!(selected.cost.selection_sqrt_muls > 0);
+            assert!(selected.cost.selection_peak_frontier > 0);
+            assert!(selected.cost.selection_peak_coset_entries > 0);
+            eprintln!(
+                "PKM_SELECT p={p} m={} draws={} cosets={} x_scanned={} sqrt_calls={} sqrt_muls={} target_legendre={} search_gae={} build_gae={} peak_frontier={} peak_cosets={}",
+                selected.cost.selection_m,
+                selected.cost.curves_tried,
+                selected.cost.selection_cosets_tested,
+                selected.cost.selection_x_scanned,
+                selected.cost.selection_sqrt_calls,
+                selected.cost.selection_sqrt_muls,
+                selected.cost.selection_target_legendre,
+                selected.cost.search_gae,
+                selected.cost.build_gae,
+                selected.cost.selection_peak_frontier,
+                selected.cost.selection_peak_coset_entries,
+            );
             let mut selected_v = selected.v;
             selected_v.sort_unstable();
             assert_eq!(selected_v, expected_v);
