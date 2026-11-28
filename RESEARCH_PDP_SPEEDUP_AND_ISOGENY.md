@@ -47,8 +47,10 @@ when \(m<N\); the union bound makes the chance of *any* collision at most
 \(\binom M2/N=o(1)\). Detecting and resampling a colliding base leaves
 expected preprocessing \(p^{o(1)}\).
 
-This construction also gives an explicit full-rank stopping argument. After
-collision-free preprocessing, each \(mB_i\) has the unique multiplicity
+This construction also gives an explicit full-rank stopping argument: a
+hit with multiplicity vector \(e\) contributes the row \((e,-b)\) in
+\(e\cdot L-bs=a\pmod N\), where \(L_i=\log_P B_i\) and
+\(s=\log_P Q\). After collision-free preprocessing, each \(mB_i\) has the unique multiplicity
 vector \(m e_i\). Uniform independent targets encounter all \(t\) of these
 points in \(NH_t\) expected attempts, where \(H_t=\sum_{j=1}^t1/j\);
 their coefficient rows span \(\mathbb F_N^t\). Conditional on \(R\), the
