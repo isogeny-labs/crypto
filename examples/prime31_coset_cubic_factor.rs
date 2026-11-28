@@ -6,9 +6,7 @@
 //! and not an ECDLP solve. Benchmarking is paired within one process.
 //!
 //! cargo run --release --example prime31_coset_cubic_factor
-use crypto_lib::cryptanalysis::pkm_smooth_tower::{
-    mulm, poly_mul, poly_roots, powm, Curve, Rng,
-};
+use crypto_lib::cryptanalysis::pkm_smooth_tower::{mulm, poly_mul, poly_roots, powm, Curve, Rng};
 use std::collections::BTreeSet;
 use std::time::{Duration, Instant};
 
@@ -25,7 +23,7 @@ const COSETS: [(u64, u64); 8] = [
     (131_394_216, 1_893_426_316),
     (49_444_078, 1_215_727_561),
     (53_346_144, 1_554_347_565),
-    (1_852_955_275, 136_769_428),
+    (1_852_957_275, 136_769_428),
 ];
 
 fn rhs(x: u64) -> u64 {
@@ -72,7 +70,11 @@ fn structured(c: u64, y0: u64, seed: u64, check: bool) -> BTreeSet<u64> {
                 sum = curve.add(sum, Some((x, y)));
             }
             assert_eq!(sum, None, "horizontal cubic fiber does not sum to O");
-            assert_eq!(fiber_roots.iter().copied().sum::<u64>() % P, 0, "Vieta x^2 coefficient");
+            assert_eq!(
+                fiber_roots.iter().copied().sum::<u64>() % P,
+                0,
+                "Vieta x^2 coefficient"
+            );
         }
         for x in fiber_roots {
             if check {
