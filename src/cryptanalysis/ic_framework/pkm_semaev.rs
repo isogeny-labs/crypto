@@ -985,6 +985,10 @@ pub struct PkmSemaevOracle {
     totals: SolverTotals,
     shape: Option<SystemShape>,
     setup_mults: u64,
+    /// `from_spec` constructs an isogeny tower before the pipeline builds
+    /// the factor base. Charge that separate work once during `prepare`.
+    constructor_ops: Option<GroupOps>,
+    constructor_native: BTreeMap<String, u64>,
     native: BTreeMap<String, u64>,
     // Opt-in dataset snapshots. Ordinary callers pay no JSON/trace cost.
     dataset_trace: bool,
@@ -1095,6 +1099,8 @@ impl PkmSemaevOracle {
             },
             shape: None,
             setup_mults: 0,
+            constructor_ops: None,
+            constructor_native: BTreeMap::new(),
             native: BTreeMap::new(),
             dataset_trace: false,
             dataset_artifact: None,
@@ -1150,9 +1156,8 @@ impl PkmSemaevOracle {
     /// built from: `prime-kummer:t,g` (the `μ_{2^t}` coset), PKM's isogeny
     /// form `prime-isogeny:t,seed,aux,family,selection` (the tower is rebuilt
     /// deterministically from the same public factor-base parameters and
-    /// target curve; the rebuild is not
-    /// charged, since the base's build on the factor-base ledger is the
-    /// same work), or any base with `bits=T[,lo=L]` on the oracle (an
+    /// target curve; that separate rebuild is charged to oracle setup),
+    /// or any base with `bits=T[,lo=L]` on the oracle (an
     /// interval written in bits) or `digits=c1;…;ct[,lo=L]` (a digit set,
     /// `t` its length). ecbench and `ic bench` both build the oracle here,
     /// so the two harnesses solve the same system.
@@ -1197,7 +1202,50 @@ impl PkmSemaevOracle {
                     supersingular_tower(p, t, seed, kind, &mut scratch)?
                 };
                 let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
-                Self::new_isogeny(m, t, tower.v.clone(), steps, tower.c)
+                let mut oracle = Self::new_isogeny(m, t, tower.v.clone(), steps, tower.c);
+                oracle.constructor_ops = Some(scratch);
+                let cost = &tower.cost;
+                for (name, value) in [
+                    ("pkm_oracle_aux_curves_tried", cost.curves_tried),
+                    ("pkm_oracle_aux_search_gae", cost.search_gae),
+                    ("pkm_oracle_aux_tower_build_gae", cost.build_gae),
+                    (
+                        "pkm_oracle_aux_selection_cosets_tested",
+                        cost.selection_cosets_tested,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_sqrt_calls",
+                        cost.selection_sqrt_calls,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_sqrt_muls_uncharged",
+                        cost.selection_sqrt_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_target_legendre_uncharged",
+                        cost.selection_target_legendre,
+                    ),
+                    (
+                        "pkm_oracle_aux_legendre_symbols_uncharged",
+                        cost.legendre_symbols,
+                    ),
+                    ("pkm_oracle_aux_sqrt_solves_uncharged", cost.sqrt_solves),
+                    (
+                        "pkm_oracle_aux_velu_evaluations_uncharged",
+                        cost.velu_evaluations,
+                    ),
+                ] {
+                    if value > 0 {
+                        oracle.constructor_native.insert(name.into(), value);
+                    }
+                }
+                // The selector also performs coefficient/Jacobi arithmetic
+                // outside the group law. Its complete field price is not yet
+                // available; keep the positive omission explicit.
+                oracle
+                    .constructor_native
+                    .insert("pkm_oracle_aux_other_field_work_uncharged".into(), 1);
+                oracle
             }
             "prime-interval" => {
                 let (t, lo) = PrimeIntervalBase::interval(fb, inst.curve.p)?;
@@ -4030,6 +4078,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         ops: &mut GroupOps,
     ) -> Result<(), String> {
         self.read_params(params)?;
+        if let Some(constructor_ops) = self.constructor_ops.take() {
+            ops.merge(constructor_ops);
+        } else {
+            self.constructor_native.clear();
+        }
         self.fiber = None;
         if self.lifts {
             // E(F_q)[h] once, from [r]P over the base points; its group
@@ -4209,6 +4262,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         if self.setup_mults > 0 {
             m.insert("pkm_base_check_fp_mults_uncharged".into(), self.setup_mults);
         }
+        m.extend(self.constructor_native.clone());
         m.extend(self.trace_setup.clone());
         m.extend(self.t0_setup.clone());
         if let Some(f) = &self.fiber {
@@ -5435,8 +5489,9 @@ mod tests {
             oracle_params: oracle_params.clone(),
             ..Default::default()
         };
+        let mut fb_ops = GroupOps::default();
         let fb = PrimeIsogenyBase { instance: &inst }
-            .build(&ctx(&inst), &fb_params, &mut GroupOps::default())
+            .build(&ctx(&inst), &fb_params, &mut fb_ops)
             .unwrap();
         assert!(fb.abscissa_list.contains(&392));
         let mut oracle = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
@@ -5444,9 +5499,23 @@ mod tests {
             panic!("expected the selected isogeny tower")
         };
         assert!(fb.abscissa_list.iter().all(|x| v.contains(x)));
+        let mut prep_ops = GroupOps::default();
         oracle
-            .prepare(&ctx(&inst), &fb, &oracle_params, &mut GroupOps::default())
+            .prepare(&ctx(&inst), &fb, &oracle_params, &mut prep_ops)
             .unwrap();
+        assert_eq!(prep_ops, fb_ops);
+        let native = oracle.setup_native();
+        assert_eq!(native["pkm_oracle_aux_search_gae"], 879);
+        assert_eq!(native["pkm_oracle_aux_tower_build_gae"], 74);
+        assert!(native["pkm_oracle_aux_selection_sqrt_muls_uncharged"] > 0);
+        let mut repeat_ops = GroupOps::default();
+        oracle
+            .prepare(&ctx(&inst), &fb, &oracle_params, &mut repeat_ops)
+            .unwrap();
+        assert_eq!(repeat_ops.gae(), 0.0);
+        assert!(!oracle
+            .setup_native()
+            .contains_key("pkm_oracle_aux_search_gae"));
     }
 
     /// F4 trace (`trace=1`): the verdicts equal plain F4's and the grid's
