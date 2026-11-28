@@ -56,12 +56,11 @@ pub struct DegreeTwoLineFactorization {
 /// `point` is projectively normalized over `F_p[s]/(polynomial)`; each
 /// coordinate is `[constant, s coefficient]`. The line and parameter basis
 /// are canonical, so the key is independent of the caller's line basis.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct QuadraticLinePlace {
     pub line: [u32; 3],
     pub polynomial: [u32; 3],
     pub point: [[u32; 2]; 3],
-    pub multiplicity: usize,
 }
 
 /// A completely rational line section on a smooth plane curve.
@@ -485,7 +484,7 @@ impl PlaneCurve {
         &self,
         u: [u32; 3],
         v: [u32; 3],
-    ) -> Result<Vec<QuadraticLinePlace>, &'static str> {
+    ) -> Result<Vec<(QuadraticLinePlace, usize)>, &'static str> {
         let p = self.p;
         let u = u.map(|x| x % p);
         let v = v.map(|x| x % p);
@@ -548,12 +547,14 @@ impl PlaneCurve {
             if (0..3).all(|axis| evaluate(Some(axis)) == [0, 0]) {
                 return Err("line meets a singular quadratic point");
             }
-            places.push(QuadraticLinePlace {
-                line,
-                polynomial,
-                point,
-                multiplicity: factor.multiplicity,
-            });
+            places.push((
+                QuadraticLinePlace {
+                    line,
+                    polynomial,
+                    point,
+                },
+                factor.multiplicity,
+            ));
         }
         Ok(places)
     }
@@ -844,10 +845,10 @@ mod tests {
         let conic = PlaneCurve::new(3, 2, &[term(2, 0, 0), term(0, 2, 0), term(0, 0, 2)]).unwrap();
         let places = conic.quadratic_line_places([1, 0, 0], [0, 1, 0]).unwrap();
         assert_eq!(places.len(), 1);
-        assert_eq!(places[0].line, [0, 0, 1]);
-        assert_eq!(places[0].polynomial, [1, 0, 1]);
-        assert_eq!(places[0].point, [[1, 0], [0, 2], [0, 0]]);
-        assert_eq!(places[0].multiplicity, 1);
+        assert_eq!(places[0].0.line, [0, 0, 1]);
+        assert_eq!(places[0].0.polynomial, [1, 0, 1]);
+        assert_eq!(places[0].0.point, [[1, 0], [0, 2], [0, 0]]);
+        assert_eq!(places[0].1, 1);
         assert_eq!(
             conic.quadratic_line_places([1, 1, 0], [1, 2, 0]).unwrap(),
             places
@@ -857,8 +858,8 @@ mod tests {
             places
         );
         let other_line = conic.quadratic_line_places([0, 1, 0], [0, 0, 1]).unwrap();
-        assert_eq!(other_line[0].line, [1, 0, 0]);
-        assert_eq!(other_line[0].point, [[0, 0], [1, 0], [0, 2]]);
+        assert_eq!(other_line[0].0.line, [1, 0, 0]);
+        assert_eq!(other_line[0].0.point, [[0, 0], [1, 0], [0, 2]]);
         let nonreduced = PlaneCurve::new(
             3,
             4,
