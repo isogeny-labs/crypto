@@ -6,7 +6,7 @@ This study runs the frozen specs `../specs/c1-e2e-m5-std.json` and `../specs/c1-
 
 ## Verdict (PROTOCOL "Decision rule")
 
-**Improvement.**
+**Improvement.** [pcc:unverified]
 - The decision comparison `ic-tw-a / ic-std` is **0.1286 [0.114, 0.145]**, in counted GAE, paired over 30 pairs on 6 workloads with a 95% linearised-t interval.
 - Its upper end is below 1 at every §5a weight: w = 0, 0.1, 1 give 0.1286, 0.1286, 0.1287.
 - The line A/A `ic-tw-b / ic-tw-a` is 1.0306 [0.964, 1.102], which contains 1.
@@ -51,6 +51,6 @@ Both IC arms remain about 10³–10⁴× above rho at m = 5 (N = 20, r ≈ 2^18)
 
 ## What this does not establish
 
-- **Validation gate.** There is no validator report and no independent-host replay (the replays ran on the producing pod), so no IC-leaderboard or `benchmarks/README.md` row is added.
+- **Validation gate.** There is no validator report and no independent-host replay (the replays ran on the producing pod), so no IC-leaderboard or `benchmarks/README.md` row is added. [pcc:unverified]
 - **Scale.** This is one size and one curve family (`f2m4_a0`, m = 5). The scaling claim needs stage 2 (m = 7) under the same protocol.
 - **Rho.** The improvement is relative to the standard-line IC baseline. It is not below rho; the gap is listed above.
