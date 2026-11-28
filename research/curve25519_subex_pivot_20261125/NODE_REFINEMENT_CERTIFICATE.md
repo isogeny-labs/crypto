@@ -41,6 +41,15 @@ aligned with a separately strict-parsed `PackingLabelSource`. The summary is
 therefore arithmetic evidence, not a replacement for the full source trace.
 `[pcc:unverified]`
 
+The native exporter also emits a joint projection: those eight values followed
+by the complete packing-label projection. The formal bundle importer splits at
+the fixed eight-field boundary, checks compact arithmetic, runs the full strict
+packing parser, and internally checks parent edge count, label-class count, and
+maximum class equality. Its soundness theorem gives bundle validity for every
+successful parse, and every valid or successfully parsed bundle yields
+eightfold shrink with no caller-supplied alignment equality.
+`[pcc:unverified]`
+
 ## Native control
 
 The admitted three-edge conditional-packing fixture serializes and parses a
@@ -66,9 +75,10 @@ falsifies the stronger identification: the schema-6 normalized local witness
 has different `M,K` from the strict root. A natural-number formal endpoint now
 consumes the exact `LD<=M` and `child*64<=2*height*D` facts reported here, and
 the compact formal importer pins their field order and arithmetic acceptance.
-Proving that every native projection equals the corresponding formal
-natural-number record across compiler, allocation, conversion, and
-serialization semantics is still needed; the live `usize` branch cannot
-allocate a strict-root bundle, and the external contraction theorem remains
-unproved. No practical Curve25519 attack follows.
+The joint formal importer also removes caller-supplied summary/source alignment.
+Proving that every native joint projection equals the corresponding formal
+bundle across compiler, allocation, conversion, and serialization semantics is
+still needed; the live `usize` branch cannot allocate a strict-root bundle, and
+the external contraction theorem remains unproved. No practical Curve25519
+attack follows.
 `[pcc:unverified]`

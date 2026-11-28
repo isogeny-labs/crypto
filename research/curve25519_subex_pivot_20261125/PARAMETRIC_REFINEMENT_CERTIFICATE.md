@@ -234,6 +234,10 @@ evidence for two independent claims:
    exact field-order parser, checked round trip, and strict-source-aligned
    history-shrink theorem. Arbitrary-size cross-language equality across
    compiler, allocation, conversion, and serialization remains open.
+   A joint native exporter appends the full packing-label projection. The
+   matching formal bundle parser checks both components, verifies the three
+   edge/class/maximum alignments internally, proves every successful import
+   valid, and derives eightfold shrink with no external alignment equality.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

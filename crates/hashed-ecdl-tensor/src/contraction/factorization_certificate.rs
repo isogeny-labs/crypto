@@ -18,9 +18,9 @@ use crate::factorization_certificate::{
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
-    history_shrink_projection, verify as verify_node_refinement, verify_history_shrink_projection,
-    verify_strict as verify_strict_node_refinement, Certificate as NodeRefinementCertificate,
-    SCHEMA as NODE_REFINEMENT_SCHEMA,
+    history_shrink_bundle_projection, history_shrink_projection, verify as verify_node_refinement,
+    verify_history_shrink_projection, verify_strict as verify_strict_node_refinement,
+    Certificate as NodeRefinementCertificate, SCHEMA as NODE_REFINEMENT_SCHEMA,
 };
 use crate::packing_provenance_certificate::{
     description_envelope as packing_description_envelope,
@@ -1109,6 +1109,20 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert_eq!(
         verify_history_shrink_projection(&exact_history_projection[..7]).unwrap_err(),
         "node refinement history projection context"
+    );
+    let history_bundle =
+        history_shrink_bundle_projection(&node_summary, &conditional_provenance).unwrap();
+    assert_eq!(
+        &history_bundle[..history_projection.len()],
+        history_projection.as_slice()
+    );
+    assert_eq!(
+        history_bundle[history_projection.len()..],
+        packing_label_projection(&conditional_provenance)
+            .unwrap()
+            .into_iter()
+            .map(BigUint::from)
+            .collect::<Vec<_>>()
     );
     assert_eq!(
         verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),

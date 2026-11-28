@@ -1182,6 +1182,59 @@ theorem PackingLabelSource.historyChildStrictShrinkOfRoundedMaximum
     (((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ)
     child hM (by positivity) hclass hlength hheight hchild'
 
+/-- Artifact-level natural-number boundary for a strictly parsed canonical
+packing projection. -/
+theorem PackingLabelArtifact.historyChildStrictShrinkOfRoundedMaximumNat
+    (artifact : PackingLabelArtifact)
+    (hparse :
+      parseSourceGuardPackingLabelArtifact artifact.projectionValues =
+        some artifact)
+    (packetLength child : ℕ)
+    (hlength :
+      packetLength * (artifact.labelCount * artifact.labelCount) ≤
+        artifact.edgeCount)
+    (hchild :
+      child * 64 ≤ 2 *
+        ((artifact.maximumClassSize ⌈/⌉ packetLength) * packetLength) *
+        (artifact.labelCount * artifact.labelCount)) :
+    8 * child ≤ artifact.edgeCount := by
+  let classSize := artifact.maximumClassSize
+  have hclass :=
+    parseSourceGuardPackingLabelArtifact_maximumClassCap hparse
+  have hheightNat :=
+    Curve25519ParametricRefinement.rounded_class_height_le_add
+      classSize packetLength
+  have hlengthReal :
+      (packetLength : ℝ) *
+          ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) ≤
+        (artifact.edgeCount : ℝ) := by
+    exact_mod_cast hlength
+  have hheightReal :
+      (((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ) ≤
+        (classSize : ℝ) + (packetLength : ℝ) := by
+    exact_mod_cast hheightNat
+  have hchildReal :
+      (child : ℝ) * 64 ≤ 2 *
+        ((((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ) *
+          ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ)) := by
+    have hchildCast :
+        (child : ℝ) * 64 ≤ 2 *
+          (((artifact.maximumClassSize ⌈/⌉ packetLength) *
+              packetLength : ℕ) : ℝ) *
+            ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ) := by
+      exact_mod_cast hchild
+    simpa [classSize, mul_assoc] using hchildCast
+  have hshrink :=
+    Curve25519ParametricRefinement.history_child_strict_shrink_of_class_capacity
+      (artifact.edgeCount : ℝ)
+      ((artifact.labelCount * artifact.labelCount : ℕ) : ℝ)
+      (packetLength : ℝ)
+      (classSize : ℝ)
+      (((classSize ⌈/⌉ packetLength) * packetLength : ℕ) : ℝ)
+      (child : ℝ) (by positivity) (by positivity) hclass hlengthReal
+      hheightReal hchildReal
+  exact_mod_cast hshrink
+
 /-- Natural-number boundary matching the independently checked native node
 summary. Its two inequalities are exactly source length mass and replayed
 two-sided child incidence; all casts are discharged internally. -/
@@ -1200,21 +1253,9 @@ theorem PackingLabelSource.historyChildStrictShrinkOfRoundedMaximumNat
         ((source.artifact.maximumClassSize ⌈/⌉ packetLength) *
           packetLength) *
         (source.artifact.labelCount * source.artifact.labelCount)) :
-    8 * child ≤ source.artifact.edgeCount := by
-  have hlengthReal :
-      (packetLength : ℝ) *
-          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ) ≤
-        (source.artifact.edgeCount : ℝ) := by
-    exact_mod_cast hlength
-  have hchildReal :
-      (child : ℝ) * 64 ≤ 2 *
-        (((source.artifact.maximumClassSize ⌈/⌉ packetLength) *
-            packetLength : ℕ) : ℝ) *
-          ((source.artifact.labelCount * source.artifact.labelCount : ℕ) : ℝ) := by
-    exact_mod_cast hchild
-  have hshrink := source.historyChildStrictShrinkOfRoundedMaximum
-    hparse packetLength (child : ℝ) (by positivity) hlengthReal hchildReal
-  exact_mod_cast hshrink
+    8 * child ≤ source.artifact.edgeCount :=
+  source.artifact.historyChildStrictShrinkOfRoundedMaximumNat
+    hparse packetLength child hlength hchild
 
 /-- The shared native projection contains these exact fields. -/
 theorem packingLabelWitnessArtifactValues :

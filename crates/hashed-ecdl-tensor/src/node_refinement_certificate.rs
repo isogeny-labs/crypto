@@ -11,7 +11,8 @@ use crate::factorization_certificate::{
     Certificate as FactorizationCertificate, SourceDimensionWitness,
 };
 use crate::packing_provenance_certificate::{
-    verify as verify_packing, Certificate as PackingCertificate,
+    label_projection as packing_label_projection, verify as verify_packing,
+    Certificate as PackingCertificate,
 };
 use crate::{BigUint, Meter};
 use serde::{Deserialize, Serialize};
@@ -97,6 +98,25 @@ pub fn history_shrink_projection(summary: &VerificationSummary) -> [BigUint; 8] 
         BigUint::from(summary.padded_class_height),
         BigUint::from(summary.maximum_child_edges),
     ]
+}
+
+/// Canonical joint projection of the compact node arithmetic followed by the
+/// complete packing-label source projection.
+///
+/// The formal bundle importer checks strict packing acceptance and aligns
+/// parent edges, label classes, and the recomputed maximum class internally.
+pub fn history_shrink_bundle_projection(
+    summary: &VerificationSummary,
+    packing: &PackingCertificate,
+) -> Result<Vec<BigUint>, String> {
+    let packing_values = packing_label_projection(packing)?;
+    let capacity = HISTORY_SHRINK_PROJECTION_FIELDS
+        .checked_add(packing_values.len())
+        .ok_or_else(|| "node refinement history bundle length".to_string())?;
+    let mut values = Vec::with_capacity(capacity);
+    values.extend(history_shrink_projection(summary));
+    values.extend(packing_values.into_iter().map(BigUint::from));
+    Ok(values)
 }
 
 /// Independently check the arithmetic carried by the compact history-shrink

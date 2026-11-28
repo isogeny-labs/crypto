@@ -493,6 +493,13 @@ the natural-number shrink endpoint only when aligned with a separately
 strict-parsed packing source. This pins the compact interface while leaving
 compiler, allocation, conversion, and serialization equivalence open.
 `[pcc:unverified]`
+The native joint exporter now concatenates that compact header with the full
+packing-label projection. The formal bundle importer strictly checks both,
+aligns parent edges, label classes, and maximum class internally, proves every
+successful parse valid, and derives eightfold shrink from the parsed bundle
+without caller-supplied alignment premises. The remaining cross-language gap
+is equality of actual native output with this formal bundle, not a missing
+formal summary/source composition. `[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

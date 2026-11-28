@@ -296,6 +296,13 @@ projection round trips, and connects any valid aligned artifact to the
 strict-source history theorem. Alignment with a strictly parsed packing source
 is explicit; compiler, allocation, conversion, and serialization refinement
 remain outside the theorem. `[pcc:unverified]`
+The native joint exporter appends the complete packing-label projection to the
+eight summary fields. The formal bundle importer splits that exact interface,
+runs both checked parsers, and verifies edge count, label-class count, and
+maximum class alignment internally. Successful-parse soundness now carries
+directly to eightfold shrink, eliminating external alignment equalities at the
+formal data boundary. Equality with every native execution remains unproved.
+`[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,
