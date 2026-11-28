@@ -42,7 +42,11 @@ fn main() {
     let dmax: u32 = av[12].parse().unwrap();
     let budget: u64 = av[13].parse().unwrap();
     let max_trials: u64 = av[14].parse().unwrap();
-    assert_eq!(degrees.iter().product::<u64>(), s, "degrees do not multiply to S");
+    assert_eq!(
+        degrees.iter().product::<u64>(),
+        s,
+        "degrees do not multiply to S"
+    );
 
     let e = st::Curve { p, a, b };
     let g = (gx, gy);
@@ -133,13 +137,13 @@ fn main() {
         }
         let mut lead = None;
         for col in 0..ncol {
-            if rows[i][col] % r != 0 {
+            if !rows[i][col].is_multiple_of(r) {
                 lead = Some(col);
                 break;
             }
         }
         let Some(col) = lead else {
-            if rows[i][ncol] % r != 0 {
+            if !rows[i][ncol].is_multiple_of(r) {
                 inconsistent = true;
             }
             continue;
@@ -167,7 +171,9 @@ fn main() {
         }
     }
     let recovered = pivot_row[ncol - 1].map(|i| rows[i][ncol] % r);
-    let verified = recovered.map(|d| e.mul(d, Some(g)) == Some(q_pt)).unwrap_or(false);
+    let verified = recovered
+        .map(|d| e.mul(d, Some(g)) == Some(q_pt))
+        .unwrap_or(false);
 
     println!(
         "{{\"p\":{p},\"S\":{s},\"degrees\":\"{}\",\"n0\":{},\"B\":{},\"cols\":{c},\
@@ -178,7 +184,9 @@ fn main() {
         av[3],
         degrees.len(),
         degrees.iter().copied().max().unwrap(),
-        recovered.map(|d| d.to_string()).unwrap_or_else(|| "null".into()),
+        recovered
+            .map(|d| d.to_string())
+            .unwrap_or_else(|| "null".into()),
         found.curves_tried,
     );
 }
