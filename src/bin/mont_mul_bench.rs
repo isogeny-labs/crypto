@@ -703,7 +703,7 @@ fn rho_mode(args: &[String]) {
         let mut marg: std::collections::BTreeMap<usize, Vec<f64>> = Default::default();
         let mut ratios = Vec::new();
         for round in 0..rounds {
-            let mut runs = vec![
+            let mut runs = [
                 (1usize, budget),
                 (1, 2 * budget),
                 (lanes, budget),
