@@ -1,0 +1,16 @@
+{
+  "action": "count three causes per failed attempt, not two: v_deg free (no line row with sum c_j + 4 c_kappa != 0), z columns (core columns only in decomposition rows), and ab_rank 1 (one or two decomposition rows reach the core); the dump lines carry q, seed, attempt and r but no arm or curve seed, so run --threads 1 and match them to runs by (r, seed) in arm order, asserting attempts 1..k per run",
+  "created": "2026-11-28T05:14:51Z",
+  "evidence": [
+    "research/quartic_diem_p0lines_20261128/validation/diag_check.json",
+    "research/quartic_diem_p0lines_20261128/validation/diag_check.py"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "classifying failed attempts of a quartic Diem 2LP arm from QL_CORE_DUMP cores (genus_ladder --quartic-diag)",
+  "why": "p0lines grid replay: 11 p0 failed attempts, v_deg free in 0, z columns in 9, and 2 (4099 curve 205 seed 6, 16411 curve 158 seed 4) with neither but ab_rank 1; RESULTS named only the first two mechanisms"
+}
