@@ -33,6 +33,17 @@ fn mul(a: u64, b: u64, p: u64) -> u64 {
     ((a as u128 * b as u128) % p as u128) as u64
 }
 
+fn mul_counted(a: u64, b: u64, p: u64, count: &mut u64) -> u64 {
+    *count += 1;
+    mul(a, b, p)
+}
+
+fn pow_counted(base: u64, exponent: u64, p: u64, count: &mut u64) -> u64 {
+    // residual_walk::pow_mod squares once per bit and multiplies once per set bit.
+    *count += u64::from(exponent.count_ones() + (64 - exponent.leading_zeros()));
+    pow_mod(base, exponent, p)
+}
+
 /// A primitive `2^t`-th root of unity in `F_p`, from the first small
 /// base that gives one; `None` when `2^t ∤ p − 1`.
 pub fn primitive_two_power_root(p: u64, t: u32) -> Option<u64> {
@@ -253,6 +264,18 @@ pub struct IsogenyTowerCost {
     pub selection_sqrt_calls: u64,
     pub selection_sqrt_muls: u64,
     pub selection_target_legendre: u64,
+    /// Direct `prime_tower::mul` calls outside the charged group law and sqrt.
+    pub selection_direct_fp_muls: u64,
+    /// Multiplications inside `residual_walk::pow_mod` during selection.
+    pub selection_pow_fp_muls: u64,
+    /// `PrimeCurve::rhs` multiplies three times per selection call.
+    pub selection_rhs_fp_muls: u64,
+    /// `PrimeCurve::is_on_curve` multiplies four times per finite point.
+    pub selection_curve_check_fp_muls: u64,
+    /// Direct `prime_tower::mul` calls in the accepted Vélu chain.
+    pub velu_direct_fp_muls: u64,
+    /// Multiplications inside `residual_walk::pow_mod` in Vélu inversions.
+    pub velu_pow_fp_muls: u64,
     pub selection_peak_frontier: u64,
     pub selection_peak_coset_entries: u64,
     /// Per-draw and per-distinct-coset record, retained even for rejects.
@@ -304,13 +327,16 @@ impl IsogenyTower {
 }
 
 /// Vélu's 2-isogeny with kernel `(ξ, 0)` on a point.
-fn velu_map(pt: PrimePoint, xi: u64, tau: u64, p: u64) -> PrimePoint {
+fn velu_map(pt: PrimePoint, xi: u64, tau: u64, p: u64, cost: &mut IsogenyTowerCost) -> PrimePoint {
     if pt.infinity || pt.x == xi {
         return PrimePoint::INFINITY;
     }
-    let d = pow_mod((pt.x + p - xi) % p, p - 2, p);
-    let x = (pt.x + mul(tau, d, p)) % p;
-    let y = mul(pt.y, (1 + p - mul(tau, mul(d, d, p), p)) % p, p);
+    let d = pow_counted((pt.x + p - xi) % p, p - 2, p, &mut cost.velu_pow_fp_muls);
+    let td = mul_counted(tau, d, p, &mut cost.velu_direct_fp_muls);
+    let x = (pt.x + td) % p;
+    let d2 = mul_counted(d, d, p, &mut cost.velu_direct_fp_muls);
+    let td2 = mul_counted(tau, d2, p, &mut cost.velu_direct_fp_muls);
+    let y = mul_counted(pt.y, (1 + p - td2) % p, p, &mut cost.velu_direct_fp_muls);
     PrimePoint::affine(x, y)
 }
 
@@ -495,9 +521,14 @@ fn z2xz8_halving_q32(
 ) -> Option<PrimePoint> {
     let p = aux.p;
     let roots = [0, (p - bb4) % p, (p - aa4) % p];
-    let inv3 = pow_mod(3, p - 2, p);
+    let inv3 = pow_counted(3, p - 2, p, &mut cost.selection_pow_fp_muls);
     let reduce = |v: u128| (v % u128::from(p)) as u64;
-    let shift = mul(reduce(roots.iter().map(|&r| u128::from(r)).sum()), inv3, p);
+    let shift = mul_counted(
+        reduce(roots.iter().map(|&r| u128::from(r)).sum()),
+        inv3,
+        p,
+        &mut cost.selection_direct_fp_muls,
+    );
     let mut frontier: Vec<_> = roots
         .iter()
         .map(|&root| PrimePoint::affine((root + p - shift) % p, 0))
@@ -527,26 +558,37 @@ fn z2xz8_halving_q32(
             for &r1 in &choices[0][..lengths[0]] {
                 for &r2 in &choices[1][..lengths[1]] {
                     for &r3 in &choices[2][..lengths[2]] {
-                        if mul(mul(r1, r2, p), r3, p) != (p - point.y) % p {
+                        let r1r2 = mul_counted(r1, r2, p, &mut cost.selection_direct_fp_muls);
+                        if mul_counted(r1r2, r3, p, &mut cost.selection_direct_fp_muls)
+                            != (p - point.y) % p
+                        {
                             continue;
                         }
+                        let x12 = mul_counted(r1, r2, p, &mut cost.selection_direct_fp_muls);
+                        let r1r3 = mul_counted(r1, r3, p, &mut cost.selection_direct_fp_muls);
+                        let r2r3 = mul_counted(r2, r3, p, &mut cost.selection_direct_fp_muls);
                         let new_x = reduce(
                             u128::from(x)
-                                + u128::from(mul(r1, r2, p))
-                                + u128::from(mul(r1, r3, p))
-                                + u128::from(mul(r2, r3, p))
+                                + u128::from(x12)
+                                + u128::from(r1r3)
+                                + u128::from(r2r3)
                                 + u128::from(p - shift),
                         );
-                        let new_y = (p - mul(
-                            mul(
-                                reduce(u128::from(r1) + u128::from(r2)),
-                                reduce(u128::from(r1) + u128::from(r3)),
-                                p,
-                            ),
+                        let y12 = mul_counted(
+                            reduce(u128::from(r1) + u128::from(r2)),
+                            reduce(u128::from(r1) + u128::from(r3)),
+                            p,
+                            &mut cost.selection_direct_fp_muls,
+                        );
+                        let y123 = mul_counted(
+                            y12,
                             reduce(u128::from(r2) + u128::from(r3)),
                             p,
-                        )) % p;
+                            &mut cost.selection_direct_fp_muls,
+                        );
+                        let new_y = (p - y123) % p;
                         let half = PrimePoint::affine(new_x, new_y);
+                        cost.selection_curve_check_fp_muls += 4;
                         if aux.is_on_curve(half) && aux.double(ops, half) == *point {
                             next.push(half);
                         }
@@ -589,10 +631,11 @@ fn z2xz8_equal_size_tower_bounded(
     let mut interval_size = 0;
     for x in 0..32 {
         cost.selection_target_legendre += 1;
+        cost.selection_rhs_fp_muls += 3;
         interval_size += usize::from(target.legendre(target.rhs(x)) >= 0);
     }
-    let inv3 = pow_mod(3, p - 2, p);
-    let inv27 = pow_mod(27, p - 2, p);
+    let inv3 = pow_counted(3, p - 2, p, &mut cost.selection_pow_fp_muls);
+    let inv27 = pow_counted(27, p - 2, p, &mut cost.selection_pow_fp_muls);
     let reduce = |v: u128| (v % u128::from(p)) as u64;
     let search_before = ops.adds + ops.doubles;
     for m in 1..=max_m {
@@ -608,16 +651,20 @@ fn z2xz8_equal_size_tower_bounded(
             skipped_two_r_in_subgroup: 0,
             skipped_duplicate_cosets: 0,
         };
-        let m2 = mul(m, m, p);
+        let m2 = mul_counted(m, m, p, &mut cost.selection_direct_fp_muls);
         let fa = (m2 + p - 1) % p;
-        let fb = mul(2, m, p);
+        let fb = mul_counted(2, m, p, &mut cost.selection_direct_fp_muls);
         if fa == 0 || fb == 0 {
             cost.singular += 1;
             cost.selection_trace.push(attempt);
             continue;
         }
-        let aa4 = mul(mul(fa, fa, p), mul(fa, fa, p), p);
-        let bb4 = mul(mul(fb, fb, p), mul(fb, fb, p), p);
+        let fa2a = mul_counted(fa, fa, p, &mut cost.selection_direct_fp_muls);
+        let fa2b = mul_counted(fa, fa, p, &mut cost.selection_direct_fp_muls);
+        let aa4 = mul_counted(fa2a, fa2b, p, &mut cost.selection_direct_fp_muls);
+        let fb2a = mul_counted(fb, fb, p, &mut cost.selection_direct_fp_muls);
+        let fb2b = mul_counted(fb, fb, p, &mut cost.selection_direct_fp_muls);
+        let bb4 = mul_counted(fb2a, fb2b, p, &mut cost.selection_direct_fp_muls);
         if aa4 == bb4 {
             cost.singular += 1;
             cost.selection_trace.push(attempt);
@@ -626,10 +673,16 @@ fn z2xz8_equal_size_tower_bounded(
         let e2 = (p - bb4) % p;
         let e3 = (p - aa4) % p;
         let s1 = reduce(u128::from(e2) + u128::from(e3));
-        let s2 = mul(e2, e3, p);
-        let s1sq = mul(s1, s1, p);
-        let a = (s2 + p - mul(s1sq, inv3, p)) % p;
-        let b = (mul(mul(s1, s2, p), inv3, p) + p - mul(2, mul(mul(s1sq, s1, p), inv27, p), p)) % p;
+        let s2 = mul_counted(e2, e3, p, &mut cost.selection_direct_fp_muls);
+        let s1sq = mul_counted(s1, s1, p, &mut cost.selection_direct_fp_muls);
+        let a_term = mul_counted(s1sq, inv3, p, &mut cost.selection_direct_fp_muls);
+        let a = (s2 + p - a_term) % p;
+        let b_first = mul_counted(s1, s2, p, &mut cost.selection_direct_fp_muls);
+        let b_first = mul_counted(b_first, inv3, p, &mut cost.selection_direct_fp_muls);
+        let b_second = mul_counted(s1sq, s1, p, &mut cost.selection_direct_fp_muls);
+        let b_second = mul_counted(b_second, inv27, p, &mut cost.selection_direct_fp_muls);
+        let b_second = mul_counted(2, b_second, p, &mut cost.selection_direct_fp_muls);
+        let b = (b_first + p - b_second) % p;
         let aux = PrimeCurve { p, a, b };
         attempt.aux = Some((a, b));
         attempt.status = "no_32_torsion";
@@ -660,6 +713,7 @@ fn z2xz8_equal_size_tower_bounded(
             cost.selection_x_scanned += 1;
             attempt.x_scanned += 1;
             cost.selection_sqrt_calls += 1;
+            cost.selection_rhs_fp_muls += 3;
             let Some(y) = aux.sqrt_counted(aux.rhs(x), &mut cost.selection_sqrt_muls) else {
                 attempt.skipped_nonpoints += 1;
                 continue;
@@ -696,6 +750,7 @@ fn z2xz8_equal_size_tower_bounded(
                 .iter()
                 .filter(|&&z| {
                     cost.selection_target_legendre += 1;
+                    cost.selection_rhs_fp_muls += 3;
                     target.legendre(target.rhs(z)) >= 0
                 })
                 .count();
@@ -899,18 +954,21 @@ fn finish_tower(
         return Err("Q does not have order 2^t".into());
     }
     let keys: std::collections::HashSet<u64> = multiples.iter().map(|m| aux.key(m)).collect();
-    let valid_r = |r: PrimePoint, ops: &mut GroupOps| {
+    let valid_r = |r: PrimePoint, ops: &mut GroupOps, cost: &mut IsogenyTowerCost| {
+        if !r.infinity {
+            cost.selection_curve_check_fp_muls += 4;
+        }
         !r.infinity && aux.is_on_curve(r) && !keys.contains(&aux.key(&aux.double(ops, r)))
     };
     let r0 = if let Some(r) = selected_r {
-        if !valid_r(r, ops) {
+        if !valid_r(r, ops, &mut cost) {
             return Err("selected R is not a valid distinct-abscissa coset".into());
         }
         r
     } else {
         loop {
             let r = random_point(&aux, rng, &mut cost);
-            if valid_r(r, ops) {
+            if valid_r(r, ops, &mut cost) {
                 break r;
             }
         }
@@ -934,19 +992,30 @@ fn finish_tower(
             return Err(format!("step {j}: the kernel point is not 2-torsion"));
         }
         let xi = kj.x;
-        let tau = (mul(3, mul(xi, xi, p), p) + aj) % p;
+        let xi2 = mul_counted(xi, xi, p, &mut cost.velu_direct_fp_muls);
+        let tau_term = mul_counted(3, xi2, p, &mut cost.velu_direct_fp_muls);
+        let tau = (tau_term + aj) % p;
         steps.push(VeluStep {
             xi,
             tau,
             a: aj,
             b: bj,
         });
-        qj = velu_map(qj, xi, tau, p);
-        rj = velu_map(rj, xi, tau, p);
+        qj = velu_map(qj, xi, tau, p, &mut cost);
+        rj = velu_map(rj, xi, tau, p, &mut cost);
         cost.velu_evaluations += 2;
-        aj = (aj + p - mul(5, tau, p)) % p;
-        bj = (bj + p - mul(7, mul(xi, tau, p), p)) % p;
+        let a_term = mul_counted(5, tau, p, &mut cost.velu_direct_fp_muls);
+        aj = (aj + p - a_term) % p;
+        let xi_tau = mul_counted(xi, tau, p, &mut cost.velu_direct_fp_muls);
+        let b_term = mul_counted(7, xi_tau, p, &mut cost.velu_direct_fp_muls);
+        bj = (bj + p - b_term) % p;
         let next = PrimeCurve { p, a: aj, b: bj };
+        if !qj.infinity {
+            cost.selection_curve_check_fp_muls += 4;
+        }
+        if !rj.infinity {
+            cost.selection_curve_check_fp_muls += 4;
+        }
         if !next.is_on_curve(qj) || !next.is_on_curve(rj) {
             return Err(format!("step {j}: a Vélu image is off the codomain"));
         }
@@ -1288,6 +1357,24 @@ fn build_isogeny_base(
         ("aux_selection_sqrt_calls", c.selection_sqrt_calls),
         ("aux_selection_sqrt_muls", c.selection_sqrt_muls),
         ("aux_selection_target_legendre", c.selection_target_legendre),
+        (
+            "aux_selection_direct_fp_muls_uncharged",
+            c.selection_direct_fp_muls,
+        ),
+        (
+            "aux_selection_pow_fp_muls_uncharged",
+            c.selection_pow_fp_muls,
+        ),
+        (
+            "aux_selection_rhs_fp_muls_uncharged",
+            c.selection_rhs_fp_muls,
+        ),
+        (
+            "aux_selection_curve_check_fp_muls_uncharged",
+            c.selection_curve_check_fp_muls,
+        ),
+        ("aux_velu_direct_fp_muls_uncharged", c.velu_direct_fp_muls),
+        ("aux_velu_pow_fp_muls_uncharged", c.velu_pow_fp_muls),
         ("aux_selection_peak_frontier", c.selection_peak_frontier),
         (
             "aux_selection_peak_coset_entries",
@@ -1706,6 +1793,17 @@ mod tests {
             );
             assert!(selected.cost.selection_sqrt_calls > 0);
             assert!(selected.cost.selection_sqrt_muls > 0);
+            assert!(selected.cost.selection_direct_fp_muls > 0);
+            assert!(selected.cost.selection_pow_fp_muls > 0);
+            assert_eq!(
+                selected.cost.selection_rhs_fp_muls,
+                3 * (32
+                    + selected.cost.selection_x_scanned
+                    + 32 * selected.cost.selection_cosets_tested)
+            );
+            assert!(selected.cost.selection_curve_check_fp_muls > 0);
+            assert!(selected.cost.velu_direct_fp_muls > 0);
+            assert!(selected.cost.velu_pow_fp_muls > 0);
             assert!(selected.cost.selection_peak_frontier > 0);
             assert!(selected.cost.selection_peak_coset_entries > 0);
             assert_eq!(
