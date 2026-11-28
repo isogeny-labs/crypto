@@ -1,0 +1,14 @@
+error[E0282]: type annotations needed
+  --> research/prime_field_100_ideas_20261123/WS68_PARTIAL_PANEL_075_076/verify.rs:16:170
+   |
+16 | ...et b=t[4][2..].parse().unwrap();let x=t[5][4..].trim_end_matches(',').parse().unwrap();let y=t[6].trim_end_matches(')').parse().unwrap();let kind=match &t[7][5..]{"Full"=>0,"One"=>1,"Two"=>2,_=>panic!("kind")};let i=t[8][2..].parse().unwrap();let j=t[9][2..].parse().unwrap();let mut row=vec![0;B+1];row[i]+=1;row[j]+=1;row[T]=red(-b,R)...
+   |       ^                                                                                                                                                                                                                                                                                                                                       -- type must be known at this point
+   |
+help: consider giving `b` an explicit type
+   |
+16 | fn parse(line:&str)->Src{let t:Vec<_>=line.split_whitespace().collect();assert_eq!(t.len(),10);let trial=t[2][6..].parse().unwrap();let a=t[3][2..].parse().unwrap();let b: /* Type */=t[4][2..].parse().unwrap();let x=t[5][4..].trim_end_matches(',').parse().unwrap();let y=t[6].trim_end_matches(')').parse().unwrap();let kind=match &t[7][5..]{"Full"=>0,"One"=>1,"Two"=>2,_=>panic!("kind")};let i=t[8][2..].parse().unwrap();let j=t[9][2..].parse().unwrap();let mut row=vec![0;B+1];row[i]+=1;row[j]+=1;row[T]=red(-b,R);row[B]=a;Src{trial,a,b,r:Pt::A(x,y),kind,i,j,row}}
+   |                                                                                                                                                                           ++++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0282`.

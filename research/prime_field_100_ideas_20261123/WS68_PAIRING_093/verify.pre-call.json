@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-25",
+  "conductor_task": "T-174",
+  "source_sha256": "b78a331b1eaf231df61da243a5f01a2d9028878e7b0b72d3654ac4dfd369885e",
+  "admission": "small local-only verifier under prior user-authorized checkpoint bypass",
+  "input": "published transfer scalar 7, G=(31,18), H=(13,24), E/F43",
+  "method": "enumerate curve cardinality by quadratic-character sum, enumerate all 11 multiples of G, demand unique H match",
+  "command": "/usr/bin/time -p gp -q < verify.gp",
+  "acceptance": "VERIFY_OK=1 and stderr only time lines"
+}
