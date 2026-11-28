@@ -1,0 +1,135 @@
+{
+  "schema": "pkm-groebner-e2e/v1",
+  "protocol_commit": "49f652707f3217a7b15f6714efcfa0693c9a27d6",
+  "binary_sha256": "5be9a8ce836f33d1a7d20683e7753565e5669ae963226cd5273148b3c5ef07e7",
+  "command": "RAYON_NUM_THREADS=4 PKM_E2E_PAIRS=2 target/release/examples/pkm_groebner_drastic",
+  "claim_scope": "selected 13-bit matched complete native pipeline; host-measured F4 pricing; not random-instance, rho, or asymptotic",
+  "fixture": {
+    "instance": "icv1-fp13-tm13-9e2d11f6",
+    "instance_seed": 20261185,
+    "planted_scalar": 2261,
+    "base_abscissae_each": 18,
+    "system_variables_each": 10,
+    "system_equations_each": 11,
+    "system_degrees_each": [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+    "balanced_order": "interval, degree32_velu, degree32_velu, interval",
+    "pairs": 2
+  },
+  "calibration": {
+    "ns_per_add": 79.557515,
+    "ns_per_row_op": 2.188044921875,
+    "pinned_units": [],
+    "measured_units": ["ns_per_double", "ns_per_lookup", "ns_per_row_op"],
+    "solver_priced_by": "measured"
+  },
+  "gate": {
+    "maximum_candidate_over_interval_total_gae": 0.5,
+    "observed_candidate_over_interval_total_gae": 0.3345506339105974,
+    "passed": true,
+    "all_eight_scalar_checks_passed": true,
+    "all_phase_sums_equal_total_gae": true,
+    "all_cost_qualifications_null": true
+  },
+  "aggregate": {
+    "interval_total_gae": 283364531.59759796,
+    "degree32_velu_total_gae": 94799783.67375591,
+    "e2e_gae_candidate_over_interval": 0.3345506339105974,
+    "e2e_gae_speedup_x": 2.989084158385519,
+    "interval_cold_wall_seconds": 22.613043158,
+    "degree32_velu_cold_wall_seconds": 7.575308296999999,
+    "cold_wall_candidate_over_interval": 0.3349972953251107,
+    "cold_wall_speedup_x": 2.985098727527076,
+    "f4_speedup_x_each_run": 27.333750389303834
+  },
+  "interval_runs": [
+    {
+      "total_gae": 71693183.65161316,
+      "cold_wall_seconds": 5.725891493,
+      "solver_calls": 110,
+      "f4_multiply_adds": 14012270724,
+      "solving_degree_max": 6,
+      "phase_gae": [0.0, 0.0, 71693163.38869767, 4.262915488129877, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 71888060.05015326,
+      "cold_wall_seconds": 5.735105728,
+      "solver_calls": 110,
+      "f4_multiply_adds": 14012270724,
+      "solving_degree_max": 6,
+      "phase_gae": [0.0, 0.0, 71888039.78723776, 4.262915488129877, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 69649519.16561206,
+      "cold_wall_seconds": 5.556784867,
+      "solver_calls": 110,
+      "f4_multiply_adds": 14012270724,
+      "solving_degree_max": 6,
+      "phase_gae": [0.0, 0.0, 69649498.90269656, 4.262915488129877, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 70133768.7302195,
+      "cold_wall_seconds": 5.59526107,
+      "solver_calls": 110,
+      "f4_multiply_adds": 14012270724,
+      "solving_degree_max": 6,
+      "phase_gae": [0.0, 0.0, 70133748.467304, 4.262915488129877, 16.0],
+      "recovered": 2261,
+      "verified": true
+    }
+  ],
+  "degree32_velu_runs": [
+    {
+      "total_gae": 24036194.565094166,
+      "cold_wall_seconds": 1.921982697,
+      "solver_calls": 129,
+      "f4_multiply_adds": 512636229,
+      "solving_degree_max": 5,
+      "phase_gae": [1143.0, 0.0, 24035031.192167956, 4.372926210404197, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 24389081.052310366,
+      "cold_wall_seconds": 1.949578314,
+      "solver_calls": 129,
+      "f4_multiply_adds": 512636229,
+      "solving_degree_max": 5,
+      "phase_gae": [1143.0, 0.0, 24387917.679384157, 4.372926210404197, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 23024416.494851526,
+      "cold_wall_seconds": 1.838972823,
+      "solver_calls": 129,
+      "f4_multiply_adds": 512636229,
+      "solving_degree_max": 5,
+      "phase_gae": [1143.0, 0.0, 23023253.121925317, 4.372926210404197, 16.0],
+      "recovered": 2261,
+      "verified": true
+    },
+    {
+      "total_gae": 23350091.56149985,
+      "cold_wall_seconds": 1.864774463,
+      "solver_calls": 129,
+      "f4_multiply_adds": 512636229,
+      "solving_degree_max": 5,
+      "phase_gae": [1143.0, 0.0, 23348928.18857364, 4.372926210404197, 16.0],
+      "recovered": 2261,
+      "verified": true
+    }
+  ],
+  "phase_gae_order": [
+    "factor_base",
+    "oracle_setup",
+    "relations_and_solver",
+    "linear_algebra",
+    "verification"
+  ]
+}

@@ -1,0 +1,16 @@
+// Frozen preregistered protocol summary (Typst companion to protocol.json).
+#set page(paper: "us-letter", margin: 0.85in)
+#set text(font: "DejaVu Serif", size: 10pt)
+
+= Preregistered Protocol: Graph-Anchored Multi-Pattern Extension-Field Index Calculus (`EXT-IC-GRAPH-ANCHORED-MP-20261126`)
+
+*Status:* Frozen prior to benchmark execution (`2026-11-26`, `[pcc:unverified]`). Machine-readable specification: `protocol.json`.
+
+== 1. Objective & Falsifiable Hypotheses
+1. *H1 (Accounting & Karatsuba Tower Closure):* Operation-level `LinOps` in `zero_dim_la.rs` reconciles identically with legacy algebraic formulas across all `action_variable in 0..n`; `tracked_rref_contributors` charges pivot scans, inversions, negations, and bitset word ops without altering `F4Report::field_ops`; `KaratsubaArith` executes `(32, 28, 65)` $\mathbb{F}_p$ multiplications per $\mathbb{F}_{p^6}$ `(mul, sq, inv)` vs `(55, 55, 80)` schoolbook.
+2. *H2 (Fast Phase-1 Candidate Extraction):* `SparseTableFast` and `DeferredPairsFast` preserve byte-identical Phase-1 certificates, anchor tables, homogeneous kernels, and recovered scalars while reducing Phase-1 `Collection` `w=0` bit-operations by $>= 25%$ on `p = 1009, seed = 389`.
+3. *H3 (Graph-Anchored Multi-Pattern Binomial Law):* Accepting squarefree sextics of patterns `(1^6), (1^4,2), (1^2,2^2), (2^3)` whose quadratic factors lie in `AnchorTable` follows $M_"pred"(f) = 1 + 15 f + 45 f^2 + 15 f^3$ against the exact Galois-conjugate + norm-QR quadratic class universe $|cal(Q)_2(p)|$, with $M >= 1.25$ on 2-LP at `p = 1009` and $100%$ Cantor Jacobian replay `[scale]R == sum d_k B_k`.
+4. *H4 (Cold-Process F4 Trace + Anchored Descent Cost):* Cold single-target `TracedAnchored` descent reduces Phase-3 `Descent` `w=0` bit-ops by $>= 45%$ vs `Original` `(1^6)` descent on matched collectors.
+5. *H5 (Frustrated Odd-Cycle Half-Anchors):* Unanchored odd-sign 2-LP cycles yield `scale = 2` witnesses (`+2 D(v)`) verified by `[2]R == sum d_k B_k`; competing sparse-subgraph null predicts small density gain $Delta f < 0.02$ at rank-stop.
+6. *H6 (Finite-$B$-Space 1-LP vs 2-LP Transition & Scaling):* Multi-prime panel across $p in {307, 383, 503, 661, 1009}$ (`seeds = [101, 211, 307]`), symmetric against both schoolbook and Karatsuba Pollard rho (`foreign_hook_calls == 0`, sensitivity band $w in {0, 0.1, 1}$), plus `-C overflow-checks=on` release control.
+7. *H7 (Online $ZZ$-Exact Signed Frame-Matroid DSU + Hit-Bucket Sieve + Deterministic Frobenius-Norm Resolvent):* `SignedMatroidGraph` (`O(1)` dense interning, union-by-size DSU, smaller-tree re-rooting, LCA shared-suffix cancellation, complete Zaslavsky balanced/frustrated cycle harvesting, and multi-source Dijkstra shortest-witness anchors) + `HitBuckets` sieve + deterministic Frobenius-norm resolvent quartic splitting cuts Phase-1 `Relations` `w=0` bit-ops by $>= 2.5 times$ vs legacy `DeferredPairs` and outperforms legacy BFS across a 7-engine head-to-head partial-relation graph benchmark (`1lp-singleton-table`, `2lp-deferred-bfs`, `2lp-forest-witness-fl`, `2lp-signed-matroid-dsu`, `klp-markowitz-2core`, `klp-sharedkey-prim-mst`, `3lp-signed-matroid-hyper`); $S_6$ cycle-type yield ($1/8$ vs $1/48$) predicts `SignedMatroid2lp` outperforms `SignedMatroid3lp` on total bit-ops while `SignedMatroid3lp` closes rank in fewer planes.

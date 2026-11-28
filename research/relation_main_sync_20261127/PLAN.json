@@ -1,0 +1,26 @@
+{
+  "schema": "main99-dependency-regression/v1",
+  "purpose": "coherent normal merge of upstream99b949b383b into15x lane, resolving journal conflict without dropping or interleaving entries; qualify only changed dependency regressions",
+  "parents": {
+    "lane_before_merge": "publication receipt commit after7f6c4fa7db091dbf1c7868e6bc08dc11a1a4abff",
+    "upstream": "99b949b383b1205114201a2a5792c09f6fc2d180"
+  },
+  "math_changes": "take upstream prepared.rs/optimized.rs byte-exact, no local algebra/test modification",
+  "commands": [
+    "cargo test --release --locked --offline --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --lib prepared::tests -j1 -- --test-threads=1",
+    "cargo test --release --locked --offline --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --test five_leads -j1 -- --test-threads=1",
+    "cargo test --release --locked --offline --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --test prepared_pairs -j1 -- --test-threads=1",
+    "cargo test --release --locked --offline --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --test optimized_cli -j1 -- --test-threads=1"
+  ],
+  "expected_test_counts": [
+    7,
+    9,
+    5,
+    7
+  ],
+  "resources": "CPU0 one job/thread, releaseopt0/LTOoff/CG16/debug0/incrementalfalse; AS6GiB/file128MiB/300seconds each,1200seconds maximum all commands; zero cloud compute",
+  "failure_policy": "retain every exit/stdout/stderr, no selective retries; no broad library/whole-root pass inferred",
+  "frozen_evidence": "old153-file and pair246-file payloads remain byte-exact; their SOURCE manifests describe premerge compiler inputs, not this merged source; reconstruct historical code at original evidence commits",
+  "unqualified": "no root production library rebuild or current native F4/transport qualification; old Root0 cached executable remains premerge artifact and cannot pin new main",
+  "goal": "original15x active/unachieved; no comparative timings, intrinsic regularity or scalar claims; full strongest controls/proofs/acceptance retained"
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "main99-actual-root-native-plan/v1",
+  "source_commit": "3ddaa65f2d2f528d69c642c4bde3183e1bcbfb28",
+  "upstream": "99b949b383b1205114201a2a5792c09f6fc2d180",
+  "purpose": "fresh actual full production library and unchanged native integration after two root dependency sources/two docs changed; no algorithm or test edits",
+  "cache": "validate old rlib/rmeta against existing166994936byte archive sha8c461673b6a5444793b0d62daa304ca6424f40c7f647a63a3f1742822431d5f0 and indexed inventory, then unlink only these2non-executable single-link rebuildable files; archive retained locally, every immutable worker/source unchanged; new library cache belongs to merged source, never relabel old artifact",
+  "cache_files": [
+    "relation-root-build-20261127/release/build/crypto/b1af7d8773d35e6c/out/libcrypto_lib-b1af7d8773d35e6c.rlib",
+    "relation-root-build-20261127/release/build/crypto/b1af7d8773d35e6c/out/libcrypto_lib-b1af7d8773d35e6c.rmeta"
+  ],
+  "build": {
+    "attempts": 1,
+    "target": "existing native harness tests; crypto non-test production lib dependency only, never cargo root --lib libtest",
+    "profile": "releaseopt0/LTOoff/CG16/debug0/incrementalfalse/defaultfeaturesfalse",
+    "cpu": 0,
+    "jobs_threads": 1,
+    "deadline_seconds": 900,
+    "address_space_bytes": 12884901888,
+    "file_bytes": 1073741824,
+    "physical_cgroup_refusal_bytes": 15032385536,
+    "tmpfs_floor_bytes": 536870912,
+    "target_growth_refusal_bytes": 2684354560,
+    "probe_seconds": 2
+  },
+  "native": {
+    "primes": [
+      2147483647,
+      9007199254740881
+    ],
+    "n": [
+      3,
+      4,
+      6
+    ],
+    "seed": 7,
+    "graph": "LAST-star",
+    "original_cases": 36,
+    "matched_pairs": 108,
+    "mutation_assertions": 1116,
+    "unsupported_refusals": 6,
+    "case_deadline_seconds_each_lane": 1200,
+    "address_space_bytes": 2147483648,
+    "file_bytes": 134217728,
+    "outputs": [
+      "/dev/shm/relation-main99-original-20261127",
+      "/dev/shm/relation-main99-pairgraph-20261127"
+    ]
+  },
+  "proofs": "unchanged separate baseline/pairgraph auditors reexecute all144proofs and2+5sabotage views; source-scoped native counters not independently rerun; require fresh immutable workers/precall; compare every181/433mathematical file with immediately preceding guarded-scan scope",
+  "failure": "retain any build/resource/refusal/test/source failure; no same-configuration retry, cap increase, weakened check or older-worker substitution; unexecuted stages uncomputed",
+  "resources": "oneCPU/thread, zero new cloud compute; compile+native+audits all bounded as declared; old cachebackup RAM-local rebuildable artifact, not distributed proof",
+  "scope": "correctness only, no full-root unit pass or optimized-build/performance qualification; existing whole-libtest/opt3 failures remain; full15x unchanged/unachieved and timing-document choice pending; Conductor/checkpoint waived"
+}

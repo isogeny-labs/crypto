@@ -1,0 +1,27 @@
+{
+  "schema": "reversible-cache-memory-recovery-plan/v1",
+  "created_utc": "2026-11-27T21:39:47.788088+00:00",
+  "previous_build_plan_result": "OUTCOME.json (three failed/refused contexts, not overwritten)",
+  "scope": "Rebuildable compiler outputs only, exact34file inventory; no source, proof, algorithm, test, key, gate or qualified executable removal.",
+  "selected_directories": [
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/e7435ac0b284a6c7",
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/37b9da3435de8dd7",
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/b1af7d8773d35e6c"
+  ],
+  "inventory": "CACHE_FILE_INVENTORY.json",
+  "protected_workers": "FROZEN_WORKER_GUARD_BEFORE.json",
+  "backup": "/dev/shm/relation-opt-cache-backup-20261127.tar.xz",
+  "backup_creation": "CPU0/thread1 xz-level1, no cloud compute",
+  "before_release": [
+    "Verify exact full archive member roster, SHA256 bytes and modes against each current source file",
+    "Require net reclaimed source bytes minus compressed backup>=1073741824",
+    "Require no open or mapped selected cache file in any inspectable process; refuse on inaccessible non-owned context before removal",
+    "Verify all frozen worker bytes before/after; current compilation source postcheck"
+  ],
+  "release": "Unlink only exact inventoried cache files after verified backup, retain directories and backup for byte-exact restoration. Original source/evidence and all other caches stay untouched.",
+  "followup": "One additional unchanged-codegen AS10 attempt under existing15GiB cgroup monitor,1.5GiB target threshold and3600aggregate compiler seconds including prior1440. No further AS increase.",
+  "reversible": true,
+  "compiler_seconds_budget_includes_prior_attempts": true,
+  "performance_observations": 0,
+  "15x_admitted": false
+}

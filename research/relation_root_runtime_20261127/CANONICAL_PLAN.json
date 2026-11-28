@@ -1,0 +1,38 @@
+{
+  "schema": "repaired-canonical-root-qualification/v1",
+  "source": "CANONICAL_SOURCE.sha256",
+  "prior_context": "CANDIDATE_SOURCE.sha256 remains frozen historical source with two empty literals",
+  "correction": "failed Git lazy restores created empty files; presence-based helper skipped them. Restore both exact current Git blobs and require byte-level literal audit",
+  "source_content_audit": "hydration-repair/POST_AUDIT.json",
+  "tracked_literals_verified": 552,
+  "actual_root_compiler_included_panel": true,
+  "algorithms_or_tests_removed": false,
+  "same_candidate_API_and_tests": true,
+  "changed_inputs_only": [
+    "gpu/certicom/arithmetic.h",
+    "research/ecbench_phased_panel_20261117/panel.json"
+  ],
+  "build_profile": "same opt0/LTOoff/debug0/codegen16/default-features=false",
+  "cpu": 0,
+  "jobs_and_threads": 1,
+  "build_wall_seconds": 1800,
+  "build_address_space_bytes": 12884901888,
+  "run_wall_seconds": 1200,
+  "run_address_space_bytes": 2147483648,
+  "require_fresh_workers_and_precall": true,
+  "repeat_original_cases": 36,
+  "repeat_matched_pairs": 108,
+  "native_mutations": 1116,
+  "unsupported_refusals": 6,
+  "separate_complete_old_replays": 36,
+  "component_tests_already_passed_unaffected_by_two_noncomponent_literal_repairs": [
+    92,
+    93,
+    14
+  ],
+  "component_scope": "producer and checker sources/fixtures unchanged by this restoration",
+  "whole_default_feature_root_unit_runtime_qualified": false,
+  "benchmark": false,
+  "15x_admitted": false,
+  "signed_verdict": false
+}

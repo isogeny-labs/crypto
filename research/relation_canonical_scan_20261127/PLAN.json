@@ -1,0 +1,62 @@
+{
+  "schema": "canonical-row-scan-qualification-plan/v1",
+  "source_baseline": "7a943dd94c9cb733594508d7a5038a2adb41b6e2",
+  "pr": 5251,
+  "hypothesis": "For the declared bounded domain, canonicality can be checked by a read-only scan instead of allocating/sorting/rescaling an already-monic row. No runtime gain is claimed without timing.",
+  "candidate": "pending-source/canonical_row.rs",
+  "acceptance": "Exact agreement with existing production normalization; complete before/after basis, original/proof, native receipt and enabled-bitop phase counts must match on every fixed case.",
+  "fast_domain": {
+    "primes": [
+      2147483647,
+      9007199254740881
+    ],
+    "variables_min": 3,
+    "variables_max": 16,
+    "uniform_dimensions_required": true,
+    "max_exponent": 64
+  },
+  "fallback": "Original normalization for active Visit accounting or bitop counting, or unsupported shape. Nonempty/leading1 guard identical.",
+  "tests": "Differential fixed coefficient/monomial/order boundary classes against production normalization; accounted fallback call-count test; unsupported shape fallback. No selection RNG.",
+  "fixed_matrix": {
+    "primes": [
+      2147483647,
+      9007199254740881
+    ],
+    "n": [
+      3,
+      4,
+      6
+    ],
+    "seed": 7,
+    "graph": "LAST-star",
+    "forms": 6,
+    "kernels": 3,
+    "native_checkers": 2,
+    "bitop_modes": [
+      false,
+      true
+    ],
+    "cases": 432,
+    "public_reverification_each_case": true,
+    "performance_clocks": false
+  },
+  "cpu": 0,
+  "jobs_and_numerical_threads": 1,
+  "new_cloud_compute": false,
+  "build": {
+    "profile": "release opt0 LTOoff debug0 incrementalfalse codegen16 default-features=false",
+    "wall_seconds": 1800,
+    "address_space_bytes": 12884901888,
+    "file_bytes": 1073741824
+  },
+  "run": {
+    "wall_seconds": 1200,
+    "address_space_bytes": 2147483648,
+    "file_bytes": 134217728
+  },
+  "production_integration": "Only after candidate differential tests and baseline complete; promote exact helper and replace two predicates. Keep all proof/pair/resource obligations unchanged.",
+  "canonical_timing_choice": "pending; no approval inferred",
+  "comparative_timing": false,
+  "15x_admitted": false,
+  "new_pcc_claims": false
+}

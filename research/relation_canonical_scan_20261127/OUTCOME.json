@@ -1,0 +1,56 @@
+{
+  "schema": "canonical-row-scan-integration-outcome/v1",
+  "source": "CANDIDATE_SOURCE.sha256",
+  "baseline_source": "BASELINE_SOURCE.sha256",
+  "differential_unit_functions": 3,
+  "differential_rows_checked": 15804,
+  "baseline_cases": 432,
+  "candidate_cases": 432,
+  "public_reverifications_per_matrix": 432,
+  "per_phase_bitop_snapshots_exactly_preserved": true,
+  "bitop_modes": [
+    false,
+    true
+  ],
+  "comparisons": {
+    "matrix": {
+      "files": 1729,
+      "all_bytes_identical": true,
+      "old": "/dev/shm/relation-canonical-scan-baseline-20261127",
+      "new": "/dev/shm/relation-canonical-scan-candidate-20261127"
+    },
+    "native_original": {
+      "files": 181,
+      "all_bytes_identical": true,
+      "old": "/dev/shm/relation-postmerge-original-20261127",
+      "new": "/dev/shm/relation-canonical-scan-native-original-20261127"
+    },
+    "native_pairgraph": {
+      "files": 433,
+      "all_bytes_identical": true,
+      "old": "/dev/shm/relation-postmerge-pairgraph-20261127",
+      "new": "/dev/shm/relation-canonical-scan-native-pairgraph-20261127"
+    }
+  },
+  "native_original_cases": 36,
+  "native_matched_pairs": 108,
+  "native_mutations": 1116,
+  "unsupported_refusals": 6,
+  "complete_separate_replays": 144,
+  "audit_semantic_canaries": 7,
+  "active_visit_accounting_fallback": "same original normalization branch; helper flag/fallback tested, no separate Visit-ledger campaign",
+  "normalization_avoidance": "supported unaccounted helper path makes zero normalization calls in the tested canonical row; accounted helper path calls normalization once",
+  "all_proof_obligations_preserved": true,
+  "production_ordinary_normalise_unchanged": true,
+  "performance_observations": 0,
+  "timing_protocol_choice": "pending; no approval inferred",
+  "15x_admitted": false,
+  "actual_f4_solving_degree": null,
+  "intrinsic_regularity": null,
+  "independent_signed_execution": false,
+  "live_production_helper_unit_functions": 1,
+  "live_production_predicates_checked": 31500,
+  "live_unit_captured_exit": 0,
+  "live_unit_outer_observer_exit": 1,
+  "live_unit_imports_actual_production_file": true
+}

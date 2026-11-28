@@ -1,0 +1,69 @@
+{
+  "schema": "scan-root-full-call-instrument-qualification-plan/v1",
+  "production_context": "research/relation_canonical_scan_20261127/CANDIDATE_SOURCE.sha256",
+  "primary_fixed_before_observations": "scan-root-pairgraph-flat-dag-487-native",
+  "prior_arms_all_eligible_controls": 120,
+  "current_root_exhaustive_controls": 36,
+  "total_controls": 156,
+  "current_root_pairgraph_candidates": 36,
+  "aa_arms": 312,
+  "ab_arms": 192,
+  "rounds": 5,
+  "planned_future_calls": 15120,
+  "fixed_cases": {
+    "primes": [
+      2147483647,
+      9007199254740881
+    ],
+    "n": [
+      3,
+      4,
+      6
+    ],
+    "seed": 7,
+    "graph": "LAST-star"
+  },
+  "future_timing_boundary": "unchanged entire matched parent call: child command/raw capture, process/transport/proof writes, complete parent readback and packed proof replay, basis identity and all binding checks; no root setup amortized",
+  "root_phase_scope": "API includes wire replay, conversion and native checking; additional complete worker readback remains charged. Existing controls retain their original costs. Current exhaustive and pairgraph arms use same worker and extra checks.",
+  "qualification": {
+    "clock_mode": "worker --qualify only; diagnostic phases null",
+    "native_and_wrapped_calls": 432,
+    "complete_parent_proof_replays": 432,
+    "semantic_canaries_per_call": 4,
+    "synthetic_analysis_calls_each": 15120,
+    "scenarios": [
+      "neutral",
+      "hypothetical20"
+    ],
+    "synthetic_never_admitted": true,
+    "reused_source_proofs_checked_every_time": true,
+    "corruption_canaries": [
+      "clock",
+      "duplicate"
+    ]
+  },
+  "cpu": 0,
+  "jobs_and_numerical_threads": 1,
+  "new_cloud_compute": false,
+  "compile": {
+    "profile": "release opt0 LTOoff debug0 incrementalfalse codegen16 default-features=false",
+    "address_space_bytes": 12884901888,
+    "file_bytes": 1073741824,
+    "wall_seconds_per_command": 1800
+  },
+  "numerical_worker_and_analyzer": {
+    "address_space_bytes": 2147483648,
+    "file_bytes": 134217728,
+    "wall_seconds_each_qualification_stage": 1800,
+    "child_deadline_seconds": 30,
+    "child_file_bytes": 16777216
+  },
+  "all_initial_registry_versions_and_checksums_preserved": true,
+  "performance_observations_collected": 0,
+  "comparative_timing_authorized_by_this_plan": false,
+  "canonical_protocol_validation": "pending; encrypted document not waived",
+  "15x_admitted": false,
+  "new_pcc_ids": false,
+  "signed_execution_verdict": false,
+  "source": "SOURCE.sha256"
+}

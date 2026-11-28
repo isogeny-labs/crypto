@@ -22,9 +22,10 @@ pub(super) fn certify(
     opts: &F4Options,
     stats: &mut TraceStats,
 ) -> bool {
+    let accounted = visit_accounting_active() || crate::cryptanalysis::jv_bitops::enabled();
     if basis
         .iter()
-        .any(|g| g.is_empty() || g[0].1 != 1 || *g != normalise(g, p, opts.order))
+        .any(|g| !super::canonical_row::is_canonical_monic(g, p, opts.order, accounted))
     {
         return false;
     }

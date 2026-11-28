@@ -1,0 +1,26 @@
+{
+  "source": "CANONICAL_SOURCE.sha256",
+  "literal_audit": "hydration-repair/POST_AUDIT.json",
+  "workers": {
+    "canonical-original": {
+      "path": "/dev/shm/relation-root-workers-20261127/canonical-original",
+      "sha256": "8e9cb48f48abdbd23aa22714777ce9708914ad44a66e5ecd831e638f1dbd2d53"
+    },
+    "canonical-pairgraph": {
+      "path": "/dev/shm/relation-root-workers-20261127/canonical-pairgraph",
+      "sha256": "21b138cf333b00679b9dce346c27a81c3f7b6553c510237f183e11624653a871"
+    }
+  },
+  "cpu": 0,
+  "threads": 1,
+  "old_cases": 36,
+  "matched_pairs": 108,
+  "old_mutations": 252,
+  "new_mutations": 864,
+  "unsupported_refusals": 6,
+  "old_output": "/dev/shm/root-native-canonical-original-20261127",
+  "new_output": "/dev/shm/root-native-pairgraph-canonical-20261127",
+  "separate_original_audit": true,
+  "benchmark": false,
+  "signed_verdict": false
+}

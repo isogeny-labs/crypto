@@ -1,0 +1,2333 @@
+{
+  "actual_f4_calls": 41,
+  "cases": [
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        4,
+        31
+      ],
+      "case": "p2147483647-n3",
+      "fresh_aa_exact": true,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 37,
+          "max_rows": 34,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 3956,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": 8
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 37,
+          "max_rows": 34,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 3956,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": 8
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 30,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 3548,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 4,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 31,
+              "degree": 4,
+              "rank": 31,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": 6
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 37,
+          "max_rows": 34,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 3916,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": 7
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 30,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 3606,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": 7
+        }
+      ],
+      "prior_original_full_exact": true
+    },
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        6,
+        66
+      ],
+      "case": "p2147483647-n4",
+      "fresh_aa_exact": true,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 71,
+          "max_rows": 71,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 16011,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": 8
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 71,
+          "max_rows": 71,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 16011,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": 8
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 62,
+          "max_rows": 64,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 11864,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 6,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 66,
+              "degree": 4,
+              "rank": 66,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": 6
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 71,
+          "max_rows": 71,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 15951,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 3,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": 7
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3,
+              5
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 62,
+          "max_rows": 64,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 12545,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 3,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": 7
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "pair-00-01"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5925,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-01-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "id": "pair-differences-00-01"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5858,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-00-01-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              5
+            ],
+            "id": "pair-00-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5540,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-02-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              5
+            ],
+            "id": "pair-differences-00-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5462,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-00-02-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              5
+            ],
+            "id": "pair-01-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5255,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-02-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              5
+            ],
+            "id": "pair-differences-01-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 31,
+          "max_rows": 26,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 5137,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-01-02-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        }
+      ],
+      "prior_original_full_exact": true
+    },
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        10,
+        206
+      ],
+      "case": "p2147483647-n6",
+      "fresh_aa_exact": true,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 175,
+          "max_rows": 136,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 79695,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": 11
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 175,
+          "max_rows": 136,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 79695,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": 11
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 95,
+          "max_rows": 134,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 57399,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 10,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 206,
+              "degree": 4,
+              "rank": 206,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              6,
+              8
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 175,
+          "max_rows": 136,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 5,
+          "row_reduction_multiplications_only": 79595,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3,
+              5,
+              7,
+              9
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 95,
+          "max_rows": 134,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 57402,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "pair-00-01"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 73,
+          "max_rows": 78,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 12310,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-01-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              8
+            ],
+            "id": "pair-differences-00-01"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 73,
+          "max_rows": 78,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 12181,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-01-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              5
+            ],
+            "id": "pair-00-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 70,
+          "max_rows": 72,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 11423,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-02-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              5,
+              6,
+              8
+            ],
+            "id": "pair-differences-00-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 70,
+          "max_rows": 72,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 11305,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-02-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              7
+            ],
+            "id": "pair-00-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10624,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-03-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-00-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10517,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-03-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              9
+            ],
+            "id": "pair-00-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9939,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-04-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-00-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9821,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-04-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              5
+            ],
+            "id": "pair-01-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 70,
+          "max_rows": 72,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 11651,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-02-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              5,
+              6,
+              8
+            ],
+            "id": "pair-differences-01-02"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 70,
+          "max_rows": 72,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 11471,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-02-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              7
+            ],
+            "id": "pair-01-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10659,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-03-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-01-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10490,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-03-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              9
+            ],
+            "id": "pair-01-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9978,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-04-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-01-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9809,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-04-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              5,
+              7
+            ],
+            "id": "pair-02-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10693,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-02-03-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-02-03"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 69,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10542,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-02-03-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              5,
+              9
+            ],
+            "id": "pair-02-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 10030,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-02-04-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              5,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-02-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9890,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-02-04-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        },
+        {
+          "arm": {
+            "aux": [
+              7,
+              9
+            ],
+            "id": "pair-03-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9614,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-03-04-D3.json.gz"
+            }
+          ],
+          "steps": 10
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              6,
+              7,
+              8,
+              9
+            ],
+            "id": "pair-differences-03-04"
+          },
+          "complete_basis_valid": true,
+          "f4_supported": true,
+          "max_cols": 67,
+          "max_rows": 66,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": 4,
+          "row_reduction_multiplications_only": 9463,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-03-04-D3.json.gz"
+            }
+          ],
+          "steps": 9
+        }
+      ],
+      "prior_original_full_exact": true
+    },
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        4,
+        31
+      ],
+      "case": "p9007199254740881-n3",
+      "fresh_aa_exact": null,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 4,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 31,
+              "degree": 4,
+              "rank": 31,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 4,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": null
+        }
+      ],
+      "prior_original_full_exact": null
+    },
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        6,
+        66
+      ],
+      "case": "p9007199254740881-n4",
+      "fresh_aa_exact": null,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 6,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 66,
+              "degree": 4,
+              "rank": 66,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 3,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3,
+              5
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 3,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "pair-00-01"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-01-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "id": "pair-differences-00-01"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-00-01-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              5
+            ],
+            "id": "pair-00-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              5
+            ],
+            "id": "pair-differences-00-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-00-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              5
+            ],
+            "id": "pair-01-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              5
+            ],
+            "id": "pair-differences-01-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 6,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "pair-differences-01-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        }
+      ],
+      "prior_original_full_exact": null
+    },
+    {
+      "baseline_ranks_D2_D3_D4": [
+        0,
+        10,
+        206
+      ],
+      "case": "p9007199254740881-n6",
+      "fresh_aa_exact": null,
+      "observations": [
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-a"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-a-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [],
+            "id": "original-aa"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 0,
+              "snapshot": "original-aa-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            "id": "full"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": true,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 10,
+              "snapshot": "baseline-D3.json.gz"
+            },
+            {
+              "baseline_rank": 0,
+              "degree": 2,
+              "rank": 0,
+              "snapshot": "baseline-D2.json.gz"
+            },
+            {
+              "baseline_rank": 206,
+              "degree": 4,
+              "rank": 206,
+              "snapshot": "baseline-D4.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              6,
+              8
+            ],
+            "id": "differences"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "differences-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3,
+              5,
+              7,
+              9
+            ],
+            "id": "syzygies"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 5,
+              "snapshot": "syzygies-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              3
+            ],
+            "id": "pair-00-01"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-01-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              6,
+              8
+            ],
+            "id": "pair-differences-00-01"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-01-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              5
+            ],
+            "id": "pair-00-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              5,
+              6,
+              8
+            ],
+            "id": "pair-differences-00-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              7
+            ],
+            "id": "pair-00-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-00-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              1,
+              9
+            ],
+            "id": "pair-00-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-00-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              1,
+              2,
+              4,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-00-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-00-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              5
+            ],
+            "id": "pair-01-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              5,
+              6,
+              8
+            ],
+            "id": "pair-differences-01-02"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-02-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              7
+            ],
+            "id": "pair-01-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-01-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              3,
+              9
+            ],
+            "id": "pair-01-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-01-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              3,
+              4,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-01-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-01-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              5,
+              7
+            ],
+            "id": "pair-02-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-02-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            "id": "pair-differences-02-03"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-02-03-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              5,
+              9
+            ],
+            "id": "pair-02-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-02-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              5,
+              6,
+              8,
+              9
+            ],
+            "id": "pair-differences-02-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-02-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              7,
+              9
+            ],
+            "id": "pair-03-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 2,
+              "snapshot": "pair-03-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        },
+        {
+          "arm": {
+            "aux": [
+              0,
+              2,
+              4,
+              6,
+              7,
+              8,
+              9
+            ],
+            "id": "pair-differences-03-04"
+          },
+          "complete_basis_valid": null,
+          "f4_supported": false,
+          "max_cols": null,
+          "max_rows": null,
+          "polynomial_space_gate_pass": false,
+          "productive_degree": null,
+          "row_reduction_multiplications_only": null,
+          "space_checks": [
+            {
+              "baseline_rank": 10,
+              "degree": 3,
+              "rank": 7,
+              "snapshot": "pair-differences-03-04-D3.json.gz"
+            }
+          ],
+          "steps": null
+        }
+      ],
+      "prior_original_full_exact": null
+    }
+  ],
+  "declared_arms": 82,
+  "group_scalar_labels_present": false,
+  "intrinsic_regularity": null,
+  "original_15x_achieved": false,
+  "schema": "syzygy-pair-summary/v1",
+  "speedup_established": false,
+  "timing_observations": 0,
+  "unsupported_f4_not_called": 41
+}
