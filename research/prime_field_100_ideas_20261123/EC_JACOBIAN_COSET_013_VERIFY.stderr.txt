@@ -1,0 +1,44 @@
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(i=1,n,
+  ***            ^-
+... skipping file 'research/prime_field_100_ideas_20261123/EC_JACOBIAN_COSET_013_VERIFY.gp'
+  ***   at top-level: h1=[rows[i][3],rows[i][4]];h2=[rows[i][5],rows
+  ***                          ^-------------------------------------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: if(!j1||!j2,error("missing base coordinate"))
+  ***                             ^---------------------------------
+  ***   user error: missing base coordinate
+  ***   at top-level: A[i,j1]+=Mod(1,109);A[i,j2]+=Mod(1,109)
+  ***                   ^-------------------------------------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: ...elladd(e,ellmul(e,G,rows[i][1]),ellmul(e,Q,row
+  ***                                             ^---------------------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: if(elladd(e,h1,h2)!=ellmul(e,source,4),error("
+  ***                    ^-------------------------------------------
+  *** elladd: incorrect type in elladd (t_POL).
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   at top-level: if(BA!=42||BT!=43,error("rank mismatch"))
+  ***                                   ^-----------------------
+  ***   user error: rank mismatch
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(j=1,matsize(N)[2],
+  ***                        ^-
+  ***   at top-level: y=N[,j];yt=sum(i=1,n,y[i]*t[i])
+  ***                      ^--------------------------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   at top-level: y=N[,chosen];yt=sum(i=1,n,y[i]*t[i]);yc=sum(i=
+  ***                      ^-----------------------------------------
+  ***   incorrect type in gtos [integer expected] (t_POL).
+  ***   at top-level: if(ellmul(e,G,lift(d))!=Q,error("independent s
+  ***                    ^-------------------------------------------
+  *** ellmul: incorrect type in ellmul (non integral, non CM exponent) (t_RFRAC).
+  ***   at top-level: ..." y_nonzero=",sum(i=1,n,y[i]!=Mod(0,109))," y_
+  ***                                             ^---------------------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   at top-level: ...ate_y=",vector(n,i,lift(y[i])))
+  ***                                             ^------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
