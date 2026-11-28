@@ -1,0 +1,15 @@
+# Kernel3 even-Weil/Kummer coordinate matching
+
+2026-11-16. Fixed input: completed actual kernel3 curve, theta vector, target-Weil receipt and the eight good functions qualified under unsigned PCC-20261116-41d5db. Freeze this contract before coordinate/function matching data. Primary source: Tian arXiv:2007.03172 sections2 and4.2, Propositions3.2/3.3; KB unavailable.
+
+Construct the eight even Weil functions for characteristic labels S=(0,b), b=0..7. Let W be the28 differences La-Lb, Lb=label52. If S is in W, use the existing raw conic function. Otherwise choose the first ascending even a in W with b'=S+a in W and use raw_a(E)*raw_b'(E+a). This path choice depends only on labels/parity. Normalize each function at the canonical even origin to the pinned theta-square value w_S, requiring a nonzero raw value.
+
+For a known even torsion evaluation class T with T+S even, the forward intermediate T+a may be odd and outside the finite cubic chart. Use the reverse path when necessary, multiplied by the known commutator sign (-1)^pair(a,b'). At least one intermediate is even under these parity hypotheses. Before using this regularization, check both path orders and their sign at a generic finite divisor. Construct general even torsion representatives with an even first step; retain the fixed paths and all exclusions/failures. Never treat a zero times pole as zero.
+
+Require all64 values at the eight even torsion classes to equal the ratios w_(S+T)/w_T. Require the64 normal subgroup multiplication equations at a generic divisor and four nontrivial path-order commutator checks. A mismatch rejects normalization. These checks cover this declared eight-element subgroup, not a full64-function target Weil set.
+
+Compute the theta-null vector X0 from the full64 theta-square values using Proposition3.2's signed sums at b=0. Require all eight coordinates nonzero and the origin identity X0_0*sum_b(-1)^(i*b)w_(0,b)=X0_i^2. At a generic divisor compute K_i=sum_b(-1)^(i*b)f_(0,b)/X0_i. Check its projective origin and subgroup Heisenberg sign action.
+
+Use the exact eight generic triples retained by the good-function receipt. Require finite, distinct x-coordinates and noncollinearity; do not replace a failed mathematical or unsupported chart input silently. Recompute their good-function values and match the retained receipt. Solve the8-by8 change of basis between K and h/omega^2, requiring full rank. Then check all eight coordinates on16 unused generic triples from indices(i+53,i+79,i+113) modulo N, within128 attempts; reject repeated, collinear or duplicate training supports. Other unsupported function charts stop the run.
+
+Retain the8-by8 matrix, paths, normalizing scalars, theta-null vector and full heldout values. Perturb a matrix coefficient corresponding to a nonzero heldout coordinate and require rejection. No threshold, field or support window may change after data. A successful coordinate match prepares the finite divisor-lift equations; solving them and checking the actual source map/Frobenius/kernel/dual and DLP transfer remain open. All results are producer-unverified, with no timing claim.
