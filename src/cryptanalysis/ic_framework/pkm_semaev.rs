@@ -912,6 +912,9 @@ pub struct PkmSemaevOracle {
     /// `gcd=half`: `engine=resgcd` takes gcds by half-GCD (Newton division,
     /// Thull–Yap recursion) instead of classical Euclid.
     resgcd_half: bool,
+    /// `mul=ntt`: `engine=resgcd` multiplies by multi-prime NTT (with
+    /// transform reuse in the half-GCD's matrix steps) above `UG_NTT_MIN`.
+    resgcd_ntt: bool,
     max_degree: u32,
     max_nnz: Option<u64>,
     stop_staircase: Option<usize>,
@@ -1003,6 +1006,7 @@ impl PkmSemaevOracle {
             engine: PkmEngine::F4,
             resgcd_fv: None,
             resgcd_half: false,
+            resgcd_ntt: false,
             max_degree: 12,
             max_nnz: None,
             stop_staircase: None,
@@ -1263,17 +1267,20 @@ impl PkmSemaevOracle {
             Some("half") => true,
             Some(o) => return Err(format!("pkm-semaev: gcd is classical or half, not {o}")),
         };
-        if self.resgcd_half && self.engine != PkmEngine::ResGcd {
-            return Err("pkm-semaev: gcd=half needs engine=resgcd".into());
+        self.resgcd_ntt = match params.get("mul") {
+            None | Some("karatsuba") => false,
+            Some("ntt") => true,
+            Some(o) => return Err(format!("pkm-semaev: mul is karatsuba or ntt, not {o}")),
+        };
+        if (self.resgcd_half || self.resgcd_ntt) && self.engine != PkmEngine::ResGcd {
+            return Err("pkm-semaev: gcd=half and mul=ntt need engine=resgcd".into());
         }
         match self.engine {
             PkmEngine::Exhaustive => self.totals.solver = "tower-exhaustive".into(),
             PkmEngine::ResGcd => {
-                self.totals.solver = if params.get("gcd") == Some("half") {
-                    "univariate-resultant-half-gcd".into()
-                } else {
-                    "univariate-resultant-gcd".into()
-                }
+                let gcd = if params.get("gcd") == Some("half") { "half-gcd" } else { "gcd" };
+                let mul = if params.get("mul") == Some("ntt") { "-ntt" } else { "" };
+                self.totals.solver = format!("univariate-resultant-{gcd}{mul}");
             }
             PkmEngine::Scan => self.totals.solver = "quadratic-scan".into(),
             PkmEngine::F4 => {}
@@ -2361,7 +2368,7 @@ fn ug_product_tree(mut level: Vec<Vec<u64>>, p: u64, mults: &mut u64) -> Vec<u64
         let mut it = level.into_iter();
         while let Some(x) = it.next() {
             match it.next() {
-                Some(y) => next.push(ug_karatsuba(&x, &y, p, mults)),
+                Some(y) => next.push(ug_mul(&x, &y, p, mults)),
                 None => next.push(x),
             }
         }
@@ -2445,6 +2452,9 @@ fn ug_deg(a: &[u64]) -> isize {
 }
 
 fn ug_mul(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    if ug_use_ntt(a.len().min(b.len())) {
+        return ug_mul_ntt(a, b, p, mults);
+    }
     let mut r = ug_karatsuba(a, b, p, mults);
     ug_trim(&mut r);
     r
@@ -2576,6 +2586,21 @@ fn ug_mat_step(q: &[u64], m: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 }
 
 fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
+    let la = a.iter().flatten().map(Vec::len).max().unwrap_or(0);
+    let lb = b.iter().flatten().map(Vec::len).max().unwrap_or(0);
+    if ug_use_ntt(la.min(lb)) {
+        // One forward transform per entry, products summed before the inverse.
+        let polys: [&[u64]; 8] = [&a[0][0], &a[0][1], &a[1][0], &a[1][1], &b[0][0], &b[0][1], &b[1][0], &b[1][1]];
+        let terms = [
+            vec![(0, 4), (1, 6)],
+            vec![(0, 5), (1, 7)],
+            vec![(2, 4), (3, 6)],
+            vec![(2, 5), (3, 7)],
+        ];
+        let mut o = ug_ntt_sums(&terms, &polys, p, mults).into_iter();
+        let mut nx = || o.next().expect("four outputs");
+        return [[nx(), nx()], [nx(), nx()]];
+    }
     let e = |i: usize, j: usize, mults: &mut u64| {
         ug_add(
             &ug_mul(&a[i][0], &b[0][j], p, mults),
@@ -2587,6 +2612,14 @@ fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 }
 
 fn ug_mat_apply(m: &UgMat, a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
+    let lm = m.iter().flatten().map(Vec::len).max().unwrap_or(0);
+    if ug_use_ntt(lm.min(a.len().max(b.len()))) {
+        let polys: [&[u64]; 6] = [&m[0][0], &m[0][1], &m[1][0], &m[1][1], a, b];
+        let terms = [vec![(0, 4), (1, 5)], vec![(2, 4), (3, 5)]];
+        let mut o = ug_ntt_sums(&terms, &polys, p, mults).into_iter();
+        let c = o.next().expect("two outputs");
+        return (c, o.next().expect("two outputs"));
+    }
     (
         ug_add(&ug_mul(&m[0][0], a, p, mults), &ug_mul(&m[0][1], b, p, mults), p),
         ug_add(&ug_mul(&m[1][0], a, p, mults), &ug_mul(&m[1][1], b, p, mults), p),
@@ -2655,6 +2688,207 @@ fn ug_gcd_half(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
         x = d;
         y = r;
     }
+}
+
+// ---------------------------------------------------------------------------
+// Multi-prime NTT multiplication for `mul=ntt`. A sum of `c` products of
+// polynomials over F_p (p < 2^31) with transform length n has integer
+// coefficients below c·n·(p − 1)²; the fewest NTT primes whose product
+// exceeds that bound are used (two for a 16-bit p, three for a 31-bit p),
+// the exact integers are recovered by Garner CRT and reduced mod p.
+// `ug_ntt_sums` transforms each input once and accumulates the products of
+// each output pointwise before one inverse transform, which is how the
+// half-GCD's 2×2 matrix products are formed. Every modular multiplication
+// (twiddles, butterflies, pointwise products, scaling, CRT) counts as one.
+// ---------------------------------------------------------------------------
+
+/// `(prime, primitive root)`: 119·2^23 + 1, 5·2^25 + 1, 7·2^26 + 1.
+const UG_NTT_PRIMES: [(u64, u64); 3] = [(998_244_353, 3), (167_772_161, 3), (469_762_049, 3)];
+/// Below this many coefficients in the longest input, products stay on Karatsuba.
+const UG_NTT_MIN: usize = 256;
+
+thread_local! {
+    /// `mul=ntt` for the resgcd engine: products and the half-GCD's matrix
+    /// steps use the NTT above `UG_NTT_MIN`. Set and restored around one
+    /// solver call.
+    static UG_USE_NTT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+fn ug_use_ntt(len: usize) -> bool {
+    len >= UG_NTT_MIN && UG_USE_NTT.with(|c| c.get())
+}
+
+fn ug_ntt_pow(mut b: u64, mut e: u64, m: u64) -> u64 {
+    let mut r = 1u64;
+    b %= m;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = r * b % m;
+        }
+        b = b * b % m;
+        e >>= 1;
+    }
+    r
+}
+
+/// Twiddle table for length-`n` transforms modulo `m`: stage `s` (half-size
+/// `h = 2^s`) occupies `[h, 2h)` with `w_{2h}^k`, `k < h`. `n − 1` products.
+fn ug_ntt_twiddles(n: usize, m: u64, g: u64, invert: bool, mults: &mut u64) -> Vec<u64> {
+    let mut tw = vec![0u64; n.max(2)];
+    let mut h = 1usize;
+    while h < n {
+        let mut w = ug_ntt_pow(g, (m - 1) / (2 * h) as u64, m);
+        if invert {
+            w = ug_ntt_pow(w, m - 2, m);
+        }
+        let mut x = 1u64;
+        for k in 0..h {
+            tw[h + k] = x;
+            x = x * w % m;
+        }
+        *mults += h as u64 + 2 * UG_INV_MULTS;
+        h <<= 1;
+    }
+    tw
+}
+
+/// In-place iterative radix-2 transform with a precomputed twiddle table;
+/// `(n/2)·log2 n` multiplications (the inverse's 1/n scaling is applied by
+/// the caller, folded into the CRT input).
+fn ug_ntt(a: &mut [u64], tw: &[u64], m: u64, mults: &mut u64) {
+    let n = a.len();
+    let mut j = 0usize;
+    for i in 1..n {
+        let mut bit = n >> 1;
+        while j & bit != 0 {
+            j ^= bit;
+            bit >>= 1;
+        }
+        j |= bit;
+        if i < j {
+            a.swap(i, j);
+        }
+    }
+    let mut h = 1usize;
+    while h < n {
+        for start in (0..n).step_by(2 * h) {
+            for k in 0..h {
+                let u = a[start + k];
+                let v = a[start + k + h] * tw[h + k] % m;
+                a[start + k] = if u + v >= m { u + v - m } else { u + v };
+                a[start + k + h] = if u >= v { u - v } else { u + m - v };
+            }
+        }
+        *mults += (n / 2) as u64;
+        h <<= 1;
+    }
+}
+
+/// For each output `o`, `Σ_{(i, j) ∈ terms[o]} polys[i] · polys[j]` over F_p.
+fn ug_ntt_sums(terms: &[Vec<(usize, usize)>], polys: &[&[u64]], p: u64, mults: &mut u64) -> Vec<Vec<u64>> {
+    let out_len: Vec<usize> = terms
+        .iter()
+        .map(|t| {
+            t.iter()
+                .filter(|&&(i, j)| !polys[i].is_empty() && !polys[j].is_empty())
+                .map(|&(i, j)| polys[i].len() + polys[j].len() - 1)
+                .max()
+                .unwrap_or(0)
+        })
+        .collect();
+    let max_len = out_len.iter().copied().max().unwrap_or(0);
+    if max_len == 0 {
+        return vec![Vec::new(); terms.len()];
+    }
+    let n = max_len.next_power_of_two();
+    let c = terms.iter().map(|t| t.len()).max().unwrap_or(1) as f64;
+    let bound = c * n as f64 * ((p - 1) as f64).powi(2);
+    let mut k = 1usize;
+    let mut prod = UG_NTT_PRIMES[0].0 as f64;
+    while prod <= bound * 1.000_001 {
+        assert!(k < UG_NTT_PRIMES.len(), "NTT CRT range exceeded");
+        prod *= UG_NTT_PRIMES[k].0 as f64;
+        k += 1;
+    }
+    let used: Vec<bool> = (0..polys.len())
+        .map(|i| !polys[i].is_empty() && terms.iter().any(|t| t.iter().any(|&(a, b)| a == i || b == i)))
+        .collect();
+    let mut res: Vec<Vec<Vec<u64>>> = Vec::with_capacity(k);
+    for &(m, g) in &UG_NTT_PRIMES[..k] {
+        let tw = ug_ntt_twiddles(n, m, g, false, mults);
+        let itw = ug_ntt_twiddles(n, m, g, true, mults);
+        let inv_n = ug_ntt_pow(n as u64, m - 2, m);
+        *mults += UG_INV_MULTS;
+        let fwd: Vec<Option<Vec<u64>>> = (0..polys.len())
+            .map(|i| {
+                used[i].then(|| {
+                    let mut f: Vec<u64> = polys[i].iter().map(|&x| x % m).collect();
+                    f.resize(n, 0);
+                    ug_ntt(&mut f, &tw, m, mults);
+                    f
+                })
+            })
+            .collect();
+        let mut outs = Vec::with_capacity(terms.len());
+        for t in terms {
+            let mut acc = vec![0u64; n];
+            let mut any = false;
+            for &(i, j) in t {
+                if let (Some(fi), Some(fj)) = (&fwd[i], &fwd[j]) {
+                    for (s, (x, y)) in acc.iter_mut().zip(fi.iter().zip(fj)) {
+                        *s = (*s + x * y) % m;
+                    }
+                    *mults += n as u64;
+                    any = true;
+                }
+            }
+            if any {
+                ug_ntt(&mut acc, &itw, m, mults);
+                for x in acc.iter_mut() {
+                    *x = *x * inv_n % m;
+                }
+                *mults += n as u64;
+            }
+            outs.push(acc);
+        }
+        res.push(outs);
+    }
+    // Garner: x = x1 + x2·m1 (+ x3·m1·m2), reduced mod p.
+    let (m1, m2, m3) = (UG_NTT_PRIMES[0].0, UG_NTT_PRIMES[1].0, UG_NTT_PRIMES[2].0);
+    let inv_m1_m2 = ug_ntt_pow(m1 % m2, m2 - 2, m2);
+    let inv_m1m2_m3 = ug_ntt_pow((m1 % m3) * (m2 % m3) % m3, m3 - 2, m3);
+    let (m1_p, m1m2_p) = (m1 % p, mulm(m1 % p, m2 % p, p));
+    *mults += 2 * UG_INV_MULTS + 2;
+    let mut out = Vec::with_capacity(terms.len());
+    for (o, &len) in out_len.iter().enumerate() {
+        let mut v = Vec::with_capacity(len);
+        for i in 0..len {
+            let x1 = res[0][o][i];
+            let val = match k {
+                1 => x1 % p,
+                2 => {
+                    let x2 = ((res[1][o][i] + m2 - x1 % m2) % m2) * inv_m1_m2 % m2;
+                    (x1 % p + mulm(x2 % p, m1_p, p)) % p
+                }
+                _ => {
+                    let x2 = ((res[1][o][i] + m2 - x1 % m2) % m2) * inv_m1_m2 % m2;
+                    let t = (res[2][o][i] + m3 - x1 % m3) % m3;
+                    let t = (t + m3 - x2 % m3 * (m1 % m3) % m3) % m3;
+                    let x3 = t * inv_m1m2_m3 % m3;
+                    (x1 % p + mulm(x2 % p, m1_p, p) + mulm(x3 % p, m1m2_p, p)) % p
+                }
+            };
+            v.push(val);
+        }
+        *mults += [0u64, 0, 2, 5][k] * len as u64;
+        ug_trim(&mut v);
+        out.push(v);
+    }
+    out
+}
+
+fn ug_mul_ntt(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    ug_ntt_sums(&[vec![(0, 1)]], &[a, b], p, mults).pop().expect("one output")
 }
 
 impl PkmSemaevOracle {
@@ -4042,6 +4276,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                  hash membership; m = 2)",
             ),
             ("gcd", "engine=resgcd only: classical (Euclid, default) or half (half-GCD)"),
+            ("mul", "engine=resgcd only: karatsuba (default) or ntt (multi-prime NTT)"),
             ("degree", "F4 degree bound, default 12"),
             (
                 "max_nnz",
@@ -4393,7 +4628,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             PkmEngine::ResGcd | PkmEngine::Scan => {
                 let started = Instant::now();
                 let (sols, mults) = if self.engine == PkmEngine::ResGcd {
-                    self.resgcd(curve, x_r)
+                    UG_USE_NTT.with(|c| c.set(self.resgcd_ntt));
+                    let out = self.resgcd(curve, x_r);
+                    UG_USE_NTT.with(|c| c.set(false));
+                    out
                 } else {
                     self.scan(curve, x_r)
                 };
@@ -4842,6 +5080,49 @@ mod tests {
     /// satisfies its degree postcondition and returns classical Euclid's
     /// monic gcd, on random and planted-common-factor inputs over tiny and
     /// 16-bit primes (degenerate remainder sequences are common for p = 3).
+    /// The multi-prime NTT product equals schoolbook (two primes for a
+    /// 16-bit p, three for a 31-bit p), the transform-sharing matrix steps
+    /// equal their Karatsuba forms, and the half-GCD on NTT returns
+    /// classical Euclid's gcd.
+    #[test]
+    fn ntt_products_and_ntt_half_gcd_match_classical() {
+        let mut rng = StdRng::seed_from_u64(1201);
+        let rand_poly = |rng: &mut StdRng, len: usize, p: u64| -> Vec<u64> {
+            let mut v: Vec<u64> = (0..len).map(|_| rng.gen_range(0..p)).collect();
+            *v.last_mut().unwrap() = 1 + rng.gen_range(0..p - 1);
+            v
+        };
+        for p in [3u64, 65_521, 1_000_003, 2_147_483_647] {
+            for _ in 0..12 {
+                let (la, lb) = (rng.gen_range(1..2500usize), rng.gen_range(1..2500usize));
+                let a = rand_poly(&mut rng, la, p);
+                let b = rand_poly(&mut rng, lb, p);
+                let mut want = ug_school(&a, &b, p, &mut 0);
+                ug_trim(&mut want);
+                assert_eq!(ug_mul_ntt(&a, &b, p, &mut 0), want, "ntt p = {p}, {la} x {lb}");
+            }
+        }
+        UG_USE_NTT.with(|c| c.set(true));
+        for p in [5u64, 65_521] {
+            for round in 0..24 {
+                let lg = rng.gen_range(1..400usize);
+                let mut g = rand_poly(&mut rng, lg, p);
+                *g.last_mut().unwrap() = 1;
+                let (lu, lv) = (rng.gen_range(300..2500usize), rng.gen_range(1..3000usize));
+                let mut u = rand_poly(&mut rng, lu, p);
+                *u.last_mut().unwrap() = 1;
+                let v = rand_poly(&mut rng, lv, p);
+                let fa = ug_mul(&g, &u, p, &mut 0);
+                let fb = ug_mul(&g, &v, p, &mut 0);
+                UG_USE_NTT.with(|c| c.set(false));
+                let want = ug_gcd_monic(fa.clone(), fb.clone(), p, &mut 0);
+                UG_USE_NTT.with(|c| c.set(true));
+                assert_eq!(ug_gcd_half(fa, fb, p, &mut 0), want, "ntt half-gcd p = {p}, round {round}");
+            }
+        }
+        UG_USE_NTT.with(|c| c.set(false));
+    }
+
     #[test]
     fn half_gcd_and_fast_division_match_classical() {
         let mut rng = StdRng::seed_from_u64(97);
@@ -5241,6 +5522,7 @@ mod tests {
         let mut grid = prep("m=2,engine=exhaustive");
         let mut resgcd = prep("m=2,engine=resgcd,crosscheck=1");
         let mut half = prep("m=2,engine=resgcd,gcd=half,crosscheck=1");
+        let mut half_ntt = prep("m=2,engine=resgcd,gcd=half,mul=ntt,crosscheck=1");
         let mut scan = prep("m=2,engine=scan,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
@@ -5276,6 +5558,7 @@ mod tests {
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
             assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
             assert_eq!(run(&mut half), c, "{label}: half-GCD resgcd against the grid, target {k}");
+            assert_eq!(run(&mut half_ntt), c, "{label}: half-GCD NTT resgcd against the grid, target {k}");
             assert_eq!(run(&mut scan), c, "{label}: scan against the grid, target {k}");
             assert_eq!(
                 c,
@@ -5285,7 +5568,7 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
-        for (name, o) in [("resgcd", &resgcd), ("half", &half), ("scan", &scan)] {
+        for (name, o) in [("resgcd", &resgcd), ("half", &half), ("half_ntt", &half_ntt), ("scan", &scan)] {
             let n = o.relation_counters();
             assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} crosschecked");
             assert_eq!(
@@ -5722,6 +6005,7 @@ mod tests {
         let mut grid = prep("m=3,engine=exhaustive");
         let mut resgcd = prep("m=3,engine=resgcd,crosscheck=1");
         let mut half = prep("m=3,engine=resgcd,gcd=half,crosscheck=1");
+        let mut half_ntt = prep("m=3,engine=resgcd,gcd=half,mul=ntt,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(31);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -5758,6 +6042,7 @@ mod tests {
             assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
             assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
             assert_eq!(run(&mut half), c, "{label}: half-GCD resgcd against the grid, target {k}");
+            assert_eq!(run(&mut half_ntt), c, "{label}: half-GCD NTT resgcd against the grid, target {k}");
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -5766,7 +6051,7 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
-        for (name, o) in [("resgcd", &resgcd), ("half", &half)] {
+        for (name, o) in [("resgcd", &resgcd), ("half", &half), ("half_ntt", &half_ntt)] {
             let n = o.relation_counters();
             assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} m=3 crosschecked");
             assert_eq!(
