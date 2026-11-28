@@ -1,0 +1,8 @@
+digraph G {rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11];
+ a[label="Actual factorization and residual point product"];
+ b[label="Explicit independent non-target/residual labels"];
+ c[label="Derived n_t*Q+c*P=0"];
+ d[label="ell*Q=0 and gcd(n_t,ell)=1",fillcolor="#fff1d5"];
+ e[label="Construct Bezout coefficient\nQ=(-gcdA(n_t,ell)*c)*P\nCorrect modulo actual generator order"];
+ f[label="OPEN: obtain useful labeled residual factors\nActual sampler / probability / full bit cost",style="rounded,dashed",fillcolor="white"];
+ a->c;b->c;c->e;d->e;e->f[style=dashed];}

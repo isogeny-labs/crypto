@@ -1,0 +1,73 @@
+{
+  "schema": "experiment.protocol/v1 (bwd-protocol/v1)",
+  "study": "bwd-20261126/v1",
+  "builds_on": "crypto PR #5253, study bcr-20261126/v1, research/binary-composite-rootfind-20261126 (A1 + A2)",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "frozen_utc": "2026-11-27T00:27Z",
+  "single_target": "every solve is one cold solve of one public Q; no multi-target amortisation (owner instruction)",
+  "seed_derivation": "unchanged #5253 seeds.rs: seed(parts) = first 8 bytes big-endian of SHA-256('bcr-20261126/v1|' + '|'.join(parts)); stream = SplitMix64(seed); uniform below m by rejection. The study prefix stays bcr-20261126/v1 so that curves, targets and target streams are bitwise those of #5253.",
+  "streams": {
+    "curve": ["curve", "<n>", "<ci>"],
+    "target": ["target", "<n>", "<ci>", "<ti>"],
+    "ic_relation_targets (A1, shared by D, F, M2)": ["icstream-a1", "<n>", "<ci>", "<ti>"],
+    "rho": ["rho", "<n>", "<ci>", "<ti>", "<si>"],
+    "rho lane pilot (held out)": ["pilot-curve|pilot-target|pilot-rho", "<n>", "..."],
+    "bootstrap": ["boot", "bwd", "main | slope | <label>"],
+    "selftest (separate instances, never evaluation)": ["bwd-selftest-curve | bwd-selftest-target | bwd-selftest | bwd-selftest-stream", "..."]
+  },
+  "custody": "d drawn from the 'target' stream inside the evaluator; solvers receive (curve, G, Q, ell); [d]G = Q checked inside the counted solve; d == d_true compared by the evaluator after the solve",
+  "arms": {
+    "D": "Gaudry-Diem k=3 Weil descent of symmetric S4 to K' = F_{2^n'}, elimination to U(t), deg <= 20, subfield root finding gcd(U', t^q' + t), exact lift and cubic split; A1 stream, A2 echelon LA; bwd_harness (this study)",
+    "F": "#5253 tuned factored S4 root finder (pairs-and-solve), reused records data/runs_a2.jsonl, panel only",
+    "M2": "#5253 m=2 hash MITM; panel: reused records data/runs_a2.jsonl; extension n=36,39: #5253 binary unchanged",
+    "RHO": "#5253 negation-map rho, 16 seeds per target; panel: reused records data/runs.jsonl; extension: #5253 binary unchanged with lanes below"
+  },
+  "reference_binary_sha256": "bf3f431fcec5a4e724e7282c952d3f1c90f2daf51789f2a20e931a4d52d4011b (rebuilt here; equals #5253's recorded A2 binary)",
+  "curves_per_rung": 4,
+  "targets_per_curve": 3,
+  "rho_seeds_per_target": 16,
+  "target_walk": "ap",
+  "linear_algebra": "echelon",
+  "rungs": [
+    {"n": 18, "np": 6, "set": "panel", "fcheck_targets": 1000000, "brute_targets": 1000000},
+    {"n": 21, "np": 7, "set": "panel", "fcheck_targets": 1000000, "brute_targets": 1000000},
+    {"n": 24, "np": 8, "set": "panel", "fcheck_targets": 1000000, "brute_targets": 64},
+    {"n": 27, "np": 9, "set": "panel", "fcheck_targets": 256},
+    {"n": 30, "np": 10, "set": "panel", "fcheck_targets": 128},
+    {"n": 33, "np": 11, "set": "panel", "fcheck_targets": 64, "curves": 2, "targets": 2},
+    {"n": 36, "np": 12, "set": "extension", "fcheck_targets": 16, "rho_lanes": 64, "arms_ref": ["RHO", "M2"]},
+    {"n": 39, "np": 13, "set": "extension", "fcheck_targets": 16, "rho_lanes": 64, "arms_ref": ["RHO", "M2"]},
+    {"n": 42, "np": 14, "set": "extension", "rho_lanes": 64, "arms_ref": ["RHO"]},
+    {"n": 45, "np": 15, "set": "extension", "rho_lanes": 64, "arms_ref": ["RHO"]},
+    {"n": 48, "np": 16, "set": "extension", "rho_lanes": 64, "arms_ref": ["RHO"], "curves": 2, "targets": 2}
+  ],
+  "rho_lanes_choice": "argmin of mean Meq(s=1,u=1) over W in {1,2,4,8,16,32,64} on 2 held-out pilot curves x 16 pilot targets per rung (data/pilot_rho_ext.jsonl), same rule as #5253; W = 64 (the grid edge) won at every extension rung; panel rungs keep #5253's lanes",
+  "resources": {"per_process_address_space": "prlimit --as 10 GiB", "wall_budget_per_rung_process_s": {"<=42": 7200, "45": 10800, "48": 14400}, "rule": "a killed/failed process is a resource-limit record, never a negative result; the run continues with the next rung"},
+  "primary_metric": "Meq(s=1,u=1) of the whole cold solve (factor base, setup, target stream, oracle, relation replay, LA, [d]G = Q); #5253 unit unchanged",
+  "band": "u in {0, 0.1, 1} for non-field units, s in {1, 0.25}; order between arms stated only where it holds across the band (AGENTS.md 5a)",
+  "analysis": "bwd_harness analyze: paired per-case ratios D/rho, F/rho, M2/rho (rho = mean of 16 runs on the same Q), D/F, D/M2; per-rung geometric mean with hierarchical bootstrap B=10000 (2000 for band); rho A/A (seeds 0-7 vs 8-15); exponent fits; D census; crossover projection (model, PROTOCOL.md)",
+  "checks": {
+    "group_law_replay": "every D decomposition resolved into signs by the group law before it becomes a row",
+    "D_eq_F": "per rung fcheck_targets per case",
+    "D_eq_bruteforce": "per rung brute_targets per case (exhaustive multiset x signs group-law enumeration)",
+    "D_identical_to_F_record": "(d, targets, relations, columns) of D equals #5253 A2 F record on every panel case",
+    "logs": "[d]G = Q in-solve and d == d_true, every solve",
+    "replay": "n=30 ci=0 ti=0 rerun from the frozen manifest, bitwise compare of all counts"
+  },
+  "hypotheses": {
+    "H1": "D's decomposition sets equal F's and the exhaustive group-law sets on every checked target; D reproduces F's (d, targets, relations, columns) on all 64 panel cases; every log correct",
+    "H2": "oracle Meq per target linear in n', within 1.5e3..6e3 over n' = 6..16; mean deg U' = 16",
+    "H3": "panel: 10 <= D/rho <= 100 at every rung (no parity); D/F <= 1e-2 for n >= 24; D/M2 > 1 at n = 18 and < 1 from some rung in 27..33",
+    "H4": "D relation-phase slope (log2 cost on log2 ell) in 0.33..0.45; D total slope > 0.5 once echelon LA dominates; LA share > 0.5 from n = 42",
+    "H5": "model: full-base D never crosses rho (LA >= F^2); relation phase alone would cross at n' ~ 22..26; balanced base ratio ~ sqrt(10 kappa c_D h)/S ~ 50, no crossing; only double large prime (exponent 4/3) could cross, not measured"
+  },
+  "predictions": {
+    "decompositions_per_target": "4F^3/(3N) ~ 1/6",
+    "targets_per_solve": "~2.6-3 q'",
+    "oracle_meq_per_target": "~1000 + 260 n'",
+    "deg_U_prime": 16
+  },
+  "falsifier": "parity at a rung if the upper 95% bound of D/rho <= 1 there; such a rung then requires the rho A/A floor and full verification before it is stated",
+  "exclusions": "none; every record, failure, kill and mismatch is retained",
+  "untested": ["multi-target amortisation (excluded)", "double large prime (modelled only)", "Koblitz rungs (subfield base projects to O, #5253)", "GHS", "isolab / L2", "F on the extension rungs (cost)", "M2 at n >= 42 (memory)"]
+}

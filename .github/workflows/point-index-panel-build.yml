@@ -1,0 +1,91 @@
+name: Point index native pair build (development)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/point-index-panel-build.yml
+      - crates/hashed-ecdl-tensor/src/panel_driver.rs
+      - research/unified_point_index_20261127/panel-bridge-20261127/**
+permissions:
+  contents: read
+jobs:
+  native-pair-build:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out exact driver revision as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: driver
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+            /research/unified_point_index_20261127/panel-bridge-20261127/
+      - name: Read provisional pinned development revisions
+        id: pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          inputs=driver/research/unified_point_index_20261127/panel-bridge-20261127/build-inputs.json
+          jq -e '.schema=="point-index.development-build-inputs/v1"
+            and .status=="provisional-development" and .experiment_submitted==false
+            and (.baseline_revision|test("^[a-f0-9]{40}$"))
+            and (.candidate_revision|test("^[a-f0-9]{40}$"))' "$inputs" >/dev/null
+          echo "baseline=$(jq -er .baseline_revision "$inputs")" >> "$GITHUB_OUTPUT"
+          echo "candidate=$(jq -er .candidate_revision "$inputs")" >> "$GITHUB_OUTPUT"
+      - name: Check out exact baseline revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.baseline }}
+          path: baseline
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Check out exact candidate revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.candidate }}
+          path: candidate
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Install static native build target
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends musl-tools
+          rustup toolchain install 1.78.0 --profile minimal --target x86_64-unknown-linux-musl
+      - name: Run unprivileged exact-source build and panel tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          driver_sha=$(git -C driver rev-parse HEAD)
+          test "$driver_sha" = '${{ github.event.pull_request.head.sha }}'
+          study=driver/research/unified_point_index_20261127/panel-bridge-20261127
+          bash -n "$study/build-pair.sh" "$study/publish-pair.sh" "$study/test-publish-pair.sh" \
+            "$study/check-frozen-inputs.sh" "$study/checkpoint-pair.sh" "$study/test-check-frozen-inputs.sh" \
+            "$study/run-pair.sh" "$study/check-l2-request.sh"
+          "$study/test-check-frozen-inputs.sh"
+          "$study/test-publish-pair.sh"
+          python3 "$study/test-verify-result-readback.py"
+          CARGO_TARGET_DIR="$RUNNER_TEMP/point-index-panel-tests" cargo +1.78.0 test --locked --release \
+            --manifest-path driver/crates/hashed-ecdl-tensor/Cargo.toml \
+            --bin hashed-ecdl-panel
+          "$study/build-pair.sh" baseline '${{ steps.pins.outputs.baseline }}' \
+            candidate '${{ steps.pins.outputs.candidate }}' driver "$driver_sha" \
+            "$study/optimized-options.json" "$RUNNER_TEMP/point-index-pair"
+          (cd "$RUNNER_TEMP/point-index-pair" && sha256sum -c SHA256SUMS)
+      - name: Retain non-secret development bundle and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: point-index-native-pair-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/point-index-pair
+          if-no-files-found: warn
+          retention-days: 7
+          compression-level: 0

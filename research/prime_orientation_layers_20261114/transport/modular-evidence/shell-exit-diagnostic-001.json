@@ -1,0 +1,53 @@
+{
+  "created_at": "post-call; precise file creation time is in the associated session-log entry",
+  "scope": "Execution-wrapper diagnostic only; no mathematical proof rerun or gate bypass.",
+  "earlier_observations_transcribed_from_actual_tool_results": [
+    {
+      "case": "exit 0",
+      "chunk_id": "76f511",
+      "outer_exit_code": 0
+    },
+    {
+      "case": "set -e; exit 0",
+      "chunk_id": "ba1e99",
+      "outer_exit_code": 1
+    },
+    {
+      "case": "set -u; exit 0",
+      "chunk_id": "63a315",
+      "outer_exit_code": 0
+    },
+    {
+      "case": "set -o pipefail; exit 0",
+      "chunk_id": "739230",
+      "outer_exit_code": 0
+    },
+    {
+      "case": "set -e; true",
+      "chunk_id": "ab8556",
+      "outer_exit_code": 0
+    }
+  ],
+  "resolution_and_traps": {
+    "exit_type": "builtin",
+    "EXIT_trap_bytes": 0,
+    "ERR_trap_bytes": 0,
+    "DEBUG_trap_bytes": 0,
+    "RETURN_trap_bytes": 0
+  },
+  "count125": {
+    "lean_exit_file": 0,
+    "outer_tool_exit_report": 1,
+    "compiler_warnings": 0,
+    "compiler_errors": 0,
+    "statement": "Preserve discrepancy; do not reinterpret outer report as zero or rerun unchanged proof."
+  },
+  "final_check_command": "set -euo pipefail\ntask_probe_code=0\nprintf 'diagnostic final-check status: %s\\n' \"$task_probe_code\"\ntest \"$task_probe_code\" -eq 0",
+  "final_check_actual_result": {
+    "chunk_id": "c0246c",
+    "wall_time_seconds": 0.000028163,
+    "exit_code": 0,
+    "original_token_count": 9,
+    "output": "diagnostic final-check status: 0\n"
+  }
+}

@@ -24,6 +24,8 @@ use crate::cryptanalysis::semaev_field_profile::{
 
 /// Policy-bearing specs written by current tooling.
 pub const SPEC_SCHEMA: &str = "ecbench.spec/v2";
+/// Fixed non-Cartesian study schedules. Existing v1/v2 expansion is unchanged.
+pub const STUDY_SPEC_SCHEMA: &str = "ecbench.spec/v3";
 /// Frozen historical specs.  They remain parseable for replay and audit.
 pub const LEGACY_SPEC_SCHEMA: &str = "ecbench.spec/v1";
 
@@ -235,6 +237,34 @@ pub struct Execution {
     pub arm: usize,
     pub workload: usize,
     pub algorithm_seed: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub study: Option<StudyExecution>,
+}
+
+/// Frozen logical identity retained on a fixed-study execution.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StudyExecution {
+    pub study: String,
+    pub curve_slug: String,
+    pub panel: String,
+    pub replicate: u64,
+    pub arm: String,
+    pub copy: String,
+    pub schedule_position: u8,
+    pub items: Vec<StudyItemIdentity>,
+}
+
+/// One target/walk identity within a fixed-study execution. Batch executions
+/// contain all 64 ordered items rather than hiding them behind the first point.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StudyItemIdentity {
+    pub item: u64,
+    pub target_derived_u64_hex: String,
+    /// Public target coordinates. The runner's child projection retains this
+    /// field while redacting `target_derived_u64_hex`.
+    pub target: [String; 2],
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rho_derived_u64_hex: Option<String>,
 }
 
 /// A spec expanded.
@@ -277,9 +307,13 @@ impl Spec {
                 )
             }
             SPEC_SCHEMA => {}
+            STUDY_SPEC_SCHEMA if spec.curve_policy.is_legacy() => {
+                return Err("ecbench.spec/v3 requires an explicit curve_policy".into())
+            }
+            STUDY_SPEC_SCHEMA => {}
             other => {
                 return Err(format!(
-                    "spec schema is `{other}`, expected `{LEGACY_SPEC_SCHEMA}` or `{SPEC_SCHEMA}`"
+                    "spec schema is `{other}`, expected `{LEGACY_SPEC_SCHEMA}`, `{SPEC_SCHEMA}`, or `{STUDY_SPEC_SCHEMA}`"
                 ))
             }
         }
@@ -653,6 +687,23 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
             method: resolve(&a.method)?,
         });
     }
+    if spec.schema == STUDY_SPEC_SCHEMA {
+        let fixed = super::blocked_bsgs_rho_study::expand(&spec, &arms)?;
+        let (spec_id, spec_sha256) = short_id("ECS1", &spec.identity_view())?;
+        let plan = Plan {
+            spec,
+            spec_id,
+            spec_sha256,
+            arms,
+            workloads: fixed.workloads,
+            warnings: fixed.warnings,
+            instances: fixed.instances,
+            curve_of: fixed.curve_of,
+            executions: fixed.executions,
+        };
+        validate_field_profile(&plan, false)?;
+        return Ok(plan);
+    }
     let mut workloads = Vec::new();
     let mut instances = Vec::new();
     let mut curve_of = Vec::new();
@@ -809,6 +860,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                     arm,
                     workload: wi,
                     algorithm_seed,
+                    study: None,
                 });
                 seq += 1;
             }

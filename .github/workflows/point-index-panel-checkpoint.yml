@@ -1,0 +1,111 @@
+name: Point index native pair source checkpoint
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checkpoint:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out reviewed main control tooling
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/checkpoint.sh
+            /research/unified_point_index_20261127/panel-bridge-20261127/
+      - name: Check out the same reviewed source as checkpoint data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          path: source
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            /crates/hashed-ecdl-tensor/
+            /docs/experiment-seeds.md
+            /research/unified_point_index_20261127/panel-bridge-20261127/
+      - name: Require frozen pair and public panel before AWS
+        id: pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=research/unified_point_index_20261127/panel-bridge-20261127
+          test "$(git -C control rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git -C source rev-parse HEAD)" = "$GITHUB_SHA"
+          control/$study/check-frozen-inputs.sh source "$GITHUB_SHA"
+          inputs="source/$study/publish-inputs.json"
+          echo "baseline=$(jq -er .baseline_revision "$inputs")" >> "$GITHUB_OUTPUT"
+          echo "candidate=$(jq -er .candidate_revision "$inputs")" >> "$GITHUB_OUTPUT"
+      - name: Check out pinned baseline as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.baseline }}
+          path: baseline
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Check out pinned candidate as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ steps.pins.outputs.candidate }}
+          path: candidate
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /crates/hashed-ecdl-tensor/
+      - name: Verify three-source closure before AWS
+        shell: bash
+        run: |
+          set -euo pipefail
+          study=control/research/unified_point_index_20261127/panel-bridge-20261127
+          "$study/checkpoint-pair.sh" --check-only control source "$GITHUB_SHA" \
+            baseline '${{ steps.pins.outputs.baseline }}' \
+            candidate '${{ steps.pins.outputs.candidate }}' "$RUNNER_TEMP/point-index-checkpoint"
+      - name: Obtain existing temporary checkpoint identity
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: point-index-checkpoint-${{ github.run_id }}
+          aws-region: us-east-2
+      - name: Upload and independently read back the native pair checkpoint
+        shell: bash
+        env:
+          AWS_REGION: us-east-2
+        run: |
+          set -euo pipefail
+          if ! command -v aws >/dev/null; then
+            curl --fail --silent --show-error --location https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "$RUNNER_TEMP/aws.zip"
+            unzip -q "$RUNNER_TEMP/aws.zip" -d "$RUNNER_TEMP/aws-install"
+            sudo "$RUNNER_TEMP/aws-install/aws/install"
+          fi
+          study=control/research/unified_point_index_20261127/panel-bridge-20261127
+          "$study/checkpoint-pair.sh" control source "$GITHUB_SHA" \
+            baseline '${{ steps.pins.outputs.baseline }}' \
+            candidate '${{ steps.pins.outputs.candidate }}' "$RUNNER_TEMP/point-index-checkpoint"
+      - name: Retain non-secret checkpoint receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: point-index-checkpoint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/point-index-checkpoint/checkpoint.json
+            ${{ runner.temp }}/point-index-checkpoint/caller-account-check.json
+            ${{ runner.temp }}/point-index-checkpoint/upload.txt
+            ${{ runner.temp }}/point-index-checkpoint/gate.txt
+            ${{ runner.temp }}/point-index-checkpoint/payload.sha256
+            ${{ runner.temp }}/point-index-checkpoint/source-check.txt
+            ${{ runner.temp }}/point-index-checkpoint/payload-readback.txt
+          if-no-files-found: warn

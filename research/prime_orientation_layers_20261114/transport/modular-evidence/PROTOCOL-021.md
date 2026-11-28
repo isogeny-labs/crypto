@@ -1,0 +1,11 @@
+# Paired nonscalar-origin candidate: prospective exact contracts
+
+Sources checked: committed prime_jet_completion_20261030/README.md and prime_pole_anchor_20261030/README.md; actual OrientationAnchor completed/node/origin/degree laws; prior changed-valid-support cofactor control in prime_norm_rank_20261112/recovery-report/README.md. KB unavailable in this runtime. Standard interpolation/permutation algebra, priority and novelty unverified.
+
+Let D(T)=completed(grid a,u,0,0,m). Test W'(T)=W(T)+D(T)*(S-I) entrywise for a single public matrix S. D(0)=1 and D vanishes at every nonzero source node. Predictions: W'(0)=S; nonzero node matrices unchanged; diagonal vanishes when S has zero diagonal; degree does not increase beyond old card(grid)-1+mass. This is NOT W+C*H because C(0)=0; the original origin premise changes. Replacing S by I recovers the old family. No favorable rank or target identity is supplied.
+
+Prospective paired case a=u+1: pair equal low-u residues, displacement delta=+/-2^u. Define U_delta=product_j (2^j/(2^j-delta))^m_j. Candidate S_xy=-U_delta on partners, zero elsewhere. Each U should be a 2-adic unit, making S a weighted permutation with integral inverse. Predicted partner entry W'_xy=D*U_delta*delta/(T-delta), potentially gaining u-i at a retained node of valuation i<u. These are unproved targets, not accepted content or runtime results. Full polynomial charts including anchor zeros and all retained nodes, not selected first jets, are required.
+
+Negative controls: a=u has singleton residue classes and proposed diagonal-free origin is singular; plain constant swaps may lose the predicted weighted cancellation; changed origin requires actual input/output/recovery equivalence. Nonzero-node preservation alone does not preserve the ECDLP problem. Any origin normalization must charge its effects on node matrices, modes, degree, bit preparation and recovery. Same-rank norm controls already show rank alone is insufficient.
+
+Next after algebra contracts: construct actual paired origin and inverse; specialize exact partner polynomial; derive rather than assume full retained-node content. Only then test weighted inventory/recursion and actual elliptic relation interface. No paid/cloud/native crypto fixture/F4/msolve/timing/scaling campaign. No subexponential algorithm or general impossibility claimed. [pcc:unverified]

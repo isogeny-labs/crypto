@@ -252,3 +252,291 @@ cutoff. The next discriminating question is constructive bounded full
 closure on this actual family. Preserve public finder, coverage,
 field-extraction, retry and complete expected bit-cost exit criteria;
 no solver/native/paid experiment was launched [pcc:unverified].
+
+
+## 2026-11-17: direct public predicate tensor integration screen
+
+The orientation continuation now has actual identity-origin J and full
+crossing content, group-node locality and conditional packet/child counts.
+These are local Lean components, not a public branch finder; see
+[versioned status005](../research/prime_orientation_layers_20261114/transport/modular-evidence/STATUS-20261117-005.md).
+For the direct representation with all signs at one predicate vertex,
+dummy padding preserves that vertex degree. Source packing
+M>=2*(groups^(2*a))^2*Delta, u<=a, groups>=2 and signs<=Delta
+gives signs*u<=M, and positiveu gives signs<=M/u. Source175/receipt098,
+unsigned PCC-20261117-2eb7b3. This is a finite condition on the direct
+representation, not an actual runtime lower bound or universal exclusion
+of other tensor/circuit reductions [pcc:unverified].
+
+Next require the actual public signed-Hankel bounded-fanout network and
+field-bit preparation, wire/degree/entry-cost bound as a function of
+subgroup bit length. Structural graph size and coefficient-description
+length remain distinct. Test that explicit bound before more supplied-input
+checker proofs; an alternative discrete branch-selection rule must count
+visits and preserve full curve/norm/target validity. No attack/scaling/paid
+campaign was launched; original finder and total expected-cost exit
+criteria remain open. The separate old W-jet correction map remains absent;
+no identification of its correction H with the norm H is made.
+
+
+## 2026-11-17: stored public construction and rational list-recovery screen
+
+[Public-input report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261117-001.md)
+binds actual stored moments/Hankel row semantics and arithmetic-call counts,
+plus a scoped algebraic test of rational list recovery. The declared literal
+q-bit field-gate port count is6qT; a conditional incidence bound is not an
+arbitrary-circuit lower bound or constructed graph [pcc:unverified].
+
+The natural curve auxiliary and its powers specialize to nonzero full norms
+of exact degree2a*r, not a strictly lower-degree root certificate. More
+strongly, at multiplicityONE, natural weights(1,a,a-2), a>=2,2a distinct
+abscissas, characteristic!=2 and nonzero opposite branches, every homogeneous
+helper of ANY degree satisfying the strict weighted budget<2a and vanishing
+at both branches is zero. Public009/build010/receipt005, unsigned
+PCC-20261117-108594; this does not exclude higher/nonuniform multiplicities,
+other budgets/support or ECDLP algorithms [pcc:unverified].
+
+Next check a faithful higher-multiplicity/Hasse-jet model and the actual
+root-cancellation premise before treating multiplicity as a rescue. The
+induction sketch in public PROTOCOL-001.md is prospective, not accepted
+evidence. A positive changed rule must select valid signs from public inputs,
+keep a useful nonzero target-scalar coefficient and charge complete expected
+bit work. No native/paid/attack/scaling campaign was launched.
+
+Readable final: [versioned final report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-final-001.pdf) makes natural subtraction explicit at m=0; all frozen earlier reports/source evidence stay exact.
+
+
+## 2026-11-17: full uniform multiplicity and fixed target controls
+
+[Versioned status002](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261117-002.md)
+and [report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-uniform-001.pdf)
+extend the exact symmetric interpolation obstruction to EVERY uniform
+multiplicity using full mixed Taylor coefficients, not factorial derivatives.
+At both nonzero opposite branches on all2a abscissas, the natural strict
+homogeneous budget<2ar forces helperzero. Source011/receipt006, unsigned
+PCC-20261117-3bcc1a. This is not an ECDLP algorithm nonexistence proof
+[pcc:unverified].
+
+The actual target's known sign is a changed hypothesis: source013/receipt007
+checks one target branch plus paired othernodes at multiplicityONE only.
+Singleton-target higher multiplicity is outside that theorem. Source014/008
+checks the PRIMARY sufficient count condition: it fails for a>=3 with at
+least3unresolved pairs, all r>=1; failure of that sufficient bound is not
+helper/rank nonexistence. The changed fixed control a2,u3,r4,ell7 passes
+72variables>70constraints, not an asymptotic attack or field-characteristic2
+result. Unsigned PCC-20261117-bb5895/896a0c [pcc:unverified].
+
+Next actual anchored coefficient-to-full-jet operator must handle repeated
+abscissas and be bound to the finite coefficient encoding, beginning with
+that positive control. No supplied successful signs or kernel oracle.
+Generation, factor/root results, full norm validity, useful target scalar
+coefficient and complete expected bit cost remain separate. Published fast
+interpolation with one Lagrange ordinate per abscissa is not automatically
+admitted for this list input. Optional anchored cubic/norm restriction
+sketch is unvalidated and does not close the finder.
+
+
+## 2026-11-23: fixed four-point helper has a canonical quadratic residual
+
+[Current factor status](../research/prime_orientation_layers_20261114/transport/public-input-evidence/STATUS-20261123-005.md)
+and [versioned report](../research/prime_orientation_layers_20261114/transport/public-input-evidence/report/report-norm-factors-001.pdf)
+record source056/build059/local029:147primary statements,14new since133,
+default-limit exit0/no warnings/all standard printed dependencies.
+For the actual fixed support4control, a nonzero actual curve normN of degree
+at most30 has the derived monic degree28factor
+L=(X-Cxt)^4*product_{x in S}(X-Cx)^8, and actual quotientQ=N /ₘL
+satisfies N=LQ,Qnonzero,degreeQ<=2. Neither successful factor nor quotient
+is supplied. PCC-20261123-148f8a/6e7e87remain unsigned, outside shared
+Transport53/57 audit/fresh [pcc:unverified].
+
+The missing semantic arrow from actual mixed jets to original branch
+evaluation is now closed through a separately audited public evaluation
+identity. Evaluated remainder equality at the derived formal root gives
+norm factorization into plus/minus original branch evaluations; paired
+full4gives normseriesorder8, target full4gives order4. A separately audited
+series/root-power equivalence and actual coprime product prove the factors.
+No ambient remainder jets, favorable branch, hidden rank, residual
+splitting or scalar labels are assumed [pcc:unverified].
+
+The algebraic statements need cubic degree3 and the explicit local point,
+nonzero2y and distinct-node premises, not an already identified globally
+nonsingular elliptic group. An elliptic/scalar conclusion must still bind
+f to the actual Weierstrass cubic and required nonsingularity/subgroup
+hypotheses. Existing NormGroupBridge.principalPointProduct/fullNormPointSum
+provide a norm-to-group route for their distinct-simple-point/nodal-norm
+hypotheses, and targetScalarFromSum exposes supplied-other-label premises.
+Repeated factors do not automatically instantiate those hypotheses.
+Source-only review PCC-20261123-8fa3bdpins exact prior statements; no
+unchanged old proof/native replay was run [pcc:unverified].
+
+Next discriminator: derive actual paired-factor normalization in A andB,
+not only their norm. Test G^4|A,B for actual G=productS(X-Cx), using both
+branch evaluations and unit2y. Construct canonical A'=A /ₘG^4,
+B'=B /ₘG^4 and derive degreeA'<=3,degreeB'<=1. This is prospective, not an
+accepted normalization theorem. Then map the actual function to
+multiplicity-aware principal ideals/group relations, handling residual
+degree0/1/2, field of definition, infinity/zero/ramification/duplicates.
+Check whether public known scalar labels are produced. Degree-two residual
+alone supplies neither base-field roots nor their logarithms [pcc:unverified].
+
+Original public-finder, full input/subgroup coverage and complete
+exp(o(log r)) expected bit-cost exit criteria remain unchanged. Fixed
+support4does not grow with subgroup size. No algorithm, timing/scaling
+claim or universal nonexistence follows. No paid/cloud/native/attack
+campaign, vault/signing, protected-ledger rewrite or gate bypass was used.
+
+## 2026-11-23: paired normalization and actual target ideal power
+
+Local source068/build072/local036 accepts182statements/35new since147,
+zero warnings/all printed dependencies standard; PCC-20261123-f01f40 is
+unsigned local data, no shared/fresh/signed inference. [pcc:unverified]
+
+Actual paired mixed jets derive G^4divisibility of both actual norm
+coefficients. Canonical quotients degree<=3/1 yield actual nonzero
+normalized normdegree<=6, target branch sign/order4, and explicit actual
+Weierstrass equation/norm/class identities. Original mixed jets give actual
+pointideal powers via separately audited/committed generic owner1; derived
+mapped coprime Bezout cancelsG^4. Actual nonsingular point data constructs
+nonzero actual coordinatefunction h with normdegree<=6 and h in targetI^4.
+No successful helper/norm/idealpower witness supplied. [pcc:unverified]
+
+This is not a principal ideal exhaustion or useful known-log group relation.
+Next construct actual integral residual ideal J with(span h)=I^4*J,
+derive actual quotient/length residual bound<=2, then group/residual-field/
+known-label/publicfinder/full expected-cost bridge. Original criteria and
+nonscalar-origin/rank-directed W-jet obligations unchanged.
+
+## 2026-11-23: actual integral residual factor, degree gap retained
+
+Source070/build074/local037/PCC-20261123-cba56c accepts186local statements/
+4new since182,0warnings/all printed foundations standard, unsigned.
+Actual nonsingular target/helper constructs integralJ and exact
+span{h}=I^4J with actual finite residualquotient/finrank<=SIX.
+No successfulJ supplied; no residualdegree2/subtraction4 claimed.
+Generic owner InvertibleIdealResidual2 committed ba07267/audit2/0/0.
+[pcc:unverified]
+
+Next derive invertible-module finite-quotient dimension and actual
+idealproduct codimension additivity, then targetI^4dimension4/residual<=2,
+actualgroup/knownlabel coverage/publicfinder/full expectedcost.
+Original criteria, earlier failure history and public input scope unchanged.
+
+## 2026-11-23: actual residual dimension two; fixed pair certificate coverage
+
+Source073/build079/local038/PCC-20261123-6acf43 derives actualtargetresidue1,
+actualpowerquotientfinite/dimensionn and actualconstructedresidualdimension<=2.
+Source077/build083/local040/PCC-20261123-7eef03 checks197/11new since186,
+0warnings/standard foundations. Explicitactualrationalresidualpointfactors
+deriveprincipalproduct/4P+sumQ=0. Exactlytworesidualpointsin fixedB cover
+<=B.card^2targetsunderinjective4; actualcoprimegroupcardderivesinjection,
+and B.card^2<grouporder givesanactualtargetwithoutthispaircertificate.
+Scopedpairfamily only, notallresidualcases or universalECDLP lowerbound.
+All local unsigned outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Next zero/onepoint residualcases and paddedidentity coverage, nonsplitdegree2
+field/scalar bridge, asymmetric/growingknownsupport survivingnormalization,
+then actualpublicfinder/density/retry/full expectedbitcost. Originalcriteria,
+nonscalarorigin/rank-directedWjet obligations and oldfailurehistory retained.
+
+## 2026-11-23: all short rational certificates and invariant residual class
+
+078/build084/local041/PCC-20261123-89ca74 derivesactual0/1/2rational
+residualpointcertificate cases, paddedgroupidentityandcoverage<=(B.card+1)^2
+underactualinjection/copimecardpremises.080/build086/local042/PCC-a97e80
+checks205/5new/0warnings/standardfoundations, constructsactualresidualunit
+representingactualJfromexactspanh=I4J, derivesclassinversefourthtargetclass
+andindependenceofnonzerohwithout rationalsplitting. All localunsigned
+outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Nextactualasymmetricbranch rplus/rminus normorder/commonminfactor and
+survivingorientedknownpoint factors, then growingpublickernel/nonzeroimage/
+degree/group/knownscalarfinder/completeexpectedcost. Classinvariance does
+notpreventchangingrepresentatives/factorizations or proveuniversalbarrier.
+Originalcriteria/nonscalarorigin/rank-directedWjet and oldhistory unchanged.
+
+## 2026-11-23: actual asymmetric normalization retains prescribed point powers
+
+088/build094/local046/PCC-20261123-1d0e6d checks217/12new since205,
+0warnings/standardfoundations. Actualunequalmixedbranchorders andmin m
+constructdivByMoniccoefficients/localFunction; actualcoordinate/opposite
+coprimeideal/unitcancellation derivesconstructednonzeroquotient and
+span(localFunction)=Ip^(rplus-m)*Im^(rminus-m)*J withactualintegralJ.
+Nonzerooriginalcoordinateclass remains explicitpremise; no suppliedJ,
+no exactvaluation/gcd or newgrowingkernel/finder/cost result. Localunsigned
+outsidehistoricalshared53/57/fresh. [pcc:unverified]
+
+Nextactualgrowingbranch-jet map needsderivedactualkernelI^n/finitejet
+algebradimension/surjectivity beforebranchonlyconstraintsreplaceoriginal
+mixedjetpremises. Thenactualgrowingbasis/kernel/nonzeroimage/degree/
+knownscalarfinder/coverage/retry/full expectedbitcost. Originalcriteria,
+nonscalarorigin/rank-directedWjet and allpriorfailurehistory unchanged.
+
+## 2026-11-27: actual growing point-jet kernel, function and residual
+
+Actual branch-to-polynomial-jet maps now have derived kernel I^n and
+branch-order equivalence (092/098/local048/PCC-20261127-230077). The
+actual growing coefficient map has dimension2d+1 and injective coordinate
+image; strict sumlevels<2d+1 derives nonzero constrained h and actual norm
+degree<=2d+1 (094/100/local049/PCC-20261127-134586). Pair-injective
+actual point families yield coprime powers, principal containment and CRT
+quotient dimension=sumlevels (095/101/local050/PCC-20261127-e3c997).
+Constructed integral residual J satisfies (h)=product(I_i^n_i)*J and
+sumlevels+dim(R/J)<=2d+1 (096/102/local051/PCC-20261127-379167).
+Final252 printed/35new since217/zero warnings/standard foundations;
+all unsigned local outside historical shared audit/fresh. [pcc:unverified]
+
+Next executable useful known-label relation construction, residual point
+representation/logarithms, support density/retry and complete expected bit
+cost remain open. These existence proofs use noncomputable choice. Distinct
+pairs, not merely distinct indices, are required for the product argument.
+Original criteria and nonscalar-origin/rank-directed W-jet interfaces unchanged.
+
+## 2026-11-27: actual weighted residual sum and scalar information
+
+098/build104/local052/PCC-20261127-9326d2 checks258 printed/six new,
+zero warnings/standard foundations. From actual principal factorization and
+explicit nonsingular rational residual point product, derive weighted
+input-plus-residual sum zero. Residual group sum is fixed by prescribed
+inputs, independent of h; a single residual point is determined. Under
+Q+sP+R=0 derive R=rP iff Q=(-s-r)P. Unsigned local, outside shared
+Transport53/57 audit/fresh. [pcc:unverified]
+
+Rational splitting and useful residual labels remain explicit obligations,
+not consequences of the low degree bound. Multi-point factorizations may
+vary while their sum stays fixed; adaptive support/smoothness methods are
+not excluded. Next target multiplicity/unit scalar congruence and actual
+public construction of useful labeled residual factors, class-conditioned
+success/retry and full expected bit cost. Original criteria unchanged.
+
+## 2026-11-27: actual weighted scalar extraction
+
+100/build106/local053/PCC-20261127-2c4548 checks263 printed/five new,
+zero warnings/standard foundations. Actual independent non-target input
+and residual labels derive c and n_t*Q+c*P=0. Explicit ell*Q=0 and
+gcd(n_t,ell)=1 construct Q=(-Nat.gcdA(n_t,ell)*c)*P; actual generator
+order yields congruence for the unknown label. Composition uses actual
+principal factorization and exact residual point product. Unsigned local,
+outside shared audit/fresh. [pcc:unverified]
+
+This closes the stated conditional extraction algebra, not the public
+procedure for obtaining useful residual labels. Next actual finite-field
+coefficient-kernel sampler, class-conditioned success probability, support
+selection/label generation, retries and full expected bit cost. Charge all
+per-instance work; no reusable-precomputation shortcut. Original criteria
+and prior scope restrictions unchanged.
+
+## 2026-11-27: actual projective residual sampler interface
+
+103/build109/local054/PCC-20261127-7bc08e checks270 printed/seven new,
+zero warnings/standard foundations. Actual kernel raw residual has exact
+nonzero scalar invariance; derive its descent to projective coefficient
+kernel and integrality from actual membership/distinct point pairs. Exact
+coefficient-line cardinal formulas specialized, without assuming kernel
+rank, output fibers, output uniformity or success probability. Unsigned
+local outside shared audit/fresh. [pcc:unverified]
+
+Next actual output fibers via fractional-unit cancellation and actual
+coordinate-ring unit classification/basis norm laws; then useful labeled
+residual outputs/class-conditioned success/retry/full per-instance bit
+cost. No public useful-label finder or novel attack conclusion from these
+standard projective identities. Original criteria unchanged.
