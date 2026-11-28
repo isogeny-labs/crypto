@@ -1148,8 +1148,9 @@ impl PkmSemaevOracle {
 
     /// The oracle a pipeline spec names, on the tower its factor base was
     /// built from: `prime-kummer:t,g` (the `μ_{2^t}` coset), PKM's isogeny
-    /// form `prime-isogeny:t,seed,aux` (the tower is rebuilt
-    /// deterministically from `(p, t, seed, aux)`; the rebuild is not
+    /// form `prime-isogeny:t,seed,aux,family,selection` (the tower is rebuilt
+    /// deterministically from the same public factor-base parameters and
+    /// target curve; the rebuild is not
     /// charged, since the base's build on the factor-base ledger is the
     /// same work), or any base with `bits=T[,lo=L]` on the oracle (an
     /// interval written in bits) or `digits=c1;…;ct[,lo=L]` (a digit set,
@@ -1160,18 +1161,38 @@ impl PkmSemaevOracle {
         spec: &super::PipelineSpec,
         inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     ) -> Result<Self, String> {
-        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxFamily, AuxKind};
+        use super::prime_tower::{
+            isogeny_tower, supersingular_tower, z2xz8_equal_size_tower, AuxFamily, AuxKind,
+        };
         let fb = &spec.factor_base_params;
         let oracle = match spec.factor_base.as_str() {
             "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
             "prime-isogeny" => {
                 let p = inst.curve.p;
-                let t = fb.u64("t")? as u32;
+                let t = u32::try_from(fb.u64("t")?)
+                    .map_err(|_| "t must be at most 2^32 − 1".to_string())?;
                 let seed = fb.u64_or("seed", 0)?;
                 let kind = AuxKind::parse(fb.get("aux").unwrap_or("ordinary"), p)?;
+                let family = AuxFamily::parse(fb.get("family").unwrap_or("any"))?;
+                let selection = fb.get("selection").unwrap_or("seeded");
                 let mut scratch = GroupOps::default();
-                let tower = if kind == AuxKind::Ordinary {
-                    isogeny_tower(p, t, seed, AuxFamily::Any, &mut scratch)?
+                let tower = if selection == "equal-size" {
+                    if kind != AuxKind::Ordinary
+                        || family != AuxFamily::Z2xZ8
+                        || t != 5
+                        || seed != 0
+                    {
+                        return Err(
+                            "equal-size selection requires ordinary aux, family=z2xz8, t=5, seed=0"
+                                .into(),
+                        );
+                    }
+                    z2xz8_equal_size_tower(&inst.curve, &mut scratch)
+                        .map_err(|failure| failure.reason)?
+                } else if selection != "seeded" {
+                    return Err(format!("unknown isogeny selection {selection:?}"));
+                } else if kind == AuxKind::Ordinary {
+                    isogeny_tower(p, t, seed, family, &mut scratch)?
                 } else {
                     supersingular_tower(p, t, seed, kind, &mut scratch)?
                 };
@@ -5379,6 +5400,53 @@ mod tests {
             "isogeny",
             "",
         );
+    }
+
+    #[test]
+    fn equal_size_isogeny_oracle_uses_the_factor_base_tower() {
+        use crate::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase;
+        use crate::cryptanalysis::ic_framework::PipelineSpec;
+
+        // Development curve t5_c0: the old from_spec rebuilt the generic
+        // seeded tower and rejected selected-base abscissa 392.
+        let inst = PrimeInstance {
+            name: "pkm-equal-size-p5569".into(),
+            curve: PrimeCurve {
+                p: 5_569,
+                a: 1,
+                b: 3,
+            },
+            group_order: 5_669,
+            r: 5_669,
+            cofactor: 1,
+            generator: (0, 2_191),
+            representation: None,
+        };
+        let (_, fb_params) = Params::parse_spec(
+            "prime-isogeny:t=5,seed=0,aux=ordinary,family=z2xz8,selection=equal-size",
+        )
+        .unwrap();
+        let (_, oracle_params) =
+            Params::parse_spec("pkm-semaev:m=2,engine=f4,degree=8,mode=chain").unwrap();
+        let spec = PipelineSpec {
+            factor_base: "prime-isogeny".into(),
+            factor_base_params: fb_params.clone(),
+            oracle: "pkm-semaev".into(),
+            oracle_params: oracle_params.clone(),
+            ..Default::default()
+        };
+        let fb = PrimeIsogenyBase { instance: &inst }
+            .build(&ctx(&inst), &fb_params, &mut GroupOps::default())
+            .unwrap();
+        assert!(fb.abscissa_list.contains(&392));
+        let mut oracle = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+        let Membership::Isogeny { v, .. } = &oracle.membership else {
+            panic!("expected the selected isogeny tower")
+        };
+        assert!(fb.abscissa_list.iter().all(|x| v.contains(x)));
+        oracle
+            .prepare(&ctx(&inst), &fb, &oracle_params, &mut GroupOps::default())
+            .unwrap();
     }
 
     /// F4 trace (`trace=1`): the verdicts equal plain F4's and the grid's
