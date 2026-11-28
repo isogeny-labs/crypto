@@ -54,6 +54,22 @@ unsafe fn clmul_hw(a: u64, b: u64) -> u128 {
     std::arch::aarch64::vmull_p64(a, b)
 }
 
+/// `a²` before reduction by BMI2 bit deposit: in characteristic 2 the square
+/// of `Σ aᵢ z^i` is `Σ aᵢ z^{2i}`, so each 32-bit half of a limb is spread to
+/// the even bit positions of one output word.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "bmi2")]
+unsafe fn sqr_spread_bmi2(a: &W3) -> [u64; 6] {
+    use std::arch::x86_64::_pdep_u64;
+    const EVEN: u64 = 0x5555_5555_5555_5555;
+    let mut r = [0u64; 6];
+    for i in 0..3 {
+        r[2 * i] = _pdep_u64(a[i], EVEN);
+        r[2 * i + 1] = _pdep_u64(a[i] >> 32, EVEN);
+    }
+    r
+}
+
 #[inline(always)]
 pub fn xor(a: W3, b: W3) -> W3 {
     [a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2]]
@@ -110,6 +126,9 @@ pub struct Gf2W {
     low_terms: Vec<u32>,
     mask: W3,
     has_clmul: bool,
+    /// BMI2 `pdep` is available and the hardware kernel is selected: squaring
+    /// is a bit spread rather than a carry-less product.
+    has_bmi2: bool,
     /// `Tr(x) = parity(x & trace_mask)`.
     trace_mask: W3,
     /// `half_trace[c][byte]`: the half-trace of the byte placed at bits
@@ -145,11 +164,16 @@ impl Gf2W {
         for i in 0..n {
             mask[(i / 64) as usize] |= 1u64 << (i % 64);
         }
+        #[cfg(target_arch = "x86_64")]
+        let has_bmi2 = has_clmul && std::arch::is_x86_feature_detected!("bmi2");
+        #[cfg(not(target_arch = "x86_64"))]
+        let has_bmi2 = false;
         let mut f = Self {
             n,
             low_terms,
             mask,
             has_clmul,
+            has_bmi2,
             trace_mask: ZERO,
             half_trace: Vec::new(),
         };
@@ -265,9 +289,31 @@ impl Gf2W {
         self.reduce(self.mul_unreduced(a, b))
     }
 
+    /// `a²`. The cross terms of a square vanish in characteristic 2, so this is
+    /// not `mul(a, a)` (nine carry-less products): with BMI2 each limb is spread
+    /// by `pdep`, otherwise each limb is squared by one carry-less product.
+    /// Either way the same reduction follows.
     #[inline(always)]
     pub fn sqr(&self, a: &W3) -> W3 {
-        self.mul(a, a)
+        self.reduce(self.sqr_unreduced(a))
+    }
+
+    #[inline(always)]
+    fn sqr_unreduced(&self, a: &W3) -> [u64; 6] {
+        #[cfg(target_arch = "x86_64")]
+        if self.has_bmi2 {
+            // SAFETY: `has_bmi2` is set only when the CPU reports BMI2.
+            return unsafe { sqr_spread_bmi2(a) };
+        }
+        let mut r = [0u64; 6];
+        for i in 0..3 {
+            if a[i] != 0 {
+                let p = self.clmul64(a[i], a[i]);
+                r[2 * i] = p as u64;
+                r[2 * i + 1] = (p >> 64) as u64;
+            }
+        }
+        r
     }
 
     pub fn sqr_k(&self, a: &W3, k: u32) -> W3 {
@@ -519,6 +565,7 @@ impl Gf2W {
             low_terms,
             mask,
             has_clmul: false,
+            has_bmi2: false,
             trace_mask: ZERO,
             half_trace: Vec::new(),
         }
@@ -599,6 +646,36 @@ mod tests {
             degree: 4,
             low_terms: vec![0, 2]
         }));
+    }
+
+    #[test]
+    fn squaring_matches_the_full_product_on_every_kernel() {
+        for n in [61u32, 64, 113, 127, 128, 131, 163, 191] {
+            let irr = low_weight_irreducible(n);
+            let fields = [
+                Gf2W::new(&irr),
+                Gf2W::with_kernel(&irr, false),
+                Gf2W::with_kernel(&irr, true),
+            ];
+            let mut rng = StdRng::seed_from_u64(0x5a5a ^ n as u64);
+            for _ in 0..2000 {
+                let a = fields[0].random(&mut rng);
+                for f in &fields {
+                    assert_eq!(
+                        f.sqr(&a),
+                        f.mul(&a, &a),
+                        "n={n} bmi2={} clmul={}",
+                        f.has_bmi2,
+                        f.has_clmul
+                    );
+                }
+            }
+            for f in &fields {
+                assert_eq!(f.sqr(&ZERO), ZERO);
+                assert_eq!(f.sqr(&ONE), ONE);
+                assert_eq!(f.sqr(&f.mask()), f.mul(&f.mask(), &f.mask()));
+            }
+        }
     }
 
     #[test]
