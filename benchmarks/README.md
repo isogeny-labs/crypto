@@ -63,6 +63,15 @@ remains outside this table pending validation admission.
 The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
+The [27 November fair-baseline ablation of that study](20261127-norm-one-torus-m5-ablation/)
+retains a report PDF plus SVG and 150 dpi PNG copies. Against a fair control
+(i64 inversion and an Fx hash, 15.410 ms median), the #5229 lane takes
+6.195 ms (2.487x [2.476–2.497]) and a new affine x-only query takes 3.358 ms
+(4.589x [4.580–4.604]). The #5229 pair reproduces at 4.538x. The host was a
+2-vCPU Xeon @ 2.30 GHz with one pinned core, not isolated. There is no matched
+rho reference and no signature, so it remains outside the admitted table.
+[pcc:unverified]
+
 The [26 November Rust Prime31 norm-one-torus m=5 component study](20261126-norm-one-torus-m5/)
 retains a report PDF plus SVG and 150 dpi PNG copies. Its publicly precommitted
 producer run reports 48.356 ms versus 10.355 ms median setup-plus-query time
