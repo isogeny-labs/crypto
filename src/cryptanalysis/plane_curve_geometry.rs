@@ -52,6 +52,18 @@ pub struct DegreeTwoLineFactorization {
     pub residual_degree: usize,
 }
 
+/// A degree-two closed point on the smooth locus of a rational line section.
+/// `point` is projectively normalized over `F_p[s]/(polynomial)`; each
+/// coordinate is `[constant, s coefficient]`. The line and parameter basis
+/// are canonical, so the key is independent of the caller's line basis.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct QuadraticLinePlace {
+    pub line: [u32; 3],
+    pub polynomial: [u32; 3],
+    pub point: [[u32; 2]; 3],
+    pub multiplicity: usize,
+}
+
 /// A completely rational line section on a smooth plane curve.
 /// Points use the first nonzero coordinate scaled to one.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -75,6 +87,41 @@ fn prime(n: u32) -> bool {
 
 fn mul(a: u32, b: u32, p: u32) -> u32 {
     (u64::from(a) * u64::from(b) % u64::from(p)) as u32
+}
+
+fn sub(a: u32, b: u32, p: u32) -> u32 {
+    ((u64::from(a) + u64::from(p) - u64::from(b)) % u64::from(p)) as u32
+}
+
+fn ext_mul(x: [u32; 2], y: [u32; 2], polynomial: [u32; 3], p: u32) -> [u32; 2] {
+    let s2 = mul(x[1], y[1], p);
+    [
+        sub(mul(x[0], y[0], p), mul(polynomial[0], s2, p), p),
+        sub(
+            ((u64::from(mul(x[0], y[1], p)) + u64::from(mul(x[1], y[0], p))) % u64::from(p)) as u32,
+            mul(polynomial[1], s2, p),
+            p,
+        ),
+    ]
+}
+
+fn ext_add(x: [u32; 2], y: [u32; 2], p: u32) -> [u32; 2] {
+    [
+        ((u64::from(x[0]) + u64::from(y[0])) % u64::from(p)) as u32,
+        ((u64::from(x[1]) + u64::from(y[1])) % u64::from(p)) as u32,
+    ]
+}
+
+fn ext_pow(mut base: [u32; 2], mut exponent: u64, polynomial: [u32; 3], p: u32) -> [u32; 2] {
+    let mut out = [1, 0];
+    while exponent != 0 {
+        if exponent & 1 != 0 {
+            out = ext_mul(out, base, polynomial, p);
+        }
+        base = ext_mul(base, base, polynomial, p);
+        exponent >>= 1;
+    }
+    out
 }
 
 fn pow(mut a: u32, mut n: usize, p: u32) -> u32 {
@@ -429,6 +476,88 @@ impl PlaneCurve {
         })
     }
 
+    /// Return locally smooth degree-two places of a rational line section.
+    /// The unique rational line through each quadratic point is normalized,
+    /// then given a deterministic basis before factoring. A singular point
+    /// over the quadratic extension is refused; this does not certify that
+    /// the whole plane curve is geometrically smooth.
+    pub fn quadratic_line_places(
+        &self,
+        u: [u32; 3],
+        v: [u32; 3],
+    ) -> Result<Vec<QuadraticLinePlace>, &'static str> {
+        let p = self.p;
+        let u = u.map(|x| x % p);
+        let v = v.map(|x| x % p);
+        let mut line = [
+            sub(mul(u[1], v[2], p), mul(u[2], v[1], p), p),
+            sub(mul(u[2], v[0], p), mul(u[0], v[2], p), p),
+            sub(mul(u[0], v[1], p), mul(u[1], v[0], p), p),
+        ];
+        let pivot = line
+            .iter()
+            .position(|&coefficient| coefficient != 0)
+            .ok_or("line basis is dependent")?;
+        let inverse = pow(line[pivot], (p - 2) as usize, p);
+        line = line.map(|coefficient| mul(coefficient, inverse, p));
+        let free: Vec<_> = (0..3).filter(|&axis| axis != pivot).collect();
+        let basis: [[u32; 3]; 2] = std::array::from_fn(|index| {
+            let mut point = [0; 3];
+            point[free[index]] = 1;
+            point[pivot] = sub(0, line[free[index]], p);
+            point
+        });
+        let section = self.line_section(basis[0], basis[1])?;
+        let factors = self.line_factors_degree_two(&section)?;
+        let mut places = Vec::new();
+        for factor in factors.quadratic {
+            let polynomial = factor.polynomial;
+            let mut point: [[u32; 2]; 3] = std::array::from_fn(|i| [basis[1][i], basis[0][i]]);
+            let leading = point
+                .iter()
+                .copied()
+                .find(|&coordinate| coordinate != [0, 0])
+                .ok_or("quadratic line parameter gave zero projective point")?;
+            let inverse = ext_pow(leading, u64::from(p) * u64::from(p) - 2, polynomial, p);
+            point = point.map(|coordinate| ext_mul(coordinate, inverse, polynomial, p));
+            let evaluate = |derivative: Option<usize>| {
+                self.terms.iter().fold([0, 0], |sum, term| {
+                    let mut exponents = [term.x_exp, term.y_exp, term.z_exp];
+                    let mut coefficient = term.coeff;
+                    if let Some(axis) = derivative {
+                        if exponents[axis] == 0 {
+                            return sum;
+                        }
+                        coefficient = mul(coefficient, exponents[axis] as u32 % p, p);
+                        exponents[axis] -= 1;
+                    }
+                    let value = (0..3).fold([coefficient, 0], |acc, axis| {
+                        ext_mul(
+                            acc,
+                            ext_pow(point[axis], exponents[axis] as u64, polynomial, p),
+                            polynomial,
+                            p,
+                        )
+                    });
+                    ext_add(sum, value, p)
+                })
+            };
+            if evaluate(None) != [0, 0] {
+                return Err("quadratic line factor is not on the curve");
+            }
+            if (0..3).all(|axis| evaluate(Some(axis)) == [0, 0]) {
+                return Err("line meets a singular quadratic point");
+            }
+            places.push(QuadraticLinePlace {
+                line,
+                polynomial,
+                point,
+                multiplicity: factor.multiplicity,
+            });
+        }
+        Ok(places)
+    }
+
     /// Rational intersection parameters `[s:t]`, without multiplicities.
     pub fn rational_line_roots(&self, section: &[u32]) -> Result<Vec<[u32; 2]>, &'static str> {
         Ok(self
@@ -708,6 +837,37 @@ mod tests {
         );
         let large = PlaneCurve::new(263, 2, &[term(2, 0, 0)]).unwrap();
         assert!(large.line_factors_degree_two(&[1, 0, 1]).is_err());
+    }
+
+    #[test]
+    fn quadratic_line_places_are_basis_independent_and_locally_smooth() {
+        let conic = PlaneCurve::new(3, 2, &[term(2, 0, 0), term(0, 2, 0), term(0, 0, 2)]).unwrap();
+        let places = conic.quadratic_line_places([1, 0, 0], [0, 1, 0]).unwrap();
+        assert_eq!(places.len(), 1);
+        assert_eq!(places[0].line, [0, 0, 1]);
+        assert_eq!(places[0].polynomial, [1, 0, 1]);
+        assert_eq!(places[0].point, [[1, 0], [0, 2], [0, 0]]);
+        assert_eq!(places[0].multiplicity, 1);
+        assert_eq!(
+            conic.quadratic_line_places([1, 1, 0], [1, 2, 0]).unwrap(),
+            places
+        );
+        assert_eq!(
+            conic.quadratic_line_places([0, 1, 0], [1, 0, 0]).unwrap(),
+            places
+        );
+        let other_line = conic.quadratic_line_places([0, 1, 0], [0, 0, 1]).unwrap();
+        assert_eq!(other_line[0].line, [1, 0, 0]);
+        assert_eq!(other_line[0].point, [[0, 0], [1, 0], [0, 2]]);
+        let nonreduced = PlaneCurve::new(
+            3,
+            4,
+            &[term(4, 0, 0), term(2, 2, 0), term(2, 2, 0), term(0, 4, 0)],
+        )
+        .unwrap();
+        assert!(nonreduced
+            .quadratic_line_places([1, 0, 0], [0, 1, 0])
+            .is_err());
     }
 
     #[test]
