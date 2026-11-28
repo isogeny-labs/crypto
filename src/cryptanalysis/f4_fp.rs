@@ -35,6 +35,9 @@
 //! system resolved — the number to compare across coordinate systems —
 //! and stops cooperatively at a deadline, so a budget never leaves a
 //! thread behind.
+//! Root extraction uses closed forms through degree two and a scan-versus-
+//! Frobenius cost estimate for higher degrees. [`solve_with_root_mode`]
+//! retains explicit scan and algebraic controls for matched comparisons.
 //! An opt-in diagnostic policy (`F4_FP_LINEAR_ROOTS=1`, default off) first
 //! substitutes a pure univariate linear equation analytically. Other root
 //! finding and the final exact input check are unchanged.
@@ -351,6 +354,11 @@ fn stair_scan() -> bool {
 }
 
 fn field_ops_now() -> u64 {
+    // Drain every Rayon pool thread's buffer (and this thread's) before
+    // reading the process total — otherwise a worker's unflushed share is
+    // missing from the report.
+    let _ = rayon::broadcast(|_| flush_field_ops_buf());
+    flush_field_ops_buf();
     if thread_ops_mode() {
         FIELD_OPS_THREAD.with(|c| c.get())
     } else {
@@ -472,14 +480,46 @@ fn count_probes(n: u64, key_words: u64) {
     }
 }
 
+thread_local! {
+    /// Buffered share of [`FIELD_OPS`] not yet flushed.  Flushing every
+    /// `add_lazy` contended the same cache line under multi-thread FL /
+    /// deferred; batching keeps the process total exact at report time.
+    static FIELD_OPS_BUF: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+const FIELD_OPS_BUF_FLUSH: u64 = 1 << 20;
+
+#[inline]
+fn flush_field_ops_buf() {
+    FIELD_OPS_BUF.with(|b| {
+        let v = b.replace(0);
+        if v != 0 {
+            FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+        }
+    });
+}
+
 #[inline]
 fn count_ops(n: usize) {
-    FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    let n = n as u64;
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n));
+    if thread_ops_mode() {
+        // Reports read the thread-local only; skip the process atomic.
+    } else {
+        FIELD_OPS_BUF.with(|b| {
+            let v = b.get() + n;
+            if v >= FIELD_OPS_BUF_FLUSH {
+                FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+                b.set(0);
+            } else {
+                b.set(v);
+            }
+        });
+    }
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
-    super::jv_bitops::row_ops(n as u64);
-    visit_account_row_operations(n);
+    super::jv_bitops::row_ops(n);
+    visit_account_row_operations(n as usize);
 }
 
 #[inline]
@@ -963,14 +1003,15 @@ pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
     per_point.saturating_mul(domain_len as u64)
 }
 
-/// An upper estimate of the Frobenius root finder's multiplications for a
+/// An estimate of the Frobenius root finder's multiplications for a
 /// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
 /// step a schoolbook product and a reduction, plus the gcd.  Used only to
 /// choose between the modes in [`DomainRootMode::Auto`]; never reported.
 pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
     let n = u64::from(degree) + 1;
-    let step = 2 * n * n;
-    powmod_muls(p).saturating_mul(step).saturating_add(n * n)
+    let square = n.saturating_mul(n);
+    let step = square.saturating_mul(2);
+    powmod_muls(p).saturating_mul(step).saturating_add(square)
 }
 
 /// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
@@ -3263,6 +3304,9 @@ fn pp_add(i: usize, n: u64) {
 /// The process-wide row-operation counter, for the profile's deltas.
 #[inline]
 fn pp_ops() -> u64 {
+    // Profile deltas call this often; only flush this thread.  Full-pool
+    // drain happens in [`field_ops_now`] for the report total.
+    flush_field_ops_buf();
     FIELD_OPS.load(AtomicOrdering::Relaxed)
 }
 
@@ -3571,13 +3615,184 @@ fn normalize_lazy(acc: &mut [u64], fp: Barrett) {
 /// chunk's rows are independent of each other until they are stored, so
 /// their reductions run in parallel; a smaller chunk finds pivots sooner
 /// for the rows after it, a larger one spreads better.
-const DEFERRED_CHUNK: usize = 64;
+/// Rows reduced together against the pivots known before the chunk.
+/// Larger than 64 amortises the deferred schedule on wide NTT free-column
+/// matrices (m=3 t=5 is ~28k rows); override with `F4_FP_DEFERRED_CHUNK`.
+fn deferred_chunk_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_CHUNK")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=4096).contains(&n))
+            .unwrap_or(64)
+    })
+}
 
 /// `F4_FP_DEFERRED_PAR=0` runs the deferred elimination row by row on one
 /// thread, as it did before the chunks; a same-binary control.
 fn deferred_parallel() -> bool {
     static PAR: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *PAR.get_or_init(|| std::env::var("F4_FP_DEFERRED_PAR").as_deref() != Ok("0"))
+}
+
+/// Exact `f64` SpMM/GEMM trailing updates in deferred RREF
+/// (`p` with [`fp_gemm::supports_f64_gemm`]).  Opt-in (`F4_FP_GEMM=1`):
+/// on NTT free-column cells packing still loses to parallel AVX `add_lazy`
+/// even without strip-splitting; default off.  Same-binary control: `=1`.
+fn f4_fp_gemm_env_on() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() == Ok("1"))
+}
+
+/// Wide-prime deferred RREF (default on when the prime admits exact `f64`
+/// arithmetic).  `F4_FP_WIDE_DEFERRED=0` forces classical [`rref`].
+fn wide_deferred_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_WIDE_DEFERRED").as_deref() != Ok("0"))
+}
+
+/// Whether a deferred chunk should use blocked exact-`f64` GEMM against
+/// `known`: enough pivots and trailing width that packing beats rank-1
+/// `add_lazy`, and the prime admits exact `f64` accumulation.
+fn deferred_gemm_worthwhile(p: u64, n_rows: usize, n_cols: usize, n_pivots: usize) -> bool {
+    // Prefer SpMM/GEMM only when the panel is large enough that packing
+    // beats parallel AVX `add_lazy` (smaller panels regress on NTT cells).
+    f4_fp_gemm_env_on()
+        && super::fp_gemm::supports_f64_gemm(p)
+        && n_pivots >= 32
+        && n_cols >= 256
+        && n_rows >= 16
+        && n_rows.saturating_mul(n_pivots).saturating_mul(n_cols) >= (1 << 20)
+}
+
+/// Reduce every row of `sources` by the pivots `known` with blocked exact
+/// `f64` SpMM/GEMM trailing updates.  Panels of at most `min(64, k_safe_f64(p))`
+/// pivots: multipliers are formed by the same left-looking triangular rule
+/// as [`reduce_lazy_by`], then adaptive [`fp_gemm::spmm_or_gemm_f64`] writes
+/// the trailing submatrix (sparse `A` avoids zero-factor flops).  Returns
+/// fully-reduced accumulators (`pending = 0`); counted ops match the
+/// nonzero-factor `add_lazy` total (`n − c` per factor).
+fn reduce_chunk_by_known_gemm(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+) -> Vec<(Vec<u64>, usize)> {
+    use super::fp_gemm::{
+        detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p, spmm_or_gemm_f64,
+    };
+    let m = sources.len();
+    let n = sources[0].len();
+    let p = fp.p;
+    let bm = ((1u128 << 64) / u128::from(p)) as u64;
+    let simd = detect_gemm_simd();
+    let k_cap = k_safe_f64(p).min(64).max(1);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut a_dense_buf = Vec::new();
+    let mut b_pack_buf = Vec::new();
+    let mut panel_start = 0usize;
+    while panel_start < known.len() {
+        let k = (known.len() - panel_start).min(k_cap);
+        let panel = &known[panel_start..panel_start + k];
+        let c_min = panel[0].0;
+        let w = n - c_min;
+        if w == 0 {
+            panel_start += k;
+            continue;
+        }
+        let mut a_rows: Vec<Vec<(u32, f64)>> = vec![Vec::new(); m];
+        let mut ops = 0usize;
+        for (i, acc) in accs.iter().enumerate() {
+            let mut ell = vec![0u64; k];
+            for j in 0..k {
+                let cj = panel[j].0;
+                let mut v = u128::from(acc[cj]);
+                for jprev in 0..j {
+                    let f = ell[jprev];
+                    if f != 0 {
+                        v += u128::from(p - f) * u128::from(panel[jprev].1[cj]);
+                    }
+                }
+                let f = (v % u128::from(p)) as u64;
+                ell[j] = f;
+                if f != 0 {
+                    a_rows[i].push((j as u32, (p - f) as f64));
+                    ops += n - cj;
+                }
+            }
+        }
+        count_ops(ops);
+        let mut b = vec![0f64; k * w];
+        for j in 0..k {
+            let prow = &panel[j].1;
+            for t in 0..w {
+                b[j * w + t] = f64::from(prow[c_min + t]);
+            }
+        }
+        let mut c = vec![0f64; m * w];
+        for (i, acc) in accs.iter().enumerate() {
+            for t in 0..w {
+                c[i * w + t] = acc[c_min + t] as f64;
+            }
+        }
+        spmm_or_gemm_f64(
+            simd,
+            m,
+            w,
+            k,
+            &a_rows,
+            &b,
+            w,
+            &mut c,
+            w,
+            &mut a_dense_buf,
+            &mut b_pack_buf,
+        );
+        for i in 0..m {
+            reduce_f64_slice_mod_p(&mut c[i * w..(i + 1) * w], p, bm);
+        }
+        for (i, acc) in accs.iter_mut().enumerate() {
+            for t in 0..w {
+                acc[c_min + t] = c[i * w + t] as u64;
+            }
+        }
+        panel_start += k;
+    }
+    accs.into_iter().map(|a| (a, 0usize)).collect()
+}
+
+/// GEMM on the full chunk (do not strip-parallelize): B-panel packing is the
+/// dominant cost, so one pack over `m = chunk` rows beats many small packs.
+fn reduce_chunk_by_known_gemm_par(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    _spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    reduce_chunk_by_known_gemm(sources, known, fp)
+}
+
+/// How many unnormalised `add_lazy` updates may land on one accumulator
+/// before a full [`normalize_lazy`].  Bounded by the exact `u64` product
+/// limit for `p`, clamped to `[256, 4096]` (NTT primes have ~3×10⁷
+/// headroom; a higher cap was measured and did not beat 4096 on
+/// m=3 t=5).  Override with `F4_FP_NORMALIZE_AFTER`.
+#[inline]
+fn normalize_after_for(p: u64) -> usize {
+    static OVERRIDE: std::sync::OnceLock<Option<usize>> = std::sync::OnceLock::new();
+    if let Some(n) = *OVERRIDE.get_or_init(|| {
+        std::env::var("F4_FP_NORMALIZE_AFTER")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=(1 << 24)).contains(&n))
+    }) {
+        return n;
+    }
+    let lim = ((u64::MAX - p) / (p - 1).saturating_mul(p - 1).max(1)) as usize;
+    lim.clamp(256, 4096)
 }
 
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
@@ -3595,16 +3810,133 @@ fn reduce_lazy_by(
     if mem_site(0) {
         return reduce_lazy_by_fused(acc, known, fp, simd, pending);
     }
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     for (c, pivot) in known {
         let f = fp.reduce(acc[*c]);
         if f != 0 {
             add_lazy(acc, pivot, *c, fp.p - f, simd);
             *pending += 1;
-            if *pending == NORMALIZE_AFTER {
+            if *pending == normalize_after {
                 normalize_lazy(acc, fp);
                 *pending = 0;
             }
+        }
+    }
+}
+
+/// Rows per pivot-outer panel in deferred chunk reduce.  Default **off**
+/// (`0`): on NTT m=3 t=5 with MEM fused, per-row rayon + fused beats
+/// panels.  Opt in with `F4_FP_DEFERRED_PANEL=8` (or 2..64) for hosts
+/// where pivot reuse wins without MEM.
+fn deferred_panel_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_PANEL")
+            .ok()
+            .and_then(|v| {
+                if v == "0" {
+                    Some(0)
+                } else {
+                    v.parse().ok()
+                }
+            })
+            .filter(|&n| n == 0 || (2..=64).contains(&n))
+            .unwrap_or(0)
+    })
+}
+
+/// Pivot-outer reduction of a small panel of source rows by `known`: each
+/// pivot stays hot while every residual in the panel is updated (exact
+/// same products and counted ops as per-row [`reduce_lazy_by`]).
+fn reduce_panel_by_known(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+) -> Vec<(Vec<u64>, usize)> {
+    let normalize_after = normalize_after_for(fp.p);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut pendings = vec![0usize; sources.len()];
+    // Prefer fused multi-pivot when MEM site A is on: each row keeps its
+    // own MemGroup, flushed when full — pivots are still re-read per row
+    // inside a flush, but the outer walk shares the pivot pointer.
+    if mem_site(0) {
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            reduce_lazy_by_fused(acc, known, fp, simd, pending);
+        }
+        return accs.into_iter().zip(pendings).collect();
+    }
+    for (c, pivot) in known {
+        let c = *c;
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            let v = acc[c];
+            let f = if v == 0 {
+                0
+            } else if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            };
+            if f != 0 {
+                add_lazy(acc, pivot, c, fp.p - f, simd);
+                *pending += 1;
+                if *pending >= normalize_after {
+                    normalize_lazy(acc, fp);
+                    *pending = 0;
+                }
+            }
+        }
+    }
+    accs.into_iter().zip(pendings).collect()
+}
+
+/// Reduce every row of `chunk` by `known`, optionally as pivot-outer panels
+/// in parallel (`deferred_panel_rows`), else per-row fused/lazy.
+fn reduce_chunk_by_known(
+    chunk: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+    spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    let panel = deferred_panel_rows();
+    if panel >= 2 && chunk.len() >= panel && !mem_site(0) {
+        // Pivot-outer panels (MEM off): better pivot reuse than per-row.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else if panel >= 2 && chunk.len() >= 2 && mem_site(0) {
+        // MEM on: still shard into panels so rayon tasks are larger than
+        // one row (less scheduling overhead) while each row uses fused.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else {
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
+            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+            let mut pending = 0usize;
+            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+            (acc, pending)
+        };
+        if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
         }
     }
 }
@@ -3614,7 +3946,7 @@ fn reduce_lazy_by(
 /// coefficient and the row when it is stored.  A bounded normalization
 /// keeps even the largest supported prime far below `u64` overflow.
 ///
-/// Rows are taken in chunks of [`DEFERRED_CHUNK`]: every row of a chunk is
+/// Rows are taken in chunks of [`deferred_chunk_rows`]: every row of a chunk is
 /// reduced in parallel against the pivots known before the chunk, then the
 /// rows are stored one at a time, each first reduced again against the
 /// whole pivot list so the pivots its chunk-mates contributed (and any
@@ -3639,7 +3971,7 @@ fn rref32_deferred(
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
-    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
     let _def_ns = PpNs(PP_DEF_NS, Instant::now());
     pp_add(PP_DEF_ROWS, sources.len() as u64);
     for chunk in sources.chunks(chunk_rows) {
@@ -3648,18 +3980,17 @@ fn rref32_deferred(
             return None;
         }
         let n_cols = chunk[0].len();
-        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
-            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
-            let mut pending = 0usize;
-            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
-            (acc, pending)
-        };
         let o0 = pp_ops();
         let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
-        let mut reduced: Vec<(Vec<u64>, usize)> = if spread {
-            chunk.par_iter().map(reduce_one).collect()
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
         } else {
-            chunk.iter().map(reduce_one).collect()
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
         };
         let o1 = pp_ops();
         pp_add(
@@ -3671,13 +4002,13 @@ fn rref32_deferred(
             o1 - o0,
         );
         let t_store = Instant::now();
-        let known_before = known.len();
+        // Same as `rref_u32_barrett_deferred`: only re-reduce by this
+        // chunk's new pivots (pre-chunk columns are already clear).
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
         for (acc, pending) in reduced.iter_mut() {
-            if known.len() > known_before {
-                // chunk-mates became pivots: clear them, and whatever
-                // earlier pivot columns they re-dirtied
-                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
-                reduce_lazy_by(acc, &known, fp, simd, pending);
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
             }
             let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
             let Some(c) = row.iter().position(|&v| v != 0) else {
@@ -3689,8 +4020,32 @@ fn rref32_deferred(
             }
             count_ops(row.len() - c);
             count_norm(row.len() - c);
-            let at = known.partition_point(|(pc, _)| *pc < c);
-            known.insert(at, (c, row));
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
         }
         pp_add(PP_DEF_STORE, pp_ops() - o1);
         pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
@@ -3722,6 +4077,155 @@ fn rref32_deferred(
         },
         pp_ops() - o0,
     );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// Deferred RREF for residues stored as `u32` with a general [`Barrett`]
+/// prime (`p < 2^32`, including NTT primes above `2^16` where
+/// [`Barrett32`] refuses).  Same schedule as [`rref32_deferred`]'s 64-bit
+/// accumulator path, including exact-`f64` GEMM trailing updates.
+fn rref_u32_barrett_deferred(
+    rows: &mut Vec<Vec<u32>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<usize>> {
+    debug_assert!(fp.p < (1 << 32));
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+        } else {
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        // Residuals are already cleared against pre-chunk `known`, and each
+        // new pivot inherits that (zeros on those columns).  Re-walking the
+        // whole pivot list on every store only re-checks zeros — keep a
+        // column-ordered list of *this chunk's* new pivots and reduce by
+        // those alone, then merge into `known` once.
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
+        for (acc, pending) in reduced.iter_mut() {
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
+            }
+            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p);
+            for x in &mut row[c..] {
+                *x = fp.reduce(u64::from(*x) * inv) as u32;
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            // Both sides column-ordered: linear merge beats k·n inserts.
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+        let mut pending = 0usize;
+        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
+        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    // Prefer GEMM panels for back-substitution when the trailing width and
+    // pivot count amortise packing; otherwise the parallel lazy path.
+    let o0 = pp_ops();
+    let reduced: Vec<Vec<u32>> = if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len())
+        && known.len() >= 2
+    {
+        // One GEMM-style reduce of each pivot row by the later pivots:
+        // build sources = known rows, then for i reduce by known[i+1..].
+        // Fall back to per-row lazy when the triangular structure makes a
+        // single packed call awkward — still use GEMM per row panel via
+        // reduce_chunk against the suffix.
+        (0..known.len())
+            .into_par_iter()
+            .map(|i| {
+                let src = known[i].1.clone();
+                let suffix = &known[i + 1..];
+                if deferred_gemm_worthwhile(fp.p, 1, n_cols, suffix.len()) {
+                    let mut out = reduce_chunk_by_known_gemm(&[src], suffix, fp);
+                    let (acc, _) = out.pop().unwrap();
+                    acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+                } else {
+                    back(i)
+                }
+            })
+            .collect()
+    } else {
+        let spread = parallel && known.len() * n_cols > PAR_WORK;
+        if spread {
+            (0..known.len()).into_par_iter().map(back).collect()
+        } else {
+            (0..known.len()).map(back).collect()
+        }
+    };
+    pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
     let pivots = known.iter().map(|(c, _)| *c).collect();
     *rows = reduced;
     Some(pivots)
@@ -3875,7 +4379,7 @@ fn rref32_deferred_n32(
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
-    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
     let _def_ns = PpNs(PP_DEF_NS, Instant::now());
     pp_add(PP_DEF_ROWS, sources.len() as u64);
     for chunk in sources.chunks(chunk_rows) {
@@ -4024,7 +4528,7 @@ fn reduce_pairs_fl(
     }
     let fuse = mem_site(1);
     const NONE: u32 = u32::MAX;
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     let simd = lazy_simd_kind();
     let n_free = free_cols.len();
     if fuse && mem_stats() {
@@ -4081,7 +4585,7 @@ fn reduce_pairs_fl(
     // first when the group would take the unnormalised updates past the
     // bound
     let flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize, st: &mut (u64, u64)| {
-        if *pending + g.n > NORMALIZE_AFTER {
+        if *pending + g.n > normalize_after {
             normalize_lazy(acc, fp);
             *pending = 0;
         }
@@ -4131,7 +4635,7 @@ fn reduce_pairs_fl(
                 if position[j] < block_start {
                     add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                     pending += 1;
-                    if pending == NORMALIZE_AFTER {
+                    if pending == normalize_after {
                         normalize_lazy(&mut acc, fp);
                         pending = 0;
                     }
@@ -4248,7 +4752,7 @@ fn reduce_pairs_fl(
                 debug_assert!(position[j] < position[k]);
                 add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
                 *pending += 1;
-                if *pending == NORMALIZE_AFTER {
+                if *pending == normalize_after {
                     normalize_lazy(acc, fp);
                     *pending = 0;
                 }
@@ -4260,8 +4764,27 @@ fn reduce_pairs_fl(
     pp_add(PP_FLB_NS, pp_ns(t_flb));
     let t_pairs = Instant::now();
     let _pairs_ns = PpNs(PP_PAIRS_NS, t_pairs);
-    if fl_blocked_pairs() {
+    // `reduce_pairs_blocked` asserts `p ≤ 2¹⁶` (u64 accumulators without
+    // mid-tile normalisation).  Larger primes that still fit in `u32`
+    // coefficients (`supports_f64_gemm`, including the NTT prime 786433)
+    // take the per-row lazy path below, or the exact-f64 blocked form.
+    if fl_blocked_pairs() && fp.p <= 1 << 16 {
         return reduce_pairs_blocked(
+            pair_rows,
+            &bprime,
+            &bstart,
+            reducer_at,
+            &free_index,
+            n_free,
+            fp,
+            deadline,
+        );
+    }
+    // Wide primes: exact-f64 blocked D−C·B' (default on when the prime
+    // admits it).  Independent of F4_FP_GEMM (that flag is for deferred
+    // RREF panels, which still need packing-cost tuning).
+    if fl_blocked_pairs() && super::fp_gemm::supports_f64_gemm(fp.p) && fp.p > 1 << 16 {
+        return reduce_pairs_blocked_f64(
             pair_rows,
             &bprime,
             &bstart,
@@ -4286,7 +4809,7 @@ fn reduce_pairs_fl(
                 let j = reducer_at[c as usize] as usize;
                 add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                 pending += 1;
-                if pending == NORMALIZE_AFTER {
+                if pending == normalize_after {
                     normalize_lazy(&mut acc, fp);
                     pending = 0;
                 }
@@ -4784,6 +5307,121 @@ fn reduce_pairs_blocked(
     Some(out)
 }
 
+/// [`reduce_pairs_blocked`] for primes with exact `f64` GEMM (`p` up to the
+/// `supports_f64_gemm` bound, including 786433): same hit grouping and
+/// column tiles, with `f64` accumulators reduced every `k_safe_f64(p)`
+/// updates so every partial sum stays strictly ≤ 2⁵³.
+#[allow(clippy::too_many_arguments)]
+fn reduce_pairs_blocked_f64(
+    pair_rows: &[Vec<(u32, u64)>],
+    bprime: &[Vec<u32>],
+    bstart: &[usize],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    use super::fp_gemm::{
+        axpy_f64, cvt_u32_to_f64, detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p,
+    };
+    const NONE: u32 = u32::MAX;
+    assert!(bprime.len() < 1 << 31, "reducer index fits u32");
+    let simd = detect_gemm_simd();
+    let k_safe = k_safe_f64(fp.p).max(1);
+    let bm = ((1u128 << 64) / u128::from(fp.p)) as u64;
+    // B' as f64 once: every block reuses the same panels.
+    let bprime_f64: Vec<Vec<f64>> = bprime
+        .iter()
+        .map(|row| {
+            let mut out = vec![0f64; row.len()];
+            cvt_u32_to_f64(simd, row, &mut out);
+            out
+        })
+        .collect();
+    let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc: Vec<Vec<f64>> = vec![vec![0f64; n_free]; rows.len()];
+        let mut hits: Vec<(u32, u32, f64)> = Vec::new();
+        for (i, r) in rows.iter().enumerate() {
+            for &(c, v) in r {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[i][fi as usize] += v as f64;
+                } else {
+                    hits.push((reducer_at[c as usize], i as u32, (fp.p - v) as f64));
+                }
+            }
+        }
+        hits.sort_unstable_by_key(|&(j, i, _)| (j, i));
+        let mut pending = vec![0usize; rows.len()];
+        let mut from = 0usize;
+        while from < n_free {
+            let to = (from + FL_PAIR_TILE).min(n_free);
+            for &(j, i, factor) in &hits {
+                let j = j as usize;
+                let i = i as usize;
+                let start = bstart[j].max(from);
+                if start >= to {
+                    continue;
+                }
+                axpy_f64(
+                    simd,
+                    &mut acc[i][start..to],
+                    &bprime_f64[j][start..to],
+                    factor,
+                );
+                pending[i] += 1;
+                if pending[i] >= k_safe {
+                    reduce_f64_slice_mod_p(&mut acc[i], fp.p, bm);
+                    pending[i] = 0;
+                }
+            }
+            from = to;
+        }
+        for (i, a) in acc.iter_mut().enumerate() {
+            if pending[i] > 0 {
+                reduce_f64_slice_mod_p(a, fp.p, bm);
+            }
+        }
+        count_ops(
+            hits.iter()
+                .map(|&(j, _, _)| n_free - bstart[j as usize])
+                .sum(),
+        );
+        Some(
+            acc.into_iter()
+                .map(|a| {
+                    a.into_iter()
+                        .map(|x| {
+                            debug_assert!(x >= 0.0 && x < fp.p as f64);
+                            x as u32
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+    };
+    let o0 = pp_ops();
+    let (spread, rows_per_block) = pairs_blocked_dispatch(pair_rows, n_free);
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if spread {
+        pair_rows.par_chunks(rows_per_block).map(block).collect()
+    } else {
+        pair_rows.chunks(rows_per_block).map(block).collect()
+    };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
+    let mut out = Vec::with_capacity(pair_rows.len());
+    for b in blocks {
+        out.extend(b?);
+    }
+    Some(out)
+}
+
 /// [`add_lazy`] over the columns `from..to` only, uncounted (the caller
 /// counts the whole update once).
 #[inline]
@@ -4817,25 +5455,22 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
 // exact integer sums, one accumulator pass per group instead of one per
 // update.
 //
-// Opt-in: `F4_FP_MEM=1` turns the fused path on; it is off by default.  In
-// the serial interleaved A/B (research/f4_groebner_speed_leads_20261116)
-// its pre-registered endpoint (quad_n9, 1.2-1.4x) was not met (0.97-1.06),
-// its significant gains (overdet_n10/n12 at 4 threads, 1.22x/1.67x) were not
-// predicted, and it slowed small systems at 1 thread (quad_n5 0.80x), so it
-// stays off until a pre-registered confirmation passes.  With it on,
-// `F4_FP_MEM_A=0`, `F4_FP_MEM_B=0`, `F4_FP_MEM_C=0` turn off one site each
-// (the deferred reduction, the `B'` build, the blocked pair rows), and
-// `F4_FP_MEM_OLD=1` still forces the one-update path.
+// Default on: fused multi-pivot updates for deferred reduction, `B'` build,
+// and blocked pair rows.  On NTT `pkm_symmetric_tower` m=3 t=5 the fused
+// path cut wall another ~1.2× on top of wide FL + deferred lazy (three
+// matched repeats).  `F4_FP_MEM=0` or `F4_FP_MEM_OLD=1` restores the
+// one-update path; `F4_FP_MEM_A=0` / `B=0` / `C=0` turn off one site each.
 
-/// Updates of one accumulator applied together.
+/// Updates of one accumulator applied together.  Capped at 8: the AVX-512
+/// fused kernel is instantiated only for `n ≤ 8` ([`fused_apply`]).
 const MEM_K: usize = 8;
 
 /// Whether fused site `site` (0 deferred reduction, 1 `B'` build, 2
-/// blocked pair rows) is on.  Off unless `F4_FP_MEM=1`.
+/// blocked pair rows) is on.  Default on; `F4_FP_MEM=0` disables.
 fn mem_site(site: usize) -> bool {
     static ON: std::sync::OnceLock<[bool; 3]> = std::sync::OnceLock::new();
     ON.get_or_init(|| {
-        let on = std::env::var("F4_FP_MEM").as_deref() == Ok("1")
+        let on = std::env::var("F4_FP_MEM").as_deref() != Ok("0")
             && std::env::var("F4_FP_MEM_OLD").as_deref() != Ok("1");
         let off = |v: &str| std::env::var(v).as_deref() == Ok("0");
         [
@@ -4988,6 +5623,20 @@ fn fused_apply(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize,
         go!(1, 2, 3, 4, 5, 6, 7, 8);
         return;
     }
+    #[cfg(target_arch = "x86_64")]
+    if simd == 1 {
+        macro_rules! go {
+            ($($n:literal),*) => {
+                match piv.len() {
+                    // SAFETY: `lazy_simd_kind` verified AVX2; bounds asserted above.
+                    $($n => unsafe { fused_avx2::<$n>(acc, piv, f, lo, hi) },)*
+                    _ => unreachable!(),
+                }
+            };
+        }
+        go!(1, 2, 3, 4, 5, 6, 7, 8);
+        return;
+    }
     let _ = simd;
     fused_scalar(acc, piv, f, lo, hi);
 }
@@ -5000,6 +5649,52 @@ fn fused_scalar(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize
             x += f[t] * u64::from(piv[t][i]);
         }
         acc[i] = x;
+    }
+}
+
+/// [`fused_apply`] with `N` updates in AVX2: per four columns one
+/// accumulator load and store and `N` pivot loads.  Same schedule as
+/// [`fused_avx512`]; used when AVX-512F is unavailable (the previous
+/// fallback was scalar and left a large gap on AVX2-only hosts).
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn fused_avx2<const N: usize>(
+    acc: &mut [u64],
+    piv: &[&[u32]],
+    f: &[u64],
+    lo: usize,
+    hi: usize,
+) {
+    use std::arch::x86_64::{
+        __m128i, __m256i, _mm256_add_epi64, _mm256_cvtepu32_epi64, _mm256_loadu_si256,
+        _mm256_mul_epu32, _mm256_set1_epi64x, _mm256_storeu_si256, _mm_loadu_si128,
+    };
+    let mut m = [_mm256_set1_epi64x(0); N];
+    let mut ptr = [std::ptr::null::<u32>(); N];
+    for t in 0..N {
+        m[t] = _mm256_set1_epi64x(f[t] as i64);
+        ptr[t] = piv[t].as_ptr();
+    }
+    let a = acc.as_mut_ptr();
+    let mut i = lo;
+    while i + 4 <= hi {
+        // SAFETY: caller asserted `hi` within the accumulator and every
+        // pivot row; loads and stores accept unaligned pointers.
+        let mut cur = unsafe { _mm256_loadu_si256(a.add(i) as *const __m256i) };
+        for t in 0..N {
+            let v = unsafe { _mm_loadu_si128(ptr[t].add(i) as *const __m128i) };
+            cur = _mm256_add_epi64(cur, _mm256_mul_epu32(_mm256_cvtepu32_epi64(v), m[t]));
+        }
+        unsafe { _mm256_storeu_si256(a.add(i) as *mut __m256i, cur) };
+        i += 4;
+    }
+    while i < hi {
+        let mut x = acc[i];
+        for t in 0..N {
+            x += f[t] * u64::from(piv[t][i]);
+        }
+        acc[i] = x;
+        i += 1;
     }
 }
 
@@ -5060,12 +5755,12 @@ fn reduce_lazy_by_fused(
     simd: u8,
     pending: &mut usize,
 ) {
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     let len = acc.len();
     let mut g = MemGroup::new();
     let (mut ops, mut touched, mut flushes) = (0usize, 0u64, 0u64);
     let mut flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize| {
-        if *pending + g.n > NORMALIZE_AFTER {
+        if *pending + g.n > normalize_after {
             normalize_lazy(acc, fp);
             *pending = 0;
         }
@@ -5075,11 +5770,26 @@ fn reduce_lazy_by_fused(
     };
     for (c, pivot) in known {
         let c = *c;
-        let mut v = acc[c];
-        for t in 0..g.n {
-            v += g.f[t] * u64::from(g.piv[t][c]);
-        }
-        let f = fp.reduce(v);
+        let f = if g.n == 0 {
+            // Hot miss path: no pending group — skip Barrett when the
+            // coefficient is already a reduced residue (common after a
+            // flush/normalise).
+            let v = acc[c];
+            if v == 0 {
+                continue;
+            }
+            if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            }
+        } else {
+            let mut v = acc[c];
+            for t in 0..g.n {
+                v += g.f[t] * u64::from(g.piv[t][c]);
+            }
+            fp.reduce(v)
+        };
         if f != 0 {
             g.push(pivot, c, fp.p - f);
             ops += len - c;
@@ -7131,6 +7841,16 @@ fn f4_with_arithmetic(
             // Products an entry below `p` can take without reaching `2⁶⁴`
             // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
             let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
+            // Wide primes (above the narrow/deferred gate at 2¹⁶) still admit
+            // Faugère–Lachartre when coefficients fit in `u32` and exact `f64`
+            // panels are safe — the NTT prime 786433 is the motivating case.
+            // `F4_FP_FL=0` keeps the cascade below as a same-binary control.
+            let fl_wide = resume_here.is_none()
+                && opts.resource_limits.is_none()
+                && fl_enabled()
+                && n_cols >= fl_min_cols()
+                && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES
+                && super::fp_gemm::supports_f64_gemm(p);
             let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                 if deadline.is_some_and(|d| Instant::now() > d) {
                     return None;
@@ -7195,6 +7915,21 @@ fn f4_with_arithmetic(
             // part of the reduction
             let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
                 Some(Vec::new())
+            } else if fl_wide {
+                reduce_pairs_fl(
+                    pair_rows,
+                    reducers,
+                    &reducer_at,
+                    &free_cols,
+                    n_cols,
+                    fp,
+                    deadline,
+                )
+                .map(|rows| {
+                    rows.into_iter()
+                        .map(|r| r.into_iter().map(u64::from).collect())
+                        .collect()
+                })
             } else if parallel {
                 pair_rows.par_iter().map(reduce_pair_row).collect()
             } else {
@@ -7290,13 +8025,46 @@ fn f4_with_arithmetic(
                 let piv = match &block_classes {
                     Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
                     None => {
-                        let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                            if top.is_some() && opts.checkpoint.is_some() {
-                                Some(&mut snapshot_hook)
-                            } else {
-                                None
-                            };
-                        rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        let want_hook = top.is_some() && opts.checkpoint.is_some();
+                        // Deferred lazy/SpMM RREF for free-column matrices on
+                        // exact-f64 primes (NTT 786433): classical `rref` uses
+                        // per-entry Barrett reduces; deferred keeps AVX lazy
+                        // accumulators (GEMM panels optional via F4_FP_GEMM).
+                        // `F4_FP_WIDE_DEFERRED=0` restores classical `rref`.
+                        let use_wide_deferred = resume_arg.is_none()
+                            && !want_hook
+                            && wide_deferred_enabled()
+                            && super::fp_gemm::supports_f64_gemm(p)
+                            && rows.len() >= 8
+                            && rows.first().map(|r| r.len()).unwrap_or(0) >= 64;
+                        if use_wide_deferred {
+                            let mut rows32: Vec<Vec<u32>> = rows
+                                .iter()
+                                .map(|r| {
+                                    r.iter()
+                                        .map(|&v| {
+                                            debug_assert!(v < p);
+                                            v as u32
+                                        })
+                                        .collect()
+                                })
+                                .collect();
+                            let piv =
+                                rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                            rows = rows32
+                                .into_iter()
+                                .map(|r| r.into_iter().map(u64::from).collect())
+                                .collect();
+                            Some(piv)
+                        } else {
+                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                if want_hook {
+                                    Some(&mut snapshot_hook)
+                                } else {
+                                    None
+                                };
+                            rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        }
                     }
                 };
                 piv.map(|piv| (rows, piv))
@@ -9692,15 +10460,18 @@ impl Drop for VisitAccountingSession<'_> {
     }
 }
 
-const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 33] = [
+const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 36] = [
     "F4_DEBUG",
     "F4_FP_BRANCH",
+    "F4_FP_DEFERRED_CHUNK",
     "F4_FP_DEFERRED_PAR",
     "F4_FP_FL",
     "F4_FP_FL_BLOCKED",
     "F4_FP_FL_MIN_COLS",
     "F4_FP_FREEZE",
+    "F4_FP_GEMM",
     "F4_FP_GM",
+    "F4_FP_WIDE_DEFERRED",
     "F4_FP_LAZY_AVX2",
     "F4_FP_LAZY_AVX512",
     "F4_FP_LAZY_SIMD",
@@ -13118,7 +13889,8 @@ pub struct SolveReport {
     pub final_filter_ns: u64,
     pub timed_out: bool,
     /// `F_p` multiplications spent in row reduction, summed over the F4
-    /// runs of the substitution tree.
+    /// runs of the substitution tree. This excludes root extraction, whose
+    /// elapsed time is included in `root_selection_ns`.
     pub field_ops: u64,
     /// Block-reduced steps of the top-level run.
     pub blocked_steps: usize,
@@ -13343,11 +14115,13 @@ pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
         *muls += powmod_muls(e);
         powmod(a, e, p)
     };
+    if p % 4 == 3 {
+        let root = pw(n, (p + 1) / 4, muls);
+        *muls += 1;
+        return (mulmod(root, root, p) == n).then_some(root);
+    }
     if pw(n, (p - 1) / 2, muls) != 1 {
         return None;
-    }
-    if p % 4 == 3 {
-        return Some(pw(n, (p + 1) / 4, muls));
     }
     let (mut q, mut s) = (p - 1, 0u32);
     while q % 2 == 0 {
@@ -13398,6 +14172,9 @@ pub(crate) fn dense_roots_fp(
     muls: &mut u64,
     deadline: Option<Instant>,
 ) -> Option<Vec<u64>> {
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        return None;
+    }
     let mut roots = match h.len() {
         0 | 1 => Vec::new(),
         2 => {
@@ -13407,18 +14184,19 @@ pub(crate) fn dense_roots_fp(
         3 if p % 2 == 1 => {
             let (c0, c1, c2) = (h[0], h[1], h[2]);
             let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
-            *muls += 4;
-            let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+            *muls += 3;
             match sqrt_mod_counted(disc, p, muls) {
                 None => Vec::new(),
                 Some(s) => {
                     *muls += 2;
+                    let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
                     let neg_b = (p - c1) % p;
                     let r1 = mulmod((neg_b + s) % p, inv2a, p);
-                    let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
-                    if r1 == r2 {
+                    if s == 0 {
                         vec![r1]
                     } else {
+                        *muls += 1;
+                        let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
                         vec![r1, r2]
                     }
                 }
@@ -13434,184 +14212,93 @@ pub(crate) fn dense_roots_fp(
     };
     roots.sort_unstable();
     roots.dedup();
-    Some(roots)
-}
-
-/// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
-/// Field sizes below this keep the exhaustive scan, so the counted
-/// operations of every existing small-field measurement are unchanged.
-/// Above it the scan (about `p * terms` modular powers) cannot finish:
-/// at `p = 2^31 - 1` one degree-21 polynomial needs hours.
-const ROOTS_EXHAUSTIVE_MAX_P: u64 = 1 << 28;
-
-/// All roots in `F_p` of `sum c * x^k`, ascending.  Exact on both paths:
-/// the large-field path returns the roots of `gcd(f, x^p - x)`, which are
-/// exactly the `F_p` roots of `f`.
-fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
-    if p < ROOTS_EXHAUSTIVE_MAX_P {
-        return roots_univariate_exhaustive(coeffs, p);
-    }
-    roots_univariate_split(coeffs, p).unwrap_or_else(|| roots_univariate_exhaustive(coeffs, p))
-}
-
-fn roots_univariate_exhaustive(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
-    (0..p)
-        .filter(|&x| {
-            let mut v = 0u64;
-            for (k, c) in coeffs {
-                v = (v + mulmod(*c, powmod(x, *k as u64, p), p)) % p;
-            }
-            v == 0
-        })
-        .collect()
-}
-
-// Dense polynomials over F_p, lowest degree first, without trailing zeros.
-fn upoly_trim(mut a: Vec<u64>) -> Vec<u64> {
-    while a.last() == Some(&0) {
-        a.pop();
-    }
-    a
-}
-
-fn upoly_monic(a: Vec<u64>, p: u64) -> Vec<u64> {
-    match a.last() {
-        Some(&lead) if lead != 1 => {
-            let inv = inv_mod_u64(lead, p);
-            a.into_iter().map(|c| mulmod(c, inv, p)).collect()
-        }
-        _ => a,
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
     }
 }
 
-/// Quotient and remainder of `a` by a monic nonzero `m`.
-fn upoly_divrem(a: &[u64], m: &[u64], p: u64) -> (Vec<u64>, Vec<u64>) {
-    let dm = m.len() - 1;
-    let mut r = a.to_vec();
-    if r.len() <= dm {
-        return (Vec::new(), upoly_trim(r));
-    }
-    let mut q = vec![0u64; r.len() - dm];
-    for i in (dm..r.len()).rev() {
-        let c = r[i];
-        if c == 0 {
-            continue;
-        }
-        q[i - dm] = c;
-        for (j, &mj) in m.iter().enumerate() {
-            let k = i - dm + j;
-            r[k] = (r[k] + p - mulmod(c, mj, p)) % p;
-        }
-    }
-    r.truncate(dm);
-    (upoly_trim(q), upoly_trim(r))
-}
-
-fn upoly_mulrem(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
-    if a.is_empty() || b.is_empty() {
-        return Vec::new();
-    }
-    let mut c = vec![0u64; a.len() + b.len() - 1];
-    for (i, &ai) in a.iter().enumerate() {
-        for (j, &bj) in b.iter().enumerate() {
-            c[i + j] = (c[i + j] + mulmod(ai, bj, p)) % p;
-        }
-    }
-    upoly_divrem(&c, m, p).1
-}
-
-fn upoly_powrem(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Vec<u64> {
-    let mut r = upoly_divrem(&[1], m, p).1;
-    let mut b = upoly_divrem(base, m, p).1;
-    while e > 0 {
-        if e & 1 == 1 {
-            r = upoly_mulrem(&r, &b, m, p);
-        }
-        b = upoly_mulrem(&b, &b, m, p);
-        e >>= 1;
-    }
-    r
-}
-
-/// `a - c` for a constant `c`.
-fn upoly_sub_const(mut a: Vec<u64>, c: u64, p: u64) -> Vec<u64> {
-    if a.is_empty() {
-        a.push(0);
-    }
-    a[0] = (a[0] + p - c % p) % p;
-    upoly_trim(a)
-}
-
-/// Monic gcd; the gcd of two zero polynomials is zero (empty).
-fn upoly_gcd(a: Vec<u64>, b: Vec<u64>, p: u64) -> Vec<u64> {
-    let (mut a, mut b) = (upoly_trim(a), upoly_trim(b));
-    while !b.is_empty() {
-        let bm = upoly_monic(b, p);
-        let r = upoly_divrem(&a, &bm, p).1;
-        a = bm;
-        b = r;
-    }
-    upoly_monic(a, p)
-}
-
-/// Roots of a monic, squarefree `g` that splits into distinct linear
-/// factors over F_p (odd p), by Cantor-Zassenhaus equal-degree splitting
-/// with the deterministic shifts `x + 1, x + 2, ...`.
-fn upoly_split_linear(g: Vec<u64>, p: u64, out: &mut Vec<u64>) -> Option<()> {
-    match g.len() {
-        0 => return None,
-        1 => return Some(()),
-        2 => {
-            out.push((p - g[0]) % p);
-            return Some(());
-        }
-        _ => {}
-    }
-    // Each shift fails to split with probability about 2^(1 - deg g).
-    for a in 1..=256u64 {
-        let t = upoly_powrem(&[a % p, 1], (p - 1) / 2, &g, p);
-        let d = upoly_gcd(g.clone(), upoly_sub_const(t, 1, p), p);
-        if d.len() > 1 && d.len() < g.len() {
-            let (q, r) = upoly_divrem(&g, &d, p);
-            debug_assert!(r.is_empty());
-            upoly_split_linear(d, p, out)?;
-            return upoly_split_linear(upoly_monic(q, p), p, out);
-        }
-    }
-    None
-}
-
-/// The F_p roots of `sum c * x^k` through `gcd(f, x^p - x)`, ascending.
-/// `None` for the zero polynomial (every element is a root) or an even
-/// field, which the exhaustive scan handles.
-fn roots_univariate_split(coeffs: &[(u32, u64)], p: u64) -> Option<Vec<u64>> {
-    if p < 3 || p.is_multiple_of(2) {
+/// All roots of a sparse univariate polynomial over the prime field, in
+/// ascending order. A cancelled extraction is distinct from an empty root set.
+/// The automatic policy uses closed forms through degree two and the visitor's
+/// existing scan/Frobenius cost estimate for higher degrees.
+fn roots_univariate(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    mode: DomainRootMode,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let expired = || deadline.is_some_and(|d| Instant::now() >= d);
+    if expired() {
         return None;
     }
-    let deg = coeffs.iter().map(|(k, _)| *k as usize).max()?;
-    let mut f = vec![0u64; deg + 1];
-    for (k, c) in coeffs {
-        f[*k as usize] = (f[*k as usize] + c % p) % p;
+    let exponents: Vec<u32> = coeffs
+        .iter()
+        .filter(|(_, c)| !c.is_multiple_of(p))
+        .map(|&(k, _)| k)
+        .collect();
+    let degree = exponents.iter().copied().max().unwrap_or(0);
+    let scan = mode == DomainRootMode::Scan
+        || p == 2
+        || (mode == DomainRootMode::Auto
+            && degree > 2
+            && domain_scan_cost(&exponents, p as usize) <= domain_frobenius_cost(degree, p));
+    if scan {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
     }
-    let f = upoly_monic(upoly_trim(f), p);
-    match f.len() {
-        0 => return None,
-        1 => return Some(Vec::new()),
-        _ => {}
+    let mut dense = vec![0; degree as usize + 1];
+    for &(k, c) in coeffs {
+        // Ignore zero terms before indexing, including a trailing term whose
+        // exponent exceeds the actual degree. Merge duplicate exponents.
+        if !c.is_multiple_of(p) {
+            dense[k as usize] =
+                ((u128::from(dense[k as usize]) + u128::from(c % p)) % u128::from(p)) as u64;
+        }
     }
-    let xp = upoly_powrem(&[0, 1], p, &f, p);
-    // x^p - x reduced modulo f.
-    let mut h = xp;
-    if h.len() < 2 {
-        h.resize(2, 0);
+    let dense = dense_trim(dense);
+    if dense.is_empty() {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
     }
-    h[1] = (h[1] + p - 1) % p;
-    let g = upoly_gcd(f, upoly_trim(h), p);
-    let mut roots = Vec::with_capacity(g.len().saturating_sub(1));
-    upoly_split_linear(g, p, &mut roots)?;
-    roots.sort_unstable();
-    roots.dedup();
-    Some(roots)
+    let mut muls = 0;
+    let roots = dense_roots_fp(&dense, p, &mut muls, deadline)?;
+    if expired() {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+/// Original sparse evaluation control, with cooperative cancellation. Keep
+/// the arithmetic and root order so historical small-field runs can replay.
+fn roots_univariate_exhaustive_until(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = Vec::new();
+    for x in 0..p {
+        if x % 256 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        let mut value = 0u64;
+        for &(k, c) in coeffs {
+            value = (value + mulmod(c, powmod(x, u64::from(k), p), p)) % p;
+        }
+        if value == 0 {
+            roots.push(x);
+        }
+    }
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+#[cfg(test)]
+fn roots_univariate_exhaustive(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
+    roots_univariate_exhaustive_until(coeffs, p, None).unwrap()
 }
 
 /// A forced assignment from a pure nonconstant linear univariate equation.
@@ -13667,8 +14354,22 @@ fn specialise(f: &Poly, i: usize, a: u64, p: u64) -> Vec<(Vec<u32>, u64)> {
 /// Solve a zero-dimensional system over `F_p` by degree-bounded F4 and
 /// substitution.  Solutions are full assignments `(x_0, …, x_{n−1})`.
 pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveReport {
+    solve_with_root_mode(input, n_vars, p, opts, DomainRootMode::Auto)
+}
+
+/// Solve with an explicit univariate root policy. `Scan` retains the exhaustive
+/// control, `Frobenius` forces algebraic extraction, and `Auto` is the normal
+/// [`solve`] policy. This policy applies to the full field. Finite-domain
+/// visitor extraction remains controlled by [`F4Options::domain_roots`].
+pub fn solve_with_root_mode(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    root_mode: DomainRootMode,
+) -> SolveReport {
     let linear_roots = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
-    solve_with_linear_roots(input, n_vars, p, opts, linear_roots)
+    solve_with_linear_roots(input, n_vars, p, opts, linear_roots, root_mode)
 }
 
 fn solve_with_linear_roots(
@@ -13677,6 +14378,7 @@ fn solve_with_linear_roots(
     p: u64,
     opts: &F4Options,
     linear_roots: bool,
+    root_mode: DomainRootMode,
 ) -> SolveReport {
     let t0 = Instant::now();
     let ops0 = field_ops_now();
@@ -13696,6 +14398,7 @@ fn solve_with_linear_roots(
         p,
         opts,
         linear_roots,
+        root_mode,
         &mut runs,
         &mut max_rows,
         &mut max_cols,
@@ -13769,6 +14472,7 @@ fn solve_rec(
     p: u64,
     opts: &F4Options,
     linear_roots: bool,
+    root_mode: DomainRootMode,
     runs: &mut usize,
     max_rows: &mut usize,
     max_cols: &mut usize,
@@ -13830,27 +14534,33 @@ fn solve_rec(
             if vars.len() == 1 {
                 let i = *vars.iter().next().unwrap();
                 let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
-                let roots = roots_univariate(&coeffs, p);
+                let Some(roots) = roots_univariate(&coeffs, p, root_mode, opts.deadline) else {
+                    *root_selection_ns += root_selection_start.elapsed().as_nanos();
+                    *timed_out = true;
+                    return Verdict::Undetermined;
+                };
                 if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
                     best = Some((i, roots));
                 }
             }
         }
     }
-    let (var, values): (usize, Vec<u64>) = match best {
-        Some(b) => b,
+    let (var, roots, field_values) = match best {
+        Some((i, roots)) => (i, roots, 0..0),
         None => {
             // Without a univariate element every value of the first
             // variable is tried.  With a truncation (`pairs_above_bound`)
             // the basis is that of a sub-ideal, so this and the root
             // enumeration above return a superset of the solutions, which
             // `solve` filters against the input.
-            (0, (0..p).collect())
+            // Iterate lazily so a large field cannot allocate p entries
+            // before the recursion gets a chance to observe its deadline.
+            (0, Vec::new(), 0..p)
         }
     };
     *root_selection_ns += root_selection_start.elapsed().as_nanos();
     let mut sols: Vec<Vec<u64>> = Vec::new();
-    for a in values {
+    for a in roots.into_iter().chain(field_values) {
         if let Some(d) = opts.deadline {
             if Instant::now() > d {
                 *timed_out = true;
@@ -13871,6 +14581,7 @@ fn solve_rec(
             p,
             opts,
             linear_roots,
+            root_mode,
             runs,
             max_rows,
             max_cols,
@@ -13927,6 +14638,129 @@ mod tests {
     }
 
     #[test]
+    fn root_policies_match_every_small_cubic() {
+        for p in [2u64, 3, 5, 7] {
+            for encoded in 0..p.pow(4) {
+                let mut digits = encoded;
+                let coeffs: Vec<_> = (0..4)
+                    .map(|k| {
+                        let c = digits % p;
+                        digits /= p;
+                        (k, c)
+                    })
+                    .collect();
+                let want = roots_univariate_exhaustive(&coeffs, p);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(
+                        roots_univariate(&coeffs, p, mode, None),
+                        Some(want.clone()),
+                        "p={p} coeffs={coeffs:?} mode={mode:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_match_13_bit_repeated_root_polynomials() {
+        for p in [4099u64, 6151, 8191] {
+            for degree in [1, 2, 4, 8, 16, 32, 64] {
+                let mut dense = vec![1];
+                let mut want = Vec::new();
+                for k in 0..degree {
+                    // Include zero and repeated roots without relying on
+                    // the extraction implementation to construct the oracle.
+                    let root = (k / 2 * 137) % p;
+                    want.push(root);
+                    let mut next = vec![0; dense.len() + 1];
+                    for (i, &c) in dense.iter().enumerate() {
+                        next[i] = (next[i] + p - mulmod(c, root, p)) % p;
+                        next[i + 1] = (next[i + 1] + c) % p;
+                    }
+                    dense = next;
+                }
+                want.sort_unstable();
+                want.dedup();
+                let coeffs: Vec<_> = dense
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, c)| (i as u32, c))
+                    .collect();
+                assert_eq!(roots_univariate_exhaustive(&coeffs, p), want);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(roots_univariate(&coeffs, p, mode, None), Some(want.clone()));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_preserve_zero_terms_and_cancellation() {
+        let cases = [
+            vec![],
+            vec![(0, 0)],
+            vec![(1, 1), (1, 4)],
+            vec![(1, 1), (0, 4), (u32::MAX, 0)],
+            vec![(2, 6), (2, 4), (1, 1), (0, 4)],
+        ];
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            for coeffs in &cases {
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, None),
+                    Some(roots_univariate_exhaustive(coeffs, 5))
+                );
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, Some(Instant::now())),
+                    None
+                );
+            }
+            let mut opts = F4Options::new(Ordering::Grevlex, 4);
+            opts.deadline = Some(Instant::now());
+            let report =
+                solve_with_root_mode(&[vec![(vec![2], 1), (vec![0], 4)]], 1, 5, &opts, mode);
+            assert!(report.timed_out);
+            assert!(matches!(report.verdict, Verdict::Undetermined));
+        }
+        assert_eq!(domain_frobenius_cost(u32::MAX, 8191), u64::MAX);
+    }
+
+    #[test]
+    fn public_solver_root_modes_preserve_complete_solutions() {
+        let p = 101;
+        let input = vec![
+            vec![(vec![4, 0], 1), (vec![0, 0], p - 1)],
+            vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+        ];
+        let want: Vec<_> = (0..p)
+            .filter(|&x| input.iter().all(|g| eval(g, &[x, x], p) == 0))
+            .map(|x| vec![x, x])
+            .collect();
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            let report = solve_with_root_mode(&input, 2, p, &opts, mode);
+            assert!(!report.timed_out);
+            let Verdict::Solutions(mut got) = report.verdict else {
+                panic!("{mode:?}: no roots");
+            };
+            got.sort();
+            assert_eq!(got, want);
+        }
+        let Verdict::Solutions(mut got) = solve(&input, 2, p, &opts).verdict else {
+            panic!("default: no roots");
+        };
+        got.sort();
+        assert_eq!(got, want);
+    }
+
+    #[test]
     fn split_roots_match_the_exhaustive_scan() {
         let mut state = 7u64;
         for p in [3u64, 5, 7, 101, 10_007, 65_537] {
@@ -13951,14 +14785,9 @@ mod tests {
                     }
                     coeffs = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
                 }
-                let fast = roots_univariate_split(&coeffs, p);
+                let fast = roots_univariate(&coeffs, p, DomainRootMode::Frobenius, None);
                 let slow = roots_univariate_exhaustive(&coeffs, p);
-                match fast {
-                    Some(r) => assert_eq!(r, slow, "p={p} coeffs={coeffs:?}"),
-                    None => {
-                        assert_eq!(slow.len() as u64, p, "only the zero polynomial is deferred")
-                    }
-                }
+                assert_eq!(fast, Some(slow), "p={p} coeffs={coeffs:?}");
             }
         }
     }
@@ -13978,8 +14807,14 @@ mod tests {
             f = g;
         }
         let coeffs: Vec<(u32, u64)> = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
-        assert_eq!(roots_univariate(&coeffs, p), want);
-        assert_eq!(roots_univariate(&[(0, 5)], p), Vec::<u64>::new());
+        assert_eq!(
+            roots_univariate(&coeffs, p, DomainRootMode::Auto, None),
+            Some(want)
+        );
+        assert_eq!(
+            roots_univariate(&[(0, 5)], p, DomainRootMode::Auto, None),
+            Some(Vec::new())
+        );
     }
 
     #[test]
@@ -13990,7 +14825,10 @@ mod tests {
                     let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
                     let (var, root) = linear_assignment(&g, p).unwrap();
                     assert_eq!(var, 1);
-                    assert_eq!(roots_univariate(&[(1, a), (0, b)], p), vec![root]);
+                    assert_eq!(
+                        roots_univariate(&[(1, a), (0, b)], p, DomainRootMode::Auto, None),
+                        Some(vec![root])
+                    );
                 }
             }
         }
@@ -14015,8 +14853,10 @@ mod tests {
                     vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
                 ];
                 let opts = F4Options::new(Ordering::Grevlex, 8);
-                let baseline = solve_with_linear_roots(&input, 2, p, &opts, false);
-                let candidate = solve_with_linear_roots(&input, 2, p, &opts, true);
+                let baseline =
+                    solve_with_linear_roots(&input, 2, p, &opts, false, DomainRootMode::Auto);
+                let candidate =
+                    solve_with_linear_roots(&input, 2, p, &opts, true, DomainRootMode::Auto);
                 match (baseline.verdict, candidate.verdict) {
                     (Verdict::Inconsistent, Verdict::Inconsistent) => {}
                     (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {
@@ -15358,6 +16198,58 @@ mod tests {
                     widened_deferred, wide,
                     "deferred p={p}, shape={rows}x{cols}"
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn reduce_chunk_gemm_matches_lazy_on_ntt_prime() {
+        // Direct A/B of the blocked GEMM helper against per-row `reduce_lazy_by`
+        // on p = 786433 (exact-f64 GEMM prime used by E2LOCMS45).
+        let p = 786_433u64;
+        assert!(super::super::fp_gemm::supports_f64_gemm(p));
+        let fp = Barrett::new(p);
+        let simd = lazy_simd_kind();
+        let mut x = 0xC0FF_EE00_D15C_AFE1u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for (n_piv, n_rows, n_cols) in [(12usize, 16usize, 96usize), (24, 32, 128), (40, 48, 160)]
+        {
+            let mut known: Vec<(usize, Vec<u32>)> = Vec::with_capacity(n_piv);
+            for j in 0..n_piv {
+                let c = j * (n_cols / n_piv);
+                let mut row = vec![0u32; n_cols];
+                row[c] = 1;
+                for t in (c + 1)..n_cols {
+                    row[t] = (next() % p) as u32;
+                }
+                // Zero earlier pivot columns (forward-elim shape).
+                for &(pc, _) in &known {
+                    row[pc] = 0;
+                }
+                known.push((c, row));
+            }
+            let sources: Vec<Vec<u32>> = (0..n_rows)
+                .map(|_| (0..n_cols).map(|_| (next() % p) as u32).collect())
+                .collect();
+            let gemm = reduce_chunk_by_known_gemm(&sources, &known, fp);
+            let lazy: Vec<(Vec<u64>, usize)> = sources
+                .iter()
+                .map(|s| {
+                    let mut acc: Vec<u64> = s.iter().copied().map(u64::from).collect();
+                    let mut pending = 0usize;
+                    reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+                    normalize_lazy(&mut acc, fp);
+                    (acc, 0usize)
+                })
+                .collect();
+            assert_eq!(gemm.len(), lazy.len(), "row count {n_piv}/{n_rows}x{n_cols}");
+            for (i, ((ga, _), (la, _))) in gemm.iter().zip(lazy.iter()).enumerate() {
+                assert_eq!(ga, la, "row {i} piv={n_piv} {n_rows}x{n_cols}");
             }
         }
     }
