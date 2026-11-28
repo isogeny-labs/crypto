@@ -1,0 +1,14 @@
+{
+  "action": "Derive the labels from verified point indices and signs; check coefficient and group reconstruction before allocating the full search table.",
+  "created": "2026-11-27T20:49:24Z",
+  "evidence": [
+    "research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/shifted-six-v1/source/shifted-six.cpp"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "native-research"
+  ],
+  "trigger": "A mathematical search uses a known reference word encoded with signed integer labels",
+  "why": "A hard-coded reference word was off by one column; review stopped shifted-six-v1 after44.156s and v2 moves this check before enumeration."
+}
