@@ -23,6 +23,19 @@ pub struct PlaneCurve {
     pub terms: Vec<PlaneTerm>,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LineRoot {
+    pub parameter: [u32; 2],
+    pub multiplicity: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RationalLineFactorization {
+    pub roots: Vec<LineRoot>,
+    /// Degree left after removing all rational linear factors.
+    pub residual_degree: usize,
+}
+
 fn prime(n: u32) -> bool {
     if n < 2 {
         return false;
@@ -178,31 +191,77 @@ impl PlaneCurve {
         Ok(section)
     }
 
-    /// Rational intersection parameters `[s:t]`, without multiplicities.
+    /// Factor `F(s*u+t*v)` by all rational linear factors, with multiplicity.
+    /// A positive residual degree means the section has nonrational factors.
     /// The field cap prevents accidental whole-field scans on large inputs.
-    pub fn rational_line_roots(&self, section: &[u32]) -> Result<Vec<[u32; 2]>, &'static str> {
+    pub fn rational_line_factors(
+        &self,
+        section: &[u32],
+    ) -> Result<RationalLineFactorization, &'static str> {
         if section.len() != self.degree + 1 || section.iter().all(|&c| c % self.p == 0) {
             return Err("section is zero or has the wrong degree");
         }
         if self.p > 65_536 {
             return Err("rational line scan exceeds field cap");
         }
+        // Coefficients of F(s*u+v), ascending in s. Leading zeros in this
+        // dehomogenization are precisely the multiplicity at [1:0].
+        let mut poly: Vec<u32> = section.iter().rev().map(|&c| c % self.p).collect();
+        let mut infinity = 0;
+        while poly.len() > 1 && poly.last() == Some(&0) {
+            poly.pop();
+            infinity += 1;
+        }
         let mut roots = Vec::new();
         for s in 0..self.p {
-            let mut value = 0;
-            for &c in section {
-                value =
-                    ((u64::from(mul(value, s, self.p)) + u64::from(c)) % u64::from(self.p)) as u32;
+            let mut multiplicity = 0;
+            while poly.len() > 1 {
+                let value = poly.iter().rev().fold(0u32, |acc, &c| {
+                    ((u64::from(mul(acc, s, self.p)) + u64::from(c)) % u64::from(self.p)) as u32
+                });
+                if value != 0 {
+                    break;
+                }
+                // Synthetic division by (s_variable - s), exact because
+                // the Horner remainder above is zero.
+                let mut quotient = vec![0u32; poly.len() - 1];
+                let top = quotient.len() - 1;
+                quotient[top] = poly[top + 1];
+                for i in (0..top).rev() {
+                    quotient[i] = ((u64::from(poly[i + 1])
+                        + u64::from(mul(s, quotient[i + 1], self.p)))
+                        % u64::from(self.p)) as u32;
+                }
+                poly = quotient;
+                multiplicity += 1;
             }
-            // Evaluate F(s*u + v), so s is the affine parameter.
-            if value == 0 {
-                roots.push([s, 1]);
+            if multiplicity > 0 {
+                roots.push(LineRoot {
+                    parameter: [s, 1],
+                    multiplicity,
+                });
             }
         }
-        if section[0] == 0 {
-            roots.push([1, 0]);
+        if infinity > 0 {
+            roots.push(LineRoot {
+                parameter: [1, 0],
+                multiplicity: infinity,
+            });
         }
-        Ok(roots)
+        Ok(RationalLineFactorization {
+            roots,
+            residual_degree: poly.len() - 1,
+        })
+    }
+
+    /// Rational intersection parameters `[s:t]`, without multiplicities.
+    pub fn rational_line_roots(&self, section: &[u32]) -> Result<Vec<[u32; 2]>, &'static str> {
+        Ok(self
+            .rational_line_factors(section)?
+            .roots
+            .into_iter()
+            .map(|root| root.parameter)
+            .collect())
     }
 }
 
@@ -227,10 +286,22 @@ mod tests {
         let section = c.line_section(u, v).unwrap();
         assert_eq!(section, vec![1, 0, 0, 1]);
         assert_eq!(c.rational_line_roots(&section).unwrap(), vec![[4, 1]]);
-        assert_eq!(c.tangent([1, 4, 0]).unwrap(), [3, 3, 0]);
         assert_eq!(
-            c.line_section([1, 4, 0], [0, 0, 1]).unwrap(),
-            vec![0, 0, 0, 1]
+            c.rational_line_factors(&section).unwrap().roots[0].multiplicity,
+            1
+        );
+        assert_eq!(c.tangent([1, 4, 0]).unwrap(), [3, 3, 0]);
+        let tangent_section = c.line_section([1, 4, 0], [0, 0, 1]).unwrap();
+        assert_eq!(tangent_section, vec![0, 0, 0, 1]);
+        assert_eq!(
+            c.rational_line_factors(&tangent_section).unwrap(),
+            RationalLineFactorization {
+                roots: vec![LineRoot {
+                    parameter: [1, 0],
+                    multiplicity: 3
+                }],
+                residual_degree: 0
+            }
         );
     }
 
@@ -243,6 +314,10 @@ mod tests {
         let section = c.line_section([1, 0, 0], [0, 1, 0]).unwrap();
         assert_eq!(section, vec![1, 0, 0, 0, 0, 0]);
         assert_eq!(c.rational_line_roots(&section).unwrap(), vec![[0, 1]]);
+        assert_eq!(
+            c.rational_line_factors(&section).unwrap().roots[0].multiplicity,
+            5
+        );
     }
 
     #[test]
@@ -252,6 +327,20 @@ mod tests {
         let c = PlaneCurve::new(5, 3, &[term(3, 0, 0)]).unwrap();
         assert!(c.line_section([1, 0, 0], [2, 0, 0]).is_err());
         assert!(c.rational_line_roots(&[0, 0, 0, 0]).is_err());
+    }
+
+    #[test]
+    fn retain_nonrational_residual_degree() {
+        let c = PlaneCurve::new(3, 2, &[term(2, 0, 0), term(0, 2, 0), term(0, 0, 2)]).unwrap();
+        let section = c.line_section([1, 0, 0], [0, 1, 0]).unwrap();
+        assert_eq!(section, vec![1, 0, 1]);
+        assert_eq!(
+            c.rational_line_factors(&section).unwrap(),
+            RationalLineFactorization {
+                roots: vec![],
+                residual_degree: 2,
+            }
+        );
     }
 
     #[test]
@@ -271,6 +360,16 @@ mod tests {
             let u = [1, 2, 3];
             let v = [4, 5, 7];
             let section = curve.line_section(u, v).unwrap();
+            let factors = curve.rational_line_factors(&section).unwrap();
+            assert_eq!(
+                factors.residual_degree
+                    + factors
+                        .roots
+                        .iter()
+                        .map(|root| root.multiplicity)
+                        .sum::<usize>(),
+                degree
+            );
             for s in 0..11u32 {
                 for t in 0..11u32 {
                     let point = std::array::from_fn(|i| (s * u[i] + t * v[i]) % 11);
