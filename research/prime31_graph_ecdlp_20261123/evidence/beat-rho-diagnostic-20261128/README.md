@@ -54,3 +54,14 @@ Median of the seven paired wall ratios (IC/rho) is 2.076; every pair favors rho 
 ### Follow-up at 07:32 UTC: standalone build check
 
 The published `rho_neg_dp.rs` and `Cargo.toml` were copied into the same public repository path layout in the diagnostic source export. `cargo build --release --manifest-path research/prime31_graph_ecdlp_20261123/evidence/beat-rho-diagnostic-20261128/Cargo.toml` completed successfully with Rust 1.100.1. This checks that the published control can be built without the scratch diagnostic runner; it does not make its walk policy identical to repository v5. The next comparison should use current main's 8-lane collector, because the seven-round panel above used its frozen predecessor.
+
+### Follow-up at 07:36 UTC: current main collector and independent replay
+
+The 8-lane fast collector source from public `main` commit `37a2cd21ddd879b0defb3f2da0f6ee272f6760f1` was exported unchanged (SHA-256 `098c6d3c67440677f0b53cf81ede2ddd6850c4ec600345635f526f6de4519c60`), built in the same isolated release package, and paired with the same diagnostic rho binary in seven fresh, alternating cold rounds. All 14 processes returned `987654321` and passed their internal checks. The raw [`paired7-current.jsonl`](paired7-current.jsonl) records wall, child CPU, probes/steps and walk counts.
+
+| Arm | Median external wall | Range | Median child CPU |
+| --- | ---: | ---: | ---: |
+| Current 8-lane four-thread IC | 27.033 ms | 24.563–31.085 ms | 47.037 ms |
+| 64-jump negation rho diagnostic | 17.583 ms | 16.357–19.391 ms | 17.306 ms |
+
+The paired IC/rho wall ratios were 1.551, 1.267, 1.537, 1.768, 1.477, 1.750 and 1.583; all favor rho. A separate Python affine point implementation independently checked `[987654321]G=Q` and `[2147446831]G=O`. This is a repeatable fixed-target negative result for the public collector against a valid optimized scratch rho control. It does not establish a broad scaling or distributional result, and repository `RhoV3::v5(true)` parity remains open. No IC-over-rho win was measured. [pcc:unverified]
