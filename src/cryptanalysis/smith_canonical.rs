@@ -1053,6 +1053,25 @@ impl HJac {
     pub fn is_zero(&self, d: &Mumford) -> bool {
         d.u.len() == 1
     }
+    /// Check the canonical reduced Mumford input contract before using a
+    /// public class in Cantor arithmetic or the Smith transfer.
+    pub fn is_reduced_mumford(&self, d: &Mumford) -> bool {
+        if d.u.is_empty()
+            || d.u.len() > 4
+            || d.u.last() != Some(&1)
+            || d.v.last() == Some(&0)
+            || d.u.iter().chain(&d.v).any(|&c| c >= self.p)
+            || deg(&d.v) >= deg(&d.u)
+        {
+            return false;
+        }
+        prem(
+            &psub(&self.f, &pmul(&d.v, &d.v, self.p), self.p),
+            &d.u,
+            self.p,
+        )
+        .is_empty()
+    }
     /// The class `[P - inf]`.
     pub fn point(&self, x: u64, y: u64) -> Mumford {
         let mut v = vec![y % self.p];

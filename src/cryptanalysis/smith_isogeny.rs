@@ -175,6 +175,9 @@ impl SmithIso {
 
     /// `Psi(D)` (representation-independent; checked by the tests).
     pub fn image(&self, d: &Mumford, rng: &mut SplitMix64) -> Result<PicClass, String> {
+        if !self.jac.is_reduced_mumford(d) {
+            return Err("invalid reduced source Mumford class".into());
+        }
         self.tf.transfer_divisor(&self.jac, d, &self.pts, rng)
     }
 
@@ -195,6 +198,9 @@ impl SmithIso {
         let order = u64::try_from(self.order).map_err(|_| "Jacobian order too large")?;
         let q = u32::try_from(self.p).map_err(|_| "base field too large for quartic solver")?;
         let h = order / r;
+        if !self.jac.is_reduced_mumford(generator) || !self.jac.is_reduced_mumford(target) {
+            return Err("invalid reduced source Mumford class".into());
+        }
         if self.jac.is_zero(generator)
             || !self.jac.is_zero(&self.jac.mul(generator, r as u128))
             || !self.jac.is_zero(&self.jac.mul(target, r as u128))
