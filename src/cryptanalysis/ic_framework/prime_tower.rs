@@ -202,6 +202,13 @@ pub struct IsogenySelectionAttempt {
     pub skipped_duplicate_cosets: u64,
 }
 
+/// Censored or invalid deterministic selection, with all work done so far.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IsogenySelectionFailure {
+    pub reason: String,
+    pub cost: IsogenyTowerCost,
+}
+
 /// The work of the auxiliary-curve search and the tower build, by kind.
 /// Every group operation on `E'` is also on the caller's ledger (and so
 /// in the factor-base phase's `S`); these are the same counts split by
@@ -561,12 +568,24 @@ fn z2xz8_halving_q32(
 pub fn z2xz8_equal_size_tower(
     target: &PrimeCurve,
     ops: &mut GroupOps,
-) -> Result<IsogenyTower, String> {
+) -> Result<IsogenyTower, IsogenySelectionFailure> {
+    z2xz8_equal_size_tower_bounded(target, ops, 64, 64)
+}
+
+fn z2xz8_equal_size_tower_bounded(
+    target: &PrimeCurve,
+    ops: &mut GroupOps,
+    max_m: u64,
+    max_cosets: usize,
+) -> Result<IsogenyTower, IsogenySelectionFailure> {
     let p = target.p;
-    if p < 128 || p % 4 != 1 || p >= (1u64 << 63) {
-        return Err("equal-size selector requires 128 <= p < 2^63 and p = 1 mod 4".into());
-    }
     let mut cost = IsogenyTowerCost::default();
+    if p < 128 || p % 4 != 1 || p >= (1u64 << 63) {
+        return Err(IsogenySelectionFailure {
+            reason: "equal-size selector requires 128 <= p < 2^63 and p = 1 mod 4".into(),
+            cost,
+        });
+    }
     let mut interval_size = 0;
     for x in 0..32 {
         cost.selection_target_legendre += 1;
@@ -576,7 +595,7 @@ pub fn z2xz8_equal_size_tower(
     let inv27 = pow_mod(27, p - 2, p);
     let reduce = |v: u128| (v % u128::from(p)) as u64;
     let search_before = ops.adds + ops.doubles;
-    for m in 1..=64u64 {
+    for m in 1..=max_m {
         cost.curves_tried += 1;
         let mut attempt = IsogenySelectionAttempt {
             m,
@@ -621,9 +640,13 @@ pub fn z2xz8_equal_size_tower(
         };
         attempt.q = Some(q);
         if !aux.is_identity(&aux.mul(ops, q, 32)) || aux.is_identity(&aux.mul(ops, q, 16)) {
-            return Err(format!(
-                "m = {m}: halving point does not have exact order 32"
-            ));
+            attempt.status = "invalid_q";
+            cost.selection_trace.push(attempt);
+            cost.search_gae = ops.adds + ops.doubles - search_before;
+            return Err(IsogenySelectionFailure {
+                reason: format!("m = {m}: halving point does not have exact order 32"),
+                cost,
+            });
         }
         let mut subgroup = std::collections::HashSet::new();
         let mut acc = PrimePoint::INFINITY;
@@ -654,7 +677,13 @@ pub fn z2xz8_equal_size_tower(
             }
             v.sort_unstable();
             if v.windows(2).any(|pair| pair[0] == pair[1]) {
-                return Err(format!("m = {m}: coset abscissae are not distinct"));
+                attempt.status = "invalid_coset";
+                cost.selection_trace.push(attempt);
+                cost.search_gae = ops.adds + ops.doubles - search_before;
+                return Err(IsogenySelectionFailure {
+                    reason: format!("m = {m}: coset abscissae are not distinct"),
+                    cost,
+                });
             }
             if !seen.insert(v.clone()) {
                 attempt.skipped_duplicate_cosets += 1;
@@ -680,16 +709,27 @@ pub fn z2xz8_equal_size_tower(
                 cost.selection_trace.push(attempt);
                 cost.selection_m = m;
                 cost.search_gae = ops.adds + ops.doubles - search_before;
-                return finish_tower(p, 5, aux, 0, q, Some(r), &mut SplitMix(0), ops, cost);
+                let failure_cost = cost.clone();
+                return finish_tower(p, 5, aux, 0, q, Some(r), &mut SplitMix(0), ops, cost)
+                    .map_err(|reason| IsogenySelectionFailure {
+                        reason,
+                        cost: failure_cost,
+                    });
             }
-            if seen.len() == 64 {
+            if seen.len() == max_cosets {
                 attempt.status = "coset_cap";
                 break;
             }
         }
         cost.selection_trace.push(attempt);
     }
-    Err("no equal-size X1(2,8) coset within m<=64 and 64 cosets per m".into())
+    cost.search_gae = ops.adds + ops.doubles - search_before;
+    Err(IsogenySelectionFailure {
+        reason: format!(
+            "no equal-size X1(2,8) coset within m<={max_m} and {max_cosets} cosets per m"
+        ),
+        cost,
+    })
 }
 
 pub fn isogeny_tower(
@@ -1336,7 +1376,8 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
                     "equal-size selection requires ordinary aux, family=z2xz8, t=5, seed=0".into(),
                 );
             }
-            z2xz8_equal_size_tower(&self.instance.curve, &mut aux_ops)?
+            z2xz8_equal_size_tower(&self.instance.curve, &mut aux_ops)
+                .map_err(|failure| failure.reason)?
         } else if selection != "seeded" {
             return Err(format!("unknown isogeny selection {selection:?}"));
         } else if kind == AuxKind::Ordinary {
@@ -1720,6 +1761,22 @@ mod tests {
             selected_v.sort_unstable();
             assert_eq!(selected_v, expected_v);
         }
+    }
+
+    #[test]
+    fn equal_size_selector_retains_censored_work() {
+        let target = PrimeCurve { p: 769, a: 1, b: 1 };
+        let mut ops = GroupOps::default();
+        let failure = z2xz8_equal_size_tower_bounded(&target, &mut ops, 4, 1).unwrap_err();
+        assert!(failure.reason.contains("no equal-size"));
+        assert_eq!(failure.cost.curves_tried, 4);
+        assert_eq!(failure.cost.selection_cosets_tested, 1);
+        assert_eq!(failure.cost.selection_trace.len(), 4);
+        assert_eq!(failure.cost.selection_trace[0].status, "singular");
+        assert_eq!(failure.cost.selection_trace[3].status, "coset_cap");
+        assert_eq!(failure.cost.selection_trace[3].cosets.len(), 1);
+        assert_eq!(failure.cost.search_gae, ops.adds + ops.doubles);
+        assert!(failure.cost.selection_sqrt_muls > 0);
     }
 
     #[test]
