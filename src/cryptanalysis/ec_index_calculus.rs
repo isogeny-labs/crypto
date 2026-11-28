@@ -95,6 +95,7 @@ use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::utils::mod_inverse;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
+use rayon::prelude::*;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Public Semaev / IC walks: default vartime point ops.
@@ -155,6 +156,19 @@ fn take_counters() -> std::collections::BTreeMap<String, u64> {
             .map(|(k, v)| (k.to_string(), *v))
             .collect()
     })
+}
+
+fn take_counters_raw() -> std::collections::BTreeMap<&'static str, u64> {
+    COUNTERS.with(|c| c.borrow().clone())
+}
+
+fn merge_counters(raw: std::collections::BTreeMap<&'static str, u64>) {
+    COUNTERS.with(|c| {
+        let mut counters = c.borrow_mut();
+        for (name, value) in raw {
+            *counters.entry(name).or_insert(0) += value;
+        }
+    });
 }
 
 /// Group operations of a left-to-right double-and-add ladder for the scalar `k`:
@@ -3527,12 +3541,15 @@ pub fn ec_index_calculus_dlp(
     let target = fb.len() + extra_relations;
 
     let x_to_idx = factor_base_x_index(&fb);
-    let mut relations = Vec::with_capacity(target);
-    while relations.len() < target {
-        let rel =
-            find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation)?;
-        relations.push(rel);
-    }
+    // Relation searches are independent once the factor base and its index
+    // are built.  Collecting into a vector preserves the requested row order
+    // even when workers finish in a different order.
+    let relations = (0..target)
+        .into_par_iter()
+        .map(|_| find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation))
+        .collect::<Vec<_>>()
+        .into_iter()
+        .collect::<Option<Vec<_>>>()?;
 
     // Build the linear system.  Unknowns: (y_1, …, y_m, x = log_G Q).
     // Row r:   Σ entries[j].value y_j  − coef_b · x  ≡ coef_a (mod n)
@@ -4325,61 +4342,113 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let mut echelon: Option<EchelonState> = None;
     let mut eliminated_rows = 0usize;
     let (m, solution, linear_algebra_ms) = loop {
-        while relations.len() < target {
-            let mut failed_trials = 0usize;
-            let found = 'attempt: {
-                for _ in 0..max_relation_attempts {
-                    let attempt = match &sum_table {
-                        Some(t) if walk.is_some() => find_one_relation_table_walk(
+        if walk.is_none() {
+            // With no shared walk state, each relation can use its own RNG and
+            // search independently.  The indexed result vector keeps row and
+            // trial-accounting order stable across Rayon workers.
+            let remaining = target - relations.len();
+            let found = (0..remaining)
+                .into_par_iter()
+                .map(|_| {
+                    let before_ops = bitop_ops::snapshot();
+                    let before_validation = bitop_ops::snapshot_validation();
+                    let before_counters = take_counters_raw();
+                    let mut local_rng = rand::rngs::OsRng;
+                    let mut failed_trials = 0usize;
+                    let result = 'search: {
+                        for exhausted in 0..max_relation_attempts {
+                            let attempt = match &sum_table {
+                                Some(t) => find_one_relation_table_with_rng(
+                                    curve,
+                                    g,
+                                    q,
+                                    t,
+                                    max_trials_per_relation,
+                                    &mut local_rng,
+                                ),
+                                None => match &hoisted_index {
+                                    Some(ix) => find_one_relation_sweep_with_index(
+                                        curve,
+                                        g,
+                                        q,
+                                        &fb,
+                                        ix,
+                                        word_sweep.as_ref(),
+                                        max_trials_per_relation,
+                                        &mut local_rng,
+                                    ),
+                                    None => find_one_relation_counted_with_rng(
+                                        curve,
+                                        g,
+                                        q,
+                                        &fb,
+                                        max_trials_per_relation,
+                                        &mut local_rng,
+                                    ),
+                                },
+                            };
+                            if let Some((rel, trials)) = attempt {
+                                break 'search Some((rel, failed_trials + trials, exhausted));
+                            }
+                            failed_trials += max_trials_per_relation;
+                        }
+                        None
+                    };
+                    let worker_ops = bitop_ops::snapshot().since(&before_ops);
+                    let worker_validation =
+                        bitop_ops::snapshot_validation().since(&before_validation);
+                    let worker_counters = take_counters_raw()
+                        .into_iter()
+                        .filter_map(|(name, total)| {
+                            let previous = before_counters.get(name).copied().unwrap_or(0);
+                            (total > previous).then_some((name, total - previous))
+                        })
+                        .collect();
+                    (result, worker_ops, worker_validation, worker_counters)
+                })
+                .collect::<Vec<_>>();
+            let mut failed = false;
+            for (result, worker_ops, worker_validation, worker_counters) in found {
+                bitop_ops::merge(&worker_ops, &worker_validation);
+                merge_counters(worker_counters);
+                if let Some((rel, trials, exhausted)) = result {
+                    attempts_exhausted += exhausted;
+                    trials_total += trials;
+                    trials_per_relation.push(trials);
+                    relations.push(rel);
+                } else {
+                    failed = true;
+                }
+            }
+            if failed {
+                return None;
+            }
+        } else {
+            while relations.len() < target {
+                let mut failed_trials = 0usize;
+                let found = 'attempt: {
+                    for _ in 0..max_relation_attempts {
+                        if let Some(found) = find_one_relation_table_walk(
                             curve,
                             g,
                             q,
-                            t,
+                            sum_table.as_ref().expect("walk requires a pair table"),
                             walk.as_mut().expect("walk checked"),
                             max_trials_per_relation,
                             rng,
-                        ),
-                        Some(t) => find_one_relation_table_with_rng(
-                            curve,
-                            g,
-                            q,
-                            t,
-                            max_trials_per_relation,
-                            rng,
-                        ),
-                        None => match &hoisted_index {
-                            Some(ix) => find_one_relation_sweep_with_index(
-                                curve,
-                                g,
-                                q,
-                                &fb,
-                                ix,
-                                word_sweep.as_ref(),
-                                max_trials_per_relation,
-                                rng,
-                            ),
-                            None => find_one_relation_counted_with_rng(
-                                curve,
-                                g,
-                                q,
-                                &fb,
-                                max_trials_per_relation,
-                                rng,
-                            ),
-                        },
-                    };
-                    if let Some(found) = attempt {
-                        break 'attempt Some(found);
+                        ) {
+                            break 'attempt Some(found);
+                        }
+                        attempts_exhausted += 1;
+                        failed_trials += max_trials_per_relation;
                     }
-                    attempts_exhausted += 1;
-                    failed_trials += max_trials_per_relation;
-                }
-                None
-            };
-            let (rel, trials) = found?;
-            trials_total += failed_trials + trials;
-            trials_per_relation.push(failed_trials + trials);
-            relations.push(rel);
+                    None
+                };
+                let (rel, trials) = found?;
+                trials_total += failed_trials + trials;
+                trials_per_relation.push(failed_trials + trials);
+                relations.push(rel);
+            }
         }
         relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
 
@@ -4718,7 +4787,8 @@ fn ec_index_calculus_dlp_s4_staged_with<P, F>(
 ) -> Option<(BigUint, EcIcStageReport)>
 where
     P: FnOnce(&[FactorBaseEntry]) -> F,
-    F: FnMut(&CurveParams, &Point, &Point, &[FactorBaseEntry], usize) -> Option<(Relation, usize)>,
+    F: Fn(&CurveParams, &Point, &Point, &[FactorBaseEntry], usize) -> Option<(Relation, usize)>
+        + Sync,
 {
     use std::time::Instant;
     refresh_ic_ct_flag();
@@ -4736,30 +4806,60 @@ where
     // identity closure for the stateless oracles) is charged separately
     // from relation collection.
     let prepare_started = Instant::now();
-    let mut finder = prepare(&fb);
+    let finder = prepare(&fb);
     let pair_table_ms = prepare_started.elapsed().as_secs_f64() * 1e3;
 
     let relations_started = Instant::now();
-    let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
     let mut trials_total = 0usize;
-    while relations.len() < target {
-        let mut failed_trials = 0usize;
-        let found = 'attempt: {
-            for _ in 0..max_relation_attempts {
-                if let Some(found) = finder(curve, g, q, &fb, max_trials_per_relation) {
-                    break 'attempt Some(found);
+    // S₄ relation searches are independent once the factor base and any
+    // meet-in-the-middle table are ready.  Collect one result slot per row so
+    // the output order is stable even when workers finish out of order.
+    let found = (0..target)
+        .into_par_iter()
+        .map(|_| {
+            let before_ops = bitop_ops::snapshot();
+            let before_validation = bitop_ops::snapshot_validation();
+            let before_counters = take_counters_raw();
+            let mut failed_trials = 0usize;
+            let result = 'search: {
+                for exhausted in 0..max_relation_attempts {
+                    if let Some((rel, trials)) = finder(curve, g, q, &fb, max_trials_per_relation) {
+                        break 'search Some((rel, failed_trials + trials, exhausted));
+                    }
+                    failed_trials += max_trials_per_relation;
                 }
-                attempts_exhausted += 1;
-                failed_trials += max_trials_per_relation;
-            }
-            None
-        };
-        let (rel, trials) = found?;
-        trials_total += failed_trials + trials;
-        trials_per_relation.push(failed_trials + trials);
-        relations.push(rel);
+                None
+            };
+            let worker_ops = bitop_ops::snapshot().since(&before_ops);
+            let worker_validation = bitop_ops::snapshot_validation().since(&before_validation);
+            let worker_counters = take_counters_raw()
+                .into_iter()
+                .filter_map(|(name, total)| {
+                    let previous = before_counters.get(name).copied().unwrap_or(0);
+                    (total > previous).then_some((name, total - previous))
+                })
+                .collect();
+            (result, worker_ops, worker_validation, worker_counters)
+        })
+        .collect::<Vec<_>>();
+    let mut relations = Vec::with_capacity(target);
+    let mut failed = false;
+    for (result, worker_ops, worker_validation, worker_counters) in found {
+        bitop_ops::merge(&worker_ops, &worker_validation);
+        merge_counters(worker_counters);
+        if let Some((rel, trials, exhausted)) = result {
+            attempts_exhausted += exhausted;
+            trials_total += trials;
+            trials_per_relation.push(trials);
+            relations.push(rel);
+        } else {
+            failed = true;
+        }
+    }
+    if failed {
+        return None;
     }
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
 

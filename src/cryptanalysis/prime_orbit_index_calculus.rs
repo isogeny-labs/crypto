@@ -87,6 +87,7 @@ use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use rayon::prelude::*;
 use std::collections::hash_map::Entry;
 use std::time::Instant;
 
@@ -1721,6 +1722,56 @@ fn collect_full(
     rows
 }
 
+/// Collect full-decomposition relations from independent probe walks.
+///
+/// A single [`ProbeWalk`] is stateful, but separate walks have no shared
+/// state.  Splitting both the relation target and the oracle budget keeps the
+/// total budget unchanged while allowing the decomposition sweeps to run on
+/// the Rayon pool.  Rows and counters are merged in worker order.
+fn collect_full_parallel(
+    c: &OrbitCurve,
+    fb: &OrbitFactorBase,
+    opts: &OrbitIcOptions,
+    want: usize,
+    rep: &mut LogsReport,
+) -> Vec<Relation> {
+    let workers = rayon::current_num_threads()
+        .max(1)
+        .min(want.max(1))
+        .min(opts.max_ops.max(1).min(usize::MAX as u64) as usize);
+    if workers == 1 {
+        return collect_full(c, fb, opts, want, rep);
+    }
+    let relation_base = want / workers;
+    let relation_extra = want % workers;
+    let op_base = opts.max_ops / workers as u64;
+    let op_extra = opts.max_ops % workers as u64;
+    let chunks: Vec<(Vec<Relation>, LogsReport)> = (0..workers)
+        .into_par_iter()
+        .map(|worker| {
+            let local_want = relation_base + usize::from(worker < relation_extra);
+            let local_ops = op_base + u64::from((worker as u64) < op_extra);
+            let mut local_opts = *opts;
+            local_opts.seed = opts
+                .seed
+                .wrapping_add((worker as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            local_opts.max_ops = local_ops;
+            let mut local_report = LogsReport::default();
+            let rows = collect_full(c, fb, &local_opts, local_want, &mut local_report);
+            (rows, local_report)
+        })
+        .collect();
+    let mut rows = Vec::with_capacity(want);
+    for (local_rows, local) in chunks {
+        rep.trials += local.trials;
+        rep.rejected_relations += local.rejected_relations;
+        rep.oracle_ops += local.oracle_ops;
+        rep.probe_ops += local.probe_ops;
+        rows.extend(local_rows);
+    }
+    rows
+}
+
 /// A large prime's first occurrence: the probe `R = [a]G = P_o + d`.
 #[derive(Clone, Copy)]
 struct Anchor {
@@ -2027,6 +2078,96 @@ impl<'t> LargePrimeCollector<'t> {
     }
 }
 
+fn merge_large_prime_anchor(
+    c: &OrbitCurve,
+    rows: &mut Vec<Relation>,
+    anchors: &mut FxMap<u64, Anchor>,
+    key: u64,
+    anchor: Anchor,
+) {
+    match anchors.entry(key) {
+        Entry::Vacant(slot) => {
+            slot.insert(anchor);
+        }
+        Entry::Occupied(slot) => {
+            let first = *slot.get();
+            match c.image_eig(first.d, anchor.d) {
+                Some(1) if first.o == anchor.o => {}
+                Some(g) => rows.push(Relation {
+                    terms: vec![(anchor.o, 1), (first.o, c.r - g)],
+                    rhs: sub_r(anchor.a, mul_r(g, first.a, c.r), c.r),
+                }),
+                None => {}
+            }
+        }
+    }
+}
+
+/// Parallel large-prime collection from independent collectors.
+///
+/// Each worker owns its adding walk and local large-prime table.  Matching
+/// anchors are merged after the workers join, including cross-worker
+/// collisions, so the resulting graph has the same relation semantics as the
+/// serial collector while the expensive probe sweeps run concurrently.
+fn collect_large_prime_parallel(
+    c: &OrbitCurve,
+    table: &RhoJumps,
+    fb: &OrbitFactorBase,
+    opts: &OrbitIcOptions,
+    want: usize,
+) -> (Vec<Relation>, FxMap<u64, Anchor>, LogsReport) {
+    let workers = rayon::current_num_threads()
+        .max(1)
+        .min(want.max(1))
+        .min(opts.max_ops.max(1).min(usize::MAX as u64) as usize);
+    if workers == 1 {
+        let mut report = LogsReport::default();
+        let mut collector = LargePrimeCollector::new(c, table, opts, &mut report);
+        collector.collect(c, fb, opts, want, &mut report);
+        report.relations = collector.rows.len();
+        return (collector.rows, collector.anchors, report);
+    }
+    let relation_base = want / workers;
+    let relation_extra = want % workers;
+    let op_base = opts.max_ops / workers as u64;
+    let op_extra = opts.max_ops % workers as u64;
+    let chunks: Vec<(Vec<Relation>, FxMap<u64, Anchor>, LogsReport)> = (0..workers)
+        .into_par_iter()
+        .map(|worker| {
+            let local_want = relation_base + usize::from(worker < relation_extra);
+            let local_ops = op_base + u64::from((worker as u64) < op_extra);
+            let mut local_opts = *opts;
+            local_opts.seed = opts
+                .seed
+                .wrapping_add((worker as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            local_opts.max_ops = local_ops;
+            let mut local_report = LogsReport::default();
+            let mut collector = LargePrimeCollector::new(c, table, &local_opts, &mut local_report);
+            collector.collect(c, fb, &local_opts, local_want, &mut local_report);
+            (collector.rows, collector.anchors, local_report)
+        })
+        .collect();
+    let mut rows = Vec::with_capacity(want);
+    let mut anchors = FxMap::default();
+    let mut report = LogsReport::default();
+    for (local_rows, local_anchors, local) in chunks {
+        report.trials += local.trials;
+        report.rejected_relations += local.rejected_relations;
+        report.full_relations += local.full_relations;
+        report.combined_relations += local.combined_relations;
+        report.oracle_ops += local.oracle_ops;
+        report.probe_ops += local.probe_ops;
+        report.walk_restarts += local.walk_restarts;
+        rows.extend(local_rows);
+        for (key, anchor) in local_anchors {
+            merge_large_prime_anchor(c, &mut rows, &mut anchors, key, anchor);
+        }
+    }
+    report.distinct_large_primes = anchors.len() as u64;
+    report.relations = rows.len();
+    (rows, anchors, report)
+}
+
 /// Solve `rows` over `fb` and certify every solved column as
 /// `[x_o]G == P_o`: the certified logarithm of each column (or `None`),
 /// the system's statistics and the count of solved columns that failed.
@@ -2145,36 +2286,64 @@ pub fn solve_logs(
     let jumps = RhoJumps::new(c, opts.seed ^ 0x6c61_7267_655f_7072);
     rep.probe_ops += jumps.ops;
     let (rows, anchors, (certified, stats, uncertified)) = if opts.large_primes {
-        let collection_begin = Instant::now();
-        let mut collector = LargePrimeCollector::new(c, &jumps, opts, &mut rep);
-        rep.collection_ns = collection_begin.elapsed().as_nanos() as u64;
+        let mut rows = Vec::new();
+        let mut anchors = FxMap::default();
         let mut want = round;
         loop {
             let collection_begin = Instant::now();
-            collector.collect(c, fb, opts, want, &mut rep);
+            let need = want.saturating_sub(rows.len());
+            let (local_rows, local_anchors, local) = if need == 0 {
+                (Vec::new(), FxMap::default(), LogsReport::default())
+            } else {
+                let remaining_ops = opts.max_ops.saturating_sub(rep.oracle_ops);
+                if remaining_ops == 0 {
+                    (Vec::new(), FxMap::default(), LogsReport::default())
+                } else {
+                    let mut round_opts = *opts;
+                    round_opts.max_ops = remaining_ops;
+                    round_opts.seed = opts.seed.wrapping_add(
+                        (rep.collection_rounds as u64).wrapping_mul(0xD1B5_4A32_D192_ED03),
+                    );
+                    collect_large_prime_parallel(c, &jumps, fb, &round_opts, need)
+                }
+            };
+            rep.trials += local.trials;
+            rep.rejected_relations += local.rejected_relations;
+            rep.full_relations += local.full_relations;
+            rep.combined_relations += local.combined_relations;
+            rep.oracle_ops += local.oracle_ops;
+            rep.probe_ops += local.probe_ops;
+            rep.walk_restarts += local.walk_restarts;
+            rows.extend(local_rows);
+            for (key, anchor) in local_anchors {
+                let before = rows.len();
+                merge_large_prime_anchor(c, &mut rows, &mut anchors, key, anchor);
+                rep.combined_relations += (rows.len() - before) as u64;
+            }
             rep.collection_ns = rep
                 .collection_ns
                 .saturating_add(collection_begin.elapsed().as_nanos() as u64);
             rep.collection_rounds += 1;
-            let solved = certify_columns(c, fb, &collector.rows);
+            let solved = certify_columns(c, fb, &rows);
             let certified = solved.0.iter().flatten().count();
-            let starved = collector.rows.len() < want;
+            let starved = rows.len() < want;
             if 4 * certified >= 3 * fb.len()
                 || starved
                 || rep.collection_rounds >= MAX_COLLECTION_ROUNDS
             {
-                break (collector.rows, collector.anchors, solved);
+                break (rows, anchors, solved);
             }
             want += round;
         }
     } else {
         let collection_begin = Instant::now();
-        let rows = collect_full(c, fb, opts, round, &mut rep);
+        let rows = collect_full_parallel(c, fb, opts, round, &mut rep);
         rep.collection_ns = collection_begin.elapsed().as_nanos() as u64;
         rep.collection_rounds = 1;
         let solved = certify_columns(c, fb, &rows);
         (rows, FxMap::default(), solved)
     };
+    rep.distinct_large_primes = anchors.len() as u64;
     rep.relations = rows.len();
     if opts.capture_relations {
         rep.captured_relations = Some(rows.clone());

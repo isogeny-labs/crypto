@@ -662,7 +662,7 @@ impl Default for BhecIndexCalculusParams {
             search: RelationSearch::factor_base_walk(),
             linear_algebra: LinearAlgebra::Sparse,
             smoothness: BhecSmoothnessTest::Trace,
-            threads: 1,
+            threads: rayon::current_num_threads().max(1),
         }
     }
 }
@@ -839,22 +839,38 @@ fn collect_relations_parallel(
     params: &BhecIndexCalculusParams,
     report: &mut HecIndexCalculusReport,
 ) -> Vec<HecRelation> {
-    let threads = params.threads.max(1).min(wanted.max(1));
+    let threads = params
+        .threads
+        .max(1)
+        .min(wanted.max(1))
+        .min(params.max_trials.max(1));
     if threads == 1 {
         return collect_relations(curve, d1, d2, n, fb, wanted, params, report);
     }
-    let per_thread = wanted / threads + 1;
-    let trial_budget = params.max_trials / threads + 1;
+    let relation_base = wanted / threads;
+    let relation_extra = wanted % threads;
+    let trial_base = params.max_trials / threads;
+    let trial_extra = params.max_trials % threads;
     let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {
         let mut handles = Vec::with_capacity(threads);
         for t in 0..threads {
+            let local_wanted = relation_base + usize::from(t < relation_extra);
+            let local_trials = trial_base + usize::from(t < trial_extra);
             let mut local = params.clone();
             local.seed ^= (t as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15);
-            local.max_trials = trial_budget;
+            local.max_trials = local_trials;
             handles.push(scope.spawn(move || {
                 let mut local_report = HecIndexCalculusReport::default();
-                let relations =
-                    collect_relations(curve, d1, d2, n, fb, per_thread, &local, &mut local_report);
+                let relations = collect_relations(
+                    curve,
+                    d1,
+                    d2,
+                    n,
+                    fb,
+                    local_wanted,
+                    &local,
+                    &mut local_report,
+                );
                 (relations, local_report)
             }));
         }

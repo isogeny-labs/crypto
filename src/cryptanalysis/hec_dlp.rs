@@ -69,7 +69,7 @@ pub struct HecSolveConfig {
     /// calculus.  BSGS cost is `sqrt(q)`; IC has a much larger constant.
     pub small_prime_bound: u64,
     /// Relation-collection threads for the binary-field engine.  The prime
-    /// engine's counted walk is serial; values above one are ignored there.
+    /// hyperelliptic engine uses the Rayon pool directly.
     pub threads: usize,
 }
 
@@ -83,7 +83,7 @@ impl Default for HecSolveConfig {
             trial_factor_bound: 1 << 16,
             bsgs_max_steps: 2_000_000,
             small_prime_bound: 1 << 20,
-            threads: 1,
+            threads: rayon::current_num_threads().max(1),
         }
     }
 }

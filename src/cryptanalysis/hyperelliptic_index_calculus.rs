@@ -1615,6 +1615,93 @@ pub fn collect_relations(
     relations
 }
 
+/// Collect relations from independent walks in parallel.
+///
+/// A single adding walk is stateful, so its trials cannot be split safely at
+/// an arbitrary instruction boundary. Each worker therefore owns a complete
+/// walk and private counters. The worker results are merged in worker order,
+/// which keeps the relation vector stable regardless of completion timing.
+fn collect_relations_parallel(
+    curve: &HyperellipticCurveP,
+    d1: &MumfordDivisorP,
+    d2: &MumfordDivisorP,
+    n: &BigUint,
+    fb: &HecFactorBase,
+    wanted: usize,
+    params: &HecIndexCalculusParams,
+    report: &mut HecIndexCalculusReport,
+) -> Vec<HecRelation> {
+    let threads = rayon::current_num_threads().max(1).min(wanted.max(1));
+    if threads == 1 {
+        return collect_relations(curve, d1, d2, n, fb, wanted, params, report);
+    }
+
+    let relation_base = wanted / threads;
+    let relation_extra = wanted % threads;
+    let trial_base = params.max_trials / threads;
+    let trial_extra = params.max_trials % threads;
+    let chunks: Vec<(
+        Vec<HecRelation>,
+        HecIndexCalculusReport,
+        bitop_ops::PhaseTally,
+        bitop_ops::PhaseTally,
+    )> = std::thread::scope(|scope| {
+        let mut handles = Vec::with_capacity(threads);
+        for worker in 0..threads {
+            let local_wanted = relation_base + usize::from(worker < relation_extra);
+            let local_trials = trial_base + usize::from(worker < trial_extra);
+            let mut local_params = params.clone();
+            local_params.seed = params
+                .seed
+                .wrapping_add((worker as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15));
+            local_params.max_trials = local_trials;
+            handles.push(scope.spawn(move || {
+                let before_ops = bitop_ops::snapshot();
+                let before_validation = bitop_ops::snapshot_validation();
+                let mut local_report = HecIndexCalculusReport::default();
+                let relations = collect_relations(
+                    curve,
+                    d1,
+                    d2,
+                    n,
+                    fb,
+                    local_wanted,
+                    &local_params,
+                    &mut local_report,
+                );
+                let worker_ops = bitop_ops::snapshot().since(&before_ops);
+                let worker_validation = bitop_ops::snapshot_validation().since(&before_validation);
+                (relations, local_report, worker_ops, worker_validation)
+            }));
+        }
+        handles
+            .into_iter()
+            .map(|handle| handle.join().expect("relation worker panicked"))
+            .collect()
+    });
+
+    let mut relations = Vec::with_capacity(wanted);
+    for (rows, local, worker_ops, worker_validation) in chunks {
+        bitop_ops::merge(&worker_ops, &worker_validation);
+        report.trials += local.trials;
+        report.smooth_trials += local.smooth_trials;
+        report.discarded_off_base += local.discarded_off_base;
+        report.partial_relations += local.partial_relations;
+        report.combined_relations += local.combined_relations;
+        report.jacobian_ops += local.jacobian_ops;
+        report.precompute_ops += local.precompute_ops;
+        report.walk_wall_ns = report.walk_wall_ns.saturating_add(local.walk_wall_ns);
+        report.partial_wall_ns = report.partial_wall_ns.saturating_add(local.partial_wall_ns);
+        report.smoothness_wall_ns = report
+            .smoothness_wall_ns
+            .saturating_add(local.smoothness_wall_ns);
+        report.smoothness_field_ops += local.smoothness_field_ops;
+        relations.extend(rows);
+    }
+    report.relations = relations.len();
+    relations
+}
+
 /// `e₂·r₁ − e₁·r₂` for two partials `r₁ = … + e₁·P` and `r₂ = … + e₂·P`
 /// sharing the off-base place `P`: the combination eliminates `log P`
 /// and leaves a relation over the factor base alone.
@@ -1706,7 +1793,8 @@ pub fn hec_index_calculus_dlp(
     let mut k = None;
     for round in 0..4 {
         let wanted = m + 1 + extra;
-        let collected = collect_relations(curve, d1, d2, n, &fb, wanted, params, &mut report);
+        let collected =
+            collect_relations_parallel(curve, d1, d2, n, &fb, wanted, params, &mut report);
         if collected.len() < m + 1 {
             return (None, report);
         }

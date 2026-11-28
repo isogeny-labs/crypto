@@ -11,8 +11,8 @@
 //!
 //! The tallies are **thread-local** and are only ever read on the thread
 //! that did the work: a reader takes a [`snapshot`] before and after and
-//! subtracts.  None of the counted paths runs inside rayon workers, so
-//! every count is a deterministic function of the inputs and seeds.
+//! subtracts.  Code that delegates counted work to another thread must
+//! merge that worker's delta with [`merge`].
 //!
 //! Each tally is split by [`Phase`].  The caller sets the current phase
 //! ([`enter`], restored when the guard drops); work outside any phase lands
@@ -402,6 +402,46 @@ pub fn snapshot() -> PhaseTally {
 /// The validation subset of [`snapshot`].
 pub fn snapshot_validation() -> PhaseTally {
     VALIDATION.with(read)
+}
+
+/// Credit work performed by another thread to this thread's tally.
+///
+/// The phase is part of the supplied tally, so merging does not depend on the
+/// caller's current phase.  `validation` is the matching subset returned by
+/// [`snapshot_validation`].
+pub(crate) fn merge(tally: &PhaseTally, validation: &PhaseTally) {
+    TALLY.with(|cells| {
+        for (phase, row) in cells.iter().enumerate() {
+            for kind in 0..KINDS {
+                row[kind].set(
+                    row[kind]
+                        .get()
+                        .saturating_add(tally.phases[phase].counts[kind]),
+                );
+            }
+            row[KINDS].set(
+                row[KINDS]
+                    .get()
+                    .saturating_add(tally.phases[phase].rng_words),
+            );
+        }
+    });
+    VALIDATION.with(|cells| {
+        for (phase, row) in cells.iter().enumerate() {
+            for kind in 0..KINDS {
+                row[kind].set(
+                    row[kind]
+                        .get()
+                        .saturating_add(validation.phases[phase].counts[kind]),
+                );
+            }
+            row[KINDS].set(
+                row[KINDS]
+                    .get()
+                    .saturating_add(validation.phases[phase].rng_words),
+            );
+        }
+    });
 }
 
 /// The current phase.

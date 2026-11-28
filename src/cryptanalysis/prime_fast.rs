@@ -49,6 +49,7 @@ use std::time::Instant;
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use rayon::prelude::*;
 
 use crate::cryptanalysis::residual_walk::is_prime_u64;
 use crate::ecc::curve::CurveParams;
@@ -2374,6 +2375,90 @@ pub struct IcReport {
     pub rows_three: usize,
 }
 
+/// Parallel relation collection for the native prime-field engine.
+///
+/// The lock-step collector owns a private lane state and batches the field
+/// inversions for every round. Its fixed lane ranges let Rayon run the lane
+/// work across the available cores while the returned rows and counters are
+/// reduced in a stable order. A pair table selects the constant-time lookup
+/// path; without one the direct subtraction sweep is used.
+pub fn collect_relations_parallel(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: Option<&PairTable>,
+    needed: usize,
+    max_targets: u64,
+    seed: u64,
+) -> (Vec<FastRelation>, CollectStats) {
+    let mode = if pairs.is_some() {
+        LockStepMode::PairTable2
+    } else {
+        LockStepMode::DirectSweep
+    };
+    collect_relations_parallel_with_mode(curve, g, q, fb, pairs, needed, max_targets, seed, mode)
+}
+
+fn collect_relations_parallel_with_mode(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: Option<&PairTable>,
+    needed: usize,
+    max_targets: u64,
+    seed: u64,
+    mode: LockStepMode,
+) -> (Vec<FastRelation>, CollectStats) {
+    if needed == 0 || max_targets == 0 {
+        return (Vec::new(), CollectStats::default());
+    }
+    let workers = rayon::current_num_threads()
+        .max(1)
+        .min(needed)
+        .min(max_targets.min(usize::MAX as u64) as usize);
+    let relation_base = needed / workers;
+    let relation_extra = needed % workers;
+    let target_base = max_targets / workers as u64;
+    let target_extra = max_targets % workers as u64;
+    let chunks: Vec<(Vec<FastRelation>, CollectStats)> = (0..workers)
+        .into_par_iter()
+        .map(|worker| {
+            let local_needed = relation_base + usize::from(worker < relation_extra);
+            let local_targets = target_base + if (worker as u64) < target_extra { 1 } else { 0 };
+            let local_walkers = (rayon::current_num_threads().max(1) * 8).clamp(16, 128);
+            let mut scratch = LockStepCollectScratch::default();
+            collect_relations_lockstep(
+                curve,
+                g,
+                q,
+                fb,
+                pairs,
+                local_needed,
+                local_targets,
+                local_walkers,
+                mode,
+                seed.wrapping_add((worker as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15)),
+                &mut scratch,
+            )
+        })
+        .collect();
+    let mut relations = Vec::with_capacity(needed);
+    let mut stats = CollectStats::default();
+    for (rows, local) in chunks {
+        stats.targets += local.targets;
+        stats.relations += local.relations;
+        stats.rows_one += local.rows_one;
+        stats.rows_two += local.rows_two;
+        stats.rows_three += local.rows_three;
+        stats.rejected += local.rejected;
+        relations.extend(rows);
+    }
+    stats.relations = relations.len();
+    (relations, stats)
+}
+
 /// End-to-end index calculus: factor base → (pair table) → relations →
 /// linear algebra → group verification.  `summands` is 2 or 3.
 pub fn ic_solve(
@@ -2401,8 +2486,17 @@ pub fn ic_solve(
     let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
     let needed = fb.len() + extra_relations;
     let t2 = Instant::now();
-    let (rels, stats) =
-        collect_relations(curve, g, q, &fb, pairs.as_ref(), needed, max_targets, seed);
+    let (rels, stats) = collect_relations_parallel_with_mode(
+        curve,
+        g,
+        q,
+        &fb,
+        pairs.as_ref(),
+        needed,
+        max_targets,
+        seed,
+        LockStepMode::DirectSweep,
+    );
     let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
     if rels.len() < needed {
         return None;
@@ -2610,6 +2704,50 @@ fn collect_setup_batched(
     rels
 }
 
+/// Parallel setup collection for the batched multi-target path.
+///
+/// Each worker owns its lock-step lanes and duplicate filter.  Rows are
+/// concatenated in worker-index order, so the linear system sees a stable
+/// order while the expensive point/decomposition probes run concurrently.
+fn collect_setup_batched_parallel(
+    curve: &FastCurve,
+    g: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    lanes: usize,
+    seed: u64,
+) -> Vec<FastRelation> {
+    if needed == 0 {
+        return Vec::new();
+    }
+    let workers = rayon::current_num_threads()
+        .max(1)
+        .min(needed)
+        .min(lanes.max(1));
+    let relation_base = needed / workers;
+    let relation_extra = needed % workers;
+    let lane_base = lanes.max(workers) / workers;
+    let lane_extra = lanes.max(workers) % workers;
+    let chunks: Vec<Vec<FastRelation>> = (0..workers)
+        .into_par_iter()
+        .map(|worker| {
+            let local_needed = relation_base + usize::from(worker < relation_extra);
+            let local_lanes = lane_base + usize::from(worker < lane_extra);
+            collect_setup_batched(
+                curve,
+                g,
+                fb,
+                pairs,
+                local_needed,
+                local_lanes.max(1),
+                seed.wrapping_add((worker as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15)),
+            )
+        })
+        .collect();
+    chunks.into_iter().flatten().take(needed).collect()
+}
+
 /// Same as [`ic_multi_solve_ex`] without the batched per-target phase.
 pub fn ic_multi_solve(
     curve: &FastCurve,
@@ -2721,16 +2859,17 @@ pub fn ic_multi_solve_ex(
     let pair_ms = t_pt.elapsed().as_secs_f64() * 1e3;
     let needed = fb.len() + extra_relations;
     let collect = |q: Pt, need: usize, maxw: u64, sd: u64| {
-        if table {
-            collect_relations_table(curve, g, q, &fb, &pairs, need, maxw, sd)
+        let mode = if table {
+            LockStepMode::PairTable2
         } else {
-            collect_relations(curve, g, q, &fb, Some(&pairs), need, maxw, sd)
-        }
+            LockStepMode::DirectSweep
+        };
+        collect_relations_parallel_with_mode(curve, g, q, &fb, Some(&pairs), need, maxw, sd, mode)
     };
     let t_col = Instant::now();
     let (rels, _) = if table && batched {
         (
-            collect_setup_batched(curve, g, &fb, &pairs, needed, 256, seed),
+            collect_setup_batched_parallel(curve, g, &fb, &pairs, needed, 256, seed),
             CollectStats::default(),
         )
     } else {
@@ -2976,8 +3115,17 @@ pub fn ic_solve_table(
     let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
     let needed = fb.len() + extra_relations;
     let t2 = Instant::now();
-    let (rels, stats) =
-        collect_relations_table(curve, g, q, &fb, &pairs, needed, max_targets, seed);
+    let (rels, stats) = collect_relations_parallel_with_mode(
+        curve,
+        g,
+        q,
+        &fb,
+        Some(&pairs),
+        needed,
+        max_targets,
+        seed,
+        LockStepMode::PairTable2,
+    );
     let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
     if rels.len() < needed {
         return None;

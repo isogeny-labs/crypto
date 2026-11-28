@@ -91,8 +91,7 @@
 
 use crate::cryptanalysis::ec_index_calculus::{
     factor_base_x_index, find_one_relation_with_index, gaussian_eliminate_mod_n_particular,
-    ic_padd, ic_smul, refresh_ic_ct_flag, semaev_s3, semaev_s3_in_x3, sqrt_mod_p,
-    FactorBaseEntry,
+    ic_padd, ic_smul, refresh_ic_ct_flag, semaev_s3, semaev_s3_in_x3, sqrt_mod_p, FactorBaseEntry,
 };
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;
@@ -901,12 +900,16 @@ pub fn eisenstein_smooth_ic_dlp(
     let m = fb.len();
     let target = m + extra_relations;
     let x_to_idx = factor_base_x_index(&fb);
-    let mut relations = Vec::with_capacity(target);
-    while relations.len() < target {
-        let rel =
-            find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation)?;
-        relations.push(rel);
-    }
+    // The Eisenstein-smooth relation searches are independent after the
+    // factor base index is built.  Rayon keeps the result order indexed by
+    // relation slot, so the matrix and its diagnostics remain reproducible
+    // with respect to the collected vector.
+    let relations = (0..target)
+        .into_par_iter()
+        .map(|_| find_one_relation_with_index(curve, g, q, &fb, &x_to_idx, max_trials_per_relation))
+        .collect::<Vec<_>>()
+        .into_iter()
+        .collect::<Option<Vec<_>>>()?;
     let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
     let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
     for rel in &relations {
