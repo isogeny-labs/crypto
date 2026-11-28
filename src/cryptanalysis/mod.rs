@@ -247,6 +247,7 @@ pub mod genus_ladder_fastgroup;
 pub mod genus_ladder_harvest;
 pub mod genus_ladder_sieve;
 pub mod hec_dlp;
+mod hec_two_large_prime_graph;
 pub mod hilbert_class_poly;
 pub mod hky_closure_io;
 pub mod hky_fp_tower;
