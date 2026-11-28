@@ -1,0 +1,24 @@
+{
+  "schema": "chained-fixed-control-seeds/v1",
+  "policy": "isogeny-labs/experiment-seeds/v1",
+  "scope": "fixed-object deterministic correctness and source-operation controls; no timing or statistical inference",
+  "target_design": "all d=1..10, target coordinates generated only in main driver; evaluator and solver never receive d",
+  "target_generation_randomness": "none; exhaustive fixed public orbit",
+  "master_walk_seed_hex": [
+    "243f6a8885a308d3",
+    "13198a2e03707344",
+    "a4093822299f31d0",
+    "082efa98ec4e6c89"
+  ],
+  "walk_rng": "SplitMix64 Weyl increment 9e3779b97f4a7c15, multipliers bf58476d1ce4e5b9 and 94d049bb133111eb; exact rho.rs implementation",
+  "restart_design": "restart 0..31; coin=restart_stream, each draw sets coin=mix(coin) then reduces modulo11; eight ordered jump coefficient pairs followed by one start pair; every pair evaluates [a]G+[b]Q. Actual used streams are retained in each row.",
+  "partition": "eight bins from mix of canonical coordinate serialization and stream; negation canonicalization updates both scalar coefficients",
+  "pairing": "Same source coordinates, master/effective seeds and ordered coefficient streams intentionally reused across three cold arms. Encodings and resulting walks may differ. Effective seed derivation is charged inside every arm.",
+  "order": "oracle d ascending, master seeds in listed order, direct_E_rho then cubic_pullback_J_rho then prior_Gamma_J_rho; counts are deterministic, no walltime collected",
+  "retention": "all prior rows and partial failed streams; no seed reroll, target exclusion, tuning, or hidden fallback",
+  "replay": "portable independent same-source replay remains distinct from the first Cloud executable; exact mathematical outputs and counts required, heap layouts disclosed separately",
+  "held_out": "none claimed; later generalization or performance needs fresh precommitted seeds and admission",
+  "seed_width_encoding": "64-bit unsigned values, sixteen lowercase hexadecimal digits; arithmetic wraps modulo 2^64",
+  "domain_separation": "target_seed(master,Q)=Elliptic::hash(Q,mix(master XOR 0x434d313943554231)); restart_stream=mix(mix(target_seed XOR 0x5245535441525431) XOR restart). Versioned roles bind study, coordinate target, replicate and restart.",
+  "duplicates": "Before controls, require 1280 distinct target/master/restart stream IDs. Cross-arm reuse is intentional, not independent replication."
+}

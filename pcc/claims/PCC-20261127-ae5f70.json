@@ -1,0 +1,100 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-27T23:04:08Z",
+ "id": "PCC-20261127-ae5f70",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e30f6512a0d13075ef177c38693f34f7027d317e",
+  "model": "",
+  "session": "chained-transfers-20261127"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/cubic.rs",
+    "sha256": "ea5f662357dc435d1484d0687bd4824516ff42bf0a739d76cd89632dee56048d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/ACTUAL_CUBIC_MAP_PROOF_E.md",
+    "sha256": "97e90514808ccfb67810fef8f1b3dc2beb2cb9ff49d8d4e2ec7ac2e31b497c5c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/FORMAL_PROOF_MAP_E.md",
+    "sha256": "bd1cfa6326831c97d94f3c5600cfe6bbff9dc38a2eebfd9934411601f649aecb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/analysis_e.rs",
+    "sha256": "791dbb8d8417102590061fa7055c7e65c5e5d6b0aafcd66f9c1a1f9c9e303dfa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/SOURCE_LOCK_E.json",
+    "sha256": "56907c8adc8ce4776d3be2ad5d4d22cceef6e8512eb160ba3af109ecb0077b02"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/FIRST_C_NATIVE_INVENTORY.json",
+    "sha256": "add290fc96a8f5345f3033d6b90c0ce3dd9ff28c7a47a8021b214325333de20b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/FIRST_E_NATIVE_INVENTORY.json",
+    "sha256": "38d511bedf708999d8a4b86d5b7b9762996f01c5cf968521035bce955f77d4c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/first-C-native/actual-cubic-coordinate.stdout",
+    "sha256": "10843cb3e39776dc65bdc4962c193c2349d514ded48371a12f5dabc88535b2fb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/first-C-native/data/cold_operation_controls.csv",
+    "sha256": "9b6e785c250c5872c401db73642235e8fda9fa52fe9b4a8f1878f503460de8ef"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/first-E-native/actual-counter-analysis.stdout",
+    "sha256": "d411faab894f850b3540371a58eb21ff69731dba4a49c54c1933567832f27d34"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/first-E-native/data/counter_summary.csv",
+    "sha256": "6b04f54659c833696792630e50fa23d068b8faa26ee0b76fadd034a643e6a62f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_coordinate_20261127/first-E-native/data/paired_map_deltas.csv",
+    "sha256": "e96f48dcd0c1a8289d3f9d18f74da8fe6c981e3dca95cf3c0c52f54a4ccafc16"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/chained_cubic_coordinate_20261127",
+ "statement": "For the specified actual F7 curves, H3=(N/G,YR/G^2) is a separable proper degree3 cover and its Jacobian pullback equals the genuine chained Gamma globally, with p1 pushforward a left inverse and principal norm3. The retained source-C operation matrix and native source-E analysis show40/40 paired cubic-versus-prior-Gamma Jacobian walks identical and fewer F7 multiplications for cubic construction; these are partial source-operation findings with unpriced whole-call terms. The geometric proof is written, not full Lean or independently signed verification."
+}

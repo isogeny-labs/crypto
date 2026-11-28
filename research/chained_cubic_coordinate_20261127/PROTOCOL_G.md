@@ -1,0 +1,11 @@
+# Portable deterministic replay G
+
+This is a distinct portability/integration execution of the already frozen C and E certificates, justified by the new CI driver and exact-output comparison. It does not rerun a historical missing original for replacement custody. No new random cohort, parameter search, timing, baseline-performance qualification or PCC claim is authorized by this protocol.
+
+Read the published CI_REPLAY_LOCK_G.json and every whole driver/workflow/protocol input before any strict call. Read every complete C/E locked input and lock from its immutable source commit, check hashes and restore recorded modes into separate original and compile copies. Direct official Rust1.99.1 compiler tools and named installed Rust runtime files must have the same bytes as the original locks; locate them under this host's installation, without pretending the old Cloud rustup dispatcher is the new CI runtime. Record and guard the runtime, all input copies, built files and separate0555 qualifiers before and after calls. Freeze all whole result-reference files before calls too.
+
+Use the same warning/optimization/overflow/debug/codegen settings,120seconds and2GiB virtual memory per phase, and one worker. Preserve every argv, full stdout/stderr and status, including initialization or timeout failures. A failed version is terminal; do not relax byte comparisons, suppress warnings, raise caps or rerun unchanged.
+
+For C compare the entire mathematical stdout and all three output CSVs byte-for-byte with results commit7b52e831e2df3b6c69e23493c889738cacc742da. For E compare its entire stdout and three complete generated data/table files against that result commit. E intentionally reads its frozen original C dataset; the independently replayed C dataset must itself match that original. File comparison and custody are Python metadata operations; mathematics and descriptive statistics remain native Rust.
+
+GitHub Actions stores whole new outputs, sources, original/qualifier ELF pairs and manifests through normal artifact transport with compression disabled. This remains producer/CI replay and cannot sign a PCC claim or replace original Cloud binaries. All artifact-store, paidSTOP, admission and CI/review rules remain binding.

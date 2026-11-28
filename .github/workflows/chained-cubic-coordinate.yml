@@ -1,0 +1,41 @@
+name: Chained cubic coordinate replay
+on:
+  pull_request:
+    paths:
+      - 'research/chained_cubic_coordinate_20261127/**'
+      - '.github/workflows/chained-cubic-coordinate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'research/chained_cubic_coordinate_20261127/**'
+      - '.github/workflows/chained-cubic-coordinate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CARGO_BUILD_JOBS: '1'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+      - name: Acquire the immutable source and result commits
+        run: git fetch --no-tags --filter=blob:none --depth=1 origin 91db340ea313aaefe12e9c39a458a7b81929eeb7 e30f6512a0d13075ef177c38693f34f7027d317e 7b52e831e2df3b6c69e23493c889738cacc742da
+      - name: Install official pinned compiler tools
+        run: rustup toolchain install 1.99.1 --profile minimal --component clippy --component rustfmt
+      - name: Replay frozen coordinate and full-data certificates
+        run: python3 research/chained_cubic_coordinate_20261127/ci_replay_g.py "$RUNNER_TEMP/chained-cubic-replay"
+      - name: Retain complete originals and separate qualifiers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chained-cubic-replay-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chained-cubic-replay
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
