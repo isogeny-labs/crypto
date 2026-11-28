@@ -26,6 +26,25 @@ backend and record the complete output and report required by the protocol.
 Earlier Python counts from a separate workspace were exploratory and are not
 replayed or promoted here.
 
+## Limits for index calculus
+
+The A-free differential quartic fixes the product of the two outputs, not
+their individual values. When `x1 != x2`, genuine outputs also satisfy
+
+`(x1-x2)^2*(x(P+Q)+x(P-Q)) = 2*((x1+x2)*(x1*x2+1)+2*A*x1*x2)`,
+
+where `A=486662`. The quartic alone therefore admits spurious tuples as a
+relation-finding equation. The evaluator computes both outputs from actual
+lifted curve points.
+
+This weight-two population has at most
+`1 + 2*85 + 4*binom(85,2) = 14,451` abscissae and at most twice as many
+signed points. Consequently, four-summand combinations cover fewer than
+`(2*14,451)^4 < 2^60` group elements, even before collisions. This is a
+cardinality bound for the restricted search, not a general barrier to sparse
+representations. The weight-two run is an arithmetic control and cannot
+supply full-size four-summand index-calculus coverage.
+
 ## Relation to prior work
 
 The affine Montgomery addition formula and X/Z doubling controls follow the
