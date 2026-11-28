@@ -1693,7 +1693,7 @@ fn collect_relations_impl(
                     };
                     if off_base.is_empty() {
                         relations.push(rel);
-                    } else if off_base.iter().all(|(_, c)| c.unsigned_abs() == 1) {
+                    } else {
                         let started = Instant::now();
                         report.partial_relations += 1;
                         if let Some(full) = two_lp_graph.push(rel, &off_base, n) {
@@ -1701,8 +1701,6 @@ fn collect_relations_impl(
                             relations.push(full);
                         }
                         report.partial_wall_ns += started.elapsed().as_nanos() as u64;
-                    } else {
-                        report.discarded_off_base += 1;
                     }
                 }
                 TwoLargePrimeDecomposition::TooManyOffBase => {
@@ -1824,9 +1822,10 @@ pub fn hec_index_calculus_dlp(
     hec_index_calculus_dlp_impl(curve, d1, d2, n, params, false)
 }
 
-/// Solve with the opt-in two-large-prime graph collector. Only partials
-/// with unit off-base coefficients enter the graph; the final scalar is
-/// checked in the Jacobian exactly as in [`hec_index_calculus_dlp`].
+/// Solve with the opt-in two-large-prime graph collector. Repeated
+/// off-base places use checked integer cross-products; cycles whose
+/// factor-base coefficients overflow `i64` are withheld. The final scalar
+/// is checked in the Jacobian exactly as in [`hec_index_calculus_dlp`].
 pub fn hec_index_calculus_dlp_two_large_primes(
     curve: &HyperellipticCurveP,
     d1: &MumfordDivisorP,
@@ -2466,6 +2465,33 @@ mod tests {
         assert_eq!(
             classify_counted_with(&curve, &d, &fb, &mut 0, &SmoothnessTest::Scan),
             Decomposition::SmoothOffBase
+        );
+    }
+
+    #[test]
+    fn two_large_prime_oracle_keeps_doubled_place_multiplicity() {
+        let curve = toy_curve(41);
+        let full = build_factor_base(&curve, usize::MAX);
+        let fb = build_factor_base(&curve, full.len() / 2);
+        let p = full
+            .entries
+            .iter()
+            .find(|e| fb.index_of_x(&e.x).is_none() && !e.y.is_zero())
+            .expect("non-Weierstrass off-base place");
+        let doubled = p.divisor.add(&p.divisor, &curve);
+        let got = classify_two_large_primes_counted_with(
+            &curve,
+            &doubled,
+            &fb,
+            &mut 0,
+            &SmoothnessTest::Scan,
+        );
+        assert_eq!(
+            got,
+            TwoLargePrimeDecomposition::Split {
+                entries: vec![],
+                off_base: vec![(p.x.clone(), 2)],
+            }
         );
     }
 
