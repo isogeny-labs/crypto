@@ -17,7 +17,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Execute the frozen volcano IC source pilot locally under the owner’s no-AWS instruction, retain all private journals and separate replay, then continue the selected 46-curve study (Codex, in progress, started 2026-11-28, branch lane/volcano-local-recovery-20261128; follows PR #5126; original curve, target, base and bounds unchanged).
+- [ ] Execute the frozen volcano IC source pilot locally under the owner’s no-AWS instruction, retain all private journals and separate replay, then continue the selected 46-curve study (Codex, in progress, started 2026-11-28, branch lane/volcano-local-recovery-20261128, draft PR #5306; follows PR #5126; original curve, target, base and bounds unchanged).
 - [x] Integrate adaptive native Rust root extraction into F4 and PKM (Codex, 2026-11-27, PR #5283 merged as addead2953; all 176 affected-module tests pass, Clippy passes with and without default features; full library run completed, with four unrelated catalog/archive failures remaining after fixture recovery; outcome records in PR #5299).
 - [ ] Qualify the Rust rootfinder's complete-pipeline and fastest-external-backend performance (Codex, follow-up to PR #5283; blocked on an authenticated Iso Lab/checkpoint environment; no new timing result, and corrected PKM counters require fresh matched measurements).
 - [x] Archive ePrint 2026/3020 and add the prime-field DLP literature reference (Codex, completed 2026-11-27, PR #5284, branch docs/eprint-2026-3020)
