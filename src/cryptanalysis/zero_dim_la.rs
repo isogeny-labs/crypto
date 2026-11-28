@@ -89,6 +89,142 @@ impl FastStats {
     }
 }
 
+/// Operation counts of the linear stage on this thread (cumulative; take
+/// differences of [`lin_ops_snapshot`]).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct LinOps {
+    pub mul: u64,
+    pub add: u64,
+    pub mac: u64,
+    pub word: u64,
+    pub probe: u64,
+    pub rng: u64,
+    pub mul_outside_legacy: u64,
+    pub legacy_overcount: u64,
+    pub ring_muls: u64,
+}
+
+impl LinOps {
+    pub fn since(&self, b: &LinOps) -> LinOps {
+        LinOps {
+            mul: self.mul - b.mul,
+            add: self.add - b.add,
+            mac: self.mac - b.mac,
+            word: self.word - b.word,
+            probe: self.probe - b.probe,
+            rng: self.rng - b.rng,
+            mul_outside_legacy: self.mul_outside_legacy - b.mul_outside_legacy,
+            legacy_overcount: self.legacy_overcount - b.legacy_overcount,
+            ring_muls: self.ring_muls - b.ring_muls,
+        }
+    }
+    pub fn add_assign(&mut self, o: &LinOps) {
+        self.mul += o.mul;
+        self.add += o.add;
+        self.mac += o.mac;
+        self.word += o.word;
+        self.probe += o.probe;
+        self.rng += o.rng;
+        self.mul_outside_legacy += o.mul_outside_legacy;
+        self.legacy_overcount += o.legacy_overcount;
+        self.ring_muls += o.ring_muls;
+    }
+    pub fn field_mul(&self) -> u64 {
+        self.mul + self.mac
+    }
+    pub fn field_add(&self) -> u64 {
+        self.add + self.mac
+    }
+    pub fn word_op(&self) -> u64 {
+        self.word + self.probe + self.rng
+    }
+}
+
+thread_local! {
+    static LIN: std::cell::Cell<LinOps> = const {
+        std::cell::Cell::new(LinOps {
+            mul: 0,
+            add: 0,
+            mac: 0,
+            word: 0,
+            probe: 0,
+            rng: 0,
+            mul_outside_legacy: 0,
+            legacy_overcount: 0,
+            ring_muls: 0,
+        })
+    };
+}
+
+/// This thread's cumulative linear-stage operation counts.
+pub fn lin_ops_snapshot() -> LinOps {
+    LIN.with(|c| c.get())
+}
+
+#[inline(always)]
+fn lin(f: impl FnOnce(&mut LinOps)) {
+    LIN.with(|c| {
+        let mut v = c.get();
+        f(&mut v);
+        c.set(v);
+    });
+}
+#[inline(always)]
+fn c_mul(n: u64) {
+    lin(|v| v.mul += n);
+}
+#[inline(always)]
+fn c_add(n: u64) {
+    lin(|v| v.add += n);
+}
+#[inline(always)]
+fn c_mac(n: u64) {
+    lin(|v| v.mac += n);
+}
+#[inline(always)]
+fn c_word(n: u64) {
+    lin(|v| v.word += n);
+}
+#[inline(always)]
+fn c_probe(n: u64) {
+    lin(|v| v.probe += n);
+}
+#[inline(always)]
+fn c_rng(n: u64) {
+    lin(|v| v.rng += n);
+}
+#[inline(always)]
+fn c_outside(n: u64) {
+    lin(|v| v.mul_outside_legacy += n);
+}
+
+fn charge_lin(d: &LinOps) {
+    if !super::jv_bitops::enabled() {
+        return;
+    }
+    use super::jv_bitops::{charge, probes, rng_words, words, Kind};
+    charge(Kind::FieldMul, d.field_mul());
+    charge(Kind::FieldAdd, d.field_add());
+    words(d.word);
+    probes(d.probe, 1);
+    rng_words(d.rng);
+}
+
+fn eval_counted(f: &Poly, x: &[u64], p: u64) -> u64 {
+    let mut m = 0u64;
+    for (e, _) in f {
+        for &k in e.iter() {
+            if k > 0 {
+                m += (32 - k.leading_zeros()) as u64 + k.count_ones() as u64 + 1;
+            }
+        }
+    }
+    c_mul(m);
+    c_outside(m);
+    c_add(f.len() as u64);
+    f4_fp::eval(f, x, p)
+}
+
 /// `F_p` with lazy `u128` reduction.
 #[derive(Clone, Copy)]
 struct Fp {
@@ -142,13 +278,14 @@ impl Fp {
             let hi = self.bred((x >> 64) as u64);
             let lo = self.bred(x as u64);
             // hi·r64 < p² < 2^64
-            self.add(self.bred(hi * self.r64), lo)
+            self.add_raw(self.bred(hi * self.r64), lo)
         } else {
             (x % self.p as u128) as u64
         }
     }
     #[inline(always)]
     fn mul(&self, a: u64, b: u64) -> u64 {
+        c_mul(1);
         if self.small && a < self.p && b < self.p {
             self.bred(a * b)
         } else {
@@ -156,7 +293,7 @@ impl Fp {
         }
     }
     #[inline(always)]
-    fn add(&self, a: u64, b: u64) -> u64 {
+    fn add_raw(&self, a: u64, b: u64) -> u64 {
         let s = a + b;
         if s >= self.p {
             s - self.p
@@ -165,7 +302,13 @@ impl Fp {
         }
     }
     #[inline(always)]
+    fn add(&self, a: u64, b: u64) -> u64 {
+        c_add(1);
+        self.add_raw(a, b)
+    }
+    #[inline(always)]
     fn sub(&self, a: u64, b: u64) -> u64 {
+        c_add(1);
         if a >= b {
             a - b
         } else {
@@ -471,11 +614,16 @@ impl Fp {
     #[inline(always)]
     fn red_lohi(&self, lo: u64, hi: u64) -> u64 {
         let h = self.bred(self.bred(hi) * self.r32);
-        self.add(h, self.bred(lo))
+        self.add_raw(h, self.bred(lo))
     }
     /// `Σ a_i b_i mod p`, `a, b` reduced, fewer than 2^32 terms.
     #[inline]
     fn dot(&self, a: &[u32], b: &[u32]) -> u64 {
+        c_mac(a.len() as u64);
+        self.dot_nc(a, b)
+    }
+    #[inline]
+    fn dot_nc(&self, a: &[u32], b: &[u32]) -> u64 {
         #[cfg(target_arch = "x86_64")]
         let (l, h) = match simd_level() {
             2 => unsafe { dot_avx512(a, b) },
@@ -489,6 +637,7 @@ impl Fp {
     /// Four dot products `r_k · w mod p`.
     #[inline]
     fn dot4(&self, r: [&[u32]; 4], w: &[u32]) -> [u64; 4] {
+        c_mac(r.iter().map(|x| x.len().min(w.len()) as u64).sum());
         #[cfg(target_arch = "x86_64")]
         let v = match simd_level() {
             2 => unsafe { dot4_avx512(r, w) },
@@ -514,6 +663,7 @@ impl Fp {
     /// `(lo, hi) += c · row`, lane-wise.
     #[inline]
     fn axpy(&self, lo: &mut [u64], hi: &mut [u64], c: u32, row: &[u32]) {
+        c_mac(row.len() as u64);
         #[cfg(target_arch = "x86_64")]
         match simd_level() {
             2 => {
@@ -630,6 +780,8 @@ impl ModF {
                 hi += pr >> 32;
             }
             *muls += i.min(d) as u64;
+            c_mac(i.min(d) as u64);
+            c_add(1);
             inv[i] = (fp.p - fp.red_lohi(lo, hi)) % fp.p;
         }
         ModF {
@@ -721,10 +873,10 @@ fn staircase(lms: &[Vec<u32>], n: usize, limit: usize) -> Option<Vec<Vec<u32>>> 
         out: &mut Vec<Vec<u32>>,
         limit: usize,
     ) -> bool {
-        if lms
-            .iter()
-            .any(|l| l.iter().zip(mono.iter()).all(|(a, b)| a <= b))
-        {
+        if lms.iter().any(|l| {
+            c_word(1);
+            l.iter().zip(mono.iter()).all(|(a, b)| a <= b)
+        }) {
             return true;
         }
         if k == cap.len() {
@@ -782,13 +934,18 @@ impl NfTable<'_> {
     /// `NF(m)`, or `None` when no basis element reduces `m` (not a Gröbner
     /// basis of a zero-dimensional ideal).
     fn nf(&mut self, m: u64) -> Option<Nf> {
+        c_probe(1);
         if let Some(&k) = self.index.get(&m) {
             return Some(Nf::Unit(k));
         }
+        c_probe(1);
         if let Some(&r) = self.memo.get(&m) {
             return Some(Nf::Row(r));
         }
-        let gi = self.bas.iter().position(|(lm, _)| self.divides(*lm, m))?;
+        let gi = self.bas.iter().position(|(lm, _)| {
+            c_word(1);
+            self.divides(*lm, m)
+        })?;
         let cof = m - self.bas[gi].0;
         let tail_len = self.bas[gi].1.len();
         // the tail's normal forms first (recursion), then one lazy pass
@@ -796,6 +953,7 @@ impl NfTable<'_> {
         for t in 0..tail_len {
             let (tm, c) = self.bas[gi].1[t];
             let sub = self.nf(tm + cof)?;
+            c_add(1);
             parts.push((self.f.p - c, sub));
         }
         let delta = self.delta;
@@ -818,6 +976,7 @@ impl NfTable<'_> {
                     *a += c * x as u128;
                 }
                 self.muls += delta as u64;
+                c_mac(delta as u64);
             }
             if rows.len() > f.chunk {
                 for (o, a) in out.iter_mut().zip(acc.iter_mut()) {
@@ -838,6 +997,7 @@ impl NfTable<'_> {
         }
         let id = self.rows.len();
         self.rows.push(out);
+        c_probe(1);
         self.memo.insert(m, id);
         Some(Nf::Row(id))
     }
@@ -999,8 +1159,10 @@ fn square_into(fp: &Fp, a: &[u32], out: &mut [u32], ks: &mut KScratch) {
     for i in 0..len {
         // a lane is below 2^32·n, so doubling it stays far from 2^64
         let (mut l, mut h) = (2 * lo[i], 2 * hi[i]);
+        c_add(1);
         if i % 2 == 0 {
             kcount(1);
+            c_mac(1);
             let pr = a[i / 2] as u64 * a[i / 2] as u64;
             l += pr & LO;
             h += pr >> 32;
@@ -1174,6 +1336,7 @@ fn roots_in_fp(fp: &Fp, f: &[u64], rng: &mut StdRng, muls: &mut u64) -> Vec<u64>
     if d <= 2 {
         let r = ring.roots(&UPoly(f.to_vec()), rng);
         *muls += ring.muls.get();
+        lin(|v| v.ring_muls += ring.muls.get());
         return r;
     }
     let mf = ModF::new(fp, f, muls);
@@ -1190,6 +1353,7 @@ fn roots_in_fp(fp: &Fp, f: &[u64], rng: &mut StdRng, muls: &mut u64) -> Vec<u64>
     // g has small degree (the number of roots): split it with the ring
     let r = ring.roots(&UPoly(g), rng);
     *muls += ring.muls.get();
+    lin(|v| v.ring_muls += ring.muls.get());
     r
 }
 
@@ -1215,6 +1379,7 @@ fn poly_gcd(fp: &Fp, a: &[u64], b: &[u64], muls: &mut u64) -> Vec<u64> {
     }
     if let Some(&l) = a.last() {
         let li = fp.inv(l);
+        c_outside(a.len() as u64);
         for c in a.iter_mut() {
             *c = fp.mul(*c, li);
         }
@@ -1253,7 +1418,9 @@ pub fn fast_stage_with_action(
     st: &mut FastStats,
 ) -> Option<Vec<Vec<u64>>> {
     let t0 = Instant::now();
+    let before = lin_ops_snapshot();
     let out = fast_inner(basis, input, n, p, action_variable, rng, st);
+    charge_lin(&lin_ops_snapshot().since(&before));
     st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
     out
 }
@@ -1277,6 +1444,7 @@ fn fast_inner(
         return None;
     }
     let fp = Fp::new(p);
+    c_rng(1);
     let mut lrng = StdRng::seed_from_u64(rng.gen());
     let t = Instant::now();
     let lms: Vec<Vec<u32>> = basis.iter().map(|g| g[0].0.clone()).collect();
@@ -1308,6 +1476,7 @@ fn fast_inner(
         .enumerate()
         .map(|(i, m)| (pack(m), i))
         .collect();
+    c_probe(delta as u64);
     let mut tab = NfTable {
         f: fp,
         delta,
@@ -1322,7 +1491,10 @@ fn fast_inner(
                     pack(&g[0].0),
                     g[1..]
                         .iter()
-                        .map(|(e, c)| (pack(e), fp.mul(*c, lc_inv)))
+                        .map(|(e, c)| {
+                            c_outside(1);
+                            (pack(e), fp.mul(*c, lc_inv))
+                        })
                         .collect(),
                 )
             })
@@ -1351,12 +1523,14 @@ fn fast_inner(
             Some(Nf::Row(r)) => {
                 let row = &tab.rows[r];
                 let nz = row.iter().filter(|&&c| c != 0).count();
+                c_word(delta as u64);
                 st.dense_cols += 1;
                 st.nnz += nz;
                 if 4 * nz > delta {
                     dense_pos.push(j);
                     dmat.extend(row.iter().map(|&c| c as u32));
                 } else {
+                    c_word(delta as u64);
                     sparse_cols.push((
                         j,
                         row.iter()
@@ -1381,6 +1555,7 @@ fn fast_inner(
             Some(Nf::Unit(k)) => vec![(k, 1u64)],
             Some(Nf::Row(r)) => tab.rows[r]
                 .iter()
+                .inspect(|_| c_word(1))
                 .enumerate()
                 .filter(|(_, &c)| c != 0)
                 .map(|(k, &c)| (k, c))
@@ -1400,6 +1575,7 @@ fn fast_inner(
         st.functionals_tried += 1;
         let t = Instant::now();
         let mut w: Vec<u32> = (0..delta).map(|_| lrng.gen_range(0..p) as u32).collect();
+        c_rng(delta as u64);
         let mut y = vec![0u32; delta];
         let pool = krylov_pool();
         let mut dvals = vec![0u32; dense_pos.len()];
@@ -1414,6 +1590,7 @@ fn fast_inner(
                         acc += c as u128 * w[k] as u128;
                     }
                     st.krylov_muls += v.len() as u64;
+                    c_mac(v.len() as u64);
                     fp.red(acc)
                 };
                 s.push(x);
@@ -1435,9 +1612,10 @@ fn fast_inner(
                             .enumerate()
                             .with_min_len(4)
                             .for_each(|(c, v)| {
-                                *v = fp.dot(&dmat[c * delta..(c + 1) * delta], wr) as u32;
+                                *v = fp.dot_nc(&dmat[c * delta..(c + 1) * delta], wr) as u32;
                             })
                     });
+                    c_mac((dense_pos.len() * delta) as u64);
                     for (&pos, &v) in dense_pos.iter().zip(&dvals) {
                         y[pos] = v;
                     }
@@ -1466,6 +1644,7 @@ fn fast_inner(
                     lo += pr & LO;
                     hi += pr >> 32;
                 }
+                c_mac(nz.len() as u64);
                 y[*pos] = fp.red_lohi(lo, hi) as u32;
             }
             st.krylov_muls += (dense_pos.len() * delta
@@ -1499,7 +1678,9 @@ fn fast_inner(
             q[j] = fp.add(fpoly[j + 1], fp.mul(xi, q[j + 1]));
         }
         st.readout_muls += delta as u64;
+        lin(|v| v.legacy_overcount += 1);
         let psi = |a: &[u64]| -> u64 {
+            c_mac(delta as u64);
             let mut res = 0u64;
             for (ach, qch) in a[..delta].chunks(fp.chunk).zip(q.chunks(fp.chunk)) {
                 let mut acc = 0u128;
@@ -1512,10 +1693,12 @@ fn fast_inner(
         };
         let den = psi(&seqs[xn]);
         if den == 0 {
+            c_outside(delta as u64);
             st.gave_up = Some("multiple point");
             return None;
         }
         let di = fp.inv(den);
+        c_outside((n - 1) as u64);
         let mut sol = vec![0u64; n];
         for i in 0..n {
             if i != xn {
@@ -1524,13 +1707,14 @@ fn fast_inner(
         }
         sol[xn] = xi;
         st.readout_muls += (n * delta) as u64;
-        if !input.iter().all(|f| f4_fp::eval(f, &sol, p) == 0) {
+        if !input.iter().all(|f| eval_counted(f, &sol, p) == 0) {
             st.gave_up = Some("candidate fails the input");
             return None;
         }
         sols.push(sol);
     }
     st.readout_ms = t.elapsed().as_secs_f64() * 1e3;
+    c_word(super::jv_bitops::sort_cost(sols.len()) + sols.len().saturating_sub(1) as u64);
     sols.sort();
     sols.dedup();
     Some(sols)
@@ -1743,6 +1927,114 @@ mod tests {
             let mut want = planted.to_vec();
             want.sort();
             assert_eq!(got, want, "p = {p}");
+        }
+    }
+
+    #[test]
+    fn counted_bm_hand_control() {
+        let f = Fp::new(101);
+        let mut legacy = 0;
+        let b = lin_ops_snapshot();
+        let g = berlekamp_massey(&f, &[1, 2], &mut legacy);
+        let d = lin_ops_snapshot().since(&b);
+        assert_eq!(g, vec![99, 1]);
+        assert_eq!((d.mul, d.add, d.mac, legacy), (4, 3, 1, 5));
+        assert_eq!(legacy, d.mac + d.mul);
+    }
+
+    #[test]
+    fn counted_kernels_charge_their_lengths() {
+        let f = Fp::new(1009);
+        let a: Vec<u32> = (1..=7).collect();
+        let b0 = lin_ops_snapshot();
+        assert_eq!(f.dot(&a, &a), (1..=7u64).map(|x| x * x).sum::<u64>() % 1009);
+        let r: Vec<u32> = (0..9).collect();
+        let _ = f.dot4([&r, &r, &r, &r], &r);
+        let (mut lo, mut hi) = (vec![0u64; 5], vec![0u64; 5]);
+        f.axpy(&mut lo, &mut hi, 3, &r[..5]);
+        let d = lin_ops_snapshot().since(&b0);
+        assert_eq!((d.mac, d.mul, d.add), (7 + 36 + 5, 0, 0));
+        let b1 = lin_ops_snapshot();
+        let _ = f.red(123_456_789);
+        let _ = f.red_lohi(5, 7);
+        let _ = f.dot_nc(&a, &a);
+        assert_eq!(lin_ops_snapshot().since(&b1), LinOps::default());
+        let _ = f.mul(5, 6);
+        let _ = f.add(5, 6);
+        let _ = f.sub(5, 6);
+        let d = lin_ops_snapshot().since(&b1);
+        assert_eq!((d.mul, d.add, d.mac), (1, 2, 0));
+    }
+
+    #[test]
+    fn counted_products_reconcile_with_the_legacy_formula_and_jv_bitops() {
+        let mut rng = StdRng::seed_from_u64(23);
+        for &p in &[1009u64, 65_521] {
+            let fp = Fp::new(p);
+            for &n in &[3usize, 33, 64, 65, 100] {
+                let a: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
+                let b: Vec<u32> = (0..n).map(|_| rng.gen_range(0..p) as u32).collect();
+                let (mut m, s) = (0u64, lin_ops_snapshot());
+                let _ = pmul(&fp, &a, &b, &mut m);
+                let d = lin_ops_snapshot().since(&s);
+                assert_eq!((m, d.mul), (d.mac, 0), "pmul p={p} n={n}");
+                assert_eq!(d.add > 0, n > KARATSUBA_MIN);
+            }
+            for &d in &[3usize, 10, 64] {
+                let mut f: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+                f.push(1);
+                let (mut m, s) = (0u64, lin_ops_snapshot());
+                let mf = ModF::new(&fp, &f, &mut m);
+                let _ = x_pow_p(&fp, &mf, &mut m);
+                let o = lin_ops_snapshot().since(&s);
+                assert_eq!(m, o.mac + o.mul, "powering p={p} d={d}");
+            }
+        }
+        // Full fast_stage_with_action conservation across action coordinates.
+        let p = 1009u64;
+        let opts = f4_fp::F4Options::new(f4_fp::Ordering::Grevlex, 4);
+        let system = vec![
+            vec![(vec![2, 0, 0], 1), (vec![0, 0, 0], p - 9)],
+            vec![(vec![0, 2, 0], 1), (vec![0, 0, 0], p - 16)],
+            vec![
+                (vec![0, 0, 1], 1),
+                (vec![1, 0, 0], p - 2),
+                (vec![0, 1, 0], p - 5),
+            ],
+        ];
+        let r = f4_fp::f4(&system, 3, p, &opts);
+        for action in [0usize, 1, 2] {
+            let mut rng_off = StdRng::seed_from_u64(77);
+            let mut st_off = FastStats::default();
+            super::super::jv_bitops::enable(false);
+            let sols_off =
+                fast_stage_with_action(&r.basis, &system, 3, p, action, &mut rng_off, &mut st_off);
+
+            let mut rng_on = StdRng::seed_from_u64(77);
+            let mut st_on = FastStats::default();
+            super::super::jv_bitops::enable(true);
+            super::super::jv_bitops::claim();
+            super::super::jv_bitops::set_moduli(p, p);
+            let _g = super::super::jv_bitops::enter(super::super::jv_bitops::Phase::Descent);
+            let lin0 = lin_ops_snapshot();
+            let bit0 = super::super::jv_bitops::snapshot();
+            let sols_on =
+                fast_stage_with_action(&r.basis, &system, 3, p, action, &mut rng_on, &mut st_on);
+            let dlin = lin_ops_snapshot().since(&lin0);
+            let dbit = super::super::jv_bitops::snapshot().since(&bit0).total();
+            drop(_g);
+            super::super::jv_bitops::enable(false);
+
+            assert_eq!(sols_off, sols_on);
+            assert_eq!(st_off.muls(), st_on.muls());
+            assert_eq!(
+                st_on.muls() + dlin.mul_outside_legacy,
+                dlin.mac + dlin.mul + dlin.legacy_overcount + dlin.ring_muls,
+                "conservation action={action}"
+            );
+            assert!(dbit.get(super::super::jv_bitops::Kind::FieldMul) >= dlin.field_mul());
+            assert!(dbit.get(super::super::jv_bitops::Kind::FieldAdd) >= dlin.field_add());
+            assert!(dbit.get(super::super::jv_bitops::Kind::HashProbe) >= dlin.probe);
         }
     }
 }

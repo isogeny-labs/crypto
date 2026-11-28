@@ -497,68 +497,84 @@ OriginalIC4525556132414is lower on this sample; all complete costs/bands/
 ratios remain null. Exact records/report/custody are retained and the owned
 runner is deleted. ResultPCC-7d4d7e remains unverified. [pcc:unverified]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Signed-matroid partial-relation graph and multi-pattern descent (26 November)
+
+The [signed-matroid and multi-pattern study](anchored_multi_pattern_20261126/report.pdf)
+([frozen protocol](anchored_multi_pattern_20261126/protocol.json),
+[Panel A summary](anchored_multi_pattern_20261126/panel_a_run50_summary.json),
+[7-engine graph head-to-head](anchored_multi_pattern_20261126/graph_engine_head_to_head.json),
+[Panel B multi-prime summary](anchored_multi_pattern_20261126/panel_b_multiprime_summary.json))
+closes the remaining `zero_dim_la` and `tracked_rref_contributors` `bitop/v1` hooks
+(`foreign_hook_calls == 0`), adds a `(32, 28, 65)` Karatsuba/Chung-Hasan $\mathbb{F}_{p^6}$
+tower alongside `(55, 55, 80)` schoolbook arithmetic, replaces `BTreeMap` BFS with
+an online $\mathbb{Z}$-exact `SignedMatroidGraph` (`src/cryptanalysis/jv_signed_matroid_graph.rs`),
+adds hit-bucket sieving plus deterministic zero-RNG Frobenius-norm quartic splitting,
+and couples exported $\mathbb{Z}$ divisor anchors to multi-pattern `(1^6), (1^4,2), (1^2,2^2), (2^3)`
+descent with cold F4 trace replay (`src/cryptanalysis/jv_anchored_descent.rs`). [pcc:unverified]
+
+- **Seven-engine partial-relation graph head-to-head (`p = 1009, seed = 389`, `100,088` sources):**
+  `1lp-singleton-table` stalls at rank `315 / 508` on `155,648` planes, while modular $\mathbb{F}_\ell$-inverting
+  engines (`2lp-forest-witness-fl`, `klp-markowitz-2core`, `klp-sharedkey-prim-mst`) export `0`
+  valid $\mathbb{Z}$ anchors due to cofactor torsion loss. [pcc:unverified]
+  `2lp-signed-matroid-dsu` reaches full rank `508 / 508` with `0` modular inversions, exports `20,667`
+  $\mathbb{Z}$-exact unit anchors, achieves the lowest mean row weight (`16.26`), and cuts pure graph +
+  projection `bitop/v1` cost to `254.61e6` (`1.54x` below `2lp-deferred-bfs`, `4.08x` below
+  `klp-markowitz-2core`, `7.66x` below `klp-sharedkey-prim-mst`, and `33.44x` below `2lp-forest-witness-fl`),
+  while `3lp-signed-matroid-hyper` cascades `(1^3, 2^3)` triples into `21,080` anchors at `291.04e6`
+  graph bitops. [pcc:unverified]
+- **Panel A 13-arm Run50 ablation (`p = 1009, seed = 389`, 58-bit $\ell = 263,807,419,614,139,553$):**
+  All 13 arms recover `d = 242624768583643540` from public input (`Spec.d = 0`). [pcc:unverified]
+  `TracedAnchored` cuts Phase-3 descent `w=0` bitops by `8.920x` (`4.368T -> 0.490T`, `3,415 -> 666`
+  residuals), and `signed-matroid-2lp:traced-anchored` cuts Phase-1 relation bitops by `1.807x`
+  (`2.043T -> 1.131T`; `2.089x` wall reduction `22.78s -> 10.90s`) and end-to-end `w=0` bitops by
+  `3.329x` (`6.872T -> 2.065T`; `w=1` Karatsuba `2.068T`, `11.89s` wall), standing `63.3x` below
+  analytical and `36.1x` below empirical `B=16` Karatsuba Pollard rho (`74.52T`, `60.70s` wall) on
+  this restricted weak-cover family. [pcc:unverified]
+- **Panel B multi-prime scaling (`p in {307, 383, 503, 661, 1009}` x 3 fresh seeds = 60 IC bundles) & controls:**
+  `2-LP` overcomes `p = 383` `1-LP` starvation (`3/3` vs `1/3` solved), anchor coverage follows
+  $p \cdot f(p) \approx 64..77$ (log-slope `-0.854`), end-to-end `signed-matroid-2lp:traced-anchored`
+  scales with log-slope `1.393` (`1.337` on `661..1009`) vs Karatsuba Pollard rho `3.000` (`69.6x`
+  analytical / `96.4x` empirical ratio at `p = 1009`), `-C overflow-checks=on` matches standard
+  release bit-for-bit, and the pre-sealed standalone qualifier
+  ([Panel A](anchored_multi_pattern_20261126/qualification_panel_a.json),
+  [Panel B part 1](anchored_multi_pattern_20261126/qualification_panel_b_part1.json),
+  [Panel B part 2](anchored_multi_pattern_20261126/qualification_panel_b_part2.json))
+  passes `73 / 73` bundles (`failed_bundles == 0`). [pcc:unverified]
+
+## Multi-round algorithmic hillclimb until frontier stall (26 November continuation)
+
+The [16-round hillclimb continuation](hillclimb_until_stall_20261126/report.pdf)
+([frozen protocol](hillclimb_until_stall_20261126/protocol.json),
+[trajectory summary](hillclimb_until_stall_20261126/results/hillclimb_rounds.json),
+[multi-prime frontier](hillclimb_until_stall_20261126/results/multiprime_frontier.json),
+[standalone qualification](hillclimb_until_stall_20261126/results/qualification_report.json))
+executes 16 successive single-mechanism hypotheses (`R0..R15`) across frozen seeds `{389, 101, 211, 307}`
+at `p = 1009` under a frozen `<= -1.00%` 4-seed `bitop/v1` promotion gate (`foreign_hook_calls == 0`),
+continuing until five consecutive orthogonal frontier candidates stall. [pcc:unverified]
+
+- **Eight promoted steps beyond Round-1 (`R2..R5, R7..R10`, `mean4`: `1,925.05G -> 1,045.54G`, `1.841x` beyond `R1`, `3.915x` beyond `R0`):**
+  Online minimum-Markowitz SGE (`R2: -9.25%`) and factored addition-chain Scalar Wiedemann (`R8: -13.60%`,
+  `src/cryptanalysis/jv_sparse_markowitz.rs`) cut Phase-2 homogeneous LA `bitop/v1` by `90.31%`
+  (`447.35G -> 43.35G`, `10.32x`) by keeping rows in sparse `+-1, +-2` form with pure `ModrAdd` chains
+  (`0` `ModrMul`s on `|c| <= 8`) and `{-1, +1}^N` projections. [pcc:unverified]
+  Root-free `m=9` partition line splitting (`R3: -2.24%`), stack-array Stickelberger quartic extraction
+  (`R4: -1.14%`), `4096/64` incidence/sub-rank cadence (`R5: -2.97%`), zero-multiplication `inv_2w_sq`
+  lookup with degree-4 $A_1'(x)$ forward differences (`R9: -15.89%`), and Euclidean-fused `disc(rest)`
+  Stickelberger screening with a squaring-built Frobenius matrix (`R10: -5.70%`,
+  `src/cryptanalysis/jv_sieve_fast_m9.rs`) cut Phase-1 relation `bitop/v1` to `770.48G` (`Run50 = 767.81G`),
+  while switching cold-traced F4 from `Staircase(64)` to `Hilbert(8)` (`R7: -6.86%`) cuts Phase-3 descent
+  `bitop/v1` by `32.74%` (`343.68G -> 230.94G`; `Run50`: `1,141.61G` total, `8.36s` wall). [pcc:unverified]
+- **Intermediate falsification (`R6`) and 5-round frontier stall (`R11..R15`):**
+  Linear $d_0$ elimination (`R6: +0.76%`, `STALL #1`) increases Macaulay degree-4 fill; at the `R10`
+  frontier, post-rank anchor margins (`R11: +0.48%`, `R12: +1.10%`), conditional `3-LP` on productive
+  `2-LP` lines (`R13: +6.30%`), `92%` small-FB restriction (`R14: +211.88%`, `0/4` rank-capped at `467/508`),
+  and narrow `512/16` batch cadence (`R15: +4.96%`) produce five consecutive stalls (`STALL #1..#5`),
+  confirming local slope exhaustion across Phase-1/2/3 balance, hypergraph arity, factor-base size, and
+  batch cadence. [pcc:unverified]
+- **Multi-prime scaling (`p in {307, 383, 503, 661, 1009}`), overflow & standalone qualification:**
+  `R10` lowers the 5-prime log-slope `d(log cost)/d(log p)` from `1.391` (`R1`) to `1.280` (`1.59x` at
+  `p = 383` rising monotonically to `1.85x` at `p = 1009`, standing `129.0x` below analytical Karatsuba
+  Pollard rho on fresh seeds at `p = 1009`), matches runtime-verified `overflow-checks = true` bit-for-bit
+  across `(307,101), (383,211), (503,307)`, and passes `17 / 17` pre-sealed standalone bundle qualifications
+  (`failed_bundles == 0`), scoped strictly to the degree-2 genus-3 Weil-cover family over $\mathbb{F}_{p^6}$.
+  [pcc:unverified]

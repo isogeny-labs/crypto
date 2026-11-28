@@ -1,0 +1,63 @@
+{
+  "schema": "experiment.protocol/v1",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "protocol_id": "EXT-IC-GRAPH-HILLCLIMB-STALL-20261126",
+  "version": 1,
+  "created": "2026-11-26",
+  "repository": "crypto",
+  "study_dir": "research/extension_ic_graph_20261115/hillclimb_until_stall_20261126",
+  "pcc": "unverified",
+  "status_note": "Preregistered 16-round greedy hillclimb continuation from Round-1 champion (matroid-2lp:traced-anchored, 2.065 Tbitops on Run50) across Phase 1 (sieve/factorization/graph), Phase 2 (sparse LA), and Phase 3 (multi-pattern F4 descent) until >= 5 consecutive orthogonal frontier hypotheses stall under the frozen 1.0% 4-seed mean bitop/v1 acceptance rule. Independently qualified by frozen /tmp/immutable_jv_graph_ic_hillclimb_qualify.",
+  "links": {
+    "report_typst": "REPORT.typ",
+    "report_pdf": "report.pdf",
+    "round1_protocol": "../anchored_multi_pattern_20261126/protocol.json",
+    "round1_report": "../anchored_multi_pattern_20261126/report.pdf"
+  },
+  "seed_manifest": {
+    "schema": "isogeny-labs/experiment-seeds/v1",
+    "hillclimb_p": 1009,
+    "hillclimb_seeds": [389, 101, 211, 307],
+    "multiprime_primes": [307, 383, 503, 661, 1009],
+    "multiprime_seeds": [101, 211, 307],
+    "named_streams": {
+      "factor_base": "seed ^ 0xBACE_0001",
+      "line_enumeration": "seed ^ 0xA17E_2E17",
+      "quartic_split": "seed ^ 0x5155_4144_5041_4952",
+      "lanczos_kernel": "seed ^ 0x5A46_4B45_524E_454C",
+      "wiedemann_kernel": "seed ^ 0x5749_4544_454D_414E",
+      "descent_walk": "seed ^ 0x51E7E",
+      "descent_residual": "seed ^ (i * 0x9E37_79B9_7F4A_7C15)"
+    }
+  },
+  "greedy_promotion_rule": {
+    "metric": "mean observed_bitops (bitop/v1) across all 4 frozen seeds [389, 101, 211, 307] at p = 1009",
+    "completeness_gate": "verified == true and matches_planted_truth == true on 4/4 seeds, with foreign_hook_calls == 0",
+    "min_relative_improvement_pct": 1.0,
+    "stall_definition": "Any round with 4/4 valid solves whose 4-seed mean observed_bitops fails to improve over the incumbent champion by >= 1.0% (delta_pct > -1.0%) is classified as STALL; the incumbent champion is retained as the base configuration for subsequent rounds.",
+    "stopping_criterion": "Evaluate the complete 16-round schedule R0..R15, confirming >= 5 consecutive STALL rounds across orthogonal Phase-1/2/3 frontier hypotheses."
+  },
+  "rounds": [
+    {"round_id": "R0", "label": "r0_deferred_original", "phase_target": "Baseline", "hypothesis": "Pre-matroid baseline (DeferredPairsFast + Original 1^6 descent + Randomized Lanczos LA)."},
+    {"round_id": "R1", "label": "r1_matroid_2lp_traced", "phase_target": "Round-1 Champion", "hypothesis": "SignedMatroid2lp + HitBuckets + deterministic resolvent + TracedAnchored multi-pattern descent + Randomized Lanczos LA."},
+    {"round_id": "R2", "label": "r2_markowitz_sge_la", "phase_target": "Phase 2 (Sparse SGE)", "hypothesis": "Online incremental minimum-Markowitz sparse Gaussian elimination + column-support pre-gating replaces 3x Lanczos checkpoints."},
+    {"round_id": "R3", "label": "r3_partition_m9_fast_sieve", "phase_target": "Phase 1 (Sieve)", "hypothesis": "Root-free deg-8/7 partition direct line factorization + 1-inversion Montgomery F_p inverse table + single-flush stack-difference bucket sieve."},
+    {"round_id": "R4", "label": "r4_stickelberger_stack_2lp", "phase_target": "Phase 1 (Extractor)", "hypothesis": "Stickelberger-parity stack-polynomial quartic (2,2) splitter + deferred E2 ordinate checks."},
+    {"round_id": "R5", "label": "r5_batch4096_sub64_fast_sextic", "phase_target": "Cadence + Phase 3 Post", "hypothesis": "4096-plane roots_by_incidence batching + 64-plane sub-batch rank stop (surplus=1) + zero-inversion stack sextic post-screening."},
+    {"round_id": "R6", "label": "r6_flat_unit5_d0_elim", "phase_target": "Phase 3 (F4 Algebra)", "hypothesis": "Eliminate constant-coeff linear d_0 from Im(q_5)=0 via 126-monomial flat array (6 quadrics -> 5 deg-4 eqs) vs degree-4 Macaulay fill."},
+    {"round_id": "R7", "label": "r7_hilbert8_f4_stop", "phase_target": "Phase 3 (F4 Stop)", "hypothesis": "Hilbert-driven F4 early termination StopMode::Hilbert(8) vs Staircase(64) under active cold-trace replay."},
+    {"round_id": "R8", "label": "r8_wiedemann_addchain_la", "phase_target": "Phase 2 (Krylov LA)", "hypothesis": "Factored Scalar Wiedemann (Berlekamp-Massey) with +-1 projection and pure ModrAdd chains on |coef|<=8 eliminates Markowitz fill-in."},
+    {"round_id": "R9", "label": "r9_zero_mul_deg4_sieve", "phase_target": "Phase 1 (Zero-Mul Sieve)", "hypothesis": "Degree-4 A_1'(x) difference table + pre-scaled SharedBFast + O(1) inv_2w_sq[y] lookup eliminates 3*|FB| Montgomery batch muls per line."},
+    {"round_id": "R10", "label": "r10_frob_basis_stickelberger_g", "phase_target": "Phase 1 (Frob + Disc)", "hypothesis": "Simultaneous squarefreeness + Stickelberger G-discriminant character filter + squaring-built Frobenius matrix action."},
+    {"round_id": "R11", "label": "r11_overcollect_1024b", "phase_target": "Phase 1 <-> 3 Trade-off", "hypothesis": "Post-rank +1,024 extra fast-sieve B-planes to raise 2-LP anchor coverage f(p) vs linear sieve cost."},
+    {"round_id": "R12", "label": "r12_overcollect_3072b", "phase_target": "Phase 1 <-> 3 Trade-off", "hypothesis": "Post-rank +3,072 extra fast-sieve B-planes to test deeper anchor saturation vs linear sieve cost."},
+    {"round_id": "R13", "label": "r13_selective_3lp_productive_lines", "phase_target": "Phase 1 (Hypergraph)", "hypothesis": "Conditional <= 1 cnt==3 (3-LP) candidate only on lines that already yielded a 2-LP source."},
+    {"round_id": "R14", "label": "r14_subsampled_fb_92pct", "phase_target": "Phase 1/2 (Dimension)", "hypothesis": "Sub-sampled 92% rational factor base (8% smaller target rank vs (0.92)^5 = 65.9% hit-rate drop)."},
+    {"round_id": "R15", "label": "r15_batch512_sub16_cadence", "phase_target": "Phase 1/2 (Cadence)", "hypothesis": "Narrow 512-plane roots_by_incidence batching with 16-plane sub-batch rank checks."}
+  ],
+  "panels": {
+    "panel_a_hillclimb_trajectory": {"p": 1009, "seeds": [389, 101, 211, 307], "rounds": 16},
+    "panel_b_multiprime_frontier": {"primes": [307, 383, 503, 661, 1009], "seeds": [101, 211, 307]},
+    "panel_c_overflow_control": {"cases": [{"p": 307, "seed": 101}, {"p": 383, "seed": 211}, {"p": 503, "seed": 307}]}
+  }
+}
