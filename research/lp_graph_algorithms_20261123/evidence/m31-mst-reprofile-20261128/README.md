@@ -14,7 +14,7 @@ the number is per MST call. Input parsing and the input clone are
 outside `filter_large_primes_mst_with` and not counted. Group probes were
 run separately so nested matches cannot cancel. Per-function
 differentials: `exclusive-*.txt`, `inclusive-*.txt` (from
-`callgrind_diff.py`).
+`callgrind_diff.sh`).
 
 ## Per call
 
