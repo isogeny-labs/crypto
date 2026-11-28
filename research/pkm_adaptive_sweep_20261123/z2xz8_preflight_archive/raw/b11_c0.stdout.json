@@ -1,0 +1,260 @@
+{
+  "all_verified": false,
+  "calibration": {
+    "ns_per_add": 36.46646,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 39.72229,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 0.8709306640625,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.255645751953125,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_word_xor"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.000927959,
+  "frozen_target_scalars": [
+    1792
+  ],
+  "instance": "icv1-fp12-t29-7c0328de",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp12-t29-7c0328de | prime-isogeny[aux=ordinary,family=z2xz8,seed=0,selection=equal-size,t=5] + mitm[m=2] + — + walk + incremental-gauss-full-rank-checked | 34 | 17 | 2.0 | 0.000 | 1 | 0 | 0 | — | — | 31.604 | — | gave up |\n",
+  "operation": "bench",
+  "plan": null,
+  "prime_workload_curve_validation": {
+    "field": "proved",
+    "generator": "checked_annihilated_by_r",
+    "group_order": "proved_exact_census",
+    "subgroup_primality": "proved"
+  },
+  "prime_workload_sha256": "fd3d17752e8ea1e621dff4e5724e333b44bf992c728a5950eb6626f73bc342db",
+  "regime": "prime",
+  "rho_reference": null,
+  "rho_reference_candidates": [],
+  "rho_reference_plain": null,
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 32.0,
+          "group_ops": {
+            "adds": 12,
+            "doubles": 20,
+            "scalar_mults": 2
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 1,
+            "relations": 0,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 1,
+            "trials": 1,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_jumps_materialised": 0,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 0
+          },
+          "wall_ns": 43500,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34
+          }
+        },
+        "description": "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), built in full",
+        "gae_before_solver": 32.0,
+        "hit_rate": 0.0,
+        "name": "mitm",
+        "relations_found": 0,
+        "setup": {
+          "gae": 595.0,
+          "group_ops": {
+            "adds": 595,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 80333,
+          "work_native": {
+            "counted:table_insert_attempts": 1,
+            "table_insert_attempts": 578
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 1
+      },
+      "exhausted": true,
+      "factor_base": {
+        "abscissae": 17,
+        "columns": 17,
+        "cost": {
+          "gae": 805.0,
+          "group_ops": {
+            "adds": 287,
+            "doubles": 518,
+            "scalar_mults": 2
+          },
+          "native": {
+            "aux_bsgs_table_entries": 0,
+            "aux_count_gae": 0,
+            "aux_curves_filtered_out": 0,
+            "aux_curves_singular": 1,
+            "aux_curves_tried": 10,
+            "aux_filter_false_positives": 0,
+            "aux_legendre_symbols": 0,
+            "aux_orders_computed": 0,
+            "aux_orders_undetermined": 0,
+            "aux_search_gae": 731,
+            "aux_selection_cosets_tested": 6,
+            "aux_selection_m": 10,
+            "aux_selection_peak_coset_entries": 6,
+            "aux_selection_peak_frontier": 128,
+            "aux_selection_sqrt_calls": 719,
+            "aux_selection_sqrt_muls": 37715,
+            "aux_selection_target_legendre": 224,
+            "aux_selection_x_scanned": 11,
+            "aux_sqrt_solves": 0,
+            "aux_tower_build_gae": 74,
+            "aux_two_sylow_rejected": 8,
+            "legendre_symbols": 32,
+            "sqrt_solves": 17,
+            "velu_evaluations_uncharged": 10
+          },
+          "wall_ns": 454625,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 102,
+            "index_point_negations": 34,
+            "index_sort_word_ops": 102
+          }
+        },
+        "description": "PKM X1(2,8) isogeny tower with deterministic halving and first equal-size coset search (m<=64, <=64 distinct cosets per m); search is charged to the factor-base phase",
+        "name": "prime-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 34
+      },
+      "group_order": 2053,
+      "instance": "icv1-fp12-t29-7c0328de",
+      "label": "prime-isogeny[aux=ordinary,family=z2xz8,seed=0,selection=equal-size,t=5] + mitm[m=2] + — + walk + incremental-gauss-full-rank-checked",
+      "linear_algebra": {
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 18,
+            "first_target_pinned_rank": 0,
+            "first_target_pinned_relation": 0,
+            "first_target_pinned_trial": 0,
+            "full_rank_reached": 0,
+            "pinned_by_repeated_row": 0,
+            "rank": 0,
+            "repeated_column_rows": 0,
+            "row_ops": 0,
+            "rows": 0,
+            "single_column_rows": 0,
+            "two_column_rows": 0
+          },
+          "wall_ns": 0,
+          "work_native": {
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss-full-rank-checked",
+        "rank": 0,
+        "rows": 0,
+        "work": 0,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 11.003517912108602,
+      "r": 2053,
+      "recovered": null,
+      "rho_s": null,
+      "s": 31.604472298465783,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-isogeny",
+        "factor_base_params": {
+          "aux": "ordinary",
+          "family": "z2xz8",
+          "seed": "0",
+          "selection": "equal-size",
+          "t": "5"
+        },
+        "linalg": "incremental-gauss-full-rank-checked",
+        "max_trials": 1,
+        "oracle": "mitm",
+        "oracle_params": {
+          "m": "2"
+        },
+        "seed": 12735128633771208257,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 1432.0,
+      "verified": false,
+      "verify": {
+        "gae": 0.0,
+        "group_ops": {
+          "adds": 0,
+          "doubles": 0,
+          "scalar_mults": 0
+        },
+        "native": {},
+        "wall_ns": 0
+      },
+      "wall_seconds": 0.000744334
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "acf8e34b0bf8ee1dc23413a67e1c21e121fd78d463f4a2246ce8dc09d3f73cb9",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "incomplete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}
