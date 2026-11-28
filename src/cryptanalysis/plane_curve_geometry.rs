@@ -1,8 +1,9 @@
-//! Rational line sections of a homogeneous plane curve over a small prime field.
+//! Bounded line sections of a homogeneous plane curve over a small prime field.
 //!
 //! This supplies geometry shared by degree-`d` relation collectors. It does
-//! not construct the Jacobian, certify geometric smoothness, or normalize a
-//! singular model. In particular, a quintic or sextic model of genus 4 or 5
+//! not construct the Jacobian or normalize a singular model. Smoothness is
+//! certified only for supported degrees and characteristics. In particular,
+//! a quintic or sextic model of genus 4 or 5
 //! needs a separate singularity and normalization layer.
 
 use std::collections::BTreeMap;
@@ -36,6 +37,32 @@ pub struct RationalLineFactorization {
     pub residual_degree: usize,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct QuadraticLineFactor {
+    /// Monic irreducible polynomial in the affine line parameter, ascending.
+    pub polynomial: [u32; 3],
+    pub multiplicity: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DegreeTwoLineFactorization {
+    pub rational: Vec<LineRoot>,
+    pub quadratic: Vec<QuadraticLineFactor>,
+    /// Degree left after removing rational and irreducible quadratic factors.
+    pub residual_degree: usize,
+}
+
+/// A degree-two closed point on the smooth locus of a rational line section.
+/// `point` is projectively normalized over `F_p[s]/(polynomial)`; each
+/// coordinate is `[constant, s coefficient]`. The line and parameter basis
+/// are canonical, so the key is independent of the caller's line basis.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct QuadraticLinePlace {
+    pub line: [u32; 3],
+    pub polynomial: [u32; 3],
+    pub point: [[u32; 2]; 3],
+}
+
 /// A completely rational line section on a smooth plane curve.
 /// Points use the first nonzero coordinate scaled to one.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -61,6 +88,41 @@ fn mul(a: u32, b: u32, p: u32) -> u32 {
     (u64::from(a) * u64::from(b) % u64::from(p)) as u32
 }
 
+fn sub(a: u32, b: u32, p: u32) -> u32 {
+    ((u64::from(a) + u64::from(p) - u64::from(b)) % u64::from(p)) as u32
+}
+
+fn ext_mul(x: [u32; 2], y: [u32; 2], polynomial: [u32; 3], p: u32) -> [u32; 2] {
+    let s2 = mul(x[1], y[1], p);
+    [
+        sub(mul(x[0], y[0], p), mul(polynomial[0], s2, p), p),
+        sub(
+            ((u64::from(mul(x[0], y[1], p)) + u64::from(mul(x[1], y[0], p))) % u64::from(p)) as u32,
+            mul(polynomial[1], s2, p),
+            p,
+        ),
+    ]
+}
+
+fn ext_add(x: [u32; 2], y: [u32; 2], p: u32) -> [u32; 2] {
+    [
+        ((u64::from(x[0]) + u64::from(y[0])) % u64::from(p)) as u32,
+        ((u64::from(x[1]) + u64::from(y[1])) % u64::from(p)) as u32,
+    ]
+}
+
+fn ext_pow(mut base: [u32; 2], mut exponent: u64, polynomial: [u32; 3], p: u32) -> [u32; 2] {
+    let mut out = [1, 0];
+    while exponent != 0 {
+        if exponent & 1 != 0 {
+            out = ext_mul(out, base, polynomial, p);
+        }
+        base = ext_mul(base, base, polynomial, p);
+        exponent >>= 1;
+    }
+    out
+}
+
 fn pow(mut a: u32, mut n: usize, p: u32) -> u32 {
     let mut out = 1;
     while n > 0 {
@@ -71,6 +133,26 @@ fn pow(mut a: u32, mut n: usize, p: u32) -> u32 {
         n >>= 1;
     }
     out
+}
+
+fn divide_monic_quadratic(poly: &[u32], a: u32, b: u32, p: u32) -> Option<Vec<u32>> {
+    if poly.len() < 3 {
+        return None;
+    }
+    let mut remainder = poly.to_vec();
+    let mut quotient = vec![0; poly.len() - 2];
+    for i in (2..poly.len()).rev() {
+        let lead = remainder[i];
+        quotient[i - 2] = lead;
+        remainder[i] = 0;
+        remainder[i - 1] = ((u64::from(remainder[i - 1]) + u64::from(p)
+            - u64::from(mul(lead, a, p)))
+            % u64::from(p)) as u32;
+        remainder[i - 2] = ((u64::from(remainder[i - 2]) + u64::from(p)
+            - u64::from(mul(lead, b, p)))
+            % u64::from(p)) as u32;
+    }
+    (remainder[0] == 0 && remainder[1] == 0).then_some(quotient)
 }
 
 impl PlaneCurve {
@@ -279,6 +361,14 @@ impl PlaneCurve {
         &self,
         section: &[u32],
     ) -> Result<RationalLineFactorization, &'static str> {
+        self.rational_line_factors_with_residual(section)
+            .map(|(factors, _)| factors)
+    }
+
+    fn rational_line_factors_with_residual(
+        &self,
+        section: &[u32],
+    ) -> Result<(RationalLineFactorization, Vec<u32>), &'static str> {
         if section.len() != self.degree + 1 || section.iter().all(|&c| c % self.p == 0) {
             return Err("section is zero or has the wrong degree");
         }
@@ -329,10 +419,144 @@ impl PlaneCurve {
                 multiplicity: infinity,
             });
         }
-        Ok(RationalLineFactorization {
-            roots,
-            residual_degree: poly.len() - 1,
+        Ok((
+            RationalLineFactorization {
+                roots,
+                residual_degree: poly.len() - 1,
+            },
+            poly,
+        ))
+    }
+
+    /// Extract every rational and irreducible quadratic line factor with
+    /// multiplicity. A positive residual degree consists of factors of
+    /// degree at least three. The field cap bounds exhaustive quadratic scans.
+    pub fn line_factors_degree_two(
+        &self,
+        section: &[u32],
+    ) -> Result<DegreeTwoLineFactorization, &'static str> {
+        if self.p > 257 {
+            return Err("quadratic line scan exceeds field cap");
+        }
+        let (rational, mut residual) = self.rational_line_factors_with_residual(section)?;
+        let mut squares = vec![false; self.p as usize];
+        for x in 0..self.p {
+            squares[mul(x, x, self.p) as usize] = true;
+        }
+        let mut quadratic = Vec::new();
+        for a in 0..self.p {
+            for b in 0..self.p {
+                if residual.len() < 3 {
+                    break;
+                }
+                let discriminant = ((u64::from(mul(a, a, self.p)) + u64::from(self.p)
+                    - u64::from(mul(4 % self.p, b, self.p)))
+                    % u64::from(self.p)) as u32;
+                if squares[discriminant as usize] {
+                    continue;
+                }
+                let mut multiplicity = 0;
+                while let Some(quotient) = divide_monic_quadratic(&residual, a, b, self.p) {
+                    residual = quotient;
+                    multiplicity += 1;
+                }
+                if multiplicity != 0 {
+                    quadratic.push(QuadraticLineFactor {
+                        polynomial: [b, a, 1],
+                        multiplicity,
+                    });
+                }
+            }
+        }
+        Ok(DegreeTwoLineFactorization {
+            rational: rational.roots,
+            quadratic,
+            residual_degree: residual.len() - 1,
         })
+    }
+
+    /// Return locally smooth degree-two places of a rational line section.
+    /// The unique rational line through each quadratic point is normalized,
+    /// then given a deterministic basis before factoring. A singular point
+    /// over the quadratic extension is refused; this does not certify that
+    /// the whole plane curve is geometrically smooth.
+    pub fn quadratic_line_places(
+        &self,
+        u: [u32; 3],
+        v: [u32; 3],
+    ) -> Result<Vec<(QuadraticLinePlace, usize)>, &'static str> {
+        let p = self.p;
+        let u = u.map(|x| x % p);
+        let v = v.map(|x| x % p);
+        let mut line = [
+            sub(mul(u[1], v[2], p), mul(u[2], v[1], p), p),
+            sub(mul(u[2], v[0], p), mul(u[0], v[2], p), p),
+            sub(mul(u[0], v[1], p), mul(u[1], v[0], p), p),
+        ];
+        let pivot = line
+            .iter()
+            .position(|&coefficient| coefficient != 0)
+            .ok_or("line basis is dependent")?;
+        let inverse = pow(line[pivot], (p - 2) as usize, p);
+        line = line.map(|coefficient| mul(coefficient, inverse, p));
+        let free: Vec<_> = (0..3).filter(|&axis| axis != pivot).collect();
+        let basis: [[u32; 3]; 2] = std::array::from_fn(|index| {
+            let mut point = [0; 3];
+            point[free[index]] = 1;
+            point[pivot] = sub(0, line[free[index]], p);
+            point
+        });
+        let section = self.line_section(basis[0], basis[1])?;
+        let factors = self.line_factors_degree_two(&section)?;
+        let mut places = Vec::new();
+        for factor in factors.quadratic {
+            let polynomial = factor.polynomial;
+            let mut point: [[u32; 2]; 3] = std::array::from_fn(|i| [basis[1][i], basis[0][i]]);
+            let leading = point
+                .iter()
+                .copied()
+                .find(|&coordinate| coordinate != [0, 0])
+                .ok_or("quadratic line parameter gave zero projective point")?;
+            let inverse = ext_pow(leading, u64::from(p) * u64::from(p) - 2, polynomial, p);
+            point = point.map(|coordinate| ext_mul(coordinate, inverse, polynomial, p));
+            let evaluate = |derivative: Option<usize>| {
+                self.terms.iter().fold([0, 0], |sum, term| {
+                    let mut exponents = [term.x_exp, term.y_exp, term.z_exp];
+                    let mut coefficient = term.coeff;
+                    if let Some(axis) = derivative {
+                        if exponents[axis] == 0 {
+                            return sum;
+                        }
+                        coefficient = mul(coefficient, exponents[axis] as u32 % p, p);
+                        exponents[axis] -= 1;
+                    }
+                    let value = (0..3).fold([coefficient, 0], |acc, axis| {
+                        ext_mul(
+                            acc,
+                            ext_pow(point[axis], exponents[axis] as u64, polynomial, p),
+                            polynomial,
+                            p,
+                        )
+                    });
+                    ext_add(sum, value, p)
+                })
+            };
+            if evaluate(None) != [0, 0] {
+                return Err("quadratic line factor is not on the curve");
+            }
+            if (0..3).all(|axis| evaluate(Some(axis)) == [0, 0]) {
+                return Err("line meets a singular quadratic point");
+            }
+            places.push((
+                QuadraticLinePlace {
+                    line,
+                    polynomial,
+                    point,
+                },
+                factor.multiplicity,
+            ));
+        }
+        Ok(places)
     }
 
     /// Rational intersection parameters `[s:t]`, without multiplicities.
@@ -560,6 +784,91 @@ mod tests {
             }
         );
         assert_eq!(c.rational_line_divisor([1, 0, 0], [0, 1, 0]).unwrap(), None);
+        assert_eq!(
+            c.line_factors_degree_two(&section).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 1,
+                }],
+                residual_degree: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn quadratic_line_factors_keep_multiplicity_and_higher_residual() {
+        let quartic = PlaneCurve::new(3, 4, &[term(4, 0, 0)]).unwrap();
+        // (s²+1)² = s⁴+2s²+1 over F_3.
+        assert_eq!(
+            quartic.line_factors_degree_two(&[1, 0, 2, 0, 1]).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 2,
+                }],
+                residual_degree: 0,
+            }
+        );
+        let cubic = PlaneCurve::new(3, 3, &[term(3, 0, 0)]).unwrap();
+        // (s−1)(s²+1), with one rational and one quadratic place.
+        assert_eq!(
+            cubic.line_factors_degree_two(&[1, 2, 1, 2]).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![LineRoot {
+                    parameter: [1, 1],
+                    multiplicity: 1,
+                }],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 1,
+                }],
+                residual_degree: 0,
+            }
+        );
+        // s³+2s+1 has no root in F_3, hence no degree-one or two factor.
+        assert_eq!(
+            cubic
+                .line_factors_degree_two(&[1, 2, 0, 1])
+                .unwrap()
+                .residual_degree,
+            3
+        );
+        let large = PlaneCurve::new(263, 2, &[term(2, 0, 0)]).unwrap();
+        assert!(large.line_factors_degree_two(&[1, 0, 1]).is_err());
+    }
+
+    #[test]
+    fn quadratic_line_places_are_basis_independent_and_locally_smooth() {
+        let conic = PlaneCurve::new(3, 2, &[term(2, 0, 0), term(0, 2, 0), term(0, 0, 2)]).unwrap();
+        let places = conic.quadratic_line_places([1, 0, 0], [0, 1, 0]).unwrap();
+        assert_eq!(places.len(), 1);
+        assert_eq!(places[0].0.line, [0, 0, 1]);
+        assert_eq!(places[0].0.polynomial, [1, 0, 1]);
+        assert_eq!(places[0].0.point, [[1, 0], [0, 2], [0, 0]]);
+        assert_eq!(places[0].1, 1);
+        assert_eq!(
+            conic.quadratic_line_places([1, 1, 0], [1, 2, 0]).unwrap(),
+            places
+        );
+        assert_eq!(
+            conic.quadratic_line_places([0, 1, 0], [1, 0, 0]).unwrap(),
+            places
+        );
+        let other_line = conic.quadratic_line_places([0, 1, 0], [0, 0, 1]).unwrap();
+        assert_eq!(other_line[0].0.line, [1, 0, 0]);
+        assert_eq!(other_line[0].0.point, [[0, 0], [1, 0], [0, 2]]);
+        let nonreduced = PlaneCurve::new(
+            3,
+            4,
+            &[term(4, 0, 0), term(2, 2, 0), term(2, 2, 0), term(0, 4, 0)],
+        )
+        .unwrap();
+        assert!(nonreduced
+            .quadratic_line_places([1, 0, 0], [0, 1, 0])
+            .is_err());
     }
 
     #[test]
@@ -629,6 +938,21 @@ mod tests {
             let v = [4, 5, 7];
             let section = curve.line_section(u, v).unwrap();
             let factors = curve.rational_line_factors(&section).unwrap();
+            let factors2 = curve.line_factors_degree_two(&section).unwrap();
+            assert_eq!(
+                factors2.residual_degree
+                    + factors2
+                        .rational
+                        .iter()
+                        .map(|root| root.multiplicity)
+                        .sum::<usize>()
+                    + 2 * factors2
+                        .quadratic
+                        .iter()
+                        .map(|factor| factor.multiplicity)
+                        .sum::<usize>(),
+                degree
+            );
             assert_eq!(
                 factors.residual_degree
                     + factors
