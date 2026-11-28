@@ -455,11 +455,6 @@ pub fn isogeny_tower(
     if p < 64 || (1u64 << t) > p / 4 {
         return Err(format!("p = {p} is too small for t = {t}"));
     }
-    if family == AuxFamily::Z2xZ8 && p % 4 != 3 {
-        return Err(format!(
-            "p = {p} is not 3 mod 4: the X₁(2, 8) family needs −1 to be a non-residue"
-        ));
-    }
     let two_t = 1u64 << t;
     let w = (4 * p).isqrt();
     let (lo, hi) = (p + 1 - w, p + 1 + w);
@@ -481,8 +476,7 @@ pub fn isogeny_tower(
             AuxFamily::Any => {
                 let a = rng.range(0, p);
                 let b = rng.range(1, p);
-                let disc =
-                    (mul(4, mul(mul(a, a, p), a, p), p) + mul(27, mul(b, b, p), p)) % p;
+                let disc = (mul(4, mul(mul(a, a, p), a, p), p) + mul(27, mul(b, b, p), p)) % p;
                 if disc == 0 {
                     cost.singular += 1;
                     continue;
@@ -491,11 +485,11 @@ pub fn isogeny_tower(
             }
             // The genus-0 family `X₁(2, 8)` (the `z2xz8` family of
             // `two_sylow_search`): Legendre roots `(0, −B⁴, −A⁴)` for
-            // `A = m² − 1`, `B = 2m`, `m` drawn at random.  `−1` is a
-            // non-residue, so `C = m² + 1 ≠ 0`, and the curve is singular
-            // iff `A·B = 0` or `A⁴ = B⁴`.  Every draw's 2-Sylow exponent is
-            // at least `2³`, so the filter accepts with probability
-            // `2^{3−t}` instead of `2^{−t}`: about 8× fewer curves tried.
+            // `A = m² − 1`, `B = 2m`, `m` drawn at random. The singularity
+            // check also catches `C = m² + 1 = 0` when −1 is a square:
+            // then `A⁴ = B⁴`. The Pythagorean construction has an order-4
+            // point divisible by 2 over any odd field; no condition on
+            // p mod 4 is needed by this generic group-law search.
             AuxFamily::Z2xZ8 => {
                 let m = rng.range(1, p);
                 let m2 = mul(m, m, p);
@@ -687,9 +681,8 @@ pub enum AuxFamily {
     Any,
     /// The genus-0 modular curve `X₁(2, 8)` (the `z2xz8` family of
     /// `two_sylow_search`): every draw's 2-Sylow exponent is at least
-    /// `2³`, so the residue filter accepts with probability `2^{3−t}`
-    /// instead of `2^{−t}` — about 8× fewer curves tried.  Needs
-    /// `p ≡ 3 (mod 4)`.
+    /// `2³` over any odd field. The generic residue filter benefits from
+    /// this known torsion; the exact acceptance probability depends on p.
     Z2xZ8,
 }
 
@@ -1032,8 +1025,7 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
             (
                 "family",
                 "ordinary search only: any (default, every curve) or z2xz8 (the X₁(2, 8) family; \
-                  every draw has 2-Sylow exponent at least 2³, about 8× fewer curves tried; \
-                  needs p ≡ 3 mod 4)",
+                  every nonsingular draw has 2-Sylow exponent at least 2³)",
             ),
         ]
     }
@@ -1158,10 +1150,9 @@ mod tests {
     }
 
     #[test]
-    fn the_z2xz8_family_needs_p_three_mod_four_and_tries_fewer_curves() {
-        // p = 65,519 is 3 mod 4, so the X₁(2, 8) family is defined, and the
-        // Hasse window holds several multiples of 2^6; 786,433 is 1 mod 4
-        // and must be refused.
+    fn the_z2xz8_family_tries_fewer_curves_at_p_three_mod_four() {
+        // p = 65,519 is 3 mod 4; the Hasse window holds several multiples
+        // of 2^6. This retains the old seeded comparison.
         let p = 65_519u64;
         let t = 6u32;
         let any = isogeny_tower(p, t, 5, AuxFamily::Any, &mut GroupOps::default()).unwrap();
@@ -1180,16 +1171,39 @@ mod tests {
         // same seed (the Haar models give 2^{3−t} against 2^{−t}).
         assert!(fam.aux_order.is_multiple_of(8));
         assert_eq!(fam.aux_order, fam.aux.point_count());
-        assert!(fam.cost.curves_tried < any.cost.curves_tried,
-            "z2xz8 tried {} curves, any tried {}", fam.cost.curves_tried, any.cost.curves_tried);
+        assert!(
+            fam.cost.curves_tried < any.cost.curves_tried,
+            "z2xz8 tried {} curves, any tried {}",
+            fam.cost.curves_tried,
+            any.cost.curves_tried
+        );
         // Deterministic in (p, t, seed, family).
         let again = isogeny_tower(p, t, 5, AuxFamily::Z2xZ8, &mut GroupOps::default()).unwrap();
         assert_eq!(again.v, fam.v);
         assert_eq!(again.cost, fam.cost);
-        // And the family is refused where −1 is a residue.
-        assert!(isogeny_tower(786_433, 8, 5, AuxFamily::Z2xZ8, &mut GroupOps::default())
-            .unwrap_err()
-            .contains("3 mod 4"));
+    }
+
+    #[test]
+    fn the_z2xz8_family_builds_degree32_at_p_one_mod_four() {
+        for p in [769u64, 881, 929, 5_569, 5_857, 5_953] {
+            assert_eq!(p % 4, 1);
+            let tower = isogeny_tower(p, 5, 0, AuxFamily::Z2xZ8, &mut GroupOps::default()).unwrap();
+            assert_eq!(tower.aux_order, tower.aux.point_count());
+            assert_eq!(tower.v.len(), 32);
+            let mut distinct = tower.v.clone();
+            distinct.sort_unstable();
+            distinct.dedup();
+            assert_eq!(distinct.len(), 32);
+            for &x in &tower.v {
+                assert_eq!(tower.eval(x), Some(tower.c));
+            }
+            assert!(tower
+                .aux
+                .is_identity(&tower.aux.mul(&mut GroupOps::default(), tower.q, 32)));
+            assert!(!tower
+                .aux
+                .is_identity(&tower.aux.mul(&mut GroupOps::default(), tower.q, 16)));
+        }
     }
 
     #[test]
