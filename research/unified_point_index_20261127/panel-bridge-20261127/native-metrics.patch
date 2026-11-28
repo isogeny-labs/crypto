@@ -1,0 +1,98 @@
+diff --git a/crates/hashed-ecdl-tensor/src/bin/hashed-ecdl.rs b/crates/hashed-ecdl-tensor/src/bin/hashed-ecdl.rs
+index 6dc794edd4..68eb3697a1 100644
+--- a/crates/hashed-ecdl-tensor/src/bin/hashed-ecdl.rs
++++ b/crates/hashed-ecdl-tensor/src/bin/hashed-ecdl.rs
+@@ -8 +8 @@ use hashed_ecdl_tensor::reduction::{self, Certificate, Config};
+-use hashed_ecdl_tensor::{finite, optimized, prepared, width};
++use hashed_ecdl_tensor::{finite, metrics, optimized, prepared, width};
+@@ -150,0 +151,27 @@ fn read(path: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
++fn metric_diagnostics(snapshot: metrics::Snapshot) -> Value {
++    let phases: serde_json::Map<String, Value> = snapshot
++        .phases
++        .into_iter()
++        .map(|(name, phase)| {
++            (
++                name,
++                json!({
++                    "adds": phase.adds,
++                    "doubles": phase.doubles,
++                    "scalar_mults": phase.scalar_mults,
++                    "meter_steps": phase.meter_steps,
++                    "wall_ns": phase.wall_ns,
++                }),
++            )
++        })
++        .collect();
++    json!({
++        "schema": "hashed-ecdl.native-metrics/v1",
++        "phases": phases,
++        "online_phases_ns": snapshot.online_phases_ns,
++        "online_start_phase": snapshot.online_start_phase,
++        "online_wall_ns": snapshot.online_wall_ns,
++        "calibrated_total_operations": Value::Null,
++    })
++}
++
+@@ -218,0 +246 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
++            let session = metrics::Session::start()?;
+@@ -233,0 +262 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
++            let native_metrics = metric_diagnostics(session.finish()?);
+@@ -238,0 +268 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
++                "native_metrics": native_metrics,
+diff --git a/crates/hashed-ecdl-tensor/src/collector_metrics.rs b/crates/hashed-ecdl-tensor/src/collector_metrics.rs
+index 0e952cb8b8..d169607bd7 100644
+--- a/crates/hashed-ecdl-tensor/src/collector_metrics.rs
++++ b/crates/hashed-ecdl-tensor/src/collector_metrics.rs
+@@ -1,2 +1,2 @@
+-//! Narrow adapter for the mirror's existing optional phase/group recorder.
+-//! Crypto retains its original Meter diagnostics and does not start clocks.
++//! Narrow adapter for the optional native phase recorder.
++//! An inactive recorder preserves the original solver behavior and counters.
+@@ -6,2 +6,2 @@ use crate::Result;
+-pub(crate) fn phase(_name: &'static str) -> Result<()> {
+-    Ok(())
++pub(crate) fn phase(name: &'static str) -> Result<()> {
++    crate::metrics::phase(name)
+diff --git a/crates/hashed-ecdl-tensor/src/metrics.rs b/crates/hashed-ecdl-tensor/src/metrics.rs
+index 576bd338cb..ab82a45d66 100644
+--- a/crates/hashed-ecdl-tensor/src/metrics.rs
++++ b/crates/hashed-ecdl-tensor/src/metrics.rs
+@@ -54,0 +55 @@ fn online_name(phase: &str) -> &'static str {
++        "target_validation" => "target_validation",
+diff --git a/crates/hashed-ecdl-tensor/tests/optimized_cli.rs b/crates/hashed-ecdl-tensor/tests/optimized_cli.rs
+index 8aa17c9f57..2c9d99b7ca 100644
+--- a/crates/hashed-ecdl-tensor/tests/optimized_cli.rs
++++ b/crates/hashed-ecdl-tensor/tests/optimized_cli.rs
+@@ -73,0 +74,28 @@ fn success(result: &Output) {
++fn assert_native_metrics(receipt: &Value) {
++    let metrics = &receipt["diagnostics"]["native_metrics"];
++    assert_eq!(metrics["schema"], "hashed-ecdl.native-metrics/v1");
++    assert_eq!(metrics["online_start_phase"], "target_validation");
++    assert!(metrics["calibrated_total_operations"].is_null());
++    let phases = metrics["phases"].as_object().unwrap();
++    assert!(phases["factor_base"]["meter_steps"].as_u64().unwrap() > 0);
++    let total = metrics["online_wall_ns"].as_u64().unwrap();
++    assert_eq!(
++        metrics["online_phases_ns"]
++            .as_object()
++            .unwrap()
++            .values()
++            .map(|n| n.as_u64().unwrap())
++            .sum::<u64>(),
++        total
++    );
++    for name in [
++        "target_validation",
++        "target_query",
++        "target_PDP",
++        "target_relation_check",
++        "target_recovery_check",
++    ] {
++        assert!(metrics["online_phases_ns"][name].is_u64(), "missing {name}");
++    }
++}
++
+@@ -96,0 +125 @@ fn default_options_match_the_old_joint_receipt_and_replay() {
++    assert_native_metrics(&receipt);
+@@ -136,0 +166 @@ fn all_five_options_produce_a_v1_receipt_with_effective_configuration() {
++    assert_native_metrics(&receipt);

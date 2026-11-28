@@ -53,8 +53,6 @@
 
 use super::polynomial::{fr_neg, fr_sub, Poly};
 use crate::bls12_381::fq::scalar_modulus;
-use crate::bls12_381::fq12::Fq12;
-use crate::bls12_381::fq2::Fq2;
 use crate::bls12_381::g1::G1Point;
 use crate::bls12_381::g2::G2Point;
 use crate::bls12_381::pairing::pairing;
@@ -85,7 +83,7 @@ impl KzgSrs {
 pub fn kzg_insecure_setup(max_degree: usize) -> KzgSrs {
     let mut rng = OsRng;
     let r = scalar_modulus();
-    let tau = rng.gen_biguint_below(&r);
+    let tau = rng.gen_biguint_range(&BigUint::one(), &r);
 
     let g1 = G1Point::generator();
     let g2 = G2Point::generator();
@@ -180,6 +178,18 @@ pub fn kzg_verify(
     proof: &KzgProof,
     srs: &KzgSrs,
 ) -> bool {
+    let r = scalar_modulus();
+    if srs.g1_powers.is_empty()
+        || srs.g2_powers.len() < 2
+        || *z >= r
+        || *y >= r
+        || !commit.point.is_on_curve()
+        || !commit.point.is_in_correct_subgroup()
+        || !proof.point.is_on_curve()
+        || !proof.point.is_in_correct_subgroup()
+    {
+        return false;
+    }
     let g1 = &srs.g1_powers[0];
     let g2 = &srs.g2_powers[0];
     let tau_g2 = &srs.g2_powers[1];
@@ -192,17 +202,15 @@ pub fn kzg_verify(
     let z_g2 = g2.scalar_mul(z);
     let rhs_g2 = tau_g2.add(&z_g2.neg());
 
-    // Pairing check.
     let lhs = pairing(&lhs_g1, g2);
     let rhs = pairing(&proof.point, &rhs_g2);
-    let _ = Fq2::one(); // suppress unused-import warning if Fq2 wasn't used otherwise
-    let _ = Fq12::one();
     lhs == rhs
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bls12_381::fq::Fq;
 
     /// Commitments are additively homomorphic: Com(p) + Com(q) = Com(p + q).
     #[test]
@@ -221,20 +229,42 @@ mod tests {
         assert_eq!(c_sum_lhs, c_sum_rhs);
     }
 
-    /// **Completeness**: open & verify roundtrip.
-    /// This is the headline test; it exercises the full pairing path
-    /// and is slow (~minutes due to BigUint Miller loop).
+    /// **Completeness & soundness**: open & verify roundtrip plus tampered/off-curve rejection.
     #[test]
-    #[ignore]
     fn kzg_open_verify_roundtrip() {
         let srs = kzg_insecure_setup(8);
         let p = Poly::from_coeffs((1u32..=5).map(BigUint::from).collect());
         let z = BigUint::from(3u32);
         let (y, proof) = kzg_open(&p, &z, &srs);
         let commit = kzg_commit(&p, &srs);
-        // Sanity: y = p(z) (no pairing).
         assert_eq!(y, p.evaluate(&z));
-        // Full verify (uses pairing).
         assert!(kzg_verify(&commit, &z, &y, &proof, &srs));
+
+        // Wrong claimed evaluation y + 1 must fail.
+        let wrong_y = &y + BigUint::one();
+        assert!(!kzg_verify(&commit, &z, &wrong_y, &proof, &srs));
+
+        // Wrong evaluation point z + 1 must fail.
+        let wrong_z = &z + BigUint::one();
+        assert!(!kzg_verify(&commit, &wrong_z, &y, &proof, &srs));
+
+        // Tampered proof point must fail.
+        let bad_proof = KzgProof {
+            point: proof.point.add(&G1Point::generator()),
+        };
+        assert!(!kzg_verify(&commit, &z, &y, &bad_proof, &srs));
+
+        // Non-canonical scalar y + r must be rejected.
+        let non_canonical_y = &y + scalar_modulus();
+        assert!(!kzg_verify(&commit, &z, &non_canonical_y, &proof, &srs));
+
+        // Off-curve commitment or proof point must return false without panicking.
+        let off_curve = KzgCommitment {
+            point: G1Point::Affine {
+                x: Fq::zero(),
+                y: Fq::one(),
+            },
+        };
+        assert!(!kzg_verify(&off_curve, &z, &y, &proof, &srs));
     }
 }

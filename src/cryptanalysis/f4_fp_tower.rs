@@ -4261,7 +4261,7 @@ fn f4_tower_cached(
     let fp = Fp::new(ring.p);
     let mut rep = TowerF4Report {
         open_top_pair_omission_mask: opts.omit_zero_top_pairs,
-        ..Default::default()
+        ..TowerF4Report::default()
     };
     let finish = |mut rep: TowerF4Report| {
         rep.ms = started.elapsed().as_secs_f64() * 1e3;

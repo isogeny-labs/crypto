@@ -1,0 +1,82 @@
+{
+  "schema": "experiment.protocol/v1 (bdsl-protocol/v1)",
+  "study": "bdsl-20261127/v1",
+  "builds_on": "crypto PR #5261 (study bwd-20261126/v1, research/binary-weil-descent-20261126, arm D), stacked on PR #5253 (bcr-20261126/v1, A1 + A2)",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "single_target": "every solve is one cold solve of one public Q; no multi-target amortisation (owner instruction)",
+  "seed_derivation": "unchanged #5253 seeds.rs: seed(parts) = first 8 bytes big-endian of SHA-256('bcr-20261126/v1|' + '|'.join(parts)); stream = SplitMix64(seed). The prefix stays bcr-20261126/v1 so that curves, targets and relation-target streams are bitwise those of #5253/#5261.",
+  "streams": {
+    "curve": ["curve", "<n>", "<ci>"],
+    "target": ["target", "<n>", "<ci>", "<ti>"],
+    "ic_relation_targets (A1, shared with D)": ["icstream-a1", "<n>", "<ci>", "<ti>"],
+    "DS linear algebra (Wiedemann projections, dense rows)": ["la-ds", "<n>", "<ci>", "<ti>"],
+    "DSB linear algebra": ["la-dsb", "<n>", "<ci>", "<ti>", "<l1.41|l2>"],
+    "DSB reduced factor base membership": ["fbsub", "<n>", "<ci>", "<l1.41|l2>", "<x as 0x-hex>"],
+    "rho": ["rho", "<n>", "<ci>", "<ti>", "<si>"],
+    "rho lane pilot (held out)": ["pilot-curve|pilot-target|pilot-rho", "<n>", "..."],
+    "bootstrap": ["boot", "bdsl", "main | slope | <label>"],
+    "selftest and engineering (separate instances, never evaluation)": ["bdsl-selftest-curve | bdsl-selftest-target | bdsl-selftest | bdsl-selftest-stream | bdsl-selftest-la | bdsl-wcal-curve | bdsl-wcal", "..."]
+  },
+  "custody": "d drawn from the 'target' stream inside the evaluator; the solver receives (curve, G, Q, ell); [d]G = Q checked inside the counted solve; d == d_true compared by the evaluator after the solve",
+  "arms": {
+    "DS": "arm D's relation phase unchanged (#5261 descent.rs, A1 stream, group-law resolution) + stopping rule (2-core excess >= 1 at a checkpoint) + SGE (singletons, weight-bounded Markowitz pivots by cross-multiplication, cost-model stop) + excess pruning to <= 2 + Wiedemann mod ell (sparse projection, Berlekamp-Massey, k-1 dense random rows); bdsl_harness (this study)",
+    "DSB_l1.41, DSB_l2": "DS with the factor base reduced to the classes whose keyed hash is below 2^64/lambda, lambda = sqrt(2) and 2 (declared here, before data); the oracle is unchanged and its decompositions are filtered to the reduced base (one hash probe per point, counted); the stop rule and LA scale with the reduced base",
+    "D": "#5261 arm D (echelon LA), records reused unchanged from research/binary-weil-descent-20261126/data/runs_d.jsonl",
+    "RHO": "#5253 negation-map rho, 16 seeds per target; panel: #5253 data/runs.jsonl; n = 36..48: #5261 data/runs_ext_ref.jsonl; n = 51, 54: new, the #5253 binary unchanged (sha256 bf3f431f...4d52d4011b)"
+  },
+  "reference_binary_sha256": "bf3f431fcec5a4e724e7282c952d3f1c90f2daf51789f2a20e931a4d52d4011b (#5253 bcr_harness rebuilt here; equals #5253's recorded A2 binary)",
+  "curves_per_rung": 4,
+  "targets_per_curve": 3,
+  "rho_seeds_per_target": 16,
+  "target_walk": "ap",
+  "linear_algebra": "echelon",
+  "ic_arms": [],
+  "stop_rule": {"first_check_relations": "ceil(0.70 * F)", "check_every_relations": "max(1, ceil(F / 256))", "condition": "2-core excess >= 1, then the LA; if the LA returns no d, continue to the next checkpoint and rerun the LA from scratch (counted)", "F": "factor-base classes excluding T (reduced base for DSB)"},
+  "la_parameters": {"sge_kmax": 64, "sge_cost_model": "N*(6*nnz + 4*N)", "max_excess": 2, "wiedemann_attempts": 4, "u_weight": 16, "track_check_max_n": 30},
+  "rungs": [
+    {"n": 18, "np": 6, "set": "panel", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 21, "np": 7, "set": "panel", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 24, "np": 8, "set": "panel", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 27, "np": 9, "set": "panel", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 30, "np": 10, "set": "panel", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 33, "np": 11, "set": "panel", "shadow_echelon": true, "arms": ["DS"], "curves": 2, "targets": 2},
+    {"n": 36, "np": 12, "set": "extension", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 39, "np": 13, "set": "extension", "shadow_echelon": true, "arms": ["DS"]},
+    {"n": 42, "np": 14, "set": "extension", "shadow_echelon": true, "arms": ["DS", "DSB_l1.41", "DSB_l2"]},
+    {"n": 45, "np": 15, "set": "extension", "shadow_echelon": true, "arms": ["DS", "DSB_l1.41", "DSB_l2"]},
+    {"n": 48, "np": 16, "set": "extension", "shadow_echelon": true, "arms": ["DS", "DSB_l1.41", "DSB_l2"], "curves": 2, "targets": 2},
+    {"n": 51, "np": 17, "set": "new", "shadow_echelon": false, "arms": ["DS", "DSB_l1.41", "DSB_l2"], "rho_lanes": "pilot argmin (data/pilot_rho_51.jsonl)"},
+    {"n": 54, "np": 18, "set": "new", "shadow_echelon": false, "arms": ["DS", "DSB_l1.41", "DSB_l2"], "curves": 2, "targets": 2, "rho_lanes": "same W as n = 51 (no n = 54 pilot: host budget)"}
+  ],
+  "rho_lanes_choice": "n <= 48: the lanes of the reused records (#5253 panel, #5261 W = 64); n = 51: argmin of mean Meq(s=1,u=1) over W in {1,2,4,8,16,32,64} on 2 held-out pilot curves x 16 pilot targets (#5253 'pilot' command, unchanged); n = 54: the n = 51 choice",
+  "resources": {"per_process_address_space": "prlimit --as 10 GiB", "threads": "<= 2 (shared host)", "wall_budget_per_rung_process_s": {"<=45": 7200, "48": 10800, "51": 10800, "54": 14400}, "rule": "a killed/failed process is a resource-limit record, never a negative result; the run continues with the next rung"},
+  "primary_metric": "Meq(s=1,u=1) of the whole cold solve (factor base, setup, target stream, oracle, relation replay, LA including every LA rerun, [d]G = Q); #5253 unit unchanged",
+  "cost_unit_mod_ell": "one product mod ell = one z, one addition mod ell = one za, each priced u Meq (u in {0, 0.1, 1}; primary u = 1, i.e. one F_{2^n} multiplication); an inversion mod ell = 2*bits(ell) z; a product with an operand equal to +-1 is a sign change and is not charged (#5253 kernel() rule; the echelon of D pays for its products because its pivot rows are normalised); index bookkeeping is not charged (as for D's echelon). Sensitivity readings: meq_s1_u1_pm1_charged (+-1 products charged as z) and meq_s1_u1_pm1_and_structural_charged (also every counted bookkeeping operation at 1).",
+  "band": "u in {0, 0.1, 1} for non-field units, s in {1, 0.25} (AGENTS.md 5a); an order between arms is stated only where it holds across the band; the two sensitivity readings are reported next to it",
+  "analysis": "bdsl_harness analyze: paired per-case DS/rho, D/rho, DSB/rho (rho = mean of 16 runs on the same Q), DS/D, DSB/DS; per-rung geometric mean with hierarchical bootstrap B = 10000 (2000 for band and diagnostics); rho A/A (seeds 0-7 vs 8-15); DS relation-phase/rho, DS LA/rho, DS rel/D rel, DS LA/D LA; shadow identity; DS census; exponent fits; crossover model",
+  "checks": {
+    "logs": "[d]G = Q in-solve and d == d_true, every solve",
+    "shadow_identity": "n <= 48: an uncounted copy of #5253's echelon is fed DS's rows exactly as D feeds it; at its stop, (d, targets, relations, columns) and the 7 relation-phase counter maps must equal #5261's D record of the same case bitwise",
+    "relations_prefix": "DS relations >= D relations on every case with a D record",
+    "kernel_cross_check": "n <= 30: the SGE+Wiedemann dependency is tracked back to the input rows (uncounted) and checked exactly: sum c_j row_j = 0 and sum c_j (a_j + b_j d) = 0, with d equal to the shadow echelon's d",
+    "replay": "n = 39, ci = 0, ti = 0 rerun from the frozen manifest; every non-wall field compared bitwise"
+  },
+  "hypotheses": {
+    "H1": "every DS and DSB log correct; shadow identity on every case n <= 48; DS relations >= D relations everywhere; every kernel cross-check exact",
+    "H2": "LA_DS / F^2 (mod-ell units, u = 1) in [0.4, 1.5] at every rung n >= 36, with an exponent of LA_DS in F of 1.8-2.2",
+    "H3": "DS/D in [0.9, 1.1] for n <= 30; in [0.02, 0.10] at n = 48",
+    "H4": "DS/rho in [12, 40] at n = 48; within 15% of D/rho for n <= 33; no parity at any rung (upper 95% bound of DS/rho > 1 everywhere)",
+    "H5": "DS LA share at n = 48 in [0.3, 0.7]; DS relation phase / D relation phase in [1.0, 1.03] at every rung",
+    "H6": "model: with LA = c F^2, no crossover for the full base; the relation phase alone crosses near n' ~ 23-25; the balanced-base minimum ratio is 10-40x, no crossing",
+    "H7": "DSB_l1.41/DS < 1 at n >= 48 and > 1 at n = 42; DSB_l2/DS > DSB_l1.41/DS at every rung n <= 48"
+  },
+  "predictions": {
+    "la_model": "LA_DS ~ 3 * rho_r^2 * w * F^2 + 4 (rho_r F)^2, rho_r = remainder rows / F ~ 0.12, w = remainder row weight ~ 13 (entries mostly +-1, so ~1 charged op each): ~0.6-0.8 F^2",
+    "core_rows_over_F": "~0.64 (random 3-uniform 2-core at rows/F ~ 0.92)",
+    "stop_relations_over_F": "~0.92 (as D)",
+    "crossover": "MODEL ONLY: see PROTOCOL.md"
+  },
+  "falsifier": "parity at a rung if the upper 95% bound of DS/rho <= 1 there; such a rung then requires the rho A/A floor and the full verification before it is stated",
+  "exclusions": "none; every record, failure, kill and rerun is retained",
+  "untested": ["multi-target amortisation (excluded)", "double large prime (other lane, claude/binary-descent-2lp-20261127)", "block Wiedemann with block size > 1 / block Lanczos (block size 1 used: see PROTOCOL.md, deviation declared before data)", "D (echelon) at n = 51, 54 (wall: about 2 h per case)", "Koblitz rungs", "isolab / L2"]
+}

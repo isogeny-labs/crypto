@@ -1,0 +1,339 @@
+'OrientationRationalSize.Bits.add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.grid_natAbs_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_chart_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_anchor_slope_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_derivative_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_diagonal_bits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationRationalSize.actual_absolute_left_coefficient_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.cleared_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.integer_bivariate_clearing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.Rep.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.geometric_denominator_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actualDenomRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.actual_geometric_denominator_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.numerator_divisible' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.quotientResidue_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.reduceCleared_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.bivariate_coefficient_modular' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_denominator_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.actual_geometric_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.rowNumeratorRep' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.approximationRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_absolute_right_coefficient_modular' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationCommonDenominator.chartRootRep_den_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCommonDenominator.absoluteRightRep_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_right_modular_with_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationModularReduction.finiteExtract_intCast' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationModularReduction.actual_finite_right_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.boxEval_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.modular_box_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCoefficientBox.multiplicationProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.rowNumeratorCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.approximationCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNumeratorCode.boundedRightEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.matches_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.Matches.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.scalarDiagonal_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedApprox_matches' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCode.packedEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.packedApprox_nodes_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationScalarCost.actualApprox_scalarProducts_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.evaluate_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationStoredBox.entry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.convolutionLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.materializeLogged_count' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.multiplyLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.evaluateLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.evaluateLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_multiply_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationConvolutionTrace.coefficientLogged_cast_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.budget_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.Budget.geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_approximation_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_approximation_literals' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_inputVolume_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationLiteralBudget.actual_right_work_precision' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.evaluateWithInputs_erasure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.evaluateWithInputs_inputs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPayloadTrace.actual_recorded_volume' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBinaryInput.signed_correct' depends on axioms: [propext, Quot.sound]
+'OrientationBinaryInput.signed_adds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBinaryInput.bounded_signed_reads' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.fullAdder_identity' does not depend on any axioms
+'OrientationBooleanAdder.ripple_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.ripple_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationBooleanAdder.ripple_residue' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.encode_quotient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.ofNatWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.addWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationFixedWord.addWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.invertWord_value' depends on axioms: [propext, Quot.sound]
+'OrientationSignedWord.negateWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.ofIntWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSignedWord.ofIntWord_events_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.shiftWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.multiplyWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordMultiply.multiplyWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.dotWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.wordConvolution_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordConvolution.wordConvolution_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.materializeGated_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.multiplyWords_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordArray.multiplyWords_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEvaluator.evaluateWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEvaluator.coefficientWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.evaluateWord_events_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.actualApprox_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordGateCost.coefficientWord_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.rightNumeratorWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.rightNumeratorWord_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordEntry.entryWord_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordQuotient.quotientWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordQuotient.quotientWord_skipped_length' depends on axioms: [propext, Quot.sound]
+'OrientationWordQuotient.finiteExtract_from_word' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNewtonKernel.newtonR_error' depends on axioms: [propext, Quot.sound]
+'OrientationNewtonKernel.newtonR_actual_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNewtonKernel.even_zero_control' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.stepWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.inverseWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationWordInverse.inverseWord_events_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.extractWord_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_gate_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCompleteWordEntry.completeEntry_skipped_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCreationWord.liftWord_canonical' depends on axioms: [propext, Quot.sound]
+'OrientationCreationWord.liftWord_trans_val' depends on axioms: [propext, Quot.sound]
+'OrientationCreationWord.frozenEntry_later' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.nilpotent_power' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.eval_nilpotent_finite' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.actualEntry_correct' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.extension_nontrivial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.wordEntrySum_representative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.normalCoordinate_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.padded_normalCoordinate_val' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationConcreteEntry.actual_coordinate_reuse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.zero_right_diagonal_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.activeZero_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.zero_right_all_k_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualZeroModes.activeZeroAt_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityControl.symmetric_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityControl.odd_geometric_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_denominator_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_denominator_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_geometric_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationActualParity.actual_odd_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOffDiagonalControl.offdiag_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationOffDiagonalControl.odd_joint_witness' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationEvenControl.actual_even_right_first' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationEvenControl.actual_even_right_first_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.ParityContent.mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.parity_geometric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationParityContent.scaled_odd_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.neg_den_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.half_slope_sum_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationHalfSlopes.chart_slope_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationUniformOddContent.scaled_denominator_parity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationUniformOddContent.actual_odd_right_content_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-091.lean.txt:4780:14: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (oddMode rb)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../modular-evidence/draft-091.lean.txt:4783:14: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (oddMode rb)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../modular-evidence/draft-091.lean.txt:4786:29: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Decidable (oddMode rb)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../modular-evidence/draft-091.lean.txt:4789:2: error: Type mismatch: After simplification, term
+  OrientationResidue.two_power_valuation 2
+ has type
+  padicValRat 2 2 = 1
+but is expected to have type
+  padicValRat 2 4 = 2
+../modular-evidence/draft-091.lean.txt:4805:4: error: Tactic `apply` failed: could not unify the conclusion of `Prod.ext rfl`
+  ?m.102 = ?m.102
+with the goal
+  rb = (rb.1, ⟨2 * s + 1, hb⟩)
+
+Note: The full type of `Prod.ext rfl` is
+  ?m.102.2 = ?m.102.2 → ?m.102 = ?m.102
+
+a u i k : ℕ
+hiu : i < u
+hu : u ≤ a
+rb : MomentLabels u k
+y : Ports a
+ho : oddMode rb
+s : ℕ := ↑rb.2 / 2
+he : ↑rb.2 = 2 * s + 1
+hb : 2 * s + 1 < k
+⊢ rb = (rb.1, ⟨2 * s + 1, hb⟩)
+../modular-evidence/draft-091.lean.txt:4815:15: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4811:8: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4811:47: warning: Variable name `hiu` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hiu
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../modular-evidence/draft-091.lean.txt:4811:59: warning: Variable name `hu` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hu
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../modular-evidence/draft-091.lean.txt:4815:29: warning: This simp argument is unused:
+  ho
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledRight, ite_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4815:32: warning: This simp argument is unused:
+  ite_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledRight, ho]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4817:29: warning: This simp argument is unused:
+  ho
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledRight, ite_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4817:32: warning: This simp argument is unused:
+  ite_false
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledRight, ho]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4816:4: warning: Unused tactic linter: `simpa only [neg_add_cancel] using
+  (Content.C quarter_bound).mul (actual_odd_content a u i k hiu hu rb y ho)` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../modular-evidence/draft-091.lean.txt:4818:4: warning: Unused tactic linter: `exact
+  poly_right_integral a u i k (pole i) (singleMultiplicity i) (by rw [pole_cast]; exact pole_member a i (by omega))
+    (pole_ne_zero i) (pole_valuation i) hiu hu rb y` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../modular-evidence/draft-091.lean.txt:4827:15: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4827:28: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4822:8: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4827:43: warning: This simp argument is unused:
+  ho
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledWeight, ite_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4827:46: warning: This simp argument is unused:
+  ite_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledWeight, ho]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4831:4: warning: Unused tactic linter: `simpa only [he] using H` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../modular-evidence/draft-091.lean.txt:4854:2: error: Tactic `split_ifs` failed: no if-then-else conditions to split
+
+a u i k : ℕ
+hiu : i < u
+hu : u ≤ a
+x : Ports a
+rb : MomentLabels u k
+hw : 0 ≤ jetWeight a u i (singleMultiplicity i)
+⊢ 0 ≤ jetWeight a u i (singleMultiplicity i) + ↑↑rb.2 + sorry
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+../modular-evidence/draft-091.lean.txt:4867:92: error: unsolved goals
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+x y : Ports a
+rb : MomentLabels u k
+a✝ : rb ∈ univ
+ho : oddMode rb
+⊢ sorry ^ 2 = C 4 * C (1 / 4) * OrientationBivariate.weightedLeft a u i k m x rb * polyRight a u i k t m rb y
+../modular-evidence/draft-091.lean.txt:4869:2: error: unsolved goals
+case neg
+a u i k : ℕ
+t : ℤ
+m : ℕ → ℕ
+x y : Ports a
+rb : MomentLabels u k
+a✝ : rb ∈ univ
+ho : ¬oddMode rb
+⊢ sorry * sorry = OrientationBivariate.weightedLeft a u i k m x rb * polyRight a u i k t m rb y
+../modular-evidence/draft-091.lean.txt:4865:15: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4865:28: warning: declaration uses `sorry`
+../modular-evidence/draft-091.lean.txt:4865:42: warning: This simp argument is unused:
+  ho
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledRight, ite_true]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4865:45: warning: This simp argument is unused:
+  ite_true
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledRight, ho]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4869:42: warning: This simp argument is unused:
+  ho
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledRight, ite_false]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4869:45: warning: This simp argument is unused:
+  ite_false
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [rescaledLeft, rescaledRight, ho]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-091.lean.txt:4874:35: error: Function expected at
+  nodeCrossingPolynomial
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  a
+
+Hint: The identifier `nodeCrossingPolynomial` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+'OrientationOddRescaling.rescaled_right_integral' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_left_weight' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_product' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationOddRescaling.rescaled_precision' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

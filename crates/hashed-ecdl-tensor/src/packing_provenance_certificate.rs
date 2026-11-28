@@ -8,6 +8,7 @@ use crate::factorization_certificate::Certificate as FactorizationCertificate;
 use crate::{BigUint, Meter};
 use num_traits::Zero;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// Current packing-provenance wire schema.
 pub const SCHEMA: u32 = 3;
@@ -54,6 +55,100 @@ pub struct Certificate {
     pub packet_pairs: Vec<Vec<(usize, usize)>>,
 }
 
+/// Borrowed, checked source view of the canonical packing-label projection.
+///
+/// These named fields are the native counterpart of the formal
+/// `PackingLabelArtifact` header. The edge slice remains structured until
+/// `values` flattens each endpoint quadruple in source order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct LabelProjectionView<'a> {
+    /// Wire schema converted to the projection machine word.
+    pub schema: usize,
+    /// Packet label radix.
+    pub radix: usize,
+    /// Packet exponent converted to the projection machine word.
+    pub packet_exponent: usize,
+    /// Active coordinate converted to the projection machine word.
+    pub coordinate: usize,
+    /// Conditional-label flag encoded as zero or one.
+    pub conditional_labels: usize,
+    /// Source degree cap, or zero when it is absent.
+    pub source_degree_cap: usize,
+    /// Source-ordered endpoint quadruples.
+    pub edges: &'a [EdgeEndpoints],
+    /// Every source row label, including isolates.
+    pub row_labels: &'a [usize],
+    /// Every source column label, including isolates.
+    pub column_labels: &'a [usize],
+    length: usize,
+}
+
+impl<'a> LabelProjectionView<'a> {
+    /// Check all projection arithmetic and machine-word conversions once,
+    /// before allocation or flattening.
+    pub fn try_from_certificate(certificate: &'a Certificate) -> Result<Self, String> {
+        let edge_fields = checked_product(
+            &[4, certificate.edges.len()],
+            "packing label projection edge fields",
+        )?;
+        let length = checked_sum(
+            &[
+                9,
+                edge_fields,
+                certificate.row_labels.len(),
+                certificate.column_labels.len(),
+            ],
+            "packing label projection length",
+        )?;
+        Ok(Self {
+            schema: usize::try_from(certificate.schema)
+                .map_err(|_| "packing label projection schema".to_string())?,
+            radix: certificate.radix,
+            packet_exponent: usize::try_from(certificate.packet_exponent)
+                .map_err(|_| "packing label projection packet exponent".to_string())?,
+            coordinate: usize::try_from(certificate.coordinate)
+                .map_err(|_| "packing label projection coordinate".to_string())?,
+            conditional_labels: usize::from(certificate.conditional_labels),
+            source_degree_cap: certificate.source_degree_cap.unwrap_or(0),
+            edges: &certificate.edges,
+            row_labels: &certificate.row_labels,
+            column_labels: &certificate.column_labels,
+            length,
+        })
+    }
+
+    /// The exact nine-field header consumed by the formal importer.
+    pub fn header(self) -> [usize; 9] {
+        [
+            self.schema,
+            self.radix,
+            self.packet_exponent,
+            self.coordinate,
+            self.conditional_labels,
+            self.source_degree_cap,
+            self.edges.len(),
+            self.row_labels.len(),
+            self.column_labels.len(),
+        ]
+    }
+
+    /// Flatten the checked named view in header/edge/row/column order.
+    pub fn values(self) -> Result<Vec<usize>, String> {
+        let mut values = Vec::new();
+        values
+            .try_reserve_exact(self.length)
+            .map_err(|_| "packing label projection allocation".to_string())?;
+        values.extend(self.header());
+        for edge in self.edges {
+            values.extend([edge.left, edge.left_port, edge.right, edge.right_port]);
+        }
+        values.extend(self.row_labels.iter().copied());
+        values.extend(self.column_labels.iter().copied());
+        debug_assert_eq!(values.len(), self.length);
+        Ok(values)
+    }
+}
+
 /// Checked dimensions of one accepted packing-provenance replay.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct VerificationSummary {
@@ -71,12 +166,16 @@ pub struct VerificationSummary {
     pub label_classes: usize,
     /// Largest reconstructed row/column label class.
     pub maximum_class: usize,
+    /// Exact native padded class height `ceil(maximum_class/L)*L`.
+    pub padded_class_height: usize,
     /// Number of unordered digit patterns replayed before empty suppression.
     pub orientation_patterns: usize,
     /// Nonnegative slack in `K L<=3M`, when that inequality holds.
     pub packing_slack: Option<BigUint>,
     /// Whether the replayed packet array satisfies source capacity.
     pub source_capacity_admitted: bool,
+    /// Whether the source length-mass guard `L D<=M` holds.
+    pub source_length_mass_admitted: bool,
     /// Whether conditional-expectation label selection was independently replayed.
     pub conditional_labels_verified: bool,
     /// Whether degree, variance, capacity, and all-coordinate balance were checked.
@@ -120,6 +219,17 @@ fn checked_product(values: &[usize], label: &str) -> Result<usize, String> {
 
 fn bit_width(value: usize) -> usize {
     (usize::BITS as usize - value.leading_zeros() as usize).max(1)
+}
+
+/// Flatten the label-selection boundary in the canonical order consumed by
+/// the checked Lean importer.
+///
+/// The header is schema, radix, packet exponent, active coordinate,
+/// conditional-label flag, source degree cap (zero when absent), edge count,
+/// row count, and column count. It is followed by four fields per edge, then
+/// every row label and every column label.
+pub fn label_projection(certificate: &Certificate) -> Result<Vec<usize>, String> {
+    LabelProjectionView::try_from_certificate(certificate)?.values()
 }
 
 fn verify_source_guard_closure(
@@ -258,7 +368,8 @@ fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
         .map(|place| (label / place) % radix)
 }
 
-fn conditional_objective(
+#[cfg(test)]
+fn reference_conditional_objective(
     edges: &[EdgeEndpoints],
     rows: &[Option<usize>],
     columns: &[Option<usize>],
@@ -303,11 +414,12 @@ fn conditional_objective(
     Ok(total)
 }
 
-fn verify_conditional_labels(
+#[cfg(test)]
+fn reference_conditional_labels(
     provenance: &Certificate,
     labels: usize,
     meter: &mut Meter,
-) -> Result<(), String> {
+) -> Result<(Vec<usize>, Vec<usize>), String> {
     let mut rows = vec![None; provenance.row_labels.len()];
     let mut columns = vec![None; provenance.column_labels.len()];
     for right_side in [false, true] {
@@ -342,8 +454,13 @@ fn verify_conditional_labels(
                 } else {
                     rows[vertex] = Some(label);
                 }
-                let score =
-                    conditional_objective(&provenance.edges, &rows, &columns, labels, meter)?;
+                let score = reference_conditional_objective(
+                    &provenance.edges,
+                    &rows,
+                    &columns,
+                    labels,
+                    meter,
+                )?;
                 if best.as_ref().map_or(true, |(old, _)| score < *old) {
                     best = Some((score, label));
                 }
@@ -358,8 +475,163 @@ fn verify_conditional_labels(
             }
         }
     }
-    let rows: Vec<_> = rows.into_iter().map(Option::unwrap).collect();
-    let columns: Vec<_> = columns.into_iter().map(Option::unwrap).collect();
+    Ok((
+        rows.into_iter().map(Option::unwrap).collect(),
+        columns.into_iter().map(Option::unwrap).collect(),
+    ))
+}
+
+fn first_minimum(scores: &[BigUint], meter: &mut Meter) -> Result<usize, String> {
+    let mut best = None;
+    for (label, score) in scores.iter().enumerate() {
+        meter
+            .charge(1, "packing provenance conditional candidate")
+            .map_err(|error| error.to_string())?;
+        if best.map_or(true, |old| score < &scores[old]) {
+            best = Some(label);
+        }
+    }
+    best.ok_or_else(|| "packing provenance conditional alphabet".to_string())
+}
+
+/// Replay the proved degree/incidence-bucket first-minimum schedule without
+/// importing the source packing implementation.
+fn sparse_conditional_labels(
+    edges: &[EdgeEndpoints],
+    row_count: usize,
+    column_count: usize,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(Vec<usize>, Vec<usize>), String> {
+    if labels == 0 {
+        return Err("packing provenance conditional alphabet".into());
+    }
+    meter
+        .vector(labels, "packing provenance conditional alphabet")
+        .map_err(|error| error.to_string())?;
+    meter
+        .vector(row_count, "packing provenance conditional row adjacency")
+        .map_err(|error| error.to_string())?;
+    meter
+        .vector(
+            column_count,
+            "packing provenance conditional column adjacency",
+        )
+        .map_err(|error| error.to_string())?;
+    let mut row_edges = vec![Vec::new(); row_count];
+    let mut column_edges = vec![Vec::new(); column_count];
+    for (index, edge) in edges.iter().enumerate() {
+        meter
+            .charge(1, "packing provenance conditional adjacency")
+            .map_err(|error| error.to_string())?;
+        row_edges[edge.left].push(index);
+        column_edges[edge.right].push(index);
+    }
+
+    meter
+        .vector(
+            column_count,
+            "packing provenance conditional row incidence buckets",
+        )
+        .map_err(|error| error.to_string())?;
+    let mut right_bucket_ports = vec![BTreeMap::<usize, usize>::new(); column_count];
+    let mut bucket_degrees = vec![0usize; labels];
+    let overlap_multiplier = BigUint::from(labels - 1);
+    let mut rows = Vec::with_capacity(row_count);
+    for incident_edges in &row_edges {
+        if incident_edges.is_empty() {
+            rows.push(0);
+            continue;
+        }
+        let degree = BigUint::from(incident_edges.len());
+        let mut scores: Vec<BigUint> = bucket_degrees
+            .iter()
+            .map(|&old_degree| &degree * BigUint::from(old_degree))
+            .collect();
+        for &edge_index in incident_edges {
+            let right = edges[edge_index].right;
+            for (&label, &ports) in &right_bucket_ports[right] {
+                meter
+                    .charge(1, "packing provenance conditional row overlap")
+                    .map_err(|error| error.to_string())?;
+                scores[label] += &overlap_multiplier * BigUint::from(ports);
+            }
+        }
+        let selected = first_minimum(&scores, meter)?;
+        bucket_degrees[selected] = bucket_degrees[selected]
+            .checked_add(incident_edges.len())
+            .ok_or_else(|| "packing provenance conditional row bucket degree".to_string())?;
+        for &edge_index in incident_edges {
+            meter
+                .charge(1, "packing provenance conditional row incidence")
+                .map_err(|error| error.to_string())?;
+            let right = edges[edge_index].right;
+            let ports = right_bucket_ports[right].entry(selected).or_default();
+            *ports = ports
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance conditional row incidence".to_string())?;
+        }
+        rows.push(selected);
+    }
+
+    let mut row_label_column_ports = vec![BTreeMap::<usize, usize>::new(); labels];
+    let mut columns = Vec::with_capacity(column_count);
+    for incident_edges in &column_edges {
+        if incident_edges.is_empty() {
+            columns.push(0);
+            continue;
+        }
+        let mut scores = vec![BigUint::zero(); labels];
+        for &edge_index in incident_edges {
+            let row_label = rows[edges[edge_index].left];
+            for (&column_label, &ports) in &row_label_column_ports[row_label] {
+                meter
+                    .charge(1, "packing provenance conditional column overlap")
+                    .map_err(|error| error.to_string())?;
+                scores[column_label] += BigUint::from(ports);
+            }
+        }
+        let selected = first_minimum(&scores, meter)?;
+        for &edge_index in incident_edges {
+            meter
+                .charge(1, "packing provenance conditional column incidence")
+                .map_err(|error| error.to_string())?;
+            let row_label = rows[edges[edge_index].left];
+            let ports = row_label_column_ports[row_label]
+                .entry(selected)
+                .or_default();
+            *ports = ports
+                .checked_add(1)
+                .ok_or_else(|| "packing provenance conditional column incidence".to_string())?;
+        }
+        columns.push(selected);
+    }
+    Ok((rows, columns))
+}
+
+#[cfg(test)]
+pub(crate) fn replay_conditional_labels_for_test(
+    edges: &[EdgeEndpoints],
+    row_count: usize,
+    column_count: usize,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(Vec<usize>, Vec<usize>), String> {
+    sparse_conditional_labels(edges, row_count, column_count, labels, meter)
+}
+
+fn verify_conditional_labels(
+    provenance: &Certificate,
+    labels: usize,
+    meter: &mut Meter,
+) -> Result<(), String> {
+    let (rows, columns) = sparse_conditional_labels(
+        &provenance.edges,
+        provenance.row_labels.len(),
+        provenance.column_labels.len(),
+        labels,
+        meter,
+    )?;
     if rows != provenance.row_labels || columns != provenance.column_labels {
         return Err("packing provenance conditional labels".into());
     }
@@ -385,7 +657,7 @@ pub fn verify(
         || provenance.edges.len() != factorization.edge_count
         || provenance.row_creation_precisions.len() != provenance.row_labels.len()
         || provenance.column_creation_precisions.len() != provenance.column_labels.len()
-        || (provenance.source_degree_cap.is_some() && !provenance.conditional_labels)
+        || provenance.conditional_labels != provenance.source_degree_cap.is_some()
     {
         return Err("packing provenance context".into());
     }
@@ -572,6 +844,8 @@ pub fn verify(
     if provenance.source_degree_cap.is_some() && !source_capacity_admitted {
         return Err("packing provenance source capacity".into());
     }
+    let source_length_mass_admitted = BigUint::from(packet_length) * BigUint::from(label_classes)
+        <= BigUint::from(provenance.edges.len());
     let mut maximum_group_load = 0usize;
     if provenance.source_degree_cap.is_some() {
         for coordinate in 0..provenance.packet_exponent {
@@ -636,9 +910,11 @@ pub fn verify(
         packet_length,
         label_classes,
         maximum_class: maximum,
+        padded_class_height: height,
         orientation_patterns,
         packing_slack: source_capacity_admitted.then(|| packing_rhs - packing_lhs),
         source_capacity_admitted,
+        source_length_mass_admitted,
         conditional_labels_verified: provenance.conditional_labels,
         source_bounds_verified: provenance.source_degree_cap.is_some(),
         source_guard_closure_admitted,
@@ -662,5 +938,98 @@ mod tests {
             verify_source_guard_closure(512, 16, 2, Some(1), 64, 4, 257).unwrap_err(),
             "packing provenance source guard group cap"
         );
+    }
+
+    #[test]
+    fn sparse_conditional_labels_match_quadratic_reference() {
+        let cases = [
+            (2, 3, vec![]),
+            (2, 2, vec![(0, 0)]),
+            (2, 2, vec![(0, 0), (0, 0), (1, 1)]),
+            (
+                3,
+                3,
+                vec![(0, 0), (0, 1), (1, 0), (1, 2), (2, 1), (2, 2), (2, 2)],
+            ),
+        ];
+        for (row_count, column_count, endpoints) in cases {
+            let edges = endpoints
+                .into_iter()
+                .enumerate()
+                .map(|(port, (left, right))| EdgeEndpoints {
+                    left,
+                    left_port: port,
+                    right,
+                    right_port: port,
+                })
+                .collect();
+            let provenance = Certificate {
+                schema: SCHEMA,
+                radix: 2,
+                packet_exponent: 1,
+                coordinate: 0,
+                conditional_labels: true,
+                source_degree_cap: Some(1),
+                edges,
+                row_labels: vec![0; row_count],
+                column_labels: vec![0; column_count],
+                row_creation_precisions: vec![1; row_count],
+                column_creation_precisions: vec![1; column_count],
+                packet_pairs: Vec::new(),
+            };
+            for labels in [1, 2, 4] {
+                let limits = crate::Limits {
+                    steps: 10_000_000,
+                    ..crate::Limits::default()
+                };
+                let mut sparse_meter = Meter::new(limits.clone());
+                let mut reference_meter = Meter::new(limits);
+                assert_eq!(
+                    sparse_conditional_labels(
+                        &provenance.edges,
+                        provenance.row_labels.len(),
+                        provenance.column_labels.len(),
+                        labels,
+                        &mut sparse_meter,
+                    )
+                    .unwrap(),
+                    reference_conditional_labels(&provenance, labels, &mut reference_meter)
+                        .unwrap()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn label_projection_has_canonical_flat_order() {
+        let certificate = Certificate {
+            schema: SCHEMA,
+            radix: 2,
+            packet_exponent: 1,
+            coordinate: 0,
+            conditional_labels: false,
+            source_degree_cap: None,
+            edges: vec![EdgeEndpoints {
+                left: 1,
+                left_port: 2,
+                right: 3,
+                right_port: 4,
+            }],
+            row_labels: vec![0, 1],
+            column_labels: vec![1, 0, 1, 0],
+            row_creation_precisions: vec![1, 1],
+            column_creation_precisions: vec![1, 1, 1, 1],
+            packet_pairs: Vec::new(),
+        };
+        let view = LabelProjectionView::try_from_certificate(&certificate).unwrap();
+        assert_eq!(view.header(), [3, 2, 1, 0, 0, 0, 1, 2, 4]);
+        assert_eq!(view.edges, certificate.edges);
+        assert_eq!(view.row_labels, certificate.row_labels);
+        assert_eq!(view.column_labels, certificate.column_labels);
+        assert_eq!(
+            view.values().unwrap(),
+            vec![3, 2, 1, 0, 0, 0, 1, 2, 4, 1, 2, 3, 4, 0, 1, 1, 0, 1, 0]
+        );
+        assert_eq!(label_projection(&certificate), view.values());
     }
 }

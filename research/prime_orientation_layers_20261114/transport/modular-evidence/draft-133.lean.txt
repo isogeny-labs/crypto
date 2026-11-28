@@ -1,0 +1,146 @@
+module
+public import OrientationStudyBase121
+import all OrientationStudyBase121
+public section
+noncomputable section
+namespace OrientationNonscalarOrigin
+open Polynomial Finset OrientationAnchor
+
+def diagonal (a u : ℕ) (m : ℕ → ℕ) : ℚ[X] := completed (grid a) u 0 0 m
+
+def kernel (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) : ℚ[X] :=
+  completed (grid a) u x.val y.val m + diagonal a u m*C (S x y-if x=y then 1 else 0)
+
+theorem actual_diagonal (a u : ℕ) (m : ℕ → ℕ) (x : OrientationLeading.Ports a) :
+    completed (grid a) u x.val x.val m=diagonal a u m := by
+  simp only [completed,correction,mask,delta,sub_self,Finset.filter_true,diagonal]
+
+theorem diagonal_origin (a u : ℕ) (m : ℕ → ℕ) :
+    (diagonal a u m).eval 0=1 :=
+  completed_origin_diagonal (grid a) u 0 m (zero_in_grid a)
+
+theorem diagonal_nonzero_node (a u : ℕ) (m : ℕ → ℕ) (t : ℚ)
+    (ht : t ∈ grid a) (hn : t≠0) : (diagonal a u m).eval t=0 := by
+  have hz : delta 0 0 ∈ grid a := by simpa [delta] using zero_in_grid a
+  rw [diagonal,completed_at_node (grid a) u 0 0 m hz t ht]
+  have hp : (puncture (grid a) 0).eval t=0 := by
+    simp only [puncture,eval_prod]
+    exact Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hn,ht⟩) (by simp)
+  simp only [delta,Nat.cast_zero,sub_self,base,eval_mul,eval_C,hp,mul_zero]
+
+theorem kernel_origin (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) : (kernel a u m S x y).eval 0=S x y := by
+  rw [kernel,eval_add,eval_mul,eval_C,diagonal_origin,one_mul]
+  by_cases h : x=y
+  · subst y
+    rw [completed_origin_diagonal (grid a) u x.val m (zero_in_grid a),ite_eq_left rfl]
+    ring
+  · have hn : x.val≠y.val := by intro he;exact h (Fin.ext he)
+    rw [completed_origin_offdiagonal (grid a) u x.val y.val m
+      (delta_in_grid a x.val y.val x.isLt y.isLt) (zero_in_grid a) hn,ite_eq_right h]
+    ring
+
+theorem kernel_nonzero_node (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) (t : ℚ) (ht : t∈grid a) (hn : t≠0) :
+    (kernel a u m S x y).eval t=(completed (grid a) u x.val y.val m).eval t := by
+  rw [kernel,eval_add,eval_mul,diagonal_nonzero_node a u m t ht hn,zero_mul,add_zero]
+
+theorem kernel_diagonal_zero (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (hs : ∀ x,S x x=0) (x : OrientationLeading.Ports a) : kernel a u m S x x=0 := by
+  rw [kernel,actual_diagonal,hs x,ite_eq_left rfl]
+  simp
+
+theorem kernel_degree (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) :
+    (kernel a u m S x y).natDegree≤(grid a).card-1+mass u m := by
+  have hd : (diagonal a u m).natDegree≤(grid a).card-1+mass u m :=
+    completed_degree (grid a) u 0 0 m (by simpa [delta] using zero_in_grid a)
+  exact (natDegree_add_le _ _).trans (max_le
+    (completed_degree (grid a) u x.val y.val m (delta_in_grid a x.val y.val x.isLt y.isLt))
+    ((natDegree_mul_C_le _ _).trans hd))
+
+end OrientationNonscalarOrigin
+#print axioms OrientationNonscalarOrigin.kernel_origin
+#print axioms OrientationNonscalarOrigin.kernel_nonzero_node
+#print axioms OrientationNonscalarOrigin.kernel_diagonal_zero
+#print axioms OrientationNonscalarOrigin.kernel_degree
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationLeading
+
+def blocks (u : ℕ) : Fin 2 × Labels u ≃ Ports (u+1) :=
+  finProdFinEquiv.trans (finCongr (by rw [pow_succ];exact Nat.mul_comm _ _))
+
+theorem blocks_val (u : ℕ) (p : Fin 2 × Labels u) :
+    (blocks u p).val=p.2.val+2^u*p.1.val := rfl
+
+def pairing (u : ℕ) : Equiv.Perm (Ports (u+1)) :=
+  (blocks u).symm.trans ((Equiv.prodCongr (Fin.revPerm : Equiv.Perm (Fin 2))
+    (Equiv.refl (Labels u))).trans (blocks u))
+
+theorem pairing_blocks (u : ℕ) (p : Fin 2 × Labels u) :
+    pairing u (blocks u p)=blocks u (p.1.rev,p.2) := by
+  simp only [pairing,Equiv.trans_apply,Equiv.symm_apply_apply,Equiv.prodCongr_apply,
+    Equiv.refl_apply,Fin.revPerm_apply]
+
+theorem pairing_no_fixed (u : ℕ) (x : Ports (u+1)) : pairing u x≠x := by
+  obtain ⟨p,rfl⟩ := (blocks u).surjective x
+  rw [pairing_blocks]
+  intro h
+  have H := congrArg (fun x => ((blocks u).symm x).1.val) h
+  simp only [Equiv.symm_apply_apply,Fin.val_rev] at H
+  have hp := p.1.isLt
+  omega
+
+theorem pairing_matching (u : ℕ) (x : Ports (u+1)) :
+    x.val % 2^u=(pairing u x).val % 2^u := by
+  obtain ⟨p,rfl⟩ := (blocks u).surjective x
+  rw [pairing_blocks,blocks_val,blocks_val]
+  rw [Nat.add_mul_mod_self_left,Nat.add_mul_mod_self_left]
+
+def weight (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) : ℚ :=
+  ∏ j ∈ range u, (((2:ℚ)^j)/((2:ℚ)^j-delta x.val (pairing u x).val))^m j
+
+theorem weight_oneModTwo (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    OneModTwo (weight u m x) := by
+  apply OneModTwo.prod
+  intro j hj
+  exact (anchor_ratio_one u x.val (pairing u x).val j (mem_range.mp hj)
+    (pairing_matching u x)).pow (m j)
+
+theorem weight_integral (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    VBound 0 (weight u m x) := (weight_oneModTwo u m x).integral
+
+theorem weight_ne_zero (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    weight u m x≠0 := by
+  unfold weight
+  apply Finset.prod_ne_zero_iff.mpr
+  intro j hj
+  apply pow_ne_zero
+  apply div_ne_zero (by positivity)
+  apply denominator_ne_zero u x.val (pairing u x).val j
+  rw [matching_mask u x.val (pairing u x).val (pairing_matching u x)]
+  exact hj
+
+theorem weight_valuation (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    padicValRat 2 (weight u m x)=0 := by
+  have hb : VBound 1 (1-weight u m x) := by
+    convert (weight_oneModTwo u m x).neg using 1; ring
+  have h := one_sub_valuation hb
+  simpa only [sub_sub_cancel] using h
+
+theorem weight_inverse_integral (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    VBound 0 ((weight u m x)⁻¹) := by
+  exact Or.inr (by rw [padicValRat.inv,weight_valuation];simp)
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.pairing_no_fixed
+#print axioms OrientationPairedOrigin.pairing_matching
+#print axioms OrientationPairedOrigin.weight_oneModTwo
+#print axioms OrientationPairedOrigin.weight_inverse_integral

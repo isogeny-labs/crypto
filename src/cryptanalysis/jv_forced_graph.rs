@@ -1,10 +1,24 @@
 //! Checked principal witnesses and anchored composite incidence for the
 //! existing signed graph. Composite rows retain both original functions.
 //! Field/map/hash/container work is not a complete native-cost model.
+#[allow(dead_code, clippy::duplicate_mod)] // Also loaded by jv_sieve_two_large_prime.
+#[path = "jv_deferred_pair_graph.rs"]
+mod deferred_pair_graph;
+#[allow(
+    dead_code,
+    clippy::duplicate_mod,
+    clippy::too_many_arguments,
+    clippy::type_complexity
+)] // Existing certificate API/test tuple.
+#[path = "jv_principal_relation.rs"]
+mod principal_relation;
+#[allow(dead_code, clippy::duplicate_mod)] // Also loaded by jv_sieve_two_large_prime.
+#[path = "jv_quadratic_pair_graph.rs"]
+mod quadratic_pair_graph;
+#[allow(dead_code, clippy::duplicate_mod)] // Also loaded by jv_sieve_two_large_prime.
+#[path = "jv_quadratic_pair_relation.rs"]
+mod quadratic_pair_relation;
 use super::jv_forced_divisor::{CandidateFunction, Family};
-use crate::cryptanalysis::jv_sieve::two_large_prime::{
-    deferred_pair_graph, principal_relation, quadratic_pair_graph, quadratic_pair_relation,
-};
 use crate::cryptanalysis::{
     jv_cover::{BaseEl, Div, Fld, Fq, Hyp, E2},
     residual_walk::{is_prime_u64, pow_mod},

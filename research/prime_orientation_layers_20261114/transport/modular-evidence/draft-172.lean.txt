@@ -1,0 +1,1764 @@
+module
+public import OrientationStudyBase121
+public import Mathlib.LinearAlgebra.Matrix.Block
+public import CryptoLean.TensorPaddingInterface
+public import Mathlib.Logic.Equiv.Sum
+public import Mathlib.Data.Fintype.Card
+public import Mathlib.LinearAlgebra.Matrix.SchurComplement
+import all OrientationStudyBase121
+public section
+noncomputable section
+namespace OrientationNonscalarOrigin
+open Polynomial Finset OrientationAnchor
+
+def diagonal (a u : ℕ) (m : ℕ → ℕ) : ℚ[X] := completed (grid a) u 0 0 m
+
+def kernel (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) : ℚ[X] :=
+  completed (grid a) u x.val y.val m + diagonal a u m*C (S x y-if x=y then 1 else 0)
+
+theorem actual_diagonal (a u : ℕ) (m : ℕ → ℕ) (x : OrientationLeading.Ports a) :
+    completed (grid a) u x.val x.val m=diagonal a u m := by
+  simp only [completed,correction,mask,delta,sub_self,Finset.filter_true,diagonal]
+
+theorem diagonal_origin (a u : ℕ) (m : ℕ → ℕ) :
+    (diagonal a u m).eval 0=1 :=
+  completed_origin_diagonal (grid a) u 0 m (zero_in_grid a)
+
+theorem diagonal_nonzero_node (a u : ℕ) (m : ℕ → ℕ) (t : ℚ)
+    (ht : t ∈ grid a) (hn : t≠0) : (diagonal a u m).eval t=0 := by
+  have hz : delta 0 0 ∈ grid a := by simpa [delta] using zero_in_grid a
+  rw [diagonal,completed_at_node (grid a) u 0 0 m hz t ht]
+  have hp : (puncture (grid a) 0).eval t=0 := by
+    simp only [puncture,eval_prod]
+    exact Finset.prod_eq_zero (Finset.mem_erase.mpr ⟨hn,ht⟩) (by simp)
+  simp only [delta,Nat.cast_zero,sub_self,base,eval_mul,eval_C,hp,mul_zero]
+
+theorem kernel_origin (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) : (kernel a u m S x y).eval 0=S x y := by
+  rw [kernel,eval_add,eval_mul,eval_C,diagonal_origin,one_mul]
+  by_cases h : x=y
+  · subst y
+    rw [completed_origin_diagonal (grid a) u x.val m (zero_in_grid a),ite_eq_left rfl]
+    ring
+  · have hn : x.val≠y.val := by intro he;exact h (Fin.ext he)
+    rw [completed_origin_offdiagonal (grid a) u x.val y.val m
+      (delta_in_grid a x.val y.val x.isLt y.isLt) (zero_in_grid a) hn,ite_eq_right h]
+    ring
+
+theorem kernel_nonzero_node (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) (t : ℚ) (ht : t∈grid a) (hn : t≠0) :
+    (kernel a u m S x y).eval t=(completed (grid a) u x.val y.val m).eval t := by
+  rw [kernel,eval_add,eval_mul,diagonal_nonzero_node a u m t ht hn,zero_mul,add_zero]
+
+theorem kernel_diagonal_zero (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (hs : ∀ x,S x x=0) (x : OrientationLeading.Ports a) : kernel a u m S x x=0 := by
+  rw [kernel,actual_diagonal,hs x,ite_eq_left rfl]
+  simp
+
+theorem kernel_degree (a u : ℕ) (m : ℕ → ℕ)
+    (S : Matrix (OrientationLeading.Ports a) (OrientationLeading.Ports a) ℚ)
+    (x y : OrientationLeading.Ports a) :
+    (kernel a u m S x y).natDegree≤(grid a).card-1+mass u m := by
+  have hd : (diagonal a u m).natDegree≤(grid a).card-1+mass u m :=
+    completed_degree (grid a) u 0 0 m (by simpa [delta] using zero_in_grid a)
+  exact (natDegree_add_le _ _).trans (max_le
+    (completed_degree (grid a) u x.val y.val m (delta_in_grid a x.val y.val x.isLt y.isLt))
+    ((natDegree_mul_C_le _ _).trans hd))
+
+end OrientationNonscalarOrigin
+#print axioms OrientationNonscalarOrigin.kernel_origin
+#print axioms OrientationNonscalarOrigin.kernel_nonzero_node
+#print axioms OrientationNonscalarOrigin.kernel_diagonal_zero
+#print axioms OrientationNonscalarOrigin.kernel_degree
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationResidue OrientationLeading
+
+def blocks (u : ℕ) : Fin 2 × Labels u ≃ Ports (u+1) :=
+  finProdFinEquiv.trans (finCongr (by rw [pow_succ];exact Nat.mul_comm _ _))
+
+theorem blocks_val (u : ℕ) (p : Fin 2 × Labels u) :
+    (blocks u p).val=p.2.val+2^u*p.1.val := by
+  simp only [blocks,Equiv.trans_apply,finCongr_apply_coe]
+  rfl
+
+def pairing (u : ℕ) : Equiv.Perm (Ports (u+1)) :=
+  (blocks u).symm.trans ((Equiv.prodCongr (Fin.revPerm : Equiv.Perm (Fin 2))
+    (Equiv.refl (Labels u))).trans (blocks u))
+
+theorem pairing_blocks (u : ℕ) (p : Fin 2 × Labels u) :
+    pairing u (blocks u p)=blocks u (p.1.rev,p.2) := by
+  simp only [pairing,Equiv.trans_apply,Equiv.symm_apply_apply,Equiv.prodCongr_apply,
+    Prod.map_apply',Equiv.refl_apply,Fin.revPerm_apply]
+
+theorem pairing_no_fixed (u : ℕ) (x : Ports (u+1)) : pairing u x≠x := by
+  obtain ⟨p,rfl⟩ := (blocks u).surjective x
+  rw [pairing_blocks]
+  intro h
+  have H := congrArg (fun x => ((blocks u).symm x).1.val) h
+  simp only [Equiv.symm_apply_apply,Fin.val_rev] at H
+  have hp := p.1.isLt
+  omega
+
+theorem pairing_matching (u : ℕ) (x : Ports (u+1)) :
+    x.val % 2^u=(pairing u x).val % 2^u := by
+  obtain ⟨p,rfl⟩ := (blocks u).surjective x
+  rw [pairing_blocks,blocks_val,blocks_val]
+  rw [Nat.add_mul_mod_self_left,Nat.add_mul_mod_self_left]
+
+def weight (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) : ℚ :=
+  ∏ j ∈ range u, (((2:ℚ)^j)/((2:ℚ)^j-delta x.val (pairing u x).val))^m j
+
+theorem weight_oneModTwo (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    OneModTwo (weight u m x) := by
+  apply OneModTwo.prod
+  intro j hj
+  exact (anchor_ratio_one u x.val (pairing u x).val j (mem_range.mp hj)
+    (pairing_matching u x)).pow (m j)
+
+theorem weight_integral (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    VBound 0 (weight u m x) := (weight_oneModTwo u m x).integral
+
+theorem weight_ne_zero (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    weight u m x≠0 := by
+  unfold weight
+  apply Finset.prod_ne_zero_iff.mpr
+  intro j hj
+  apply pow_ne_zero
+  apply div_ne_zero (by positivity)
+  apply denominator_ne_zero u x.val (pairing u x).val j
+  rw [matching_mask u x.val (pairing u x).val (pairing_matching u x)]
+  exact hj
+
+theorem weight_valuation (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    padicValRat 2 (weight u m x)=0 := by
+  have hb : VBound 1 (1-weight u m x) := by
+    convert (weight_oneModTwo u m x).neg using 1; ring
+  have h := one_sub_valuation hb
+  simpa only [sub_sub_cancel] using h
+
+theorem weight_inverse_integral (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    VBound 0 ((weight u m x)⁻¹) := by
+  exact Or.inr (by rw [padicValRat.inv,weight_valuation];simp)
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.pairing_no_fixed
+#print axioms OrientationPairedOrigin.pairing_matching
+#print axioms OrientationPairedOrigin.weight_oneModTwo
+#print axioms OrientationPairedOrigin.weight_inverse_integral
+
+namespace OrientationPairedOrigin
+open Polynomial OrientationAnchor OrientationLeading OrientationCoefficientReduction
+
+def weightUnit (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) : integralRationalsˣ where
+  val := ⟨-weight u m x,(weight_integral u m x).neg⟩
+  inv := ⟨-(weight u m x)⁻¹,(weight_inverse_integral u m x).neg⟩
+  val_inv := by
+    apply Subtype.ext
+    change (-weight u m x)*(-(weight u m x)⁻¹)=1
+    simp only [neg_mul_neg,mul_inv_cancel₀ (weight_ne_zero u m x)]
+  inv_val := by
+    apply Subtype.ext
+    change (-(weight u m x)⁻¹)*(-weight u m x)=1
+    simp only [neg_mul_neg,inv_mul_cancel₀ (weight_ne_zero u m x)]
+
+def rowUnits (u : ℕ) (m : ℕ → ℕ) : (Ports (u+1) → integralRationals)ˣ where
+  val := fun x => (weightUnit u m x).val
+  inv := fun x => (weightUnit u m x).inv
+  val_inv := funext fun x => (weightUnit u m x).val_inv
+  inv_val := funext fun x => (weightUnit u m x).inv_val
+
+def permutationUnit (u : ℕ) : (Matrix (Ports (u+1)) (Ports (u+1)) integralRationals)ˣ where
+  val := (pairing u).permMatrix integralRationals
+  inv := ((pairing u)⁻¹).permMatrix integralRationals
+  val_inv := by rw [← Matrix.permMatrix_mul,inv_mul_cancel,Matrix.permMatrix_one]
+  inv_val := by rw [← Matrix.permMatrix_mul,mul_inv_cancel,Matrix.permMatrix_one]
+
+def originUnit (u : ℕ) (m : ℕ → ℕ) :
+    (Matrix (Ports (u+1)) (Ports (u+1)) integralRationals)ˣ :=
+  Units.map (Matrix.diagonalRingHom (α:=integralRationals) (n:=Ports (u+1))).toMonoidHom (rowUnits u m) *
+    permutationUnit u
+
+def origin (u : ℕ) (m : ℕ → ℕ) : Matrix (Ports (u+1)) (Ports (u+1)) ℚ :=
+  fun x y => ((originUnit u m).val x y : ℚ)
+
+theorem origin_entry (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    origin u m x y=(-weight u m x)*(if pairing u x=y then 1 else 0) := by
+  simp only [origin,originUnit,Units.val_mul,Units.coe_map,
+    rowUnits,permutationUnit,Equiv.Perm.permMatrix]
+  split_ifs with h <;> simp_all [weightUnit]
+
+theorem origin_diagonal (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) : origin u m x x=0 := by
+  rw [origin_entry,ite_eq_right (pairing_no_fixed u x),mul_zero]
+
+theorem origin_two_sided_inverse (u : ℕ) (m : ℕ → ℕ) :
+    (originUnit u m).val*(originUnit u m).inv=1 ∧
+    (originUnit u m).inv*(originUnit u m).val=1 :=
+  ⟨(originUnit u m).val_inv,(originUnit u m).inv_val⟩
+
+theorem origin_inverse_integral (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    VBound 0 (((originUnit u m).inv x y : integralRationals) : ℚ) :=
+  ((originUnit u m).inv x y).property
+
+def actualKernel (u : ℕ) (m : ℕ → ℕ) :
+    Matrix (Ports (u+1)) (Ports (u+1)) ℚ[X] :=
+  OrientationNonscalarOrigin.kernel (u+1) u m (origin u m)
+
+theorem actual_origin (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    (actualKernel u m x y).eval 0=origin u m x y :=
+  OrientationNonscalarOrigin.kernel_origin (u+1) u m (origin u m) x y
+
+theorem actual_diagonal_zero (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    actualKernel u m x x=0 :=
+  OrientationNonscalarOrigin.kernel_diagonal_zero (u+1) u m (origin u m)
+    (origin_diagonal u m) x
+
+theorem actual_nonzero_node (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1))
+    (t : ℚ) (ht : t∈grid (u+1)) (hn : t≠0) :
+    (actualKernel u m x y).eval t=(completed (grid (u+1)) u x.val y.val m).eval t :=
+  OrientationNonscalarOrigin.kernel_nonzero_node (u+1) u m (origin u m) x y t ht hn
+
+theorem actual_degree (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    (actualKernel u m x y).natDegree≤(grid (u+1)).card-1+mass u m :=
+  OrientationNonscalarOrigin.kernel_degree (u+1) u m (origin u m) x y
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.origin_entry
+#print axioms OrientationPairedOrigin.origin_two_sided_inverse
+#print axioms OrientationPairedOrigin.actual_origin
+#print axioms OrientationPairedOrigin.actual_diagonal_zero
+#print axioms OrientationPairedOrigin.actual_degree
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue
+
+theorem correction_polynomial (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    correction u x.val (pairing u x).val m = correction u 0 0 m*C (weight u m x) := by
+  have hf (j : ℕ) : factor (delta x.val (pairing u x).val) j =
+      factor 0 j*C (((2:ℚ)^j)/((2:ℚ)^j-delta x.val (pairing u x).val)) := by
+    apply Polynomial.funext
+    intro T
+    rw [eval_mul,eval_C,OrientationDiagonal.factor_eval,OrientationDiagonal.factor_eval]
+    simp only [sub_zero]
+    field_simp [show (2:ℚ)^j≠0 by positivity]
+  have hzero : mask u 0 0=range u := by simp [mask]
+  have hdelta : delta 0 0=0 := by simp [delta]
+  rw [correction,matching_mask u x.val (pairing u x).val (pairing_matching u x),
+    correction,hzero,hdelta]
+  simp_rw [hf,mul_pow]
+  rw [Finset.prod_mul_distrib]
+  simp only [weight,map_prod,map_pow]
+
+theorem cauchy_polynomial_transfer (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    (X-C (delta x.val (pairing u x).val))*
+      completed (grid (u+1)) u x.val (pairing u x).val m =
+    X*OrientationNonscalarOrigin.diagonal (u+1) u m*C (weight u m x) := by
+  have hd := delta_in_grid (u+1) x.val (pairing u x).val x.isLt (pairing u x).isLt
+  have hz := zero_in_grid (u+1)
+  have hdelta : delta 0 0=0 := by simp [delta]
+  rw [completed,correction_polynomial,OrientationNonscalarOrigin.diagonal,completed,
+    hdelta,base,base]
+  calc
+    _ = C ((normalizer (grid (u+1)))⁻¹)*
+        (puncture (grid (u+1)) (delta x.val (pairing u x).val)*
+          (X-C (delta x.val (pairing u x).val)))*
+        correction u 0 0 m*C (weight u m x) := by ring
+    _ = C ((normalizer (grid (u+1)))⁻¹)*nodal (grid (u+1))*
+        correction u 0 0 m*C (weight u m x) := by rw [nodal_puncture _ _ hd]
+    _ = _ := by rw [← nodal_puncture (grid (u+1)) 0 hz];simp only [map_zero,sub_zero];ring
+
+theorem actual_partner_entry (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    actualKernel u m x (pairing u x)=
+      completed (grid (u+1)) u x.val (pairing u x).val m-
+        OrientationNonscalarOrigin.diagonal (u+1) u m*C (weight u m x) := by
+  rw [actualKernel,OrientationNonscalarOrigin.kernel,origin_entry,ite_eq_left rfl,
+    mul_one,ite_eq_right (Ne.symm (pairing_no_fixed u x)),sub_zero,map_neg]
+  ring
+
+theorem actual_partner_cancellation (u : ℕ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    (X-C (delta x.val (pairing u x).val))*actualKernel u m x (pairing u x)=
+      C (delta x.val (pairing u x).val)*
+        OrientationNonscalarOrigin.diagonal (u+1) u m*C (weight u m x) := by
+  rw [actual_partner_entry,mul_sub,cauchy_polynomial_transfer]
+  ring
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.correction_polynomial
+#print axioms OrientationPairedOrigin.cauchy_polynomial_transfer
+#print axioms OrientationPairedOrigin.actual_partner_cancellation
+
+namespace OrientationPairedOrigin
+open Polynomial OrientationAnchor OrientationLeading OrientationResidue
+
+theorem paired_displacement (u : ℕ) (x : Ports (u+1)) :
+    delta x.val (pairing u x).val=(2:ℚ)^u ∨
+    delta x.val (pairing u x).val= -((2:ℚ)^u) := by
+  obtain ⟨⟨b,r⟩,rfl⟩ := (blocks u).surjective x
+  rw [pairing_blocks,delta,blocks_val,blocks_val,Fin.val_rev]
+  fin_cases b
+  · left
+    norm_num
+  · right
+    norm_num
+
+theorem paired_displacement_nonzero (u : ℕ) (x : Ports (u+1)) :
+    delta x.val (pairing u x).val≠0 := by
+  rcases paired_displacement u x with h | h
+  · rw [h];positivity
+  · rw [h];exact neg_ne_zero.mpr (by positivity)
+
+theorem paired_displacement_valuation (u : ℕ) (x : Ports (u+1)) :
+    padicValRat 2 (delta x.val (pairing u x).val)=(u:ℤ) := by
+  rcases paired_displacement u x with h | h
+  · rw [h,two_power_valuation]
+  · rw [h,padicValRat.neg,two_power_valuation]
+
+theorem retained_denominator_nonzero (u i : ℕ) (x : Ports (u+1)) (t : ℤ)
+    (hi : padicValInt 2 t=i) (hiu : i<u) :
+    (t:ℚ)-delta x.val (pairing u x).val≠0 := by
+  apply sub_ne_zero.mpr
+  intro h
+  have H := congrArg (padicValRat 2) h
+  rw [padicValRat.of_int,hi,paired_displacement_valuation] at H
+  omega
+
+theorem retained_denominator_valuation (u i : ℕ) (x : Ports (u+1)) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    padicValRat 2 ((t:ℚ)-delta x.val (pairing u x).val)=(i:ℤ) := by
+  have h := padicValRat.add_eq_min (p:=2) (q:=(t:ℚ))
+    (r:= -delta x.val (pairing u x).val)
+    (by simpa only [← sub_eq_add_neg] using retained_denominator_nonzero u i x t hi hiu)
+    (by exact_mod_cast ht)
+    (neg_ne_zero.mpr (paired_displacement_nonzero u x))
+    (by rw [padicValRat.of_int,hi,padicValRat.neg,paired_displacement_valuation];omega)
+  simpa only [← sub_eq_add_neg,padicValRat.of_int,hi,padicValRat.neg,
+    paired_displacement_valuation,min_eq_left (by omega : (i:ℤ)≤u)] using h
+
+theorem retained_displacement_ratio (u i : ℕ) (x : Ports (u+1)) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    VBound ((u-i:ℕ):ℤ) (delta x.val (pairing u x).val/((t:ℚ)-delta x.val (pairing u x).val)) := by
+  right
+  rw [padicValRat.div (paired_displacement_nonzero u x)
+    (retained_denominator_nonzero u i x t hi hiu),paired_displacement_valuation,
+    retained_denominator_valuation u i x t ht hi hiu]
+  omega
+
+theorem retained_chart_slope (u i : ℕ) (x : Ports (u+1)) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    VBound 1 (((2:ℚ)^((u+1)+1))/((t:ℚ)-delta x.val (pairing u x).val)) := by
+  right
+  rw [padicValRat.div (by positivity) (retained_denominator_nonzero u i x t hi hiu),
+    two_power_valuation,retained_denominator_valuation u i x t ht hi hiu]
+  omega
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.paired_displacement
+#print axioms OrientationPairedOrigin.retained_denominator_valuation
+#print axioms OrientationPairedOrigin.retained_displacement_ratio
+#print axioms OrientationPairedOrigin.retained_chart_slope
+
+namespace OrientationPairedOrigin
+open Polynomial OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationNodePolynomial
+
+def pairedChart (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x : Ports (u+1)) : ℚ[X] :=
+  C ((diagonalJet (u+1) u i m)⁻¹)*chart (u+1) t (actualKernel u m x (pairing u x))
+
+def pairDenominator (u : ℕ) (t : ℤ) (x : Ports (u+1)) : ℚ[X] :=
+  1+C (((2:ℚ)^((u+1)+1))/((t:ℚ)-delta x.val (pairing u x).val))*X
+
+theorem pairedChart_entry (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x : Ports (u+1)) :
+    pairedChart u i t m x=normalizedNodeEntry (u+1) u i x.val (pairing u x).val t m-
+      normalizedNodeEntry (u+1) u i 0 0 t m*C (weight u m x) := by
+  simp only [pairedChart,actual_partner_entry,normalizedNodeEntry,
+    OrientationNonscalarOrigin.diagonal,chart,sub_comp,mul_comp,C_comp]
+  ring
+
+theorem pairedChart_integral (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    Content 0 (pairedChart u i t m x) := by
+  have hc := matching_bits u x.val (pairing u x).val i hiu (pairing_matching u x)
+  have hp := actual_node_integral (u+1) u i x.val (pairing u x).val t m
+    x.isLt (pairing u x).isLt ht ht0 hi hiu (by omega) hc
+  have hd := actual_node_integral (u+1) u i 0 0 t m
+    (by positivity) (by positivity) ht ht0 hi hiu (by omega) rfl
+  have hm : Content 0 (normalizedNodeEntry (u+1) u i 0 0 t m*C (weight u m x)) := by
+    simpa only [zero_add] using hd.mul (Content.C (weight_integral u m x))
+  rw [pairedChart_entry]
+  exact content_sub hp hm
+
+theorem pairDenominator_near_one (u i : ℕ) (t : ℤ) (x : Ports (u+1))
+    (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    Content 1 (pairDenominator u t x-1) := by
+  have h := (Content.C (retained_chart_slope u i x t ht0 hi hiu)).mul Content.X
+  have he : pairDenominator u t x-1=
+      C (((2:ℚ)^((u+1)+1))/((t:ℚ)-delta x.val (pairing u x).val))*X := by
+    unfold pairDenominator
+    ring
+  rw [he]
+  simpa only [add_zero] using h
+
+theorem pairedChart_denominator_identity (u i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (x : Ports (u+1)) (hi : padicValInt 2 t=i) (hiu : i<u) :
+    pairDenominator u t x*pairedChart u i t m x=
+      C (delta x.val (pairing u x).val/((t:ℚ)-delta x.val (pairing u x).val))*
+        normalizedNodeEntry (u+1) u i 0 0 t m*C (weight u m x) := by
+  have hden := retained_denominator_nonzero u i x t hi hiu
+  have hjet := diagonalJet_ne_zero (u+1) u i m (by omega)
+  apply Polynomial.funext
+  intro z
+  have H := congrArg (fun P : ℚ[X] => P.eval ((t:ℚ)+(2:ℚ)^((u+1)+1)*z))
+    (actual_partner_cancellation u m x)
+  simp only [eval_mul,eval_sub,eval_X,eval_C,OrientationNonscalarOrigin.diagonal] at H
+  simp only [pairDenominator,pairedChart,normalizedNodeEntry,
+    chart,eval_mul,eval_add,eval_C,eval_comp,eval_one,eval_X]
+  field_simp [hden,hjet]
+  nlinarith [H]
+
+theorem pairedChart_content_gain (u i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (x : Ports (u+1)) (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0)
+    (hi : padicValInt 2 t=i) (hiu : i<u) :
+    Content ((u-i:ℕ):ℤ) (pairedChart u i t m x) := by
+  have hd := actual_node_integral (u+1) u i 0 0 t m
+    (by positivity) (by positivity) ht ht0 hi hiu (by omega) rfl
+  have hn : Content ((u-i:ℕ):ℤ)
+      (C (delta x.val (pairing u x).val/((t:ℚ)-delta x.val (pairing u x).val))*
+        normalizedNodeEntry (u+1) u i 0 0 t m*C (weight u m x)) := by
+    simpa only [add_zero] using
+      ((Content.C (retained_displacement_ratio u i x t ht0 hi hiu)).mul hd).mul
+        (Content.C (weight_integral u m x))
+  apply content_cancel_near_one (pairDenominator u t x) (pairedChart u i t m x) (u-i)
+    (pairDenominator_near_one u i t x ht0 hi hiu)
+    (pairedChart_integral u i t m x ht ht0 hi hiu)
+  rw [pairedChart_denominator_identity u i t m x hi hiu]
+  exact hn
+
+theorem actual_paired_absolute_content (u i : ℕ) (t : ℤ) (m : ℕ → ℕ)
+    (x : Ports (u+1)) (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0)
+    (hi : padicValInt 2 t=i) (hiu : i<u) :
+    Content (OrientationLeading.jetWeight (u+1) u i m+((u-i:ℕ):ℤ))
+      (chart (u+1) t (actualKernel u m x (pairing u x))) := by
+  have hv : VBound (OrientationLeading.jetWeight (u+1) u i m) (diagonalJet (u+1) u i m) :=
+    Or.inr (by rw [diagonalJet_valuation (u+1) u i m hiu (by omega)];rfl)
+  have he : C (diagonalJet (u+1) u i m)*pairedChart u i t m x=
+      chart (u+1) t (actualKernel u m x (pairing u x)) := by
+    rw [pairedChart,← mul_assoc,← map_mul,
+      mul_inv_cancel₀ (diagonalJet_ne_zero (u+1) u i m (by omega)),map_one,one_mul]
+  have h := (Content.C hv).mul (pairedChart_content_gain u i t m x ht ht0 hi hiu)
+  rwa [he] at h
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.pairedChart_denominator_identity
+#print axioms OrientationPairedOrigin.pairedChart_content_gain
+#print axioms OrientationPairedOrigin.actual_paired_absolute_content
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationNodePolynomial OrientationConstructedProfile OrientationHierarchy
+
+theorem actual_profile_lower (u j : ℕ) (hj : j<u) : u-j≤profile u j := by
+  have hu : u-1<u := by omega
+  have hs : (u-1-j)*profile u (u-1)≤∑ k ∈ range u,(k-j)*profile u k :=
+    Finset.single_le_sum (f:=fun k : ℕ => (k-j)*profile u k)
+      (fun k _ => Nat.zero_le _) (mem_range.mpr hu)
+  have hp := profile_positive u (u-1) hu
+  have hm : u-1-j≤(u-1-j)*profile u (u-1) := by nlinarith
+  have hr := profile_row u j hj
+  omega
+
+theorem actual_nonmatching_profile_gain (u i x y : ℕ) (hiu : i<u)
+    (hc : x.testBit i=y.testBit i) (hn : x%2^u≠y%2^u) :
+    schedule u i (fun j => 4*profile u j)+((u-i:ℕ):ℤ)≤
+      gain u x y i (order x y) (fun j => 4*profile u j) := by
+  have hxy : x≠y := by intro h;subst y;exact hn rfl
+  have hs := order_lt_of_residue_ne u x y hn
+  have him : i∈mask u x y := mem_filter.mpr ⟨mem_range.mpr hiu,hc⟩
+  have hsm := mask_omits_order u x y hxy
+  have hne : order x y≠i := by intro h;rw [h] at hsm;exact hsm him
+  rcases lt_or_gt_of_ne hne with hlt | hgt
+  · have hg := low_order_gain u x y i (order x y) (fun j => 4*profile u j) him hlt
+    have hp : ((u-i:ℕ):ℤ)≤(profile u i:ℤ) := by exact_mod_cast actual_profile_lower u i hiu
+    have ha : (1:ℤ)≤((i-order x y:ℕ):ℤ) := by omega
+    have hm : ((u-i:ℕ):ℤ)≤((i-order x y:ℕ):ℤ)*(4*(profile u i:ℤ)) := by
+      nlinarith [mul_le_mul_of_nonneg_right ha (by positivity : (0:ℤ)≤(profile u i:ℤ))]
+    push_cast at hg
+    omega
+  · have hg := omitted_high_gain u x y i (order x y) (fun j => 4*profile u j) him hs hsm
+    have hp : ((u-order x y:ℕ):ℤ)≤(profile u (order x y):ℤ) := by
+      exact_mod_cast actual_profile_lower u (order x y) hs
+    have ha : (1:ℤ)≤((order x y-i:ℕ):ℤ) := by omega
+    have hb : (1:ℤ)≤((u-order x y:ℕ):ℤ) := by omega
+    have hd : ((order x y-i:ℕ):ℤ)+((u-order x y:ℕ):ℤ)=((u-i:ℕ):ℤ) := by omega
+    have hab := mul_nonneg (sub_nonneg.mpr ha) (sub_nonneg.mpr hb)
+    have hpA := mul_le_mul_of_nonneg_left hp (by omega : (0:ℤ)≤((order x y-i:ℕ):ℤ))
+    have hm : ((u-i:ℕ):ℤ)≤loss i (fun j => 4*profile u j) (order x y) := by
+      unfold loss
+      push_cast
+      nlinarith
+    omega
+
+theorem actual_nonmatching_normalized_graded (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) (hn : x.val%2^u≠y.val%2^u) :
+    Graded (((u-i:ℕ):ℤ)-1)
+      (normalizedNodeEntry (u+1) u i x.val y.val t (fun j => 4*profile u j)) := by
+  have hxy : x.val≠y.val := by intro h;exact hn (congrArg (fun n => n%2^u) h)
+  have hb := actual_base_graded (u+1) i x.val y.val t x.isLt y.isLt ht ht0 hi hc
+  have hg := actual_correction_graded (u+1) u x.val y.val i t (fun j => 4*profile u j)
+    ht0 hi (by omega)
+  simp only [chartOrder,ite_eq_right hxy] at hg
+  have hgain := actual_nonmatching_profile_gain u i x.val y.val hiu hc hn
+  have hw := hb.mul hg
+  have hscalar : VBound (-jetWeight (u+1) u i (fun j => 4*profile u j))
+      ((diagonalJet (u+1) u i (fun j => 4*profile u j))⁻¹) :=
+    Or.inr (by rw [padicValRat.inv,diagonalJet_valuation (u+1) u i _ hiu (by omega)];rfl)
+  have H := (Graded.C hscalar).mul hw
+  have he : -jetWeight (u+1) u i (fun j => 4*profile u j)+
+      (((u+1:ℕ):ℤ)-i+gain u x.val y.val i (order x.val y.val) (fun j => 4*profile u j))≥
+      ((u-i:ℕ):ℤ)-1 := by unfold jetWeight;omega
+  have H' := H.mono he
+  simpa only [normalizedNodeEntry,chart,completed,mul_comp] using H'
+
+theorem actual_nonmatching_normalized_content (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) (hn : x.val%2^u≠y.val%2^u) :
+    Content ((u-i:ℕ):ℤ)
+      (normalizedNodeEntry (u+1) u i x.val y.val t (fun j => 4*profile u j)) := by
+  intro n
+  cases n with
+  | zero =>
+    rw [actual_node_constant (u+1) u i x.val y.val t _ ht ht0 hi hc]
+    exact VBound.zero _
+  | succ n =>
+    have H := actual_nonmatching_normalized_graded u i t x y ht ht0 hi hiu hc hn (n+1)
+    exact H.mono (by omega)
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.actual_profile_lower
+#print axioms OrientationPairedOrigin.actual_nonmatching_profile_gain
+#print axioms OrientationPairedOrigin.actual_nonmatching_normalized_content
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationNodePolynomial OrientationConstructedProfile
+
+theorem matching_self_or_pair (u : ℕ) (x y : Ports (u+1))
+    (h : x.val%2^u=y.val%2^u) : y=x ∨ y=pairing u x := by
+  obtain ⟨⟨bx,rx⟩,rfl⟩ := (blocks u).surjective x
+  obtain ⟨⟨byy,ry⟩,rfl⟩ := (blocks u).surjective y
+  have hr : rx=ry := by
+    apply Fin.ext
+    rw [blocks_val,blocks_val] at h
+    simpa only [Nat.add_mul_mod_self_left,Nat.mod_eq_of_lt rx.isLt,
+      Nat.mod_eq_of_lt ry.isLt] using h
+  subst ry
+  rw [pairing_blocks]
+  fin_cases bx <;> fin_cases byy <;> norm_num [Fin.rev]
+
+theorem nonmatching_kernel_entry (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1))
+    (h : x.val%2^u≠y.val%2^u) :
+    actualKernel u m x y=completed (grid (u+1)) u x.val y.val m := by
+  have hn : pairing u x≠y := by
+    intro he
+    apply h
+    rw [← he]
+    exact pairing_matching u x
+  have hxy : x≠y := by intro he;subst y;exact h rfl
+  rw [actualKernel,OrientationNonscalarOrigin.kernel,origin_entry,ite_eq_right hn,mul_zero,
+    ite_eq_right hxy,sub_zero,map_zero,mul_zero,add_zero]
+
+def wholeChart (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports (u+1)) : ℚ[X] :=
+  C ((diagonalJet (u+1) u i m)⁻¹)*chart (u+1) t (actualKernel u m x y)
+
+theorem whole_crossing_content (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content ((u-i:ℕ):ℤ) (wholeChart u i t (fun j => 4*profile u j) x y) := by
+  by_cases hr : x.val%2^u=y.val%2^u
+  · rcases matching_self_or_pair u x y hr with he | he
+    · subst y
+      simp only [wholeChart,actual_diagonal_zero,chart,zero_comp,mul_zero]
+      intro n
+      rw [coeff_zero]
+      exact VBound.zero _
+    · subst y
+      exact pairedChart_content_gain u i t (fun j => 4*profile u j) x ht ht0 hi hiu
+  · rw [wholeChart,nonmatching_kernel_entry u _ x y hr]
+    exact actual_nonmatching_normalized_content u i t x y ht ht0 hi hiu hc hr
+
+theorem whole_crossing_absolute_content (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content (jetWeight (u+1) u i (fun j => 4*profile u j)+((u-i:ℕ):ℤ))
+      (chart (u+1) t (actualKernel u (fun j => 4*profile u j) x y)) := by
+  have hv : VBound (jetWeight (u+1) u i (fun j => 4*profile u j))
+      (diagonalJet (u+1) u i (fun j => 4*profile u j)) :=
+    Or.inr (by rw [diagonalJet_valuation (u+1) u i _ hiu (by omega)];rfl)
+  have he : C (diagonalJet (u+1) u i (fun j => 4*profile u j))*
+      wholeChart u i t (fun j => 4*profile u j) x y=
+      chart (u+1) t (actualKernel u (fun j => 4*profile u j) x y) := by
+    rw [wholeChart,← mul_assoc,← map_mul,
+      mul_inv_cancel₀ (diagonalJet_ne_zero (u+1) u i _ (by omega)),map_one,one_mul]
+  have H := (Content.C hv).mul (whole_crossing_content u i t x y ht ht0 hi hiu hc)
+  rwa [he] at H
+
+def crossingChart (u i : ℕ) (t : ℤ) : Matrix (Ports (u+1)) (Ports (u+1)) ℚ[X] :=
+  fun x y => if x.val.testBit i=y.val.testBit i then
+    wholeChart u i t (fun j => 4*profile u j) x y else 0
+
+theorem crossingChart_content (u i : ℕ) (t : ℤ)
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (x y : Ports (u+1)) : Content ((u-i:ℕ):ℤ) (crossingChart u i t x y) := by
+  unfold crossingChart
+  split_ifs with hc
+  · exact whole_crossing_content u i t x y ht ht0 hi hiu hc
+  · intro n
+    rw [coeff_zero]
+    exact VBound.zero _
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.matching_self_or_pair
+#print axioms OrientationPairedOrigin.whole_crossing_content
+#print axioms OrientationPairedOrigin.whole_crossing_absolute_content
+#print axioms OrientationPairedOrigin.crossingChart_content
+
+namespace OrientationPairedOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationConstructedProfile
+
+def identityKernel (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) : ℚ[X] :=
+  C (-(weight u m y)⁻¹)*actualKernel u m x (pairing u y)
+
+theorem identityKernel_origin (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    (identityKernel u m x y).eval 0=if x=y then 1 else 0 := by
+  rw [identityKernel,eval_mul,eval_C,actual_origin,origin_entry]
+  by_cases h : x=y
+  · subst y
+    rw [ite_eq_left rfl,ite_eq_left rfl,mul_one]
+    simp only [neg_mul_neg,inv_mul_cancel₀ (weight_ne_zero u m x)]
+  · have hp : pairing u x≠pairing u y := by intro he;exact h ((pairing u).injective he)
+    rw [ite_eq_right hp,mul_zero,mul_zero,ite_eq_right h]
+
+theorem identityKernel_nonzero_node (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1))
+    (t : ℚ) (ht : t∈grid (u+1)) (ht0 : t≠0) :
+    (identityKernel u m x y).eval t=
+      -(weight u m y)⁻¹*(completed (grid (u+1)) u x.val (pairing u y).val m).eval t := by
+  rw [identityKernel,eval_mul,eval_C,actual_nonzero_node u m x (pairing u y) t ht ht0]
+
+theorem identityKernel_degree (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    (identityKernel u m x y).natDegree≤(grid (u+1)).card-1+mass u m :=
+  (natDegree_C_mul_le _ _).trans (actual_degree u m x (pairing u y))
+
+def identityWholeChart (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports (u+1)) : ℚ[X] :=
+  C ((diagonalJet (u+1) u i m)⁻¹)*chart (u+1) t (identityKernel u m x y)
+
+theorem identityWholeChart_entry (u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    identityWholeChart u i t m x y=
+      C (-(weight u m y)⁻¹)*wholeChart u i t m x (pairing u y) := by
+  simp only [identityWholeChart,identityKernel,wholeChart,chart,mul_comp,C_comp]
+  ring
+
+theorem identity_crossing_content (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content ((u-i:ℕ):ℤ) (identityWholeChart u i t (fun j => 4*profile u j) x y) := by
+  have hp := matching_bits u y.val (pairing u y).val i hiu (pairing_matching u y)
+  have H := whole_crossing_content u i t x (pairing u y) ht ht0 hi hiu (hc.trans hp)
+  rw [identityWholeChart_entry]
+  simpa only [zero_add] using
+    (Content.C ((weight_inverse_integral u (fun j => 4*profile u j) y).neg)).mul H
+
+theorem identity_crossing_absolute_content (u i : ℕ) (t : ℤ) (x y : Ports (u+1))
+    (ht : (t:ℚ)∈grid (u+1)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content (jetWeight (u+1) u i (fun j => 4*profile u j)+((u-i:ℕ):ℤ))
+      (chart (u+1) t (identityKernel u (fun j => 4*profile u j) x y)) := by
+  have hp := matching_bits u y.val (pairing u y).val i hiu (pairing_matching u y)
+  have H := whole_crossing_absolute_content u i t x (pairing u y) ht ht0 hi hiu (hc.trans hp)
+  have he : chart (u+1) t (identityKernel u (fun j => 4*profile u j) x y)=
+      C (-(weight u (fun j => 4*profile u j) y)⁻¹)*
+        chart (u+1) t (actualKernel u (fun j => 4*profile u j) x (pairing u y)) := by
+    simp only [identityKernel,chart,mul_comp,C_comp]
+  rw [he]
+  simpa only [zero_add] using
+    (Content.C ((weight_inverse_integral u (fun j => 4*profile u j) y).neg)).mul H
+
+end OrientationPairedOrigin
+#print axioms OrientationPairedOrigin.identityKernel_origin
+#print axioms OrientationPairedOrigin.identityKernel_nonzero_node
+#print axioms OrientationPairedOrigin.identityKernel_degree
+#print axioms OrientationPairedOrigin.identity_crossing_content
+#print axioms OrientationPairedOrigin.identity_crossing_absolute_content
+
+namespace OrientationSparseExtension
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationMoment OrientationPairedOrigin OrientationConstructedProfile
+
+def sparseWeight (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a) : ℚ :=
+  ∏ j ∈ range u, (((2:ℚ)^j)/((2:ℚ)^j-delta x.val y.val))^m j
+
+def sparseOrigin (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ :=
+  fun x y => if x.val/2^(u+1)=y.val/2^(u+1) ∧ x.val%2^u=y.val%2^u ∧ x≠y
+    then -sparseWeight a u m x y else 0
+
+theorem sparseOrigin_minimal (u : ℕ) (m : ℕ → ℕ) (x y : Ports (u+1)) :
+    sparseOrigin (u+1) u m x y=origin u m x y := by
+  unfold sparseOrigin
+  rw [Nat.div_eq_of_lt x.isLt,Nat.div_eq_of_lt y.isLt]
+  by_cases h : pairing u x=y
+  · subst y
+    rw [ite_eq_left ⟨rfl,pairing_matching u x,Ne.symm (pairing_no_fixed u x)⟩,
+      origin_entry,ite_eq_left rfl,mul_one]
+    rfl
+  · have hn : ¬(0=0 ∧ x.val%2^u=y.val%2^u ∧ x≠y) := by
+      intro H
+      rcases matching_self_or_pair u x y H.2.1 with he | he
+      · exact H.2.2 he.symm
+      · exact h he.symm
+    rw [ite_eq_right hn,origin_entry,ite_eq_right h,mul_zero]
+
+def farPort (a u : ℕ) (ha : u+2≤a) : Ports a :=
+  ⟨2^(u+1),pow_lt_pow_right₀ (by decide : 1<(2:ℕ)) (by omega)⟩
+
+theorem farPort_val (a u : ℕ) (ha : u+2≤a) : (farPort a u ha).val=2^(u+1) := by
+  simp only [farPort]
+
+theorem sparseOrigin_far_zero (a u : ℕ) (m : ℕ → ℕ) (ha : u+2≤a) :
+    sparseOrigin a u m (0:Ports a) (farPort a u ha)=0 := by
+  have hn : ¬((0:Ports a).val/2^(u+1)=(farPort a u ha).val/2^(u+1)) := by
+    change ¬(0/2^(u+1)=2^(u+1)/2^(u+1))
+    rw [Nat.zero_div,Nat.div_self (by positivity)]
+    decide
+  unfold sparseOrigin
+  rw [ite_eq_right (fun h => hn h.1)]
+
+def sparseKernel (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ[X] :=
+  OrientationNonscalarOrigin.kernel a u m (sparseOrigin a u m)
+
+theorem sparseKernel_far_old (a u : ℕ) (m : ℕ → ℕ) (ha : u+2≤a) :
+    sparseKernel a u m (0:Ports a) (farPort a u ha)=
+      completed (grid a) u 0 (farPort a u ha).val m := by
+  have hn : (0:Ports a)≠farPort a u ha := by
+    intro h
+    have H := congrArg Fin.val h
+    change 0=2^(u+1) at H
+    exact (by positivity : (0:ℕ)≠2^(u+1)) H
+  rw [sparseKernel,OrientationNonscalarOrigin.kernel,sparseOrigin_far_zero,
+    ite_eq_right hn,sub_zero,map_zero,mul_zero,add_zero]
+  rw [Fin.val_zero]
+
+def sparseFarChart (a u i : ℕ) (m : ℕ → ℕ) (ha : u+2≤a) : ℚ[X] :=
+  C ((diagonalJet a u i m)⁻¹)*chart a (OrientationDiagonal.pole i)
+    (sparseKernel a u m (0:Ports a) (farPort a u ha))
+
+theorem sparse_far_not_content_one (a u i : ℕ) (m : ℕ → ℕ)
+    (ha : u+2≤a) (hiu : i<u) : ¬Content 1 (sparseFarChart a u i m ha) := by
+  have hdiv : 2^u∣2^(u+1) := ⟨2,pow_succ 2 u⟩
+  have hm : (0:ℕ)%2^u=(farPort a u ha).val%2^u := by
+    rw [farPort_val,Nat.zero_mod,Nat.mod_eq_zero_of_dvd hdiv]
+  have hOne := matching_firstJet_one a u i 0 (farPort a u ha).val m
+    (by positivity) (farPort a u ha).isLt hiu (by omega) hm
+  have hne := one_mod_two_ne_zero hOne
+  have hv := one_mod_two_valuation hOne
+  intro hc
+  have H := hc 1
+  rw [sparseFarChart,sparseKernel_far_old] at H
+  change VBound 1 ((normalizedNodeEntry a u i 0 (farPort a u ha).val
+    (OrientationDiagonal.pole i) m).coeff 1) at H
+  rw [actual_node_first] at H
+  change VBound 1 (firstJet a u i 0 (farPort a u ha).val m/diagonalJet a u i m) at H
+  rcases H with H | H
+  · exact hne H
+  · rw [hv] at H
+    omega
+
+theorem source_root_sparse_gain_fails (u i : ℕ) (hu : 2≤u) (hiu : i<u) :
+    ¬Content ((u-i:ℕ):ℤ)
+      (sparseFarChart (2*u) u i (fun j => 4*profile u j) (by omega)) := by
+  intro H
+  exact sparse_far_not_content_one (2*u) u i (fun j => 4*profile u j) (by omega) hiu
+    (H.mono (by omega))
+
+end OrientationSparseExtension
+#print axioms OrientationSparseExtension.sparseOrigin_minimal
+#print axioms OrientationSparseExtension.sparse_far_not_content_one
+#print axioms OrientationSparseExtension.source_root_sparse_gain_fails
+
+
+namespace OrientationDenseOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue
+open OrientationSparseExtension
+
+def origin (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ :=
+  fun x y => if x.val%2^u=y.val%2^u ∧ x≠y then -sparseWeight a u m x y else 0
+
+def kernel (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ[X] :=
+  OrientationNonscalarOrigin.kernel a u m (origin a u m)
+
+theorem correction_polynomial (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) :
+    correction u x.val y.val m=correction u 0 0 m*C (sparseWeight a u m x y) := by
+  have hf (j : ℕ) : factor (delta x.val y.val) j =
+      factor 0 j*C (((2:ℚ)^j)/((2:ℚ)^j-delta x.val y.val)) := by
+    apply Polynomial.funext
+    intro T
+    rw [eval_mul,eval_C,OrientationDiagonal.factor_eval,OrientationDiagonal.factor_eval]
+    simp only [sub_zero]
+    field_simp [show (2:ℚ)^j≠0 by positivity]
+  have hzero : mask u 0 0=range u := by simp [mask]
+  have hdelta : delta 0 0=0 := by simp [delta]
+  rw [correction,matching_mask u x.val y.val hm,correction,hzero,hdelta]
+  simp_rw [hf,mul_pow]
+  rw [Finset.prod_mul_distrib]
+  simp only [sparseWeight,map_prod,map_pow]
+
+theorem weight_oneModTwo (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) : OneModTwo (sparseWeight a u m x y) := by
+  exact OneModTwo.prod (range u)
+    (fun j => (((2:ℚ)^j)/((2:ℚ)^j-delta x.val y.val))^m j)
+    (by intro j hj; exact (anchor_ratio_one u x.val y.val j (mem_range.mp hj) hm).pow (m j))
+
+theorem cauchy_transfer (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) :
+    (X-C (delta x.val y.val))*completed (grid a) u x.val y.val m =
+    X*OrientationNonscalarOrigin.diagonal a u m*C (sparseWeight a u m x y) := by
+  have hd := delta_in_grid a x.val y.val x.isLt y.isLt
+  have hz := zero_in_grid a
+  have hdelta : delta 0 0=0 := by simp [delta]
+  rw [completed,correction_polynomial a u m x y hm,
+    OrientationNonscalarOrigin.diagonal,completed,hdelta,base,base]
+  calc
+    _ = C ((normalizer (grid a))⁻¹)*
+        (puncture (grid a) (delta x.val y.val)*(X-C (delta x.val y.val)))*
+        correction u 0 0 m*C (sparseWeight a u m x y) := by ring
+    _ = C ((normalizer (grid a))⁻¹)*nodal (grid a)*
+        correction u 0 0 m*C (sparseWeight a u m x y) := by rw [nodal_puncture _ _ hd]
+    _ = _ := by rw [← nodal_puncture (grid a) 0 hz];simp only [map_zero,sub_zero];ring
+
+theorem matching_entry (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    kernel a u m x y=completed (grid a) u x.val y.val m-
+      OrientationNonscalarOrigin.diagonal a u m*C (sparseWeight a u m x y) := by
+  rw [kernel,OrientationNonscalarOrigin.kernel,origin,ite_eq_left ⟨hm,hne⟩,
+    ite_eq_right hne,sub_zero,map_neg]
+  ring
+
+theorem matching_cancellation (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    (X-C (delta x.val y.val))*kernel a u m x y =
+      C (delta x.val y.val)*OrientationNonscalarOrigin.diagonal a u m*
+        C (sparseWeight a u m x y) := by
+  rw [matching_entry a u m x y hm hne,mul_sub,cauchy_transfer a u m x y hm]
+  ring
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.correction_polynomial
+#print axioms OrientationDenseOrigin.weight_oneModTwo
+#print axioms OrientationDenseOrigin.matching_cancellation
+
+
+namespace OrientationDenseOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue
+  OrientationSparseExtension OrientationCoefficientReduction
+
+def integralWeight (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) : integralRationals :=
+  ⟨sparseWeight a u m x y,(weight_oneModTwo a u m x y hm).integral⟩
+
+def integralOrigin (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) integralRationals :=
+  fun x y => if h : x.val%2^u=y.val%2^u ∧ x≠y
+    then -integralWeight a u m x y h.1 else 0
+
+def reduction : integralRationals →+* ZMod 2 := reduce 1
+
+theorem weight_reduction (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) : reduction (integralWeight a u m x y hm)=1 := by
+  have H := reduce_zero_of_bound 1 (integralWeight a u m x y hm-1)
+    (show VBound 1 (sparseWeight a u m x y-1) from weight_oneModTwo a u m x y hm)
+  change reduction (integralWeight a u m x y hm-1)=0 at H
+  rw [map_sub,map_one,sub_eq_zero] at H
+  exact H
+
+theorem integralOrigin_coe (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a) :
+    (integralOrigin a u m x y).val=origin a u m x y := by
+  unfold integralOrigin origin
+  split_ifs <;> rfl
+
+theorem origin_reduction (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a) :
+    reduction (integralOrigin a u m x y)=
+      if x.val%2^u=y.val%2^u ∧ x≠y then 1 else 0 := by
+  by_cases h : x.val%2^u=y.val%2^u ∧ x≠y
+  · simp only [integralOrigin,dite_eq_left h,map_neg,weight_reduction,ite_eq_left h]
+    decide
+  · simp only [integralOrigin,dite_eq_right h,map_zero,ite_eq_right h]
+
+def residueBlocks (a u : ℕ) (hu : u≤a) :
+    Fin (2^(a-u)) × Labels u ≃ Ports a :=
+  finProdFinEquiv.trans (finCongr (by rw [← pow_add];congr 1;omega))
+
+theorem residueBlocks_val (a u : ℕ) (hu : u≤a)
+    (p : Fin (2^(a-u)) × Labels u) :
+    (residueBlocks a u hu p).val=p.2.val+2^u*p.1.val := by
+  simp only [residueBlocks,Equiv.trans_apply,finCongr_apply_coe]
+  rfl
+
+theorem residueBlocks_mod (a u : ℕ) (hu : u≤a)
+    (p : Fin (2^(a-u)) × Labels u) :
+    (residueBlocks a u hu p).val%2^u=p.2.val := by
+  rw [residueBlocks_val]
+  simp [Nat.add_mod,Nat.mod_eq_of_lt p.2.isLt]
+
+theorem origin_reduction_blocks (a u : ℕ) (hu : u≤a) (m : ℕ → ℕ)
+    (p q : Fin (2^(a-u)) × Labels u) :
+    reduction (integralOrigin a u m (residueBlocks a u hu p) (residueBlocks a u hu q))=
+      if p.2=q.2 ∧ p≠q then 1 else 0 := by
+  rw [origin_reduction,residueBlocks_mod,residueBlocks_mod]
+  have he : residueBlocks a u hu p=residueBlocks a u hu q ↔ p=q :=
+    (residueBlocks a u hu).injective.eq_iff
+  simp only [Fin.val_inj,ne_eq,he]
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.weight_reduction
+#print axioms OrientationDenseOrigin.integralOrigin_coe
+#print axioms OrientationDenseOrigin.origin_reduction_blocks
+
+
+namespace OrientationDenseOrigin
+open Matrix Finset OrientationAnchor OrientationLeading OrientationCoefficientReduction
+
+def fiberMatrix (a u : ℕ) : Matrix (Fin (2^(a-u))) (Fin (2^(a-u))) (ZMod 2) :=
+  1 + replicateCol Unit (fun _ : Fin (2^(a-u)) => (1:ZMod 2))*
+    replicateRow Unit (fun _ : Fin (2^(a-u)) => (1:ZMod 2))
+
+theorem fiberMatrix_entry (a u : ℕ) (x y : Fin (2^(a-u))) :
+    fiberMatrix a u x y=if x=y then 0 else 1 := by
+  by_cases h : x=y
+  · subst y
+    simp [fiberMatrix,Matrix.mul_apply]; decide
+  · simp [fiberMatrix,Matrix.mul_apply,h]
+
+theorem fiberMatrix_det (a u : ℕ) (ha : u<a) : (fiberMatrix a u).det=1 := by
+  rw [fiberMatrix,Matrix.det_one_add_replicateCol_mul_replicateRow]
+  simp [dotProduct,Nat.cast_pow,show (2:ZMod 2)=0 by decide,show a-u≠0 by omega]
+
+theorem integralOrigin_reduction_block (a u : ℕ) (hu : u≤a) (m : ℕ → ℕ) :
+    reduction.mapMatrix (integralOrigin a u m)=
+      Matrix.reindex (residueBlocks a u hu) (residueBlocks a u hu)
+        (Matrix.blockDiagonal (fun _ : Labels u => fiberMatrix a u)) := by
+  ext x y
+  obtain ⟨p,rfl⟩ := (residueBlocks a u hu).surjective x
+  obtain ⟨q,rfl⟩ := (residueBlocks a u hu).surjective y
+  change reduction (integralOrigin a u m (residueBlocks a u hu p) (residueBlocks a u hu q))=_
+  simp only [Matrix.reindex_apply,Matrix.submatrix_apply,Equiv.symm_apply_apply]
+  rw [origin_reduction_blocks,Matrix.blockDiagonal_apply,fiberMatrix_entry]
+  by_cases hr : p.2=q.2
+  · have hp : p=q ↔ p.1=q.1 := by
+      constructor
+      · exact fun h => congrArg Prod.fst h
+      · exact fun h => Prod.ext h hr
+    simp only [hr,true_and,ne_eq,hp,ite_true]
+    split_ifs <;> rfl
+  · simp only [hr,false_and,ite_false]
+
+theorem determinant_reduction (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    reduction (integralOrigin a u m).det=1 := by
+  rw [reduction.map_det,integralOrigin_reduction_block a u (by omega) m,
+    Matrix.det_reindex_self,Matrix.det_blockDiagonal]
+  simp_rw [fiberMatrix_det a u ha]
+  simp
+
+theorem determinant_ne_zero (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    (integralOrigin a u m).det.val≠0 := by
+  intro hz
+  have he : (integralOrigin a u m).det=0 := Subtype.ext hz
+  have H := determinant_reduction a u ha m
+  rw [he,map_zero] at H
+  exact zero_ne_one H
+
+theorem determinant_valuation (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    padicValRat 2 (integralOrigin a u m).det.val=0 := by
+  have hz := determinant_ne_zero a u ha m
+  have hp := (integralOrigin a u m).det.property
+  rcases hp with hp | hp
+  · exact False.elim (hz hp)
+  have hn : ¬1≤padicValRat 2 (integralOrigin a u m).det.val := by
+    intro h
+    have H := reduce_zero_of_bound 1 (integralOrigin a u m).det (Or.inr h)
+    change reduction (integralOrigin a u m).det=0 at H
+    rw [determinant_reduction a u ha m] at H
+    exact one_ne_zero H
+  omega
+
+def determinantUnit (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) : integralRationalsˣ where
+  val := (integralOrigin a u m).det
+  inv := ⟨((integralOrigin a u m).det.val)⁻¹,
+    Or.inr (by rw [padicValRat.inv,determinant_valuation a u ha m];simp)⟩
+  val_inv := by
+    apply Subtype.ext
+    change (integralOrigin a u m).det.val*((integralOrigin a u m).det.val)⁻¹=1
+    exact mul_inv_cancel₀ (determinant_ne_zero a u ha m)
+  inv_val := by
+    apply Subtype.ext
+    change ((integralOrigin a u m).det.val)⁻¹*(integralOrigin a u m).det.val=1
+    exact inv_mul_cancel₀ (determinant_ne_zero a u ha m)
+
+theorem determinant_isUnit (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    IsUnit (integralOrigin a u m).det :=
+  ⟨determinantUnit a u ha m,rfl⟩
+
+def integralInverse (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) integralRationals :=
+  (integralOrigin a u m)⁻¹
+
+theorem integral_two_sided_inverse (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    integralOrigin a u m*integralInverse a u m=1 ∧
+      integralInverse a u m*integralOrigin a u m=1 := by
+  exact ⟨Matrix.mul_nonsing_inv _ (determinant_isUnit a u ha m),
+    Matrix.nonsing_inv_mul _ (determinant_isUnit a u ha m)⟩
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.fiberMatrix_det
+#print axioms OrientationDenseOrigin.integralOrigin_reduction_block
+#print axioms OrientationDenseOrigin.determinant_reduction
+#print axioms OrientationDenseOrigin.determinant_valuation
+#print axioms OrientationDenseOrigin.integral_two_sided_inverse
+
+
+namespace OrientationDenseOrigin
+open OrientationAnchor OrientationResidue OrientationLeading
+
+theorem relative_displacement_small (a u i : ℕ) (x y : Ports a) (t : ℤ)
+    (hi : padicValInt 2 t=i) (hiu : i<u) (hm : x.val%2^u=y.val%2^u) :
+    VBound 1 (delta x.val y.val/(t:ℚ)) := by
+  have H := vbound_div (displacement_bound u x.val y.val hm) (r:=(t:ℚ))
+  rw [padicValRat.of_int,hi] at H
+  exact H.mono (by omega)
+
+theorem retained_denominator_nonzero (a u i : ℕ) (x y : Ports a) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) : (t:ℚ)-delta x.val y.val≠0 := by
+  have htq : (t:ℚ)≠0 := by exact_mod_cast ht
+  have he : (t:ℚ)*(1-delta x.val y.val/(t:ℚ))=(t:ℚ)-delta x.val y.val := by
+    rw [mul_one_sub,← mul_div_assoc,mul_div_cancel_left₀ _ htq]
+  rw [← he]
+  exact mul_ne_zero htq (one_sub_ne_zero (relative_displacement_small a u i x y t hi hiu hm))
+
+theorem retained_denominator_valuation (a u i : ℕ) (x y : Ports a) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) :
+    padicValRat 2 ((t:ℚ)-delta x.val y.val)=(i:ℤ) := by
+  have htq : (t:ℚ)≠0 := by exact_mod_cast ht
+  have hs := relative_displacement_small a u i x y t hi hiu hm
+  have he : (t:ℚ)*(1-delta x.val y.val/(t:ℚ))=(t:ℚ)-delta x.val y.val := by
+    rw [mul_one_sub,← mul_div_assoc,mul_div_cancel_left₀ _ htq]
+  rw [← he,padicValRat.mul htq (one_sub_ne_zero hs),padicValRat.of_int,hi,
+    one_sub_valuation hs,add_zero]
+
+theorem retained_displacement_ratio (a u i : ℕ) (x y : Ports a) (t : ℤ)
+    (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) :
+    VBound ((u-i:ℕ):ℤ) (delta x.val y.val/((t:ℚ)-delta x.val y.val)) := by
+  have H := vbound_div (displacement_bound u x.val y.val hm)
+    (r:=((t:ℚ)-delta x.val y.val))
+  rw [retained_denominator_valuation a u i x y t ht hi hiu hm] at H
+  convert H using 1; omega
+
+theorem retained_chart_slope (a u i : ℕ) (x y : Ports a) (t : ℤ)
+    (hu : u≤a) (ht : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) :
+    VBound 1 (((2:ℚ)^(a+1))/((t:ℚ)-delta x.val y.val)) := by
+  have hp : VBound (a+1:ℕ) ((2:ℚ)^(a+1)) := Or.inr (by rw [two_power_valuation])
+  have H := vbound_div hp (r:=((t:ℚ)-delta x.val y.val))
+  rw [retained_denominator_valuation a u i x y t ht hi hiu hm] at H
+  exact H.mono (by omega)
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.retained_denominator_nonzero
+#print axioms OrientationDenseOrigin.retained_denominator_valuation
+#print axioms OrientationDenseOrigin.retained_displacement_ratio
+#print axioms OrientationDenseOrigin.retained_chart_slope
+
+
+namespace OrientationDenseOrigin
+open Matrix OrientationLeading OrientationCoefficientReduction
+
+def singletonRestriction (a u : ℕ) (m : ℕ → ℕ) (x : Ports a) :
+    Matrix Unit Unit integralRationals :=
+  (integralOrigin a u m).submatrix (fun _ : Unit => x) (fun _ : Unit => x)
+
+theorem singletonRestriction_zero (a u : ℕ) (m : ℕ → ℕ) (x : Ports a) :
+    singletonRestriction a u m x=0 := by
+  apply Matrix.ext
+  intro i j
+  simp only [singletonRestriction,Matrix.submatrix_apply]
+  simp [integralOrigin]
+
+theorem singletonRestriction_not_unit (a u : ℕ) (m : ℕ → ℕ) (x : Ports a) :
+    ¬IsUnit (singletonRestriction a u m x) := by
+  rw [singletonRestriction_zero]
+  exact not_isUnit_zero
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.singletonRestriction_zero
+#print axioms OrientationDenseOrigin.singletonRestriction_not_unit
+
+
+namespace OrientationPacketPadding
+open Finset OrientationLeading
+
+abbrev Slots (P a : ℕ) := Fin P × Ports a
+abbrev RealSlots (P a : ℕ) (keep : Slots P a → Prop) := {s : Slots P a // keep s}
+abbrev DummySlots (P a : ℕ) (keep : Slots P a → Prop) := {s : Slots P a // ¬keep s}
+
+variable {R : Type*} [CommSemiring R] (P a : ℕ) (keep : Slots P a → Prop) [DecidablePred keep]
+
+def assignmentEquiv : (Slots P a → Bool) ≃ (RealSlots P a keep ⊕ DummySlots P a keep → Bool) :=
+  Equiv.arrowCongr (Equiv.sumCompl keep).symm (Equiv.refl Bool)
+
+theorem assignment_real (x : Slots P a → Bool) (s : RealSlots P a keep) :
+    assignmentEquiv P a keep x (Sum.inl s)=x s.val := by
+  simp [assignmentEquiv,Equiv.arrowCongr]
+
+theorem assignment_dummy (x : Slots P a → Bool) (s : DummySlots P a keep) :
+    assignmentEquiv P a keep x (Sum.inr s)=x s.val := by
+  simp [assignmentEquiv,Equiv.arrowCongr]
+
+def fullLeft (A : (RealSlots P a keep → Bool) → R) (x : Slots P a → Bool) : R :=
+  CryptoLean.TensorPadding.leftPad A (fun _ : DummySlots P a keep => false)
+    (assignmentEquiv P a keep x)
+
+def fullRight (B : (RealSlots P a keep → Bool) → R) (x : Slots P a → Bool) : R :=
+  CryptoLean.TensorPadding.rightPad B (assignmentEquiv P a keep x)
+
+theorem fullLeft_entry (A : (RealSlots P a keep → Bool) → R) (x : Slots P a → Bool) :
+    fullLeft P a keep A x=A (fun s => x s.val)*
+      ∏ d : DummySlots P a keep, (if x d.val=false then 1 else 0) := by
+  simp only [fullLeft,CryptoLean.TensorPadding.leftPad_eq]
+  rw [funext (assignment_real P a keep x),funext (assignment_dummy P a keep x)]
+  rw [CryptoLean.TensorPadding.dummyWeight_eq_prod]
+
+omit [CommSemiring R] in
+theorem fullRight_entry (B : (RealSlots P a keep → Bool) → R) (x : Slots P a → Bool) :
+    fullRight P a keep B x=B (fun s => x s.val) := by
+  simp only [fullRight,CryptoLean.TensorPadding.rightPad_eq]
+  rw [funext (assignment_real P a keep x)]
+
+theorem contraction_eq_original (A B : (RealSlots P a keep → Bool) → R) :
+    CryptoLean.TensorPadding.contraction (fullLeft P a keep A) (fullRight P a keep B)=
+      CryptoLean.TensorPadding.contraction A B := by
+  calc
+    _ = CryptoLean.TensorPadding.contraction
+        (CryptoLean.TensorPadding.leftPad A (fun _ : DummySlots P a keep => false))
+        (CryptoLean.TensorPadding.rightPad B) := by
+      simp only [CryptoLean.TensorPadding.contraction_eq_sum]
+      simpa only [fullLeft,fullRight] using
+        (assignmentEquiv P a keep).sum_comp
+          (fun y => CryptoLean.TensorPadding.leftPad A
+            (fun _ : DummySlots P a keep => false) y*CryptoLean.TensorPadding.rightPad B y)
+    _ = _ := CryptoLean.TensorPadding.contraction_padded A B _
+
+theorem slot_count : Fintype.card (Slots P a)=P*2^a := by
+  simp only [Slots,Ports,Fintype.card_prod,Fintype.card_fin]
+
+theorem dummy_count : Fintype.card (DummySlots P a keep)=
+    P*2^a-Fintype.card (RealSlots P a keep) := by
+  rw [Fintype.card_subtype_compl,slot_count P a]
+
+theorem padded_edge_bound (M : ℕ) (hP : P≤3*M/2^a) :
+    Fintype.card (Slots P a)≤3*M := by
+  rw [slot_count P a]
+  exact (Nat.le_div_iff_mul_le (by positivity)).mp hP
+
+theorem dummy_edge_bound (M : ℕ) (hReal : Fintype.card (RealSlots P a keep)=M)
+    (hP : P≤3*M/2^a) : Fintype.card (DummySlots P a keep)≤2*M := by
+  rw [dummy_count P a keep,hReal]
+  have H := padded_edge_bound P a M hP
+  rw [slot_count P a] at H
+  omega
+
+def endpoint {V : Type*} (original : RealSlots P a keep → V) (s : Slots P a) :
+    V ⊕ DummySlots P a keep :=
+  if h : keep s then Sum.inl (original ⟨s,h⟩) else Sum.inr ⟨s,h⟩
+
+theorem dummy_endpoint_iff {V : Type*} (original : RealSlots P a keep → V)
+    (s : Slots P a) (d : DummySlots P a keep) :
+    endpoint P a keep original s=Sum.inr d ↔ s=d.val := by
+  by_cases h : keep s
+  · have hn : s≠d.val := by intro he;exact d.property (he ▸ h)
+    simp [endpoint,h,hn]
+  · simp [endpoint,h,Subtype.ext_iff]
+
+theorem dummy_endpoint_degree {V : Type*} [DecidableEq V]
+    (original : RealSlots P a keep → V) (d : DummySlots P a keep) :
+    Fintype.card {s : Slots P a // endpoint P a keep original s=Sum.inr d}=1 := by
+  calc
+    _ = Fintype.card {s : Slots P a // s=d.val} :=
+      Fintype.card_congr (Equiv.subtypeEquivRight (fun s => dummy_endpoint_iff P a keep original s d))
+    _ = 1 := Fintype.card_subtype_eq d.val
+
+end OrientationPacketPadding
+#print axioms OrientationPacketPadding.contraction_eq_original
+#print axioms OrientationPacketPadding.padded_edge_bound
+#print axioms OrientationPacketPadding.dummy_edge_bound
+#print axioms OrientationPacketPadding.dummy_endpoint_degree
+
+#print axioms OrientationPacketPadding.assignment_real
+#print axioms OrientationPacketPadding.assignment_dummy
+#print axioms OrientationPacketPadding.fullLeft_entry
+#print axioms OrientationPacketPadding.fullRight_entry
+#print axioms OrientationPacketPadding.slot_count
+#print axioms OrientationPacketPadding.dummy_count
+#print axioms OrientationPacketPadding.dummy_endpoint_iff
+
+
+namespace OrientationPacketPadding
+open Finset
+variable (P a : ℕ) (keep : Slots P a → Prop) [DecidablePred keep]
+
+theorem endpoint_real {V : Type*} (original : RealSlots P a keep → V)
+    (s : RealSlots P a keep) : endpoint P a keep original s.val=Sum.inl (original s) := by
+  simp [endpoint,s.property]
+
+theorem endpoint_dummy {V : Type*} (original : RealSlots P a keep → V)
+    (s : DummySlots P a keep) : endpoint P a keep original s.val=Sum.inr s := by
+  simp [endpoint,s.property]
+
+theorem real_endpoint_degree {V : Type*} [DecidableEq V]
+    (original : RealSlots P a keep → V) (v : V) :
+    Fintype.card {s : Slots P a // endpoint P a keep original s=Sum.inl v}=
+      Fintype.card {r : RealSlots P a keep // original r=v} := by
+  calc
+    _ = Fintype.card {t : RealSlots P a keep ⊕ DummySlots P a keep //
+        endpoint P a keep original (Equiv.sumCompl keep t)=Sum.inl v} :=
+      (Fintype.card_congr (Equiv.subtypeEquiv (Equiv.sumCompl keep)
+        (p:=fun t => endpoint P a keep original (Equiv.sumCompl keep t)=Sum.inl v)
+        (q:=fun s => endpoint P a keep original s=Sum.inl v) (fun _ => Iff.rfl))).symm
+    _ = Fintype.card {r : RealSlots P a keep //
+          endpoint P a keep original (Equiv.sumCompl keep (Sum.inl r))=Sum.inl v}+
+        Fintype.card {d : DummySlots P a keep //
+          endpoint P a keep original (Equiv.sumCompl keep (Sum.inr d))=Sum.inl v} :=
+      (Fintype.card_congr Equiv.subtypeSum).trans Fintype.card_sum
+    _ = _ := by simp [endpoint_real,endpoint_dummy]
+
+theorem padded_degree_bound {V : Type*} [DecidableEq V]
+    (original : RealSlots P a keep → V) (Delta : ℕ) (h1 : 1≤Delta)
+    (hD : ∀ v, Fintype.card {r : RealSlots P a keep // original r=v}≤Delta)
+    (v : V ⊕ DummySlots P a keep) :
+    Fintype.card {s : Slots P a // endpoint P a keep original s=v}≤Delta := by
+  cases v with
+  | inl v => rw [real_endpoint_degree P a keep original v];exact hD v
+  | inr d => rw [dummy_endpoint_degree P a keep original d];exact h1
+
+def endpointLabel {V C : Type*} (oldLabel : V → C) (slotLabel : Slots P a → C) :
+    V ⊕ DummySlots P a keep → C :=
+  Sum.elim oldLabel (fun d => slotLabel d.val)
+
+theorem endpoint_label_compatible {V C : Type*}
+    (original : RealSlots P a keep → V) (oldLabel : V → C) (slotLabel : Slots P a → C)
+    (hReal : ∀ r : RealSlots P a keep, oldLabel (original r)=slotLabel r.val)
+    (s : Slots P a) :
+    endpointLabel P a keep oldLabel slotLabel (endpoint P a keep original s)=slotLabel s := by
+  by_cases h : keep s
+  · simp only [endpoint,dite_eq_left h,endpointLabel,Sum.elim_inl]
+    exact hReal ⟨s,h⟩
+  · simp only [endpoint,dite_eq_right h,endpointLabel,Sum.elim_inr]
+
+theorem padded_symbol_count {V C : Type*} [DecidableEq C]
+    (original : RealSlots P a keep → V) (oldLabel : V → C) (slotLabel : Slots P a → C)
+    (hReal : ∀ r : RealSlots P a keep, oldLabel (original r)=slotLabel r.val) (c : C) :
+    Fintype.card {s : Slots P a //
+      endpointLabel P a keep oldLabel slotLabel (endpoint P a keep original s)=c}=
+      Fintype.card {s : Slots P a // slotLabel s=c} := by
+  exact Fintype.card_congr (Equiv.subtypeEquivRight
+    (fun s => by rw [endpoint_label_compatible P a keep original oldLabel slotLabel hReal s]))
+
+end OrientationPacketPadding
+#print axioms OrientationPacketPadding.endpoint_real
+#print axioms OrientationPacketPadding.endpoint_dummy
+#print axioms OrientationPacketPadding.real_endpoint_degree
+#print axioms OrientationPacketPadding.padded_degree_bound
+#print axioms OrientationPacketPadding.endpoint_label_compatible
+#print axioms OrientationPacketPadding.padded_symbol_count
+
+
+namespace OrientationDummyCreation
+open OrientationFixedWord OrientationCreationWord
+
+def rowLiteral (b : Bool) : ℕ := if b=false then 1 else 0
+
+def rowFrozen (pc : ℕ) (b : Bool) : Frozen := ⟨pc,ofNatWord pc (rowLiteral b)⟩
+def columnFrozen (pc : ℕ) : Frozen := ⟨pc,ofNatWord pc 1⟩
+
+
+theorem row_precision (pc : ℕ) (b : Bool) : (rowFrozen pc b).creationPrecision=pc := by
+  simp only [rowFrozen]
+
+theorem column_precision (pc : ℕ) : (columnFrozen pc).creationPrecision=pc := by
+  simp only [columnFrozen]
+
+def rowLater (pc P : ℕ) (b : Bool) (h : pc≤P) : LiftRun P :=
+  later (rowFrozen pc b) P ((row_precision pc b).trans_le h)
+
+def columnLater (pc P : ℕ) (h : pc≤P) : LiftRun P :=
+  later (columnFrozen pc) P ((column_precision pc).trans_le h)
+
+theorem rowLiteral_le_one (b : Bool) : rowLiteral b≤1 := by
+  unfold rowLiteral
+  split_ifs <;> omega
+
+theorem rowLiteral_lt_modulus (pc : ℕ) (b : Bool) (hpc : 1≤pc) : rowLiteral b<2^pc := by
+  have hp : 1<(2:ℕ)^pc := one_lt_pow₀ (by decide) (by omega)
+  exact lt_of_le_of_lt (rowLiteral_le_one b) hp
+
+theorem row_creation_integer (pc : ℕ) (b : Bool) (hpc : 1≤pc) :
+    (wordValue (rowFrozen pc b).word).val=rowLiteral b := by
+  simp only [rowFrozen,ofNatWord_value]
+  exact ZMod.val_natCast_of_lt (rowLiteral_lt_modulus pc b hpc)
+
+theorem column_creation_integer (pc : ℕ) (hpc : 1≤pc) :
+    (wordValue (columnFrozen pc).word).val=1 := by
+  simp only [columnFrozen,ofNatWord_value]
+  exact ZMod.val_natCast_of_lt (one_lt_pow₀ (by decide : 1<(2:ℕ)) (by omega : pc≠0))
+
+theorem row_later_integer (pc P : ℕ) (b : Bool) (hpc : 1≤pc) (h : pc≤P) :
+    (wordValue (rowLater pc P b h).value).val=rowLiteral b := by
+  calc
+    _ = (wordValue (rowFrozen pc b).word).val := by rw [rowLater];exact later_preserves _ P _
+    _ = _ := row_creation_integer pc b hpc
+
+theorem column_later_integer (pc P : ℕ) (hpc : 1≤pc) (h : pc≤P) :
+    (wordValue (columnLater pc P h).value).val=1 := by
+  calc
+    _ = (wordValue (columnFrozen pc).word).val := by rw [columnLater];exact later_preserves _ P _
+    _ = _ := column_creation_integer pc hpc
+
+theorem column_creation_pc_zero : (wordValue (columnFrozen 0).word).val=0 := by
+  simp only [columnFrozen,ofNatWord_value]
+  decide
+
+theorem column_later_pc_zero (P : ℕ) :
+    (wordValue (columnLater 0 P (Nat.zero_le P)).value).val=0 := by
+  calc
+    _ = (wordValue (columnFrozen 0).word).val := by rw [columnLater];exact later_preserves _ P _
+    _ = _ := column_creation_pc_zero
+
+theorem row_payload (pc P : ℕ) (b : Bool) (h : pc≤P) :
+    (rowLater pc P b h).copied.length=pc ∧
+    (rowLater pc P b h).padding.length=P-pc ∧
+    (rowLater pc P b h).copied.length+
+      (rowLater pc P b h).padding.length=P := by
+  simpa only [rowLater,rowFrozen,later] using liftWord_payload (ofNatWord pc (rowLiteral b)) P h
+
+theorem column_payload (pc P : ℕ) (h : pc≤P) :
+    (columnLater pc P h).copied.length=pc ∧
+    (columnLater pc P h).padding.length=P-pc ∧
+    (columnLater pc P h).copied.length+
+      (columnLater pc P h).padding.length=P := by
+  simpa only [columnLater,columnFrozen,later] using liftWord_payload (ofNatWord pc 1) P h
+
+def creationBits (pc : ℕ) : List Bool :=
+  (rowFrozen pc false).word.val++(rowFrozen pc true).word.val++(columnFrozen pc).word.val
+
+theorem creationBits_length (pc : ℕ) : (creationBits pc).length=3*pc := by
+  have h0 : (rowFrozen pc false).word.val.length=pc := (rowFrozen pc false).word.property
+  have h1 : (rowFrozen pc true).word.val.length=pc := (rowFrozen pc true).word.property
+  have hc : (columnFrozen pc).word.val.length=pc := (columnFrozen pc).word.property
+  simp only [creationBits,List.length_append,h0,h1,hc]
+  omega
+
+def laterBits (pc P : ℕ) (h : pc≤P) : List Bool :=
+  (rowLater pc P false h).value.val++
+  (rowLater pc P true h).value.val++(columnLater pc P h).value.val
+
+theorem laterBits_length (pc P : ℕ) (h : pc≤P) : (laterBits pc P h).length=3*P := by
+  have h0 := (rowLater pc P false h).value.property
+  have h1 := (rowLater pc P true h).value.property
+  have hc := (columnLater pc P h).value.property
+  simp only [laterBits,List.length_append,h0,h1,hc]
+  omega
+
+def copiedBits (pc P : ℕ) (h : pc≤P) : List Bool :=
+  (rowLater pc P false h).copied++
+  (rowLater pc P true h).copied++(columnLater pc P h).copied
+
+theorem copiedBits_length (pc P : ℕ) (h : pc≤P) : (copiedBits pc P h).length=3*pc := by
+  simp only [copiedBits,List.length_append,(row_payload pc P false h).1,
+    (row_payload pc P true h).1,(column_payload pc P h).1]
+  omega
+
+def paddingBits (pc P : ℕ) (h : pc≤P) : List Bool :=
+  (rowLater pc P false h).padding++
+  (rowLater pc P true h).padding++(columnLater pc P h).padding
+
+theorem paddingBits_length (pc P : ℕ) (h : pc≤P) :
+    (paddingBits pc P h).length=3*(P-pc) := by
+  simp only [paddingBits,List.length_append,(row_payload pc P false h).2.1,
+    (row_payload pc P true h).2.1,(column_payload pc P h).2.1]
+  omega
+
+def materializedBits (N pc : ℕ) : List Bool := (List.replicate N (creationBits pc)).flatten
+
+theorem materializedBits_length (N pc : ℕ) : (materializedBits N pc).length=N*(3*pc) := by
+  simp only [materializedBits,List.length_flatten,List.map_replicate,List.sum_replicate_nat,
+    creationBits_length]
+
+theorem packet_scalar_payload_bound (pc P a M : ℕ)
+    (keep : OrientationPacketPadding.Slots P a → Prop) [DecidablePred keep]
+    (hReal : Fintype.card (OrientationPacketPadding.RealSlots P a keep)=M)
+    (hP : P≤3*M/2^a) :
+    (materializedBits (Fintype.card (OrientationPacketPadding.DummySlots P a keep)) pc).length≤
+      6*M*pc := by
+  calc
+    _ = Fintype.card (OrientationPacketPadding.DummySlots P a keep)*(3*pc) :=
+      materializedBits_length _ _
+    _ ≤ (2*M)*(3*pc) := Nat.mul_le_mul_right _
+      (OrientationPacketPadding.dummy_edge_bound P a keep M hReal hP)
+    _ = _ := by ring
+
+end OrientationDummyCreation
+#print axioms OrientationDummyCreation.rowLiteral_le_one
+#print axioms OrientationDummyCreation.rowLiteral_lt_modulus
+#print axioms OrientationDummyCreation.row_creation_integer
+#print axioms OrientationDummyCreation.column_creation_integer
+#print axioms OrientationDummyCreation.row_later_integer
+#print axioms OrientationDummyCreation.column_later_integer
+#print axioms OrientationDummyCreation.column_creation_pc_zero
+#print axioms OrientationDummyCreation.column_later_pc_zero
+#print axioms OrientationDummyCreation.row_payload
+#print axioms OrientationDummyCreation.column_payload
+#print axioms OrientationDummyCreation.creationBits_length
+#print axioms OrientationDummyCreation.laterBits_length
+#print axioms OrientationDummyCreation.copiedBits_length
+#print axioms OrientationDummyCreation.paddingBits_length
+#print axioms OrientationDummyCreation.materializedBits_length
+#print axioms OrientationDummyCreation.packet_scalar_payload_bound
+
+#print axioms OrientationDummyCreation.row_precision
+#print axioms OrientationDummyCreation.column_precision
+
+
+namespace OrientationDenseOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationNodePolynomial OrientationSparseExtension
+
+def denseChart (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a) : ℚ[X] :=
+  C ((diagonalJet a u i m)⁻¹)*chart a t (kernel a u m x y)
+
+def chartDenominator (a : ℕ) (t : ℤ) (x y : Ports a) : ℚ[X] :=
+  1+C (((2:ℚ)^(a+1))/((t:ℚ)-delta x.val y.val))*X
+
+theorem denseChart_matching_entry (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    denseChart a u i t m x y=normalizedNodeEntry a u i x.val y.val t m-
+      normalizedNodeEntry a u i 0 0 t m*C (sparseWeight a u m x y) := by
+  simp only [denseChart,matching_entry a u m x y hm hne,normalizedNodeEntry,
+    OrientationNonscalarOrigin.diagonal,chart,sub_comp,mul_comp,C_comp]
+  ring
+
+theorem denseChart_matching_integral (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) : Content 0 (denseChart a u i t m x y) := by
+  have hc := matching_bits u x.val y.val i hiu hm
+  have hp := actual_node_integral a u i x.val y.val t m x.isLt y.isLt ht ht0 hi hiu hu hc
+  have hd := actual_node_integral a u i 0 0 t m (by positivity) (by positivity) ht ht0 hi hiu hu rfl
+  have hs : Content 0 (normalizedNodeEntry a u i 0 0 t m*C (sparseWeight a u m x y)) := by
+    simpa only [zero_add] using hd.mul (Content.C (weight_oneModTwo a u m x y hm).integral)
+  rw [denseChart_matching_entry a u i t m x y hm hne]
+  exact content_sub hp hs
+
+theorem chartDenominator_near_one (a u i : ℕ) (t : ℤ) (x y : Ports a)
+    (hu : u≤a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) : Content 1 (chartDenominator a t x y-1) := by
+  have H := (Content.C (retained_chart_slope a u i x y t hu ht0 hi hiu hm)).mul Content.X
+  have he : chartDenominator a t x y-1=
+      C (((2:ℚ)^(a+1))/((t:ℚ)-delta x.val y.val))*X := by
+    unfold chartDenominator
+    ring
+  rw [he]
+  simpa only [add_zero] using H
+
+theorem denseChart_denominator_identity (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a)
+    (hu : u≤a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    chartDenominator a t x y*denseChart a u i t m x y=
+      C (delta x.val y.val/((t:ℚ)-delta x.val y.val))*
+        normalizedNodeEntry a u i 0 0 t m*C (sparseWeight a u m x y) := by
+  have hden := retained_denominator_nonzero a u i x y t ht0 hi hiu hm
+  have hjet := diagonalJet_ne_zero a u i m (by omega)
+  apply Polynomial.funext
+  intro z
+  have H := congrArg (fun Q : ℚ[X] => Q.eval ((t:ℚ)+(2:ℚ)^(a+1)*z))
+    (matching_cancellation a u m x y hm hne)
+  simp only [eval_mul,eval_sub,eval_X,eval_C,OrientationNonscalarOrigin.diagonal] at H
+  simp only [chartDenominator,denseChart,normalizedNodeEntry,chart,eval_mul,eval_add,
+    eval_C,eval_comp,eval_one,eval_X]
+  field_simp [hden,hjet]
+  nlinarith [H]
+
+theorem denseChart_matching_gain (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    Content ((u-i:ℕ):ℤ) (denseChart a u i t m x y) := by
+  have hd := actual_node_integral a u i 0 0 t m (by positivity) (by positivity) ht ht0 hi hiu hu rfl
+  have hn : Content ((u-i:ℕ):ℤ)
+      (C (delta x.val y.val/((t:ℚ)-delta x.val y.val))*
+        normalizedNodeEntry a u i 0 0 t m*C (sparseWeight a u m x y)) := by
+    simpa only [add_zero] using
+      ((Content.C (retained_displacement_ratio a u i x y t ht0 hi hiu hm)).mul hd).mul
+        (Content.C (weight_oneModTwo a u m x y hm).integral)
+  apply content_cancel_near_one (chartDenominator a t x y) (denseChart a u i t m x y) (u-i)
+    (chartDenominator_near_one a u i t x y hu ht0 hi hiu hm)
+    (denseChart_matching_integral a u i t m x y hu ht ht0 hi hiu hm hne)
+  rw [denseChart_denominator_identity a u i t m x y hu ht0 hi hiu hm hne]
+  exact hn
+
+theorem matching_absolute_content (a u i : ℕ) (t : ℤ) (m : ℕ → ℕ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hm : x.val%2^u=y.val%2^u) (hne : x≠y) :
+    Content (jetWeight a u i m+((u-i:ℕ):ℤ)) (chart a t (kernel a u m x y)) := by
+  have hv : VBound (jetWeight a u i m) (diagonalJet a u i m) :=
+    Or.inr (by rw [diagonalJet_valuation a u i m hiu hu];rfl)
+  have he : C (diagonalJet a u i m)*denseChart a u i t m x y=chart a t (kernel a u m x y) := by
+    rw [denseChart,← mul_assoc,← map_mul,
+      mul_inv_cancel₀ (diagonalJet_ne_zero a u i m (by omega)),map_one,one_mul]
+  have H := (Content.C hv).mul (denseChart_matching_gain a u i t m x y hu ht ht0 hi hiu hm hne)
+  rwa [he] at H
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.denseChart_matching_entry
+#print axioms OrientationDenseOrigin.denseChart_matching_integral
+#print axioms OrientationDenseOrigin.chartDenominator_near_one
+#print axioms OrientationDenseOrigin.denseChart_denominator_identity
+#print axioms OrientationDenseOrigin.denseChart_matching_gain
+#print axioms OrientationDenseOrigin.matching_absolute_content
+
+
+namespace OrientationDenseOrigin
+open Polynomial Finset OrientationAnchor OrientationLeading OrientationResidue OrientationJet
+  OrientationGradedNode OrientationNodePolynomial OrientationConstructedProfile OrientationHierarchy
+
+theorem dense_diagonal_zero (a u : ℕ) (m : ℕ → ℕ) (x : Ports a) : kernel a u m x x=0 := by
+  rw [kernel]
+  exact OrientationNonscalarOrigin.kernel_diagonal_zero a u m (origin a u m)
+    (by intro z;simp [origin]) x
+
+theorem nonmatching_kernel_entry (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hn : x.val%2^u≠y.val%2^u) : kernel a u m x y=completed (grid a) u x.val y.val m := by
+  have hxy : x≠y := by intro h;subst y;exact hn rfl
+  have ho : origin a u m x y=0 := by simp [origin,hn]
+  rw [kernel,OrientationNonscalarOrigin.kernel,ho,ite_eq_right hxy,sub_zero,map_zero,mul_zero,add_zero]
+
+theorem nonmatching_normalized_graded (a u i : ℕ) (t : ℤ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) (hn : x.val%2^u≠y.val%2^u) :
+    Graded (((u-i:ℕ):ℤ)-1)
+      (normalizedNodeEntry a u i x.val y.val t (fun j => 4*profile u j)) := by
+  have hxy : x.val≠y.val := by intro h;exact hn (congrArg (fun n => n%2^u) h)
+  have hb := actual_base_graded a i x.val y.val t x.isLt y.isLt ht ht0 hi hc
+  have hg := actual_correction_graded a u x.val y.val i t (fun j => 4*profile u j)
+    ht0 hi (by omega)
+  simp only [chartOrder,ite_eq_right hxy] at hg
+  have hgain := OrientationPairedOrigin.actual_nonmatching_profile_gain u i x.val y.val hiu hc hn
+  have hw := hb.mul hg
+  have hs : VBound (-jetWeight a u i (fun j => 4*profile u j))
+      ((diagonalJet a u i (fun j => 4*profile u j))⁻¹) :=
+    Or.inr (by rw [padicValRat.inv,diagonalJet_valuation a u i _ hiu hu];rfl)
+  have H := (Graded.C hs).mul hw
+  have he : -jetWeight a u i (fun j => 4*profile u j)+
+      ((a:ℤ)-i+gain u x.val y.val i (order x.val y.val) (fun j => 4*profile u j))≥
+      ((u-i:ℕ):ℤ)-1 := by unfold jetWeight;omega
+  have H' := H.mono he
+  simpa only [normalizedNodeEntry,chart,completed,mul_comp] using H'
+
+theorem nonmatching_normalized_content (a u i : ℕ) (t : ℤ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) (hn : x.val%2^u≠y.val%2^u) :
+    Content ((u-i:ℕ):ℤ)
+      (normalizedNodeEntry a u i x.val y.val t (fun j => 4*profile u j)) := by
+  intro n
+  cases n with
+  | zero =>
+    rw [actual_node_constant a u i x.val y.val t _ ht ht0 hi hc]
+    exact VBound.zero _
+  | succ n =>
+    have H := nonmatching_normalized_graded a u i t x y hu ht ht0 hi hiu hc hn (n+1)
+    exact H.mono (by omega)
+
+theorem whole_crossing_content (a u i : ℕ) (t : ℤ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content ((u-i:ℕ):ℤ) (denseChart a u i t (fun j => 4*profile u j) x y) := by
+  by_cases hxy : x=y
+  · subst y
+    simp only [denseChart,dense_diagonal_zero,chart,zero_comp,mul_zero]
+    intro n
+    rw [coeff_zero]
+    exact VBound.zero _
+  · by_cases hm : x.val%2^u=y.val%2^u
+    · exact denseChart_matching_gain a u i t (fun j => 4*profile u j) x y hu ht ht0 hi hiu hm hxy
+    · rw [denseChart,nonmatching_kernel_entry a u _ x y hm]
+      exact nonmatching_normalized_content a u i t x y hu ht ht0 hi hiu hc hm
+
+theorem whole_crossing_absolute_content (a u i : ℕ) (t : ℤ) (x y : Ports a)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content (jetWeight a u i (fun j => 4*profile u j)+((u-i:ℕ):ℤ))
+      (chart a t (kernel a u (fun j => 4*profile u j) x y)) := by
+  have hv : VBound (jetWeight a u i (fun j => 4*profile u j))
+      (diagonalJet a u i (fun j => 4*profile u j)) :=
+    Or.inr (by rw [diagonalJet_valuation a u i _ hiu hu];rfl)
+  have he : C (diagonalJet a u i (fun j => 4*profile u j))*
+      denseChart a u i t (fun j => 4*profile u j) x y=
+      chart a t (kernel a u (fun j => 4*profile u j) x y) := by
+    rw [denseChart,← mul_assoc,← map_mul,
+      mul_inv_cancel₀ (diagonalJet_ne_zero a u i _ (by omega)),map_one,one_mul]
+  have H := (Content.C hv).mul (whole_crossing_content a u i t x y hu ht ht0 hi hiu hc)
+  rwa [he] at H
+
+def denseCrossingChart (a u i : ℕ) (t : ℤ) : Matrix (Ports a) (Ports a) ℚ[X] :=
+  fun x y => if x.val.testBit i=y.val.testBit i then
+    denseChart a u i t (fun j => 4*profile u j) x y else 0
+
+theorem denseCrossingChart_content (a u i : ℕ) (t : ℤ)
+    (hu : u≤a) (ht : (t:ℚ)∈grid a) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (x y : Ports a) : Content ((u-i:ℕ):ℤ) (denseCrossingChart a u i t x y) := by
+  unfold denseCrossingChart
+  split_ifs with hc
+  · exact whole_crossing_content a u i t x y hu ht ht0 hi hiu hc
+  · intro n
+    rw [coeff_zero]
+    exact VBound.zero _
+
+theorem source_root_crossing_content (u i : ℕ) (t : ℤ) (x y : Ports (2*u))
+    (ht : (t:ℚ)∈grid (2*u)) (ht0 : t≠0) (hi : padicValInt 2 t=i) (hiu : i<u)
+    (hc : x.val.testBit i=y.val.testBit i) :
+    Content ((u-i:ℕ):ℤ) (denseChart (2*u) u i t (fun j => 4*profile u j) x y) :=
+  whole_crossing_content (2*u) u i t x y (by omega) ht ht0 hi hiu hc
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.dense_diagonal_zero
+#print axioms OrientationDenseOrigin.nonmatching_kernel_entry
+#print axioms OrientationDenseOrigin.nonmatching_normalized_graded
+#print axioms OrientationDenseOrigin.nonmatching_normalized_content
+#print axioms OrientationDenseOrigin.whole_crossing_content
+#print axioms OrientationDenseOrigin.whole_crossing_absolute_content
+#print axioms OrientationDenseOrigin.denseCrossingChart_content
+#print axioms OrientationDenseOrigin.source_root_crossing_content
+
+
+namespace OrientationDenseOrigin
+open Matrix OrientationLeading OrientationResidue OrientationCoefficientReduction
+
+theorem integralOrigin_off_residue (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a)
+    (hn : x.val%2^u≠y.val%2^u) : integralOrigin a u m x y=0 := by
+  simp [integralOrigin,hn]
+
+theorem integralInverse_off_residue (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) (x y : Ports a)
+    (hn : x.val%2^u≠y.val%2^u) : integralInverse a u m x y=0 := by
+  let : Invertible (integralOrigin a u m) := Classical.choice
+    ((nonempty_invertible_iff_isUnit (integralOrigin a u m)).mpr
+      ((Matrix.isUnit_iff_isUnit_det (integralOrigin a u m)).mpr (determinant_isUnit a u ha m)))
+  have hT : Matrix.BlockTriangular (integralOrigin a u m) (fun z : Ports a => z.val%2^u) := by
+    intro r s h
+    exact integralOrigin_off_residue a u m r s (ne_of_gt h)
+  have hD : Matrix.BlockTriangular (integralOrigin a u m)
+      (fun z : Ports a => (z.val%2^u : ℕᵒᵈ)) := by
+    intro r s h
+    change r.val%2^u<s.val%2^u at h
+    exact integralOrigin_off_residue a u m r s (ne_of_lt h)
+  have hTi := Matrix.blockTriangular_inv_of_blockTriangular hT
+  have hDi := Matrix.blockTriangular_inv_of_blockTriangular hD
+  rw [integralInverse]
+  rcases lt_or_gt_of_ne hn with h | h
+  · exact hDi h
+  · exact hTi h
+
+theorem integralInverse_bits (a u i : ℕ) (ha : u<a) (m : ℕ → ℕ) (x y : Ports a)
+    (hi : i<u) (hne : integralInverse a u m x y≠0) :
+    x.val.testBit i=y.val.testBit i := by
+  have hm : x.val%2^u=y.val%2^u := by
+    by_contra h
+    exact hne (integralInverse_off_residue a u ha m x y h)
+  exact matching_bits u x.val y.val i hi hm
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.integralOrigin_off_residue
+#print axioms OrientationDenseOrigin.integralInverse_off_residue
+#print axioms OrientationDenseOrigin.integralInverse_bits
+
+
+namespace OrientationDenseOrigin
+open Polynomial Matrix OrientationAnchor OrientationLeading OrientationCoefficientReduction
+
+def coefficientMap : integralRationals →+* ℚ[X] :=
+  (Polynomial.C : ℚ →+* ℚ[X]).comp integralRationals.subtype
+
+def constantInverse (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ[X] :=
+  coefficientMap.mapMatrix (integralInverse a u m)
+
+def normalizedKernel (a u : ℕ) (m : ℕ → ℕ) : Matrix (Ports a) (Ports a) ℚ[X] :=
+  kernel a u m*constantInverse a u m
+
+def oldEvaluation (a u : ℕ) (m : ℕ → ℕ) (t : ℚ) : Matrix (Ports a) (Ports a) ℚ :=
+  fun x y => (completed (grid a) u x.val y.val m).eval t
+
+theorem constantInverse_entry (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a) :
+    constantInverse a u m x y=C (integralInverse a u m x y).val := by
+  simp only [constantInverse,RingHom.mapMatrix_apply,Matrix.map_apply,coefficientMap,
+    RingHom.comp_apply,Subring.subtype_apply]
+
+theorem constantInverse_evaluation (a u : ℕ) (m : ℕ → ℕ) (t : ℚ) :
+    (evalRingHom t).mapMatrix (constantInverse a u m)=
+      integralRationals.subtype.mapMatrix (integralInverse a u m) := by
+  apply Matrix.ext
+  intro x y
+  simp only [RingHom.mapMatrix_apply,Matrix.map_apply,coe_evalRingHom,
+    constantInverse_entry,eval_C,Subring.subtype_apply]
+
+theorem kernel_evaluation_zero (a u : ℕ) (m : ℕ → ℕ) :
+    (evalRingHom 0).mapMatrix (kernel a u m)=
+      integralRationals.subtype.mapMatrix (integralOrigin a u m) := by
+  apply Matrix.ext
+  intro x y
+  simp only [RingHom.mapMatrix_apply,Matrix.map_apply,coe_evalRingHom,Subring.subtype_apply,
+    integralOrigin_coe]
+  rw [kernel]
+  exact OrientationNonscalarOrigin.kernel_origin a u m (origin a u m) x y
+
+theorem normalizedKernel_origin (a u : ℕ) (ha : u<a) (m : ℕ → ℕ) :
+    (evalRingHom 0).mapMatrix (normalizedKernel a u m)=1 := by
+  rw [normalizedKernel,map_mul,kernel_evaluation_zero,constantInverse_evaluation,
+    ← map_mul,(integral_two_sided_inverse a u ha m).1,map_one]
+
+theorem kernel_nonzero_evaluation (a u : ℕ) (m : ℕ → ℕ) (t : ℚ)
+    (ht : t∈grid a) (ht0 : t≠0) :
+    (evalRingHom t).mapMatrix (kernel a u m)=oldEvaluation a u m t := by
+  apply Matrix.ext
+  intro x y
+  simp only [RingHom.mapMatrix_apply,Matrix.map_apply,coe_evalRingHom,oldEvaluation]
+  rw [kernel]
+  exact OrientationNonscalarOrigin.kernel_nonzero_node a u m (origin a u m) x y t ht ht0
+
+theorem normalizedKernel_nonzero_node (a u : ℕ) (m : ℕ → ℕ) (t : ℚ)
+    (ht : t∈grid a) (ht0 : t≠0) :
+    (evalRingHom t).mapMatrix (normalizedKernel a u m)=
+      oldEvaluation a u m t*integralRationals.subtype.mapMatrix (integralInverse a u m) := by
+  rw [normalizedKernel,map_mul,kernel_nonzero_evaluation a u m t ht ht0,constantInverse_evaluation]
+
+theorem normalizedKernel_entry (a u : ℕ) (m : ℕ → ℕ) (x y : Ports a) :
+    normalizedKernel a u m x y=
+      ∑ z : Ports a,kernel a u m x z*C (integralInverse a u m z y).val := by
+  simp only [normalizedKernel,Matrix.mul_apply,constantInverse_entry]
+
+end OrientationDenseOrigin
+#print axioms OrientationDenseOrigin.constantInverse_entry
+#print axioms OrientationDenseOrigin.constantInverse_evaluation
+#print axioms OrientationDenseOrigin.kernel_evaluation_zero
+#print axioms OrientationDenseOrigin.normalizedKernel_origin
+#print axioms OrientationDenseOrigin.kernel_nonzero_evaluation
+#print axioms OrientationDenseOrigin.normalizedKernel_nonzero_node
+#print axioms OrientationDenseOrigin.normalizedKernel_entry

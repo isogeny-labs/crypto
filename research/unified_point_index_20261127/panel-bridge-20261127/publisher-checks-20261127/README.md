@@ -1,0 +1,5 @@
+# Offline publisher contract receipt
+
+`test.txt` is the complete stdout/stderr of `test-publish-pair.sh` against mock AWS and Docker commands. The test accepts one exact self-consistent bundle, then rejects a changed candidate binary, mismatched driver revision, extra checksum-list entry and a self-consistently rehashed but disallowed options policy. It checks that none of the invalid cases reached AWS/Docker and that no supplied binary executed. `syntax.txt` records the Bash parse check. This is a local contract test, not an ECR publication, EKS admission or scientific result. [pcc:unverified]
+
+`conductor-check.txt` and `.exit` retain the attempted coordination check. This executor has no Conductor CLI or shared endpoint. The repo's `docs/CONDUCTOR.md` describes its hooks as warning and allowing edits in that state; this work remained in the dedicated draft PR. A later editor should perform a real task reservation before further code changes when Conductor is available. [pcc:unverified]
