@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # m = 3 companion to sweep_t_engines.sh: per-call cost of resgcd, grid and F4 (chain) against t.
-# usage: [TS="3 4 ..."] [HALF=1] sweep_t_engines_m3.sh BIN OUT.jsonl   (HALF=1 adds engine=resgcd,gcd=half)
+# usage: [TS="3 4 ..."] [HALF=1] [NOF4=1] sweep_t_engines_m3.sh BIN OUT.jsonl   (HALF=1 adds engine=resgcd,gcd=half)
 set -u
 BIN=$1; OUT=$2; SEED=20261400
 run() { # label t fb oracle max_trials; skipped when (label, t) is already in OUT (resume)
@@ -34,5 +34,5 @@ for t in ${TS:-3 4 5 6 7 8}; do
   run m3-resgcd      $t "$C" "pkm-semaev:m=3,engine=resgcd" $nt
   [ -n "${HALF:-}" ] && run m3-resgcd-half $t "$C" "pkm-semaev:m=3,engine=resgcd,gcd=half" $nt
   run m3-grid        $t "$C" "pkm-semaev:m=3,engine=exhaustive" $nt
-  [ $t -le 5 ] && run m3-f4-chain $t "$C" "pkm-semaev:m=3,engine=f4,degree=8,mode=chain" $([ $t -le 4 ] && echo 50 || echo 5)
+  [ -z "${NOF4:-}" ] && [ $t -le 5 ] && run m3-f4-chain $t "$C" "pkm-semaev:m=3,engine=f4,degree=8,mode=chain" $([ $t -le 4 ] && echo 50 || echo 5)
 done

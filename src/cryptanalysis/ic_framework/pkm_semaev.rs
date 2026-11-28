@@ -2430,8 +2430,13 @@ fn ug_gcd_monic(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
 
 /// Below this many coefficients division is classical.
 const UG_FAST_DIV_MIN: usize = 64;
-/// Below this degree the half-GCD runs classical Euclid steps.
-const UG_HGCD_MIN: usize = 48;
+/// Below this degree the half-GCD runs classical Euclid steps. Measured
+/// with the counted multiplications (random monic pairs, p = 65521):
+/// half / classical = 2.1, 1.7, 1.3, 1.02, 0.78 at degree 512, 1024, 2048,
+/// 4096, 8192 with a threshold of 48, and 1.5, 1.3, 1.17, 0.95, 0.75 with
+/// 512, so 512 it is. Over Karatsuba (M(n) ~ n^1.58) the crossover against
+/// classical Euclid is near degree 4096.
+const UG_HGCD_MIN: usize = 512;
 
 type UgMat = [[Vec<u64>; 2]; 2];
 
