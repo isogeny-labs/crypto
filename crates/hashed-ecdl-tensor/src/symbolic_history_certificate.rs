@@ -86,6 +86,14 @@ pub struct VerificationSummary {
     pub lambda: u64,
     /// Root source scale `floor(lambda/2^17)`.
     pub root_u: u64,
+    /// Root packet exponent in the normalized history witness.
+    pub root_a: u64,
+    /// Multiplier in the normalized root identity `M_norm=u*2^a`.
+    pub normalized_root_edge_factor: u64,
+    /// Normalized root packet count `K_norm=3u`.
+    pub normalized_root_packets: u64,
+    /// Denominator in the history child bound `M_child<=M/8`.
+    pub strict_edge_shrink_factor: u64,
     /// Number of possible active depths reconstructed from strict shrinkage.
     pub active_depths: usize,
     /// Number of endpoint dimension witnesses checked across all depths.
@@ -472,6 +480,10 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     Ok(VerificationSummary {
         lambda: certificate.lambda,
         root_u,
+        root_a: certificate.depths[0].current_a,
+        normalized_root_edge_factor: root_u,
+        normalized_root_packets: packet_capacity_constant * root_u,
+        strict_edge_shrink_factor,
         active_depths: index,
         normalized_coordinate_witnesses: 2 * index,
         description_overhead_constant,

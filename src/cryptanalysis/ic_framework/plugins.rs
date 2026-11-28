@@ -2560,6 +2560,12 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
         self.m
     }
 
+    fn exact_unit_summands(&self, _params: &Params) -> Option<u32> {
+        // `decompose_mitm`: exactly two (m = 2) or three (m = 3) signed
+        // base points, every coefficient ±1.
+        matches!(self.m, 2 | 3).then_some(self.m)
+    }
+
     fn describe(&self, params: &Params) -> String {
         format!(
             "a table of pair sums probed once per target (m = 2) or once per R − P (m = 3), {}",
@@ -2683,6 +2689,12 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
 
     fn summands(&self) -> u32 {
         self.k
+    }
+
+    fn exact_unit_summands(&self, params: &Params) -> Option<u32> {
+        // Every key is a signed k-sum; `prefix=1` also keys shorter sums,
+        // whose parity differs, so it makes no promise.
+        (!params.flag("prefix")).then_some(self.k)
     }
 
     fn describe(&self, _params: &Params) -> String {
@@ -4807,6 +4819,17 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
 
     fn summands(&self) -> u32 {
         self.m
+    }
+
+    fn exact_unit_summands(&self, params: &Params) -> Option<u32> {
+        // `decompose_mitm_frobenius`: two or three signed Frobenius images
+        // of base points (the trace class is Frobenius-invariant).  Large-
+        // prime partials combine in pairs into even-length relations, so
+        // they make no promise.
+        match LargePrimeConfig::from_params(params) {
+            Ok(None) if matches!(self.m, 2 | 3) => Some(self.m),
+            _ => None,
+        }
     }
 
     fn describe(&self, params: &Params) -> String {

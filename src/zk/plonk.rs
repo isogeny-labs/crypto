@@ -149,14 +149,24 @@ pub struct Witness {
 
 impl Circuit {
     pub fn is_well_formed(&self) -> bool {
-        self.n.is_power_of_two()
-            && self.q_l.len() == self.n
-            && self.q_r.len() == self.n
-            && self.q_o.len() == self.n
-            && self.q_m.len() == self.n
-            && self.q_c.len() == self.n
-            && self.permutation.len() == 3 * self.n
-            && self.permutation.iter().all(|&i| i < 3 * self.n)
+        if !self.n.is_power_of_two()
+            || self.q_l.len() != self.n
+            || self.q_r.len() != self.n
+            || self.q_o.len() != self.n
+            || self.q_m.len() != self.n
+            || self.q_c.len() != self.n
+            || self.permutation.len() != 3 * self.n
+        {
+            return false;
+        }
+        let mut seen = vec![false; 3 * self.n];
+        for &i in &self.permutation {
+            if i >= 3 * self.n || seen[i] {
+                return false;
+            }
+            seen[i] = true;
+        }
+        true
     }
 
     /// **Direct check** of the circuit constraints against a witness.
@@ -278,8 +288,9 @@ impl Transcript {
         self.state.extend_from_slice(bytes);
     }
     fn append_scalar(&mut self, label: &str, s: &BigUint) {
+        let reduced = s % scalar_modulus();
+        let bytes = reduced.to_bytes_be();
         let mut buf = [0u8; 32];
-        let bytes = s.to_bytes_be();
         buf[32 - bytes.len()..].copy_from_slice(&bytes);
         self.append(label, &buf);
     }
@@ -1386,5 +1397,16 @@ mod tests {
         let (circuit, witness) = toy_circuit();
         let proof = prove(&circuit, &witness);
         assert!(verify(&circuit, &proof));
+    }
+
+    /// VULN-5a regression: a non-bijective `permutation` vector is not a valid
+    /// copy-constraint permutation and must be rejected as `PlonkReject::Statement`.
+    #[test]
+    fn rejects_non_bijective_wire_permutation() {
+        let (mut circuit, witness) = toy_circuit();
+        let proof = prove(&circuit, &witness);
+        circuit.permutation = vec![0; 3 * circuit.n];
+        assert!(!circuit.is_well_formed());
+        assert_eq!(check(&circuit, &[], &proof), Err(PlonkReject::Statement));
     }
 }
