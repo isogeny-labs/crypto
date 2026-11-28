@@ -60,7 +60,7 @@ pub trait FactorField {
         a == self.zero()
     }
     /// The element whose bit pattern is `v` (the factor-base encoding).
-    fn from_u64(&self, v: u64) -> Self::E;
+    fn elem(&self, v: u64) -> Self::E;
     /// `z^i`.
     fn mono(&self, i: u32) -> Self::E;
     /// Byte `j` of the bit pattern.
@@ -102,7 +102,7 @@ impl FactorField for Gf2_128 {
     fn batch_inv(&self, xs: &mut [u128], scratch: &mut Vec<u128>) {
         Gf2_128::batch_inv(self, xs, scratch)
     }
-    fn from_u64(&self, v: u64) -> u128 {
+    fn elem(&self, v: u64) -> u128 {
         v as u128
     }
     fn mono(&self, i: u32) -> u128 {
@@ -150,7 +150,7 @@ impl FactorField for Gf2W {
     fn batch_inv(&self, xs: &mut [W3], scratch: &mut Vec<W3>) {
         Gf2W::batch_inv(self, xs, scratch)
     }
-    fn from_u64(&self, v: u64) -> W3 {
+    fn elem(&self, v: u64) -> W3 {
         gw::from_u64(v)
     }
     fn mono(&self, i: u32) -> W3 {
@@ -412,7 +412,7 @@ impl<E: Copy + PartialEq + Eq + Ord + std::fmt::Debug> FactoredWide<E> {
     ) {
         let q = Self::quartic(f, x1, x2, xr);
         for v in 0..(1u64 << self.l) {
-            let x = f.from_u64(v);
+            let x = f.elem(v);
             let mut acc = q[4];
             for k in (0..4).rev() {
                 acc = f.add(f.mul(acc, x), q[k]);
@@ -593,7 +593,7 @@ mod tests {
     {
         let q = FactoredWide::<F::E>::quartic(f, x1, x2, xr);
         let mut r: Vec<F::E> = (0..(1u64 << l))
-            .map(|v| f.from_u64(v))
+            .map(|v| f.elem(v))
             .filter(|&x| {
                 let mut acc = q[4];
                 for k in (0..4).rev() {
@@ -634,10 +634,10 @@ mod tests {
         let mut planted_hits = 0;
         let mut cases = [0usize; 3];
         for t in 0..trials {
-            let x1 = f.from_u64(rng.gen_range(0..span));
-            let x2 = f.from_u64(rng.gen_range(0..span));
+            let x1 = f.elem(rng.gen_range(0..span));
+            let x2 = f.elem(rng.gen_range(0..span));
             let xr = if t % 2 == 0 {
-                let x3 = f.from_u64(rng.gen_range(0..span));
+                let x3 = f.elem(rng.gen_range(0..span));
                 match plant(f, &fw, x1, x2, x3) {
                     Some(xr) => {
                         let q = FactoredWide::<F::E>::quartic(f, x1, x2, xr);
@@ -652,7 +652,7 @@ mod tests {
                         planted_hits += 1;
                         xr
                     }
-                    None => f.from_u64(rng.gen()),
+                    None => f.elem(rng.gen()),
                 }
             } else {
                 // a random element of the field
@@ -692,7 +692,7 @@ mod tests {
         let fw = FactoredWide::new(f, l);
         let mut rng = StdRng::seed_from_u64(seed);
         let span = 1u64 << l;
-        let v: Vec<F::E> = (0..span).map(|i| f.from_u64(i)).collect();
+        let v: Vec<F::E> = (0..span).map(|i| f.elem(i)).collect();
         let mut sc = RowScratch::default();
         for _ in 0..targets {
             let (a, b, c) = (
@@ -701,7 +701,7 @@ mod tests {
                 rng.gen_range(0..span),
             );
             let xr = plant(f, &fw, v[a as usize], v[b as usize], v[c as usize])
-                .unwrap_or_else(|| f.from_u64(rng.gen()));
+                .unwrap_or_else(|| f.elem(rng.gen()));
             let inv_xr = f.inv(xr);
             for x1 in 0..span {
                 let x1e = v[x1 as usize];

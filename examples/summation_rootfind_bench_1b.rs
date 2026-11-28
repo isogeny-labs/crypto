@@ -405,7 +405,7 @@ fn extras<R: Raw>(gf: &R) -> Extras<R::E> {
         as_rows: rows,
         as_tab: None,
     };
-    if n % 2 == 0 {
+    if n.is_multiple_of(2) {
         // a fixed trace-1 basis element t1; images M(eᵢ) solve eᵢ (+ t1)
         let t1 = (0..n)
             .map(R::E::mono)
