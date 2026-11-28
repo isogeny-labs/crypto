@@ -1,0 +1,10 @@
+2026-11-27T19:05:56Z
+60f6f5afedcc1c0b1bf470b9fdfee70f2cd9c0e6
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+seed_manifest=null
+targets=G,[17]G; cross_target_amortization=0
+cargo build --release --locked --bins
+pair-transfer-candidate > evidence-v3/candidate.txt
+pair-transfer-verify evidence-v3/candidate.txt > evidence-v3/verifier.txt
+pair-transfer-analyze evidence-v3/candidate.txt evidence-v3/verifier.txt > evidence-v3/analysis.txt

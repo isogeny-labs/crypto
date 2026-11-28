@@ -1,10 +1,10 @@
-//! Narrow adapter for the mirror's existing optional phase/group recorder.
-//! Crypto retains its original Meter diagnostics and does not start clocks.
+//! Narrow adapter for the optional native phase recorder.
+//! An inactive recorder preserves the original solver behavior and counters.
 
 use crate::Result;
 
-pub(crate) fn phase(_name: &'static str) -> Result<()> {
-    Ok(())
+pub(crate) fn phase(name: &'static str) -> Result<()> {
+    crate::metrics::phase(name)
 }
 
 pub(crate) fn batch_group(_doubling: bool) -> Result<()> {
