@@ -381,6 +381,7 @@ pub mod pkm_criterion;
 pub mod pkm_smooth_tower;
 pub mod plane_curve_geometry;
 pub mod plane_curve_sparse;
+pub mod cado_bwc_io;
 pub mod plane_quartic_pic;
 pub mod plane_quartic_pic64;
 pub mod pohlig_hellman;
