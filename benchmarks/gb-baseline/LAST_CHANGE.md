@@ -4,21 +4,21 @@ Counts: 6 **cost unit changed**, 5 **still error**, 5 **unchanged**
 
 | curve | m | status | counted cost new/base | wall new/base | verdict |
 |:--|--:|:--|--:|--:|:--|
-| M31 | 2 | ok | 1.000 | 1.45 | unchanged |
-| M31 | 3 | ok | 1.000 | 1.61 | unchanged |
-| M31 | 4 | ok | 1.000 | 1.66 | unchanged |
+| M31 | 2 | ok | 1.000 | 1.16 | unchanged |
+| M31 | 3 | ok | 1.000 | 1.31 | unchanged |
+| M31 | 4 | ok | 1.000 | 1.36 | unchanged |
 | M31 | 5 | error | — | — | still error |
 | M31 | 6 | error | — | — | still error |
 | M31 | 7 | error | — | — | still error |
 | M31 | 8 | error | — | — | still error |
 | M31 | 9 | error | — | — | still error |
-| N31 | 2 | ok | 1.000 | 1.33 | unchanged |
-| N31 | 3 | ok | 1.000 | 1.59 | unchanged |
-| N31 | 4 | ok | — | 2.75 | cost unit changed |
-| N31 | 5 | ok | — | 1.29 | cost unit changed |
-| N31 | 6 | ok | — | 1.41 | cost unit changed |
-| N31 | 7 | ok | — | 1.31 | cost unit changed |
-| N31 | 8 | ok | — | 0.92 | cost unit changed |
-| N31 | 9 | ok | — | 1.00 | cost unit changed |
+| N31 | 2 | ok | 1.000 | 1.18 | unchanged |
+| N31 | 3 | ok | 1.000 | 1.37 | unchanged |
+| N31 | 4 | ok | — | 1.14 | cost unit changed |
+| N31 | 5 | ok | — | 1.02 | cost unit changed |
+| N31 | 6 | ok | — | 1.33 | cost unit changed |
+| N31 | 7 | ok | — | 1.01 | cost unit changed |
+| N31 | 8 | ok | — | 0.77 | cost unit changed |
+| N31 | 9 | ok | — | 0.82 | cost unit changed |
 
 _Counted cost is the harness's own unit and decides faster/slower (tolerance 1%); wall time is descriptive (shared runner). Stage diagnostics only, `[pcc:unverified]`._
