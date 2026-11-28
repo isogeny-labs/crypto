@@ -14,6 +14,10 @@ from pathlib import Path
 
 SOURCE_COMMIT = "a1c7d2699bd01690416274300da4b1ace3fa92e6"
 MANIFEST_SHA = "99140281d9a94c288b8993b503cf91e4226879052e25c63dfdad0fccd20c8bc8"
+PRIOR_IC_SHA = "de461514bcb5f6538781ee25785f11ac33940711a93c0b6cb6a5dfbe0a587002"
+PRIOR_FP_SOURCE_SHA = "1ef13cb97dc15782e9a8a2fca81659152535ee6aa806b15a6b4b89aa546dd7d6"
+PRIOR_FP_BINARY_SHA = "e70c562189a390b4d2a97a92d6d54484c3c99a340e49274efa5ce221878a3523"
+PRIOR_FP_BUILD_SHA = "986197cbf10c3f903cd8ae4f8e0b41be024fc923b1cc8c7c0cf9295e3e5a2b23"
 PATHS = ("curve_word_mul", "residual_pow_mul")
 REPS, ITERS = 7, 200_000
 PROTOCOL = "PROTOCOL_Z2XZ8_SELECTED_PRIMITIVE_PRICE_20261128.md"
@@ -51,6 +55,45 @@ def complete(path, schema, labels):
                for series in ("forward", "reverse") for label in labels)
 
 
+def selected_price(path, store, labels, primes):
+    if not path.is_file() or not store.is_file():
+        return False
+    try:
+        selected = load(path)
+    except (OSError, ValueError):
+        return False
+    if (not isinstance(selected, dict)
+            or selected.get("schema") != "pkm-z2xz8-heldout-fp-price-selection/v1"
+            or selected.get("store_sha256") != sha(store.read_bytes())
+            or selected.get("manifest_sha256") != MANIFEST_SHA
+            or selected.get("ic_binary_sha256") != PRIOR_IC_SHA
+            or selected.get("calibration_source_sha256") != PRIOR_FP_SOURCE_SHA
+            or selected.get("calibration_binary_sha256") != PRIOR_FP_BINARY_SHA
+            or selected.get("calibration_build_sha256") != PRIOR_FP_BUILD_SHA
+            or selected.get("host") != platform.node()
+            or not isinstance(selected.get("selected"), dict)
+            or set(selected.get("selected", {})) != set(labels)):
+        return False
+    for label in labels:
+        item = selected["selected"][label]
+        if not isinstance(item, dict):
+            return False
+        f, r = item.get("forward_ns_per_mul"), item.get("reverse_ns_per_mul")
+        if (item.get("p") != primes[label]
+                or any(type(x) not in (int, float) or not math.isfinite(x) or x <= 0
+                       for x in (f, r))
+                or max(f, r) / min(f, r) - 1 > 0.10
+                or item.get("ns_per_mul") != (f + r) / 2
+                or item.get("relative_spread") != max(f, r) / min(f, r) - 1
+                or not isinstance(item.get("receipt_ids"), list)
+                or len(item["receipt_ids"]) != 2
+                or any(not isinstance(key, str) for key in item["receipt_ids"])
+                or not item["receipt_ids"][0].startswith(f"result:forward:{label}:a")
+                or not item["receipt_ids"][1].startswith(f"result:reverse:{label}:a")):
+            return False
+    return True
+
+
 def verify_probe(out, path, p):
     if (not isinstance(out, dict) or out.get("schema") != "pkm-selected-primitive/v1"
             or out.get("path") != path or out.get("p") != p
@@ -78,6 +121,8 @@ def main():
                     default=Path("/Volumes/SSD990-2/pkm-fp-price-20261128/receipts.jsonl"))
     ap.add_argument("--heldout-store", type=Path,
                     default=Path("/Volumes/SSD990-2/pkm-z2xz8-heldout-fp-price-20261128/receipts.jsonl"))
+    ap.add_argument("--heldout-selection", type=Path,
+                    default=Path("/Volumes/SSD990-2/pkm-z2xz8-heldout-fp-price-20261128/selection.json"))
     ap.add_argument("--series", choices=("forward", "reverse"), required=True)
     ap.add_argument("--max-new", type=int, default=0)
     ap.add_argument("--dry-run", action="store_true")
@@ -124,13 +169,16 @@ def main():
     dev_labels = [f"t{t}_c{c}" for t in (4, 5) for c in range(3)]
     labels = [f"b{b}_c{c}" for b, c, _ in expected]
     dev_done = complete(args.development_store, "pkm-explicit-fp-price/v1", dev_labels)
-    heldout_done = complete(args.heldout_store, "pkm-z2xz8-heldout-fp-price/v1", labels)
+    heldout_done = (complete(args.heldout_store, "pkm-z2xz8-heldout-fp-price/v1", labels)
+                    and selected_price(args.heldout_selection, args.heldout_store, labels,
+                                       dict(zip(labels, (p for _, _, p in expected)))))
     cases = [(path, f"b{e['bits']}_c{e['curve_index']}", e["p"])
              for path in PATHS for e in entries]
     header = {"id": "header", "schema": "pkm-z2xz8-selected-primitive-price/v1",
               "source_commit": SOURCE_COMMIT, "manifest_sha256": MANIFEST_SHA,
               "development_store_sha256": sha(args.development_store.read_bytes()) if dev_done else None,
               "heldout_store_sha256": sha(args.heldout_store.read_bytes()) if heldout_done else None,
+              "heldout_selection_sha256": sha(args.heldout_selection.read_bytes()) if heldout_done else None,
               "source_sha256": sha((here / SOURCE).read_bytes()),
               "binary_sha256": sha(binary.read_bytes()), "build_sha256": sha(build_path.read_bytes()),
               "protocol_sha256": sha((here / PROTOCOL).read_bytes()),

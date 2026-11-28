@@ -11,6 +11,10 @@ from pathlib import Path
 
 COMMIT = "a1c7d2699bd01690416274300da4b1ace3fa92e6"
 MANIFEST_SHA = "99140281d9a94c288b8993b503cf91e4226879052e25c63dfdad0fccd20c8bc8"
+PRIOR_IC_SHA = "de461514bcb5f6538781ee25785f11ac33940711a93c0b6cb6a5dfbe0a587002"
+PRIOR_FP_SOURCE_SHA = "1ef13cb97dc15782e9a8a2fca81659152535ee6aa806b15a6b4b89aa546dd7d6"
+PRIOR_FP_BINARY_SHA = "e70c562189a390b4d2a97a92d6d54484c3c99a340e49274efa5ce221878a3523"
+PRIOR_FP_BUILD_SHA = "986197cbf10c3f903cd8ae4f8e0b41be024fc923b1cc8c7c0cf9295e3e5a2b23"
 PRIMES = (("b11_c0", 2081), ("b11_c1", 2113), ("b11_c2", 2273),
           ("b14_c0", 16417), ("b14_c1", 16481), ("b14_c2", 16673))
 PATHS = ("curve_word_mul", "residual_pow_mul")
@@ -89,6 +93,38 @@ def prior_complete(path, schema, labels, host):
     return True
 
 
+def prior_selection(path, store, host):
+    data = json_file(path)
+    if (data.get("schema") != "pkm-z2xz8-heldout-fp-price-selection/v1"
+            or data.get("manifest_sha256") != MANIFEST_SHA
+            or data.get("ic_binary_sha256") != PRIOR_IC_SHA
+            or data.get("calibration_source_sha256") != PRIOR_FP_SOURCE_SHA
+            or data.get("calibration_binary_sha256") != PRIOR_FP_BINARY_SHA
+            or data.get("calibration_build_sha256") != PRIOR_FP_BUILD_SHA
+            or data.get("store_sha256") != sha(store.read_bytes())
+            or data.get("host") != host
+            or not isinstance(data.get("selected"), dict)
+            or set(data.get("selected", {})) != {label for label, _ in PRIMES}):
+        raise ValueError("held-out selected-price identity differs")
+    for label, p in PRIMES:
+        item = data["selected"][label]
+        if not isinstance(item, dict):
+            raise ValueError(f"held-out selected-price row malformed: {label}")
+        f, r = item.get("forward_ns_per_mul"), item.get("reverse_ns_per_mul")
+        if (item.get("p") != p
+                or any(type(x) not in (int, float) or not math.isfinite(x) or x <= 0
+                       for x in (f, r))
+                or max(f, r) / min(f, r) - 1 > 0.10
+                or item.get("ns_per_mul") != (f + r) / 2
+                or item.get("relative_spread") != max(f, r) / min(f, r) - 1
+                or not isinstance(item.get("receipt_ids"), list)
+                or len(item["receipt_ids"]) != 2
+                or any(not isinstance(key, str) for key in item["receipt_ids"])
+                or not item["receipt_ids"][0].startswith(f"result:forward:{label}:a")
+                or not item["receipt_ids"][1].startswith(f"result:reverse:{label}:a")):
+            raise ValueError(f"held-out price did not qualify: {label}")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     for name in ("manifest", "checkout", "bin", "build-receipt", "store", "output"):
@@ -97,6 +133,8 @@ def main():
                     default=Path("/Volumes/SSD990-2/pkm-fp-price-20261128/receipts.jsonl"))
     ap.add_argument("--heldout-store", type=Path,
                     default=Path("/Volumes/SSD990-2/pkm-z2xz8-heldout-fp-price-20261128/receipts.jsonl"))
+    ap.add_argument("--heldout-selection", type=Path,
+                    default=Path("/Volumes/SSD990-2/pkm-z2xz8-heldout-fp-price-20261128/selection.json"))
     args = ap.parse_args()
     here = Path(__file__).resolve().parent
     manifest, binary, build_path, store = (args.manifest.resolve(strict=True),
@@ -141,6 +179,7 @@ def main():
     if not prior_complete(args.heldout_store, "pkm-z2xz8-heldout-fp-price/v1",
                           [label for label, _ in PRIMES], header.get("host")):
         raise ValueError("heldout price series incomplete")
+    prior_selection(args.heldout_selection, args.heldout_store, header.get("host"))
     if (header.get("schema") != "pkm-z2xz8-selected-primitive-price/v1"
             or header.get("source_commit") != COMMIT
             or header.get("manifest_sha256") != MANIFEST_SHA
@@ -152,6 +191,7 @@ def main():
             or header.get("helper_sha256") != sha(helper.read_bytes())
             or header.get("development_store_sha256") != sha(args.development_store.read_bytes())
             or header.get("heldout_store_sha256") != sha(args.heldout_store.read_bytes())
+            or header.get("heldout_selection_sha256") != sha(args.heldout_selection.read_bytes())
             or header.get("host") != build.get("host")
             or header.get("architecture") != build.get("architecture")
             or header.get("reps") != REPS or header.get("iters") != ITERS
