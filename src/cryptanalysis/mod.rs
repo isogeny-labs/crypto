@@ -379,6 +379,7 @@ pub mod pdp_split;
 pub mod petit_quisquater;
 pub mod pkm_criterion;
 pub mod pkm_smooth_tower;
+pub mod plane_curve_geometry;
 pub mod plane_quartic_pic;
 pub mod plane_quartic_pic64;
 pub mod pohlig_hellman;
