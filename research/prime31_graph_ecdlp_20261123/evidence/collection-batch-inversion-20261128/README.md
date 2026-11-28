@@ -1,4 +1,4 @@
-# Batch inversion, Mersenne reduction and a fast hash in M31 relation collection (2026-11-28)
+# Batch inversion, Mersenne reduction and a fast hash in the M31 graph-control solve (2026-11-28)
 
 [pcc:unverified]
 
@@ -16,6 +16,11 @@ the public pair table is hashed. Its levers, set by the second argument:
    subtraction instead of `% p`.
 3. **a multiply-rotate hasher** (FxHash constant) for the pair table, whose
    keys are public curve points.
+4. **batch inversion for the pair-table build.** The four sign combinations
+   `±P_i ± P_j` of a pair share the slope denominator `x_j - x_i`. That gives
+   one prefix-product slot per pair and one inversion for the whole table.
+   The sums come out in the baseline's loop order, so `pairs` and the index
+   are laid out identically; a pair with equal x would use `Arithmetic::add`.
 
 Charged work counts what the path does: one group addition per probe, one
 inversion per batch, and every multiplication.
@@ -34,8 +39,8 @@ on a shared 4-vCPU x86_64 container.
 
 ## Exactness
 
-The baseline and all eight lever combinations (0, 1, 2, 3, 12, 13, 23, 123)
-were run to the solver's natural stop (40-query cap). Each gives the same
+The baseline and sixteen lever combinations (0, 1, 2, 3, 12, 13, 23, 123,
+4, 14, 24, 34, 124, 134, 234, 1234) were run to the solver's natural stop (40-query cap). Each gives the same
 707 relation rows, per-query classes and ranks, probe count, and recovered
 scalar `987654321` after 11 queries. The normalised outputs have one
 SHA-256 (`EXACTNESS.txt`).
@@ -49,33 +54,45 @@ SHA-256 (`EXACTNESS.txt`).
 | 1 | 1,780 ms | 1,181 ms | 529 ms | 0.582 G | 636 |
 | 1+2 | 1,638 ms | 1,026 ms | 539 ms | 0.500 G | 545 |
 | 1+3 | 1,389 ms | 808 ms | 537 ms | 0.335 G | 366 |
-| **1+2+3** | **1,283 ms** | **687 ms** | 527 ms | **0.253 G** | **276** |
+| 1+2+3 | 1,283 ms | 687 ms | 527 ms | 0.253 G | 276 |
+
+**With the table batched** (`timing-runs-table.json`: a second set of 7
+interleaved rounds with the 4-lever build; the fixed part is instructions
+for fixture, table and setup, `Ir[q=1]` minus per query):
+
+| arm | cold wall, median of 7 | collection | pair table | fixed part | per query |
+|---|---:|---:|---:|---:|---:|
+| baseline | 5,123 ms | 4,510 ms | 538 ms | 2.326 G | 1.898 G |
+| 1+2+3 | 1,272 ms | 693 ms | 499 ms | 2.067 G | 0.253 G |
+| 1+3+4 | 1,126 ms | 829 ms | 237 ms | — | — |
+| **1+2+3+4** | **948 ms** | **683 ms** | **206 ms** | **0.620 G** | **0.253 G** |
 
 The table comes from `timing-runs.json` and `CALLGRIND.txt`. There were 7
 rounds, with the arms interleaved within each round and every run a
 separate cold process.
 
 **Charged work over the whole solve:**
-- Field inversions fall from 10,986,799 to 918,466. What remains is the pair-table build and the scalar multiplications, which still use the baseline addition.
-- Field multiplications fall from 703.2 M to 119.2 M.
+- Field inversions fall from 10,986,799 to 918,466 with levers 1+2+3, and to 3,163 with all four. What remains is the scalar multiplications and replay, which use the baseline addition.
+- Field multiplications fall from 703.2 M to 119.2 M with levers 1+2+3, and to 64.0 M with all four.
 - Group additions are unchanged at 10,987,529.
 
-**Overall:** about 4.0x on the cold solve, 6.6x on collection and 7.5x fewer
-instructions per query. Lever 2 does nothing by itself, because it applies
+**Overall, with all four levers:** about 5.4x on the cold solve, 6.6x on
+collection, 7.5x fewer instructions per query, and 3.8x fewer in the fixed part. Lever 2 does nothing by itself, because it applies
 only inside the batched path. Lever 3 helps more once batching has removed
 the inversions.
 
 ## What dominates now, and context
 
-- **The pair table.** Its build (915,304 additions, each still with a Fermat
-  inversion) is 527 ms, 41 % of the new cold wall. The same batching applies
-  to it; that is the next lever, not done here.
+- **Collection again.** With the table batched (206 ms, now mostly hashing
+  and inserting), collection is 72 % of the 948 ms solve. Its 276
+  instructions per probe include about 6 field multiplications. How the
+  rest splits between lookup and loop was not profiled for this arm.
 - **Matched-target rho.** `prime31-graph-rho-control` is an independent
   unfolded Brent rho on the same target with the baseline arithmetic. It
   recovers `987654321` in 98,366 steps and 43–45 ms (`rho-control-runs.json`;
   one seed, one target, so the step count is highly variable).
-- **Not a route past rho.** Even with all three levers the graph-control
-  solve is about 29x rho's time. These levers speed up this solver; they do
+- **Not a route past rho.** Even with all four levers the graph-control
+  solve (948 ms) is about 21x rho's time. These levers speed up this solver; they do
   not change the conclusion that this graph-control collection sits far
   above rho.
 - **Single target.** These are timing repeats of one fixed target and seed,

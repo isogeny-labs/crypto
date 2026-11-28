@@ -4,7 +4,7 @@
 //! fixture, pair table, queries, graph rank and stopping rule, and differs
 //! only in how each query's probe complements `r - left.sum` are computed
 //! and how the public pair table is hashed. Three switchable levers, given
-//! as the second argument (digits, default `123`; `0` = none):
+//! as the second argument (digits, default `1234`; `0` = none):
 //!
 //! 1. batch inversion (Montgomery's trick): one field inversion per query
 //!    instead of one per probe; every probe's point is the same value the
@@ -12,7 +12,10 @@
 //! 2. Mersenne reduction for p = 2^31 - 1 in that path (fold twice instead
 //!    of a generic `u128 %`), and branch subtraction instead of `% p`;
 //! 3. a non-cryptographic multiply-rotate hasher for the pair table (the
-//!    keys are public curve points; nothing adversarial is hashed).
+//!    keys are public curve points; nothing adversarial is hashed);
+//! 4. batch inversion for the pair-table build: the four sign combinations
+//!    of a pair share the denominator `x_j - x_i`, so one prefix slot per
+//!    pair and one inversion for the whole table; same sums, same order.
 //!
 //! Charged work counts what this path actually does: one group addition
 //! per probe, one inversion per batch, and every field multiplication.
@@ -165,18 +168,20 @@ struct Levers {
     batch: bool,
     mersenne: bool,
     fast_hash: bool,
+    batch_table: bool,
 }
 
 impl Levers {
     fn parse(text: &str) -> Self {
         assert!(
-            text.chars().all(|c| "0123".contains(c)),
-            "levers are digits 0-3"
+            text.chars().all(|c| "01234".contains(c)),
+            "levers are digits 0-4"
         );
         Self {
             batch: text.contains('1'),
             mersenne: text.contains('2'),
             fast_hash: text.contains('3'),
+            batch_table: text.contains('4'),
         }
     }
     fn label(&self) -> String {
@@ -185,6 +190,7 @@ impl Levers {
             (self.batch, '1'),
             (self.mersenne, '2'),
             (self.fast_hash, '3'),
+            (self.batch_table, '4'),
         ] {
             if on {
                 out.push(d);
@@ -381,12 +387,80 @@ fn batch_complements(pairs: &[Pair], r: Point, mersenne: bool, counts: &mut Coun
     out
 }
 
+/// Every `Arithmetic::add(signed[i][si], signed[j][sj])` of the table, in the
+/// baseline's loop order (i < j, then si, then sj), with one inversion. For
+/// `x_i != x_j` the four sign combinations share the slope denominator
+/// `x_j - x_i`; a pair with `x_i == x_j` uses `Arithmetic::add` itself.
+fn batch_table_sums(signed: &[[Point; 2]], mersenne: bool, ar: &mut Arithmetic) -> Vec<Point> {
+    let n = signed.len();
+    let pairs = n * (n - 1) / 2;
+    let mut den = Vec::with_capacity(pairs);
+    let mut prefix = Vec::with_capacity(pairs);
+    let mut acc = 1u64;
+    let mut mults = 0u64;
+    for i in 0..n {
+        for j in i + 1..n {
+            let d = match (signed[i][0], signed[j][0]) {
+                (Some((x, _)), Some((z, _))) if x != z => fsub(z, x, mersenne),
+                _ => 0,
+            };
+            if d != 0 {
+                acc = fmul(acc, d, mersenne);
+                mults += 1;
+            }
+            den.push(d);
+            prefix.push(acc);
+        }
+    }
+    let mut inv = if acc != 1 || den.iter().any(|&d| d != 0) {
+        ar.counts.fp_inversions += 1;
+        finv(acc, mersenne, &mut mults)
+    } else {
+        0
+    };
+    let mut inv_den = vec![0u64; pairs];
+    for k in (0..pairs).rev() {
+        if den[k] == 0 {
+            continue;
+        }
+        let before = if k == 0 { 1 } else { prefix[k - 1] };
+        inv_den[k] = fmul(inv, before, mersenne);
+        inv = fmul(inv, den[k], mersenne);
+        mults += 2;
+    }
+    let mut out = Vec::with_capacity(4 * pairs);
+    let mut k = 0;
+    for i in 0..n {
+        for j in i + 1..n {
+            for si in 0..2 {
+                for sj in 0..2 {
+                    let (u, v) = (signed[i][si], signed[j][sj]);
+                    if den[k] == 0 {
+                        out.push(ar.add(PRIME31, u, v));
+                        continue;
+                    }
+                    let ((x, y), (z, w)) = (u.unwrap(), v.unwrap());
+                    let slope = fmul(fsub(w, y, mersenne), inv_den[k], mersenne);
+                    let xx = fsub(fsub(fmul(slope, slope, mersenne), x, mersenne), z, mersenne);
+                    let yy = fsub(fmul(slope, fsub(x, xx, mersenne), mersenne), y, mersenne);
+                    mults += 3;
+                    ar.counts.group_additions += 1;
+                    out.push(Some((xx, yy)));
+                }
+            }
+            k += 1;
+        }
+    }
+    ar.counts.fp_multiplications += mults;
+    out
+}
+
 fn main() {
     let max_queries = std::env::args()
         .nth(1)
         .and_then(|value| value.parse::<usize>().ok())
         .unwrap_or(40);
-    let levers = Levers::parse(&std::env::args().nth(2).unwrap_or_else(|| "123".into()));
+    let levers = Levers::parse(&std::env::args().nth(2).unwrap_or_else(|| "1234".into()));
     if levers.fast_hash {
         run::<FastBuild>(max_queries, levers)
     } else {
@@ -415,12 +489,20 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers) {
     let mut pairs = Vec::with_capacity(4 * points.len() * (points.len() - 1) / 2);
     let mut index: HashMap<Point, Vec<usize>, S> =
         HashMap::with_capacity_and_hasher(pairs.capacity(), S::default());
+    let table_sums = if levers.batch_table {
+        Some(batch_table_sums(&signed, levers.mersenne, &mut ar))
+    } else {
+        None
+    };
     for i in 0..points.len() {
         for j in i + 1..points.len() {
             for si in 0..2 {
                 for sj in 0..2 {
-                    let sum = ar.add(PRIME31, signed[i][si], signed[j][sj]);
                     let at = pairs.len();
+                    let sum = match &table_sums {
+                        Some(all) => all[at],
+                        None => ar.add(PRIME31, signed[i][si], signed[j][sj]),
+                    };
                     pairs.push(Pair {
                         sum,
                         i: i as u16,

@@ -9,3 +9,10 @@ baseline   4,223,971,218   6,121,537,068   1,897,565,850    2,073
 
 Fixed part (fixture + pair table + setup) = Ir[q=1] - per query:
 baseline 2.326 G, levers 123 2.060 G (lever 3 also speeds table inserts).
+
+With lever 4 (4-lever build):
+arm        Ir q=1          Ir q=2          per query        fixed (q1 - per query)
+123        2,319,574,511   2,572,358,990     252,784,479    2,066,790,032
+1234         872,963,888   1,125,747,778     252,783,890      620,179,998
+(123 differs from the first table by about 7 M at q=1: the query de-duplication
+HashSet keeps std's randomized hashing in every arm.)
