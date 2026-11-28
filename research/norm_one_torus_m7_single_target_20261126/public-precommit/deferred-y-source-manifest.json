@@ -1,0 +1,37 @@
+{
+  "schema": "isogeny-labs/source-custody/v1",
+  "study_id": "norm-one-torus-m7-deferred-y-public-precommit-20261126",
+  "source_commit": "9999ecbf65319e22de8cce712cde0eb05dfbb9e9",
+  "execution_rule": "This source manifest must be committed and pushed before executing the exact-x-first follow-up.",
+  "sha256": {
+    "examples/norm_one_torus_m7.rs": "ef330e4674f26ccf037dd7a5e3a53dd9c2c46e5bdd2f8c1abcd8799e55bba8e4",
+    "examples/norm_one_torus_m7_verify.rs": "e826021a4d2fad520a48688a6014d2fc9ebcd86158f4c0ce433f6d7d9c503430",
+    "examples/support/norm_one_torus_m7.rs": "93f1ab235906d5a7a41dc2274647b4a9cc4ac8e9a4ebd7a48c523265168ce574",
+    "examples/support/norm_one_torus_compare_kernel.rs": "c94d6e0e6ab35ffdd361226ef8cc432492981c257f4724b1d0c4ae1acd5b72b8",
+    "research/norm_one_torus_m7_single_target_20261126/PROTOCOL_DEFERRED_Y.md": "90ad2851b588ee1fd395447226076239b2c39e7aefec9a5005dc8569ae223098",
+    "research/norm_one_torus_m7_single_target_20261126/public-precommit/deferred-y-manifest.json": "91c2c738a993ae348407b929b6feeb0493e523b3e83c35e2a7cf6fc526e4dd9e",
+    "src/cryptanalysis/ic_boundary.rs": "36feaa1a910b71541b9041bfd24219932d98de87639c7d264955def8e3d449f7",
+    "src/cryptanalysis/ic_framework/pkm_semaev.rs": "957dae7826f04d4744fa6fde1eaee1666d2615dca7690ff980d252f98d1bf997",
+    "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+  },
+  "pre_execution_checks": {
+    "cargo_check_release_examples": "pass",
+    "cargo_test_release_examples": "pass: 5 tests",
+    "strict_clippy_release_changed_examples": "pass after allowing only inherited library lint classes duplicate_mod, unnecessary_cast, result_large_err, field_reassign_with_default, and redundant_locals",
+    "deferred_materialization_unit_test": "pass: generic match and miss pay exactly one y multiplication",
+    "exceptional_branch_unit_test": "pass: generic, inverse, doubling, and identity agree with independent production affine group law",
+    "archived_five_arm_backward_replay": "pass",
+    "rustfmt": "pass",
+    "git_diff_check": "pass"
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "target": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.57",
+    "cpu": "Intel Xeon Platinum 8573C",
+    "visible_cpus": 5,
+    "isolation": "none; exact counts are primary and local wall time is only a producer diagnostic"
+  },
+  "proof_boundary": "public seed commitment, public witnesses, source hashes, and independent affine replay; not zero knowledge, a signed attestation, or proof of producer-host execution"
+}

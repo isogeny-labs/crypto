@@ -1,0 +1,49 @@
+{
+  "arity": 7,
+  "controls": [
+    {
+      "curve_a": 0,
+      "curve_b": 3,
+      "depth": 1,
+      "exact_seven_sum_states": 13,
+      "factor_base_abscissae": 2,
+      "factor_base_points": [
+        { "infinity": false, "x": 3, "y": 3 },
+        { "infinity": false, "x": 3, "y": 4 },
+        { "infinity": false, "x": 4, "y": 2 },
+        { "infinity": false, "x": 4, "y": 5 }
+      ],
+      "first_generator_multiple_miss": null,
+      "fixture": "f7-depth1-full-carrier",
+      "group_order": 13,
+      "infinity_reachable": true,
+      "p": 7,
+      "planted_control_witness": [1, 2, 2, 3, 1, 0, 0],
+      "planted_target": { "infinity": false, "x": 4, "y": 2 }
+    },
+    {
+      "curve_a": 0,
+      "curve_b": 12,
+      "depth": 2,
+      "exact_seven_sum_states": 8,
+      "factor_base_abscissae": 1,
+      "factor_base_points": [
+        { "infinity": false, "x": 14, "y": 11 },
+        { "infinity": false, "x": 14, "y": 20 }
+      ],
+      "first_generator_multiple_miss": {
+        "point": { "infinity": false, "x": 2, "y": 12 },
+        "scalar": 1
+      },
+      "fixture": "f31-depth2-sparse-carrier",
+      "group_order": 43,
+      "infinity_reachable": false,
+      "p": 31,
+      "planted_control_witness": [0, 0, 0, 0, 0, 0, 0],
+      "planted_target": { "infinity": false, "x": 9, "y": 20 }
+    }
+  ],
+  "cross_target_amortization": false,
+  "schema": "isogeny-labs/pplus-dickson-m7-independent-controls/v1",
+  "verdict": "public carriers and exact seven-sum controls reconstructed independently"
+}

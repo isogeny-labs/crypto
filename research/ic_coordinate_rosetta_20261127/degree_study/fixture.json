@@ -1,0 +1,115 @@
+{
+  "schema": "ic.coordinate_rosetta.degree_fixture/v1",
+  "fixture_id": "curve25519-shaped-fp1019-a5-r251-v1",
+  "purpose": "Public deterministic toy for exact quotient/isogeny identities and native F4 qualification; this is not production Curve25519.",
+  "field": {
+    "characteristic": 1019,
+    "degree": 1,
+    "representation": "prime",
+    "element_encoding": "decimal integer modulo the characteristic"
+  },
+  "field_sha256": "2bf0c220697af4be98d156034f640cde42e92619b7d3fb49ae8ef7858b06ff35",
+  "source": {
+    "curve": {
+      "curve_id": "EC1P10Cquotienttoyhc0736364223b",
+      "model": "Montgomery",
+      "coefficients": {
+        "A": 5,
+        "B": 1
+      },
+      "subgroup_order": "251",
+      "cofactor": 4,
+      "generator": [
+        328,
+        796
+      ],
+      "target_group": "prime-order subgroup"
+    },
+    "curve_sha256": "c0736364223b72593d85a84671b6818fd2ff13ad19a95884d774321eaefbf10e",
+    "curve_uid": "urn:ec-record:1:sha256:c0736364223b72593d85a84671b6818fd2ff13ad19a95884d774321eaefbf10e",
+    "equation": "v^2 = u^3 + 5*u^2 + u over F_1019",
+    "group_order": 1004
+  },
+  "destination": {
+    "curve": {
+      "curve_id": "EC1P10Cquotientisoghd0b8c6a79324",
+      "model": "long Weierstrass",
+      "coefficients": [
+        0,
+        1009,
+        0,
+        21,
+        0
+      ],
+      "subgroup_order": "251",
+      "cofactor": 4,
+      "generator": [
+        100,
+        504
+      ],
+      "target_group": "prime-order subgroup"
+    },
+    "curve_sha256": "d0b8c6a7932492aed28e352113b14a87d59099971a69ab093476a975769aef3f",
+    "curve_uid": "urn:ec-record:1:sha256:d0b8c6a7932492aed28e352113b14a87d59099971a69ab093476a975769aef3f",
+    "equation": "V^2 = U^3 + 1009*U^2 + 21*U over F_1019",
+    "group_order": 1004
+  },
+  "isogeny": {
+    "degree": 2,
+    "kernel": [
+      "point_at_infinity",
+      [
+        0,
+        0
+      ]
+    ],
+    "map_x": "U = u + 5 + 1/u",
+    "map_y": "V = v*(1 - 1/u^2)",
+    "quotient_coordinate": "w = u + 1/u; U = w + 5",
+    "exceptional_source_points": [
+      "point_at_infinity",
+      [
+        0,
+        0
+      ]
+    ],
+    "subgroup_injectivity_reason": "gcd(2,251)=1, so the kernel has trivial intersection with the retained subgroup; the Rust certificate checks all 251 subgroup scalars"
+  },
+  "relation": {
+    "statement": "[9]G + [27]G = [36]G",
+    "source_points": {
+      "left_9g": [
+        60,
+        848
+      ],
+      "right_27g": [
+        134,
+        660
+      ],
+      "target_36g": [
+        426,
+        192
+      ]
+    },
+    "quotient_w": {
+      "left_9g": 77,
+      "right_27g": 461,
+      "target_36g": 127
+    },
+    "destination_points": {
+      "left_9g": [
+        82,
+        336
+      ],
+      "right_27g": [
+        466,
+        403
+      ],
+      "target_36g": [
+        132,
+        255
+      ]
+    }
+  },
+  "scope_boundary": "The fixture preserves rational two-torsion and the degree-two quotient geometry relevant to the proposed coordinate comparison. It does not identify a Curve25519 weakness, an asymptotic change, or a complete index-calculus speedup."
+}

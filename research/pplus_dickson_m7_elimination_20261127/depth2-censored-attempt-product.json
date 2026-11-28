@@ -1,0 +1,21 @@
+{
+  "schema": "isogeny-labs/pplus-dickson-m7-censored-process/v1",
+  "fixture": "f31-depth2-sparse-carrier",
+  "target_kind": "planted-hit",
+  "command": "target/release/examples/pplus_dickson_m7_elimination depth2-hit",
+  "source_custody_manifest": "source-manifest-depth2-deadline.json",
+  "source_custody_manifest_sha256": "e18e5da93213617f616337f8e56cd20372e3422f54a59ec449d69c0dbed6cd9e",
+  "binary_sha256": "7316ec67bbb6c0149f42e83c6f0d99a8f0e3c9dc7f26900cae87f0cce3eff63a",
+  "declared_budget_seconds": 60,
+  "external_censor_seconds": 180,
+  "minimum_observed_elapsed_seconds_before_interrupt": 179,
+  "peak_observed_rss_kib": 1409036,
+  "peak_observed_vsz_kib": 1829760,
+  "stdout_rows_emitted": 0,
+  "exit_code": 130,
+  "termination": "SIGINT after a single symbolic ring product continued beyond the repaired between-wave deadline poll",
+  "resolved": false,
+  "truth_claim": null,
+  "cross_target_state_reused": false,
+  "note": "This is a second process-censoring record, not a solver hit or miss. The next source amendment checks the same deadline while expanding the terms of each symbolic product, before its carried-term sort."
+}

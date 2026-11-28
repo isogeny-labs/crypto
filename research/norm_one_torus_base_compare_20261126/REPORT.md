@@ -14,8 +14,8 @@ work. The two arms have identical retained-table sizes and identical full-scan
 operation vectors. [pcc:unverified]
 
 This is a useful null result: torus parametrization by itself is not the big
-speedup. A material improvement now requires an exact pair-spectrum query that
-avoids enumerating all pairs, a batched cross-target scheme, or an algebraic
+speedup. A material single-target improvement now requires an exact
+pair-spectrum query that avoids enumerating all pairs or an algebraic
 PKM/Semaev solver whose cost is changed by the factor-base equations.
 [pcc:unverified]
 
@@ -126,7 +126,7 @@ must not.
 Do not spend the next optimization cycle merely replacing an equally sized
 ordinary factor base with this torus base inside the same generic `2+3` loop.
 The next falsifiable target should attack the 2,346 pair candidates per target:
-query the exact pair spectrum without enumerating it, or amortize it over many
-targets. Until that algorithm exists, the p+1 geometry is useful for defining
-structured algebraic systems, not as a standalone generic-query speedup.
-[pcc:unverified]
+query the exact pair spectrum without enumerating it. Cross-target amortization
+is outside this task's accounting and must not support its speed claim. Until
+that algorithm exists, the p+1 geometry is useful for defining structured
+algebraic systems, not as a standalone generic-query speedup. [pcc:unverified]
