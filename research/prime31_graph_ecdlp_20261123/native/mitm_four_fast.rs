@@ -4,7 +4,7 @@
 //! fixture, pair table, queries, graph rank and stopping rule, and differs
 //! only in how each query's probe complements `r - left.sum` are computed
 //! and how the public pair table is hashed. Three switchable levers, given
-//! as the second argument (digits, default `1234`; `0` = none):
+//! as the second argument (digits, default `1234567`; `0` = none):
 //!
 //! 1. batch inversion (Montgomery's trick): one field inversion per query
 //!    instead of one per probe; every probe's point is the same value the
@@ -15,7 +15,16 @@
 //!    keys are public curve points; nothing adversarial is hashed);
 //! 4. batch inversion for the pair-table build: the four sign combinations
 //!    of a pair share the denominator `x_j - x_i`, so one prefix slot per
-//!    pair and one inversion for the whole table; same sums, same order.
+//!    pair and one inversion for the whole table; same sums, same order;
+//! 5. streamlined probe loop (requires 1): the backward batch pass visits
+//!    each complement directly (no output-point buffer), work buffers are
+//!    reused across queries without zeroing, negation is a branch instead of
+//!    `% p`, and the passes iterate instead of indexing;
+//! 6. lazy Mersenne reduction in that loop (requires 2 and 5): one fold and
+//!    one conditional subtraction per product, values kept in [0, p] with p
+//!    standing for 0, and only the final coordinates made canonical;
+//! 7. chained pair index: one map entry per distinct sum plus a `next`
+//!    array over pair ids, instead of a `Vec` allocation per key.
 //!
 //! Charged work counts what this path actually does: one group addition
 //! per probe, one inversion per batch, and every field multiplication.
@@ -169,20 +178,34 @@ struct Levers {
     mersenne: bool,
     fast_hash: bool,
     batch_table: bool,
+    streamline: bool,
+    lazy: bool,
+    chained: bool,
 }
 
 impl Levers {
     fn parse(text: &str) -> Self {
         assert!(
-            text.chars().all(|c| "01234".contains(c)),
-            "levers are digits 0-4"
+            text.chars().all(|c| "01234567".contains(c)),
+            "levers are digits 0-7"
         );
         Self {
             batch: text.contains('1'),
             mersenne: text.contains('2'),
             fast_hash: text.contains('3'),
             batch_table: text.contains('4'),
+            streamline: text.contains('5'),
+            lazy: text.contains('6'),
+            chained: text.contains('7'),
         }
+    }
+    fn check(self) -> Self {
+        assert!(!self.streamline || self.batch, "lever 5 needs lever 1");
+        assert!(
+            !self.lazy || (self.streamline && self.mersenne),
+            "lever 6 needs levers 2 and 5"
+        );
+        self
     }
     fn label(&self) -> String {
         let mut out = String::new();
@@ -191,6 +214,9 @@ impl Levers {
             (self.mersenne, '2'),
             (self.fast_hash, '3'),
             (self.batch_table, '4'),
+            (self.streamline, '5'),
+            (self.lazy, '6'),
+            (self.chained, '7'),
         ] {
             if on {
                 out.push(d);
@@ -455,12 +481,233 @@ fn batch_table_sums(signed: &[[Point; 2]], mersenne: bool, ar: &mut Arithmetic) 
     out
 }
 
+const NONE: u32 = u32::MAX;
+
+/// Pair-table index: the baseline's `Vec` per key, or a chain over pair ids.
+enum PairIndex<S> {
+    PerKey(HashMap<Point, Vec<usize>, S>),
+    Chained {
+        head: HashMap<Point, u32, S>,
+        next: Vec<u32>,
+    },
+}
+
+impl<S: BuildHasher + Default> PairIndex<S> {
+    fn new(chained: bool, capacity: usize) -> Self {
+        if chained {
+            PairIndex::Chained {
+                head: HashMap::with_capacity_and_hasher(capacity, S::default()),
+                next: Vec::with_capacity(capacity),
+            }
+        } else {
+            PairIndex::PerKey(HashMap::with_capacity_and_hasher(capacity, S::default()))
+        }
+    }
+    /// Insert pair id `at`; ids arrive as 0, 1, 2, ... in table order.
+    fn insert(&mut self, sum: Point, at: usize) {
+        match self {
+            PairIndex::PerKey(map) => map.entry(sum).or_default().push(at),
+            PairIndex::Chained { head, next } => {
+                debug_assert_eq!(next.len(), at);
+                let at = u32::try_from(at).expect("pair ids fit in u32");
+                match head.entry(sum) {
+                    std::collections::hash_map::Entry::Occupied(mut e) => {
+                        next.push(*e.get());
+                        *e.get_mut() = at;
+                    }
+                    std::collections::hash_map::Entry::Vacant(e) => {
+                        next.push(NONE);
+                        e.insert(at);
+                    }
+                }
+            }
+        }
+    }
+    fn len(&self) -> usize {
+        match self {
+            PairIndex::PerKey(map) => map.len(),
+            PairIndex::Chained { head, .. } => head.len(),
+        }
+    }
+    /// Every pair id with this sum (order differs between layouts; callers
+    /// collect into a set).
+    #[inline]
+    fn for_each(&self, key: &Point, mut f: impl FnMut(usize)) {
+        match self {
+            PairIndex::PerKey(map) => {
+                if let Some(ids) = map.get(key) {
+                    ids.iter().for_each(|&id| f(id));
+                }
+            }
+            PairIndex::Chained { head, next } => {
+                let mut cur = head.get(key).copied().unwrap_or(NONE);
+                while cur != NONE {
+                    f(cur as usize);
+                    cur = next[cur as usize];
+                }
+            }
+        }
+    }
+}
+
+/// One probe's matches: the baseline's inner loop, unchanged.
+#[inline]
+fn record_matches<S: BuildHasher + Default>(
+    left: &Pair,
+    complement: &Point,
+    index: &PairIndex<S>,
+    pairs: &[Pair],
+    unique: &mut HashSet<Vec<(u16, i8)>>,
+) {
+    index.for_each(complement, |right_id| {
+        let right = pairs[right_id];
+        if left.i == right.i || left.i == right.j || left.j == right.i || left.j == right.j {
+            return;
+        }
+        let mut terms = vec![
+            (left.i, left.si),
+            (left.j, left.sj),
+            (right.i, right.si),
+            (right.j, right.sj),
+        ];
+        terms.sort_unstable_by_key(|term| term.0);
+        unique.insert(terms);
+    });
+}
+
+/// Lazy Mersenne product: inputs in [0, p], output in [0, p] (p means 0).
+#[inline]
+fn fmul_lazy(x: u64, y: u64) -> u64 {
+    let t = x * y;
+    let t = (t & P) + (t >> 31);
+    if t >= P {
+        t - P
+    } else {
+        t
+    }
+}
+
+/// Lazy subtraction: inputs in [0, p], output in [0, p] (p means 0).
+#[inline]
+fn fsub_lazy(x: u64, y: u64) -> u64 {
+    if x >= y {
+        x - y
+    } else {
+        x + P - y
+    }
+}
+
+#[inline]
+fn canon(x: u64) -> u64 {
+    if x == P {
+        0
+    } else {
+        x
+    }
+}
+
+/// Reused per-query work buffers for the streamlined probe loop.
+#[derive(Default)]
+struct Scratch {
+    num: Vec<u64>,
+    den: Vec<u64>,
+    prefix: Vec<u64>,
+}
+
+/// Same complements as `batch_complements` (special cases encoded as
+/// `den = 0`: `num = 1` left identity, `num = 0` identity), visited from the
+/// backward pass instead of stored. Counts are charged exactly as there.
+fn fused_probe(
+    pairs: &[Pair],
+    r: Point,
+    mersenne: bool,
+    lazy: bool,
+    s: &mut Scratch,
+    counts: &mut Counts,
+    mut visit: impl FnMut(&Pair, Point),
+) {
+    let (rx, ry) = r.expect("query point is affine");
+    let mul = |x: u64, y: u64| {
+        if lazy {
+            fmul_lazy(x, y)
+        } else {
+            fmul(x, y, mersenne)
+        }
+    };
+    let sub = |x: u64, y: u64| {
+        if lazy {
+            fsub_lazy(x, y)
+        } else {
+            fsub(x, y, mersenne)
+        }
+    };
+    s.num.clear();
+    s.den.clear();
+    s.prefix.clear();
+    let mut acc = 1u64;
+    let mut mults = 0u64;
+    let mut general = false;
+    for left in pairs {
+        let Some((x, y)) = left.sum else {
+            s.num.push(1);
+            s.den.push(0);
+            s.prefix.push(acc);
+            continue;
+        };
+        let ny = if y == 0 { 0 } else { P - y };
+        let (n, d) = if rx == x {
+            if (ry + ny) % P == 0 {
+                s.num.push(0);
+                s.den.push(0);
+                s.prefix.push(acc);
+                continue;
+            }
+            mults += 1;
+            ((3 * fmul(rx, rx, mersenne) + PRIME31.a) % P, 2 * ry % P)
+        } else {
+            (fsub(ny, ry, mersenne), fsub(x, rx, mersenne))
+        };
+        assert!(d > 0 && d < P);
+        s.num.push(n);
+        s.den.push(d);
+        // Product of the general denominators before this one.
+        s.prefix.push(acc);
+        acc = mul(acc, d);
+        mults += 1;
+        general = true;
+    }
+    let mut inv = if general {
+        counts.fp_inversions += 1;
+        finv(canon(acc), mersenne, &mut mults)
+    } else {
+        0
+    };
+    let n = pairs.len();
+    for (((left, &nm), &d), &b) in pairs.iter().zip(&s.num).zip(&s.den).zip(&s.prefix).rev() {
+        if d == 0 {
+            visit(left, if nm == 1 { r } else { None });
+            continue;
+        }
+        let inv_k = mul(inv, b);
+        inv = mul(inv, d);
+        let (x, _) = left.sum.expect("general case has an affine left");
+        let slope = mul(nm, inv_k);
+        let xx = sub(sub(mul(slope, slope), rx), x);
+        let yy = sub(mul(slope, sub(rx, xx)), ry);
+        mults += 5;
+        visit(left, Some((canon(xx), canon(yy))));
+    }
+    counts.group_additions += n as u64;
+    counts.fp_multiplications += mults;
+}
+
 fn main() {
     let max_queries = std::env::args()
         .nth(1)
         .and_then(|value| value.parse::<usize>().ok())
         .unwrap_or(40);
-    let levers = Levers::parse(&std::env::args().nth(2).unwrap_or_else(|| "1234".into()));
+    let levers =
+        Levers::parse(&std::env::args().nth(2).unwrap_or_else(|| "1234567".into())).check();
     if levers.fast_hash {
         run::<FastBuild>(max_queries, levers)
     } else {
@@ -487,8 +734,7 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers) {
         .collect();
     let table_start = Instant::now();
     let mut pairs = Vec::with_capacity(4 * points.len() * (points.len() - 1) / 2);
-    let mut index: HashMap<Point, Vec<usize>, S> =
-        HashMap::with_capacity_and_hasher(pairs.capacity(), S::default());
+    let mut index: PairIndex<S> = PairIndex::new(levers.chained, pairs.capacity());
     let table_sums = if levers.batch_table {
         Some(batch_table_sums(&signed, levers.mersenne, &mut ar))
     } else {
@@ -510,7 +756,7 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers) {
                         si: if si == 0 { 1 } else { -1 },
                         sj: if sj == 0 { 1 } else { -1 },
                     });
-                    index.entry(sum).or_default().push(at);
+                    index.insert(sum, at);
                 }
             }
         }
@@ -537,6 +783,7 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers) {
     let mut total_probe_additions = 0u64;
     let mut all_classes = [0usize; 5];
     let mut recovered = None;
+    let mut scratch = Scratch::default();
     for label in 0..max_queries {
         let a = next_word(&mut seed) % PRIME31.n;
         let b = next_word(&mut seed) % PRIME31.n;
@@ -546,42 +793,38 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers) {
         assert!(r.is_some());
         let query_start = Instant::now();
         let mut unique = HashSet::<Vec<(u16, i8)>>::new();
-        let batched = if levers.batch {
-            Some(batch_complements(
+        if levers.streamline {
+            fused_probe(
                 &pairs,
                 r,
                 levers.mersenne,
+                levers.lazy,
+                &mut scratch,
                 &mut ar.counts,
-            ))
+                |left, complement| record_matches(left, &complement, &index, &pairs, &mut unique),
+            );
+            total_probe_additions += pairs.len() as u64;
         } else {
-            None
-        };
-        for (k, left) in pairs.iter().enumerate() {
-            let complement = match &batched {
-                Some(all) => all[k],
-                None => {
-                    let neg_left = ar.neg(PRIME31, left.sum);
-                    ar.add(PRIME31, r, neg_left)
-                }
+            let batched = if levers.batch {
+                Some(batch_complements(
+                    &pairs,
+                    r,
+                    levers.mersenne,
+                    &mut ar.counts,
+                ))
+            } else {
+                None
             };
-            total_probe_additions += 1;
-            let Some(matches) = index.get(&complement) else {
-                continue;
-            };
-            for &right_id in matches {
-                let right = pairs[right_id];
-                if left.i == right.i || left.i == right.j || left.j == right.i || left.j == right.j
-                {
-                    continue;
-                }
-                let mut terms = vec![
-                    (left.i, left.si),
-                    (left.j, left.sj),
-                    (right.i, right.si),
-                    (right.j, right.sj),
-                ];
-                terms.sort_unstable_by_key(|term| term.0);
-                unique.insert(terms);
+            for (k, left) in pairs.iter().enumerate() {
+                let complement = match &batched {
+                    Some(all) => all[k],
+                    None => {
+                        let neg_left = ar.neg(PRIME31, left.sum);
+                        ar.add(PRIME31, r, neg_left)
+                    }
+                };
+                total_probe_additions += 1;
+                record_matches(left, &complement, &index, &pairs, &mut unique);
             }
         }
         let source_ms = query_start.elapsed().as_millis();
