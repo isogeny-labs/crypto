@@ -6,7 +6,9 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use crypto_lib::cryptanalysis::cado_bwc_io::{verify_solution, write_square_system};
+use crypto_lib::cryptanalysis::cado_bwc_io::{
+    verify_rectangular_solution, verify_solution, write_rectangular_system, write_square_system,
+};
 use crypto_lib::cryptanalysis::koblitz_sparse_la::{
     solve_sparse_system, SparseRow, SparseSolveOptions, SparseSolveOutcome,
 };
@@ -61,6 +63,7 @@ fn main() {
     let mut target = Pt::affine(1, 2);
     let mut cado_dir = None;
     let mut cado_sol = None;
+    let mut overdetermined = false;
     let mut args = std::env::args_os().skip(1);
     while let Some(flag) = args.next() {
         if flag == "--target" {
@@ -84,8 +87,10 @@ fn main() {
             cado_sol = Some(std::path::PathBuf::from(
                 args.next().expect("--cado-sol needs a path"),
             ));
+        } else if flag == "--overdetermined" {
+            overdetermined = true;
         } else {
-            panic!("usage: plane_curve_ecdlp_system [--target X Y] [--cado-dir PATH] [--cado-sol PATH]");
+            panic!("usage: plane_curve_ecdlp_system [--target X Y] [--overdetermined] [--cado-dir PATH] [--cado-sol PATH]");
         }
     }
     // y²z = x³ + 2xz² + z³, with seven F_5-rational points.
@@ -188,11 +193,11 @@ fn main() {
     candidate_rows.push(columns.encode(&BTreeMap::from([(q, 1)]), -1, 0, N).unwrap());
 
     let mut rows = Vec::new();
-    for row in candidate_rows {
+    for row in &candidate_rows {
         let mut trial = rows.clone();
         trial.push(row.clone());
         if rank(&trial, columns.columns()) > rows.len() {
-            rows.push(row);
+            rows.push(row.clone());
         }
         if rows.len() == columns.columns() {
             break;
@@ -209,9 +214,23 @@ fn main() {
     if target == Pt::affine(1, 2) {
         assert_eq!(recovered, 5);
     }
+    if overdetermined {
+        let extra = candidate_rows[..split_lines]
+            .iter()
+            .find(|row| !row.entries.is_empty() && !rows.contains(row))
+            .expect("no additional curve-derived line relation")
+            .clone();
+        rows.push(extra);
+        assert_eq!(rank(&rows, columns.columns()), columns.columns());
+    }
     let mut matrix = Vec::new();
     let mut rhs = Vec::new();
-    let exported = write_square_system(&rows, columns.columns(), N, &mut matrix, &mut rhs).unwrap();
+    let exported = if overdetermined {
+        write_rectangular_system(&rows, columns.columns(), N, &mut matrix, &mut rhs)
+    } else {
+        write_square_system(&rows, columns.columns(), N, &mut matrix, &mut rhs)
+    }
+    .unwrap();
     assert_eq!(exported.dimension, 7);
     let cado_words: Vec<u8> = solution
         .iter()
@@ -219,10 +238,12 @@ fn main() {
         .chain(std::iter::once(N - 1))
         .flat_map(u64::to_le_bytes)
         .collect();
-    assert_eq!(
-        verify_solution(&rows, columns.columns(), N, &cado_words).unwrap(),
-        solution
-    );
+    let checked = if overdetermined {
+        verify_rectangular_solution(&rows, columns.columns(), N, &cado_words)
+    } else {
+        verify_solution(&rows, columns.columns(), N, &cado_words)
+    };
+    assert_eq!(checked.unwrap(), solution);
     if let Some(directory) = cado_dir {
         std::fs::create_dir_all(&directory).unwrap();
         std::fs::write(directory.join("matrix.bin"), &matrix).unwrap();
@@ -230,13 +251,19 @@ fn main() {
     }
     if let Some(path) = cado_sol {
         let words = std::fs::read(path).unwrap();
-        let external = verify_solution(&rows, columns.columns(), N, &words).unwrap();
+        let external = if overdetermined {
+            verify_rectangular_solution(&rows, columns.columns(), N, &words)
+        } else {
+            verify_solution(&rows, columns.columns(), N, &words)
+        }
+        .unwrap();
         assert_eq!(external[columns.target_column() as usize], recovered);
         assert_eq!(group.mul(&generator, recovered), target);
         println!("external CADO solution verified: log={recovered}");
     }
     println!(
-        "curve-derived plane DLP: points=7 split_lines={split_lines} rank=7 log={recovered} verified=true cado_nonzeros={}",
+        "curve-derived plane DLP: points=7 split_lines={split_lines} rank=7 rows={} log={recovered} verified=true cado_nonzeros={}",
+        rows.len(),
         exported.nonzeros
     );
 }

@@ -1,9 +1,10 @@
-//! CADO-NFS `bwc` input and solution verification for square sparse systems.
+//! CADO-NFS `bwc` input and solution verification for sparse systems.
 //!
 //! The binary matrix and ASCII right-hand-side layouts match the existing
 //! `la_engine_bench` CADO control. This module does not invoke CADO or filter
-//! relation matrices. The caller must supply a prime modulus and a square,
-//! sufficiently ranked system; a curve DLP still needs group-side checking.
+//! relation matrices. The caller must supply a prime modulus and a full-rank
+//! system with at least as many rows as columns; a curve DLP still needs
+//! group-side checking.
 
 use std::io::{self, Write};
 
@@ -23,7 +24,7 @@ fn invalid(message: &'static str) -> io::Error {
 /// Write CADO's per-row `(len, (column, signed i32 coefficient)*)` binary
 /// matrix and `rows 1 prime` followed by decimal residues in the RHS text.
 /// The modulus must be a known odd prime below `2^63`.
-pub fn write_square_system(
+pub fn write_rectangular_system(
     rows: &[SparseRow<u64>],
     columns: usize,
     modulus: u64,
@@ -33,8 +34,10 @@ pub fn write_square_system(
     if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
         return Err(invalid("modulus must be an odd prime below 2^63"));
     }
-    if columns == 0 || columns > u32::MAX as usize || rows.len() != columns {
-        return Err(invalid("CADO bwc export requires a nonempty square matrix"));
+    if columns == 0 || columns > u32::MAX as usize || rows.len() < columns {
+        return Err(invalid(
+            "CADO bwc export needs at least as many rows as columns",
+        ));
     }
     let mut nonzeros = 0;
     for row in rows {
@@ -74,6 +77,20 @@ pub fn write_square_system(
     })
 }
 
+/// Square-system compatibility entry point.
+pub fn write_square_system(
+    rows: &[SparseRow<u64>],
+    columns: usize,
+    modulus: u64,
+    matrix: &mut impl Write,
+    rhs: &mut impl Write,
+) -> io::Result<CadoExportSummary> {
+    if rows.len() != columns {
+        return Err(invalid("CADO bwc export requires a square matrix"));
+    }
+    write_rectangular_system(rows, columns, modulus, matrix, rhs)
+}
+
 fn inverse(value: u64, modulus: u64) -> Option<u64> {
     let (mut old_r, mut r) = (modulus as i128, value as i128);
     let (mut old_t, mut t) = (0i128, 1i128);
@@ -89,7 +106,7 @@ fn inverse(value: u64, modulus: u64) -> Option<u64> {
 /// CADO stores a right-nullspace vector `(x_raw, y)` for `(M || RHS)`, so
 /// the solution is `x_raw / (-y)`. Some builds pad the middle; the RHS word
 /// remains last. Only the first `columns` coordinates are read as `x_raw`.
-pub fn verify_solution(
+pub fn verify_rectangular_solution(
     rows: &[SparseRow<u64>],
     columns: usize,
     modulus: u64,
@@ -98,8 +115,8 @@ pub fn verify_solution(
     if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
         return Err("invalid modulus");
     }
-    if columns == 0 || rows.len() != columns {
-        return Err("CADO solution needs a nonempty square input system");
+    if columns == 0 || rows.len() < columns {
+        return Err("CADO solution needs at least as many rows as columns");
     }
     if bytes.len() % 8 != 0 || bytes.len() / 8 < columns + 1 {
         return Err("CADO solution has a bad word count");
@@ -137,4 +154,17 @@ pub fn verify_solution(
         }
     }
     Ok(solution)
+}
+
+/// Square-system compatibility entry point.
+pub fn verify_solution(
+    rows: &[SparseRow<u64>],
+    columns: usize,
+    modulus: u64,
+    bytes: &[u8],
+) -> Result<Vec<u64>, &'static str> {
+    if rows.len() != columns {
+        return Err("CADO solution needs a square input system");
+    }
+    verify_rectangular_solution(rows, columns, modulus, bytes)
 }
