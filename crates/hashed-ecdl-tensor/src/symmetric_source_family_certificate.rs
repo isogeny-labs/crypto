@@ -47,6 +47,8 @@ pub struct Certificate {
 pub struct VerificationSummary {
     /// Root edge-count exponent.
     pub lambda: u64,
+    /// Root source scale `floor(lambda/2^17)`.
+    pub u: u64,
     /// Packet exponent selected by the root schedule.
     pub a: u64,
     /// Vertex-count exponent on each bipartite side.
@@ -179,6 +181,7 @@ pub fn verify(certificate: &Certificate) -> Result<VerificationSummary, String> 
     }
     Ok(VerificationSummary {
         lambda: certificate.lambda,
+        u: certificate.u,
         a: certificate.a,
         vertex_exponent: certificate.vertex_exponent,
         packet_count_exponent: certificate.packet_count_exponent,
