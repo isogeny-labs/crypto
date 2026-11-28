@@ -1151,11 +1151,12 @@ impl XIndex {
         (h >> (32 - BBITS)) as usize
     }
     /// Build from the couple table's per-thread bucket histograms: global
-    /// offsets, a stable scatter of each thread's own couple range, then
-    /// filter bits and distinct counts over thread-owned bucket ranges.
+    /// offsets, then a stable two-pass radix scatter (pass A by couple range
+    /// into 256 coarse regions, pass B per coarse region into its buckets
+    /// through L1) that also sets filter bits and counts distinct points.
     fn build(t: &CoupleTable, threads: usize) -> Self {
         struct SyncPtr(*mut u64);
-        // SAFETY: threads write disjoint indices (see the scatter below).
+        // SAFETY: threads write disjoint indices (see pass A below).
         unsafe impl Sync for SyncPtr {}
         impl SyncPtr {
             fn get(&self) -> *mut u64 {
@@ -1171,56 +1172,127 @@ impl XIndex {
         let fwbits = fbits - 5;
         let fshift = 32 - fwbits;
         let wpb = fwords / nb;
+        // Coarse partitions: the top CBITS hash bits, each a run of `bpc`
+        // whole buckets (about 14 KB of entries, so pass B works in L1).
+        const CBITS: u32 = 8;
+        let nc = 1usize << CBITS;
+        let bpc = nb / nc;
         let mut off = vec![0u32; nb + 1];
-        let mut starts: Vec<Vec<u32>> = t.parts.iter().map(|_| vec![0u32; nb]).collect();
         let mut acc = 0u32;
         for b in 0..nb {
             off[b] = acc;
-            for (k, (_, _, hist)) in t.parts.iter().enumerate() {
-                starts[k][b] = acc;
+            for (_, _, hist) in &t.parts {
                 acc += hist[b];
             }
         }
         off[nb] = acc;
         assert_eq!(acc as usize, xy.len());
+        // Pass A position of (build thread k, coarse c): thread-major inside
+        // the coarse region, so the threads' ascending couple ranges stay in
+        // order.
+        let mut cstarts: Vec<Vec<u32>> = t.parts.iter().map(|_| vec![0u32; nc]).collect();
+        for c in 0..nc {
+            let mut pos = off[c * bpc];
+            for (k, (_, _, hist)) in t.parts.iter().enumerate() {
+                cstarts[k][c] = pos;
+                pos += hist[c * bpc..(c + 1) * bpc].iter().sum::<u32>();
+            }
+        }
         let mut ent = vec![0u64; xy.len()];
         let ptr = SyncPtr(ent.as_mut_ptr());
+        // Pass A: each build thread streams its couple range into the coarse
+        // regions (256 sequential write streams).
         std::thread::scope(|scope| {
-            for ((q0, q1, _), mut pos) in t.parts.iter().zip(starts) {
+            for ((q0, q1, _), starts) in t.parts.iter().zip(cstarts) {
                 let (q0, q1, ptr) = (*q0, *q1, &ptr);
                 scope.spawn(move || {
-                    for (q, &[x, _]) in xy.iter().enumerate().take(q1).skip(q0) {
-                        let b = Self::bucket(Self::hash(x as u64));
-                        // SAFETY: positions of (thread k, bucket b) are
-                        // [starts[k][b], starts[k][b] + hist_k[b]), disjoint
-                        // across (k, b) and inside `ent`.
-                        unsafe { *ptr.get().add(pos[b] as usize) = ((x as u64) << 32) | q as u64 };
-                        pos[b] += 1;
+                    // A fixed 256-entry array indexed by the top hash byte:
+                    // no bounds checks in the loop.
+                    let mut pos: [u32; 256] = starts.try_into().expect("256 coarse regions");
+                    let out = ptr.get();
+                    for (q, &[x, _]) in (q0..q1).zip(&xy[q0..q1]) {
+                        let c = (Self::hash(x as u64) >> (32 - CBITS)) as u8;
+                        let p = &mut pos[c as usize];
+                        // SAFETY: positions of (thread k, coarse c) are
+                        // [cstarts[k][c], cstarts[k][c] + count), disjoint
+                        // across (k, c) and inside `ent`.
+                        unsafe { *out.add(*p as usize) = ((x as u64) << 32) | q as u64 };
+                        *p += 1;
                     }
                 });
             }
         });
+        // Pass B, over thread-owned coarse ranges: copy each coarse region to
+        // an L1 scratch buffer and scatter it back stably into its buckets,
+        // then set the buckets' filter bits and count distinct points while
+        // they are hot.
         let mut filter = vec![0u32; fwords];
-        let ranges: Vec<(usize, usize)> = (0..threads)
-            .map(|k| (k * nb / threads, (k + 1) * nb / threads))
+        let cranges: Vec<(usize, usize)> = (0..threads)
+            .map(|k| (k * nc / threads, (k + 1) * nc / threads))
             .collect();
         let distinct: usize = std::thread::scope(|scope| {
-            let (off, ent) = (&off, &ent);
+            let off = &off;
+            let mut erest: &mut [u64] = &mut ent;
             let mut frest: &mut [u32] = &mut filter;
             let mut handles = Vec::new();
-            for &(lo, hi) in &ranges {
+            for &(clo, chi) in &cranges {
+                let (lo, hi) = (clo * bpc, chi * bpc);
+                let (e, et) = erest.split_at_mut((off[hi] - off[lo]) as usize);
+                erest = et;
                 let (f, ft) = frest.split_at_mut((hi - lo) * wpb);
                 frest = ft;
                 handles.push(scope.spawn(move || {
-                    let fbase = lo * wpb;
+                    // First touch of the fresh filter pages by a write: the
+                    // loop below reads a word before setting it, and a read
+                    // first maps the shared zero page, whose copy-on-write
+                    // break on the next write flushes every thread's TLB.
+                    f.fill(0);
+                    let (ebase, fbase) = (off[lo] as usize, lo * wpb);
+                    let mut scratch: Vec<u64> = Vec::new();
+                    // Fixed 256-entry array: the bucket inside a coarse region
+                    // is one hash byte, so the loop has no bounds checks here.
+                    assert_eq!(bpc, 256);
+                    let mut fill = [0usize; 256];
+                    let mut shared: Vec<usize> = Vec::new();
                     let mut distinct = 0usize;
-                    for b in lo..hi {
-                        let bucket = &ent[off[b] as usize..off[b + 1] as usize];
-                        for &v in bucket {
-                            let h = Self::hash(v >> 32);
-                            f[(h >> fshift) as usize - fbase] |= Self::bloom_mask(h);
+                    for c in clo..chi {
+                        let b0 = c * bpc;
+                        let region = off[b0] as usize - ebase..off[b0 + bpc] as usize - ebase;
+                        scratch.clear();
+                        scratch.extend_from_slice(&e[region]);
+                        for (i, fl) in fill.iter_mut().enumerate() {
+                            *fl = off[b0 + i] as usize - ebase;
                         }
-                        distinct += Self::bucket_distinct(bucket, xy);
+                        // One pass: stable placement into the buckets, filter
+                        // bits, and duplicate-x detection. Equal x means equal
+                        // hash, so a key whose filter bits are not all set yet
+                        // is the first with its x; only the rest are checked
+                        // against the entries already placed in their bucket.
+                        shared.clear();
+                        for &v in &scratch {
+                            let h = Self::hash(v >> 32);
+                            let b = (Self::bucket(h) - b0) as u8 as usize;
+                            let (w, m) = ((h >> fshift) as usize - fbase, Self::bloom_mask(h));
+                            if f[w] & m == m {
+                                let start = off[b0 + b] as usize - ebase;
+                                if e[start..fill[b]].iter().any(|&u| u >> 32 == v >> 32) {
+                                    shared.push(b0 + b);
+                                }
+                            }
+                            f[w] |= m;
+                            e[fill[b]] = v;
+                            fill[b] += 1;
+                        }
+                        // Two points per x held by one couple; buckets with a
+                        // shared x are counted exactly.
+                        distinct += 2 * scratch.len();
+                        shared.sort_unstable();
+                        shared.dedup();
+                        for &b in &shared {
+                            let bucket = &e[off[b] as usize - ebase..off[b + 1] as usize - ebase];
+                            distinct =
+                                distinct - 2 * bucket.len() + Self::bucket_distinct(bucket, xy);
+                        }
                     }
                     distinct
                 }));

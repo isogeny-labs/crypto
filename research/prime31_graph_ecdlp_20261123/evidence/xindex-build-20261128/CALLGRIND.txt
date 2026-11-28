@@ -1,0 +1,12 @@
+# Ir (callgrind, whole process, 40-query cap, 1 thread); x-index build functions
+main  total_Ir=342,581,718
+main  XIndex::bucket_distinct (every bucket)            32,874,091
+main  XIndex::build scatter closure                     13,271,949
+main  XIndex::build filter/distinct closure             10,400,224
+main  XIndex::build (offsets)                            1,966,245
+main  x-index build total                               58,512,509
+new   total_Ir=314,387,359
+new   XIndex::build pass B closure (scatter+filter+distinct) 19,105,244
+new   XIndex::build pass A closure (coarse scatter)      5,263,067
+new   XIndex::build (offsets)                            1,287,860
+new   x-index build total                               25,656,171
