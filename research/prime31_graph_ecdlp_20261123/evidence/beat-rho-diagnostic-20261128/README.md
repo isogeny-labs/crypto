@@ -39,3 +39,14 @@ A separate scratch control with 64 jumps, the public mixed-key partition, negati
 ### Follow-up at 07:24 UTC: successful longer control run
 
 With the same scratch policy and 2,048 maximum walks, the fresh process recovered `987654321` and passed its `[d]G=Q` check. It used 355 walks, 354 stored distinguished points, 44,428 walk steps, 45,177 counted additions, zero short-cycle escapes, 16.252 ms external wall, 16.052 ms child CPU and 8.4 MiB peak RSS. The solver's internal wall was 15.160 ms. The previously failed 32-walk run is retained above and its cost is **not** amortized into this single-run time. This control remains v5-inspired rather than identical to the repository implementation. The one-shot IC/control wall ratio is 1.87, in rho's favor; an interleaved cold panel remains necessary before reporting a stable timing ratio.
+
+### Follow-up at 07:29 UTC: seven alternating cold rounds
+
+The fresh-process order was IC/rho, rho/IC, and so on for seven rounds on the same host, source, target and fixed seed. Every process exited successfully and returned `987654321`; IC's reported replay and rho's scalar check were true in all 14 invocations. Raw external wall/child CPU, counts and output SHA-256 values are in [`paired7.jsonl`](paired7.jsonl). The diagnostic rho source and a standalone Cargo manifest are [`rho_neg_dp.rs`](rho_neg_dp.rs) and [`Cargo.toml`](Cargo.toml). The scratch control has full-size random jump and start scalar multiplications charged inside its process, but does not reproduce v5's optimized ladder construction.
+
+| Arm | Median external wall | Range | Median child CPU | Charged work |
+| --- | ---: | ---: | ---: | --- |
+| Four-thread IC | 35.058 ms | 30.608–47.922 ms | 55.319 ms | 10,068,344 probes per solve |
+| 64-jump negation rho diagnostic | 17.014 ms | 16.666–19.527 ms | 16.751 ms | 44,428 walk steps, 45,177 additions per solve |
+
+Median of the seven paired wall ratios (IC/rho) is 2.076; every pair favors rho (range 1.674–2.516). This rules out a win by this particular IC build against this valid optimized scratch control on the fixed B677 target. It is a narrow fixed-target diagnostic, not a cross-curve, randomized-target or repository-v5 equivalence result. The provisional 32-walk failure is a separate earlier run; the paired panel gives the completed process cost of the subsequently revised 2,048-walk control. Further work would use the latest 8-lane IC code and a repository-native v5 arm with the same cold panel and independently replayed output. No speedup claim is made. [pcc:unverified]
