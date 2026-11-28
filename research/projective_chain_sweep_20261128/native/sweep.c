@@ -263,10 +263,9 @@ int main(int argc, char **argv) {
             if (nscan != 3) fail("not enough scan targets");
             for (int m = 4; m <= 7; ++m) {
                 if (smoke && m > 4) break;
+                const char *labels[3] = {"scan0","scan1","scan2"};
                 for (int i = 0; i < 3; ++i) {
-                    char label[8];
-                    snprintf(label,sizeof(label),"scan%d",i);
-                    row(p,t,m,label,scans[i],evaluator_base.n_x,
+                    row(p,t,m,labels[i],scans[i],evaluator_base.n_x,
                         evaluator_base.n_points);
                 }
                 int cancel = -1;
