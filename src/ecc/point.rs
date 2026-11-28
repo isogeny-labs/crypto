@@ -18,8 +18,8 @@
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use super::mont_vt::{
-    Adx6Kernel, Adx6MulKernel, AdxIlKernel, AdxKernel, AdxQpKernel, AdxSqrKernel, CiosKernel,
-    KaratsubaKernel, Mont, MulKernel, MulxKernel, ProdAdxKernel, ProdKernel, SqrKernel,
+    Adx6Kernel, Adx6MulKernel, AdxIlKernel, AdxKernel, AdxQpKernel, AdxSqrKernel, AdxTwKernel,
+    CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel, ProdAdxKernel, ProdKernel, SqrKernel,
     TunedKernel,
 };
 use num_bigint::BigUint;
@@ -222,6 +222,8 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
         "adx_il" => mont_dispatch::<AdxIlKernel>(x, y, k, a, Binary, false, false),
         // Quotient-pipelined asm kernels at 4 and 6 limbs.
         "adx_qp" => mont_dispatch::<AdxQpKernel>(x, y, k, a, Binary, false, false),
+        // Two-word Montgomery reduction asm kernels at 4 and 6 limbs.
+        "adx_tw" => mont_dispatch::<AdxTwKernel>(x, y, k, a, Binary, false, false),
         "adx" => mont_dispatch::<AdxKernel>(x, y, k, a, Binary, false, false),
         "adx_sqr" => mont_dispatch::<AdxSqrKernel>(x, y, k, a, Binary, false, false),
         "mulx" => mont_dispatch::<MulxKernel>(x, y, k, a, Binary, false, false),
@@ -276,6 +278,11 @@ pub fn field_kernel_probe(
                 ctx.mul_adx4(&acc, &bm)?;
                 (0..iters)
                     .for_each(|_| acc = ctx.mul_adx4(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx_tw_mul" => {
+                ctx.mul_adx_tw(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx_tw(std::hint::black_box(&acc), &bm).unwrap())
             }
             "adx_qp_mul" => {
                 ctx.mul_adx_qp(&acc, &bm)?;
@@ -2129,7 +2136,8 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 17] = [
+    const ARMS: [&str; 18] = [
+        "adx_tw",
         "adx_qp",
         "adx_il",
         "adx6",
