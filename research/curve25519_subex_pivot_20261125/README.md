@@ -233,6 +233,23 @@ evidence to the active-call dimension ledger without trusting the producer's
 reported `Q` or `T`. It does not yet join the separate packing and precision
 premises to every node of an arbitrary recursive history. `[pcc:unverified]`
 
+The same accepted certificate now exposes a canonical endpoint-group
+projection: schema/radix/counts followed by the exact row and column group of
+every parent edge. `GROUP_ASSIGNMENT_ARTIFACT.md` and the matching Lean module
+check shape and ranges, preserve exact typed lookup values, and instantiate the
+formal group-fiber split to prove total endpoint mass `2M` for the imported
+arrays. That first artifact deliberately leaves packet ownership, scalar/mode
+values, and child tensor semantics separate. `[pcc:unverified]`
+
+`PACKET_ASSIGNMENT_ARTIFACT.md` now closes the next finite indexing layer. A
+native projection derives one packet owner per parent edge and rejects missing,
+duplicate, or out-of-range ownership. Its joint projection with the group
+artifact has a checked Lean importer that aligns edge counts, preserves exact
+typed packet owners, proves both endpoint incidences share their edge owner,
+and instantiates the generic complete packet/group child-family factorization.
+Concrete packet entry values, modes, tensors, and contraction semantics remain
+outside this artifact. `[pcc:unverified]`
+
 An object-level cross-check now makes the packing boundary explicit. Of those
 596 partition certificates, 285 satisfy `K L<=3M` and match the independent
 BigUint `NodeDimensions` result field for field; 311 fail that source premise
@@ -291,9 +308,12 @@ native taper term they give the uniform local bound
 p_next*u <= 34*M*2^(A+2*u-i)
 ```
 
-at every possible active child history above the threshold.  This is an
-unverified producer derivation composed from separately retained components,
-not a new kernel-checked refinement theorem. [pcc:unverified]
+at every possible active child history above the threshold. The scalar
+absorption and final constant-34 composition are now independently
+kernel-checked in the pivot's pinned Lean project by reusing the exact retained
+precision model and finite-history theorem. This remains an unverified producer
+composition until a native path witness supplies the recurrence, shrink,
+active-cutoff, scale-floor, and leaf-comparison inputs. [pcc:unverified]
 
 The exact-integer Rust certificate is `tensor-history-audit`.  At the first
 claimed threshold `lambda=2^26`, it enumerates the only five depths not
@@ -365,6 +385,151 @@ complete finite path from an edge skeleton to packet/group objects, not a
 uniform arbitrary-size theorem, asymptotic graph realization, or the external
 contraction theorem. `[pcc:unverified]`
 
+The formal objective model now executes the same ascending-label,
+strict-improvement first-minimum fold rather than only accepting an abstract
+minimizer premise. A generic theorem proves the selected cost is at most every
+candidate cost; exact row and column corollaries feed that receipt into the
+conditional-objective averaging proof and show each executable choice is
+nonincreasing. Equal costs retain the earlier label by construction.
+`SparseLabelScore.lean` now proves the first compression layer used by the
+native incidence labeler. Strict first-minimum selection is invariant under a
+label-independent offset and positive scale; updating either side splits every
+equality potential into a fixed term plus two directed selected-label
+interactions; and the full row or column candidate objective is exactly its
+fixed offset plus `2q` times the directed interaction score. The checked
+artifact replay evaluates that score and uses the proved affine identity to
+recover the original quadratic first minimum, including ties. On the shared
+32-edge strict fixture this reduced the best observed cold artifact-module
+build from 229 seconds to 145 seconds (about 37%).
+`IncidenceBucketScore.lean` now proves the next split as well. While columns
+are unknown, the row score is exactly the current degree times the selected
+label-bucket degree plus `(q-1)` times the shared-right-port overlap obtained
+from right-endpoint incidence buckets. Once all rows are fixed, the column
+score is `q` times the row-label incidence-profile dot product. Positive scale
+invariance removes that final factor without changing ties. The artifact
+checker now evaluates these source-shaped scores, reducing the best observed
+cold build to 55 seconds. `BucketStateReplay.lean` now gives
+those auxiliary maps an exact invariant: empty maps equal all-unknown
+assignments, every row/column insertion equals extending the partial assignment
+by the selected label, and state-based scores equal the proved extensional
+incidence formulas. A fuel-bounded native-order fold now threads those states
+once through all rows and then all columns; its soundness theorem maintains
+the prefix invariant at every step, and strong induction proves its accepted
+arrays equal the original recursive executable schedule. The artifact checker
+uses that fold, reducing the best observed cold module build to 52 seconds.
+The exact-boundary CSV is embedded as bounded elaboration-time chunks and
+reassembled into the same public string view. Kernel reduction over the
+chunked character view cuts the parse receipt from 23 seconds to 8.6 seconds.
+The parse, row replay, column replay, and source guard remain separate parallel
+modules, while one final join module replaces the former serial trace/parser
+pair. A forced rebuild of the complete certificate path took 27.82 seconds wall
+clock, down from 40.94 seconds (32.0%), meeting the sub-30-second end-to-end
+target. This is a proof-build optimization, not a stronger attack claim.
+`[pcc:unverified]`
+The formal layer now constructs that complete arbitrary-finite sequence itself:
+well-founded recursion labels rows in native order from their exact prefixes,
+then labels columns from the fixed rows and preceding column prefix. The
+complete executable schedule is proved nonincreasing and feeds directly into a
+new class-cap endpoint under the strongest source guard, with no supplied label
+or minimum-family premise. The native schema-3 verifier now exposes one
+overflow-checked canonical flat-projection function and constructs that
+projection before accepting every producer round trip in the 596-case corpus.
+The admitted three-edge projection binds endpoint quadruples and selected
+labels from that same function to the executable model. Lean parses and bounds it,
+requires the same nonzero radix and active-coordinate range as the native
+provenance verifier, proves the typed endpoints are the
+serialized indices, proves the typed row and column labels retain their exact
+serialized natural values without modulo wrapping, and kernel-replays the
+nontrivial row `[0,1,0]` and column `[0,0,1]` traces. For every successfully
+replayed artifact, the parsed label arrays now feed directly into the strongest
+source-guard class-cap theorem; the caller supplies only degree caps and the
+guard. A stricter generic importer now recomputes both endpoint degree caps and
+the natural-number source-class guard from the projection itself, casts the
+guard to the formal real inequality, and reaches the same class cap with no
+remaining premise. Its trace checker evaluates each serialized prefix as an
+auxiliary assignment, and well-founded induction proves those local checks equal
+the original recursive executable schedule. A second shared degree-one matching
+with two labels and 32 edges meets `M=2(q^2)^2 delta` at equality; both the native
+verifier and the Lean strict parser accept that exact projection. The three-edge
+fixture remains proved to fail the stronger parser. These are finite
+code-to-model controls plus generic native export and checked-import endpoints,
+not a uniform arbitrary-size Rust-to-Lean semantic refinement.
+`[pcc:unverified]`
+Independently of those concrete controls, the formal artifact now exposes its
+own canonical header/edge/row/column projection. The unchecked parser is proved
+to recover every artifact with the declared edge and row split lengths; the
+checked, replayed, and strict source-guard parsers are proved to recover every
+artifact satisfying their respective formal predicates. This closes the
+arbitrary-finite Lean encoder/parser round trip. In the converse direction,
+every successfully parsed flat list re-encodes exactly, including its complete
+suffix, so the checked importer admits no alternate canonical representation.
+The cross-language Rust-to-Lean compiler and serialization refinement remains
+open.
+`[pcc:unverified]`
+The three importer layers also have exact iff specifications. Checked parsing
+is precisely canonical projection plus well-formedness and bounds; replay adds
+only the formal trace predicate; strict parsing adds only the formal source
+guard. This turns the remaining Rust bridge into an explicit named-predicate
+obligation rather than an opaque parser-refinement claim. `[pcc:unverified]`
+The native side now exposes that obligation through a borrowed
+`LabelProjectionView`: named schema/radix/packet/coordinate/conditional/cap
+fields plus borrowed edge, row-label, and column-label arrays, with checked
+length arithmetic and integer conversion before flattening. Lean now models
+the same source shape as `PackingLabelSource`; each structured edge contributes
+exactly four fields, and its native-order projection is definitionally the
+artifact projection. Source-shaped iff theorems cover checked, replayed, and
+strict import. Their base conditions are now explicit `WellFormed` and
+`Bounded` propositions over the named source fields, structured endpoint
+records, and label arrays; artifact Boolean checks are proved equivalent to
+those propositions. This is source-interface alignment, not a proof of Rust
+compiler, allocator, conversion, or serialization semantics.
+`[pcc:unverified]`
+The positive 32-edge boundary fixture is now represented directly as a
+structured `PackingLabelSource`; its converted artifact is field-for-field
+the existing witness and its native-order projection passes strict import.
+For any strict source view, the formal artifact recomputes the finite maximum
+class directly. Strict acceptance bounds that maximum, and the exact native
+`ceil(maximum/length)*length` formula is proved at most `maximum+length`.
+The rounded-height composition therefore no longer accepts a selected maximum
+class or padded-height inequality from the producer. Its explicit producer
+inputs are `length*class_count<=edges` and the two-sided child-incidence bound;
+compiler/allocation/integer-conversion refinement remains open.
+`[pcc:unverified]`
+The native packing summary now reports its recomputed maximum, padded height,
+and exact length-mass admission. Exact child replay reports row and column
+incidences separately, checks their sum against the live child array, and
+verifies `child*radix<=2*height*class_count` across the complete family. The
+node verifier separately reports radix-64 shrink derived from those packing
+facts and rejects disagreement with observed eightfold shrink. A
+natural-number Lean endpoint consumes the same two inequalities; arbitrary-size
+Rust-to-Lean summary refinement remains open. `[pcc:unverified]`
+The node summary also has a canonical eight-natural history-shrink projection.
+Native code rechecks its radix, rounded height, length mass, and child bound.
+The matching formal artifact has exact unchecked/checked round trips and feeds
+the natural-number shrink endpoint only when aligned with a separately
+strict-parsed packing source. This pins the compact interface while leaving
+compiler, allocation, conversion, and serialization equivalence open.
+`[pcc:unverified]`
+The native joint exporter now concatenates that compact header with the full
+packing-label projection. The formal bundle importer strictly checks both,
+aligns parent edges, label classes, and maximum class internally, proves every
+successful parse valid, and derives eightfold shrink from the parsed bundle
+without caller-supplied alignment premises. The remaining cross-language gap
+is equality of actual native output with this formal bundle, not a missing
+formal summary/source composition. `[pcc:unverified]`
+
+The independent native importer now uses the same auxiliary-state schedule as
+the formal replay instead of its former quadratic edge-pair objective: row
+degree/right-endpoint buckets followed by column row-label profiles. Its
+test-only quadratic oracle agrees with both sparse implementations on all
+3,280 ordered `3 x 3` multigraph controls through three edges and label
+alphabets 1 through 4. The exact strongest-boundary degree-one matching family
+now passes natively at `a=1,2,3,4`, reaching `M=131072`, `D=256`,
+maximum class 512, and 8192 packets at the largest rung. The three new rungs
+take 0.71 seconds together after compilation and use 15,810, 450,038, and
+13,496,226 charged steps. This remains finite scaling evidence rather than a
+uniform producer-family theorem. `[pcc:unverified]`
+
 `CHILD_PROVENANCE_CERTIFICATE.md` extends the independent boundary through one
 group child. From schema-3 parent provenance and the accepted factorization
 object, its schema-2 verifier reconstructs retained old vertices including
@@ -420,6 +585,280 @@ also exposes the decisive non-identity: the root uses
 to promote schedule compatibility into dimension equality, graph realization,
 external-theorem verification, or a total-work conclusion. `[pcc:unverified]`
 
+`PARAMETRIC_REFINEMENT_CERTIFICATE.md` takes the next step without undoing that
+separation. From explicit generic premises it reconstructs the variance/class
+cap, `KL<=3M`, group loads, child numerators `4/64` and `6/64`, strict shrink,
+degree preservation, and the `80 -> 96 -> 290 -> 148480` cost ledger through
+all five retained threshold depths. Its summary keeps
+`generic_premises_remain_assumed=true`; graph realization and the external
+theorem remain false. `[pcc:unverified]`
+
+A pinned Lean 4.35/mathlib replay now kernel-checks the same downstream
+real-inequality and ledger chain. It makes the parent-size nonnegativity and
+positive-dimension cancellation conditions explicit. It also derives
+`nD<=6M` from `KL<=3M` and the exact power-of-two tile/distance identity for
+every admitted coordinate and composes the existing finite precision-history
+theorem with uniform absorption to obtain `pu<=34MD` from explicit path facts;
+it also checks the generic packet row expansion, mode-fiber regrouping,
+group-assignment Fubini identity, 2-adic weight product, and high-weight
+truncation used in C1. The typed child specialization groups row choices by
+their complete mode-exponent vector, proves exact `2M` endpoint mass, and
+factors complete packet/group Boolean tables with opaque retained-old-tensor
+terms. The replay also checks the nilpotent truncated geometric inverse behind
+the scalar mode expansion. The scalar proof now retains the exact
+geometric remainder, derives the normalized tile shift `2^(i+1-v)j`, and proves
+that Rust's outer `2^(a+1-v)` factor kills the first omitted coefficient under
+the source guard `v<=i<=a`. Its axiom audits contain only Lean/mathlib's
+standard `propext`, `Classical.choice`, and `Quot.sound`. Native graph and
+history bindings, a formal refinement from concrete Rust scalar/mode/child
+objects to these typed values, and the remaining external theorem
+refinements are not discharged by this replay.
+`[pcc:unverified]`
+
+The native scalar boundary now has a separate serializable
+`CauchySourceWitness`. It exposes the actual stored base, numerator unit, and
+complete `(difference, valuation, inverse)` factor map, plus the exact monic
+polynomial bit pattern and length-`d` lower-bit vector selected by `Ring::new`.
+The standalone factorization verifier reruns that deterministic selection,
+checks every lower bit, independently reconstructs the scalar values from
+`(a,i,t,z)`, then checks every packet-matrix weight and every nonzero mode row
+and column without importing deformation, packing, child, or recursive code.
+The `L=4` fixture rejects altered polynomial or lower-bit data, valuation,
+missing factor, inverse, numerator-unit, and active-coordinate witnesses, and
+every executed-source
+certificate path replays the witness before acceptance. Composing the accepted
+packing-provenance packet pairs with that witness now reconstructs the complete
+mode list in exact packet/tile/weight loop order, including every source-side
+empty/zero suppression; a mutated packet pair changes the first expected mode
+header and is rejected. This is native code-to-formula evidence, not yet a Lean
+refinement theorem. `[pcc:unverified]`
+
+A separate serializable `RingMultiplicationWitness` now narrows the native
+arithmetic boundary. For canonical degree-`d` input and output coordinates it
+reruns `Ring::new`, checks the exact polynomial and all lower bits, and then
+independently replays the zero-fast-path nested convolution, retained-high
+reverse reduction, and final truncation before comparing every product
+coordinate, charging each executed product and reduction. The dense degree-4,
+precision-5 control exercises both convolution and reduction, round-trips
+through JSON, flattens the observed polynomial `19`, lower bits `[1,1,0,0]`,
+inputs, product `[30,29,0,3]`, and exact transition counts `16/6`, and compares
+them with the committed `ring_multiplication_witness.csv` artifact before
+rejecting an altered output coordinate. This is bounded
+concrete `Vec<BigUint>` code-to-transition
+evidence; it is not a mechanized Rust compiler refinement or a universal Lean
+instantiation. `[pcc:unverified]`
+
+The same committed artifact now has a concrete kernel-checked Lean consumer.
+The formal model reads it with `include_str`, parses its decimal fields with a
+transparent digit/comma parser, and then constructs a typed
+`RingMultiplicationArtifact`. That second parser derives four vector boundaries
+from the encoded degree, rejects short, long, or non-Boolean records, and gives
+the formal multiplication named lower-bit, left, right, and product fields
+instead of positional offsets. A generic soundness theorem now proves that
+every successful parse has all four vector lengths equal to its encoded degree.
+The public canonical importer then recomputes the monic packed polynomial from
+those bits and rejects any left, right, or product coordinate outside
+`[0,2^precision)`. Its own generic theorem proves that every successful import
+satisfies the complete Boolean canonicality predicate. A third transparent
+boundary now recomputes the exact zero-fast-path convolution and descending
+reduction over natural representatives, checks every serialized product
+coordinate, and proves that its masked values cast to
+`nativeProductCoordinates`. Lean kernel-checks that the committed record passes
+this replayed boundary,
+proves that its lower bits `[1,1,0,0]` give monic degree-four packing `19`
+(`U^4+U+1`), and evaluates the audited source-shaped transition equations to
+`[1,1,1,1]^2=[30,29,0,3]` in precision five. That equality now composes with
+the universal `decodeNativeProductCoordinates` theorem, proving that the
+record's named product coordinates decode to the quotient-ring product of its
+named left and right coordinates. This removes manual cross-file constant
+transfer for the fixed sample and makes arithmetic replay available to
+arbitrary serialized records; it does not prove that compiled Rust execution
+refines the Lean evaluator or authenticate a record's external provenance.
+`[pcc:unverified]`
+
+The canonical record interface is also no longer fixed to degree four. Generic
+projections turn any imported lists into `Fin artifact.degree` lower-bit and
+left/right/product coordinate functions over `ZMod (2^artifact.precision)`.
+The earlier `parsedCanonicalRingMultiplicationArtifact_decodes_mul` theorem
+isolates an explicit product equality. The new executable natural-number
+transition model follows the same masked zero fast paths and reverse reduction,
+maintains canonical representatives after every update, and proves
+coordinatewise casting into `nativeProductCoordinates`.
+`parsedReplayedRingMultiplicationArtifact_decodes_mul` therefore carries every
+successful replayed import directly to quotient multiplication with no external
+equality premise. The committed fixture kernel-checks through that generic
+parser; the fixed `Fin 4` theorem is now only a concrete regression. The
+remaining implementation boundary is a compiler refinement from Rust
+`Vec<BigUint>` execution and its serialized output to this executable Lean
+model.
+`[pcc:unverified]`
+
+A stronger selected-replayed importer now composes that arithmetic boundary
+with the deterministic packed search. It requires degree at least two,
+recomputes `firstIrreducibleBinaryPolynomial`, and checks every typed lower bit
+against the selected packed value. Its generic certificate proves canonicality,
+the exact selected polynomial, irreducibility of the actual precision-one
+`binaryPolynomial` used by the quotient, and decoded multiplication in one
+statement. The committed degree-four record passes this combined parser by
+kernel computation. This authenticates arbitrary supplied artifact contents
+inside Lean; it does not prove that Rust produced those contents.
+`[pcc:unverified]`
+
+A final metered importer now binds the two serialized counters as well. It
+recomputes the exact number of nonzero input-pair products in nested loop order
+and threads the changing natural-number buffer through the descending reduction
+schedule before counting each executed set-bit subtraction. Its generic
+certificate returns both counter equalities together with canonicality,
+deterministic modulus selection, actual-modulus irreducibility, and decoded
+quotient multiplication. The committed fixture kernel-checks at `16` products
+and `6` reductions through this strongest parser. This checks every serialized
+artifact field inside Lean; compiled-Rust refinement and external provenance
+remain separate. `[pcc:unverified]`
+
+The deterministic-polynomial boundary is narrowed both generically and for
+this fixture.
+A transparent packed-`GF(2)` model follows the native remainder, carryless
+product, Euclidean gcd, Rabin squaring, and odd-lower-pattern search order. It
+kernel-checks that degree-four candidate `17` is reducible, candidate `19` is
+accepted, and `19` is the first search result; the typed artifact's polynomial
+field is then proved equal to that selected value. Separately, Lean classifies
+every relevant monic factor over `GF(2)` as one of two linear or four quadratic
+shapes and proves that none divides `U^4+U+1`. The artifact's lower-bit vector
+is proved to decode to that polynomial, so packed-search acceptance is paired
+with an independent algebraic irreducibility certificate. The finite claim
+that degree four returns `19` remains fixture-specific. Generically, a primitive
+element of `GF(2^degree)` supplies an irreducible minimal polynomial; its support
+packs bit-for-bit into an odd natural in the exact enumerated window. Predicate
+completeness and an induction through the bounded search therefore prove that
+the public search returns a result at every degree at least two, and that every
+returned result has exactly the requested degree and is irreducible. A Rust
+compiler refinement of the search remains separate. The packed lower bits are
+now also proved coefficient-for-coefficient equal to the precision-one
+`binaryPolynomial` used by the extension-ring presentation, so every selected
+value defines an irreducible actual ring modulus, not only an irreducible
+parallel packed decoder.
+`[pcc:unverified]`
+
+The packed-search model now also has a general coefficient-level semantics
+boundary. At any fixed width, a natural number decodes to the polynomial whose
+coefficients are its native `testBit` values; packed XOR becomes polynomial
+addition over `GF(2)`; multiplication by `2^s` moves the represented
+coefficients by `s` and leaves lower coefficients zero; and the complete native
+carryless-product fold decodes to the same fold with XOR replaced by polynomial
+addition. Width-extension stability and a whole-polynomial shift theorem then
+identify that fold with ordinary polynomial multiplication whenever the left
+packed value satisfies its explicit bit-width bound; the right width is the
+native `log2(right)+1` loop bound. For remainder, each native XOR clearing step
+is proved to add a monomial multiple of the decoded modulus and preserve
+`modByMonic`; arbitrary bounded shift lists compose, and a transparent trace
+replays the exact fuel recursion. The public remainder therefore preserves the
+polynomial residue under explicit monicity, modulus-width, and trace-window
+hypotheses. The aligned step is now also proved to clear the current top bit;
+this discharges the trace-window hypothesis, proves `log2(value)+1` fuel is
+sufficient, and shows the returned packed value is zero or has `log2` below a
+nonzero modulus. Finally, packed decoding is proved to have
+`natDegree=log2(value)` whenever the nonzero leading bit lies inside its window;
+such a decoded binary polynomial is automatically monic. These facts upgrade
+the residue theorem to an exact identity between the decoded native remainder
+and mathlib `modByMonic`. A numeric bound on the native carryless fold then
+aligns arbitrary wider windows, and its leading degree is proved additive for
+nonzero inputs. The resulting endpoint covers zero and nonzero operands and
+shows `gf2PackedProduct` decodes to polynomial multiplication followed by
+`modByMonic` for every nonzero packed modulus. The result is now collapsed back
+to its minimal `log2+1` decoding window and iterated: every native
+square-and-reduce trace equals the matching polynomial Frobenius trace. A
+separate reduction-power induction identifies that trace with the exact
+`2^steps` power modulo the decoded monic modulus whenever the start is reduced;
+the Rabin start is a native remainder, so that premise is discharged. This
+proves the Rabin value trace. A separate Euclidean induction now shows every
+packed remainder in the GCD loop strictly reduces the right degree, proves the
+public sum-of-degrees fuel sufficient, identifies the returned packed value
+with polynomial GCD, and proves the native `==1` guard equivalent to polynomial
+GCD equaling one. Composing these facts through the Rabin Boolean control flow
+is now also kernel-checked: minimal packed decoding is injective, every active
+early guard becomes polynomial GCD one, and the terminal native equality becomes
+equality of the decoded Frobenius values. Thus the public packed Boolean is
+equivalent to an explicit polynomial semantic trace. The remaining external
+step is converse completeness under the required degree and monicity
+hypotheses. The recursive trace is also
+unrolled into a single indexed family of every active Frobenius/GCD check plus
+the final equality; for nonzero modulus the latter is proved to be exactly
+`x^(2^degree)=x mod f`. Minimal-window XOR decoding and GCD invariance under
+reduction now normalize every indexed guard too: for each active offset it is
+exactly `gcd(f, x^(2^(offset+1))-x)=1` over `GF(2)`, with the implementation's
+inner remainder removed. This is the complete standard Rabin criterion, while
+the implementation checks the stronger all-half-degree family. A new
+factorization argument shows those guards alone imply irreducibility: every
+nontrivial factorization has an irreducible factor of degree at most half,
+which would divide a guard declared coprime. Consequently a true public packed
+predicate is now proved sound whenever `log2(polynomial)=degree` and
+`degree>=2`. Conversely, irreducibility makes every positive subdegree
+Frobenius polynomial coprime, reconstructs every native guard, and makes the
+terminal `X^(2^degree)=X` comparison pass. Therefore the public packed Boolean
+is now proved equivalent to genuine polynomial irreducibility on its native
+exact-degree domain. Finally, induction over the odd-candidate search proves
+that every returned value passed this Boolean predicate and has the requested
+packed degree. Composing the two results certifies every successful public
+search result as an exact-degree irreducible polynomial for `degree>=2`. For
+existence, Lean constructs a primitive element of `GF(2^degree)`, proves its
+minimal polynomial monic, irreducible, and of exact degree, packs its support
+into a natural with exact decoder inverse, and places that odd value inside the
+enumerated window. The search is therefore proved to return `some` for every
+`degree>=2`. A generic coefficient bridge identifies those selected bits with
+`binaryPolynomial 1 degree`, and hence proves the modulus used by the formal
+extension-ring type irreducible for every selected result. Compiler refinement
+to concrete Rust execution remains separate.
+`[pcc:unverified]`
+
+The formal coefficient ring is no longer left wholly abstract.
+`lean/ExtensionRingModel.lean` defines the native power-basis shape
+`(Z/2^p)[U]/f` for a monic binary polynomial, decodes fixed-length coordinate
+vectors, proves coordinatewise addition and negation, proves `2^p=0` in the
+quotient, and specializes the exact Cauchy cutoff with that premise discharged.
+It also proves `U^d=-sum_j f_j U^j` and the exact one-step high-coefficient
+subtraction performed by the native reduction loop. The loop induction is now
+formal at the polynomial level: every logical step clears its targeted
+coefficient, and every finite offset schedule preserves the quotient value.
+Low coordinate vectors also decode exactly as quotient projections of their
+coordinate polynomials; their decoded product is therefore the projection of
+ordinary coordinate convolution followed by any verified reduction schedule.
+The convolution product is also the exact nested finite `i,j` monomial sum
+accumulated by the Rust loops; its coefficient at each buffer index is the
+corresponding conditional pair sum, and it has no support beyond `2d-1` slots.
+The zero-initialized mutable nested loops are formal too: both zero-coordinate
+fast paths and every `i+j` update compose to exactly those final slot values.
+The exact descending polynomial offsets `d-2,...,0` now preserve the quotient,
+clear every target without later reintroduction, and leave no coefficient at
+index at least `d`. One complete mutable reduction inner row is formal too: its
+cloned-coefficient zero fast path and set-bit subtractions have exact slot
+formulas, and the retained target plus all higher slots stay unchanged until
+truncation. The complete reverse fold is now composed: every returned low slot
+equals the logical reduced coefficient, the truncated coordinate polynomial is
+the reduced convolution, and decoding it gives the quotient product. A
+computable natural-number version now preserves canonical representatives,
+refines that modular fold, and checks arbitrary imported product coordinates
+before decoding. A mechanized concrete-`Vec<BigUint>` compiler refinement and
+authenticated external record provenance still require formal work.
+Deterministic polynomial selection and one accepted multiplication are
+independently replayed by native witnesses, and one committed fixed-sample
+artifact supplies its exact bits, named coordinates, and transition counts to
+both Rust and Lean through the replay-checked formal record.
+`[pcc:unverified]`
+
+The formal replay also covers the `2M delta` bipartite degree-square budget,
+the centered class-variance identity, and the conversion from the scaled
+collision objective to every per-class cap, with isolates and parallel ports
+represented in the degree data. The exact remaining graph-side lemma is the
+native binding: Lean now checks the complete row/column sequence, initial and
+final objective identities, scaled collision bound, and source-guard class cap
+for arbitrary finite endpoint maps. The native producer and independent
+importer now agree with the quadratic oracle on the full 3,280-case finite
+control, while the checked projection exposes exact endpoint and label values
+to the generic formal importer. A compiler-level semantic refinement from
+arbitrary Rust producer objects to that formal projection remains separate, as
+do factorization/precision realization and the external theorem.
+`[pcc:unverified]`
+
 `SYMMETRIC_CHILD_CLOSURE.md` now probes that boundary with the production
 native Rust routines on a radix-two schedule `a=1,2,3`. An under-scale
 `M=32<LD=512` child fails exactly at packet padding, while all four two-group
@@ -433,9 +872,9 @@ recursive closure; it exposed the class inequality used by the generic proof.
 `[pcc:unverified]`
 
 `CONDITIONAL_LABEL_GRAM.md` derives the exact greedy score from sparse
-incidence Gram forms. A 3,280-case exhaustive control matches the original
-ordered-edge-pair objective exactly, while the independent provenance verifier
-retains its own quadratic replay. The former 107.32-second single path now
+incidence Gram forms. A 3,280-case exhaustive control now matches the original
+ordered-edge-pair objective exactly in both the production labeler and the
+independent sparse provenance verifier. The former 107.32-second single path now
 takes 0.02 seconds and all four paths take 0.06 seconds in the warm debug
 harness. This optimization exposes the right auxiliary variables for an orbit
 analysis and independently preserves every label choice. `[pcc:unverified]`
