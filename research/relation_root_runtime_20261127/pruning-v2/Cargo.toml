@@ -1,0 +1,15 @@
+[package]
+name = "relation-joint-pruning-stream-qualification"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+certified-relations = { path = "../../../crates/certified-relations" }
+serde = {version="1",features=["derive"]}
+serde_json = "1"
+sha2="0.10"
+flate2="=1.1.10"
+[[bin]]
+name="joint-pruning-stream"
+path="main.rs"

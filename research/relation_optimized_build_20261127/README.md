@@ -1,0 +1,29 @@
+# Matched optimized root builds: bounded qualification
+
+This study tests whether the historical root and current guarded-scan workers can be built and checked under matching optimization settings on the existing one-CPU workspace. It collects no comparative application timings. `OUTCOME_FINAL.json` records the completed five-context failure; no optimized worker or new mathematical qualification was produced. `OUTCOME.json` preserves the initial three unsuccessful build contexts; the final source-scoped outcome and any recovered qualification are recorded separately. No 15× result is established here. [pcc:unverified]
+
+The two primes (2147483647 and 9007199254740881), n=3/4/6, seed7 LAST-star and all original input digests remain fixed. The five-worker instrument's 156 controls, 36 candidates, primary, A/A roster and full parent-call boundary are unchanged. Existing frozen workers remain available; an optimized executable is an additional build artifact, not permission to displace a stronger control or reuse historical timing pins.
+
+## Compiler context
+
+Rust1.100.0/LLVM23.1.5 uses release opt3, LTO off, codegen16, debug0, incrementalfalse, default-features=false, CPU0/jobs1 and one numerical thread. Initially only optimization level changes from the earlier opt0 qualification. A separate final layout trial overrides only the crypto package to codegen256, with other dependencies unchanged. The official Cargo release defaults and the repository's existing profile/build sources informed this choice; it is not a claim of best compiler settings or canonical performance qualification. `SOURCES.json` records the bounded review and unavailable KB route. No new algorithm or novelty claim.
+
+`SOURCE_CURRENT.sha256` binds the actual complete production source inputs. Historical source is pinned to commit `82e77fbefdbef0d382ae64f50c7ca5cc15328216`; the reconstruction helper checks exact Git blobs, modes and source hashes before any historical build. It applies no patch. Historical execution is conditional on complete current qualification and declared headroom. Actual compiler invocations and all source postchecks are retained.
+
+## Retained failures and cache recovery
+
+The first current build fails allocation of 2,097,152 bytes under AS6GiB; AS8GiB fails allocation of 107,136 bytes. Both are non-test `crypto` library compiler failures, Cargo exit101/rustcSIGABRT6, with source postcheck0. They are separate from the earlier whole-libtest failures. A final AS10GiB context is stopped by its own 15GiB physical-memory monitor, exit143, at 16,114,987,008 cgroup bytes. No cgroup OOM kill is recorded. No worker or mathematical check is produced in those three contexts. [pcc:unverified]
+
+`CACHE_RECOVERY_PLAN_V2.json` then defines a separate, reversible memory-context remedy. Exactly34 rebuildable compiler-cache files are backed up and verified by complete roster, bytes and modes. The backup is166,994,936 bytes; unlinking the exact inventoried cache files reclaims1,515,515,904 filesystem bytes. All46 protected executable hashes and all compilation-source hashes remain unchanged. Source, proofs, algorithms, tests, keys and gates are untouched. The original cache is restored byte/mode-exactly afterward, as recorded in `CACHE_RESTORATION.json`. The byte-exact cache backup stays in RAM for restoration; it is not mathematical evidence or a distributed runtime dependency. [pcc:unverified]
+
+The initial all-procfs-readable guard stops before mutation. Its unreadable same-user entries are zombies; other-UID container services remain explicitly uninspected. The revised guard checks live same-user references and compilers, preserves a verified backup, and requires actual space reclamation or restoration. It makes no global process-visibility claim and kills no unrelated process. A statically found bug in an unexecuted rollback stream loop is corrected before restoration use. The final full restoration is checked separately. [pcc:unverified]
+
+The followup keeps AS10GiB, the same codegen, the 15GiB sampled physical-memory refusal, 1.5GiB target threshold and the aggregate3600 compiler-second budget including all failed attempts. Two-second cgroup samples include other processes and cache pages; they are not exclusive compiler RSS. Address space is limited per process. Compiler/unit-test incidental durations are preserved as logs and never used as application timing evidence.
+
+## Correctness and publication scope
+
+Only successfully built, frozen executables may run the existing worker units, native36/108 integrations (including1116 mutation assertions and6 unsupported refusals), full separate native audits and432 no-clock transport/proof calls per source. Qualification requires null worker phase clocks and four semantic canaries per transport. Every new proof/native/receipt payload is compared with its exact opt0 reference. Unexecuted or censored checks remain uncomputed, not passes. No unchanged whole-root libtest attempt is repeated.
+
+Prepared-but-unexecuted helpers and intermediate plan/runner versions are retained explicitly. `FINAL_RUNNER_SOURCE.sha256` and the complete payload index distinguish them from executed compiler drivers. Earlier opt0 qualification remains separate evidence. Actual F4 solving degree and intrinsic regularity are unknown. No new PCC IDs, ledger promotions or signed execution attestations.
+
+The existing encrypted canonical timing-document condition remains unresolved, with its document-only choice unanswered. Conductor and checkpoint/S3 access are waived. This study requests no credentials and grants no timing authorization. Original15× acceptance still needs prospective full-boundary measurements against the strongest matched controls, repetitions/A/A, all six fixed inputs, every proof/failure and published validated evidence. [pcc:unverified]

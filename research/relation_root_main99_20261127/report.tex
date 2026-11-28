@@ -1,0 +1,57 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=18mm]{geometry}\usepackage{booktabs,hyperref}\pagestyle{empty}
+\begin{document}
+\noindent{\Large\bfseries Fresh main99 root build: two memory refusals}\\[4pt]
+{\small 27 November 2026. Draft PR \#5251. No application timing or native pass.}
+\paragraph{Outcome.} Neither bounded compiler layout produces a fresh root
+worker. Both are stopped by their own 14GiB shared-cgroup refusal, exit 143.
+Every source postcheck passes and cgroup OOM-kill stays 0. The new 36 original
+native cases, 108 matched pairs, 1116 mutation assertions, 6 unsupported refusals
+and 144 separate proof audits/7 canaries remain unexecuted. Older frozen workers
+are not substituted. These are resource outcomes, not mathematical failures
+or passes. Compiler trials end at the declared two contexts. [pcc:unverified]
+\begin{center}\begin{tabular}{rrrr}\toprule
+Root CG units & Exit & Cgroup bytes at refusal & Source check\\\midrule
+16 & 143 & 15087357952 & pass \\
+256 & 143 & 15120109568 & pass \\
+\bottomrule\end{tabular}\end{center}
+\paragraph{Exact target.} Source 3ddaa65f includes normal main 99b949b383b and
+the existing PR implementation. Cargo compiles the full non-test production
+crypto library as the unchanged native integration harness dependency. No
+global root libtest or previously failed opt3 configuration is repeated. The
+second layout changes only crypto package codegen256; all dependencies and
+harness stay 16. Its actual compiler metadata confirms opt0, 256 units and no
+libtest flag. There is no algorithm, test, key or gate edit. [pcc:unverified]
+\paragraph{Fixed budget.} CPU0/job1/thread1, zero cloud compute. Both layouts
+use release optimization 0, LTO off, debug information 0, incremental compilation
+off and default features disabled. Limits are 12 GiB address space, 1 GiB per
+file, 900 second deadlines, 14 GiB shared-cgroup refusal, 512 MiB tmpfs floor and
+2.5GiB target growth. Samples are taken every 2 seconds. Memory includes cache pages
+and other processes, not exclusive compiler RSS. Samples may overshoot the
+threshold before the next probe. No cap escalation or identical-layout retry.
+The later native/auditor limits are declared but those calls never start.
+\paragraph{Reversible cache handling.} Exactly two premerge non-executable,
+single-link library cache files are checked against the existing archive,
+inventory, selected member hashes and own-user live references before release.
+Their byte-exact backup remains. Exactly three failed-context cache files are
+separately backed up, member-verified and released before layout 2. Every
+protected frozen worker and every source byte remains unchanged. These are
+RAM-local rebuildable cache records, not distributed mathematical evidence.
+Unqualified partial codegen256 outputs remain intact. [pcc:unverified]
+\paragraph{Retained setup limitation.} An early layout 2 launcher is invoked
+before cache validation finishes; its required receipt is absent, so it
+returns before Cargo or any mathematical call. The actual compiler starts
+only after helper success. This failure and both actual refusals are retained.
+Old and new raw/preflight/source records are separate. Initial missing KB
+wrapper and exact restored-wrapper status 127 are recorded; the KB executable
+is unavailable. Source review is a bounded fallback, with no novelty claim.
+\paragraph{Standing and next work.} Native source qualification is still
+uncomputed, with all original fixed primes, $n=3,4,6$, seed7 LAST-star, proof and failure
+gates retained. An isolated heap proof-checker prototype is independently
+testable and cannot replace this root result. Future compiler working-set
+recovery or new-source integration requires a separately declared scope;
+there is no third trial here. Historical global/optimized/CI failures remain
+historical. Conductor/checkpoint access is waived and no credentials are
+requested. The separate timing-document choice remains unanswered.
+Original 15$\times$ remains active and unachieved. [pcc:unverified]
+\end{document}

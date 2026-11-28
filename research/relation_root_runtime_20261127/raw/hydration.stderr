@@ -1,0 +1,9 @@
+error: RPC failed; HTTP 503 curl 22 The requested URL returned error: 503
+fatal: expected 'packfile'
+fatal: could not fetch 6015d9be83a20f34a0d97909b9d85eaafa1ba719 from promisor remote
+Traceback (most recent call last):
+  File "/dev/shm/relation-root-runtime-20261127/research/relation_root_runtime_20261127/materialize_includes.py", line 43, in <module>
+    subprocess.run(GIT + ['restore', '--source=HEAD', '--worktree',
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', '-c', 'gc.auto=0', '-c', 'maintenance.auto=false', 'restore', '--source=HEAD', '--worktree', '--ignore-skip-worktree-bits', '--', 'research/ecbench_phased_panel_20261117/panel.json']' returned non-zero exit status 128.

@@ -1,0 +1,32 @@
+{
+  "schema": "canonical-row-scan-integrated-precall/v1",
+  "source": "CANDIDATE_SOURCE.sha256",
+  "workers": {
+    "candidate": {
+      "path": "/dev/shm/relation-canonical-scan-workers-20261127/candidate",
+      "sha256": "2666f7eadea071a9d0598da51dbdecaba1bed0072a211d0a7f63de1c6a472745"
+    },
+    "candidate-unit": {
+      "path": "/dev/shm/relation-canonical-scan-workers-20261127/candidate-unit",
+      "sha256": "73472b75d92c607e502bcc486c66646250b1b164183505a341d6c3a3cf8e9f03"
+    },
+    "native-original": {
+      "path": "/dev/shm/relation-canonical-scan-workers-20261127/native-original",
+      "sha256": "a67614218330ead26d0887fbaf0e6670f9bc6050e4538b1bbb71df622fed1bd5"
+    },
+    "native-pairgraph": {
+      "path": "/dev/shm/relation-canonical-scan-workers-20261127/native-pairgraph",
+      "sha256": "2f1f47ef972deedf675c92f0e04faa3f6f967a215bdbce24d5aae4594f931e4c"
+    }
+  },
+  "baseline_precall": "BASELINE_PRECALL.json",
+  "cpu": 0,
+  "numerical_threads": 1,
+  "performance_observations": 0,
+  "new_outputs": [
+    "/dev/shm/relation-canonical-scan-candidate-20261127",
+    "/dev/shm/relation-canonical-scan-native-original-20261127",
+    "/dev/shm/relation-canonical-scan-native-pairgraph-20261127"
+  ],
+  "signed_execution": false
+}

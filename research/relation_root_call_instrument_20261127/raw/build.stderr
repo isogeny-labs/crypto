@@ -1,0 +1,55 @@
+   Compiling relation-native-supervisor v0.1.0 (/dev/shm/relation-root-runtime-20261127/research/relation_root_call_instrument_20261127/native-supervisor)
+   Compiling relation-root-call-instrument v0.1.0 (/dev/shm/relation-root-runtime-20261127/research/relation_root_call_instrument_20261127)
+error[E0277]: the trait bound `u32: From<usize>` is not satisfied
+  --> src/bin/root-worker.rs:98:32
+   |
+98 |                 .map(|(m, c)| (m.into_iter().map(u32::from).collect(), c))
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `From<usize>` is not implemented for `u32`
+   |
+   = help: `u32` implements trait `From<T>`:
+             From<Ipv4Addr>
+             From<aws_smithy_runtime_api::client::retries::RequestAttempts>
+             From<bool>
+             From<char>
+             From<deranged::RangedU32<MIN, MAX>>
+             From<h2::frame::reason::Reason>
+             From<h2::frame::stream_id::StreamId>
+             From<h2::share::StreamId>
+           and 8 others
+
+error[E0277]: the trait bound `u32: From<usize>` is not satisfied
+  --> src/bin/root-worker.rs:98:50
+   |
+98 |                 .map(|(m, c)| (m.into_iter().map(u32::from).collect(), c))
+   |                                                  ^^^ the trait `From<usize>` is not implemented for `u32`
+   |
+   = help: `u32` implements trait `From<T>`:
+             From<Ipv4Addr>
+             From<aws_smithy_runtime_api::client::retries::RequestAttempts>
+             From<bool>
+             From<char>
+             From<deranged::RangedU32<MIN, MAX>>
+             From<h2::frame::reason::Reason>
+             From<h2::frame::stream_id::StreamId>
+             From<h2::share::StreamId>
+           and 8 others
+
+error[E0277]: the trait bound `u32: From<usize>` is not satisfied
+  --> src/bin/root-worker.rs:98:32
+   |
+98 |                 .map(|(m, c)| (m.into_iter().map(u32::from).collect(), c))
+   |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `From<usize>` is not implemented for `u32`
+   |
+   = help: `u32` implements trait `From<T>`:
+             From<Ipv4Addr>
+             From<aws_smithy_runtime_api::client::retries::RequestAttempts>
+             From<bool>
+             From<char>
+             From<deranged::RangedU32<MIN, MAX>>
+             From<h2::frame::reason::Reason>
+             From<h2::frame::stream_id::StreamId>
+             From<h2::share::StreamId>
+           and 8 others
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `relation-root-call-instrument` (bin "root-worker") due to 3 previous errors
