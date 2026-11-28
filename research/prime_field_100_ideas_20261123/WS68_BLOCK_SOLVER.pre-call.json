@@ -1,0 +1,16 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T21:50:45Z",
+  "conductor_task":"T-117",
+  "admission":"user-authorized bounded local E(F_p) run; prior S3 HTTP 403 and missing .resume gates remain unqualified; no cloud spend",
+  "worktree_commit":"6430d48828ad11870aabc4392fed4dcf9dd5ece6",
+  "source":{"path":"WS68_BLOCK_SOLVER.rs","sha256":"b30b75afb5c35b4475b5bd14c6e2e2d382e5bdc452c8f3a9b38f4159f5ec63d9"},
+  "immutable_qualifier":{"path":"WS68_BLOCK_SOLVER.qualifier.rs","sha256":"b30b75afb5c35b4475b5bd14c6e2e2d382e5bdc452c8f3a9b38f4159f5ec63d9"},
+  "input":{"path":"WS68_NATURAL_PARTIAL.stdout","bytes":23188,"sha256":"922945c9a81568d23a504e2d296ef6c468f8dd47738e9b9e8a303ce12246f2b3","curve":"E/F_1009: y^2=x^3+x+14","subgroup_order":1013,"source_rows_partial_arm":152},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_BLOCK_SOLVER","WS68_BLOCK_SOLVER.qualifier.rs","-o","WS68_BLOCK_SOLVER.bin"],
+  "algorithm":{"row_preparation":"parse accepted source records independently; eliminate 16 large columns; replay all source coefficient witnesses and E(F_1009) group identities; select first nine independent rows including known-log anchor","matrix":"same deterministic 9x9 square full-rank subsystem for both arms","control":"direct modular Gauss-Jordan on A x=b","block_arm":"three simultaneous Krylov directions, K=[B,AB,A^2B] with B=(b,e_i,e_j); solve AK c=b and x=Kc; exact verification on square and every original complete row","predeclared_probe_pairs":[[0,1],[2,3],[4,5]],"stopping":"first full-rank K and verified solution; record each rank-deficient attempt as censored, no other retries"},
+  "expected":"No winning-arm expectation. Preserve compile/run failures. Report rank, source/witness checks, selected row IDs, exact field operation and matvec/nonzero counts, per-arm wall diagnostics and target verification.",
+  "literature":{"kb_revision":"750797a540fb4c38837c67b12df84d5b","kb_last_refresh":"2026-11-25T03:19:48Z","repository":["docs/ic/README.md","docs/ic/ECDLP_RESEARCH_TECHNIQUES.md","src/cryptanalysis/koblitz_sparse_la.rs","research/prime_field_100_ideas_20261123/README.md"],"primary_papers":["https://www.enseignement.polytechnique.fr/informatique/profs/Francois.Morain/Master1/Crypto/projects/Wiedemann86.pdf","https://kaltofen.math.ncsu.edu/bibliography/91/KaSa91.pdf"],"relevance":"Finite-field sparse solving requires exact Ax=b verification and square/nonsingular or explicitly handled singular systems. Repository block Lanczos uses A^T D A with breakdown retry. This bounded block-Krylov projection is an exact component control, not that algorithm."},
+  "limits":"One selected 9x9 matrix is too small for scaling inference. Dense projection solve is charged; group verification and row preparation are shared. No actual block-Lanczos recurrence or block-diagonal partition is claimed."
+}

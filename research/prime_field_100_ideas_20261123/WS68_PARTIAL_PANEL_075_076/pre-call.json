@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-27",
+  "conductor_task": "T-13062",
+  "curve": "y^2=x^3+x+14 over F_1009, prime group order 1013",
+  "generator": [0,425],
+  "target_points": [[480,324],[101,671],[987,758],[633,411]],
+  "target_scalar_visible_to_producer": false,
+  "seed": "0x7516_2026_1125",
+  "candidate_cap_per_target": 512,
+  "full_base_size": 8,
+  "large_base_size": 16,
+  "source_sha256": "99d8d12795a75ff869987cd4cae4999cc234ca1012014158cb4ba5f95d7c462b",
+  "rustc_version": "1.93.1 arm64 Homebrew",
+  "rustc_sha256": "de09d555d0acd2d3c1b608ab369b20c6467aa9c5681c4194a9dd5ed1e84fa5f2",
+  "checkpoint_gate": {"exit_code": 2, "reason": "missing .resume/RESUME.md", "admission": "previously authorized bounded local bypass"},
+  "arms": ["full-only F+F", "F+F plus F+L plus L+L with exact large-column filtering", "same-target Floyd rho"],
+  "fixed_controls": "same 512 ordered a,b probes and Q per full/partial pair; fresh process per Q; common base scan and candidate stream charged to each arm",
+  "rho": {"partition": "x mod 3", "seeds": [1,2,3,4], "floyd_iteration_cap_per_seed": 256},
+  "compile": "rustc --edition=2021 -O run.rs -o /tmp/ws68_partial_panel.bin",
+  "runs": ["/tmp/ws68_partial_panel.bin 0", "/tmp/ws68_partial_panel.bin 1", "/tmp/ws68_partial_panel.bin 2", "/tmp/ws68_partial_panel.bin 3"],
+  "acceptance": "exact point/source/witness replay, per-arm base/augmented rank and target pin, direct scalar-point checks, rho outcome/censor, RUN_OK=1, runtime stderr empty",
+  "claim_boundary": "bounded natural relation panel; costs are vectors, no asymptotic or full solve speed claim"
+}

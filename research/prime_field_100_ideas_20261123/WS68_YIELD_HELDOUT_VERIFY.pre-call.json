@@ -1,0 +1,10 @@
+{
+  "record_type":"immutable_pre_call",
+  "conductor_task":"T-150",
+  "admission":"independent native replay of frozen public E(F_p) held-out shards",
+  "source":{"path":"WS68_YIELD_HELDOUT_VERIFY.rs","sha256":"c71e7c69cd2c3aa5e1f790bec62b54c282d7c0fde5523002d571628278d49e41"},
+  "immutable_qualifier":{"path":"WS68_YIELD_HELDOUT_VERIFY.qualifier.rs","sha256":"c71e7c69cd2c3aa5e1f790bec62b54c282d7c0fde5523002d571628278d49e41"},
+  "input_shards":{"37":"e04b7f8a7f09d1f91300e02bc0704ac67cff68922d7c5a4c077debf17ed7a4eb","83":"95338e2d43bc26d67704daef25dea3ff459961b6bb0edab863c1d94b01c2d46f","191":"bd3ae51c7c8c3b3a280e1477520efee07fde69bfe7690a5b494f5c02f78f6f3c","349":"1eeb644145e8eaa314d38a9321a5da174d818be3761a9a31087e4570e1f83d20","613":"eba8884aba7ae9dc0f37c76176b88423343096851649e2e7396ccc25d55b4abc","769":"ad2d1f572724ad76f7a1be5eafa592fb9cf7c9485134d17ac8c6def08a81a5fb","887":"844110cc2e364c123f88ebb00a215aaca60d1a453fd93fecfe8c0059b9721418","997":"16b7197f515a7ddc11fc3905bd2ed0d02d5687dfc72eeac7397ed1ae1831c2f1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_YIELD_HELDOUT_VERIFY","WS68_YIELD_HELDOUT_VERIFY.qualifier.rs","-o","WS68_YIELD_HELDOUT_VERIFY.bin"],
+  "expected":"Independently count E(F_1009), verify each Q=[d]G, regenerate each arm's candidate scalar prefix, pair-sum hit set and feedback decisions, recompute modular rank/target pin, verify recovered logs; preserve censored arms."
+}
