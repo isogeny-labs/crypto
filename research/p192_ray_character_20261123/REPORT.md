@@ -1725,6 +1725,37 @@ sign evaluator on P-192**. Four selected markings cannot estimate
 its full-group bias; no useful-bias or cold-cost claim follows.
 [pcc:unverified]
 
+### Rational-subgroup root derivative
+
+There is a compact formula for a different point-only feature.
+Let `n=(r−1)/2` and let `M(T)` be the monic polynomial with roots
+`x([j]G)`, `1≤j≤n`. It is independent of which generator labels
+the rational group. The division-polynomial difference identity
+gives `x(P)−x([j]P)=ψ_(j+1)(P)ψ_(j−1)(P)/ψ_j(P)²`.
+Multiplication over `2≤j≤n` telescopes exactly to
+
+`M′(x(P))=ψ_(n+1)(P)/(ψ₂(P)ψ_n(P))`.
+
+The right side uses a logarithmic-depth division-polynomial
+recurrence; it does not require constructing the degree-`n`
+polynomial `M`. The
+[`rational_root_derivative_screen.sage`](rational_root_derivative_screen.sage)
+replay matches this formula to the direct root product at every
+one of 48 signed classes on each of two order-97 curves and
+checks invariance under `P↦−P` on P-192. [pcc:unverified]
+
+Its quadratic character is not the desired P-192 scalar sign.
+The value at `G` is
+`3829735520829775241229155467091416936102154705267888010662`,
+with field character `+1`. At `[2]G` the value is
+`2604617308640626115964727729063573394661445304196719701968`,
+with field character `−1`, while `χ_r(2)=+1`; `[3]G` also
+disagrees after normalization. Thus the compact root derivative
+does not evaluate the ray sign, and this identity does not
+compress the separate oriented `y` product. No bias or cold
+evaluation claim follows from the selected markings.
+[pcc:unverified]
+
 ### Trace-index division-polynomial residue screen
 
 A separate fixed-index screen evaluated the quadratic character
