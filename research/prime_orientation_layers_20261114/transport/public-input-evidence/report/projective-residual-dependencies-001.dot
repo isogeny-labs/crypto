@@ -1,0 +1,8 @@
+digraph G {rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=11];
+ a[label="Actual kernel V of public coefficient/jet map"];
+ b[label="Actual raw residual fractional ideal\nPrincipal function ideal * inverse point-product unit"];
+ c[label="Nonzero scalar rescaling gives EXACT same residual"];
+ d[label="Actual projective residual map\nIntegral under actual membership / distinct point pairs"];
+ e[label="Exact coefficient-line count\n(card(V)-1)=(q-1)*card(projective V)\ncard(projective V)=sum(i<dim V,q^i)"];
+ f[label="OPEN: actual output fibers / useful labeled factors\nSuccess probability / retries / complete bit cost",style="rounded,dashed",fillcolor="white"];
+ a->b;b->c;c->d;a->e;d->f[style=dashed];e->f[style=dashed];}

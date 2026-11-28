@@ -1,0 +1,39 @@
+module
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Basic
+public import Mathlib.Algebra.Ring.GeomSum
+public section
+namespace CryptoLean.StrictTriangular
+open Matrix Polynomial Finset
+
+variable {ι R : Type*} [Fintype ι] [DecidableEq ι] [LinearOrder ι]
+
+theorem pow_card_zero [CommRing R] (M : Matrix ι ι R)
+    (h : ∀ i j, j ≤ i → M i j=0) : M^(Fintype.card ι)=0 := by
+  have hu : M.IsUpperTriangular := fun _ _ hj => h _ _ (le_of_lt hj)
+  have hd : ∀ i, M i i=0 := fun i => h i i le_rfl
+  have hc : M.charpoly=X^(Fintype.card ι) := by
+    rw [Matrix.charpoly_of_isUpperTriangular M hu]
+    simp only [hd,map_zero,sub_zero,Finset.prod_const,Finset.card_univ]
+  have H := Matrix.aeval_self_charpoly M
+  rw [hc] at H
+  simpa only [map_pow,Polynomial.aeval_X] using H
+
+theorem nat_pow_card_zero (M : Matrix ι ι ℕ)
+    (h : ∀ i j, j ≤ i → M i j=0) : M^(Fintype.card ι)=0 := by
+  have hz : (M.map (Nat.castRingHom ℤ))^(Fintype.card ι)=0 := by
+    apply pow_card_zero
+    intro i j hij
+    simp only [Matrix.map_apply,h i j hij,map_zero]
+  apply Matrix.map_injective (Int.natCast_injective)
+  rw [Matrix.map_pow]
+  simpa only [Matrix.map_zero] using hz
+
+theorem finite_geometric_fixed_point {S : Type*} [Semiring S] (x : S) (n : ℕ) (h : x^n=0) :
+    (∑ j ∈ range n,x^j)=x*(∑ j ∈ range n,x^j)+1 := by
+  have H := (geom_sum_succ (x:=x) (n:=n)).symm.trans (geom_sum_succ' (x:=x) (n:=n))
+  simpa only [h,zero_add] using H.symm
+
+end CryptoLean.StrictTriangular
+#print axioms CryptoLean.StrictTriangular.pow_card_zero
+#print axioms CryptoLean.StrictTriangular.nat_pow_card_zero
+#print axioms CryptoLean.StrictTriangular.finite_geometric_fixed_point

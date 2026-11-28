@@ -18,8 +18,9 @@
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use super::mont_vt::{
-    AdxKernel, AdxSqrKernel, CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel,
-    ProdAdxKernel, ProdKernel, SqrKernel, TunedKernel,
+    Adx6Kernel, Adx6MulKernel, AdxIlKernel, AdxKernel, AdxQpKernel, AdxSqrKernel, AdxTwKernel,
+    CiosKernel, KaratsubaKernel, Mont, MulKernel, MulxKernel, ProdAdxKernel, ProdKernel, SqrKernel,
+    TunedKernel,
 };
 use num_bigint::BigUint;
 
@@ -212,7 +213,25 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
             mont_dispatch::<TunedKernel>(x, y, k, a, Wnaf(w), true, false)
         }
         // ADX kernels are dispatched only after the CPU check.
-        "adx" | "adx_sqr" | "adx_wnaf" if !super::mont_vt::has_adx() => None,
+        "adx" | "adx_sqr" | "adx_wnaf" | "adx6" | "adx6_mul" if !super::mont_vt::has_adx() => None,
+        // Six-limb asm product (products and squares / products only);
+        // other widths fall through to the production ADX kernel.
+        "adx6" => mont_dispatch::<Adx6Kernel>(x, y, k, a, Binary, false, false),
+        "adx6_mul" => mont_dispatch::<Adx6MulKernel>(x, y, k, a, Binary, false, false),
+        // Interleaved (m hoisted) asm kernels at 4 and 6 limbs.
+        "adx_il" => mont_dispatch::<AdxIlKernel>(x, y, k, a, Binary, false, false),
+        // Quotient-pipelined asm kernels at 4 and 6 limbs.
+        "adx_qp" => mont_dispatch::<AdxQpKernel>(x, y, k, a, Binary, false, false),
+        // Two-word Montgomery reduction asm kernels at 4 and 6 limbs.
+        "adx_tw" => mont_dispatch::<AdxTwKernel>(x, y, k, a, Binary, false, false),
+        // AVX-512 IFMA single-product kernel at 4 and 6 limbs (52-bit limbs).
+        #[cfg(target_arch = "x86_64")]
+        "ifma1" => {
+            if !super::mont_ifma::has_ifma() {
+                return None;
+            }
+            mont_dispatch::<super::mont_ifma::IfmaKernel>(x, y, k, a, Binary, false, false)
+        }
         "adx" => mont_dispatch::<AdxKernel>(x, y, k, a, Binary, false, false),
         "adx_sqr" => mont_dispatch::<AdxSqrKernel>(x, y, k, a, Binary, false, false),
         "mulx" => mont_dispatch::<MulxKernel>(x, y, k, a, Binary, false, false),
@@ -231,7 +250,9 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
 /// Field-kernel latency probe for the multiplication ablation: runs
 /// `iters` dependent operations `acc ← op(acc, b)` mod `p` and returns
 /// nanoseconds per operation and the final residue (so the work cannot be
-/// elided).  `op` is `cios_mul`, `cios_sqr` (CIOS `a·a`), `sqr`
+/// elided).  `op` is `cios_mul`, `adx_mul` / `adx6_mul` (inline-asm ADX
+/// product, 4 / 6 limbs only), `adx_il_mul` / `adx_qp_mul` (interleaved /
+/// quotient-pipelined asm, 4 and 6 limbs), `mulx_mul`, `cios_sqr` (CIOS `a·a`), `sqr`
 /// (dedicated squaring), `karatsuba_mul`, `sos_mul` (schoolbook product
 /// then separate reduction), `inv_bingcd` / `inv_fermat` (one inversion),
 /// or `biguint_mul` (`num-bigint` `a·b mod p`).  Benchmark use only; `None` for an unknown op or width.
@@ -253,6 +274,12 @@ pub fn field_kernel_probe(
         let ctx = Mont::<N>::new(p)?;
         let mut acc = ctx.enter(a)?;
         let bm = ctx.enter(b)?;
+        #[cfg(target_arch = "x86_64")]
+        if matches!(op, "ifma1_mul" | "ifma8_mul" | "adx8_mul") {
+            let (ns, check) = super::mont_ifma::probe(op, &ctx, &acc, &bm, iters)?;
+            std::hint::black_box(check);
+            return Some((ns, ctx.leave(&acc)));
+        }
         let t0 = std::time::Instant::now();
         match op {
             "cios_mul" => (0..iters).for_each(|_| acc = ctx.mul(std::hint::black_box(&acc), &bm)),
@@ -265,6 +292,26 @@ pub fn field_kernel_probe(
                 ctx.mul_adx4(&acc, &bm)?;
                 (0..iters)
                     .for_each(|_| acc = ctx.mul_adx4(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx_tw_mul" => {
+                ctx.mul_adx_tw(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx_tw(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx_qp_mul" => {
+                ctx.mul_adx_qp(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx_qp(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx_il_mul" => {
+                ctx.mul_adx_il(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx_il(std::hint::black_box(&acc), &bm).unwrap())
+            }
+            "adx6_mul" => {
+                ctx.mul_adx6(&acc, &bm)?;
+                (0..iters)
+                    .for_each(|_| acc = ctx.mul_adx6(std::hint::black_box(&acc), &bm).unwrap())
             }
             "mulx_mul" => {
                 if !super::mont_vt::has_adx() {
@@ -697,6 +744,35 @@ impl Point {
     /// double-and-add over [`Point::add`] and [`Point::double`] returns,
     /// including its identity and `2P = O` cases, because the two agree
     /// wherever the affine formulas are defined.
+    /// `ks[i]·points[i]` for many points on one curve (`y² = x³ + a·x + b`
+    /// over `a`'s modulus), equal to calling [`scalar_mul`](Self::scalar_mul)
+    /// on each.  On CPUs with AVX-512 IFMA and moduli below `2^414` it runs
+    /// eight scalar multiplications at once, one per vector lane
+    /// (`ecc::ifma_batch`: 52-bit limbs, fixed 4-bit windows, Jacobian
+    /// coordinates, one batch inversion per eight); lanes that hit an
+    /// exceptional case of the formulas (`Q = ±T`, 2-torsion) are
+    /// recomputed with `scalar_mul`.  Otherwise it is `scalar_mul` per
+    /// point.  Variable time.
+    ///
+    /// # Panics
+    /// If `points` and `ks` differ in length.
+    pub fn scalar_mul_batch(points: &[Point], ks: &[BigUint], a: &FieldElement) -> Vec<Point> {
+        assert_eq!(
+            points.len(),
+            ks.len(),
+            "scalar_mul_batch: points and scalars differ in length"
+        );
+        #[cfg(target_arch = "x86_64")]
+        if let Some(out) = super::ifma_batch::scalar_mul_batch(points, ks, a) {
+            return out;
+        }
+        points
+            .iter()
+            .zip(ks)
+            .map(|(p, k)| p.scalar_mul(k, a))
+            .collect()
+    }
+
     pub fn scalar_mul(&self, k: &BigUint, a: &FieldElement) -> Point {
         self.scalar_mul_impl(k, a, false)
     }
@@ -2103,7 +2179,13 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 13] = [
+    const ARMS: [&str; 19] = [
+        "ifma1",
+        "adx_tw",
+        "adx_qp",
+        "adx_il",
+        "adx6",
+        "adx6_mul",
         "adx",
         "adx_sqr",
         "mulx",

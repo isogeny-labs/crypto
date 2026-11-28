@@ -1,0 +1,448 @@
+saved sessions/c1-e2e-m5-std/comparisons/ic-std__ic-tw-a__ECC1h3b744c85572e.json
+ops (ok): ic-tw-a / ic-std = 0.1286 [0.114, 0.145] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 0.1286, w=0.1: 0.1286, w=1: 0.1287): ic-tw-a < ic-std at every weight; wall: refused (the arms ran in different sessions, so no pair shares a host window)
+pricing weight: 0 GAE per native operation
+measurement quality: unavailable / 100; paired attempts 0, verified 0, admitted 0; levels {}; p95 foreign busy unknown%, p95 run queue unknown%
+quality notes: different sessions: no shared host window for a fidelity score
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / ic-std | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 0.1286 | [0.1144, 0.1446] | linearised_t |
+
+| workload | curve | log2 r | ic-std mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 64867.4654 | 8934.7637 | 0.1377 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 59406.0578 | 8456.8267 | 0.1424 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 61696.1262 | 8999.0586 | 0.1459 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 65430.2295 | 8000.9301 | 0.1223 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 75573.6699 | 8500.9560 | 0.1125 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 69484.7223 | 8108.8967 | 0.1167 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__ic-std__ECC1he9caf760b42d.json
+ops (ok): ic-std / rho-strong-l1 = 22587.6799 [18904.168, 26988.932] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 22587.6799, w=0.1: 20700.0155, w=1: 11814.3219): ic-std > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.8954, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 91.04%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 22587.6799 | [18904.1676, 26988.9316] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.4969 | 64867.4654 | 18549.8297 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8399 | 59406.0578 | 20918.3288 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8804 | 61696.1262 | 21419.1672 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0809 | 65430.2295 | 21237.1484 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.5915 | 75573.6699 | 29162.2932 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6623 | 69484.7223 | 26099.5180 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l1__ic-tw-a__ECC1hac9d5b78dfed.json
+ops (ok): ic-tw-a / rho-strong-l1 = 2905.7384 [2604.521, 3241.792] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2905.7384, w=0.1: 2663.0438, w=1: 1520.6216): ic-tw-a > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.4845, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 89.82%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 2905.7384 | [2604.5213, 3241.7917] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.4969 | 8934.7637 | 2555.0304 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8399 | 8456.8267 | 2977.8559 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8804 | 8999.0586 | 3124.2211 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0809 | 8000.9301 | 2596.9180 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.5915 | 8500.9560 | 3280.3405 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6623 | 8108.8967 | 3045.8249 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l16__ic-std__ECC1h1ca3750d5dc9.json
+ops (ok): ic-std / rho-strong-l16 = 23278.9274 [20212.419, 26810.668] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 23278.9274, w=0.1: 20960.8367, w=1: 11054.2253): ic-std > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.8744, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.98%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 23278.9274 | [20212.4192, 26810.6680] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1381 | 64867.4654 | 20670.6260 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.7640 | 59406.0578 | 21493.1622 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8752 | 61696.1262 | 21458.0247 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.9591 | 65430.2295 | 22111.2596 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6204 | 75573.6699 | 28840.5490 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6739 | 69484.7223 | 25985.8234 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l16__ic-tw-a__ECC1hf6d4c240edc3.json
+ops (ok): ic-tw-a / rho-strong-l16 = 2994.6623 [2794.109, 3209.610] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2994.6623, w=0.1: 2696.5983, w=1: 1422.7896): ic-tw-a > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.5062, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.65%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 2994.6623 | [2794.1093, 3209.6104] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1381 | 8934.7637 | 2847.1462 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.7640 | 8456.8267 | 3059.6871 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8752 | 8999.0586 | 3129.8889 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.9591 | 8000.9301 | 2703.8059 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6204 | 8500.9560 | 3244.1489 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6739 | 8108.8967 | 3032.5567 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__rho-strong-l16__ECC1ha58732c0cd47.json
+ops (ok): rho-strong-l16 / rho-strong-l1 = 0.9703 [0.923, 1.020] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9703, w=0.1: 0.9876, w=1: 1.0688): unresolved inside the band; wall: descriptive (ns/GAE 1.0043, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1, rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0 GAE per native operation
+measurement quality: 40 / 100; paired attempts 30, verified 30, admitted 0; levels {"L1": 30}; p95 foreign busy 95.37%, p95 run queue 0.00%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+| curve | log2 r | workloads | rho-strong-l16 / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 0.9703 | [0.9229, 1.0202] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | rho-strong-l16 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.4969 | 3.1381 | 0.8974 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8399 | 2.7640 | 0.9733 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8804 | 2.8752 | 0.9982 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0809 | 2.9591 | 0.9605 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.5915 | 2.6204 | 1.0112 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6623 | 2.6739 | 1.0044 |
+saved sessions/c1-e2e-m5-tw/comparisons/ic-tw-a__ic-tw-b__ECC1h91a845a2102d.json
+ops (ok): ic-tw-b / ic-tw-a = 1.0306 [0.964, 1.102] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 1.0306, w=0.1: 1.0306, w=1: 1.0306): ic-tw-b > ic-tw-a at every weight; wall: descriptive (ns/GAE 1.0021, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed)
+pricing weight: 0 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 0.24%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+arm ic-tw-b: verified 30/30 (0 censored); max/median S 1.36, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-b / ic-tw-a | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0306 | [0.9638, 1.1020] | linearised_t |
+
+| workload | curve | log2 r | ic-tw-a mean S | ic-tw-b mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 8934.7637 | 9247.0597 | 1.0350 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 8456.8267 | 8930.0909 | 1.0560 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 8999.0586 | 8424.4541 | 0.9361 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 8000.9301 | 8655.9865 | 1.0819 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 8500.9560 | 8301.9969 | 0.9766 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 8108.8967 | 9001.9008 | 1.1101 |
+saved sessions/c1-e2e-m5-std/comparisons/ic-std__ic-tw-a__ECC1h1be1eed4890e.json
+ops (ok): ic-tw-a / ic-std = 0.1286 [0.114, 0.145] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 0.1286, w=0.1: 0.1286, w=1: 0.1287): ic-tw-a < ic-std at every weight; wall: refused (the arms ran in different sessions, so no pair shares a host window)
+pricing weight: 0.1 GAE per native operation
+measurement quality: unavailable / 100; paired attempts 0, verified 0, admitted 0; levels {}; p95 foreign busy unknown%, p95 run queue unknown%
+quality notes: different sessions: no shared host window for a fidelity score
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / ic-std | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 0.1286 | [0.1144, 0.1446] | linearised_t |
+
+| workload | curve | log2 r | ic-std mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 64867.6739 | 8935.2826 | 0.1377 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 59406.2445 | 8457.2725 | 0.1424 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 61696.3123 | 8999.5162 | 0.1459 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 65430.4309 | 8001.3443 | 0.1223 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 75573.8810 | 8501.4638 | 0.1125 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 69484.9298 | 8109.3790 | 0.1167 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__ic-std__ECC1h1239ac25f98b.json
+ops (ok): ic-std / rho-strong-l1 = 20700.0155 [17120.668, 25027.682] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 22587.6799, w=0.1: 20700.0155, w=1: 11814.3219): ic-std > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.8954, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 91.04%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 20700.0155 | [17120.6681, 25027.6822] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.8864 | 64867.6739 | 16691.0740 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0873 | 59406.2445 | 19241.8734 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1348 | 61696.3123 | 19680.8065 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.3851 | 65430.4309 | 19328.9924 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.7895 | 75573.8810 | 27091.8290 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8694 | 69484.9298 | 24215.6582 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l1__ic-tw-a__ECC1h4d93e8b1e168.json
+ops (ok): ic-tw-a / rho-strong-l1 = 2663.0438 [2357.380, 3008.340] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2905.7384, w=0.1: 2663.0438, w=1: 1520.6216): ic-tw-a > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.4845, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 89.82%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 2663.0438 | [2357.3802, 3008.3404] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.8864 | 8935.2826 | 2299.1338 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0873 | 8457.2725 | 2739.3377 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1348 | 8999.5162 | 2870.7994 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.3851 | 8001.3443 | 2363.7002 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.7895 | 8501.4638 | 3047.6165 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8694 | 8109.3790 | 2826.1373 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l16__ic-std__ECC1h7d9a57a67753.json
+ops (ok): ic-std / rho-strong-l16 = 20960.8367 [18043.402, 24349.990] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 23278.9274, w=0.1: 20960.8367, w=1: 11054.2253): ic-std > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.8744, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.98%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 20960.8367 | [18043.4023, 24349.9905] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.5347 | 64867.6739 | 18351.7006 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0560 | 59406.2445 | 19439.2090 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1947 | 61696.3123 | 19312.2412 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.3129 | 65430.4309 | 19750.3801 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8786 | 75573.8810 | 26253.9058 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.9375 | 69484.9298 | 23654.6092 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l16__ic-tw-a__ECC1h0701ef361d4b.json
+ops (ok): ic-tw-a / rho-strong-l16 = 2696.5983 [2494.008, 2915.645] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2994.6623, w=0.1: 2696.5983, w=1: 1422.7896): ic-tw-a > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.5062, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.65%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 2696.5983 | [2494.0080, 2915.6451] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.5347 | 8935.2826 | 2527.8790 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0560 | 8457.2725 | 2767.4311 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1947 | 8999.5162 | 2817.0375 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.3129 | 8001.3443 | 2415.2308 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8786 | 8501.4638 | 2953.3567 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.9375 | 8109.3790 | 2760.6589 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__rho-strong-l16__ECC1hccdba435dc0d.json
+ops (ok): rho-strong-l16 / rho-strong-l1 = 0.9876 [0.936, 1.042] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9703, w=0.1: 0.9876, w=1: 1.0688): unresolved inside the band; wall: descriptive (ns/GAE 1.0043, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1, rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 40 / 100; paired attempts 30, verified 30, admitted 0; levels {"L1": 30}; p95 foreign busy 95.37%, p95 run queue 0.00%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+| curve | log2 r | workloads | rho-strong-l16 / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 0.9876 | [0.9362, 1.0418] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | rho-strong-l16 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.8864 | 3.5347 | 0.9095 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0873 | 3.0560 | 0.9898 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.1348 | 3.1947 | 1.0191 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.3851 | 3.3129 | 0.9787 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.7895 | 2.8786 | 1.0319 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8694 | 2.9375 | 1.0237 |
+saved sessions/c1-e2e-m5-tw/comparisons/ic-tw-a__ic-tw-b__ECC1h58507dc4f185.json
+ops (ok): ic-tw-b / ic-tw-a = 1.0306 [0.964, 1.102] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 1.0306, w=0.1: 1.0306, w=1: 1.0306): ic-tw-b > ic-tw-a at every weight; wall: descriptive (ns/GAE 1.0021, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed)
+pricing weight: 0.1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 0.24%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+arm ic-tw-b: verified 30/30 (0 censored); max/median S 1.36, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-b / ic-tw-a | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0306 | [0.9638, 1.1020] | linearised_t |
+
+| workload | curve | log2 r | ic-tw-a mean S | ic-tw-b mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 8935.2826 | 9247.5562 | 1.0349 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 8457.2725 | 8930.6102 | 1.0560 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 8999.5162 | 8424.9311 | 0.9362 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 8001.3443 | 8656.5089 | 1.0819 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 8501.4638 | 8302.4900 | 0.9766 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 8109.3790 | 9002.4309 | 1.1101 |
+saved sessions/c1-e2e-m5-std/comparisons/ic-std__ic-tw-a__ECC1h02e07ddfb160.json
+ops (ok): ic-tw-a / ic-std = 0.1287 [0.114, 0.145] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 0.1286, w=0.1: 0.1286, w=1: 0.1287): ic-tw-a < ic-std at every weight; wall: refused (the arms ran in different sessions, so no pair shares a host window)
+pricing weight: 1 GAE per native operation
+measurement quality: unavailable / 100; paired attempts 0, verified 0, admitted 0; levels {}; p95 foreign busy unknown%, p95 run queue unknown%
+quality notes: different sessions: no shared host window for a fidelity score
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / ic-std | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 0.1287 | [0.1145, 0.1447] | linearised_t |
+
+| workload | curve | log2 r | ic-std mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 64869.5503 | 8939.9527 | 0.1378 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 59407.9240 | 8461.2844 | 0.1424 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 61697.9872 | 9003.6343 | 0.1459 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 65432.2429 | 8005.0725 | 0.1223 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 75575.7806 | 8506.0344 | 0.1125 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 69486.7974 | 8113.7193 | 0.1168 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__ic-std__ECC1h9d6640fa7a38.json
+ops (ok): ic-std / rho-strong-l1 = 11814.3219 [9220.833, 15137.267] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 22587.6799, w=0.1: 20700.0155, w=1: 11814.3219): ic-std > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.8954, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 91.04%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 11814.3219 | [9220.8325, 15137.2669] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 7.3913 | 64869.5503 | 8776.4544 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 5.3143 | 59407.9240 | 11178.9244 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.4247 | 61697.9872 | 11373.4933 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.1225 | 65432.2429 | 10687.1238 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.5721 | 75575.7806 | 16529.8492 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.7335 | 69486.7974 | 14679.7205 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l1__ic-tw-a__ECC1hd60f48157149.json
+ops (ok): ic-tw-a / rho-strong-l1 = 1520.6216 [1266.754, 1825.366] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2905.7384, w=0.1: 2663.0438, w=1: 1520.6216): ic-tw-a > rho-strong-l1 at every weight; wall: descriptive (ns/GAE 4.4845, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 89.82%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1520.6216 | [1266.7543, 1825.3659] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 7.3913 | 8939.9527 | 1209.5211 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 5.3143 | 8461.2844 | 1592.1792 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.4247 | 9003.6343 | 1659.7425 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.1225 | 8005.0725 | 1307.4777 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.5721 | 8506.0344 | 1860.4302 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.7335 | 8113.7193 | 1714.0973 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l16__ic-std__ECC1h09f026d5a7d2.json
+ops (ok): ic-std / rho-strong-l16 = 11054.2253 [9146.771, 13359.457] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 23278.9274, w=0.1: 20960.8367, w=1: 11054.2253): ic-std > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.8744, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.98%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-std: verified 30/30 (0 censored); max/median S 1.79, top run 6% of total; unpriced: none
+| curve | log2 r | workloads | ic-std / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 11054.2253 | [9146.7709, 13359.4575] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-std mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 7.1036 | 64869.5503 | 9131.8861 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 5.6844 | 59407.9240 | 10450.9577 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.0699 | 61697.9872 | 10164.5253 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.4965 | 65432.2429 | 10071.9714 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.2022 | 75575.7806 | 14527.6590 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.3093 | 69486.7974 | 13087.8266 |
+saved sessions/c1-e2e-m5-tw/comparisons/rho-strong-l16__ic-tw-a__ECC1h0f7d8fddf454.json
+ops (ok): ic-tw-a / rho-strong-l16 = 1422.7896 [1262.331, 1603.645] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 2994.6623, w=0.1: 2696.5983, w=1: 1422.7896): ic-tw-a > rho-strong-l16 at every weight; wall: descriptive (ns/GAE 4.5062, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 92.65%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a / rho-strong-l16 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1422.7896 | [1262.3305, 1603.6451] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l16 mean S | ic-tw-a mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 7.1036 | 8939.9527 | 1258.5046 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 5.6844 | 8461.2844 | 1488.4972 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.0699 | 9003.6343 | 1483.3169 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.4965 | 8005.0725 | 1232.2191 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.2022 | 8506.0344 | 1635.0842 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.3093 | 8113.7193 | 1528.2177 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__rho-strong-l16__ECC1h44b3dd88af51.json
+ops (ok): rho-strong-l16 / rho-strong-l1 = 1.0688 [0.993, 1.150] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.9703, w=0.1: 0.9876, w=1: 1.0688): unresolved inside the band; wall: descriptive (ns/GAE 1.0043, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1, rho-strong-l16 is an upper bound on its cost per operation (GAE is a lower bound)
+pricing weight: 1 GAE per native operation
+measurement quality: 40 / 100; paired attempts 30, verified 30, admitted 0; levels {"L1": 30}; p95 foreign busy 95.37%, p95 run queue 0.00%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm rho-strong-l16: verified 30/30 (0 censored); max/median S 1.54, top run 5% of total; unpriced: dp_tests_uncharged=23461, partition_hashes_uncharged=21686, table_inserts_uncharged=1511, table_queries_uncharged=1557
+| curve | log2 r | workloads | rho-strong-l16 / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0688 | [0.9932, 1.1501] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | rho-strong-l16 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 7.3913 | 7.1036 | 0.9611 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 5.3143 | 5.6844 | 1.0697 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 5.4247 | 6.0699 | 1.1189 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 6.1225 | 6.4965 | 1.0611 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.5721 | 5.2022 | 1.1378 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 4.7335 | 5.3093 | 1.1216 |
+saved sessions/c1-e2e-m5-tw/comparisons/ic-tw-a__ic-tw-b__ECC1h0c72adbc0337.json
+ops (ok): ic-tw-b / ic-tw-a = 1.0306 [0.964, 1.102] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 1.0306, w=0.1: 1.0306, w=1: 1.0306): ic-tw-b > ic-tw-a at every weight; wall: descriptive (ns/GAE 1.0021, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed)
+pricing weight: 1 GAE per native operation
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 0.24%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+arm ic-tw-b: verified 30/30 (0 censored); max/median S 1.36, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-b / ic-tw-a | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0306 | [0.9638, 1.1020] | linearised_t |
+
+| workload | curve | log2 r | ic-tw-a mean S | ic-tw-b mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 8939.9527 | 9252.0248 | 1.0349 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 8461.2844 | 8935.2842 | 1.0560 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 9003.6343 | 8429.2239 | 0.9362 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 8005.0725 | 8661.2103 | 1.0820 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 8506.0344 | 8306.9273 | 0.9766 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 8113.7193 | 9007.2015 | 1.1101 |
+saved sessions/c1-e2e-m5-tw/comparisons/ic-tw-a__ic-tw-a-aa.json
+ops (ok): ic-tw-a-aa / ic-tw-a = 1.0000 [1.000, 1.000] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: descriptive (ns/GAE 1.0092, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed)
+measurement quality: 0 / 100; paired attempts 30, verified 30, admitted 0; levels {"L0": 30}; p95 foreign busy 0.22%, p95 run queue 0.04%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm ic-tw-a: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+arm ic-tw-a-aa: verified 30/30 (0 censored); max/median S 1.42, top run 5% of total; unpriced: none
+| curve | log2 r | workloads | ic-tw-a-aa / ic-tw-a | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | ic-tw-a mean S | ic-tw-a-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 8934.8526 | 8934.8526 | 1.0000 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 8456.9109 | 8456.9109 | 1.0000 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 8999.1436 | 8999.1436 | 1.0000 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 8001.0123 | 8001.0123 | 1.0000 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 8501.0442 | 8501.0442 | 1.0000 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 8108.9832 | 8108.9832 | 1.0000 |
+saved sessions/c1-e2e-m5-std/comparisons/rho-strong-l1__rho-strong-l1-aa.json
+ops (ok): rho-strong-l1-aa / rho-strong-l1 = 1.0000 [1.000, 1.000] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.0000, w=0.1: 1.0000, w=1: 1.0000): unresolved inside the band; wall: descriptive (ns/GAE 1.0151, not a result: 30 of 30 pairs did not reach L2; 0 admitted pairs; at least 5 are needed); ns/GAE of rho-strong-l1, rho-strong-l1-aa is an upper bound on its cost per operation (GAE is a lower bound)
+measurement quality: 40 / 100; paired attempts 30, verified 30, admitted 0; levels {"L1": 30}; p95 foreign busy 91.54%, p95 run queue 0.00%
+quality notes: no admitted A/A interval; calibration bonus unavailable
+arm rho-strong-l1: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+arm rho-strong-l1-aa: verified 30/30 (0 censored); max/median S 1.52, top run 5% of total; unpriced: dp_tests_uncharged=19846, partition_hashes_uncharged=18515, table_inserts_uncharged=1282, table_queries_uncharged=1331
+| curve | log2 r | workloads | rho-strong-l1-aa / rho-strong-l1 | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m20-t133-d7e842ba | 18.00 | 6 | 1.0000 | [1.0000, 1.0000] | linearised_t |
+
+| workload | curve | log2 r | rho-strong-l1 mean S | rho-strong-l1-aa mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W22d81380d7d6 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.4969 | 3.4969 | 1.0000 |
+| W40fbd4cad15a | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8399 | 2.8399 | 1.0000 |
+| W4af9d0263718 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.8804 | 2.8804 | 1.0000 |
+| W94cb9278fc28 | icv1-f2m20-t133-d7e842ba | 18.00 | 3.0809 | 3.0809 | 1.0000 |
+| W97e304fc3a46 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.5915 | 2.5915 | 1.0000 |
+| Wb5c9de5713d1 | icv1-f2m20-t133-d7e842ba | 18.00 | 2.6623 | 2.6623 | 1.0000 |
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|
+| ECBS1hca14a07b7b51 | rho-strong-l1 | rho.negation_strong | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 2.925 | [2.600, 3.292] | 0.886 | 3.301 | 3.301 | 1.000 | yes | 0.309 | L1×30 | fixed set-up is 56% of S (over 10%); log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hca14a07b7b51 | rho-strong-l16 | rho.negation_strong | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 2.838 | [2.643, 3.048] | 0.886 | 3.203 | 3.203 | 0.970 | yes | 0.296 | L1×30 | fixed set-up is 57% of S (over 10%); log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hca14a07b7b51 | ic-std | ic.pipeline | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 66076.447 | [60275.297, 72435.925] | – | – | 74559.287 | 22587.703 | no | 34253.656 | L0×30 | log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hca14a07b7b51 | rho-strong-l1-aa | rho.negation_strong | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 2.925 | [2.600, 3.292] | 0.886 | 3.301 | 3.301 | 1.000 | yes | 0.308 | L1×30 | fixed set-up is 56% of S (over 10%); log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|
+| ECBS1hf61d0f772b8e | rho-strong-l1 | rho.negation_strong | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 2.925 | [2.600, 3.292] | 0.886 | 3.301 | 3.301 | 1.000 | yes | 0.312 | L1×30 | fixed set-up is 56% of S (over 10%); log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hf61d0f772b8e | rho-strong-l16 | rho.negation_strong | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 2.838 | [2.643, 3.048] | 0.886 | 3.203 | 3.203 | 0.970 | yes | 0.285 | L1×30 | fixed set-up is 57% of S (over 10%); log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hf61d0f772b8e | ic-tw-a | ic.pipeline | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 8500.324 | [8080.404, 8942.067] | – | – | 9591.589 | 2905.768 | no | 4039.742 | L0×30 | log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hf61d0f772b8e | ic-tw-b | ic.pipeline | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 8760.336 | [8387.830, 9149.386] | – | – | 9884.981 | 2994.651 | no | 4198.952 | L0×30 | log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |
+| ECBS1hf61d0f772b8e | ic-tw-a-aa | ic.pipeline | icv1-f2m20-t133-d7e842ba | 18.00 | 30/30 | 8500.324 | [8080.404, 8942.067] | – | – | 9591.589 | 2905.768 | no | 4047.997 | L0×30 | log2 r = 18.0 is below the calibrated range (2^25); S has not reached its constant |

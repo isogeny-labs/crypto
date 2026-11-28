@@ -11,6 +11,7 @@ pub mod quotient;
 pub mod multiplicity;
 pub mod systems;
 pub mod f4;
+pub mod graph_quotient;
 #[cfg(test)]
 mod system_certificate_tests;
 #[cfg(test)]

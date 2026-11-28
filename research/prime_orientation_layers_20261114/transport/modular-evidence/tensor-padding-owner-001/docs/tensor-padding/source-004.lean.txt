@@ -1,0 +1,55 @@
+module
+public import Mathlib.Data.Fintype.BigOperators
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Logic.Equiv.Prod
+public import Mathlib.Algebra.BigOperators.GroupWithZero.Finset
+public section
+namespace CryptoLean.TensorPadding
+open Finset
+variable {R I D Sigma : Type*} [CommSemiring R]
+  [Fintype I] [Fintype D] [Fintype Sigma]
+  [DecidableEq I] [DecidableEq D] [DecidableEq Sigma]
+
+def contraction (A B : (I → Sigma) → R) : R := ∑ x, A x*B x
+
+def dummyWeight (d0 x : D → Sigma) : R :=
+  ∏ d, if x d=d0 d then 1 else 0
+
+theorem dummyWeight_eq (d0 x : D → Sigma) :
+    dummyWeight (R:=R) d0 x=if x=d0 then 1 else 0 := by
+  classical
+  have he : (∀ d ∈ (univ : Finset D), x d=d0 d) ↔ x=d0 := by
+    constructor
+    · intro h
+      exact funext (fun d => h d (mem_univ d))
+    · intro h
+      subst x
+      exact fun _ _ => rfl
+  rw [dummyWeight,Finset.prod_boole]
+  simp only [he]
+
+def leftPad (A : (I → Sigma) → R) (d0 : D → Sigma) (x : I ⊕ D → Sigma) : R :=
+  A (fun i => x (Sum.inl i))*dummyWeight d0 (fun d => x (Sum.inr d))
+
+def rightPad (B : (I → Sigma) → R) (x : I ⊕ D → Sigma) : R :=
+  B (fun i => x (Sum.inl i))
+
+theorem contraction_padded (A B : (I → Sigma) → R) (d0 : D → Sigma) :
+    contraction (leftPad A d0) (rightPad (D:=D) B)=contraction A B := by
+  classical
+  unfold contraction
+  have H := Fintype.sum_equiv (Equiv.sumArrowEquivProdArrow I D Sigma)
+    (fun x => leftPad A d0 x*rightPad B x)
+    (fun p : (I → Sigma) × (D → Sigma) => if p.2=d0 then A p.1*B p.1 else 0)
+    (by
+      intro x
+      simp only [leftPad,rightPad,dummyWeight_eq]
+      change A (x ∘ Sum.inl)*(if x ∘ Sum.inr=d0 then 1 else 0)*B (x ∘ Sum.inl)=
+        if x ∘ Sum.inr=d0 then A (x ∘ Sum.inl)*B (x ∘ Sum.inl) else 0
+      split_ifs <;> simp)
+  rw [H,Fintype.sum_prod_type]
+  simp
+
+end CryptoLean.TensorPadding
+#print axioms CryptoLean.TensorPadding.dummyWeight_eq
+#print axioms CryptoLean.TensorPadding.contraction_padded
