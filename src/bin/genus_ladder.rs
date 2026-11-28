@@ -999,7 +999,8 @@ fn main() -> ExitCode {
                         .map(
                             |d| json!({"core_rows": d.core_rows, "core_cols": d.core_cols,
                             "t_weight": d.t_weight, "rank": d.rank, "rank_no_t": d.rank_no_t,
-                            "outcome": d.outcome, "inhom": d.inhom, "inhom_linked": d.inhom_linked})
+                            "outcome": d.outcome, "inhom": d.inhom, "inhom_linked": d.inhom_linked,
+                            "ab_rank": d.ab_rank})
                         )
                         .collect::<Vec<_>>());
                 }

@@ -1,0 +1,87 @@
+// Parse the frozen GMP/OpenSSL norm helper before the independent BN geometry
+// backend declares its global Point type; each retains its own arithmetic.
+#define main frozen_mixed_norm_entrypoint
+#include "norms.cpp"
+#undef main
+#include "partial_arithmetic.hpp"
+#include <optional>
+
+using MS=norm_test::Sparse;
+struct MPin {MS old_value;norm_test::Pair labels;int denominator=1;};
+using MPins=std::map<std::string,MPin>;
+struct MX {bool zero=false,fallback=false;F x;};
+struct MXEvaluator {
+ const BP&curve;const std::array<BP,4>&map;int nx=0,ny=0;
+ MXEvaluator(const BP&c,const std::array<BP,4>&m):curve(c),map(m){for(const BP*p:{&curve,&map[0],&map[1]})for(const auto&[e,a]:p->t){(void)a;nx=std::max(nx,e[0]);ny=std::max(ny,e[1]);}require(nx<=32&&ny<=32,"cached coordinate degree cap");}
+ MX at(const F&x,const F&y)const{
+  std::vector<F> xx(size_t(nx+1),F(1)),yy(size_t(ny+1),F(1));for(int i=1;i<=nx;++i)xx[size_t(i)]=xx[size_t(i-1)]*x;for(int i=1;i<=ny;++i)yy[size_t(i)]=yy[size_t(i-1)]*y;
+  auto eval=[&](const BP&p){F value;for(const auto&[e,a]:p.t)value=value+a*xx[size_t(e[0])]*yy[size_t(e[1])];return value;};require(eval(curve)==F(0),"cached image point incidence");F denominator=eval(map[1]);if(denominator!=F(0))return {false,false,eval(map[0])/denominator};auto full=fs_image(curve,map,x,y).value;return {full.zero,true,full.zero?F(0):full.x.p.at(0)};
+ }
+};
+void mvalue_equal(const MS&a,const MS&b){require(a==b,"same aggregate label has same formal old expression");}
+void mdense_controls(){
+ const SCMat disjoint{{1,0,1,1,0},{0,1,0,0,1}},coupled{{0,0,1,1},{1,0,1,0},{0,1,0,1}};
+ for(const auto*matrix:{&disjoint,&coupled}){SCMat aux;for(const auto&row:*matrix)aux.emplace_back(row.begin()+2,row.end());size_t gain=sc_rank(*matrix)-sc_rank(aux);require(gain==(matrix==&disjoint?0u:1u),"disjoint and coupled pin dense controls");}
+}
+struct MCross {int i,j,kind,slot;F x,y;::Point image;MPin pin;int even_sign;};
+void memit_sparse(const MS&value){std::cout<<'[';bool comma=false;for(auto[i,c]:value){if(comma)std::cout<<',';comma=true;std::cout<<'['<<i<<','<<c<<']';}std::cout<<']';}
+int main(int argc,char**argv){try{
+#ifdef MIXED_DIVIDED
+ require(argc==10,"usage: mixed-divided QUARTIC BACKMAP BASELINE TANGENTS SCAN GRAPH_RESULT NORM_RESULT DIVIDED_RESULT MIXED_RESULT");
+ auto divided_result=read_json(argv[8]),mixed_result=read_json(argv[9]);
+#else
+ require(argc==8,"usage: mixed QUARTIC BACKMAP BASELINE TANGENTS SCAN GRAPH_RESULT NORM_RESULT");
+#endif
+ auto model=read_json(argv[1]),back=read_json(argv[2]),baseline=read_json(argv[3]),tangents=read_json(argv[4]),scan=read_json(argv[5]),graph=read_json(argv[6]),old_norm=read_json(argv[7]);ss_private(baseline,tangents);mdense_controls();
+ require(graph.at("scope").scalar=="complete-rational-two-residual-canonical-line-graph-on-old-lift"&&graph.at("closed_rank").integer()==6&&graph.at("full_rank").integer()-graph.at("auxiliary_rank").integer()==6,"frozen complete graph closure dependency");
+ std::vector<audit::Point> a_base;for(const auto&q:baseline.at("projected_base").arr)a_base.push_back(audit::read_point(q));require(a_base.size()==225,"unchanged old signed base");MS a_reference;audit::Point a_kappa;
+ for(const auto&i:baseline.at("pool").at("split_fibers").arr[0].at("point_indices").arr){const auto&image=baseline.at("images").arr[size_t(i.integer())];a_kappa=audit::plus(a_kappa,audit::read_point(image.at("point")));int index=image.at("projected_index").integer();if(index>=0)a_reference[index]+=image.at("sign").integer();}
+ MPins pins;size_t zero_targets=0,duplicate_targets=0,aggregate_pairs=0;std::string aggregate_digest;
+#ifdef MIXED_DIVIDED
+ const std::vector<int> denominators{2,3};
+ const int expression_multiple=6;
+ require(divided_result.at("closed_rank").integer()==6&&divided_result.at("distinct_nonzero_candidate_rows").integer()==0,"frozen divided dependency");
+#else
+ const std::vector<int> denominators{1};
+ const int expression_multiple=1;
+#endif
+ for(int denominator:denominators){
+  std::vector<audit::Point> family_base=a_base;audit::Point family_kappa=a_kappa;
+  if(denominator!=1){audit::Big inverse;require(mpz_invert(inverse.get_mpz_t(),audit::Big(denominator).get_mpz_t(),sc_n.get_mpz_t())!=0,"mixed denominator inverse");audit::SSL ssl;
+   auto divide=[&](const audit::Point& original){auto divided=norm_test::multiply(original,inverse);require(norm_test::multiply(divided,SCBig(denominator))==original,"GMP mixed division multiplication back");auto value=ssl.make(divided),scaled=ssl.make({});auto scalar=audit::bn(audit::Big(denominator));require(EC_POINT_mul(ssl.group.get(),scaled.get(),nullptr,value.get(),scalar.get(),ssl.context.get())==1&&ssl.encode(scaled.get())==audit::key(original),"named mixed division multiplication back");return divided;};
+   for(auto& value:family_base)value=divide(value);
+   family_kappa=divide(a_kappa);
+  }
+  auto stream=norm_test::enumerate(family_base,family_kappa);require(stream.pairs.size()==101926,"complete mixed signed pairs");
+#ifdef MIXED_DIVIDED
+  require(stream.digest==divided_result.at("families").arr.at(size_t(denominator-1)).at("pair_stream_sha256").scalar,"mixed divided stream matches frozen result");
+#else
+  require(stream.digest==old_norm.at("pair_stream_sha256").scalar,"aggregate construction matches frozen independent norm stream");
+#endif
+  aggregate_pairs+=stream.pairs.size();if(!aggregate_digest.empty())aggregate_digest+=':';aggregate_digest+=stream.digest;
+  for(const auto&record:stream.pairs){const auto&encoded=record.complement;if(encoded.size()==1){require(encoded[0]==0,"zero aggregate encoding");++zero_targets;continue;}require(encoded.size()==25&&(encoded[0]==2||encoded[0]==3),"exact aggregate x/orientation encoding");audit::Big x;mpz_import(x.get_mpz_t(),24,1,1,1,0,encoded.data()+1);MS value=norm_test::row_for({record.labels[0],record.labels[1],0,0},a_reference);int sign=encoded[0]==2?1:-1;for(auto&[index,c]:value){(void)index;c*=-sign*(expression_multiple/denominator);}auto[it,added]=pins.emplace(x.get_str(),MPin{value,record.labels,denominator});if(!added){++duplicate_targets;mvalue_equal(it->second.old_value,value);}}
+ }
+ require(!pins.empty(),"nonempty aggregate candidate superset");MS bad_value=pins.begin()->second.old_value;++bad_value[0];fs_reject([&]{mvalue_equal(pins.begin()->second.old_value,bad_value);});
+ std::vector<int> old_column_aliases;for(size_t i=0;i<tangents.at("projected_base").arr.size();++i){const auto&q=tangents.at("projected_base").arr[i];if(pins.count(q.at("x").scalar))old_column_aliases.push_back(int(i));}
+ auto c=read_bp(model.at("terms"),true);std::array<BP,4> map;size_t position=0;for(const auto*name:{"X_numerator","X_denominator","Y_numerator","Y_denominator"})map[position++]=read_bp(back.at(name));require(global_identity(c,map),"actual mixed-family map identity");std::vector<F> ic(5);for(const auto&[e,a]:c.t)if(e[0]+e[1]==4)ic[size_t(e[1])]=a;Poly infinity(std::move(ic)),z{F(0),F(1)};require(gcd(infinity,wide_power(z,prime(),infinity)-z).degree()==0,"no omitted rational infinity");MXEvaluator evaluate_x(c,map);
+ std::vector<SPoint> points;std::map<std::string,int> point_keys;size_t old_checks=0,old_fallbacks=0;std::optional<F> fixture_x;
+ for(const auto&q:scan.at("points").arr){F x=coefficient(q.at("x")),y=coefficient(q.at("y"));require(point_keys.emplace(sp_key(x,y),int(points.size())).second,"distinct mixed-family pool point");::Point actual=fs_image(c,map,x,y).value;require(actual==point(q.at("image")),"fresh mixed-family old image");MX cached=evaluate_x.at(x,y);require(cached.zero==actual.zero&&(actual.zero||cached.x==actual.x.p.at(0)),"every old cached coordinate matches full map");++old_checks;if(cached.fallback)++old_fallbacks;if(!actual.zero&&!fixture_x)fixture_x=cached.x;int index=q.at("index").integer(),sign=q.at("sign").integer();if(index<0)require(index==-1&&sign==0&&actual.zero,"mixed-family identity label");else{require(index<225&&(sign==1||sign==-1),"mixed-family signed old label");::Point expected=point(baseline.at("projected_base").arr[size_t(index)]);if(sign<0)expected.y=-expected.y;require(actual==expected,"mixed-family old sign binding");}points.push_back({x,y,actual,index,sign});}
+ require(points.size()==652&&old_checks==652&&bool(fixture_x),"all old coordinate controls");std::set<std::string> fixture{decimal(*fixture_x)};require(fixture.count(decimal(*fixture_x))==1,"nonempty actual-point membership fixture");fixture.clear();fixture.insert(decimal(*fixture_x+F(1)));require(!fixture.count(decimal(*fixture_x)),"changed target coordinate removes fixture match");
+ for(size_t i=0;i<226;++i){const auto&q=baseline.at("pool").at("points").arr[i];require(decimal(points[i].x)==q.at("x").scalar&&decimal(points[i].y)==q.at("y").scalar,"unchanged original point prefix");}
+ ::Point kappa;for(const auto&i:baseline.at("pool").at("split_fibers").arr[0].at("point_indices").arr)kappa=add(kappa,points[size_t(i.integer())].image);require(!kappa.zero&&decimal(kappa.x.p.at(0))==a_kappa.x.get_str()&&decimal(kappa.y.p.at(0))==a_kappa.y.get_str(),"same reference in separate arithmetic engines");
+ size_t attempted=0,split=0,irreducible=0,partial=0,full_occurrences=0,new_slots=0,new_controls=0,new_fallbacks=0;PHash x_digest;std::vector<MCross> crosses;
+ auto section=[&](int i,int j,bool tangent){const auto&a=points[size_t(i)];const auto&b=points[size_t(j)];F dx,dy;if(tangent){dx=fs_eval(c.partial(1),a.x,a.y);dy=-fs_eval(c.partial(0),a.x,a.y);}else{dx=b.x-a.x;dy=b.y-a.y;}require(dx!=F(0)||dy!=F(0),"proper mixed-family line direction");++attempted;auto q=ss_restrict(c,a.x,a.y,dx,dy);require(q.degree()==4&&q.at(0)==F(0)&&(tangent?q.at(1)==F(0):ss_eval(q,F(1))==F(0)),"exact mixed-family restriction");auto residual=q.exact(tangent?Poly{F(0),F(0),F(1)}:Poly{F(0),F(-1),F(1)});auto roots=ss_quadratic(residual);if(roots.empty()){++irreducible;return;}++split;
+  std::array<F,2> x{a.x+dx*roots[0],a.x+dx*roots[1]},y{a.y+dy*roots[0],a.y+dy*roots[1]};bool old0=point_keys.count(sp_key(x[0],y[0])),old1=point_keys.count(sp_key(x[1],y[1]));require(old0==old1,"no three-old-slot line per completed audit");if(old0){++full_occurrences;return;}++partial;
+  for(size_t slot=0;slot<2;++slot){MX value=evaluate_x.at(x[slot],y[slot]);require(!value.zero,"unrecorded identity fibre would contradict saturation");++new_slots;if(value.fallback)++new_fallbacks;std::optional<::Point> actual;
+   if(new_controls<64){actual=fs_image(c,map,x[slot],y[slot]).value;require(!actual->zero&&actual->x.p.at(0)==value.x,"prescribed new cached/full coordinate control");++new_controls;}
+   std::string key=decimal(value.x);x_digest.add(size_t(i),size_t(j),std::to_string(slot)+":"+decimal(x[slot])+":"+decimal(y[slot])+":"+key);auto at=pins.find(key);if(at!=pins.end()){if(!actual)actual=fs_image(c,map,x[slot],y[slot]).value;require(!actual->zero&&actual->x.p.at(0)==value.x,"full actual cross-alias coordinate");int even_sign=BN_is_odd(actual->y.p.at(0).n.get())?-1:1;crosses.push_back({i,j,tangent?1:0,int(slot),x[slot],y[slot],*actual,at->second,even_sign});require(crosses.size()<=4096,"cross-alias witness cap; incomplete if exceeded");}}
+ };
+ for(size_t i=0;i<points.size();++i){for(size_t j=i+1;j<points.size();++j)section(int(i),int(j),false);section(int(i),int(i),true);if(i%64==0)std::cerr<<"mixed anchor "<<i<<" attempts "<<attempted<<" slots "<<new_slots<<" crosses "<<crosses.size()<<'\n';}
+ require(attempted==size_t(graph.at("line_attempts").integer())&&split==size_t(graph.at("split_sections").integer())&&irreducible==size_t(graph.at("irreducible_residuals").integer())&&partial==size_t(graph.at("new_partial_edges").integer())&&full_occurrences==size_t(graph.at("full_old_occurrences").integer())&&new_controls==64&&new_slots==2*partial,"complete new observable matches frozen graph family coverage");
+ std::string individual_digest=x_digest.finish();
+#ifdef MIXED_DIVIDED
+ require(individual_digest==mixed_result.at("individual_x_stream_sha256").scalar,"same complete individual image stream for new target set");
+#endif
+ bool conclusive=zero_targets==0&&old_column_aliases.empty()&&crosses.empty();std::cout<<"{\"scope\":\"aggregate-individual-residual-cross-alias-necessary-filter\",\"aggregate_pairs\":"<<aggregate_pairs<<",\"aggregate_pair_stream_sha256\":\""<<aggregate_digest<<"\",\"expression_multiple\":"<<expression_multiple<<",\"unique_signed_aggregate_labels\":"<<pins.size()<<",\"equal_expression_duplicates\":"<<duplicate_targets<<",\"zero_aggregate_targets\":"<<zero_targets<<",\"original_column_aliases\":"<<old_column_aliases.size()<<",\"line_attempts\":"<<attempted<<",\"split_sections\":"<<split<<",\"irreducible_residuals\":"<<irreducible<<",\"partial_sections\":"<<partial<<",\"individual_slots_checked\":"<<new_slots<<",\"old_cached_full_checks\":"<<old_checks<<",\"old_exceptional_checks\":"<<old_fallbacks<<",\"new_cached_full_checks\":"<<new_controls<<",\"new_exceptional_evaluations\":"<<new_fallbacks<<",\"individual_x_stream_sha256\":\""<<individual_digest<<"\",\"cross_alias_slots\":"<<crosses.size()<<",\"zero_cross_bound_conclusive\":"<<(conclusive?"true":"false")<<",\"combined_full_rank\":";if(conclusive)std::cout<<size_t(graph.at("full_rank").integer())+pins.size();else std::cout<<"null";std::cout<<",\"combined_auxiliary_rank\":";if(conclusive)std::cout<<size_t(graph.at("auxiliary_rank").integer())+pins.size();else std::cout<<"null";std::cout<<",\"combined_closed_rank\":"<<(conclusive?"6":"null")<<",\"candidate_gain\":"<<(conclusive?"0":"null")<<",\"controls_pass\":true,\"positive_gain_established\":false,\"original_alias_columns\":[";
+ for(size_t i=0;i<old_column_aliases.size();++i){std::cout<<(i?",":"")<<old_column_aliases[i];}std::cout<<"],\"crosses\":[";bool comma=false;for(const auto&hit:crosses){if(comma)std::cout<<',';comma=true;std::cout<<"{\"i\":"<<hit.i<<",\"j\":"<<hit.j<<",\"kind\":"<<hit.kind<<",\"slot\":"<<hit.slot<<",\"curve_x\":\""<<decimal(hit.x)<<"\",\"curve_y\":\""<<decimal(hit.y)<<"\",\"image\":";emit(hit.image);std::cout<<",\"even_y_sign\":"<<hit.even_sign<<",\"aggregate_pair\":["<<hit.pin.labels[0]<<','<<hit.pin.labels[1]<<"],\"denominator\":"<<hit.pin.denominator<<",\"even_image_old_value\":";memit_sparse(hit.pin.old_value);std::cout<<'}';}std::cout<<"],\"standing\":\"producer-unverified; any cross-alias requires joint elimination and actual cover/KM replay\"}\n";return 0;
+}catch(const std::exception&e){std::cerr<<"REJECT "<<e.what()<<'\n';return 1;}}

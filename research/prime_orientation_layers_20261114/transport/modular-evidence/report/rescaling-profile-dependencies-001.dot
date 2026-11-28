@@ -1,0 +1,16 @@
+digraph G {
+rankdir=TB;node[shape=box,style="rounded,filled",fontname="Helvetica",fontsize=13,fillcolor="#edf4fa"];
+a[label="Actual retained odd Content q
+common profile 4n"];
+b[label="Generic Matrix / Units law
+exact product invariance"];
+c[label="Actual integral rescaled pair
+same product and residual"];
+d[label="Finite penalty matrix resolvent
+CONSTRUCTED positive schedule4"];
+e[label="Charged mass >=4 Fib(2u+1)
+all labels retained"];
+f[label="NEXT: immutable creation width
+pc+E+q, then full public costs",fillcolor="#fff1dc"];
+{rank=same;a;b;}{rank=same;c;d;}a->c;b->c;d->c;d->e;c->f[style=dashed];e->f[style=dashed];
+}
