@@ -3841,13 +3841,13 @@ fn rref32_deferred(
             o1 - o0,
         );
         let t_store = Instant::now();
-        let known_before = known.len();
+        // Same as `rref_u32_barrett_deferred`: only re-reduce by this
+        // chunk's new pivots (pre-chunk columns are already clear).
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
         for (acc, pending) in reduced.iter_mut() {
-            if known.len() > known_before {
-                // chunk-mates became pivots: clear them, and whatever
-                // earlier pivot columns they re-dirtied
-                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
-                reduce_lazy_by(acc, &known, fp, simd, pending);
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
             }
             let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
             let Some(c) = row.iter().position(|&v| v != 0) else {
@@ -3859,8 +3859,32 @@ fn rref32_deferred(
             }
             count_ops(row.len() - c);
             count_norm(row.len() - c);
-            let at = known.partition_point(|(pc, _)| *pc < c);
-            known.insert(at, (c, row));
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
         }
         pp_add(PP_DEF_STORE, pp_ops() - o1);
         pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
@@ -3953,11 +3977,16 @@ fn rref_u32_barrett_deferred(
             o1 - o0,
         );
         let t_store = Instant::now();
-        let known_before = known.len();
+        // Residuals are already cleared against pre-chunk `known`, and each
+        // new pivot inherits that (zeros on those columns).  Re-walking the
+        // whole pivot list on every store only re-checks zeros — keep a
+        // column-ordered list of *this chunk's* new pivots and reduce by
+        // those alone, then merge into `known` once.
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
         for (acc, pending) in reduced.iter_mut() {
-            if known.len() > known_before {
-                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
-                reduce_lazy_by(acc, &known, fp, simd, pending);
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
             }
             let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
             let Some(c) = row.iter().position(|&v| v != 0) else {
@@ -3969,8 +3998,33 @@ fn rref_u32_barrett_deferred(
             }
             count_ops(row.len() - c);
             count_norm(row.len() - c);
-            let at = known.partition_point(|(pc, _)| *pc < c);
-            known.insert(at, (c, row));
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            // Both sides column-ordered: linear merge beats k·n inserts.
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
         }
         pp_add(PP_DEF_STORE, pp_ops() - o1);
         pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
@@ -5418,6 +5472,20 @@ fn fused_apply(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize,
         go!(1, 2, 3, 4, 5, 6, 7, 8);
         return;
     }
+    #[cfg(target_arch = "x86_64")]
+    if simd == 1 {
+        macro_rules! go {
+            ($($n:literal),*) => {
+                match piv.len() {
+                    // SAFETY: `lazy_simd_kind` verified AVX2; bounds asserted above.
+                    $($n => unsafe { fused_avx2::<$n>(acc, piv, f, lo, hi) },)*
+                    _ => unreachable!(),
+                }
+            };
+        }
+        go!(1, 2, 3, 4, 5, 6, 7, 8);
+        return;
+    }
     let _ = simd;
     fused_scalar(acc, piv, f, lo, hi);
 }
@@ -5430,6 +5498,52 @@ fn fused_scalar(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize
             x += f[t] * u64::from(piv[t][i]);
         }
         acc[i] = x;
+    }
+}
+
+/// [`fused_apply`] with `N` updates in AVX2: per four columns one
+/// accumulator load and store and `N` pivot loads.  Same schedule as
+/// [`fused_avx512`]; used when AVX-512F is unavailable (the previous
+/// fallback was scalar and left a large gap on AVX2-only hosts).
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn fused_avx2<const N: usize>(
+    acc: &mut [u64],
+    piv: &[&[u32]],
+    f: &[u64],
+    lo: usize,
+    hi: usize,
+) {
+    use std::arch::x86_64::{
+        __m128i, __m256i, _mm256_add_epi64, _mm256_cvtepu32_epi64, _mm256_loadu_si256,
+        _mm256_mul_epu32, _mm256_set1_epi64x, _mm256_storeu_si256, _mm_loadu_si128,
+    };
+    let mut m = [_mm256_set1_epi64x(0); N];
+    let mut ptr = [std::ptr::null::<u32>(); N];
+    for t in 0..N {
+        m[t] = _mm256_set1_epi64x(f[t] as i64);
+        ptr[t] = piv[t].as_ptr();
+    }
+    let a = acc.as_mut_ptr();
+    let mut i = lo;
+    while i + 4 <= hi {
+        // SAFETY: caller asserted `hi` within the accumulator and every
+        // pivot row; loads and stores accept unaligned pointers.
+        let mut cur = unsafe { _mm256_loadu_si256(a.add(i) as *const __m256i) };
+        for t in 0..N {
+            let v = unsafe { _mm_loadu_si128(ptr[t].add(i) as *const __m128i) };
+            cur = _mm256_add_epi64(cur, _mm256_mul_epu32(_mm256_cvtepu32_epi64(v), m[t]));
+        }
+        unsafe { _mm256_storeu_si256(a.add(i) as *mut __m256i, cur) };
+        i += 4;
+    }
+    while i < hi {
+        let mut x = acc[i];
+        for t in 0..N {
+            x += f[t] * u64::from(piv[t][i]);
+        }
+        acc[i] = x;
+        i += 1;
     }
 }
 
@@ -5505,11 +5619,26 @@ fn reduce_lazy_by_fused(
     };
     for (c, pivot) in known {
         let c = *c;
-        let mut v = acc[c];
-        for t in 0..g.n {
-            v += g.f[t] * u64::from(g.piv[t][c]);
-        }
-        let f = fp.reduce(v);
+        let f = if g.n == 0 {
+            // Hot miss path: no pending group — skip Barrett when the
+            // coefficient is already a reduced residue (common after a
+            // flush/normalise).
+            let v = acc[c];
+            if v == 0 {
+                continue;
+            }
+            if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            }
+        } else {
+            let mut v = acc[c];
+            for t in 0..g.n {
+                v += g.f[t] * u64::from(g.piv[t][c]);
+            }
+            fp.reduce(v)
+        };
         if f != 0 {
             g.push(pivot, c, fp.p - f);
             ops += len - c;
