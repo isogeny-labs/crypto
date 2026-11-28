@@ -5513,7 +5513,9 @@ mod tests {
             .prepare(&ctx(&inst), &fb, &oracle_params, &mut repeat_ops)
             .unwrap();
         assert_eq!(repeat_ops.gae(), 0.0);
-        assert!(!oracle.setup_native().contains_key("pkm_oracle_aux_search_gae"));
+        assert!(!oracle
+            .setup_native()
+            .contains_key("pkm_oracle_aux_search_gae"));
     }
 
     /// F4 trace (`trace=1`): the verdicts equal plain F4's and the grid's
