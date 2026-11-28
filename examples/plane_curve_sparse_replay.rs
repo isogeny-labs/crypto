@@ -38,9 +38,9 @@ fn main() {
     .unwrap();
     let base = [0, 1, 0];
     let point = [0, 0, 1];
-    let columns = PlaneRelationColumns::new(&curve, base, vec![point]).unwrap();
+    let columns = PlaneRelationColumns::new_certified(&curve, base, vec![point]).unwrap();
     let line = curve
-        .rational_line_relation(([0, 1, 0], [0, 0, 1]), ([1, 0, 0], [0, 1, 0]))
+        .certified_rational_line_relation(([0, 1, 0], [0, 0, 1]), ([1, 0, 0], [0, 1, 0]))
         .unwrap()
         .unwrap();
     let line_row = columns.encode_line_relation(&line, 5).unwrap();
@@ -88,6 +88,9 @@ fn main() {
     assert!(verify_solution(&rows, 2, 5, &wrong_bytes).is_err());
     assert!(verify_solution(&rows, 2, 5, &[0; 9]).is_err());
     assert!(verify_solution(&rows, 2, 5, &[0; 24]).is_err());
+    assert!(columns.encode(&BTreeMap::new(), 0, 0, 9).is_err());
+    assert!(write_square_system(&rows, 2, 9, &mut Vec::new(), &mut Vec::new()).is_err());
+    assert!(verify_solution(&rows, 2, 9, &solution_bytes).is_err());
     let negative = [SparseRow::new(vec![(0, 4)], 0, 5)];
     let mut negative_matrix = Vec::new();
     let mut negative_rhs = Vec::new();

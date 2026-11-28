@@ -8,6 +8,7 @@
 use std::io::{self, Write};
 
 use super::koblitz_sparse_la::SparseRow;
+use super::residual_walk::is_prime_u64;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CadoExportSummary {
@@ -29,8 +30,8 @@ pub fn write_square_system(
     matrix: &mut impl Write,
     rhs: &mut impl Write,
 ) -> io::Result<CadoExportSummary> {
-    if modulus < 3 || modulus >= (1u64 << 63) || modulus.is_multiple_of(2) {
-        return Err(invalid("modulus must be odd and below 2^63"));
+    if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
+        return Err(invalid("modulus must be an odd prime below 2^63"));
     }
     if columns == 0 || columns > u32::MAX as usize || rows.len() != columns {
         return Err(invalid("CADO bwc export requires a nonempty square matrix"));
@@ -94,7 +95,7 @@ pub fn verify_solution(
     modulus: u64,
     bytes: &[u8],
 ) -> Result<Vec<u64>, &'static str> {
-    if modulus < 3 || modulus >= (1u64 << 63) || modulus.is_multiple_of(2) {
+    if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
         return Err("invalid modulus");
     }
     if columns == 0 || rows.len() != columns {

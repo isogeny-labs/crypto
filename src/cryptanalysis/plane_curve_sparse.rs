@@ -9,6 +9,7 @@ use std::collections::BTreeMap;
 
 use super::koblitz_sparse_la::SparseRow;
 use super::plane_curve_geometry::PlaneCurve;
+use super::residual_walk::is_prime_u64;
 
 pub type RationalPlanePoint = [u32; 3];
 
@@ -22,6 +23,20 @@ pub struct PlaneRelationColumns {
 }
 
 impl PlaneRelationColumns {
+    /// Construct columns only after the bounded geometric smoothness
+    /// certificate succeeds. This keeps certified line rows and their
+    /// factor-base points on the same checked plane model.
+    pub fn new_certified(
+        curve: &PlaneCurve,
+        base_point: RationalPlanePoint,
+        points: Vec<RationalPlanePoint>,
+    ) -> Result<Self, &'static str> {
+        if !curve.certify_geometric_smoothness()? {
+            return Err("plane curve is geometrically singular");
+        }
+        Self::new(curve, base_point, points)
+    }
+
     /// Points must use the first nonzero projective coordinate scaled to one.
     pub fn new(
         curve: &PlaneCurve,
@@ -79,8 +94,8 @@ impl PlaneRelationColumns {
         rhs: i128,
         modulus: u64,
     ) -> Result<SparseRow<u64>, &'static str> {
-        if modulus < 3 || modulus >= (1u64 << 63) || modulus.is_multiple_of(2) {
-            return Err("modulus must be odd and below 2^63");
+        if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
+            return Err("modulus must be an odd prime below 2^63");
         }
         let reduced = |value: i128| value.rem_euclid(modulus as i128) as u64;
         let mut entries = Vec::with_capacity(coefficients.len() + 1);
