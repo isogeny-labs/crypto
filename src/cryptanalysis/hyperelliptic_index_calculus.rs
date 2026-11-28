@@ -83,6 +83,7 @@ use num_traits::{One, Zero};
 use rand::rngs::StdRng;
 use rand::{RngCore, SeedableRng};
 
+use super::hec_two_large_prime_graph::TwoLargePrimeGraph;
 use crate::cryptanalysis::ec_index_calculus::{gaussian_eliminate_mod_n_particular, sqrt_mod_p};
 use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::prime_hyperelliptic::ops::{self, Phase};
@@ -927,6 +928,64 @@ pub fn classify_counted_with(
     }
 }
 
+/// Split a reduced divisor over the factor base and at most two other
+/// rational places. The off-base pairs contain the canonical x-coordinate
+/// and its signed multiplicity. This is an opt-in oracle for the two-large-
+/// prime graph collector; the single-prime oracle above keeps its original
+/// accounting and outcomes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TwoLargePrimeDecomposition {
+    Split {
+        entries: Vec<(usize, i64)>,
+        off_base: Vec<(BigUint, i64)>,
+    },
+    TooManyOffBase,
+    NotSmooth,
+}
+
+pub fn classify_two_large_primes_counted_with(
+    curve: &HyperellipticCurveP,
+    d: &MumfordDivisorP,
+    fb: &HecFactorBase,
+    ops: &mut usize,
+    test: &SmoothnessTest,
+) -> TwoLargePrimeDecomposition {
+    let p = &curve.p;
+    let half = (p - BigUint::one()) >> 1;
+    let roots = match split_counted_with(&d.u, p, ops, test) {
+        Some(r) => r,
+        None => return TwoLargePrimeDecomposition::NotSmooth,
+    };
+    let mut acc: HashMap<usize, i64> = HashMap::new();
+    let mut off_base = Vec::with_capacity(2);
+    for (x, mult) in roots {
+        *ops += d.v.degree().unwrap_or(0);
+        let y = d.v.eval(&x);
+        debug_assert!(curve.is_on_curve(&x, &y));
+        ops::word_op(1);
+        ops::hash_probe(1);
+        let sign = if y.is_zero() || y <= half { 1 } else { -1 };
+        match fb.index_of_x(&x) {
+            Some(idx) => {
+                debug_assert_eq!(fb.entries[idx].y, if sign > 0 { y.clone() } else { p - &y });
+                ops::hash_probe(1);
+                *acc.entry(idx).or_insert(0) += sign * mult as i64;
+            }
+            None => {
+                if off_base.len() == 2 {
+                    return TwoLargePrimeDecomposition::TooManyOffBase;
+                }
+                off_base.push((x, sign * mult as i64));
+            }
+        }
+    }
+    let mut entries: Vec<_> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(entries.len()));
+    entries.sort_unstable_by_key(|&(i, _)| i);
+    off_base.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    TwoLargePrimeDecomposition::Split { entries, off_base }
+}
+
 /// As [`decompose_over_factor_base_counted`], choosing the oracle.
 pub fn decompose_counted_with(
     curve: &HyperellipticCurveP,
@@ -1328,6 +1387,37 @@ pub fn collect_relations(
     params: &HecIndexCalculusParams,
     report: &mut HecIndexCalculusReport,
 ) -> Vec<HecRelation> {
+    collect_relations_impl(curve, d1, d2, n, fb, wanted, params, report, false)
+}
+
+/// Opt-in two-large-prime collection using a spanning forest of signed
+/// off-base places. The existing single-prime collector is unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_relations_two_large_primes(
+    curve: &HyperellipticCurveP,
+    d1: &MumfordDivisorP,
+    d2: &MumfordDivisorP,
+    n: &BigUint,
+    fb: &HecFactorBase,
+    wanted: usize,
+    params: &HecIndexCalculusParams,
+    report: &mut HecIndexCalculusReport,
+) -> Vec<HecRelation> {
+    collect_relations_impl(curve, d1, d2, n, fb, wanted, params, report, true)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn collect_relations_impl(
+    curve: &HyperellipticCurveP,
+    d1: &MumfordDivisorP,
+    d2: &MumfordDivisorP,
+    n: &BigUint,
+    fb: &HecFactorBase,
+    wanted: usize,
+    params: &HecIndexCalculusParams,
+    report: &mut HecIndexCalculusReport,
+    two_large_primes: bool,
+) -> Vec<HecRelation> {
     let mut rng = StdRng::seed_from_u64(params.seed);
     let mut relations = Vec::with_capacity(wanted);
 
@@ -1404,6 +1494,7 @@ pub fn collect_relations(
     // Large-prime partials, keyed by the off-base place's `x`: the first
     // partial seen at each place, which every later one combines with.
     let mut partials: HashMap<Vec<u32>, (HecRelation, i64)> = HashMap::new();
+    let mut two_lp_graph = TwoLargePrimeGraph::default();
 
     while relations.len() < wanted && report.trials < params.max_trials {
         report.trials += 1;
@@ -1563,14 +1654,66 @@ pub fn collect_relations(
         // from that call rather than from re-running it on failure.
         let oracle_phase = ops::enter(Phase::Oracle);
         let oracle_started = Instant::now();
-        let classified = classify_counted_with(curve, &r, fb, &mut field_ops, &params.smoothness);
+        let classified_two = if two_large_primes {
+            Some(classify_two_large_primes_counted_with(
+                curve,
+                &r,
+                fb,
+                &mut field_ops,
+                &params.smoothness,
+            ))
+        } else {
+            None
+        };
+        let classified = if two_large_primes {
+            None
+        } else {
+            Some(classify_counted_with(
+                curve,
+                &r,
+                fb,
+                &mut field_ops,
+                &params.smoothness,
+            ))
+        };
         report.smoothness_wall_ns += oracle_started.elapsed().as_nanos() as u64;
         drop(oracle_phase);
         // Recording a relation (`subtract_steps`, partial bookkeeping)
         // is relation-stage work.
         let _record_phase = ops::enter(Phase::Walk);
         report.smoothness_field_ops += field_ops;
-        match classified {
+        if let Some(classified_two) = classified_two {
+            match classified_two {
+                TwoLargePrimeDecomposition::Split { entries, off_base } => {
+                    report.smooth_trials += 1;
+                    let rel = HecRelation {
+                        coef_a: a,
+                        coef_b: b,
+                        entries: subtract_steps(entries, &taken),
+                    };
+                    if off_base.is_empty() {
+                        relations.push(rel);
+                    } else if off_base.iter().all(|(_, c)| c.unsigned_abs() == 1) {
+                        let started = Instant::now();
+                        report.partial_relations += 1;
+                        if let Some(full) = two_lp_graph.push(rel, &off_base, n) {
+                            report.combined_relations += 1;
+                            relations.push(full);
+                        }
+                        report.partial_wall_ns += started.elapsed().as_nanos() as u64;
+                    } else {
+                        report.discarded_off_base += 1;
+                    }
+                }
+                TwoLargePrimeDecomposition::TooManyOffBase => {
+                    report.smooth_trials += 1;
+                    report.discarded_off_base += 1;
+                }
+                TwoLargePrimeDecomposition::NotSmooth => {}
+            }
+            continue;
+        }
+        match classified.expect("single-prime oracle when two-prime mode is off") {
             Decomposition::Smooth(entries) => {
                 report.smooth_trials += 1;
                 relations.push(HecRelation {
@@ -1678,6 +1821,30 @@ pub fn hec_index_calculus_dlp(
     n: &BigUint,
     params: &HecIndexCalculusParams,
 ) -> (Option<BigUint>, HecIndexCalculusReport) {
+    hec_index_calculus_dlp_impl(curve, d1, d2, n, params, false)
+}
+
+/// Solve with the opt-in two-large-prime graph collector. Only partials
+/// with unit off-base coefficients enter the graph; the final scalar is
+/// checked in the Jacobian exactly as in [`hec_index_calculus_dlp`].
+pub fn hec_index_calculus_dlp_two_large_primes(
+    curve: &HyperellipticCurveP,
+    d1: &MumfordDivisorP,
+    d2: &MumfordDivisorP,
+    n: &BigUint,
+    params: &HecIndexCalculusParams,
+) -> (Option<BigUint>, HecIndexCalculusReport) {
+    hec_index_calculus_dlp_impl(curve, d1, d2, n, params, true)
+}
+
+fn hec_index_calculus_dlp_impl(
+    curve: &HyperellipticCurveP,
+    d1: &MumfordDivisorP,
+    d2: &MumfordDivisorP,
+    n: &BigUint,
+    params: &HecIndexCalculusParams,
+    two_large_primes: bool,
+) -> (Option<BigUint>, HecIndexCalculusReport) {
     let mut report = HecIndexCalculusReport::default();
     let fb = {
         let _phase = ops::enter(Phase::Precompute);
@@ -1706,7 +1873,17 @@ pub fn hec_index_calculus_dlp(
     let mut k = None;
     for round in 0..4 {
         let wanted = m + 1 + extra;
-        let collected = collect_relations(curve, d1, d2, n, &fb, wanted, params, &mut report);
+        let collected = collect_relations_impl(
+            curve,
+            d1,
+            d2,
+            n,
+            &fb,
+            wanted,
+            params,
+            &mut report,
+            two_large_primes,
+        );
         if collected.len() < m + 1 {
             return (None, report);
         }
@@ -2259,6 +2436,37 @@ mod tests {
             assert!(e.y <= half, "non-canonical representative in factor base");
             assert_eq!(fb.index_of_x(&e.x).map(|i| &fb.entries[i].x), Some(&e.x));
         }
+    }
+
+    #[test]
+    fn two_large_prime_oracle_keeps_both_signed_places() {
+        let curve = toy_curve(41);
+        let full = build_factor_base(&curve, usize::MAX);
+        let fb = build_factor_base(&curve, 2);
+        assert!(full.len() >= 5);
+        let p = &full.entries[3];
+        let q = &full.entries[4];
+        let d = p.divisor.add(&q.divisor.neg(&curve), &curve);
+        let mut field_ops = 0;
+        let got = classify_two_large_primes_counted_with(
+            &curve,
+            &d,
+            &fb,
+            &mut field_ops,
+            &SmoothnessTest::Scan,
+        );
+        assert_eq!(
+            got,
+            TwoLargePrimeDecomposition::Split {
+                entries: vec![],
+                off_base: vec![(p.x.clone(), 1), (q.x.clone(), -1)],
+            }
+        );
+        assert!(field_ops > 0);
+        assert_eq!(
+            classify_counted_with(&curve, &d, &fb, &mut 0, &SmoothnessTest::Scan),
+            Decomposition::SmoothOffBase
+        );
     }
 
     #[test]
@@ -3069,6 +3277,51 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn two_large_prime_graph_relations_are_jacobian_identities() {
+        for (g, (curve, d1, d2, l, _k)) in [(2, toy_instance(61)), (3, genus3_instance(31))] {
+            let full = build_factor_base(&curve, usize::MAX).len();
+            let fb = build_factor_base(&curve, full / 2);
+            let params = HecIndexCalculusParams {
+                fb_size: full / 2,
+                seed: 11,
+                ..HecIndexCalculusParams::default()
+            };
+            let mut report = HecIndexCalculusReport::default();
+            let rels = collect_relations_two_large_primes(
+                &curve,
+                &d1,
+                &d2,
+                &l,
+                &fb,
+                fb.len() + 9,
+                &params,
+                &mut report,
+            );
+            assert!(report.combined_relations > 0, "genus {g}: {report:?}");
+            for (i, rel) in rels.iter().enumerate() {
+                assert!(
+                    relation_holds(&curve, &fb, &d1, &d2, rel),
+                    "genus {g}: invalid graph relation {i}: {rel:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn two_large_prime_graph_recovers_toy_log() {
+        let (curve, d1, d2, l, k) = toy_instance(61);
+        let full = build_factor_base(&curve, usize::MAX).len();
+        let params = HecIndexCalculusParams {
+            fb_size: full / 2,
+            seed: 11,
+            ..HecIndexCalculusParams::default()
+        };
+        let (got, report) = hec_index_calculus_dlp_two_large_primes(&curve, &d1, &d2, &l, &params);
+        assert_eq!(got.as_ref(), Some(&k), "{report:?}");
+        assert!(report.combined_relations > 0, "{report:?}");
     }
 
     /// A halved factor base with large primes still recovers `k`, and

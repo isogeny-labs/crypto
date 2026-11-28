@@ -2863,7 +2863,7 @@ mod tests {
 // rows as an A/B arm. Everything below is new code of this study.
 // =====================================================================================
 
-use crate::dq::{self, Mont, SRow};
+use super::dq::{self, Mont, SRow};
 use std::time::Instant;
 
 /// Counter triple used for phase accounting (the LA operations are tallied by the caller).
@@ -2896,6 +2896,8 @@ pub struct SparseRes {
     pub status: String,
     pub found: bool,
     pub verified: bool,
+    /// Present only when the recovered scalar passes `[scalar]P = Q`.
+    pub scalar: Option<u64>,
     pub b: usize,
     pub pairs: u64,
     pub edges: usize,
@@ -3577,6 +3579,9 @@ fn run_sparse(
     if let Some(k) = found {
         let pp = inst.p.clone();
         res.verified = inst.ctx.smul(k, &pp) == Some(inst.qq.clone());
+        if res.verified {
+            res.scalar = Some(k);
+        }
     }
     res.total = Tally::default();
     res.total.add(res.setup);
@@ -3584,6 +3589,164 @@ fn run_sparse(
     res.total.add(res.tgt);
     let _ = (ops0, c_start);
     res
+}
+
+/// A caller-supplied DLP on a smooth affine plane quartic over a prime field.
+/// `curve[i][j]` is the coefficient of `x^i y^j` (zero when `i+j>4`).
+/// A class is the monic degree-three ideal `(a(x), y-b(x))`, representing
+/// `[D-3O]`; `a` and `b` are given in ascending coefficient order.
+/// This bounded research API uses the sparse quartic collector and Wiedemann
+/// path above for `251 <= q <= 131071`. It does not infer the Jacobian order
+/// or the input subgroup.
+#[derive(Clone, Debug)]
+pub struct SuppliedDlp {
+    pub q: u64,
+    pub curve: [[u64; 5]; 5],
+    pub base_point: (u64, u64),
+    pub generator_a: [u64; 4],
+    pub generator_b: [u64; 3],
+    pub target_a: [u64; 4],
+    pub target_b: [u64; 3],
+    pub subgroup_order: u64,
+    pub factor_base_mult_100: u64,
+    pub seed: u64,
+}
+
+#[derive(Clone, Debug)]
+pub struct SuppliedDlpSolution {
+    pub scalar: u64,
+    pub report: SparseRes,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SuppliedDlpError {
+    InvalidField,
+    InvalidCurve,
+    InvalidBasePoint,
+    InvalidDivisor,
+    InvalidSubgroup,
+    InvalidFactorBase,
+    GroupArithmetic,
+    Unsolved(String),
+}
+
+fn supplied_divisor(c: &Curve, a: [u64; 4], b: [u64; 3]) -> Option<Div> {
+    let f = c.fq;
+    if a[3] != 1 || a.iter().chain(b.iter()).any(|&v| v >= f.0) {
+        return None;
+    }
+    let a = a.to_vec();
+    let mut b = b.to_vec();
+    trim(&mut b);
+    let mut value = Vec::new();
+    let mut power = vec![1];
+    for j in 0..5 {
+        value = padd(f, &value, &pmulmod(f, &c.fpoly[j], &power, &a));
+        power = pmulmod(f, &power, &b, &a);
+    }
+    if !pmod(f, &value, &a).is_empty() {
+        return None;
+    }
+    Some(Div { a, b })
+}
+
+/// Recover a log from public curve, generator, and target coordinates.
+/// A returned scalar is checked by the quartic group law. Exhaustion and
+/// unsupported inputs return an error rather than a guessed logarithm.
+pub fn solve_supplied(input: SuppliedDlp) -> Result<SuppliedDlpSolution, SuppliedDlpError> {
+    let q = input.q;
+    if !(251..=131_071).contains(&q) || !dq::is_prime_u64(q) {
+        return Err(SuppliedDlpError::InvalidField);
+    }
+    if input.curve.iter().enumerate().any(|(i, row)| {
+        row.iter()
+            .enumerate()
+            .any(|(j, &v)| (i + j > 4 && v != 0) || v >= q)
+    }) || !is_smooth(Fq(q), &input.curve)
+    {
+        return Err(SuppliedDlpError::InvalidCurve);
+    }
+    let o = input.base_point;
+    if o.0 >= q || o.1 >= q {
+        return Err(SuppliedDlpError::InvalidBasePoint);
+    }
+    let f = Fq(q);
+    let mut at_o = 0;
+    for i in 0..5 {
+        for j in 0..(5 - i) {
+            at_o = f.add(
+                at_o,
+                f.mul(
+                    input.curve[i][j],
+                    f.mul(f.pow(o.0, i as u64), f.pow(o.1, j as u64)),
+                ),
+            );
+        }
+    }
+    let d = derivs(f, &input.curve, o.0, o.1);
+    let dx = d[1];
+    let dy = f.neg(d[0]);
+    let second = f.add(
+        f.add(f.mul(d[2], f.mul(dx, dx)), f.mul(d[3], f.mul(dx, dy))),
+        f.mul(d[4], f.mul(dy, dy)),
+    );
+    if at_o != 0 || d[1] == 0 || second == 0 {
+        return Err(SuppliedDlpError::InvalidBasePoint);
+    }
+    let ell = input.subgroup_order;
+    if ell < 3 || ell >= (1u64 << 63) || !dq::is_prime_u64(ell) {
+        return Err(SuppliedDlpError::InvalidSubgroup);
+    }
+    if input.factor_base_mult_100 == 0 || input.factor_base_mult_100 > 1000 {
+        return Err(SuppliedDlpError::InvalidFactorBase);
+    }
+    let mut rng = Rng::new(input.seed);
+    let n1 = rational_point_count(f, &input.curve, &mut rng);
+    let bsize = ((input.factor_base_mult_100 as f64 / 100.0) * (q as f64).sqrt()).ceil() as u64;
+    if bsize < 8 || bsize.saturating_add(5) >= n1 {
+        return Err(SuppliedDlpError::InvalidFactorBase);
+    }
+    let curve = Curve::new(f, input.curve, o);
+    let p = supplied_divisor(&curve, input.generator_a, input.generator_b)
+        .ok_or(SuppliedDlpError::InvalidDivisor)?;
+    let qq = supplied_divisor(&curve, input.target_a, input.target_b)
+        .ok_or(SuppliedDlpError::InvalidDivisor)?;
+    let mut ctx = Ctx::new(curve, input.seed ^ 0x5155_4152_5449_4301);
+    for _ in 0..4 {
+        let c = random_class(&mut ctx, &input.curve);
+        let nc = ctx.neg(&c).map_err(|_| SuppliedDlpError::GroupArithmetic)?;
+        ctx.pool.push(c);
+        ctx.pool.push(nc);
+    }
+    if p == ctx.id() || ctx.smul(ell, &p) != Some(ctx.id()) || ctx.smul(ell, &qq) != Some(ctx.id())
+    {
+        return Err(SuppliedDlpError::InvalidSubgroup);
+    }
+    let mut inst = Instance {
+        ctx,
+        q,
+        n_group: 0,
+        ell,
+        cof: 0,
+        p,
+        qq,
+        k: 0,
+        n1,
+        curve_tries: 0,
+    };
+    let report = run_sparse(
+        &mut inst,
+        input.factor_base_mult_100,
+        input.seed,
+        1.25,
+        8,
+        false,
+        0,
+    );
+    let scalar = report
+        .scalar
+        .ok_or_else(|| SuppliedDlpError::Unsolved(report.status.clone()))?;
+    Ok(SuppliedDlpSolution { scalar, report })
 }
 
 /// Exploratory row mode (Amendment 1): breadth-first potentials from the base points, as in the base
@@ -4050,6 +4213,60 @@ pub fn cli() {
 #[cfg(test)]
 mod sparse_tests {
     use super::*;
+
+    #[test]
+    fn supplied_coordinates_recover_a_verified_quartic_log() {
+        let mut solved = 0;
+        for seed in 0..6u64 {
+            let Some(inst) = build_instance(251, 7000 + seed, 64, false) else {
+                continue;
+            };
+            if inst.p.a.len() != 4 || inst.qq.a.len() != 4 {
+                continue;
+            }
+            let mut generator_a = [0; 4];
+            let mut generator_b = [0; 3];
+            let mut target_a = [0; 4];
+            let mut target_b = [0; 3];
+            generator_a.copy_from_slice(&inst.p.a);
+            target_a.copy_from_slice(&inst.qq.a);
+            generator_b[..inst.p.b.len()].copy_from_slice(&inst.p.b);
+            target_b[..inst.qq.b.len()].copy_from_slice(&inst.qq.b);
+            let input = SuppliedDlp {
+                q: inst.q,
+                curve: inst.ctx.c.f,
+                base_point: inst.ctx.c.o,
+                generator_a,
+                generator_b,
+                target_a,
+                target_b,
+                subgroup_order: inst.ell,
+                factor_base_mult_100: 400,
+                seed: 99 + seed,
+            };
+            assert_eq!(
+                solve_supplied(SuppliedDlp {
+                    subgroup_order: 9,
+                    ..input.clone()
+                })
+                .unwrap_err(),
+                SuppliedDlpError::InvalidSubgroup
+            );
+            let mut invalid = input.clone();
+            invalid.target_a[3] = 0;
+            assert_eq!(
+                solve_supplied(invalid).unwrap_err(),
+                SuppliedDlpError::InvalidDivisor
+            );
+            if let Ok(solution) = solve_supplied(input) {
+                assert_eq!(solution.scalar, inst.k);
+                assert!(solution.report.verified);
+                assert_eq!(solution.report.scalar, Some(solution.scalar));
+                solved += 1;
+            }
+        }
+        assert!(solved >= 1, "no supplied-input solve verified");
+    }
 
     #[test]
     fn pair_decode_enumerates_each_pair_once() {
