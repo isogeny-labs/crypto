@@ -129,10 +129,11 @@ def audit_rank(rank, curve, target, roots, case):
     require(rank["modulus"] == r and rank["transcript_complete"] is True,
             f"rank modulus/transcript: {case}")
     require(rank["generator_key"] == 2 * generator[0] + 2
-            and rank["target_key"] == 2 * target[0] + 2,
+            and rank["target_key"] == 2 * target[0] + 2 + (target[1] & 1)
+            and keys[-1] == rank["target_key"],
             f"rank point keys: {case}")
     columns = []
-    for key in keys:
+    for key in keys[:-1]:
         require(isinstance(key, int) and key >= 2 and key % 2 == 0,
                 f"invalid column key: {case}")
         x = key // 2 - 1
@@ -140,9 +141,10 @@ def audit_rank(rank, curve, target, roots, case):
         require(0 <= x < p and rhs in roots, f"invalid column abscissa: {case}")
         y = roots[rhs]
         columns.append((x, min(y, (-y) % p)))
+    columns.append(target)
     basis = {}
     base_basis = {}
-    target_index = keys.index(rank["target_key"])
+    target_index = len(keys) - 1
     for j, receipt in enumerate(rank["receipts"]):
         row = receipt["row"]
         require(len(row) == len(keys) and all(isinstance(v, int) for v in row)

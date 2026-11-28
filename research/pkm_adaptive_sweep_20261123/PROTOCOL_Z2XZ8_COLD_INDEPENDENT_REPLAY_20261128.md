@@ -20,8 +20,10 @@ and target using its own elliptic-curve arithmetic. A reported recovered
 scalar is checked against the target point and subgroup residue. Matched
 rho must use the identical frozen scalar.
 
-For every complete rank transcript, replay decodes each x-column to the
-smaller square root, verifies each receipt's group equation, and
+For every complete rank transcript, replay decodes each factor-base
+x-column to the smaller square root and uses the signed frozen point for
+the final target column. The target key includes its y parity. Replay
+verifies each receipt's group equation and
 re-eliminates the coefficient rows modulo the subgroup order. It checks
 every recorded rank transition and the final rank. A complete recovered
 row without a rank transcript is a refusal.
