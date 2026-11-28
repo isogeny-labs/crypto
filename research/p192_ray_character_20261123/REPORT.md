@@ -2095,6 +2095,56 @@ cold same-target cost. Raw output and source/binary hashes are
 in [`MILLER_SIGN_RESULTS.txt`](MILLER_SIGN_RESULTS.txt).
 [pcc:unverified]
 
+### Shift-corrected Miller constant and negation obstruction
+
+The raw Miller ratio above changes with the auxiliary shift. Let
+`f=f_(r,G)` have divisor `r(G)-r(O)`, and let `g_(G,-Q)` be the
+standard chord/tangent function with divisor
+`(G)+(-Q)-(G-Q)-(O)`. As a function of `S`, the divisor of
+`f(S+Q)/f(S)` is exactly `-r div(g_(G,-Q)(S))`. Therefore
+
+`c(Q)=f(S+Q) g_(G,-Q)(S)^r / f(S)`
+
+is **independent of every valid public shift** `S`. It is a
+coordinate-input quantity computable by a binary Miller loop and
+one line evaluation. This correction removes the arbitrary shift
+effect in the preceding screen; it does not supply the ray sign.
+
+There is a stronger exact obstruction. Write `u=-x/y` for the
+local parameter at `O` and `f∼a u^(-r)`. For
+`Q≠O,G`, taking `S→O` gives `c(Q)=-f(Q)/a` because
+`g_(G,-Q)(S)∼-u^(-1)`. Divisors and the leading term at `O`
+then give, for `Q≠O,±G`,
+
+`c(Q)c(-Q)=-(x(Q)-x(G))^r`.
+
+On P-192, `r` is odd and `χ_p(-1)=-1`, so the two corrected
+character signs multiply to `-χ_p(x(Q)-x(G))`. The desired
+`χ_r(d)` is invariant under `Q↦-Q` because `χ_r(-1)=+1`.
+The degree-two function `x-x(G)` is geometrically nonsquare,
+with simple zeros at `±G`. The same
+[character-sum lemma](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/6D1DC44634CB19BEF784CE153323C084/S0008439500021871a.pdf/character-sums-with-division-polynomials.pdf)
+used above bounds its complete sign sum by `4√p`; the checked
+`(r-3)^2>16p` ensures its character takes both signs on the
+nonexceptional rational points. Thus this corrected Miller
+character cannot equal the scalar sign on the entire marked
+P-192 orbit, regardless of shift selection. The argument does
+not bound every biased classifier built from other features.
+
+The native [`miller_theta_screen.rs`](native/src/bin/miller_theta_screen.rs)
+asserts the **field** identity on 94 nonexceptional marks on each
+order-97 curve, six selected order-10009 marks and 13 selected
+P-192 marks. It also compares each constant across three
+distinct valid shifts. On P-192 the normalized candidate signs
+at `[4]G` and `-[4]G` are `+1` and `-1`, respectively,
+while both scalar signs are `+1`; supplying the negative
+point through the coordinate CLI reproduces `-1`.
+The selected 14-mark P-192 panel has 8/14 agreements, which
+is not a population-bias estimate. The raw
+[`MILLER_THETA_RESULTS.txt`](MILLER_THETA_RESULTS.txt)
+retains the output and hashes. This screen rejects exactness
+before a cold same-target cost claim. [pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
