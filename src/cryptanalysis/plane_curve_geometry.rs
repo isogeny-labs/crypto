@@ -63,6 +63,26 @@ pub struct QuadraticLinePlace {
     pub point: [[u32; 2]; 3],
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PlaneLinePlace {
+    Rational([u32; 3]),
+    Quadratic(QuadraticLinePlace),
+}
+
+impl PlaneLinePlace {
+    pub fn degree(&self) -> usize {
+        match self {
+            Self::Rational(_) => 1,
+            Self::Quadratic(_) => 2,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DegreeTwoLineDivisor {
+    pub places: Vec<(PlaneLinePlace, usize)>,
+}
+
 /// A completely rational line section on a smooth plane curve.
 /// Points use the first nonzero coordinate scaled to one.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -569,6 +589,31 @@ impl PlaneCurve {
             .collect())
     }
 
+    fn rational_line_point(
+        &self,
+        u: [u32; 3],
+        v: [u32; 3],
+        parameter: [u32; 2],
+    ) -> Result<[u32; 3], &'static str> {
+        let [s, t] = parameter;
+        let point = std::array::from_fn(|i| {
+            ((u64::from(mul(s, u[i] % self.p, self.p)) + u64::from(mul(t, v[i] % self.p, self.p)))
+                % u64::from(self.p)) as u32
+        });
+        let Some(&leading) = point.iter().find(|&&coordinate| coordinate != 0) else {
+            return Err("line parameter gave the zero projective point");
+        };
+        let inverse = pow(leading, (self.p - 2) as usize, self.p);
+        let normalized = point.map(|coordinate| mul(coordinate, inverse, self.p));
+        if self.eval(normalized) != 0 {
+            return Err("line root is not on the curve");
+        }
+        if self.gradient(normalized) == [0; 3] {
+            return Err("line meets a singular rational point");
+        }
+        Ok(normalized)
+    }
+
     /// Return a line's effective divisor when every intersection is rational.
     /// `None` means a nonrational factor remains. A rational singular point
     /// is rejected because its branches need a normalization model.
@@ -584,29 +629,80 @@ impl PlaneCurve {
         }
         let mut points = BTreeMap::<[u32; 3], usize>::new();
         for root in factors.roots {
-            let [s, t] = root.parameter;
-            let point = std::array::from_fn(|i| {
-                ((u64::from(mul(s, u[i] % self.p, self.p))
-                    + u64::from(mul(t, v[i] % self.p, self.p)))
-                    % u64::from(self.p)) as u32
-            });
-            let Some(&leading) = point.iter().find(|&&coordinate| coordinate != 0) else {
-                return Err("line parameter gave the zero projective point");
-            };
-            let inverse = pow(leading, (self.p - 2) as usize, self.p);
-            let normalized = point.map(|coordinate| mul(coordinate, inverse, self.p));
-            if self.eval(normalized) != 0 {
-                return Err("line root is not on the curve");
-            }
-            if self.gradient(normalized) == [0; 3] {
-                return Err("line meets a singular rational point");
-            }
+            let normalized = self.rational_line_point(u, v, root.parameter)?;
             *points.entry(normalized).or_default() += root.multiplicity;
         }
         debug_assert_eq!(points.values().sum::<usize>(), self.degree);
         Ok(Some(RationalLineDivisor {
             points: points.into_iter().collect(),
         }))
+    }
+
+    /// Effective line divisor when all closed points have degree at most two.
+    /// `None` means a factor of degree at least three remains. Only places
+    /// met by the line are checked for smoothness.
+    pub fn line_divisor_degree_two(
+        &self,
+        u: [u32; 3],
+        v: [u32; 3],
+    ) -> Result<Option<DegreeTwoLineDivisor>, &'static str> {
+        let factors = self.line_factors_degree_two(&self.line_section(u, v)?)?;
+        if factors.residual_degree != 0 {
+            return Ok(None);
+        }
+        let mut places = BTreeMap::<PlaneLinePlace, usize>::new();
+        for root in factors.rational {
+            let point = self.rational_line_point(u, v, root.parameter)?;
+            *places.entry(PlaneLinePlace::Rational(point)).or_default() += root.multiplicity;
+        }
+        for (place, multiplicity) in self.quadratic_line_places(u, v)? {
+            *places.entry(PlaneLinePlace::Quadratic(place)).or_default() += multiplicity;
+        }
+        debug_assert_eq!(
+            places
+                .iter()
+                .map(|(place, multiplicity)| place.degree() * multiplicity)
+                .sum::<usize>(),
+            self.degree
+        );
+        Ok(Some(DegreeTwoLineDivisor {
+            places: places.into_iter().collect(),
+        }))
+    }
+
+    /// Formal principal divisor of the ratio of two split line sections.
+    /// The caller must establish whole-curve geometric smoothness separately.
+    pub fn line_relation_degree_two(
+        &self,
+        line_a: ([u32; 3], [u32; 3]),
+        line_b: ([u32; 3], [u32; 3]),
+    ) -> Result<Option<BTreeMap<PlaneLinePlace, i32>>, &'static str> {
+        let Some(a) = self.line_divisor_degree_two(line_a.0, line_a.1)? else {
+            return Ok(None);
+        };
+        let Some(b) = self.line_divisor_degree_two(line_b.0, line_b.1)? else {
+            return Ok(None);
+        };
+        let mut relation = BTreeMap::<PlaneLinePlace, i32>::new();
+        for (place, multiplicity) in a.places {
+            *relation.entry(place).or_default() += multiplicity as i32;
+        }
+        for (place, multiplicity) in b.places {
+            *relation.entry(place).or_default() -= multiplicity as i32;
+        }
+        relation.retain(|_, coefficient| *coefficient != 0);
+        Ok(Some(relation))
+    }
+
+    pub fn certified_line_relation_degree_two(
+        &self,
+        line_a: ([u32; 3], [u32; 3]),
+        line_b: ([u32; 3], [u32; 3]),
+    ) -> Result<Option<BTreeMap<PlaneLinePlace, i32>>, &'static str> {
+        if !self.certify_geometric_smoothness()? {
+            return Err("plane curve is geometrically singular");
+        }
+        self.line_relation_degree_two(line_a, line_b)
     }
 
     /// Coefficients of `div(line_a / line_b)` at rational points.
@@ -869,6 +965,73 @@ mod tests {
         assert!(nonreduced
             .quadratic_line_places([1, 0, 0], [0, 1, 0])
             .is_err());
+    }
+
+    #[test]
+    fn mixed_degree_line_divisors_have_principal_weighted_relation() {
+        let conic = PlaneCurve::new(3, 2, &[term(2, 0, 0), term(0, 2, 0), term(0, 0, 2)]).unwrap();
+        let quadratic_line = ([1, 0, 0], [0, 1, 0]);
+        let rational_line = ([1, 1, 0], [0, 0, 1]);
+        let divisor = conic
+            .line_divisor_degree_two(quadratic_line.0, quadratic_line.1)
+            .unwrap()
+            .unwrap();
+        assert_eq!(divisor.places.len(), 1);
+        assert_eq!(divisor.places[0].0.degree(), 2);
+        assert_eq!(divisor.places[0].1, 1);
+        assert_eq!(
+            conic.line_divisor_degree_two([1, 1, 0], [1, 2, 0]).unwrap(),
+            Some(divisor)
+        );
+        let relation = conic
+            .certified_line_relation_degree_two(quadratic_line, rational_line)
+            .unwrap()
+            .unwrap();
+        assert_eq!(relation.len(), 3);
+        assert_eq!(
+            relation
+                .iter()
+                .map(|(place, coefficient)| place.degree() as i32 * coefficient)
+                .sum::<i32>(),
+            0
+        );
+        assert_eq!(
+            relation
+                .iter()
+                .filter(|(place, coefficient)| place.degree() == 2 && **coefficient == 1)
+                .count(),
+            1
+        );
+        assert_eq!(
+            relation
+                .iter()
+                .filter(|(place, coefficient)| place.degree() == 1 && **coefficient == -1)
+                .count(),
+            2
+        );
+        assert!(conic
+            .rational_line_relation(quadratic_line, rational_line)
+            .unwrap()
+            .is_none());
+        let cubic = PlaneCurve::new(
+            3,
+            3,
+            &[
+                term(3, 0, 0),
+                PlaneTerm {
+                    x_exp: 1,
+                    y_exp: 2,
+                    z_exp: 0,
+                    coeff: 2,
+                },
+                term(0, 3, 0),
+            ],
+        )
+        .unwrap();
+        assert!(cubic
+            .line_divisor_degree_two([1, 0, 0], [0, 1, 0])
+            .unwrap()
+            .is_none());
     }
 
     #[test]
