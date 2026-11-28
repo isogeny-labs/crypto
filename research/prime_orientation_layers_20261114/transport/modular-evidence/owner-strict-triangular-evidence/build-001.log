@@ -1,0 +1,22 @@
+✖ [1806/1806] Building CryptoLean.StrictTriangular (1.5s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/crypto-lean-first-moment-worktree/CryptoLean/StrictTriangular.lean -o /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/StrictTriangular.olean -i /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/StrictTriangular.ilean -c /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/StrictTriangular.c --setup /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/StrictTriangular.setup.json --json
+error: CryptoLean/StrictTriangular.lean:27:30: Unknown constant `Int.natCast_injective`
+error: CryptoLean/StrictTriangular.lean:28:6: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  (?M ^ ?a).map ⇑?f
+in the target expression
+  (fun M => M.map ?m.55) (M ^ Fintype.card ι) = (fun M => M.map ?m.55) 0
+
+ι : Type u_1
+inst✝² : Fintype ι
+inst✝¹ : DecidableEq ι
+inst✝ : LinearOrder ι
+M : Matrix ι ι ℕ
+h : ∀ (i j : ι), j ≤ i → M i j = 0
+hz : M.map ⇑(Nat.castRingHom ℤ) ^ Fintype.card ι = 0
+⊢ (fun M => M.map ?m.55) (M ^ Fintype.card ι) = (fun M => M.map ?m.55) 0
+info: CryptoLean/StrictTriangular.lean:37:0: 'CryptoLean.StrictTriangular.pow_card_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CryptoLean/StrictTriangular.lean:38:0: 'CryptoLean.StrictTriangular.nat_pow_card_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: CryptoLean/StrictTriangular.lean:39:0: 'CryptoLean.StrictTriangular.finite_geometric_fixed_point' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CryptoLean.StrictTriangular
+error: build failed

@@ -16,6 +16,14 @@
 //!
 //! Usage: `mont_mul_bench [--rounds R] [--batch B] [--seed S] [--out FILE]
 //!         [--fields a,b,..] [--kernel-iters I]`
+//!
+//! `--batch`: eight `Point::scalar_mul` calls vs one
+//! `Point::scalar_mul_batch` (AVX-512 IFMA, eight lanes) on the same points
+//! and scalars, interleaved rounds, `batch` rows (ns per point).
+//!
+//! `--rho`: marginal cost per step of the `ecdlp_nist` rho walk, one walk
+//! per worker (`lanes = 1`) vs lockstep walks (`--lanes`, batched on IFMA),
+//! `rho` rows.
 
 use crypto_lib::ecc::endo_generic_chain_set::is_probable_prime;
 use crypto_lib::ecc::field::FieldElement;
@@ -38,12 +46,25 @@ const ARMS: &[&str] = &[
     "adx_sqr",
     "mulx",
     "adx_wnaf",
+    "adx6",
+    "adx6_mul",
+    "adx_il",
+    "adx_qp",
+    "adx_tw",
+    "ifma1",
 ];
 const BASELINE: &str = "pad9_cios";
 const AA: &str = "pad9_cios#aa";
 const KERNEL_OPS: &[&str] = &[
     "cios_mul",
     "adx_mul",
+    "adx6_mul",
+    "adx_il_mul",
+    "adx_qp_mul",
+    "adx_tw_mul",
+    "ifma1_mul",
+    "adx8_mul",
+    "ifma8_mul",
     "mulx_mul",
     "sos_mul",
     "karatsuba_mul",
@@ -73,6 +94,7 @@ fn fields() -> Vec<(&'static str, BigUint)> {
         ("p192_nist", two(192) - two(64) - 1u32),
         ("p255_25519", two(255) - 19u32),
         ("p320_pmax", prime_below_pow2(320)),
+        ("p352_pmax", prime_below_pow2(352)),
         ("p384_nist", two(384) - two(128) - two(96) + two(32) - 1u32),
         ("p448_goldilocks", two(448) - two(224) - 1u32),
         ("p512_pmax", prime_below_pow2(512)),
@@ -94,6 +116,14 @@ fn main() {
         let input = args.get(i + 1).expect("--analyze FILE");
         let dir: String = arg(&args, "--report-dir", ".".to_string());
         analyze::run(input, &dir);
+        return;
+    }
+    if args.iter().any(|a| a == "--rho") {
+        rho_mode(&args);
+        return;
+    }
+    if args.iter().any(|a| a == "--batch") {
+        batch_mode(&args);
         return;
     }
     let rounds: usize = arg(&args, "--rounds", 15);
@@ -160,7 +190,7 @@ fn main() {
                     "inv_fermat" | "inv_bingcd" => kernel_iters / 1000,
                     _ => kernel_iters,
                 };
-                // `adx_mul` exists only at 4 limbs (and `*_mulx` only with ADX).
+                // `adx_mul` / `adx6_mul` exist only at 4 / 6 limbs (and `*_mulx` only with ADX).
                 let Some((ns, _)) = field_kernel_probe(op, p, &ka, &kb, iters) else {
                     continue;
                 };
@@ -343,8 +373,8 @@ mod analyze {
         for op in KERNEL_OPS {
             write!(md, " {op} |").unwrap();
         }
-        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | mulx / cios_mul | bingcd / fermat |\n|:--|--:|");
-        for _ in 0..KERNEL_OPS.len() + 6 {
+        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | adx6 / cios_mul | mulx / cios_mul | adx6 / mulx | il / adx | il / adx6 | qp / adx | qp / adx6 | tw / adx | tw / adx6 | ifma1 / adx | ifma1 / adx6 | ifma8 / adx8 | bingcd / fermat |\n|:--|--:|");
+        for _ in 0..KERNEL_OPS.len() + 17 {
             md.push_str("--:|");
         }
         md.push('\n');
@@ -374,12 +404,23 @@ mod analyze {
             };
             writeln!(
                 md,
-                " {} | {} | {} | {} | {} | {} |",
+                " {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                 ratio("sqr", "cios_sqr"),
                 ratio("karatsuba_mul", "cios_mul"),
                 ratio("sos_mul", "cios_mul"),
                 ratio("adx_mul", "cios_mul"),
+                ratio("adx6_mul", "cios_mul"),
                 ratio("mulx_mul", "cios_mul"),
+                ratio("adx6_mul", "mulx_mul"),
+                ratio("adx_il_mul", "adx_mul"),
+                ratio("adx_il_mul", "adx6_mul"),
+                ratio("adx_qp_mul", "adx_mul"),
+                ratio("adx_qp_mul", "adx6_mul"),
+                ratio("adx_tw_mul", "adx_mul"),
+                ratio("adx_tw_mul", "adx6_mul"),
+                ratio("ifma1_mul", "adx_mul"),
+                ratio("ifma1_mul", "adx6_mul"),
+                ratio("ifma8_mul", "adx8_mul"),
                 ratio("inv_bingcd", "inv_fermat")
             )
             .unwrap();
@@ -534,5 +575,181 @@ mod analyze {
         }
         s.push_str("</svg>\n");
         s
+    }
+}
+
+/// `--batch`: per field, `rounds` rounds of `batch` groups of eight random
+/// points and full-width scalars; arms `scalar8` (eight
+/// `Point::scalar_mul`) and `batch8` (one `Point::scalar_mul_batch`) in a
+/// seeded shuffled order per round, same inputs.  Every output is checked
+/// against `scalar_mul` first (edge scalars included).  Writes `batch` rows
+/// and prints the paired median ratio per field.
+fn batch_mode(args: &[String]) {
+    let rounds: usize = arg(args, "--rounds", 21);
+    let groups: usize = arg(args, "--batch", 4);
+    let seed: u64 = arg(args, "--seed", 0x6261_7463_6838);
+    let out_path: String = arg(args, "--out", "mont_mul_batch.jsonl".to_string());
+    let only: Option<String> = args
+        .iter()
+        .position(|a| a == "--fields")
+        .and_then(|i| args.get(i + 1).cloned());
+    let mut out = std::fs::File::create(&out_path).expect("create --out");
+    for (fi, (name, p)) in fields()
+        .into_iter()
+        .filter(|(n, _)| only.as_ref().is_none_or(|o| o.split(',').any(|x| x == *n)))
+        .enumerate()
+    {
+        let mut rng = StdRng::seed_from_u64(seed ^ (fi as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15));
+        let a = FieldElement::new(rng.gen_biguint_below(&p), p.clone());
+        let rand_pt = |rng: &mut StdRng| Point::Affine {
+            x: FieldElement::new(rng.gen_biguint_below(&p), p.clone()),
+            y: FieldElement::new(rng.gen_biguint_below(&p), p.clone()),
+        };
+        // Correctness gate: edge scalars, the point at infinity, random.
+        let mut pts: Vec<Point> = (0..16).map(|_| rand_pt(&mut rng)).collect();
+        pts[3] = Point::Infinity;
+        let mut ks: Vec<BigUint> = (0..16).map(|_| rng.gen_biguint(p.bits())).collect();
+        for (i, v) in [0u32, 1, 2, 15, 16, 17].iter().enumerate() {
+            ks[i + 8] = BigUint::from(*v);
+        }
+        ks[4] = &p - 1u32;
+        let got = Point::scalar_mul_batch(&pts, &ks, &a);
+        for i in 0..16 {
+            assert_eq!(
+                got[i],
+                pts[i].scalar_mul(&ks[i], &a),
+                "batch {name} lane {i}"
+            );
+        }
+        eprintln!("{name}: 16 batch lanes agree with scalar_mul");
+        let mut ratios = Vec::new();
+        for round in 0..rounds {
+            let pts: Vec<Point> = (0..8 * groups).map(|_| rand_pt(&mut rng)).collect();
+            let ks: Vec<BigUint> = (0..8 * groups).map(|_| rng.gen_biguint(p.bits())).collect();
+            let mut order = ["scalar8", "batch8"];
+            let mut orng = StdRng::seed_from_u64(seed ^ ((fi as u64) << 32) ^ round as u64);
+            order.shuffle(&mut orng);
+            let mut ns = std::collections::BTreeMap::new();
+            for (pos, arm) in order.iter().enumerate() {
+                let t0 = std::time::Instant::now();
+                if *arm == "scalar8" {
+                    for (pt, k) in pts.iter().zip(&ks) {
+                        std::hint::black_box(std::hint::black_box(pt).scalar_mul(k, &a));
+                    }
+                } else {
+                    for g in 0..groups {
+                        let r = 8 * g..8 * g + 8;
+                        std::hint::black_box(Point::scalar_mul_batch(&pts[r.clone()], &ks[r], &a));
+                    }
+                }
+                let per = t0.elapsed().as_nanos() as f64 / (8 * groups) as f64;
+                ns.insert(*arm, per);
+                writeln!(
+                    out,
+                    "{{\"kind\":\"batch\",\"field\":\"{name}\",\"limbs\":{},\"round\":{round},\"pos\":{pos},\"arm\":\"{arm}\",\"points\":{},\"ns_per_point\":{per:.1}}}",
+                    p.bits().div_ceil(64),
+                    8 * groups
+                )
+                .unwrap();
+            }
+            ratios.push(ns["scalar8"] / ns["batch8"]);
+        }
+        ratios.sort_by(|x, y| x.partial_cmp(y).unwrap());
+        println!(
+            "{name}: scalar8 / batch8 per point, median {:.3} (min {:.3}, max {:.3}, {} rounds)",
+            ratios[ratios.len() / 2],
+            ratios[0],
+            ratios[ratios.len() - 1],
+            ratios.len()
+        );
+    }
+}
+
+/// `--rho`: per curve and round, four budget-capped rho runs in a seeded
+/// shuffled order: `lanes ∈ {1, L}` × budget `{B, 2B}` (one thread, same
+/// target and seed).  The marginal cost per step is
+/// `(t(2B) − t(B)) / B` per arm, which removes walk start-up (each walk
+/// starts with two scalar multiplications).  Writes `rho` rows and prints
+/// the median marginal ns per step per arm and their paired ratio.
+fn rho_mode(args: &[String]) {
+    use crypto_lib::cryptanalysis::ecdlp_nist::rho::{pollard_rho, RhoOptions};
+    use crypto_lib::cryptanalysis::ecdlp_nist::{EcdlpGroup, PrimeGroup};
+    use crypto_lib::ecc::curve::CurveParams;
+    let rounds: usize = arg(args, "--rounds", 9);
+    let budget: u64 = arg(args, "--budget", 1u64 << 15);
+    let lanes: usize = arg(args, "--lanes", 256);
+    let seed: u64 = arg(args, "--seed", 0x7268_6f6c);
+    let out_path: String = arg(args, "--out", "mont_mul_rho.jsonl".to_string());
+    let only: Option<String> = args
+        .iter()
+        .position(|a| a == "--fields")
+        .and_then(|i| args.get(i + 1).cloned());
+    let mut out = std::fs::File::create(&out_path).expect("create --out");
+    let curves = [
+        ("eccp131", CurveParams::eccp131()),
+        ("secp256k1", CurveParams::secp256k1()),
+        ("p256", CurveParams::p256()),
+        ("gost512_test", CurveParams::gost_3410_2012_512_test()),
+    ];
+    for (ci, (name, curve)) in curves
+        .into_iter()
+        .filter(|(n, _)| only.as_ref().is_none_or(|o| o.split(',').any(|x| x == *n)))
+        .enumerate()
+    {
+        let g = PrimeGroup::new(curve);
+        let mut rng = StdRng::seed_from_u64(seed ^ ci as u64);
+        let k = rng.gen_biguint_below(g.order());
+        let q = g.mul(&g.generator(), &k);
+        let mut marg: std::collections::BTreeMap<usize, Vec<f64>> = Default::default();
+        let mut ratios = Vec::new();
+        for round in 0..rounds {
+            let mut runs = [
+                (1usize, budget),
+                (1, 2 * budget),
+                (lanes, budget),
+                (lanes, 2 * budget),
+            ];
+            let mut orng = StdRng::seed_from_u64(seed ^ ((ci as u64) << 32) ^ round as u64);
+            runs.shuffle(&mut orng);
+            let mut t = std::collections::BTreeMap::new();
+            for (pos, &(ln, b)) in runs.iter().enumerate() {
+                let opts = RhoOptions {
+                    threads: 1,
+                    seed: seed ^ round as u64,
+                    max_iterations: Some(b),
+                    lanes: ln,
+                    ..RhoOptions::default()
+                };
+                let t0 = std::time::Instant::now();
+                let rep = pollard_rho(&g, &q, &opts);
+                let ns = t0.elapsed().as_nanos() as f64;
+                t.insert((ln, b), (ns, rep.iterations));
+                writeln!(
+                    out,
+                    "{{\"kind\":\"rho\",\"curve\":\"{name}\",\"round\":{round},\"pos\":{pos},\"lanes\":{ln},\"budget\":{b},\"iterations\":{},\"ns\":{ns:.0}}}",
+                    rep.iterations
+                )
+                .unwrap();
+            }
+            let m = |ln: usize| {
+                let (t1, i1) = t[&(ln, budget)];
+                let (t2, i2) = t[&(ln, 2 * budget)];
+                (t2 - t1) / (i2 - i1).max(1) as f64
+            };
+            let (m1, ml) = (m(1), m(lanes));
+            marg.entry(1).or_default().push(m1);
+            marg.entry(lanes).or_default().push(ml);
+            ratios.push(m1 / ml);
+        }
+        let med = |v: &mut Vec<f64>| {
+            v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            v[v.len() / 2]
+        };
+        let m1 = med(marg.get_mut(&1).unwrap());
+        let ml = med(marg.get_mut(&lanes).unwrap());
+        let r = med(&mut ratios);
+        println!(
+            "{name}: marginal ns/step lanes=1 {m1:.0}, lanes={lanes} {ml:.0}; paired ratio median {r:.3} ({rounds} rounds)"
+        );
     }
 }
