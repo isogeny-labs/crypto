@@ -513,11 +513,27 @@ fn count_ops(n: usize) {
 
 #[inline]
 fn record_row_diagnostics(n: usize) {
-    FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    let n = n as u64;
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n));
+    // Batch the process atomic: every `add_lazy` under multi-thread FL /
+    // deferred contended one cache line until #5314; the VisitAccount
+    // wide-reducer split later flushed every op again.
+    if thread_ops_mode() {
+        // Reports read the thread-local only; skip the process atomic.
+    } else {
+        FIELD_OPS_BUF.with(|b| {
+            let v = b.get() + n;
+            if v >= FIELD_OPS_BUF_FLUSH {
+                FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+                b.set(0);
+            } else {
+                b.set(v);
+            }
+        });
+    }
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
-    super::jv_bitops::row_ops(n as u64);
+    super::jv_bitops::row_ops(n);
 }
 
 /// Exclusive accounting route for matrix and polynomial reducer work.
@@ -8610,6 +8626,18 @@ fn f4_with_arithmetic(
                     Err(stop) => abort_call!(stop),
                 }
             } else {
+                // Wide primes (above the narrow/deferred gate at 2¹⁶) still admit
+                // Faugère–Lachartre when coefficients fit in `u32` and exact `f64`
+                // panels are safe — the NTT prime 786433 is the motivating case.
+                // `F4_FP_FL=0` keeps the cascade below as a same-binary control.
+                // Restored here after the VisitAccount wide-reducer split dropped
+                // this gate (main tip had cascade-only for p > 2¹⁶).
+                let fl_wide = resume_here.is_none()
+                    && opts.resource_limits.is_none()
+                    && fl_enabled()
+                    && n_cols >= fl_min_cols()
+                    && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES
+                    && super::fp_gemm::supports_f64_gemm(p);
                 let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                     if deadline.is_some_and(|d| Instant::now() > d) {
                         return None;
@@ -8670,76 +8698,103 @@ fn f4_with_arithmetic(
                     count_ops(row_ops);
                     Some(free_cols.iter().map(|&c| acc[c]).collect())
                 };
-                // an in-step snapshot stands in for the reducer pass and the finished
-                // part of the reduction
-                let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
-                    Some(Vec::new())
-                } else if parallel {
-                    pair_rows.par_iter().map(reduce_pair_row).collect()
-                } else {
-                    pair_rows.iter().map(reduce_pair_row).collect()
+            // an in-step snapshot stands in for the reducer pass and the finished
+            // part of the reduction.
+            //
+            // `U32` keeps Faugère–Lachartre's native row width so wide deferred
+            // RREF does not bounce the free-column matrix through `u64`
+            // (u32→u64 after FL, then u64→u32 into deferred, then u32→u64 out).
+            enum WideReduced {
+                U64(Vec<Vec<u64>>),
+                U32(Vec<Vec<u32>>),
+            }
+            let reduced: Option<WideReduced> = if resume_here.is_some() {
+                Some(WideReduced::U64(Vec::new()))
+            } else if fl_wide {
+                reduce_pairs_fl(
+                    pair_rows,
+                    reducers,
+                    &reducer_at,
+                    &free_cols,
+                    n_cols,
+                    fp,
+                    deadline,
+                )
+                .map(WideReduced::U32)
+            } else if parallel {
+                pair_rows
+                    .par_iter()
+                    .map(reduce_pair_row)
+                    .collect::<Option<Vec<_>>>()
+                    .map(WideReduced::U64)
+            } else {
+                pair_rows
+                    .iter()
+                    .map(reduce_pair_row)
+                    .collect::<Option<Vec<_>>>()
+                    .map(WideReduced::U64)
+            };
+            let mut snapshot_hook = |v: &RrefView| -> bool {
+                let (Some((path, _)), Some(top), Some(every), Some(fp)) =
+                    (&opts.checkpoint, &top, opts.checkpoint_in_step, ck_fp)
+                else {
+                    return false;
                 };
-                let mut snapshot_hook = |v: &RrefView| -> bool {
-                    let (Some((path, _)), Some(top), Some(every), Some(fp)) =
-                        (&opts.checkpoint, &top, opts.checkpoint_in_step, ck_fp)
-                    else {
-                        return false;
+                if last_snap.elapsed() < every {
+                    return false;
+                }
+                let tw = Instant::now();
+                if !top_written {
+                    let snap = ckpt::Snap {
+                        fingerprint: fp,
+                        n_vars,
+                        elapsed: top.elapsed,
+                        field_ops: top.ops,
+                        basis: &basis,
+                        alive: &alive,
+                        pairs: &top.pairs,
+                        above: &above,
+                        pairs_above_bound,
+                        steps: top.steps,
+                        max_rows: top.max_rows,
+                        max_cols: top.max_cols,
+                        degree_reached: top.degree_reached,
+                        solving_degree: top.solving_degree,
+                        learned: top.learned,
+                        blocked_steps: top.blocked_steps,
                     };
-                    if last_snap.elapsed() < every {
-                        return false;
-                    }
-                    let tw = Instant::now();
-                    if !top_written {
-                        let snap = ckpt::Snap {
-                            fingerprint: fp,
-                            n_vars,
-                            elapsed: top.elapsed,
-                            field_ops: top.ops,
-                            basis: &basis,
-                            alive: &alive,
-                            pairs: &top.pairs,
-                            above: &above,
-                            pairs_above_bound,
-                            steps: top.steps,
-                            max_rows: top.max_rows,
-                            max_cols: top.max_cols,
-                            degree_reached: top.degree_reached,
-                            solving_degree: top.solving_degree,
-                            learned: top.learned,
-                            blocked_steps: top.blocked_steps,
-                        };
-                        match ckpt::save(path, &snap) {
-                            Ok(bytes) => {
-                                top_written = true;
-                                eprintln!(
+                    match ckpt::save(path, &snap) {
+                        Ok(bytes) => {
+                            top_written = true;
+                            eprintln!(
                                 "f4: checkpoint {} at the top of step {}, written inside it: {bytes} bytes in {:.1} s",
                                 path.display(),
                                 top.steps,
                                 tw.elapsed().as_secs_f64()
                             );
-                            }
-                            Err(e) => {
-                                eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display());
-                                last_snap = Instant::now();
-                                return false;
-                            }
+                        }
+                        Err(e) => {
+                            eprintln!("f4: CHECKPOINT WRITE FAILED {}: {e}", path.display());
+                            last_snap = Instant::now();
+                            return false;
                         }
                     }
-                    let tr = Instant::now();
-                    let rs = ckpt::RrefSnap {
-                        fingerprint: fp,
-                        top_steps: top.steps,
-                        top_elapsed: top.elapsed,
-                        ops: ops_carry.get() + (field_ops_now() - ops0),
-                        elapsed: t0.elapsed() + carried.get(),
-                        phase: v.phase,
-                        c: v.c,
-                        pr: v.pr,
-                        i: v.i,
-                        pivots: v.pivots,
-                        rows: v.rows,
-                    };
-                    match ckpt::save_rref(&ckpt::rref_path(path), &rs) {
+                }
+                let tr = Instant::now();
+                let rs = ckpt::RrefSnap {
+                    fingerprint: fp,
+                    top_steps: top.steps,
+                    top_elapsed: top.elapsed,
+                    ops: ops_carry.get() + (field_ops_now() - ops0),
+                    elapsed: t0.elapsed() + carried.get(),
+                    phase: v.phase,
+                    c: v.c,
+                    pr: v.pr,
+                    i: v.i,
+                    pivots: v.pivots,
+                    rows: v.rows,
+                };
+                match ckpt::save_rref(&ckpt::rref_path(path), &rs) {
                     Ok(bytes) => eprintln!(
                         "f4: in-step snapshot of step {} (phase {}, column {}, {} pivots): {bytes} bytes in {:.1} s",
                         top.steps + 1,
@@ -8750,36 +8805,117 @@ fn f4_with_arithmetic(
                     ),
                     Err(e) => eprintln!("f4: IN-STEP SNAPSHOT FAILED: {e}"),
                 }
-                    last_snap = Instant::now();
-                    snaps += 1;
-                    opts.checkpoint_stop_in_rref.is_some_and(|k| snaps >= k)
-                };
-                reduced.and_then(|mut rows| {
-                    let mut resume_arg = None;
-                    if let Some(rs) = resume_here {
-                        rows = rs.rows;
-                        resume_arg = Some((rs.phase, rs.c, rs.pr, rs.i, rs.pivots));
-                    } else {
-                        useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
-                        rows.retain(|r| r.iter().any(|&v| v != 0));
+                last_snap = Instant::now();
+                snaps += 1;
+                opts.checkpoint_stop_in_rref.is_some_and(|k| snaps >= k)
+            };
+            reduced.and_then(|reduced| {
+                let want_hook = top.is_some() && opts.checkpoint.is_some();
+                match reduced {
+                    WideReduced::U32(mut rows32) => {
+                        useful = rows32.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
+                        rows32.retain(|r| r.iter().any(|&v| v != 0));
                         if recording {
-                            rec_rows = rows.iter().map(|r| r.to_vec()).collect();
+                            rec_rows = rows32
+                                .iter()
+                                .map(|r| r.iter().map(|&v| u64::from(v)).collect())
+                                .collect();
+                        }
+                        // Deferred lazy RREF wants `u32` rows: keep FL's
+                        // width (no u32→u64→u32 copy of the free-column
+                        // matrix).  `F4_FP_WIDE_DEFERRED=0` falls through
+                        // to classical `rref` after one widen.
+                        let use_wide_deferred = !want_hook
+                            && wide_deferred_enabled()
+                            && block_classes.is_none()
+                            && rows32.len() >= 8
+                            && rows32.first().map(|r| r.len()).unwrap_or(0) >= 64;
+                        if use_wide_deferred {
+                            let piv = rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                            let rows = rows32
+                                .into_iter()
+                                .map(|r| r.into_iter().map(u64::from).collect())
+                                .collect();
+                            Some((rows, piv))
+                        } else {
+                            let mut rows: Vec<Vec<u64>> = rows32
+                                .into_iter()
+                                .map(|r| r.into_iter().map(u64::from).collect())
+                                .collect();
+                            let piv = match &block_classes {
+                                Some(cls) => {
+                                    rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline))
+                                }
+                                None => {
+                                    let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                        if want_hook {
+                                            Some(&mut snapshot_hook)
+                                        } else {
+                                            None
+                                        };
+                                    rref_ckpt(&mut rows, fp, deadline, None, hook)
+                                }
+                            }?;
+                            Some((rows, piv))
                         }
                     }
-                    let piv = match &block_classes {
-                        Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
-                        None => {
-                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                                if top.is_some() && opts.checkpoint.is_some() {
-                                    Some(&mut snapshot_hook)
-                                } else {
-                                    None
-                                };
-                            rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                    WideReduced::U64(mut rows) => {
+                        let mut resume_arg = None;
+                        if let Some(rs) = resume_here {
+                            rows = rs.rows;
+                            resume_arg = Some((rs.phase, rs.c, rs.pr, rs.i, rs.pivots));
+                        } else {
+                            useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
+                            rows.retain(|r| r.iter().any(|&v| v != 0));
+                            if recording {
+                                rec_rows = rows.iter().map(|r| r.to_vec()).collect();
+                            }
                         }
-                    };
-                    piv.map(|piv| (rows, piv))
-                })
+                        let piv = match &block_classes {
+                            Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
+                            None => {
+                                // Deferred lazy/SpMM RREF for free-column
+                                // matrices on exact-f64 primes when rows
+                                // arrived as `u64` (cascade path).
+                                let use_wide_deferred = resume_arg.is_none()
+                                    && !want_hook
+                                    && wide_deferred_enabled()
+                                    && super::fp_gemm::supports_f64_gemm(p)
+                                    && rows.len() >= 8
+                                    && rows.first().map(|r| r.len()).unwrap_or(0) >= 64;
+                                if use_wide_deferred {
+                                    let mut rows32: Vec<Vec<u32>> = rows
+                                        .iter()
+                                        .map(|r| {
+                                            r.iter()
+                                                .map(|&v| {
+                                                    debug_assert!(v < p);
+                                                    v as u32
+                                                })
+                                                .collect()
+                                        })
+                                        .collect();
+                                    let piv = rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                                    rows = rows32
+                                        .into_iter()
+                                        .map(|r| r.into_iter().map(u64::from).collect())
+                                        .collect();
+                                    Some(piv)
+                                } else {
+                                    let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                        if want_hook {
+                                            Some(&mut snapshot_hook)
+                                        } else {
+                                            None
+                                        };
+                                    rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                                }
+                            }
+                        }?;
+                        Some((rows, piv))
+                    }
+                }
+            })
             }
         };
         drop(account_rows);

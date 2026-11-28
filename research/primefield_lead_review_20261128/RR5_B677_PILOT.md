@@ -1,5 +1,7 @@
 # Frozen-design pilot for M31 RR5 sector relation yield
 
+**Status (28 November): conditional protocol, not a queued run.** [Merged #5208](https://github.com/isogeny-labs/crypto/pull/5208) compared these five sectors with coupled, sector-4, Graeffe and deflated RR5 on identical B677 inputs. None completed extraction or emitted a relation in 148 capped calls, including planted targets [pcc:unverified]. Do not repeat this same-formulation B677 pilot without a new smaller selector or solver premise that first completes a frozen smaller instance. The exact tuple counts below remain a combinatorial budget, not an F4 feasibility signal.
+
 Prepared 2026-11-25 from public PR #5119 (sector constructor), #5120 (streaming query pipeline), #5184 (generic B677 cost reference), and the main active goal. This is a design and exact combinatorial calculation, not an executed solver panel. All quoted PR measurements are [pcc:unverified].
 
 ## Immutable public instance and admitted chart
