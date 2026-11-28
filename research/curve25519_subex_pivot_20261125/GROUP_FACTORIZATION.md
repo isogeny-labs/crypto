@@ -2,8 +2,10 @@
 
 This note isolates the algebra implemented by `modes`, `child`,
 `PacketTensor::entry`, and the product over radix groups in `evaluate_at`.
-It is a producer proof target, not an independent or kernel-checked
-refinement. `[pcc:unverified]`
+The finite expansion/Fubini/truncation skeleton and abstract nilpotent
+geometric inverse are kernel-checked separately; mapping the Rust valuations,
+units, and mode coefficients to those inputs remains a refinement target.
+`[pcc:unverified]`
 
 ## Direct deformation semantics
 
@@ -146,16 +148,215 @@ The producer proof is the following finite rearrangement.
    omitted vector has total 2-adic weight at least `p`, so its complete term is
    zero in the working ring.
 
+`lean/GroupFactorization.lean` now kernel-checks the reusable algebra in these
+steps over arbitrary finite types: product-of-row-sums expansion, regrouping by
+finite key fibers, exact addition of powers-of-two weights, equivalence between
+global incidence assignments and dependent group-fiber assignments, finite
+Fubini factorization, and high-weight vanishing in `ZMod (2^p)`. These theorems
+also derive nilpotence from accumulated powers-of-two valuation and prove the
+truncated geometric inverse in an arbitrary commutative ring. The scalar bridge
+also proves the exact normalized tile identity
+`2^v(base-2^(i+1-v)j)=2^v base-2^(i+1)j`. Rather than assuming the inverse
+ratio is already nilpotent, it retains the next-power geometric remainder and
+proves that Rust's outer `2^(a+1-v)` shift kills that remainder when
+`v<=i<=a` and the coefficient ring satisfies `2^p=0`. Thus the exact
+`b=0..p-2` coefficient shape and cutoff used by `mode_coefficient` are
+kernel-checked. The formal packet bridge now also groups row choices by their
+complete bounded mode-exponent vector, proves that the row/column group fibers
+contain exactly `2M` endpoint incidences, and specializes finite Fubini to the
+certified child interface: one opaque old-tensor term on the complete group
+fiber and one total Boolean entry table on every packet/group subfiber. These
+theorems still do not identify a concrete Rust factor or inverse with the
+formal ring values, identify every Rust mode with an algebraic coefficient,
+or refine the accepted Rust child arrays into those typed group-local
+functions. `[pcc:unverified]`
+
+The native `CauchySourceWitness` narrows the first of those interfaces. It
+serializes the exact monic polynomial selected by `Ring::new`, its length-`d`
+lower-bit vector matching the formal `Fin d -> Bool` parameter, the production
+base, numerator unit, and complete stored factor map. An independent verifier
+reruns deterministic polynomial selection, checks every lower bit, reconstructs
+the scalar values from `(a,i,t,z)`, checks each unit inverse, and recomputes every
+schema-2 packet weight and nonzero mode row/column. The verifier imports ring
+arithmetic and serialized certificate
+types, but not `deformation`, packing, child construction, or recursion. This
+binds the concrete native values to the displayed scalar formulas. Composing
+the separately accepted packet-pair provenance now also reconstructs the full
+mode list in packet/tile/weight order and checks every source zero-suppression.
+Instantiation of the accepted lower-bit vector and scalar coordinates in Lean,
+plus a concrete all-child Rust-to-typed-function mapping, remain open.
+`[pcc:unverified]`
+
+`lean/ExtensionRingModel.lean` now fixes the formal coefficient type to the
+same power-basis shape as native `Ring`: a quotient
+`(Z/2^p)[U]/f` for a monic binary-coefficient polynomial. It decodes a
+fixed-length coordinate function into the quotient, proves coordinatewise
+addition and negation, derives `2^p=0` in every such extension, and instantiates
+the exact Cauchy cutoff without an abstract modulus premise. It also proves the
+root relation `U^d=-sum_j f_j U^j` and the exact one-step identity used when
+the native loop subtracts one high coefficient into every set lower bit. A
+logical polynomial reduction step clears its targeted coefficient and preserves
+the quotient value; induction now proves preservation for every finite offset
+schedule. Coordinate vectors now decode exactly as quotient projections of
+their low coordinate polynomials, so coordinate-polynomial convolution followed
+by any such schedule is proved to represent the decoded product. The polynomial
+product is now expanded into the exact nested finite `i,j` sum used by the Rust
+loops; every buffer coefficient equals its source-shaped conditional pair sum,
+and all coefficients beyond the native `2d-1` support vanish. The
+zero-initialized mutable nested loops, including both zero-coordinate fast paths
+and each `i+j` update, now provably finish with exactly those buffer values.
+At the polynomial level the exact source offsets `d-2,...,0` now
+preserve the quotient, clear every targeted coefficient without later
+reintroduction, and leave every coefficient at index at least `d` equal to zero
+for the `2d-1` convolution. The mutable source inner row is also formal: it
+clones the high coefficient, follows the zero fast path, subtracts only at set
+lower bits, and provably leaves the processed high slot and every higher slot
+unchanged pending truncation. The coefficient invariant now composes those rows
+over the full reverse range: every returned low slot equals the exact reduced
+polynomial coefficient, the truncated coordinate polynomial is that reduced
+polynomial, and decoding the returned coordinates equals quotient-ring
+multiplication. A serializable native multiplication witness now reruns
+deterministic polynomial selection and independently replays the same
+zero-fast-path convolution, retained-high reverse reduction, and truncation for
+canonical `Vec<BigUint>` inputs and output. A dense degree-4 control exercises
+both arithmetic phases, compares every flattened field and transition count
+with one committed CSV artifact, and rejects a changed product coordinate. Lean
+reads the same artifact with a transparent kernel-reducible parser, proves that
+every successful typed parse has four degree-sized vectors, and then passes it
+through a canonical importer that recomputes the packed polynomial and checks
+all coordinate bounds. The committed record passes that boundary; its lower
+bits pack to polynomial `19`, and the exact formal
+transition evaluator maps its named left/right vectors to `[30,29,0,3]` at
+precision five. A computable natural-number version of the exact masked loops
+now preserves canonical representatives and is proved to cast coordinatewise
+to that modular evaluator. Composing the replay check with the universal
+decoder theorem proves that any successfully replayed record's named product
+coordinates represent multiplication in the quotient ring. This closes manual
+cross-file transfer and the Lean-side arbitrary-record arithmetic check, not
+the remaining mechanized Rust compiler refinement or external record
+provenance.
+`[pcc:unverified]`
+
+The same typed interface projects arbitrary canonical records into dependent
+`Fin degree` lower-bit and coordinate functions. Its replayed importer executes
+the zero-fast-path convolution and descending reduction over natural
+representatives, checks every serialized output coordinate, and carries every
+successful import to quotient-ring multiplication without an explicit equality
+premise. The remaining implementation gap is the compiler/serialization
+refinement from concrete Rust `Vec<BigUint>` execution to this evaluator rather
+than parsing, finite-vector transport, or Lean-side arithmetic replay.
+`[pcc:unverified]`
+
+The selected-replayed importer further requires degree at least two, recomputes
+the deterministic packed irreducible-polynomial search, and checks every typed
+lower bit against that selected value. One generic endpoint now returns
+canonicality, exact selection, irreducibility of the actual precision-one
+quotient modulus, and decoded multiplication together. This closes the
+Lean-side arbitrary-artifact search/product check while leaving concrete Rust
+compiler/serialization refinement and external provenance separate.
+`[pcc:unverified]`
+
+The metered selected-replayed importer also recomputes both serialized
+transition counters. The convolution count follows the exact nested nonzero
+input-pair schedule; the reduction count follows the changing replay buffer in
+descending high-index order and charges each set lower bit only when that row's
+high coefficient is nonzero. Its generic endpoint returns those two equalities
+together with the selected-modulus/product certificate, and the committed
+fixture kernel-checks the expected `16/6`. This closes the Lean-side check of
+all serialized fields, while concrete Rust compiler/serialization refinement
+and external provenance remain separate. `[pcc:unverified]`
+
+The committed degree-four artifact now travels through that generic route too:
+its replayed-parser acceptance is kernel-checked, and the arbitrary-degree
+endpoint returns its canonicality receipt together with decoded multiplication.
+The older fixed-size and explicit-equality theorems are retained as direct
+regressions, not as the only formal bridge.
+`[pcc:unverified]`
+
+A transparent packed-`GF(2)` search model also follows the native degree-four
+polynomial-selection control flow. The Rabin predicate rejects packed candidate
+`17`, accepts `19`, and the odd-pattern search returns `19` first; the canonical
+record's polynomial field equals that result. Independently of that predicate,
+Lean rules out both monic linear factors and all four monic quadratic factor
+shapes over `GF(2)`, proving `U^4+U+1` irreducible; the artifact lower bits are
+proved to decode to the same polynomial. This is the concrete degree-four
+selection and algebraic certificate; the general result below now certifies
+the degree and irreducibility of every successful search result at degree at
+least two and proves that such a result exists at every one of those degrees.
+Compiler refinement remains separate.
+`[pcc:unverified]`
+
+For arbitrary fixed widths, the packed natural representation now decodes to a
+`GF(2)` polynomial coefficientwise. Native XOR is proved to decode as
+polynomial addition, power-of-two multiplication moves coefficients by the
+same shift with zero coefficients below it, and the complete native
+carryless-product fold is transported to a polynomial-addition fold. Stable
+width extension and a whole-polynomial shift identity now identify that fold
+with ordinary polynomial multiplication under an explicit left-width bound;
+each packed remainder XOR step is likewise proved to preserve `modByMonic`,
+arbitrary bounded shift lists compose, and a transparent trace replays the
+fuel recursion exactly. The public remainder theorem remains conditional on
+monicity and modulus width, while the trace-window condition is now discharged
+by a leading-bit cancellation proof. The same proof establishes fuel
+sufficiency and a returned packed `log2` below every nonzero modulus. Converting
+that numeric degree statement to decoded-polynomial `natDegree` is now proved
+for every nonzero value whose leading bit is in the window; the decoder is also
+proved nonzero and monic. The resulting endpoint identifies the decoded native
+remainder with `modByMonic` exactly. A carryless-fold bit-width bound and
+additivity of its nonzero leading degree align the raw-product and remainder
+windows; zero inputs are handled directly. The complete `gf2PackedProduct`
+therefore decodes as polynomial multiplication followed by `modByMonic` for
+every nonzero packed modulus. The theorem is additionally transported to the
+result's minimal decoding window and iterated through every native
+square-and-reduce step. Reduction idempotence and compatibility with powers
+then identify a reduced start with its exact `2^steps` power modulo the packed
+modulus; packed remainders supply such starts automatically. A second induction
+uses the strict remainder-degree drop to prove the packed GCD fuel sufficient,
+refines its result to Euclidean polynomial GCD, and identifies the exact native
+`==1` guard. The control-flow half is now proved too:
+decoder injectivity translates the terminal equality, and induction over the
+auxiliary loop translates every active early exit to the exact polynomial GCD
+guard. The resulting public-Boolean equivalence reaches the explicit semantic
+Rabin trace.
+That trace is now unrolled into one indexed family of all active guards and a
+terminal condition; the terminal condition is independently rewritten as the
+exact `x^(2^degree)=x mod f` polynomial identity for nonzero modulus. Exact
+minimal-window XOR decoding, GCD invariance under `modByMonic`, and
+addition-equals-subtraction over `GF(2)` also rewrite every active guard as
+`gcd(f, x^(2^(offset+1))-x)=1`. This closes the standard Rabin criterion while
+the implementation's all-half-degree guards give a stronger soundness route.
+Any reducible exact-degree polynomial has an irreducible factor of degree at
+most half, contradicting its matching GCD-one guard. The public packed
+predicate therefore implies polynomial irreducibility when its packed `log2`
+matches the supplied degree and the degree is at least two. Conversely, an
+irreducible exact-degree packed polynomial makes every lower Frobenius guard
+coprime and the terminal `X^(2^degree)=X` comparison succeed. The public packed
+Boolean is therefore equivalent to polynomial irreducibility on that native
+domain. A separate induction through the bounded odd-candidate search proves
+that every returned value has the requested packed degree and passed that
+Boolean. Thus every successful public search result at degree at least two is
+an exact-degree irreducible polynomial. A primitive element of
+`GF(2^degree)` now supplies a monic irreducible minimal polynomial of the exact
+degree; support packing proves its bits decode back to that polynomial and its
+nonzero constant coefficient places it in the enumerated odd window. Predicate
+completeness and the bounded-search induction therefore prove that the public
+search succeeds for every degree at least two. The selected packed bits are
+also proved coefficientwise equal to the precision-one `binaryPolynomial` in
+the extension-ring presentation, transferring irreducibility to the actual
+formal modulus at every selected degree.
+`[pcc:unverified]`
+
 The argument is insensitive to whether an old tensor is Boolean, equality, or
 an immutable packet tensor: it only uses its entry as an opaque function of
 the retained ordered port vector. Creation-precision lifting is therefore a
 separate semantic premise, covered by its own native mutation controls.
 `[pcc:unverified]`
 
-This closes the producer-side algebraic composition of C1 items 1–3. What
+This closes the abstract finite rearrangement skeleton of C1 items 1–3. What
 remains is an independent or kernel-checked refinement showing that every
-live Rust object and loop implements the stated finite rearrangement, plus the
-separate interpolation, Hermite, and creation-precision refinements.
+relevant Rust object and loop implements its inputs, plus the scalar mode
+and concrete child-object binding and separate interpolation, Hermite, and
+creation-precision refinements.
 `[pcc:unverified]`
 
 ## Evidence and remaining gate
