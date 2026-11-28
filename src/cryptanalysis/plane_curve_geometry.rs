@@ -1,8 +1,9 @@
-//! Rational line sections of a homogeneous plane curve over a small prime field.
+//! Bounded line sections of a homogeneous plane curve over a small prime field.
 //!
 //! This supplies geometry shared by degree-`d` relation collectors. It does
-//! not construct the Jacobian, certify geometric smoothness, or normalize a
-//! singular model. In particular, a quintic or sextic model of genus 4 or 5
+//! not construct the Jacobian or normalize a singular model. Smoothness is
+//! certified only for supported degrees and characteristics. In particular,
+//! a quintic or sextic model of genus 4 or 5
 //! needs a separate singularity and normalization layer.
 
 use std::collections::BTreeMap;
@@ -33,6 +34,21 @@ pub struct LineRoot {
 pub struct RationalLineFactorization {
     pub roots: Vec<LineRoot>,
     /// Degree left after removing all rational linear factors.
+    pub residual_degree: usize,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct QuadraticLineFactor {
+    /// Monic irreducible polynomial in the affine line parameter, ascending.
+    pub polynomial: [u32; 3],
+    pub multiplicity: usize,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DegreeTwoLineFactorization {
+    pub rational: Vec<LineRoot>,
+    pub quadratic: Vec<QuadraticLineFactor>,
+    /// Degree left after removing rational and irreducible quadratic factors.
     pub residual_degree: usize,
 }
 
@@ -71,6 +87,26 @@ fn pow(mut a: u32, mut n: usize, p: u32) -> u32 {
         n >>= 1;
     }
     out
+}
+
+fn divide_monic_quadratic(poly: &[u32], a: u32, b: u32, p: u32) -> Option<Vec<u32>> {
+    if poly.len() < 3 {
+        return None;
+    }
+    let mut remainder = poly.to_vec();
+    let mut quotient = vec![0; poly.len() - 2];
+    for i in (2..poly.len()).rev() {
+        let lead = remainder[i];
+        quotient[i - 2] = lead;
+        remainder[i] = 0;
+        remainder[i - 1] = ((u64::from(remainder[i - 1]) + u64::from(p)
+            - u64::from(mul(lead, a, p)))
+            % u64::from(p)) as u32;
+        remainder[i - 2] = ((u64::from(remainder[i - 2]) + u64::from(p)
+            - u64::from(mul(lead, b, p)))
+            % u64::from(p)) as u32;
+    }
+    (remainder[0] == 0 && remainder[1] == 0).then_some(quotient)
 }
 
 impl PlaneCurve {
@@ -279,6 +315,14 @@ impl PlaneCurve {
         &self,
         section: &[u32],
     ) -> Result<RationalLineFactorization, &'static str> {
+        self.rational_line_factors_with_residual(section)
+            .map(|(factors, _)| factors)
+    }
+
+    fn rational_line_factors_with_residual(
+        &self,
+        section: &[u32],
+    ) -> Result<(RationalLineFactorization, Vec<u32>), &'static str> {
         if section.len() != self.degree + 1 || section.iter().all(|&c| c % self.p == 0) {
             return Err("section is zero or has the wrong degree");
         }
@@ -329,9 +373,59 @@ impl PlaneCurve {
                 multiplicity: infinity,
             });
         }
-        Ok(RationalLineFactorization {
-            roots,
-            residual_degree: poly.len() - 1,
+        Ok((
+            RationalLineFactorization {
+                roots,
+                residual_degree: poly.len() - 1,
+            },
+            poly,
+        ))
+    }
+
+    /// Extract every rational and irreducible quadratic line factor with
+    /// multiplicity. A positive residual degree consists of factors of
+    /// degree at least three. The field cap bounds exhaustive quadratic scans.
+    pub fn line_factors_degree_two(
+        &self,
+        section: &[u32],
+    ) -> Result<DegreeTwoLineFactorization, &'static str> {
+        if self.p > 257 {
+            return Err("quadratic line scan exceeds field cap");
+        }
+        let (rational, mut residual) = self.rational_line_factors_with_residual(section)?;
+        let mut squares = vec![false; self.p as usize];
+        for x in 0..self.p {
+            squares[mul(x, x, self.p) as usize] = true;
+        }
+        let mut quadratic = Vec::new();
+        for a in 0..self.p {
+            for b in 0..self.p {
+                if residual.len() < 3 {
+                    break;
+                }
+                let discriminant = ((u64::from(mul(a, a, self.p)) + u64::from(self.p)
+                    - u64::from(mul(4 % self.p, b, self.p)))
+                    % u64::from(self.p)) as u32;
+                if squares[discriminant as usize] {
+                    continue;
+                }
+                let mut multiplicity = 0;
+                while let Some(quotient) = divide_monic_quadratic(&residual, a, b, self.p) {
+                    residual = quotient;
+                    multiplicity += 1;
+                }
+                if multiplicity != 0 {
+                    quadratic.push(QuadraticLineFactor {
+                        polynomial: [b, a, 1],
+                        multiplicity,
+                    });
+                }
+            }
+        }
+        Ok(DegreeTwoLineFactorization {
+            rational: rational.roots,
+            quadratic,
+            residual_degree: residual.len() - 1,
         })
     }
 
@@ -560,6 +654,60 @@ mod tests {
             }
         );
         assert_eq!(c.rational_line_divisor([1, 0, 0], [0, 1, 0]).unwrap(), None);
+        assert_eq!(
+            c.line_factors_degree_two(&section).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 1,
+                }],
+                residual_degree: 0,
+            }
+        );
+    }
+
+    #[test]
+    fn quadratic_line_factors_keep_multiplicity_and_higher_residual() {
+        let quartic = PlaneCurve::new(3, 4, &[term(4, 0, 0)]).unwrap();
+        // (s²+1)² = s⁴+2s²+1 over F_3.
+        assert_eq!(
+            quartic.line_factors_degree_two(&[1, 0, 2, 0, 1]).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 2,
+                }],
+                residual_degree: 0,
+            }
+        );
+        let cubic = PlaneCurve::new(3, 3, &[term(3, 0, 0)]).unwrap();
+        // (s−1)(s²+1), with one rational and one quadratic place.
+        assert_eq!(
+            cubic.line_factors_degree_two(&[1, 2, 1, 2]).unwrap(),
+            DegreeTwoLineFactorization {
+                rational: vec![LineRoot {
+                    parameter: [1, 1],
+                    multiplicity: 1,
+                }],
+                quadratic: vec![QuadraticLineFactor {
+                    polynomial: [1, 0, 1],
+                    multiplicity: 1,
+                }],
+                residual_degree: 0,
+            }
+        );
+        // s³+2s+1 has no root in F_3, hence no degree-one or two factor.
+        assert_eq!(
+            cubic
+                .line_factors_degree_two(&[1, 2, 0, 1])
+                .unwrap()
+                .residual_degree,
+            3
+        );
+        let large = PlaneCurve::new(263, 2, &[term(2, 0, 0)]).unwrap();
+        assert!(large.line_factors_degree_two(&[1, 0, 1]).is_err());
     }
 
     #[test]
@@ -629,6 +777,21 @@ mod tests {
             let v = [4, 5, 7];
             let section = curve.line_section(u, v).unwrap();
             let factors = curve.rational_line_factors(&section).unwrap();
+            let factors2 = curve.line_factors_degree_two(&section).unwrap();
+            assert_eq!(
+                factors2.residual_degree
+                    + factors2
+                        .rational
+                        .iter()
+                        .map(|root| root.multiplicity)
+                        .sum::<usize>()
+                    + 2 * factors2
+                        .quadratic
+                        .iter()
+                        .map(|factor| factor.multiplicity)
+                        .sum::<usize>(),
+                degree
+            );
             assert_eq!(
                 factors.residual_degree
                     + factors
