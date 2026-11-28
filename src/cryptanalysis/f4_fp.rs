@@ -3770,6 +3770,123 @@ fn reduce_lazy_by(
     }
 }
 
+/// Rows per pivot-outer panel in deferred chunk reduce.  Default **off**
+/// (`0`): on NTT m=3 t=5 with MEM fused, per-row rayon + fused beats
+/// panels.  Opt in with `F4_FP_DEFERRED_PANEL=8` (or 2..64) for hosts
+/// where pivot reuse wins without MEM.
+fn deferred_panel_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_PANEL")
+            .ok()
+            .and_then(|v| {
+                if v == "0" {
+                    Some(0)
+                } else {
+                    v.parse().ok()
+                }
+            })
+            .filter(|&n| n == 0 || (2..=64).contains(&n))
+            .unwrap_or(0)
+    })
+}
+
+/// Pivot-outer reduction of a small panel of source rows by `known`: each
+/// pivot stays hot while every residual in the panel is updated (exact
+/// same products and counted ops as per-row [`reduce_lazy_by`]).
+fn reduce_panel_by_known(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+) -> Vec<(Vec<u64>, usize)> {
+    let normalize_after = normalize_after_for(fp.p);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut pendings = vec![0usize; sources.len()];
+    // Prefer fused multi-pivot when MEM site A is on: each row keeps its
+    // own MemGroup, flushed when full — pivots are still re-read per row
+    // inside a flush, but the outer walk shares the pivot pointer.
+    if mem_site(0) {
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            reduce_lazy_by_fused(acc, known, fp, simd, pending);
+        }
+        return accs.into_iter().zip(pendings).collect();
+    }
+    for (c, pivot) in known {
+        let c = *c;
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            let v = acc[c];
+            let f = if v == 0 {
+                0
+            } else if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            };
+            if f != 0 {
+                add_lazy(acc, pivot, c, fp.p - f, simd);
+                *pending += 1;
+                if *pending >= normalize_after {
+                    normalize_lazy(acc, fp);
+                    *pending = 0;
+                }
+            }
+        }
+    }
+    accs.into_iter().zip(pendings).collect()
+}
+
+/// Reduce every row of `chunk` by `known`, optionally as pivot-outer panels
+/// in parallel (`deferred_panel_rows`), else per-row fused/lazy.
+fn reduce_chunk_by_known(
+    chunk: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+    spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    let panel = deferred_panel_rows();
+    if panel >= 2 && chunk.len() >= panel && !mem_site(0) {
+        // Pivot-outer panels (MEM off): better pivot reuse than per-row.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else if panel >= 2 && chunk.len() >= 2 && mem_site(0) {
+        // MEM on: still shard into panels so rayon tasks are larger than
+        // one row (less scheduling overhead) while each row uses fused.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else {
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
+            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+            let mut pending = 0usize;
+            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+            (acc, pending)
+        };
+        if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
+        }
+    }
+}
+
 /// Row-oriented RREF.  Each row keeps a 64-bit scratch accumulator while
 /// it meets the existing 32-bit pivots, reducing only the next pivot
 /// coefficient and the row when it is stored.  A bounded normalization
@@ -3819,17 +3936,7 @@ fn rref32_deferred(
         ) {
             reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
         } else {
-            let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
-                let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
-                let mut pending = 0usize;
-                reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
-                (acc, pending)
-            };
-            if spread {
-                chunk.par_iter().map(reduce_one).collect()
-            } else {
-                chunk.iter().map(reduce_one).collect()
-            }
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
         };
         let o1 = pp_ops();
         pp_add(
@@ -3955,17 +4062,7 @@ fn rref_u32_barrett_deferred(
         ) {
             reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
         } else {
-            let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
-                let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
-                let mut pending = 0usize;
-                reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
-                (acc, pending)
-            };
-            if spread {
-                chunk.par_iter().map(reduce_one).collect()
-            } else {
-                chunk.iter().map(reduce_one).collect()
-            }
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
         };
         let o1 = pp_ops();
         pp_add(
