@@ -8,6 +8,10 @@ This document preserves the 25 November lead and PR snapshot. It is **not** a cu
 
 The repository's current pinned goal is M31 graph-control acceleration; chained S3 is retained as a previous goal. The 2018 prime-field proposal was available here through its publisher/accepted-manuscript metadata and abstract; its full text was not accessed in this review, so any novelty comparison to its detailed method remains open.
 
+## Correction after the same-input RR5 panel (28 November)
+
+The five-sector pilot below was designed before reviewing [merged #5208](https://github.com/isogeny-labs/crypto/pull/5208). On the same B677 inputs, its coupled, five-sector, sector-4, Graeffe and deflated RR5 arms completed **no extraction and produced no relation in 148 capped runs**, including planted targets; this is a bounded producer observation, not an impossibility proof [pcc:unverified]. The five-sector systems reached F4 degree 4 but did not finish. Consequently the ranking table below is a **25 November historical priority list**. Repeating these formulations at B677 is no longer the next experiment. A new smaller selector family or changed solver method must first complete a predeclared smaller instance and show a cost trend. The [RR5 pilot](RR5_B677_PILOT.md) remains a conditional protocol template. Chained S3 degree growth and a genuinely non-enumerative relation source remain the higher-value open questions.
+
 ## Research boundary and literature
 
 The primary target is an ordinary curve over F_p, prime-order subgroup, arbitrary public target coordinates, complete cold single-target cost and verified recovered scalar. Compare to the strongest same-target IC baseline and an equally engineered negation-map rho. A cheap equation evaluator, a coordinate identity, or a rank-preserving transform is a component result until its exact signed relations, rank contribution, target pin, setup, solve, and recovery cost are charged.
@@ -16,7 +20,7 @@ Semaev's original proposal is conditional on finding bounded solutions of the su
 
 The repository's [boundary ledger](https://github.com/isogeny-labs/crypto/blob/main/research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md) gives the older common unit; its [closure note](https://github.com/isogeny-labs/crypto/blob/main/research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md) marks restricted XL conclusions and unproved hypotheses. Neither is a general impossibility theorem. The [active goal](https://github.com/isogeny-labs/crypto/blob/main/docs/ACTIVE.md) on 25 November was chained S3 on at least three eligible M31 curves with complete cost and independent validation; it changed on 28 November, as noted below.
 
-## Ranked pursuit
+## Historical ranked pursuit (25 November)
 
 | Priority | Lead | Evidence now | Decisive next experiment |
 |---|---|---|---|
