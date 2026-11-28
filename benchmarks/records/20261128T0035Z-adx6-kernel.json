@@ -1,0 +1,331 @@
+{
+  "branch": "feat/lucid-cray-tckh5e",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099998001",
+        "--out",
+        "docs/notes/adx6-20261128/raw_run1.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T00:35:46+00:00",
+      "wall_s": 69.193
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099998002",
+        "--out",
+        "docs/notes/adx6-20261128/raw_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T00:36:56+00:00",
+      "wall_s": 70.201
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099998003",
+        "--out",
+        "docs/notes/adx6-20261128/raw_run3.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T00:58:23+00:00",
+      "wall_s": 70.261
+    }
+  ],
+  "commit": "6d0a2afcddb1bd42626f0becf46d733ad6a3bddb",
+  "commit_dirty": false,
+  "created_utc": "2026-11-28T00:35:42+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261128-adx6-kernel"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v880-x86_64-with-glibc2.39"
+  },
+  "id": "20261128T0035Z-adx6-kernel",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p352_pmax-run1-scalar_mul-adx6-vs-prod",
+      "note": "run 1, 6 limbs: derived ratio of the paired medians adx6/pad9_cios over prod/pad9_cios (41 rounds x 30 scalars); prod = 2026-11-25 production (mulx CIOS at 6 limbs); taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0854
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p352_pmax-run1-scalar_mul-adx6mul-vs-prod",
+      "note": "run 1, 6 limbs: asm products, mulx squares; derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0324
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p352_pmax-run2-scalar_mul-adx6-vs-prod",
+      "note": "run 2, 6 limbs: derived ratio of the paired medians adx6/pad9_cios over prod/pad9_cios (41 rounds x 30 scalars); prod = 2026-11-25 production (mulx CIOS at 6 limbs); taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0801
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p352_pmax-run2-scalar_mul-adx6mul-vs-prod",
+      "note": "run 2, 6 limbs: asm products, mulx squares; derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0456
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p352_pmax-run3-scalar_mul-prod-vs-mulx",
+      "note": "run 3, production now on mont_mul6_adx: derived ratio of the paired medians prod/pad9_cios over mulx/pad9_cios (the mulx arm is the previous production kernel at 6 limbs), same binary",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0667
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 41,
+      "name": "p352_pmax-run3-scalar_mul-prod-median",
+      "note": "run 3: median wall seconds per Point::scalar_mul on the new production kernel",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000326115
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-run1-scalar_mul-adx6-vs-prod",
+      "note": "run 1, 6 limbs: derived ratio of the paired medians adx6/pad9_cios over prod/pad9_cios (41 rounds x 30 scalars); prod = 2026-11-25 production (mulx CIOS at 6 limbs); taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0789
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-run1-scalar_mul-adx6mul-vs-prod",
+      "note": "run 1, 6 limbs: asm products, mulx squares; derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0414
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-run2-scalar_mul-adx6-vs-prod",
+      "note": "run 2, 6 limbs: derived ratio of the paired medians adx6/pad9_cios over prod/pad9_cios (41 rounds x 30 scalars); prod = 2026-11-25 production (mulx CIOS at 6 limbs); taskset -c 3",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0835
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-run2-scalar_mul-adx6mul-vs-prod",
+      "note": "run 2, 6 limbs: asm products, mulx squares; derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0328
+    },
+    {
+      "baseline": 1.0,
+      "better": "higher",
+      "n": 41,
+      "name": "p384_nist-run3-scalar_mul-prod-vs-mulx",
+      "note": "run 3, production now on mont_mul6_adx: derived ratio of the paired medians prod/pad9_cios over mulx/pad9_cios (the mulx arm is the previous production kernel at 6 limbs), same binary",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0672
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 41,
+      "name": "p384_nist-run3-scalar_mul-prod-median",
+      "note": "run 3: median wall seconds per Point::scalar_mul on the new production kernel",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000377915
+    },
+    {
+      "baseline": 1.0,
+      "better": "neutral",
+      "n": 41,
+      "name": "p320_pmax-run1-control-adx6-vs-prod",
+      "note": "control width, adx6 falls back to prod: run 1, derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0036
+    },
+    {
+      "baseline": 1.0,
+      "better": "neutral",
+      "n": 41,
+      "name": "p320_pmax-run2-control-adx6-vs-prod",
+      "note": "control width, adx6 falls back to prod: run 2, derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.9949
+    },
+    {
+      "baseline": 1.0,
+      "better": "neutral",
+      "n": 41,
+      "name": "p448_goldilocks-run1-control-adx6-vs-prod",
+      "note": "control width, adx6 falls back to prod: run 1, derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0022
+    },
+    {
+      "baseline": 1.0,
+      "better": "neutral",
+      "n": 41,
+      "name": "p448_goldilocks-run2-control-adx6-vs-prod",
+      "note": "control width, adx6 falls back to prod: run 2, derived as above",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.0029
+    }
+  ],
+  "problem": "kernel:mont_vt_scalar_mul",
+  "raw": [
+    {
+      "bytes": 33074,
+      "path": "docs/notes/adx6-20261128/raw_run1.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/43/4309b681e5e4f59a2f2b6b11b3085d9183fff93fb80a8f89238d93031ed75eac",
+      "sha256": "4309b681e5e4f59a2f2b6b11b3085d9183fff93fb80a8f89238d93031ed75eac",
+      "uploaded": false
+    },
+    {
+      "bytes": 33189,
+      "path": "docs/notes/adx6-20261128/raw_run2.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/269ec4e98082be92cf3cffe35c8df24a868da65d9095c619987a39ece8aee215",
+      "sha256": "269ec4e98082be92cf3cffe35c8df24a868da65d9095c619987a39ece8aee215",
+      "uploaded": false
+    },
+    {
+      "bytes": 33115,
+      "path": "docs/notes/adx6-20261128/raw_run3.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a521de8f4591cf46b85cb17acd1b32ecd7c9f567e129468688b05f96836c2f5a",
+      "sha256": "a521de8f4591cf46b85cb17acd1b32ecd7c9f567e129468688b05f96836c2f5a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261128-adx6-kernel/REPORT.pdf",
+    "png": [
+      "benchmarks/20261128-adx6-kernel/speedup.png",
+      "benchmarks/20261128-adx6-kernel/kernels.png",
+      "benchmarks/20261128-adx6-kernel/speedup_run3.png"
+    ],
+    "svg": [
+      "benchmarks/20261128-adx6-kernel/speedup.svg",
+      "benchmarks/20261128-adx6-kernel/kernels.svg",
+      "benchmarks/20261128-adx6-kernel/speedup_run3.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "adx6-kernel",
+  "status": "open",
+  "summary": "6-limb inline-asm ADX/MULX Montgomery product (mont_mul6_adx), now production at 6 limbs: k*P 1.08x vs the previous production kernel (runs 1-2, derived), 1.067x paired after the switch (run 3); per product 0.71-0.77x the mulx-intrinsic latency; 5/7-limb controls within 0.5%. Local host, unverified.",
+  "validation": null
+}
