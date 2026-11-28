@@ -1132,17 +1132,27 @@ fn poly_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
 }
 
 /// `base^e mod m`.
-fn poly_powmod(base: &[u64], mut e: u64, m: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+fn poly_powmod(
+    base: &[u64],
+    mut e: u64,
+    m: &[u64],
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<std::time::Instant>,
+) -> Option<Vec<u64>> {
     let mut acc = vec![1u64];
     let mut b = poly_rem(base, m, p, muls);
     while e > 0 {
+        if deadline.is_some_and(|d| std::time::Instant::now() >= d) {
+            return None;
+        }
         if e & 1 == 1 {
             acc = poly_rem(&poly_mul(&acc, &b, p, muls), m, p, muls);
         }
         b = poly_rem(&poly_mul(&b, &b, p, muls), m, p, muls);
         e >>= 1;
     }
-    acc
+    Some(acc)
 }
 
 /// The roots in `F_p` of a polynomial (coefficients low to high), by
@@ -1189,7 +1199,7 @@ pub fn poly_roots_fp_counted_until(
         return Some(vec![negm(mulm(f[0], inv_mod(f[1], p), p), p)]);
     }
     // x^p − x mod f
-    let xp = poly_powmod(&[0, 1], p, &f, p, muls);
+    let xp = poly_powmod(&[0, 1], p, &f, p, muls, deadline)?;
     let mut xp_minus_x = xp;
     if xp_minus_x.len() < 2 {
         xp_minus_x.resize(2, 0);
@@ -1209,7 +1219,7 @@ pub fn poly_roots_fp_counted_until(
             _ => {
                 // Split h with gcd((x + δ)^((p−1)/2) − 1, h).
                 let delta = rng.gen_range(0..p);
-                let mut s = poly_powmod(&[delta, 1], (p - 1) / 2, &h, p, muls);
+                let mut s = poly_powmod(&[delta, 1], (p - 1) / 2, &h, p, muls, deadline)?;
                 if s.is_empty() {
                     s.push(0);
                 }
