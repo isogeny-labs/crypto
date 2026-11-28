@@ -29,13 +29,18 @@
 //!    `quartic_ladder::run_diem` / `run_rho` with the secret withheld;
 //! 4. [`SmithIso::certify`]: a solver's answer `t'` is accepted only if
 //!    `[t'] G = T` on the HYPERELLIPTIC side (Cantor arithmetic in `HJac`).
+//! 5. [`SmithIso::solve_public`]: accept public source classes, transfer each
+//!    independently to the existing Picard-class Diem solver, and expose a
+//!    scalar only after checking it again on `J_H`.
 //!
 //! Scope: toy primes (`HJac`, point counting and root finding are brute
 //! force), `deg F = 7`. Nothing here is a cost claim; the transfer's own
 //! counted cost is `smith_canonical::CountedTransfer`.
 
 use super::plane_quartic_pic::PicClass;
-use super::quartic_ladder::{make_instance_from_classes, QInstance};
+use super::quartic_ladder::{
+    make_instance_from_classes, run_diem, QIcParams, QIcResult, QInstance,
+};
 use super::smith_canonical::{
     count_h_points, find_trigonal, jac_order, rational_two_torsion, two_torsion_in_s, CanonicalMap,
     HJac, Mumford, Transfer,
@@ -70,6 +75,15 @@ pub struct Planted {
     pub h: u64,
     /// The instance on `C` with `t_secret = 0` (unknown to the solvers).
     pub inst: QInstance,
+}
+
+/// A public source-side DLP routed through the Smith image quartic.
+/// `scalar` is present only after verification on `J_H`, even when the
+/// quartic solver reported a candidate.
+#[derive(Clone, Debug)]
+pub struct SmithDlpResult {
+    pub scalar: Option<u64>,
+    pub quartic: QIcResult,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -162,6 +176,71 @@ impl SmithIso {
     /// `Psi(D)` (representation-independent; checked by the tests).
     pub fn image(&self, d: &Mumford, rng: &mut SplitMix64) -> Result<PicClass, String> {
         self.tf.transfer_divisor(&self.jac, d, &self.pts, rng)
+    }
+
+    /// Construct a quartic DLP instance from public source classes. The
+    /// largest prime divisor of `#J_H` is used as the subgroup order; both
+    /// source inputs and their independently transferred images are checked.
+    pub fn public_instance(
+        &self,
+        generator: &Mumford,
+        target: &Mumford,
+        seed: u64,
+    ) -> Result<QInstance, String> {
+        let r128 = largest_prime_factor(self.order);
+        let r = u64::try_from(r128).map_err(|_| "prime subgroup order too large")?;
+        if r < 5 {
+            return Err("prime subgroup order too small".into());
+        }
+        let order = u64::try_from(self.order).map_err(|_| "Jacobian order too large")?;
+        let q = u32::try_from(self.p).map_err(|_| "base field too large for quartic solver")?;
+        let h = order / r;
+        if self.jac.is_zero(generator)
+            || !self.jac.is_zero(&self.jac.mul(generator, r as u128))
+            || !self.jac.is_zero(&self.jac.mul(target, r as u128))
+        {
+            return Err("source classes are not in the required prime subgroup".into());
+        }
+        let mut rng = SplitMix64(seed);
+        let g_c = self.image(generator, &mut rng)?;
+        let t_c = self.image(target, &mut rng)?;
+        let c = &self.tf.c;
+        let n_points = c.rational_points_bruteforce().len() as u64;
+        make_instance_from_classes(
+            q,
+            self.tf.cm.quartic,
+            c.base_point(),
+            &g_c,
+            &t_c,
+            order,
+            h,
+            r,
+            n_points,
+            None,
+        )
+    }
+
+    /// Solve a public DLP on `J_H` by transfer to the quartic Diem path.
+    /// A candidate from `Pic^0(C)` is returned only when it also satisfies
+    /// `[k] generator = target` on the source Jacobian.
+    pub fn solve_public(
+        &self,
+        generator: &Mumford,
+        target: &Mumford,
+        transfer_seed: u64,
+        params: QIcParams,
+    ) -> Result<SmithDlpResult, String> {
+        let instance = self.public_instance(generator, target, transfer_seed)?;
+        let quartic = run_diem(&instance, params);
+        if quartic.recovered.is_some() && !quartic.certified {
+            return Err("quartic scalar lacks a Picard-group certificate".into());
+        }
+        let scalar = match quartic.recovered {
+            Some(k) if self.jac.mul(generator, k as u128) == *target => Some(k),
+            Some(_) => return Err("quartic scalar failed source Jacobian verification".into()),
+            None => None,
+        };
+        Ok(SmithDlpResult { scalar, quartic })
     }
 
     /// Homomorphism checks on `n` random pairs and every rational 2-torsion
@@ -356,6 +435,35 @@ mod tests {
         let rho = run_rho(&pl.inst, 11);
         assert_eq!(rho.recovered, Some(pl.t));
         assert!(iso.certify(&pl, rho.recovered));
+    }
+
+    #[test]
+    fn ex1_public_source_dlp_bridge() {
+        let iso = example1();
+        let planted = iso.planted(32, 3).unwrap();
+        let inst = iso.public_instance(&planted.g_h, &planted.t_h, 5).unwrap();
+        assert_eq!(inst.t_secret, 0);
+        assert_eq!(inst.r, planted.r);
+        assert!(iso
+            .public_instance(&iso.jac.zero(), &planted.t_h, 5)
+            .is_err());
+        let solved = iso
+            .solve_public(
+                &planted.g_h,
+                &planted.t_h,
+                5,
+                QIcParams {
+                    arm: QArm::Full,
+                    nb: 0,
+                    seed: 5,
+                    max_lines: 1 << 22,
+                    verify_relations: true,
+                },
+            )
+            .unwrap();
+        assert_eq!(solved.scalar, Some(planted.t));
+        assert!(solved.quartic.certified);
+        assert!(iso.certify(&planted, solved.scalar));
     }
 
     /// SMOKE, not a verdict: larger toy primes. `cargo test --release
