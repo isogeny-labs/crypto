@@ -24,6 +24,7 @@ pub mod field;
 pub mod gost_3410_2012;
 pub mod isogeny_scalar_mul;
 pub mod keys;
+pub(crate) mod ifma_batch;
 pub(crate) mod mont_ifma;
 pub(crate) mod mont_vt;
 pub mod p256_field;

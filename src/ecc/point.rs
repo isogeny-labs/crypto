@@ -744,6 +744,35 @@ impl Point {
     /// double-and-add over [`Point::add`] and [`Point::double`] returns,
     /// including its identity and `2P = O` cases, because the two agree
     /// wherever the affine formulas are defined.
+    /// `ks[i]·points[i]` for many points on one curve (`y² = x³ + a·x + b`
+    /// over `a`'s modulus), equal to calling [`scalar_mul`](Self::scalar_mul)
+    /// on each.  On CPUs with AVX-512 IFMA and moduli below `2^414` it runs
+    /// eight scalar multiplications at once, one per vector lane
+    /// (`ecc::ifma_batch`: 52-bit limbs, fixed 4-bit windows, Jacobian
+    /// coordinates, one batch inversion per eight); lanes that hit an
+    /// exceptional case of the formulas (`Q = ±T`, 2-torsion) are
+    /// recomputed with `scalar_mul`.  Otherwise it is `scalar_mul` per
+    /// point.  Variable time.
+    ///
+    /// # Panics
+    /// If `points` and `ks` differ in length.
+    pub fn scalar_mul_batch(points: &[Point], ks: &[BigUint], a: &FieldElement) -> Vec<Point> {
+        assert_eq!(
+            points.len(),
+            ks.len(),
+            "scalar_mul_batch: points and scalars differ in length"
+        );
+        #[cfg(target_arch = "x86_64")]
+        if let Some(out) = super::ifma_batch::scalar_mul_batch(points, ks, a) {
+            return out;
+        }
+        points
+            .iter()
+            .zip(ks)
+            .map(|(p, k)| p.scalar_mul(k, a))
+            .collect()
+    }
+
     pub fn scalar_mul(&self, k: &BigUint, a: &FieldElement) -> Point {
         self.scalar_mul_impl(k, a, false)
     }

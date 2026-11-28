@@ -16,6 +16,10 @@
 //!
 //! Usage: `mont_mul_bench [--rounds R] [--batch B] [--seed S] [--out FILE]
 //!         [--fields a,b,..] [--kernel-iters I]`
+//!
+//! `--batch`: eight `Point::scalar_mul` calls vs one
+//! `Point::scalar_mul_batch` (AVX-512 IFMA, eight lanes) on the same points
+//! and scalars, interleaved rounds, `batch` rows (ns per point).
 
 use crypto_lib::ecc::endo_generic_chain_set::is_probable_prime;
 use crypto_lib::ecc::field::FieldElement;
@@ -108,6 +112,10 @@ fn main() {
         let input = args.get(i + 1).expect("--analyze FILE");
         let dir: String = arg(&args, "--report-dir", ".".to_string());
         analyze::run(input, &dir);
+        return;
+    }
+    if args.iter().any(|a| a == "--batch") {
+        batch_mode(&args);
         return;
     }
     let rounds: usize = arg(&args, "--rounds", 15);
@@ -559,5 +567,92 @@ mod analyze {
         }
         s.push_str("</svg>\n");
         s
+    }
+}
+
+/// `--batch`: per field, `rounds` rounds of `batch` groups of eight random
+/// points and full-width scalars; arms `scalar8` (eight
+/// `Point::scalar_mul`) and `batch8` (one `Point::scalar_mul_batch`) in a
+/// seeded shuffled order per round, same inputs.  Every output is checked
+/// against `scalar_mul` first (edge scalars included).  Writes `batch` rows
+/// and prints the paired median ratio per field.
+fn batch_mode(args: &[String]) {
+    let rounds: usize = arg(args, "--rounds", 21);
+    let groups: usize = arg(args, "--batch", 4);
+    let seed: u64 = arg(args, "--seed", 0x6261_7463_6838);
+    let out_path: String = arg(args, "--out", "mont_mul_batch.jsonl".to_string());
+    let only: Option<String> = args
+        .iter()
+        .position(|a| a == "--fields")
+        .and_then(|i| args.get(i + 1).cloned());
+    let mut out = std::fs::File::create(&out_path).expect("create --out");
+    for (fi, (name, p)) in fields()
+        .into_iter()
+        .filter(|(n, _)| only.as_ref().is_none_or(|o| o.split(',').any(|x| x == *n)))
+        .enumerate()
+    {
+        let mut rng = StdRng::seed_from_u64(seed ^ (fi as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15));
+        let a = FieldElement::new(rng.gen_biguint_below(&p), p.clone());
+        let rand_pt = |rng: &mut StdRng| Point::Affine {
+            x: FieldElement::new(rng.gen_biguint_below(&p), p.clone()),
+            y: FieldElement::new(rng.gen_biguint_below(&p), p.clone()),
+        };
+        // Correctness gate: edge scalars, the point at infinity, random.
+        let mut pts: Vec<Point> = (0..16).map(|_| rand_pt(&mut rng)).collect();
+        pts[3] = Point::Infinity;
+        let mut ks: Vec<BigUint> = (0..16).map(|_| rng.gen_biguint(p.bits())).collect();
+        for (i, v) in [0u32, 1, 2, 15, 16, 17].iter().enumerate() {
+            ks[i + 8] = BigUint::from(*v);
+        }
+        ks[4] = &p - 1u32;
+        let got = Point::scalar_mul_batch(&pts, &ks, &a);
+        for i in 0..16 {
+            assert_eq!(
+                got[i],
+                pts[i].scalar_mul(&ks[i], &a),
+                "batch {name} lane {i}"
+            );
+        }
+        eprintln!("{name}: 16 batch lanes agree with scalar_mul");
+        let mut ratios = Vec::new();
+        for round in 0..rounds {
+            let pts: Vec<Point> = (0..8 * groups).map(|_| rand_pt(&mut rng)).collect();
+            let ks: Vec<BigUint> = (0..8 * groups).map(|_| rng.gen_biguint(p.bits())).collect();
+            let mut order = ["scalar8", "batch8"];
+            let mut orng = StdRng::seed_from_u64(seed ^ ((fi as u64) << 32) ^ round as u64);
+            order.shuffle(&mut orng);
+            let mut ns = std::collections::BTreeMap::new();
+            for (pos, arm) in order.iter().enumerate() {
+                let t0 = std::time::Instant::now();
+                if *arm == "scalar8" {
+                    for (pt, k) in pts.iter().zip(&ks) {
+                        std::hint::black_box(std::hint::black_box(pt).scalar_mul(k, &a));
+                    }
+                } else {
+                    for g in 0..groups {
+                        let r = 8 * g..8 * g + 8;
+                        std::hint::black_box(Point::scalar_mul_batch(&pts[r.clone()], &ks[r], &a));
+                    }
+                }
+                let per = t0.elapsed().as_nanos() as f64 / (8 * groups) as f64;
+                ns.insert(*arm, per);
+                writeln!(
+                    out,
+                    "{{\"kind\":\"batch\",\"field\":\"{name}\",\"limbs\":{},\"round\":{round},\"pos\":{pos},\"arm\":\"{arm}\",\"points\":{},\"ns_per_point\":{per:.1}}}",
+                    p.bits().div_ceil(64),
+                    8 * groups
+                )
+                .unwrap();
+            }
+            ratios.push(ns["scalar8"] / ns["batch8"]);
+        }
+        ratios.sort_by(|x, y| x.partial_cmp(y).unwrap());
+        println!(
+            "{name}: scalar8 / batch8 per point, median {:.3} (min {:.3}, max {:.3}, {} rounds)",
+            ratios[ratios.len() / 2],
+            ratios[0],
+            ratios[ratios.len() - 1],
+            ratios.len()
+        );
     }
 }
