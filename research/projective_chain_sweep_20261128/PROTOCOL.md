@@ -8,7 +8,7 @@ end-to-end discrete-logarithm speedup.
 ## Question and prior work
 
 For genuine `E(F_p)` relations, does adding the identity chart to an
-`F_p)-projective S3 chain recover the exact finite target set across
+`F_p`-projective S3 chain recover the exact finite target set across
 Kummer factor bases as `m` and tower depth vary? How often does the
 affine-only chain miss a valid target? Count the explicit S3 and reference
 group operations under a cold per-target rule.
