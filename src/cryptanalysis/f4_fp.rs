@@ -4082,6 +4082,69 @@ fn eliminate_sparse(row: &mut [u64], nz: &[(u32, u64)], col: usize, fp: Barrett)
     nz.len()
 }
 
+/// [`sparse_tail`] for 32-bit deferred pivots: pack `(column, value)` when
+/// the nonzero density of the tail is at most 1/4.  Used by the deferred
+/// RREF so each sparse pivot is walked once per row instead of as a dense
+/// SIMD update of mostly zeros.
+fn sparse_tail_u32(pivot: &[u32], col: usize) -> Option<Box<[(u32, u32)]>> {
+    sparse_tail_u32_thresh(pivot, col, 1, 4)
+}
+
+/// Pack `(column, value)` when nnz/tail ≤ `num/den`.
+fn sparse_tail_u32_thresh(
+    pivot: &[u32],
+    col: usize,
+    num: usize,
+    den: usize,
+) -> Option<Box<[(u32, u32)]>> {
+    let tail = &pivot[col..];
+    if tail.len() < 32 || pivot.len() > u32::MAX as usize || den == 0 {
+        return None;
+    }
+    let nnz = tail.iter().filter(|&&y| y != 0).count();
+    if nnz.saturating_mul(den) > tail.len().saturating_mul(num) {
+        return None;
+    }
+    Some(
+        tail.iter()
+            .enumerate()
+            .filter(|&(_, &y)| y != 0)
+            .map(|(j, &y)| ((col + j) as u32, y))
+            .collect::<Vec<_>>()
+            .into_boxed_slice(),
+    )
+}
+
+/// Lazy accumulator update by a sparse pivot: same products as dense
+/// [`add_lazy`] on the nonzero entries only (zeros contribute nothing).
+#[inline]
+fn add_lazy_sparse(acc: &mut [u64], nz: &[(u32, u32)], factor: u64) {
+    for &(j, y) in nz {
+        acc[j as usize] += factor * u64::from(y);
+    }
+    count_ops(nz.len());
+}
+
+
+fn sparse_deferred_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_SPARSE_DEFERRED").as_deref() != Ok("0"))
+}
+
+fn sparse_bprime_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_SPARSE_BPRIME").as_deref() != Ok("0"))
+}
+
+/// Bottom-up sequential deferred back-substitution: each later pivot is
+/// already fully reduced (and often sparser) before it is applied.  Default
+/// off — parallel back-sub wins when later pivots stay dense; opt in with
+/// `F4_FP_BACK_BOTTOM=1`.
+fn deferred_back_bottom_up() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_BACK_BOTTOM").as_deref() == Ok("1"))
+}
+
 /// As [`eliminate`], on narrow rows; returns the row operations.
 #[inline]
 fn eliminate32(row: &mut [u32], pivot: &[u32], col: usize, fp: Barrett32) -> usize {
@@ -4287,8 +4350,44 @@ fn add_lazy(acc: &mut [u64], pivot: &[u32], from: usize, factor: u64, simd: u8) 
 
 #[inline]
 fn normalize_lazy(acc: &mut [u64], fp: Barrett) {
-    for x in acc {
-        *x = fp.reduce(*x);
+    normalize_lazy_from(acc, 0, fp);
+}
+
+/// Barrett-reduce `acc[from..]` only.  Deferred pivots walk left-to-right, so
+/// once columns left of `from` are finished they stay untouched — skipping
+/// them cuts normalize cost on wide NTT rows (~10k cols).
+#[inline]
+fn normalize_lazy_from(acc: &mut [u64], from: usize, fp: Barrett) {
+    reduce_u64_slice_barrett(&mut acc[from..], fp);
+}
+
+/// Barrett-reduce a `u64` slice.  Unrolled by 4 so independent
+/// multiplies overlap on wide NTT store/normalize paths.
+#[inline]
+fn reduce_u64_slice_barrett(xs: &mut [u64], fp: Barrett) {
+    let mut i = 0;
+    while i + 8 <= xs.len() {
+        let a0 = fp.reduce(xs[i]);
+        let a1 = fp.reduce(xs[i + 1]);
+        let a2 = fp.reduce(xs[i + 2]);
+        let a3 = fp.reduce(xs[i + 3]);
+        let a4 = fp.reduce(xs[i + 4]);
+        let a5 = fp.reduce(xs[i + 5]);
+        let a6 = fp.reduce(xs[i + 6]);
+        let a7 = fp.reduce(xs[i + 7]);
+        xs[i] = a0;
+        xs[i + 1] = a1;
+        xs[i + 2] = a2;
+        xs[i + 3] = a3;
+        xs[i + 4] = a4;
+        xs[i + 5] = a5;
+        xs[i + 6] = a6;
+        xs[i + 7] = a7;
+        i += 8;
+    }
+    while i < xs.len() {
+        xs[i] = fp.reduce(xs[i]);
+        i += 1;
     }
 }
 
@@ -4471,7 +4570,9 @@ fn normalize_after_for(p: u64) -> usize {
         return n;
     }
     let lim = ((u64::MAX - p) / (p - 1).saturating_mul(p - 1).max(1)) as usize;
-    lim.clamp(256, 4096)
+    // Wide NTT rows (~10k cols) repay a longer lazy window: 4096 forced a
+    // Barrett sweep of the dirty tail too often on m=3 t=5.
+    lim.clamp(256, 16384)
 }
 
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
@@ -4486,14 +4587,38 @@ fn reduce_lazy_by(
     simd: u8,
     pending: &mut usize,
 ) {
+    reduce_lazy_by_sp(acc, known, &[], fp, simd, pending);
+}
+
+fn reduce_lazy_by_sp(
+    acc: &mut [u64],
+    known: &[(usize, Vec<u32>)],
+    sparse: &[Option<Box<[(u32, u32)]>>],
+    fp: Barrett,
+    simd: u8,
+    pending: &mut usize,
+) {
     if mem_site(0) {
-        return reduce_lazy_by_fused(acc, known, fp, simd, pending);
+        return reduce_lazy_by_fused(acc, known, sparse, fp, simd, pending);
     }
     let normalize_after = normalize_after_for(fp.p);
-    for (c, pivot) in known {
+    let use_sparse = sparse_deferred_enabled() && sparse.len() == known.len();
+    for (i, (c, pivot)) in known.iter().enumerate() {
         let f = fp.reduce(acc[*c]);
         if f != 0 {
-            add_lazy(acc, pivot, *c, fp.p - f, simd);
+            let factor = fp.p - f;
+            if use_sparse {
+                if let Some(nz) = sparse[i].as_deref() {
+                    add_lazy_sparse(acc, nz, factor);
+                    *pending += 1;
+                    if *pending == normalize_after {
+                        normalize_lazy(acc, fp);
+                        *pending = 0;
+                    }
+                    continue;
+                }
+            }
+            add_lazy(acc, pivot, *c, factor, simd);
             *pending += 1;
             if *pending == normalize_after {
                 normalize_lazy(acc, fp);
@@ -4538,7 +4663,7 @@ fn reduce_panel_by_known(
     // inside a flush, but the outer walk shares the pivot pointer.
     if mem_site(0) {
         for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
-            reduce_lazy_by_fused(acc, known, fp, simd, pending);
+            reduce_lazy_by_fused(acc, known, &[], fp, simd, pending);
         }
         return accs.into_iter().zip(pendings).collect();
     }
@@ -4575,9 +4700,21 @@ fn reduce_chunk_by_known(
     simd: u8,
     spread: bool,
 ) -> Vec<(Vec<u64>, usize)> {
+    reduce_chunk_by_known_sp(chunk, known, &[], fp, simd, spread)
+}
+
+fn reduce_chunk_by_known_sp(
+    chunk: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    sparse: &[Option<Box<[(u32, u32)]>>],
+    fp: Barrett,
+    simd: u8,
+    spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
     let panel = deferred_panel_rows();
+    // Panels ignore the sparse cache (rare opt-in path); per-row is the
+    // NTT default and carries packed sparse pivots.
     if panel >= 2 && chunk.len() >= panel && !mem_site(0) {
-        // Pivot-outer panels (MEM off): better pivot reuse than per-row.
         let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
         if spread {
             chunk
@@ -4588,8 +4725,6 @@ fn reduce_chunk_by_known(
             chunk.chunks(panel).flat_map(reduce_panel).collect()
         }
     } else if panel >= 2 && chunk.len() >= 2 && mem_site(0) {
-        // MEM on: still shard into panels so rayon tasks are larger than
-        // one row (less scheduling overhead) while each row uses fused.
         let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
         if spread {
             chunk
@@ -4603,7 +4738,7 @@ fn reduce_chunk_by_known(
         let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
             let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
             let mut pending = 0usize;
-            reduce_lazy_by(&mut acc, known, fp, simd, &mut pending);
+            reduce_lazy_by_sp(&mut acc, known, sparse, fp, simd, &mut pending);
             (acc, pending)
         };
         if spread {
@@ -4765,6 +4900,7 @@ fn rref_u32_barrett_deferred(
     let simd = lazy_simd_kind();
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let mut known_sp: Vec<Option<Box<[(u32, u32)]>>> = Vec::new();
     let sources = std::mem::take(rows);
     let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
     let _def_ns = PpNs(PP_DEF_NS, Instant::now());
@@ -4781,7 +4917,7 @@ fn rref_u32_barrett_deferred(
             if deferred_gemm_worthwhile(fp.p, chunk.len(), n_cols, known.len()) {
                 reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
             } else {
-                reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+                reduce_chunk_by_known_sp(chunk, &known, &known_sp, fp, simd, spread)
             };
         let o1 = pp_ops();
         pp_add(
@@ -4799,48 +4935,80 @@ fn rref_u32_barrett_deferred(
         // column-ordered list of *this chunk's* new pivots and reduce by
         // those alone, then merge into `known` once.
         let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
+        let mut chunk_sp: Vec<Option<Box<[(u32, u32)]>>> = Vec::new();
         for (acc, pending) in reduced.iter_mut() {
             if !chunk_pivots.is_empty() {
                 pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
-                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
+                reduce_lazy_by_sp(acc, &chunk_pivots, &chunk_sp, fp, simd, pending);
             }
-            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            // Reduce in place on the u64 accumulator, then narrow — same
+            // residues as mapping `fp.reduce`, with an unrolled Barrett.
+            reduce_u64_slice_barrett(acc, fp);
+            let mut row: Vec<u32> = acc.iter().map(|&v| v as u32).collect();
             let Some(c) = row.iter().position(|&v| v != 0) else {
                 continue;
             };
             let inv = invmod(u64::from(row[c]), fp.p);
-            for x in &mut row[c..] {
-                *x = fp.reduce(u64::from(*x) * inv) as u32;
+            {
+                let tail = &mut row[c..];
+                let mut j = 0;
+                while j + 4 <= tail.len() {
+                    let b0 = fp.reduce(u64::from(tail[j]) * inv) as u32;
+                    let b1 = fp.reduce(u64::from(tail[j + 1]) * inv) as u32;
+                    let b2 = fp.reduce(u64::from(tail[j + 2]) * inv) as u32;
+                    let b3 = fp.reduce(u64::from(tail[j + 3]) * inv) as u32;
+                    tail[j] = b0;
+                    tail[j + 1] = b1;
+                    tail[j + 2] = b2;
+                    tail[j + 3] = b3;
+                    j += 4;
+                }
+                while j < tail.len() {
+                    tail[j] = fp.reduce(u64::from(tail[j]) * inv) as u32;
+                    j += 1;
+                }
             }
             count_ops(row.len() - c);
             count_norm(row.len() - c);
+            let sp = sparse_tail_u32(&row, c);
             let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
             chunk_pivots.insert(at_chunk, (c, row));
+            chunk_sp.insert(at_chunk, sp);
         }
         if !chunk_pivots.is_empty() {
             // Both sides column-ordered: linear merge beats k·n inserts.
             let cap = known.len() + chunk_pivots.len();
             let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut old_sp = std::mem::take(&mut known_sp).into_iter().peekable();
             let mut add = chunk_pivots.into_iter().peekable();
+            let mut add_sp = chunk_sp.into_iter().peekable();
             let mut merged = Vec::with_capacity(cap);
+            let mut merged_sp = Vec::with_capacity(cap);
             loop {
                 match (old.peek(), add.peek()) {
                     (Some(a), Some(b)) if a.0 <= b.0 => {
                         merged.push(old.next().unwrap());
+                        merged_sp.push(old_sp.next().unwrap());
                     }
-                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), Some(_)) => {
+                        merged.push(add.next().unwrap());
+                        merged_sp.push(add_sp.next().unwrap());
+                    }
                     (Some(_), None) => {
                         merged.extend(old);
+                        merged_sp.extend(old_sp);
                         break;
                     }
                     (None, Some(_)) => {
                         merged.extend(add);
+                        merged_sp.extend(add_sp);
                         break;
                     }
                     (None, None) => break,
                 }
             }
             known = merged;
+            known_sp = merged_sp;
         }
         pp_add(PP_DEF_STORE, pp_ops() - o1);
         pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
@@ -4850,23 +5018,52 @@ fn rref_u32_barrett_deferred(
         return None;
     }
     let n_cols = known.first().map_or(0, |(_, r)| r.len());
-    let back = |i: usize| -> Vec<u32> {
-        let (_, row) = &known[i];
-        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
-        let mut pending = 0usize;
-        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
-        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
-    };
-    // Prefer GEMM panels for back-substitution when the trailing width and
-    // pivot count amortise packing; otherwise the parallel lazy path.
     let o0 = pp_ops();
-    let reduced: Vec<Vec<u32>> =
-        if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len()) && known.len() >= 2 {
-            // One GEMM-style reduce of each pivot row by the later pivots:
-            // build sources = known rows, then for i reduce by known[i+1..].
-            // Fall back to per-row lazy when the triangular structure makes a
-            // single packed call awkward — still use GEMM per row panel via
-            // reduce_chunk against the suffix.
+    if deferred_back_bottom_up() {
+        // Bottom-up: replace each pivot with its fully reduced form before
+        // earlier rows see it, and re-pack sparse tails (often much sparser
+        // after clearing later pivot columns).
+        for i in (0..known.len()).rev() {
+            let mut acc: Vec<u64> = known[i].1.iter().copied().map(u64::from).collect();
+            let mut pending = 0usize;
+            reduce_lazy_by_sp(
+                &mut acc,
+                &known[i + 1..],
+                &known_sp[i + 1..],
+                fp,
+                simd,
+                &mut pending,
+            );
+            reduce_u64_slice_barrett(&mut acc, fp);
+            let row: Vec<u32> = acc.iter().map(|&v| v as u32).collect();
+            let c = known[i].0;
+            known_sp[i] = sparse_tail_u32(&row, c);
+            known[i].1 = row;
+        }
+        pp_add(PP_DEF_BACK_SER, pp_ops() - o0);
+        let pivots: Vec<usize> = known.iter().map(|(c, _)| *c).collect();
+        *rows = known.into_iter().map(|(_, r)| r).collect();
+        return Some(pivots);
+    } else {
+        let back = |i: usize| -> Vec<u32> {
+            let (_, row) = &known[i];
+            let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+            let mut pending = 0usize;
+            reduce_lazy_by_sp(
+                &mut acc,
+                &known[i + 1..],
+                &known_sp[i + 1..],
+                fp,
+                simd,
+                &mut pending,
+            );
+            acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+        };
+        // Prefer GEMM panels for back-substitution when the trailing width and
+        // pivot count amortise packing; otherwise the parallel lazy path.
+        let out = if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len())
+            && known.len() >= 2
+        {
             (0..known.len())
                 .into_par_iter()
                 .map(|i| {
@@ -4889,10 +5086,11 @@ fn rref_u32_barrett_deferred(
                 (0..known.len()).map(back).collect()
             }
         };
-    pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
-    let pivots = known.iter().map(|(c, _)| *c).collect();
-    *rows = reduced;
-    Some(pivots)
+        pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
+        let pivots = known.iter().map(|(c, _)| *c).collect();
+        *rows = out;
+        Some(pivots)
+    }
 }
 
 /// For small primes the deferred elimination keeps its accumulators in
@@ -5932,6 +6130,19 @@ fn reduce_pairs_blocked(
         "accumulator bound"
     );
     let simd = lazy_simd_kind();
+    // Pack sparse B' rows once for the whole call: many NTT FL steps have
+    // dens ≤ 1/4 on a majority of reducers, so each hit walks nnz entries
+    // instead of a dense SIMD tile of mostly zeros.
+    let bprime_sp: Vec<Option<Box<[(u32, u32)]>>> = if sparse_bprime_enabled() {
+        bprime
+            .iter()
+            .enumerate()
+            .map(|(j, row)| sparse_tail_u32_thresh(row, bstart[j], 1, 2))
+            .collect()
+    } else {
+        Vec::new()
+    };
+    let use_sp = !bprime_sp.is_empty();
     let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
@@ -5950,24 +6161,57 @@ fn reduce_pairs_blocked(
             }
         }
         hits.sort_unstable_by_key(|&(j, i, _)| (j, i));
-        let mut from = 0;
-        while from < n_free {
-            let to = (from + FL_PAIR_TILE).min(n_free);
+        let mut ops = 0usize;
+        if use_sp {
+            // Sparse hits: one full-row scatter (no tile walk). Dense hits
+            // keep the tiled add_lazy_range schedule for SIMD.
+            let mut dense_hits: Vec<(u32, u32, u64)> = Vec::new();
             for &(j, i, factor) in &hits {
                 let j = j as usize;
-                let start = bstart[j].max(from);
-                if start >= to {
-                    continue;
+                if let Some(nz) = bprime_sp[j].as_deref() {
+                    let row = &mut acc[i as usize];
+                    for &(col, y) in nz {
+                        row[col as usize] += factor * u64::from(y);
+                    }
+                    ops += nz.len();
+                } else {
+                    dense_hits.push((j as u32, i, factor));
+                    ops += n_free - bstart[j];
                 }
-                add_lazy_range(&mut acc[i as usize], &bprime[j], start, to, factor, simd);
             }
-            from = to;
-        }
-        count_ops(
-            hits.iter()
+            let mut from = 0;
+            while from < n_free {
+                let to = (from + FL_PAIR_TILE).min(n_free);
+                for &(j, i, factor) in &dense_hits {
+                    let j = j as usize;
+                    let start = bstart[j].max(from);
+                    if start >= to {
+                        continue;
+                    }
+                    add_lazy_range(&mut acc[i as usize], &bprime[j], start, to, factor, simd);
+                }
+                from = to;
+            }
+        } else {
+            let mut from = 0;
+            while from < n_free {
+                let to = (from + FL_PAIR_TILE).min(n_free);
+                for &(j, i, factor) in &hits {
+                    let j = j as usize;
+                    let start = bstart[j].max(from);
+                    if start >= to {
+                        continue;
+                    }
+                    add_lazy_range(&mut acc[i as usize], &bprime[j], start, to, factor, simd);
+                }
+                from = to;
+            }
+            ops = hits
+                .iter()
                 .map(|&(j, _, _)| n_free - bstart[j as usize])
-                .sum(),
-        );
+                .sum();
+        }
+        count_ops(ops);
         Some(
             acc.into_iter()
                 .map(|a| a.into_iter().map(|x| fp.reduce(x) as u32).collect())
@@ -6261,7 +6505,7 @@ impl<'a> MemGroup<'a> {
         if n == 0 {
             return 0;
         }
-        // insertion sort by start (n <= 8)
+        // insertion sort by start (n <= MEM_K)
         for a in 1..n {
             let mut b = a;
             while b > 0 && self.from[b - 1] > self.from[b] {
@@ -6436,24 +6680,35 @@ unsafe fn fused_avx512<const N: usize>(
 fn reduce_lazy_by_fused(
     acc: &mut [u64],
     known: &[(usize, Vec<u32>)],
+    sparse: &[Option<Box<[(u32, u32)]>>],
     fp: Barrett,
     simd: u8,
     pending: &mut usize,
 ) {
     let normalize_after = normalize_after_for(fp.p);
     let len = acc.len();
+    let use_sparse = sparse_deferred_enabled() && sparse.len() == known.len();
     let mut g = MemGroup::new();
     let (mut ops, mut touched, mut flushes) = (0usize, 0u64, 0u64);
-    let mut flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize| {
+    // Leftmost column dirtied since the last normalize; columns before it
+    // are already reduced residues and never written again (pivots ascend).
+    let mut dirty_from = len;
+    let mut flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize, dirty_from: &mut usize| {
+        if g.n > 0 {
+            *dirty_from = (*dirty_from).min(g.from[0..g.n].iter().copied().min().unwrap_or(len));
+        }
         if *pending + g.n > normalize_after {
-            normalize_lazy(acc, fp);
+            if *dirty_from < len {
+                normalize_lazy_from(acc, *dirty_from, fp);
+            }
             *pending = 0;
+            *dirty_from = len;
         }
         *pending += g.n;
         touched += g.flush(acc, 0, len, simd);
         flushes += 1;
     };
-    for (c, pivot) in known {
+    for (i, (c, pivot)) in known.iter().enumerate() {
         let c = *c;
         let f = if g.n == 0 {
             // Hot miss path: no pending group — skip Barrett when the
@@ -6476,15 +6731,62 @@ fn reduce_lazy_by_fused(
             fp.reduce(v)
         };
         if f != 0 {
-            g.push(pivot, c, fp.p - f);
+            let factor = fp.p - f;
+            if use_sparse {
+                if let Some(nz) = sparse[i].as_deref() {
+                    // Sparse pivot: update only nonzeros directly on `acc`.
+                    // Do **not** flush the dense MemGroup — later factor
+                    // reads already add pending group contributions at
+                    // column `c`, and lazy adds commute — so dense
+                    // fusion survives across interleaved sparse pivots.
+                    if *pending + g.n + 1 > normalize_after {
+                        if g.n > 0 {
+                            flush(&mut g, acc, pending, &mut dirty_from);
+                        }
+                        if *pending >= normalize_after {
+                            if dirty_from < len {
+                                normalize_lazy_from(acc, dirty_from, fp);
+                            }
+                            *pending = 0;
+                            dirty_from = len;
+                        }
+                    }
+                    add_lazy_sparse(acc, nz, factor);
+                    dirty_from = dirty_from.min(c);
+                    *pending += 1;
+                    if *pending >= normalize_after {
+                        if g.n > 0 {
+                            flush(&mut g, acc, pending, &mut dirty_from);
+                        }
+                        if dirty_from < len {
+                            normalize_lazy_from(acc, dirty_from, fp);
+                        }
+                        *pending = 0;
+                        dirty_from = len;
+                    }
+                    continue;
+                }
+            }
+            g.push(pivot, c, factor);
             ops += len - c;
+            #[cfg(target_arch = "x86_64")]
+            if i + 1 < known.len() {
+                let next = known[i + 1].1.as_ptr();
+                // SAFETY: prefetch is a hint; `known[i+1].1` is a live Vec.
+                unsafe {
+                    core::arch::x86_64::_mm_prefetch(
+                        next as *const i8,
+                        core::arch::x86_64::_MM_HINT_T0,
+                    );
+                }
+            }
             if g.n == MEM_K {
-                flush(&mut g, acc, pending);
+                flush(&mut g, acc, pending, &mut dirty_from);
             }
         }
     }
     if g.n > 0 {
-        flush(&mut g, acc, pending);
+        flush(&mut g, acc, pending, &mut dirty_from);
     }
     count_ops(ops);
     mem_stat(0, ops as u64, touched, flushes);
