@@ -913,7 +913,8 @@ pub struct PkmSemaevOracle {
     /// Thull–Yap recursion) instead of classical Euclid.
     resgcd_half: bool,
     /// `mul=ntt`: `engine=resgcd` multiplies by multi-prime NTT (with
-    /// transform reuse in the half-GCD's matrix steps) above `UG_NTT_MIN`.
+    /// transform reuse in the half-GCD's matrix steps) above
+    /// `UG_NTT_MIN_PRODUCT` / `UG_NTT_MIN_MATRIX`.
     resgcd_ntt: bool,
     max_degree: u32,
     max_nnz: Option<u64>,
@@ -2458,7 +2459,7 @@ fn ug_deg(a: &[u64]) -> isize {
 }
 
 fn ug_mul(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
-    if ug_use_ntt(a.len().min(b.len())) {
+    if ug_use_ntt(a.len().min(b.len()), UG_NTT_MIN_PRODUCT) {
         return ug_mul_ntt(a, b, p, mults);
     }
     let mut r = ug_karatsuba(a, b, p, mults);
@@ -2599,7 +2600,7 @@ fn ug_mat_step(q: &[u64], m: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
     let la = a.iter().flatten().map(Vec::len).max().unwrap_or(0);
     let lb = b.iter().flatten().map(Vec::len).max().unwrap_or(0);
-    if ug_use_ntt(la.min(lb)) {
+    if ug_use_ntt(la.min(lb), UG_NTT_MIN_MATRIX) {
         // One forward transform per entry, products summed before the inverse.
         let polys: [&[u64]; 8] = [&a[0][0], &a[0][1], &a[1][0], &a[1][1], &b[0][0], &b[0][1], &b[1][0], &b[1][1]];
         let terms = [
@@ -2624,7 +2625,7 @@ fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
 
 fn ug_mat_apply(m: &UgMat, a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
     let lm = m.iter().flatten().map(Vec::len).max().unwrap_or(0);
-    if ug_use_ntt(lm.min(a.len().max(b.len()))) {
+    if ug_use_ntt(lm.min(a.len().max(b.len())), UG_NTT_MIN_MATRIX) {
         let polys: [&[u64]; 6] = [&m[0][0], &m[0][1], &m[1][0], &m[1][1], a, b];
         let terms = [vec![(0, 4), (1, 5)], vec![(2, 4), (3, 5)]];
         let mut o = ug_ntt_sums(&terms, &polys, p, mults).into_iter();
@@ -2715,18 +2716,26 @@ fn ug_gcd_half(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
 
 /// `(prime, primitive root)`: 119·2^23 + 1, 5·2^25 + 1, 7·2^26 + 1.
 const UG_NTT_PRIMES: [(u64, u64); 3] = [(998_244_353, 3), (167_772_161, 3), (469_762_049, 3)];
-/// Below this many coefficients in the longest input, products stay on Karatsuba.
-const UG_NTT_MIN: usize = 256;
+/// A single product goes to the NTT only when the shorter factor has at
+/// least this many coefficients. Counted per product (p = 65521): NTT /
+/// Karatsuba = 1.03 at 256, 0.70 at 512, 0.49 at 1024, so 256 lost slightly
+/// and filled the m = 3 product tree with losing products.
+const UG_NTT_MIN_PRODUCT: usize = 512;
+/// The half-GCD's 2×2 matrix steps reuse each transform, so they already
+/// gain at 256 (the joint threshold sweep: half-GCD / classical at degree
+/// 1024 is 1.05 with 256 against 1.13 with 512).
+const UG_NTT_MIN_MATRIX: usize = 256;
 
 thread_local! {
     /// `mul=ntt` for the resgcd engine: products and the half-GCD's matrix
-    /// steps use the NTT above `UG_NTT_MIN`. Set and restored around one
+    /// steps use the NTT above `UG_NTT_MIN_PRODUCT` / `UG_NTT_MIN_MATRIX`.
+    /// Set and restored around one
     /// solver call.
     static UG_USE_NTT: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
-fn ug_use_ntt(len: usize) -> bool {
-    len >= UG_NTT_MIN && UG_USE_NTT.with(|c| c.get())
+fn ug_use_ntt(len: usize, min: usize) -> bool {
+    len >= min && UG_USE_NTT.with(|c| c.get())
 }
 
 fn ug_ntt_pow(mut b: u64, mut e: u64, m: u64) -> u64 {
