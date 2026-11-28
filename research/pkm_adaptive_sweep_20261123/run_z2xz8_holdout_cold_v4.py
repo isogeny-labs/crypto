@@ -21,6 +21,7 @@ PROTOCOL_SHA = '723ac30ff07386b4ad1769ce89d353229d8ba9636b5c0582813a3c7986378a3d
 AMENDMENT_SHA = 'ebca9cd60c58f8e7b2fe0f6f43f941fe5c9acdcade4a9f81e4c26e8c47cdaa7a'
 INTERVAL_AMENDMENT_SHA = 'efdca4d5ea496adf815943fcd7e5f0aa8f9b63463bd774724e3913cb1bdb98d4'
 REBUILD_AMENDMENT_SHA = 'ed5f4cb1cc45a2326ac48840e05c63ba2dbe72ada73d364a95f4fbd66ad6768d'
+RESUME_AMENDMENT_SHA = '3f76cffcd7f4c146f7ea3db782facce835824eecaeb6afde362ce4268ace885a'
 PREFLIGHT_SHA = '4e849aebeb3da8047b7d69fa4c953483dd7d3bb6a7d45659f2971abd0a195cea'
 ARMS = ('interval_a','candidate_a','candidate_b','interval_b','mitm','kummer')
 SELECTOR = 'prime-isogeny:t=5,seed=0,aux=ordinary,family=z2xz8,selection=equal-size'
@@ -76,6 +77,7 @@ def check_inputs(args):
             or sha((HERE/'AMENDMENT_Z2XZ8_F4_PARITY_20261128.md').read_bytes())!=AMENDMENT_SHA
             or sha((HERE/'AMENDMENT_Z2XZ8_INTERVAL_ZERO_20261128.md').read_bytes())!=INTERVAL_AMENDMENT_SHA
             or sha((HERE/'AMENDMENT_Z2XZ8_ORACLE_REBUILD_LEDGER_20261128.md').read_bytes())!=REBUILD_AMENDMENT_SHA
+            or sha((HERE/'AMENDMENT_Z2XZ8_COLD_RESUME_HEADER_20261128.md').read_bytes())!=RESUME_AMENDMENT_SHA
             or sha(args.preflight.read_bytes())!=PREFLIGHT_SHA):
         raise ValueError('binary, build, manifest, protocol or preflight hash differs')
     build=read(args.build)
@@ -155,7 +157,7 @@ def main():
     parser.add_argument('--build',type=Path,default=Path('/Volumes/SSD990-2/pkm-oracle-rebuild-build-20261128/BUILD.json'))
     parser.add_argument('--manifest',type=Path,default=HERE/'z2xz8_holdout/manifest.json')
     parser.add_argument('--preflight',type=Path,default=Path('/Volumes/SSD990-2/pkm-z2xz8-holdout-preflight/receipts.jsonl'))
-    parser.add_argument('--store-dir',type=Path,default=Path('/Volumes/SSD990-2/pkm-z2xz8-holdout-cold-rebuild-ledger-20261128'))
+    parser.add_argument('--store-dir',type=Path,default=Path('/Volumes/SSD990-2/pkm-z2xz8-holdout-cold-resume-v4-20261128'))
     parser.add_argument('--max-new',type=int,default=0)
     parser.add_argument('--dry-run',action='store_true')
     args=parser.parse_args()
@@ -185,10 +187,11 @@ def main():
             'protocol_sha256':PROTOCOL_SHA,'amendment_sha256':AMENDMENT_SHA,
             'interval_amendment_sha256':INTERVAL_AMENDMENT_SHA,
             'rebuild_amendment_sha256':REBUILD_AMENDMENT_SHA,
+            'resume_amendment_sha256':RESUME_AMENDMENT_SHA,
             'interval_factor_base':'prime-interval:t=5,lo=0',
             'preflight_sha256':PREFLIGHT_SHA,
             'runner_sha256':sha(Path(__file__).read_bytes()),'helper_sha256':helper_sha,
-            'arms':ARMS,'cases':len(cases),'wall_cap_s':helper.WALL_CAP_S,
+            'arms':list(ARMS),'cases':len(cases),'wall_cap_s':helper.WALL_CAP_S,
             'rss_cap_kib':helper.RSS_CAP_KIB,
             'created_utc':dt.datetime.now(dt.timezone.utc).isoformat()}
     prior=helper.records(store)
