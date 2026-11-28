@@ -1,0 +1,26 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-26T21:43:13Z",
+ "id": "PCC-20261126-3c0b9a",
+ "kind": "speedup",
+ "producer": {
+  "commit": "30989d8c439c77e3bd140885c154226ae892cda4",
+  "model": "OpenAI Codex; independent CI signatures pending",
+  "session": "codex/norm-one-torus-m7-single-target-deferred-y"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/norm_one_torus_m7_single_target_20261126/public-precommit/deferred-y-validator-report.json",
+   "sha256": "e99911bd74d113349e2f92176c6117b69210725a299defcb5bd980f22d72781c"
+  },
+  {
+   "kind": "replay",
+   "path": "research/norm_one_torus_m7_single_target_20261126/public-precommit/deferred-y-replay-certificate.json",
+   "sha256": "4be52e01d8172dc28705029a6b895d1941f288119f2a2a5c49b87a9ce325598a"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/norm_one_torus_m7_single_target_20261126 deferred-y follow-up; curve icv1-fp31-tm3989-ae9db972; one public target; arity m=7; every table rebuilt per arm and round; no cross-target amortization; local producer evidence",
+ "statement": "On the frozen one-target Prime31 norm-one-torus m=7 generic decomposition component, retain3-prefix16-affine-x-first scans the same 971635 terminal candidates as retain3-prefix16-affine-leaf but materializes y only 35 times, reducing query multiplications from 5585265 to 4613665 (971600 removed; 17.3958%) while preserving 1254991 squarings, 476 inversions, and 1028789 additions. Against retain3-prefix16-centered it uses 2.824199x fewer multiplications and 4.053249x fewer squarings. The archived non-isolated producer replay records total medians 48.141 ms versus 57.803 ms and 69.584 ms; this is a single-target component result, not a full ECDLP, rho, asymptotic, zero-knowledge, or host-execution claim."
+}

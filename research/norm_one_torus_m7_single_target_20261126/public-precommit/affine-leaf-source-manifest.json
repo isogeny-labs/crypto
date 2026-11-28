@@ -1,0 +1,35 @@
+{
+  "schema": "isogeny-labs/source-custody/v1",
+  "study_id": "norm-one-torus-m7-affine-leaf-public-precommit-20261126",
+  "source_commit": "4d12f355d1df73f3ff7e6d6e417e8025ab80d53a",
+  "execution_rule": "This source manifest must be committed and pushed before executing the affine-leaf follow-up.",
+  "sha256": {
+    "examples/norm_one_torus_m7.rs": "4fe7e07d06ba0fd8209d49ae50616e345bcde4f22bccac4f08cd541006936df7",
+    "examples/norm_one_torus_m7_verify.rs": "ff872b5ca25d1df762b0b25c35bed0feb3a84148e49acf4bdab086078edf8184",
+    "examples/support/norm_one_torus_m7.rs": "5e6a6c0b0d770e5fbdbf743b220e3b11f55db6f08b0e951b48bfc463ee53f9e9",
+    "examples/support/norm_one_torus_compare_kernel.rs": "c94d6e0e6ab35ffdd361226ef8cc432492981c257f4724b1d0c4ae1acd5b72b8",
+    "research/norm_one_torus_m7_single_target_20261126/PROTOCOL_AFFINE_LEAF.md": "08a9f96e8b398669ed2097a532fea9ab60a3eb9e4f47546ad85bc564019b968c",
+    "research/norm_one_torus_m7_single_target_20261126/public-precommit/affine-leaf-manifest.json": "304833159c18734f76f21cb3bfcc110c5f52ed073fcc741450a9c62896041920",
+    "src/cryptanalysis/ic_boundary.rs": "36feaa1a910b71541b9041bfd24219932d98de87639c7d264955def8e3d449f7",
+    "src/cryptanalysis/ic_framework/pkm_semaev.rs": "957dae7826f04d4744fa6fde1eaee1666d2615dca7690ff980d252f98d1bf997",
+    "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+  },
+  "pre_execution_checks": {
+    "cargo_check_release_examples": "pass",
+    "cargo_test_release_examples": "pass: 4 tests",
+    "strict_clippy_release_changed_examples": "pass after allowing only inherited library lint classes duplicate_mod, unnecessary_cast, result_large_err, field_reassign_with_default, and redundant_locals",
+    "affine_branch_unit_test": "pass against independent production affine group law",
+    "rustfmt": "pass",
+    "git_diff_check": "pass"
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "target": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.57",
+    "cpu": "Intel Xeon Platinum 8573C",
+    "visible_cpus": 5,
+    "isolation": "none; exact counts are primary and local wall time is only a producer diagnostic"
+  },
+  "proof_boundary": "public seed commitment, public witnesses, source hashes, and independent affine replay; not zero knowledge, a signed attestation, or proof of producer-host execution"
+}
