@@ -153,6 +153,80 @@ impl PlaneCurve {
         out
     }
 
+    /// Certify smoothness over the algebraic closure by the degree-bounded
+    /// Jacobian-ideal rank test. When `p ∤ degree`, Euler's identity puts a
+    /// common zero of the three partials on the curve. Their homogeneous
+    /// ideal contains every form of degree `3(degree−2)+1` exactly when it
+    /// has no projective zero. This is the quartic certificate generalized
+    /// from `plane_quartic_pic`; the degree cap bounds dense elimination.
+    pub fn certify_geometric_smoothness(&self) -> Result<bool, &'static str> {
+        let d = self.degree;
+        if d > 8 {
+            return Err("smoothness certificate degree cap is eight");
+        }
+        if d.is_multiple_of(self.p as usize) {
+            return Err("smoothness certificate needs characteristic not dividing degree");
+        }
+        let target_degree = 3 * (d - 2) + 1;
+        let multiplier_degree = target_degree - (d - 1);
+        let monomials = |degree: usize| {
+            (0..=degree)
+                .flat_map(|x| (0..=degree - x).map(move |y| (x, y, degree - x - y)))
+                .collect::<Vec<_>>()
+        };
+        let target = monomials(target_degree);
+        let columns: BTreeMap<_, _> = target
+            .iter()
+            .enumerate()
+            .map(|(index, &(x, y, _))| ((x, y), index))
+            .collect();
+        let multipliers = monomials(multiplier_degree);
+        let mut rows = Vec::with_capacity(3 * multipliers.len());
+        for axis in 0..3 {
+            for &(mx, my, mz) in &multipliers {
+                let mut row = vec![0u32; target.len()];
+                for term in &self.terms {
+                    let mut exps = [term.x_exp, term.y_exp, term.z_exp];
+                    if exps[axis] == 0 {
+                        continue;
+                    }
+                    let coeff = mul(term.coeff, exps[axis] as u32 % self.p, self.p);
+                    exps[axis] -= 1;
+                    let index = columns[&(exps[0] + mx, exps[1] + my)];
+                    row[index] =
+                        ((u64::from(row[index]) + u64::from(coeff)) % u64::from(self.p)) as u32;
+                    debug_assert_eq!(exps[2] + mz, target[index].2);
+                }
+                rows.push(row);
+            }
+        }
+        let mut pivot = 0;
+        for column in 0..target.len() {
+            let Some(found) = (pivot..rows.len()).find(|&r| rows[r][column] != 0) else {
+                return Ok(false);
+            };
+            rows.swap(pivot, found);
+            let inverse = pow(rows[pivot][column], (self.p - 2) as usize, self.p);
+            for j in column..target.len() {
+                rows[pivot][j] = mul(rows[pivot][j], inverse, self.p);
+            }
+            let pivot_row = rows[pivot].clone();
+            for row in rows.iter_mut().skip(pivot + 1) {
+                let factor = row[column];
+                if factor == 0 {
+                    continue;
+                }
+                for j in column..target.len() {
+                    let subtract = mul(factor, pivot_row[j], self.p);
+                    row[j] = ((u64::from(row[j]) + u64::from(self.p) - u64::from(subtract))
+                        % u64::from(self.p)) as u32;
+                }
+            }
+            pivot += 1;
+        }
+        Ok(true)
+    }
+
     /// Tangent line coefficients at a nonsingular rational point.
     pub fn tangent(&self, point: [u32; 3]) -> Result<[u32; 3], &'static str> {
         if point.iter().all(|&v| v % self.p == 0) || self.eval(point) != 0 {
@@ -335,6 +409,20 @@ impl PlaneCurve {
         relation.retain(|_, coefficient| *coefficient != 0);
         Ok(Some(relation))
     }
+
+    /// A rational line relation on a curve certified smooth over the
+    /// algebraic closure. The certificate may refuse large degrees or a
+    /// characteristic dividing the degree; it does not guess smoothness.
+    pub fn certified_rational_line_relation(
+        &self,
+        line_a: ([u32; 3], [u32; 3]),
+        line_b: ([u32; 3], [u32; 3]),
+    ) -> Result<Option<BTreeMap<[u32; 3], i32>>, &'static str> {
+        if !self.certify_geometric_smoothness()? {
+            return Err("plane curve is geometrically singular");
+        }
+        self.rational_line_relation(line_a, line_b)
+    }
 }
 
 #[cfg(test)]
@@ -375,6 +463,64 @@ mod tests {
                 residual_degree: 0
             }
         );
+    }
+
+    #[test]
+    fn geometric_smoothness_certificate_detects_extension_field_singularities() {
+        // Fermat curves are smooth because the characteristic does not
+        // divide the degree and their three partials vanish only at zero.
+        for (p, degree) in [(5, 3), (5, 4), (7, 6)] {
+            let c = PlaneCurve::new(
+                p,
+                degree,
+                &[term(degree, 0, 0), term(0, degree, 0), term(0, 0, degree)],
+            )
+            .unwrap();
+            assert_eq!(c.certify_geometric_smoothness(), Ok(true));
+        }
+        // Over F_3, (x²+y²+z²)(x²+2y²+2z²) is singular at
+        // intersections over an extension, but has no rational singularity.
+        let c = PlaneCurve::new(
+            3,
+            4,
+            &[
+                term(4, 0, 0),
+                PlaneTerm {
+                    x_exp: 0,
+                    y_exp: 4,
+                    z_exp: 0,
+                    coeff: 2,
+                },
+                term(0, 2, 2),
+                PlaneTerm {
+                    x_exp: 0,
+                    y_exp: 0,
+                    z_exp: 4,
+                    coeff: 2,
+                },
+            ],
+        )
+        .unwrap();
+        for x in 0..3 {
+            for y in 0..3 {
+                for z in 0..3 {
+                    let point = [x, y, z];
+                    if point != [0; 3] && c.eval(point) == 0 {
+                        assert_ne!(c.gradient(point), [0; 3]);
+                    }
+                }
+            }
+        }
+        assert_eq!(c.certify_geometric_smoothness(), Ok(false));
+        assert_eq!(
+            c.certified_rational_line_relation(([1, 0, 0], [0, 1, 0]), ([0, 1, 0], [0, 0, 1])),
+            Err("plane curve is geometrically singular")
+        );
+        let bad_characteristic =
+            PlaneCurve::new(3, 3, &[term(3, 0, 0), term(0, 3, 0), term(0, 0, 3)]).unwrap();
+        assert!(bad_characteristic.certify_geometric_smoothness().is_err());
+        let above_cap = PlaneCurve::new(11, 9, &[term(9, 0, 0)]).unwrap();
+        assert!(above_cap.certify_geometric_smoothness().is_err());
     }
 
     #[test]
@@ -451,7 +597,10 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(divisor.points, vec![([0, 0, 1], 2), ([0, 1, 0], 1)]);
-        let relation = c.rational_line_relation(x_zero, z_zero).unwrap().unwrap();
+        let relation = c
+            .certified_rational_line_relation(x_zero, z_zero)
+            .unwrap()
+            .unwrap();
         assert_eq!(relation, BTreeMap::from([([0, 0, 1], 2), ([0, 1, 0], -2)]));
         assert_eq!(relation.values().sum::<i32>(), 0);
     }
