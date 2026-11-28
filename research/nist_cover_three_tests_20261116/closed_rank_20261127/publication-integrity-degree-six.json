@@ -1,0 +1,94 @@
+{
+  "scope": "Bookkeeping-only publication checks;no mathematical rerun",
+  "attempts": [
+    {
+      "attempt": "shifted-six-v1",
+      "wrapper_exit": 1,
+      "hash_checks": [
+        {
+          "manifest": "binary-manifest.sha256",
+          "entries": 1,
+          "exit": 0
+        },
+        {
+          "manifest": "pre-build-manifest.sha256",
+          "entries": 21,
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "attempt": "shifted-six-v2",
+      "wrapper_exit": 0,
+      "hash_checks": [
+        {
+          "manifest": "binary-manifest.sha256",
+          "entries": 1,
+          "exit": 0
+        },
+        {
+          "manifest": "pre-build-manifest.sha256",
+          "entries": 21,
+          "exit": 0
+        },
+        {
+          "manifest": "result-manifest.sha256",
+          "entries": 2,
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "attempt": "canonical-six-v1",
+      "wrapper_exit": 0,
+      "hash_checks": [
+        {
+          "manifest": "binary-manifest.sha256",
+          "entries": 1,
+          "exit": 0
+        },
+        {
+          "manifest": "pre-build-manifest.sha256",
+          "entries": 23,
+          "exit": 0
+        },
+        {
+          "manifest": "result-manifest.sha256",
+          "entries": 2,
+          "exit": 0
+        }
+      ]
+    },
+    {
+      "attempt": "exceptional-conic-six-v1",
+      "wrapper_exit": 0,
+      "hash_checks": [
+        {
+          "manifest": "binary-manifest.sha256",
+          "entries": 1,
+          "exit": 0
+        },
+        {
+          "manifest": "pre-build-manifest.sha256",
+          "entries": 24,
+          "exit": 0
+        },
+        {
+          "manifest": "result-manifest.sha256",
+          "entries": 2,
+          "exit": 0
+        }
+      ]
+    }
+  ],
+  "older_37_attempt_reports_unchanged": true,
+  "all_three_root_native_sources_match_executed_snapshots": true,
+  "inspected_pdf_pages": {
+    "synthesis": 12,
+    "each_new_attempt": 1,
+    "total": 16
+  },
+  "compacted_rank_svg_visually_inspected": true,
+  "rank_svg_bytes": 63528,
+  "no_native_worker_active": true
+}

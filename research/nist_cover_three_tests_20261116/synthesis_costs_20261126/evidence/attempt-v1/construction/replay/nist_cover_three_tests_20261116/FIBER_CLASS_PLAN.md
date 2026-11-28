@@ -1,0 +1,17 @@
+# Next native step: closed public fibers and target classes
+
+Original design notes after the degree6 backmap and restricted point norms. The closed-fiber portion now executes as PCC-20261116-73bb6a. Target classes now execute as PCC-20261116-8599e0,using a common auxiliary6-divisor rather than the proposed residual cubic. Zero,doubling,cancellation,the public G/Q fixture and norm[6] pass. Keep the separate generic-isogeny and projected-descent goals active. The preserved paragraphs below describe the original plan and are not additional outcomes. [pcc:unverified]
+
+Use the exact Fp rational functions from elliptic-backmap-v1. For a finite public E point P,form g=A-x(P)B and h=V-y(P)M,where M=2LB^2. Compute the two resultants in y against the quartic by native fraction-free Bareiss determinants over Fp[x]. Their gcd contains the wanted fiber and affine base points. Saturate by the norm of B using repeated polynomial gcd/exact division. Require squarefree monic degree6 support;this certifies completeness for the degree6 map in the supported chart. Any lost infinity/ramified/base-point case must stop or have an explicit chart extension.
+
+Recover y=v(x) in R=Fp[x]/U by Euclidean gcd of the three y-polynomials f_C,g,h. Coefficient inversion in this etale algebra may expose a proper factor of U;split only on that exact gcd,recurse,and CRT-recombine. Rebuild residue objects after changing the modulus. Require gcd degree1 and independently verify curve,g,h and denominator units modulo U. No individual support root extraction or arbitrary extension field is needed.
+
+Avoid the infinity fiber initially by fixing S=2G. Represent f^*(P) by D_(P+S)-D_S. Public fixtures include P=0,G,2G,Q,with Q generated separately as37G;the fiber evaluator consumes only public point coordinates. Each degree6 divisor must map identically to its public point in its etale coordinate algebra,which checks its norm as six times that point. Retain exact U,V ideals and canaries.
+
+For the existing large-model Khuri--Makdisi backend,D0 is three times a rational vertical fiber,degree12. Find a cubic section through D_S by six linear conditions in H0(O_C(3)),dimension10. Its residual degree6 divisor E_S satisfies E_S+D_S~D0. Recover this residual by resultant/exact known-factor removal and the same residue-algebra y recovery. Then D_(P+S)+E_S is an effective degree12 representative of D0+f^*(P).
+
+The active KM Class.w is H0(3D0-D_eff),dimension22:impose the two degree6 ideals on the34-dimensional degree9 quartic section space,evaluate resulting sections divided by the reference line^9 at the same85 evaluation points,and row-reduce. Do not use the smaller ten-dimensional model here. Existing equality is the general preimage test;the rejected shared-support shortcut stays excluded.
+
+Check the zero class,addition F(2G)=F(G)+F(G),cancellation,F(Q)=[37]F(G) on the public known-answer fixture,field/Frobenius,prime-order behavior and norm composition[6]. Source-check the resulting public scalar relation. This does not replace the required generic phi:J(H)->J(C) with the full recorded kernel;the backmap supplies the elliptic subgroup path.
+
+Later bind individual descent and the actual restricted point base to the same class image. Current six setup rows on225 projected points are insufficient by themselves to determine all base logarithms. Do not silently replace this with a scalar-witness lookup or an unrelated small-field instance.
