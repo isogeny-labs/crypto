@@ -4941,13 +4941,30 @@ fn rref_u32_barrett_deferred(
                 pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
                 reduce_lazy_by_sp(acc, &chunk_pivots, &chunk_sp, fp, simd, pending);
             }
-            // Reduce in place on the u64 accumulator, then narrow — same
-            // residues as mapping `fp.reduce`, with an unrolled Barrett.
-            reduce_u64_slice_barrett(acc, fp);
-            let mut row: Vec<u32> = acc.iter().map(|&v| v as u32).collect();
-            let Some(c) = row.iter().position(|&v| v != 0) else {
+            // After reduce-by-known, leading cleared columns are often
+            // exact `0` in the lazy accumulator — skip Barrett there.
+            // Reduce only from the first nonzero residue on.
+            let mut c_opt = None;
+            let mut i = 0usize;
+            while i < acc.len() {
+                let v = acc[i];
+                if v != 0 {
+                    let r = fp.reduce(v);
+                    acc[i] = r;
+                    if r != 0 {
+                        c_opt = Some(i);
+                        break;
+                    }
+                }
+                i += 1;
+            }
+            let Some(c) = c_opt else {
                 continue;
             };
+            if c + 1 < acc.len() {
+                reduce_u64_slice_barrett(&mut acc[c + 1..], fp);
+            }
+            let mut row: Vec<u32> = acc.iter().map(|&v| v as u32).collect();
             let inv = invmod(u64::from(row[c]), fp.p);
             {
                 let tail = &mut row[c..];
