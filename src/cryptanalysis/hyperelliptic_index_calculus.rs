@@ -2470,6 +2470,48 @@ mod tests {
     }
 
     #[test]
+    fn two_place_oracle_reconstructs_genus_four_and_five_divisors() {
+        for genus in [4u32, 5] {
+            let prime = BigUint::from(31u32);
+            let curve = (1..31u32)
+                .find_map(|c| {
+                    let mut coeffs = vec![BigUint::zero(); (2 * genus + 2) as usize];
+                    coeffs[0] = BigUint::one();
+                    coeffs[1] = BigUint::from(c);
+                    coeffs[3] = BigUint::one();
+                    coeffs[(2 * genus + 1) as usize] = BigUint::one();
+                    let f = FpPoly::from_coeffs(coeffs, prime.clone());
+                    HyperellipticCurveP::try_new(prime.clone(), f, genus).ok()
+                })
+                .expect("a smooth public toy curve");
+            let full = build_factor_base(&curve, usize::MAX);
+            let fb = build_factor_base(&curve, full.len() / 2);
+            let mut outside = full
+                .entries
+                .iter()
+                .filter(|e| fb.index_of_x(&e.x).is_none() && !e.y.is_zero());
+            let p = outside.next().expect("first off-base place");
+            let q = outside.next().expect("second off-base place");
+            let d = p.divisor.add(&q.divisor.neg(&curve), &curve);
+            let classified = classify_two_large_primes_counted_with(
+                &curve,
+                &d,
+                &fb,
+                &mut 0,
+                &SmoothnessTest::Scan,
+            );
+            assert_eq!(
+                classified,
+                TwoLargePrimeDecomposition::Split {
+                    entries: vec![],
+                    off_base: vec![(p.x.clone(), 1), (q.x.clone(), -1)],
+                },
+                "genus {genus}"
+            );
+        }
+    }
+
+    #[test]
     fn splitting_agrees_with_reconstruction() {
         let p = BigUint::from(41u32);
         // (x − 3)²(x − 7)
@@ -3281,7 +3323,7 @@ mod tests {
 
     #[test]
     fn two_large_prime_graph_relations_are_jacobian_identities() {
-        for (g, (curve, d1, d2, l, _k)) in [(2, toy_instance(61)), (3, genus3_instance(31))] {
+        for (g, (curve, d1, d2, l, k)) in [(2, toy_instance(61)), (3, genus3_instance(31))] {
             let full = build_factor_base(&curve, usize::MAX).len();
             let fb = build_factor_base(&curve, full / 2);
             let params = HecIndexCalculusParams {
@@ -3307,6 +3349,62 @@ mod tests {
                     "genus {g}: invalid graph relation {i}: {rel:?}"
                 );
             }
+            let (recovered, solve_report) =
+                hec_index_calculus_dlp_two_large_primes(&curve, &d1, &d2, &l, &params);
+            assert_eq!(recovered, Some(k), "genus {g}: {solve_report:?}");
+        }
+    }
+
+    #[test]
+    fn two_large_prime_graph_relations_hold_in_genus_four_and_five() {
+        for genus in [4u32, 5] {
+            let prime = BigUint::from(11u32);
+            let mut coeffs = vec![BigUint::zero(); (2 * genus + 2) as usize];
+            coeffs[0] = BigUint::one();
+            coeffs[1] = BigUint::one();
+            coeffs[3] = BigUint::one();
+            coeffs[(2 * genus + 1) as usize] = BigUint::one();
+            let f = FpPoly::from_coeffs(coeffs, prime.clone());
+            let curve = HyperellipticCurveP::try_new(prime, f, genus).expect("smooth toy curve");
+            let full = build_factor_base(&curve, usize::MAX);
+            let order = divisor_order_bsgs(&curve, &full.entries[0].divisor, 5_000)
+                .expect("toy divisor order");
+            let n = largest_prime_factor(&order);
+            let d1 = full.entries[0].divisor.scalar_mul(&(&order / &n), &curve);
+            let d2 = d1.scalar_mul(&BigUint::from(2u32), &curve);
+            let fb = build_factor_base(&curve, full.len() / 2);
+            let params = HecIndexCalculusParams {
+                fb_size: fb.len(),
+                max_trials: 5_000,
+                seed: 11,
+                search: RelationSearch::Random,
+                ..HecIndexCalculusParams::default()
+            };
+            let mut report = HecIndexCalculusReport::default();
+            let relations = collect_relations_two_large_primes(
+                &curve,
+                &d1,
+                &d2,
+                &n,
+                &fb,
+                fb.len() + 4,
+                &params,
+                &mut report,
+            );
+            assert!(report.combined_relations > 0, "genus {genus}: {report:?}");
+            for (i, rel) in relations.iter().enumerate() {
+                assert!(
+                    relation_holds(&curve, &fb, &d1, &d2, rel),
+                    "genus {genus}: invalid graph relation {i}: {rel:?}"
+                );
+            }
+            let (recovered, solve_report) =
+                hec_index_calculus_dlp_two_large_primes(&curve, &d1, &d2, &n, &params);
+            assert_eq!(
+                recovered,
+                Some(BigUint::from(2u32)),
+                "genus {genus}: {solve_report:?}"
+            );
         }
     }
 
