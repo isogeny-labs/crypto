@@ -23,6 +23,28 @@
       "exit": 0,
       "started_utc": "2026-11-28T02:24:33+00:00",
       "wall_s": 2.218
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--batch",
+        "4",
+        "--fields",
+        "p255_25519,p352_pmax,p384_nist,p521_mersenne",
+        "--rounds",
+        "21",
+        "--seed",
+        "7885634870099999202",
+        "--out",
+        "docs/notes/ifma-batch-20261128/batch_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T02:31:03+00:00",
+      "wall_s": 2.15
     }
   ],
   "commit": "4e27175e62691810c767e678220a6c32b1650e27",

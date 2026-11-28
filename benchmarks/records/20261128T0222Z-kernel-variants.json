@@ -23,6 +23,28 @@
       "exit": 0,
       "started_utc": "2026-11-28T02:22:52+00:00",
       "wall_s": 100.585
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p255_25519,p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "31",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099999102",
+        "--out",
+        "docs/notes/ifma-batch-20261128/kernel_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T02:29:23+00:00",
+      "wall_s": 100.397
     }
   ],
   "commit": "4e27175e62691810c767e678220a6c32b1650e27",
