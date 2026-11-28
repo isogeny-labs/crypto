@@ -1,0 +1,99 @@
+{
+  "schema": "pkm-groebner-e2e-panel/v1",
+  "protocol_commit": "0d4020c6978fea97978e434c5963bd392be1c993",
+  "binary_sha256": "0b4cb2c690ca46a953e2cddc06454060b937e0360251e32c3b53975797fe5d13",
+  "common_command": "RAYON_NUM_THREADS=4 PKM_E2E_PAIRS=2 PKM_INSTANCE_SEED=<seed> PKM_MAX_E2E_GAE_RATIO=0.75 target/release/examples/pkm_groebner_drastic",
+  "claim_scope": "three source-pinned equal-18 13-bit fixtures with one fixed scalar; host-measured F4 pricing; not an unselected random-instance, rho, or asymptotic result",
+  "fixed": {
+    "instance_seeds": [20261185, 20261221, 20261276],
+    "planted_scalar": 2261,
+    "pairs_per_fixture": 2,
+    "runs_per_arm_per_fixture": 4,
+    "balanced_order": "interval, degree32_velu, degree32_velu, interval",
+    "base_abscissae_each": 18,
+    "system_variables_each": 10,
+    "system_equations_each": 11,
+    "system_degrees_each": [4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+  },
+  "admission": {
+    "maximum_each_candidate_over_interval_total_gae": 0.75,
+    "maximum_combined_candidate_over_interval_total_gae": 0.5,
+    "each_fixture_passed": true,
+    "combined_passed": true,
+    "verified_recoveries": 24,
+    "expected_recoveries": 24
+  },
+  "combined": {
+    "interval_total_gae": 991698196.5273005,
+    "degree32_velu_total_gae": 268421317.81079936,
+    "e2e_gae_candidate_over_interval": 0.2706683532860594,
+    "e2e_gae_speedup_x": 3.694558258693571,
+    "interval_cold_wall_seconds": 74.401510543,
+    "degree32_velu_cold_wall_seconds": 20.150768556,
+    "cold_wall_candidate_over_interval": 0.27083816456056975,
+    "cold_wall_speedup_x": 3.692241828704174
+  },
+  "fixtures": [
+    {
+      "instance_seed": 20261185,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "calibration_ns_per_add": 72.014835,
+      "interval_total_gae": 312174772.6178459,
+      "degree32_velu_total_gae": 96729067.18401648,
+      "candidate_over_interval_total_gae": 0.3098554901565638,
+      "e2e_gae_speedup_x": 3.22731089739517,
+      "interval_cold_wall_seconds": 22.535417086000002,
+      "degree32_velu_cold_wall_seconds": 6.995018834000001,
+      "cold_wall_speedup_x": 3.2216377998103902,
+      "interval_solver_calls_each": 110,
+      "degree32_velu_solver_calls_each": 129,
+      "interval_f4_multiply_adds_each": 14012270724,
+      "degree32_velu_f4_multiply_adds_each": 512636229,
+      "interval_total_gae_runs": [79229949.00021881, 77863779.12702532, 75797923.40438151, 79283121.08622026],
+      "degree32_velu_total_gae_runs": [24464992.89334226, 24538174.99533555, 23409360.411507092, 24316538.88383158]
+    },
+    {
+      "instance_seed": 20261221,
+      "instance": "icv1-fp13-tm101-1737775c",
+      "calibration_ns_per_add": 75.117885,
+      "interval_total_gae": 273602466.9098142,
+      "degree32_velu_total_gae": 51091627.78901421,
+      "candidate_over_interval_total_gae": 0.18673672195307806,
+      "e2e_gae_speedup_x": 5.355133096163449,
+      "interval_cold_wall_seconds": 20.606380615,
+      "degree32_velu_cold_wall_seconds": 3.853451302,
+      "cold_wall_speedup_x": 5.347512917655135,
+      "interval_solver_calls_each": 102,
+      "degree32_velu_solver_calls_each": 65,
+      "interval_f4_multiply_adds_each": 13019131753,
+      "degree32_velu_f4_multiply_adds_each": 258955934,
+      "interval_total_gae_runs": [69518043.32299735, 67830183.36794136, 67980317.41391458, 68273922.80496092],
+      "degree32_velu_total_gae_runs": [12488447.087927109, 12585724.706965504, 13199173.40829675, 12818282.585824845]
+    },
+    {
+      "instance_seed": 20261276,
+      "instance": "icv1-fp13-tm137-9a89da76",
+      "calibration_ns_per_add": 76.827295,
+      "interval_total_gae": 405920956.9996404,
+      "degree32_velu_total_gae": 120600622.83776867,
+      "candidate_over_interval_total_gae": 0.29710371134613656,
+      "e2e_gae_speedup_x": 3.3658280317978386,
+      "interval_cold_wall_seconds": 31.259712842,
+      "degree32_velu_cold_wall_seconds": 9.30229842,
+      "cold_wall_speedup_x": 3.3604289424634475,
+      "interval_solver_calls_each": 154,
+      "degree32_velu_solver_calls_each": 178,
+      "interval_f4_multiply_adds_each": 19616284486,
+      "degree32_velu_f4_multiply_adds_each": 706582748,
+      "interval_total_gae_runs": [100279034.74635443, 101271308.10441032, 102206606.1518035, 102164007.99707216],
+      "degree32_velu_total_gae_runs": [29786126.90626746, 31154232.629630495, 29781740.6786904, 29878522.62318031]
+    }
+  ],
+  "common_checks": {
+    "solver_priced_by": "measured",
+    "cost_qualification": null,
+    "all_phase_sums_equal_total_gae": true,
+    "interval_solving_degree_max": 6,
+    "degree32_velu_solving_degree_max": 5
+  }
+}
