@@ -2,8 +2,9 @@
 //! Run with `cargo run --example smith_public_replay --offline`.
 
 use crypto_lib::cryptanalysis::quartic_ladder::{QArm, QIcParams};
+use crypto_lib::cryptanalysis::smith_canonical::Mumford;
 use crypto_lib::cryptanalysis::smith_isogeny::SmithIso;
-use crypto_lib::cryptanalysis::smith_prop24::{EXAMPLE1_F, EXAMPLE1_ND, EXAMPLE1_P};
+use crypto_lib::cryptanalysis::smith_prop24::{SplitMix64, EXAMPLE1_F, EXAMPLE1_ND, EXAMPLE1_P};
 use crypto_lib::cryptanalysis::smith_trigonal::Trigonal;
 
 fn main() {
@@ -14,6 +15,43 @@ fn main() {
     assert_eq!(iso.order, 55_666);
     let planted = iso.planted(32, 3).expect("admitted prime subgroup");
     assert_eq!((planted.h, planted.r), (26, 2141));
+    assert!(iso.jac.is_reduced_mumford(&planted.g_h));
+    assert!(iso.jac.is_reduced_mumford(&planted.t_h));
+    let mut off_curve = None;
+    'points: for x in 0..iso.p {
+        for y in 0..iso.p {
+            let d = iso.jac.point(x, y);
+            if !iso.jac.is_reduced_mumford(&d) {
+                off_curve = Some(d);
+                break 'points;
+            }
+        }
+    }
+    let malformed = [
+        Mumford {
+            u: vec![],
+            v: vec![],
+        },
+        Mumford {
+            u: vec![1, 2],
+            v: vec![],
+        },
+        Mumford {
+            u: vec![iso.p, 1],
+            v: vec![],
+        },
+        Mumford {
+            u: vec![1, 1],
+            v: vec![0, 1],
+        },
+        off_curve.expect("off-curve point over the toy field"),
+    ];
+    for bad in malformed {
+        assert!(!iso.jac.is_reduced_mumford(&bad));
+        assert!(iso.image(&bad, &mut SplitMix64(5)).is_err());
+        assert!(iso.public_instance(&bad, &planted.t_h, 5).is_err());
+        assert!(iso.public_instance(&planted.g_h, &bad, 5).is_err());
+    }
 
     let public = iso
         .public_instance(&planted.g_h, &planted.t_h, 5)
