@@ -1,0 +1,44 @@
+{
+  "scope": "bookkeeping-only publication hashes and report presence;no mathematical rerun",
+  "attempts": [
+    {
+      "attempt": "expanded-conics-v1",
+      "exit": 0,
+      "source_manifest_reached": true,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 23
+        },
+        "binary-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 1
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/expanded-conics-v1/REPORT.pdf"
+    },
+    {
+      "attempt": "all-expanded-conics-v1",
+      "exit": 1,
+      "source_manifest_reached": false,
+      "hash_checks": {},
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/all-expanded-conics-v1/REPORT.pdf"
+    },
+    {
+      "attempt": "all-expanded-conics-v2",
+      "exit": 0,
+      "source_manifest_reached": true,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 25
+        },
+        "binary-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 1
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/all-expanded-conics-v2/REPORT.pdf"
+    }
+  ]
+}
