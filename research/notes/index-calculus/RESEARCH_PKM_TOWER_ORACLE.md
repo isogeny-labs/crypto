@@ -3266,6 +3266,56 @@ and 4 of the factor-base encyclopedia §8.
 
 ---
 
+
+## 18. Two-sided degree-for-variables split, 2026-11-28
+
+The proposed split of `S_q` for `q ≥ 4` is already the `chain` construction
+of §2.2, applied beside the PKM factor-base tower. Here `q = m + 1` when
+there are `m` factor-base summands and one target. A left chain replaces
+`S_q` by `q − 2 = m − 1` copies of `S₃` and adds
+`q − 3 = m − 2` intermediate abscissae. The PKM side has `mt` tower
+unknowns and `mt` quadratic equations. Thus the combined affine count is
+`mt + m − 2` unknowns and `mt + m − 1` equations: the summation side still
+adds **one net constraint**. Each `S₃` generator has total degree at most
+four, whereas the unsplit `S_q` has degree `2^(q−2)` in an individual
+abscissa. The lower generator degree is the intended trade for auxiliary
+variables; it is not a bound on F4 solving degree, intermediate width, or
+per-target work. Eliminating the intermediates can restore the high-degree
+summation condition. The independent summation-split work in
+`summation_split/DEGREE_BARRIER.md` makes this distinction explicit.
+
+**Exactness qualification for §2.2.** Its free affine `F_p` intermediates
+describe a sector, not the complete projection of `S_q=0` on
+`F_p` inputs. `summation_split/FINDINGS.md` gives two counterexamples over
+`F_5`: one requires an intermediate at infinity, and another requires a
+finite intermediate in `F_{25} \ F_5`. A set-theoretically complete
+summation-polynomial projection uses projective intermediates over
+`F_{p²}`, with the identity charts and field equations charged. The
+300/300 exact specialized root-set gates in that study support this statement
+at the tested sizes; they do not prove equality of elimination ideals or
+solver complexity. For a *genuine relation* whose leaf and target points all
+lie in `E(F_p)`, partial sums are in `E(F_p)`, so `F_p` projective
+intermediates suffice for a witness. Even in that narrower sector, an
+affine-only chain can lose a valid relation when a partial sum is the
+identity. The `pkm-semaev` oracle currently offers the affine chain through
+`m = 7` and a projective split only at `m = 3`; a general exact projective
+`m ≥ 4` oracle is not established by its existing chain mode.
+
+**Cold cost and rank boundary.** The target-specialized `m = 7` Dickson
+tower plus six-`S₃` left chain in
+`research/pplus_dickson_m7_elimination_20261127/REPORT.md` rebuilds the
+factor base and solver for every target, with no cross-target preprocessing.
+Its four-point depth-one carrier takes 558,571,973 `F_p`
+multiply-adds plus 1,433,122 extraction multiplications; the planted
+depth-two hit is resource-censored. The favorable depth-one lower bound
+is 86.47–182.63 times the complete cold control under the report's
+cost panel. That is a scoped null for this implementation, not a lower
+bound for other tree layouts or all primes. A balanced layout would need
+its own chart-complete construction, frozen cold cost protocol, F4 degree
+and width measurements, and independent relation-rank accounting. At
+present the two-sided split supplies neither a `p^{o(1)}` per-attempt
+bound nor the required total-relation-rank result.
+
 ## References
 
 - C. Petit, M. Kosters, A. Messeng, *Algebraic approaches for the elliptic curve
